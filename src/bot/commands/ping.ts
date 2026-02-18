@@ -26,10 +26,10 @@ export const pingCommand: Command = {
 
       // 初回応答（タイムスタンプ計測用）
       const measuring = await t(guildId, "commands:ping.measuring");
-      const sent = await interaction.reply({
+      await interaction.reply({
         content: measuring,
-        fetchReply: true,
       });
+      const sent = await interaction.fetchReply();
 
       // レイテンシー計算
       const apiLatency = sent.createdTimestamp - interaction.createdTimestamp;

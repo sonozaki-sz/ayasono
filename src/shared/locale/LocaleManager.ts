@@ -51,7 +51,7 @@ export class LocaleManager {
     });
 
     this.initialized = true;
-    logger.info("LocaleManager initialized with i18next");
+    logger.info(tDefault("system:locale.manager_initialized"));
   }
 
   /**

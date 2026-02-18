@@ -10,8 +10,8 @@ const envSchema = z.object({
     .default("development"),
 
   // Discord
-  DISCORD_TOKEN: z.string().min(50, "DISCORD_TOKENが設定されていません"),
-  DISCORD_APP_ID: z.string().min(10, "DISCORD_APP_IDが設定されていません"),
+  DISCORD_TOKEN: z.string().min(50, "DISCORD_TOKEN is not configured"),
+  DISCORD_APP_ID: z.string().min(10, "DISCORD_APP_ID is not configured"),
   DISCORD_GUILD_ID: z.string().optional(), // 開発用：設定するとギルドコマンドとして即座に登録
 
   // ロケール
@@ -38,11 +38,12 @@ const parseEnv = () => {
     return envSchema.parse(process.env);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      console.error("❌ 環境変数の検証に失敗しました:");
+      // Note: tDefaultは使用できない（env.tsはi18n初期化前に実行される）
+      console.error("❌ Environment variable validation failed:");
       error.issues.forEach((err) => {
         console.error(`  - ${err.path.join(".")}: ${err.message}`);
       });
-      console.error("\n.env ファイルを確認してください。");
+      console.error("\nPlease check your .env file.");
     }
     process.exit(1);
   }

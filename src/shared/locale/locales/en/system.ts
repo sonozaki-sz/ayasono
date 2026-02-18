@@ -13,6 +13,7 @@ export const system = {
   "bot.client.initialized": "Discord Bot client initialized",
   "bot.client.shutting_down": "Shutting down bot client...",
   "bot.client.shutdown_complete": "Bot client shut down successfully",
+  "bot.presence_activity": "Running on {{count}} servers | by sonozaki-sz",
 
   // Error handling
   "error.reply_failed": "Failed to send error message",
@@ -23,6 +24,13 @@ export const system = {
   "error.node_warning": "Node Warning:",
   "error.cleanup_complete": "Cleanup completed",
   "error.cleanup_failed": "Error during cleanup:",
+
+  // Environment variables
+  "env.validation_failed": "Environment variable validation failed:",
+  "env.check_env_file": "Please check your .env file.",
+
+  // Locale
+  "locale.manager_initialized": "LocaleManager initialized with i18next",
 
   // Cooldown manager
   "cooldown.cleared_all": "All cooldowns cleared",
@@ -41,6 +49,13 @@ export const system = {
   "scheduler.schedule_failed": "Failed to schedule job {{jobId}}:",
   "scheduler.job_removed": "Job removed: {{jobId}}",
   "scheduler.job_stopped": "Stopped job: {{jobId}}",
+  "scheduler.job_scheduled": "Job scheduled: {{jobId}}",
+  "scheduler.bump_reminder_task_failed":
+    "Bump reminder task failed for guild {{guildId}}:",
+  "scheduler.bump_reminder_description":
+    "Bump reminder for guild {{guildId}} at {{executeAt}}",
+  "scheduler.bump_reminder_scheduled":
+    "Bump reminder scheduled for guild {{guildId}} in {{minutes}} minutes",
   "scheduler.cancel_bump_reminder":
     "Cancelling existing bump reminder for guild {{guildId}}",
   "scheduler.bump_reminder_cancelled":
