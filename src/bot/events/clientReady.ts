@@ -26,7 +26,9 @@ export const clientReadyEvent: BotEvent<"clientReady"> = {
     client.user?.setPresence({
       activities: [
         {
-          name: `${serverCount}個のサーバーで稼働中 | by sonozaki-sz`,
+          name: tDefault("system:bot.presence_activity", {
+            count: serverCount,
+          }),
           type: 0,
         },
       ],

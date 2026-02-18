@@ -14,6 +14,7 @@ export const system = {
   "bot.client.shutting_down": "Botクライアントをシャットダウンしています...",
   "bot.client.shutdown_complete":
     "Botクライアントのシャットダウンが完了しました。",
+  "bot.presence_activity": "{{count}}個のサーバーで稼働中 | by sonozaki-sz",
 
   // エラーハンドリング
   "error.reply_failed": "エラーメッセージの送信に失敗しました。",
@@ -24,6 +25,13 @@ export const system = {
   "error.node_warning": "Node警告:",
   "error.cleanup_complete": "クリーンアップ完了。",
   "error.cleanup_failed": "クリーンアップ中のエラー:",
+
+  // 環境変数
+  "env.validation_failed": "環境変数の検証に失敗しました:",
+  "env.check_env_file": ".env ファイルを確認してください。",
+
+  // ロケール
+  "locale.manager_initialized": "LocaleManagerをi18nextで初期化しました。",
 
   // クールダウンマネージャー
   "cooldown.cleared_all": "すべてのクールダウンをクリアしました。",
@@ -45,6 +53,13 @@ export const system = {
   "scheduler.schedule_failed": "Job {{jobId}} のスケジュールに失敗:",
   "scheduler.job_removed": "Job削除: {{jobId}}",
   "scheduler.job_stopped": "Job停止: {{jobId}}",
+  "scheduler.job_scheduled": "Jobスケジュール完了: {{jobId}}",
+  "scheduler.bump_reminder_task_failed":
+    "Guild {{guildId}} のBumpリマインダータスクが失敗しました:",
+  "scheduler.bump_reminder_description":
+    "Guild {{guildId}} のBumpリマインダー (実行時刻: {{executeAt}})",
+  "scheduler.bump_reminder_scheduled":
+    "Guild {{guildId}} のBumpリマインダーを{{minutes}}分後にスケジュールしました。",
   "scheduler.cancel_bump_reminder":
     "Guild {{guildId}} の既存のbump reminderをキャンセル中",
   "scheduler.bump_reminder_cancelled":

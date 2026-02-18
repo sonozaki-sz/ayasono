@@ -50,7 +50,7 @@ export class JobScheduler {
       scheduledTask.start();
 
       logger.info(
-        `Job scheduled: ${job.id}${job.description ? ` - ${job.description}` : ""}`,
+        tDefault("system:scheduler.job_scheduled", { jobId: job.id }),
       );
     } catch (error) {
       logger.error(
@@ -154,7 +154,9 @@ export class BumpReminderManager {
           });
         } catch (error) {
           logger.error(
-            `Bump reminder task failed for guild ${guildId}:`,
+            tDefault("system:scheduler.bump_reminder_task_failed", {
+              guildId,
+            }),
             error,
           );
         } finally {
@@ -163,12 +165,18 @@ export class BumpReminderManager {
           this.reminders.delete(guildId);
         }
       },
-      description: `Bump reminder for guild ${guildId} at ${executeAt.toISOString()}`,
+      description: tDefault("system:scheduler.bump_reminder_description", {
+        guildId,
+        executeAt: executeAt.toISOString(),
+      }),
     });
 
     this.reminders.set(guildId, { jobId });
     logger.info(
-      `Bump reminder scheduled for guild ${guildId} in ${delayMinutes} minutes`,
+      tDefault("system:scheduler.bump_reminder_scheduled", {
+        guildId,
+        minutes: delayMinutes,
+      }),
     );
   }
 
