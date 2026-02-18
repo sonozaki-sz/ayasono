@@ -22,14 +22,14 @@ await localeManager.initialize();
 #### Guild別の翻訳
 
 ```typescript
-import { t } from "@/shared/locale";
+import { tGuild } from "@/shared/locale";
 
 // Guild IDを指定して翻訳
-const message = await t(guildId, "common:success");
+const message = await tGuild(guildId, "common:success");
 // → "成功"
 
 // パラメータを渡す
-const cooldownMsg = await t(guildId, "commands:cooldown.message", {
+const cooldownMsg = await tGuild(guildId, "commands:cooldown.message", {
   seconds: 10,
 });
 // → "このコマンドは 10 秒後に再度使用できます。"
@@ -51,8 +51,8 @@ const message = tDefault("common:error");
 import { localeManager } from "@/shared/locale";
 
 // 日本語の翻訳関数を取得
-const t = localeManager.getFixedT("ja");
-const message = t("common:success");
+const fixedT = localeManager.getFixedT("ja");
+const message = fixedT("common:success");
 // → "成功"
 
 // Guild別の翻訳関数を取得
@@ -117,7 +117,7 @@ export const commands = {
 ### 3. 使用する
 
 ```typescript
-const message = await t(guildId, "commands:newCommand.success");
+const message = await tGuild(guildId, "commands:newCommand.success");
 ```
 
 ## 🔧 名前空間
@@ -161,7 +161,7 @@ export const events = {
 } as const;
 
 // 使用
-const msg = await t(guildId, "events:ready.logged_in", {
+const msg = await tGuild(guildId, "events:ready.logged_in", {
   username: "BotName#1234",
 });
 // → "BotName#1234 としてログインしました"

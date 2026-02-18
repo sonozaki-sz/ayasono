@@ -1,20 +1,37 @@
-# メッセージ削除コマンド - 仕様書
+# メッセージ削除機能 - 仕様書
 
-> Message Delete Command - メッセージ一括削除機能
+> Message Delete Function - メッセージ削除機能
 
-最終更新: 2026年2月11日
+最終更新: 2026年2月19日
 
 ---
 
 ## 📋 概要
 
-モデレーター権限を持つユーザーが、特定ユーザーのメッセージや指定件数のメッセージを一括削除できる機能です。
+### 目的
+
+モデレーター権限を持つユーザーが、特定ユーザーのメッセージや指定件数のメッセージを一括削除できる機能を提供し、スパムや不適切なメッセージの迅速な対応を可能にします。
+
+### 主な用途
+
+1. **スパム対策**: 大量のスパムメッセージを一括削除
+2. **不適切なコンテンツの削除**: 特定ユーザーの違反メッセージを一括削除
+3. **チャンネルクリーンアップ**: テストメッセージや古いメッセージの整理
+4. **モデレーション効率化**: 手動削除の手間を大幅に削減
+
+### 特徴
+
+- **柔軟な削除条件**: 件数指定、ユーザー指定、チャンネル指定を自由に組み合わせ
+- **14日以上前のメッセージにも対応**: 古いメッセージも個別削除で対応
+- **安全性重視**: すべてのオプション未指定時は実行を拒否
+- **進捗表示**: 大量削除時にリアルタイムで進捗を表示
+- **Cooldown機能**: 連続実行を防止し、誤操作を軽減
 
 ---
 
 ## 🎯 主要機能
 
-### `/msg-del` コマンド
+### `/message-delete` コマンド
 
 チャンネル内のメッセージを一括削除
 
@@ -49,7 +66,7 @@
 ### ⚠️ 注意: すべてのオプション未指定は禁止
 
 ```
-/msg-del
+/message-delete
 ```
 
 - **エラー**: すべてのオプションが未指定の場合は警告を表示して削除を中止
@@ -59,7 +76,7 @@
 ### 例1: 最新50件のみ削除
 
 ```
-/msg-del count:50
+/message-delete count:50
 ```
 
 - コマンド実行チャンネルの最新50件を削除
@@ -67,7 +84,7 @@
 ### 例2: 大量削除（例：1000件）
 
 ```
-/msg-del count:1000
+/message-delete count:1000
 ```
 
 - コマンド実行チャンネルの最新1000件を削除
@@ -77,7 +94,7 @@
 ### 例3: 古いプロフィールメッセージを削除
 
 ```
-/msg-del count:5 user:@User channel:#profile
+/message-delete count:5 user:@User channel:#profile
 ```
 
 - #profileチャンネルの@Userのメッセージを5件削除
@@ -86,7 +103,7 @@
 ### 例4: 特定ユーザーのメッセージをすべて削除
 
 ```
-/msg-del user:@BadUser
+/message-delete user:@BadUser
 ```
 
 - @BadUserのメッセージをすべて削除
@@ -95,7 +112,7 @@
 ### 例5: 特定ユーザーのメッセージを件数指定で削除
 
 ```
-/msg-del count:10 user:@BadUser
+/message-delete count:10 user:@BadUser
 ```
 
 - @BadUserのメッセージを最大10件削除
@@ -103,7 +120,7 @@
 ### 例6: 別チャンネルのメッセージを削除
 
 ```
-/msg-del count:20 channel:#spam-channel
+/message-delete count:20 channel:#spam-channel
 ```
 
 - #spam-channelの最新20件を削除
@@ -136,10 +153,12 @@
 ### 同時実行時の挙動
 
 **同じユーザーが連続実行:**
+
 - Cooldown (5秒) により制限される
 - 前回のコマンド実行から5秒経過していないと実行できない
 
 **異なるユーザーが同じチャンネルで実行:**
+
 - 同時実行可能（制限なし）
 - 両方の削除処理が並行して実行される
 - 注意点:
@@ -148,6 +167,7 @@
   - レート制限に引っかかりやすくなる
 
 **推奨事項:**
+
 - 同じチャンネルで複数のモデレーターが同時に削除コマンドを実行しないようコミュニケーションを取る
 - 大量削除中は他のモデレーターに通知する
 
@@ -206,7 +226,7 @@ import {
 
 export const msgDelCommand: Command = {
   data: new SlashCommandBuilder()
-    .setName("msg-del")
+    .setName("message-delete")
     .setDescription("メッセージを一括削除します")
     .addIntegerOption((option) =>
       option
@@ -457,6 +477,7 @@ Discordの`bulkDelete`メソッドは、**14日以上前のメッセージを削
    ```
 
 5. **メッセージが見つからない**
+
    ```
    ℹ️ 削除可能なメッセージが見つかりませんでした。
    ```
@@ -512,16 +533,48 @@ Discordの`bulkDelete`メソッドは、**14日以上前のメッセージを削
 
 ---
 
-## 📚 参考リソース
+## 🌐 多言語対応（i18next）
+
+### ローカライゼーションキー
+
+```typescript
+// commands.json
+export default {
+  msgDel: {
+    errors: {
+      allOptionsEmpty: {
+        title: "警告",
+        description:
+          "この操作はすべてのオプションが未指定のため実行できません。\n" +
+          "チャンネル内のすべてのメッセージを削除する場合は、チャンネルを削除することをお勧めします。\n" +
+          "少なくとも `count`、`user`、`channel` のいずれか1つを指定してください。",
+      },
+      invalidChannel: "テキストチャンネルを指定してください。",
+      noMessages: "削除可能なメッセージが見つかりませんでした。",
+      permissionDenied: "この操作を実行する権限がありません。",
+      botPermissionDenied: "Botにメッセージ削除権限がありません。",
+      failed: "メッセージの削除中にエラーが発生しました。",
+    },
+    progress: {
+      deleting: "削除中... {{current}}/{{total}}件",
+      bulk: "削除中... {{current}}/{{total}}件 (一括削除)",
+      individual:
+        "削除中... {{current}}/{{total}}件 (14日以上前のメッセージを個別削除中...)",
+    },
+    success: {
+      completed: "{{count}}件のメッセージを削除しました。",
+      completedWithUser: "{{user}}のメッセージを{{count}}件削除しました。",
+      breakdown: "(一括削除: {{bulk}}件、個別削除: {{individual}}件)",
+      allIndividual: "(すべて個別削除)",
+    },
+  },
+};
+```
+
+---
+
+## 関連ドキュメント
 
 - [Discord.js - TextChannel.bulkDelete](https://discord.js.org/#/docs/discord.js/main/class/TextChannel?scrollTo=bulkDelete)
 - [Discord.js - Message.fetch](https://discord.js.org/#/docs/discord.js/main/class/MessageManager?scrollTo=fetch)
 - [Discord API - Bulk Delete Messages](https://discord.com/developers/docs/resources/channel#bulk-delete-messages)
-
----
-
-**注意事項**:
-
-- 削除されたメッセージは復元できません
-- モデレーター権限を持つユーザーのみが実行可能
-- 必ず慎重に使用してください

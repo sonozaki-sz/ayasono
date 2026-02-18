@@ -3,9 +3,20 @@
 
 import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 import { handleCommandError } from "../../shared/errors/ErrorHandler";
-import { t } from "../../shared/locale";
+import { tGuild } from "../../shared/locale";
 import { getCommandLocalizations } from "../../shared/locale/commandLocalizations";
 import type { Command } from "../../shared/types/discord";
+import { createSuccessEmbed } from "../../shared/utils/messageResponse";
+
+const PING_COMMAND = {
+  NAME: "ping",
+} as const;
+
+const PING_I18N_KEYS = {
+  COMMAND_DESCRIPTION: "ping.description",
+  EMBED_MEASURING: "commands:ping.embed.measuring",
+  EMBED_RESPONSE: "commands:ping.embed.response",
+} as const;
 
 /**
  * Pingコマンド
@@ -13,9 +24,9 @@ import type { Command } from "../../shared/types/discord";
  */
 export const pingCommand: Command = {
   data: (() => {
-    const desc = getCommandLocalizations("ping.description");
+    const desc = getCommandLocalizations(PING_I18N_KEYS.COMMAND_DESCRIPTION);
     return new SlashCommandBuilder()
-      .setName("ping")
+      .setName(PING_COMMAND.NAME)
       .setDescription(desc.ja)
       .setDescriptionLocalizations(desc.localizations);
   })(),
@@ -25,7 +36,7 @@ export const pingCommand: Command = {
       const guildId = interaction.guildId ?? undefined;
 
       // 初回応答（タイムスタンプ計測用）
-      const measuring = await t(guildId, "commands:ping.measuring");
+      const measuring = await tGuild(guildId, PING_I18N_KEYS.EMBED_MEASURING);
       await interaction.reply({
         content: measuring,
       });
@@ -35,17 +46,20 @@ export const pingCommand: Command = {
       const apiLatency = sent.createdTimestamp - interaction.createdTimestamp;
       const wsLatency = interaction.client.ws.ping;
 
-      // 結果を編集して表示
-      const result = await t(guildId, "commands:ping.result", {
+      // 結果をEmbedで表示
+      const description = await tGuild(guildId, PING_I18N_KEYS.EMBED_RESPONSE, {
         apiLatency,
         wsLatency,
       });
 
+      const embed = createSuccessEmbed(description);
+
       await interaction.editReply({
-        content: result,
+        content: "",
+        embeds: [embed],
       });
     } catch (error) {
-      await handleCommandError(interaction, error as Error);
+      await handleCommandError(interaction, error);
     }
   },
 

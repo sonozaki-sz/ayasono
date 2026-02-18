@@ -2,24 +2,27 @@
 // Event-related translations (English)
 
 export const events = {
-  // Bot startup
-  "ready.bot_ready": "✅ Bot is ready! Logged in as {{tag}}",
-  "ready.servers": "📊 Servers: {{count}}",
-  "ready.users": "👥 Users: {{count}}",
-  "ready.commands": "💬 Commands: {{count}}",
-  "ready.status": "Running on {{count}} servers | by sonozaki-sz",
-  "ready.event_registered": "Event registered: {{name}}",
+  // Bump reminder messages
+  "bump-reminder.reminder_message.disboard": "⏰ `/bump` is ready!",
+  "bump-reminder.reminder_message.dissoku": "⏰ `/up` is ready!",
+  "bump-reminder.reminder_message": "⏰ **Ready to bump!**",
 
-  // Interactions
-  "interaction.unknown_command": "Unknown command: {{commandName}}",
-  "interaction.command_executed":
-    "Command executed: {{commandName}} by {{userTag}}",
-  "interaction.command_error": "Error executing command {{commandName}}:",
-  "interaction.autocomplete_error":
-    "Error in autocomplete for {{commandName}}:",
-  "interaction.unknown_modal": "Unknown modal: {{customId}}",
-  "interaction.modal_submitted": "Modal submitted: {{customId}} by {{userTag}}",
-  "interaction.modal_error": "Error executing modal {{customId}}:",
+  // Bump reminder panel on bump detection
+  "bump-reminder.panel.title": "Bump Reminder",
+  "bump-reminder.panel.scheduled_at":
+    "Reminder will be sent <t:{{timestamp}}:R>.",
+  "bump-reminder.panel.button_mention_on": "Get mentioned",
+  "bump-reminder.panel.button_mention_off": "Don't mention me",
+  "bump-reminder.panel.mention_added":
+    "{{user}} has been added to bump reminder mentions.",
+  "bump-reminder.panel.mention_removed":
+    "{{user}} has been removed from bump reminder mentions.",
+  "bump-reminder.panel.already_added":
+    "You are already in the bump reminder mention list.",
+  "bump-reminder.panel.not_in_list":
+    "You are not in the bump reminder mention list.",
+  "bump-reminder.panel.success_title": "Settings Updated",
+  "bump-reminder.panel.error": "Failed to update mention settings",
 } as const;
 
 export type EventsTranslations = typeof events;

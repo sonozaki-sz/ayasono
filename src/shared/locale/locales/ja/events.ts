@@ -2,24 +2,28 @@
 // イベント関連の翻訳リソース
 
 export const events = {
-  // Bot起動
-  "ready.bot_ready": "✅ Botの準備が完了しました！ {{tag}} としてログイン",
-  "ready.servers": "📊 サーバー数: {{count}}",
-  "ready.users": "👥 ユーザー数: {{count}}",
-  "ready.commands": "💬 コマンド数: {{count}}",
-  "ready.status": "{{count}}個のサーバーで稼働中 | by sonozaki",
-  "ready.event_registered": "イベント登録: {{name}}",
+  // Bumpリマインダー機能のリメインドメッセージ
+  "bump-reminder.reminder_message.disboard":
+    "⏰ `/bump` が出来るようになったよ！",
+  "bump-reminder.reminder_message.dissoku": "⏰ `/up` が出来るようになったよ！",
+  "bump-reminder.reminder_message": "⏰ **Bump出来るようになったよ！**",
 
-  // インタラクション
-  "interaction.unknown_command": "不明なコマンド: {{commandName}}",
-  "interaction.command_executed":
-    "コマンド実行: {{commandName}} (実行者: {{userTag}})",
-  "interaction.command_error": "コマンド {{commandName}} の実行エラー:",
-  "interaction.autocomplete_error": "{{commandName}} の自動補完エラー:",
-  "interaction.unknown_modal": "不明なモーダル: {{customId}}",
-  "interaction.modal_submitted":
-    "モーダル送信: {{customId}} (送信者: {{userTag}})",
-  "interaction.modal_error": "モーダル {{customId}} の実行エラー:",
+  // Bumpリマインダー機能のBump検知時パネル
+  "bump-reminder.panel.title": "Bumpリマインダー機能",
+  "bump-reminder.panel.scheduled_at":
+    "<t:{{timestamp}}:R>にリマインドが通知されます。",
+  "bump-reminder.panel.button_mention_on": "メンションする",
+  "bump-reminder.panel.button_mention_off": "メンションしない",
+  "bump-reminder.panel.mention_added":
+    "{{user}} をBumpリマインダーのメンションリストに追加しました。",
+  "bump-reminder.panel.mention_removed":
+    "{{user}} をBumpリマインダーのメンションリストから削除しました。",
+  "bump-reminder.panel.already_added":
+    "既にBumpリマインダーのメンションリストに登録されています。",
+  "bump-reminder.panel.not_in_list":
+    "Bumpリマインダーのメンションリストに登録されていません。",
+  "bump-reminder.panel.success_title": "設定完了",
+  "bump-reminder.panel.error": "メンション設定の更新に失敗しました",
 } as const;
 
 export type EventsTranslations = typeof events;

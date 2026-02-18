@@ -9,6 +9,17 @@
   "typescript.preferences.importModuleSpecifier": "relative",
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "typescript.suggest.autoImports": true,
+  // 開いていないファイルを含むプロジェクト全体を常時チェック（乖離防止の核心）
+  "typescript.tsserver.experimental.enableProjectDiagnostics": true,
+  // メモリ不足によるTSサーバー再起動を防ぐ（再起動が乖離の原因になることがある）
+  "typescript.tsserver.maxTsServerMemory": 4096,
+  // Linuxのinotifyで即時検知（ポーリング待機をなくす）
+  "typescript.tsserver.watchOptions": {
+    "watchFile": "useFsEvents",
+    "watchDirectory": "useFsEvents",
+    "fallbackPolling": "dynamicPriority",
+    "synchronousWatchDirectory": true
+  },
   // エディター設定
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",

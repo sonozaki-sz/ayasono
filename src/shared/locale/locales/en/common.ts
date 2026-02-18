@@ -2,7 +2,14 @@
 // Common translations (English)
 
 export const common = {
-  channel: "Channel",
+  // State labels
+  success: "Success",
+  info: "Information",
+  warning: "Warning",
+  error: "Error",
+  enabled: "Enabled",
+  disabled: "Disabled",
+  none: "None",
 } as const;
 
 export type CommonTranslations = typeof common;

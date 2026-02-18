@@ -4,7 +4,8 @@
 import {
   AutocompleteInteraction,
   ChatInputCommandInteraction,
-  ClientEvents,
+  type Client,
+  type ClientEvents,
   Collection,
   ModalBuilder,
   ModalSubmitInteraction,
@@ -58,16 +59,35 @@ export interface BotEvent<K extends keyof ClientEvents = keyof ClientEvents> {
 
 /**
  * Discord.js Client の型拡張
+ * BotClient に実装されたプロパティを Client インターフェースに宣言する
+ * クールダウン管理は CooldownManager を使用するため cooldowns は宣言しない
  */
 declare module "discord.js" {
   interface Client {
     /** 登録されたコマンド */
     commands: Collection<string, Command>;
 
-    /** クールダウン管理 */
-    cooldowns: Collection<string, number>;
-
     /** 登録されたモーダル */
     modals: Collection<string, Modal>;
+  }
+}
+
+/**
+ * BotEvent を Client に登録するヘルパー関数
+ *
+ * TypeScript のイベントエミッタージェネリクスの制限により、イベント名とハンドラの
+ * 型相関をユニオン全体に渡して表現できないため、キャストはこの関数内に集約している。
+ * BotEvent<K> の型整合性はインターフェース定義時に保証されている。
+ * `BotEvent<any>` を受け入れることで呼び出し側でのキャストを不要にする。
+ */
+export function registerBotEvent(
+  emitter: Client,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  event: BotEvent<any>,
+): void {
+  if (event.once) {
+    emitter.once(event.name as never, event.execute as never);
+  } else {
+    emitter.on(event.name as never, event.execute as never);
   }
 }

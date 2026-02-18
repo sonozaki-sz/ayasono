@@ -4,10 +4,9 @@
 
 import winston from "winston";
 import DailyRotateFile from "winston-daily-rotate-file";
-import { env } from "../config/env";
-import { tDefault } from "../locale";
+import { NODE_ENV, env } from "../config/env";
 
-const isDevelopment = env.NODE_ENV === "development";
+const isDevelopment = env.NODE_ENV === NODE_ENV.DEVELOPMENT;
 
 // ログフォーマット
 const logFormat = winston.format.combine(
@@ -82,17 +81,6 @@ export const logger = winston.createLogger({
   level: env.LOG_LEVEL || "info",
   transports,
   exitOnError: false,
-});
-
-// Graceful shutdown
-process.on("SIGINT", () => {
-  logger.info(tDefault("system:shutdown.gracefully"));
-  setTimeout(() => process.exit(0), 1000);
-});
-
-process.on("SIGTERM", () => {
-  logger.info(tDefault("system:shutdown.sigterm"));
-  setTimeout(() => process.exit(0), 1000);
 });
 
 export default logger;

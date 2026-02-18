@@ -10,6 +10,8 @@ import { logger } from "../../shared/utils/logger";
  */
 export class CooldownManager {
   private cooldowns: Map<string, Map<string, number>> = new Map();
+  /** 自動削除タイマーのハンドルを保持（古いタイマーのキャンセルに使用） */
+  private timers: Map<string, Map<string, NodeJS.Timeout>> = new Map();
   private cleanupInterval: NodeJS.Timeout;
 
   constructor() {
@@ -20,6 +22,8 @@ export class CooldownManager {
       },
       5 * 60 * 1000,
     );
+    // Node.js が終了を待たないようにする（テスト時のメモリリーク防止）
+    this.cleanupInterval.unref();
   }
 
   /**
@@ -32,27 +36,50 @@ export class CooldownManager {
   check(commandName: string, userId: string, cooldownSeconds: number): number {
     const now = Date.now();
 
-    if (!this.cooldowns.has(commandName)) {
-      this.cooldowns.set(commandName, new Map());
+    let timestamps = this.cooldowns.get(commandName);
+    if (!timestamps) {
+      timestamps = new Map<string, number>();
+      this.cooldowns.set(commandName, timestamps);
     }
 
-    const timestamps = this.cooldowns.get(commandName)!;
     const expirationTime = timestamps.get(userId);
 
     if (expirationTime && now < expirationTime) {
       return Math.ceil((expirationTime - now) / 1000);
     }
 
-    // クールダウン設定
-    timestamps.set(userId, now + cooldownSeconds * 1000);
+    // 既存の自動削除タイマーをキャンセル（再コマンド時の誤削除を防ぐ）
+    const existingTimer = this.timers.get(commandName)?.get(userId);
+    if (existingTimer) {
+      clearTimeout(existingTimer);
+    }
 
-    // 自動削除タイマー（メモリリーク防止）
-    setTimeout(() => {
-      timestamps.delete(userId);
-      if (timestamps.size === 0) {
-        this.cooldowns.delete(commandName);
+    // クールダウン設定
+    const expiresAt = now + cooldownSeconds * 1000;
+    timestamps.set(userId, expiresAt);
+
+    // 自動削除タイマー（クールダウン期限後に即座に解放）
+    let timerMap = this.timers.get(commandName);
+    if (!timerMap) {
+      timerMap = new Map<string, NodeJS.Timeout>();
+      this.timers.set(commandName, timerMap);
+    }
+    const timer = setTimeout(() => {
+      const ts = this.cooldowns.get(commandName);
+      // エントリが現在のタイマーが設定した期限と一致する場合のみ削除（古いタイマーによる誤削除防止）
+      if (ts?.get(userId) === expiresAt) {
+        ts.delete(userId);
+        if (ts.size === 0) {
+          this.cooldowns.delete(commandName);
+        }
       }
-    }, cooldownSeconds * 1000);
+      this.timers.get(commandName)?.delete(userId);
+      if (this.timers.get(commandName)?.size === 0) {
+        this.timers.delete(commandName);
+      }
+    }, cooldownSeconds * 1000).unref();
+
+    timerMap.set(userId, timer);
 
     return 0;
   }
@@ -62,6 +89,15 @@ export class CooldownManager {
    */
   reset(commandName: string, userId: string): void {
     this.cooldowns.get(commandName)?.delete(userId);
+    // 対応する自動削除タイマーもキャンセル
+    const timer = this.timers.get(commandName)?.get(userId);
+    if (timer) {
+      clearTimeout(timer);
+      this.timers.get(commandName)?.delete(userId);
+      if (this.timers.get(commandName)?.size === 0) {
+        this.timers.delete(commandName);
+      }
+    }
     logger.debug(tDefault("system:cooldown.reset", { commandName, userId }));
   }
 
@@ -70,6 +106,14 @@ export class CooldownManager {
    */
   clearCommand(commandName: string): void {
     this.cooldowns.delete(commandName);
+    // 対応する自動削除タイマーもキャンセル
+    const timerMap = this.timers.get(commandName);
+    if (timerMap) {
+      for (const timer of timerMap.values()) {
+        clearTimeout(timer);
+      }
+      this.timers.delete(commandName);
+    }
     logger.debug(
       tDefault("system:cooldown.cleared_for_command", { commandName }),
     );
@@ -80,6 +124,13 @@ export class CooldownManager {
    */
   clearAll(): void {
     this.cooldowns.clear();
+    // すべての自動削除タイマーをキャンセル
+    for (const timerMap of this.timers.values()) {
+      for (const timer of timerMap.values()) {
+        clearTimeout(timer);
+      }
+    }
+    this.timers.clear();
     logger.debug(tDefault("system:cooldown.cleared_all"));
   }
 
@@ -129,6 +180,13 @@ export class CooldownManager {
   destroy(): void {
     clearInterval(this.cleanupInterval);
     this.cooldowns.clear();
+    // すべての自動削除タイマーをキャンセル
+    for (const timerMap of this.timers.values()) {
+      for (const timer of timerMap.values()) {
+        clearTimeout(timer);
+      }
+    }
+    this.timers.clear();
     logger.info(tDefault("system:cooldown.destroyed"));
   }
 }

@@ -20,6 +20,7 @@ describe("Environment Configuration", () => {
       process.env.DISCORD_TOKEN = "a".repeat(50);
       process.env.DISCORD_APP_ID = "1234567890";
       process.env.NODE_ENV = "production";
+      process.env.JWT_SECRET = "super-secret-key-for-production"; // 本番環境では必須
 
       const { env } = require("../../../src/shared/config/env");
 
@@ -70,6 +71,10 @@ describe("Environment Configuration", () => {
         process.env.DISCORD_TOKEN = "a".repeat(50);
         process.env.DISCORD_APP_ID = "1234567890";
         process.env.NODE_ENV = nodeEnv;
+        // 本番環境ではJWT_SECRETが必須
+        if (nodeEnv === "production") {
+          process.env.JWT_SECRET = "test-jwt-secret-for-production";
+        }
 
         const { env } = require("../../../src/shared/config/env");
         expect(env.NODE_ENV).toBe(nodeEnv);

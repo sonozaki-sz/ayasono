@@ -1,0 +1,353 @@
+/**
+ * BumpReminderManager Integration Tests
+ * Bumpリマインダータイマー管理の統合テスト
+ */
+
+import { BumpReminderManager } from "../../../src/shared/features/bump-reminder";
+import { jobScheduler } from "../../../src/shared/scheduler/JobScheduler";
+
+// Logger のモック
+jest.mock("../../../src/shared/utils/logger", () => ({
+  logger: {
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  },
+}));
+
+// i18n のモック
+jest.mock("../../../src/shared/locale", () => ({
+  tDefault: (key: string) => `mocked:${key}`,
+}));
+
+// Prismaユーティリティのモック
+jest.mock("../../../src/shared/utils/prisma", () => ({
+  requirePrismaClient: jest.fn(() => ({})),
+}));
+
+// Repositoryのモック
+const mockRepository = {
+  create: jest.fn(),
+  findById: jest.fn(),
+  findPendingByGuild: jest.fn(),
+  findAllPending: jest.fn(),
+  updateStatus: jest.fn(),
+  delete: jest.fn(),
+  cancelByGuild: jest.fn(),
+  cleanupOld: jest.fn(),
+};
+
+jest.mock("../../../src/shared/features/bump-reminder/repository", () => ({
+  getBumpReminderRepository: () => mockRepository,
+}));
+
+describe("BumpReminderManager Integration", () => {
+  let manager: BumpReminderManager;
+
+  beforeEach(() => {
+    manager = new BumpReminderManager();
+    jest.clearAllMocks();
+
+    // すべてのジョブをクリア
+    jobScheduler.stopAll();
+  });
+
+  afterEach(() => {
+    // クリーンアップ
+    jobScheduler.stopAll();
+  });
+
+  describe("setReminder()", () => {
+    it("should create a reminder in database and schedule job", async () => {
+      const scheduledAt = new Date(Date.now() + 2 * 60 * 60 * 1000);
+      const mockReminder = {
+        id: "reminder-1",
+        guildId: "guild-123",
+        channelId: "channel-456",
+        messageId: "msg-789",
+        panelMessageId: null,
+        scheduledAt,
+        status: "pending" as const,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockRepository.create.mockResolvedValue(mockReminder);
+      const mockTask = jest.fn();
+
+      await manager.setReminder(
+        "guild-123",
+        "channel-456",
+        "msg-789",
+        undefined,
+        120,
+        mockTask,
+      );
+
+      // DBへの保存を確認
+      expect(mockRepository.create).toHaveBeenCalledWith(
+        "guild-123",
+        "channel-456",
+        expect.any(Date),
+        "msg-789",
+        undefined,
+        undefined,
+      );
+
+      // ジョブがスケジュールされたことを確認
+      expect(jobScheduler.hasJob("bump-reminder-guild-123")).toBe(true);
+    });
+
+    it("should create reminder without messageId", async () => {
+      const scheduledAt = new Date(Date.now() + 2 * 60 * 60 * 1000);
+      const mockReminder = {
+        id: "reminder-1",
+        guildId: "guild-123",
+        channelId: "channel-456",
+        messageId: null,
+        panelMessageId: null,
+        scheduledAt,
+        status: "pending" as const,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockRepository.create.mockResolvedValue(mockReminder);
+
+      await manager.setReminder(
+        "guild-123",
+        "channel-456",
+        undefined,
+        undefined,
+        120,
+        jest.fn(),
+      );
+
+      expect(mockRepository.create).toHaveBeenCalledWith(
+        "guild-123",
+        "channel-456",
+        expect.any(Date),
+        undefined,
+        undefined,
+        undefined,
+      );
+    });
+  });
+
+  describe("cancelReminder()", () => {
+    it("should cancel existing reminder", async () => {
+      const scheduledAt = new Date(Date.now() + 2 * 60 * 60 * 1000);
+      const mockReminder = {
+        id: "reminder-1",
+        guildId: "guild-123",
+        channelId: "channel-456",
+        messageId: null,
+        panelMessageId: null,
+        scheduledAt,
+        status: "pending" as const,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockRepository.create.mockResolvedValue(mockReminder);
+
+      // リマインダー設定
+      await manager.setReminder(
+        "guild-123",
+        "channel-456",
+        undefined,
+        undefined,
+        120,
+        jest.fn(),
+      );
+
+      // ジョブが存在することを確認
+      expect(jobScheduler.hasJob("bump-reminder-guild-123")).toBe(true);
+
+      // キャンセル
+      const result = await manager.cancelReminder("guild-123");
+
+      expect(result).toBe(true);
+      expect(mockRepository.updateStatus).toHaveBeenCalledWith(
+        "reminder-1",
+        "cancelled",
+      );
+      // ジョブが削除されたことを確認
+      expect(jobScheduler.hasJob("bump-reminder-guild-123")).toBe(false);
+    });
+
+    it("should return false when no reminder exists", async () => {
+      const result = await manager.cancelReminder("nonexistent-guild");
+      expect(result).toBe(false);
+    });
+  });
+
+  describe("hasReminder()", () => {
+    it("should return true when reminder exists", async () => {
+      const scheduledAt = new Date(Date.now() + 2 * 60 * 60 * 1000);
+      const mockReminder = {
+        id: "reminder-1",
+        guildId: "guild-123",
+        channelId: "channel-456",
+        messageId: null,
+        panelMessageId: null,
+        scheduledAt,
+        status: "pending" as const,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockRepository.create.mockResolvedValue(mockReminder);
+
+      await manager.setReminder(
+        "guild-123",
+        "channel-456",
+        undefined,
+        undefined,
+        120,
+        jest.fn(),
+      );
+
+      expect(manager.hasReminder("guild-123")).toBe(true);
+    });
+
+    it("should return false when no reminder exists", () => {
+      expect(manager.hasReminder("nonexistent-guild")).toBe(false);
+    });
+  });
+
+  describe("restorePendingReminders()", () => {
+    it("should restore future reminders from database", async () => {
+      const futureDate = new Date(Date.now() + 30 * 60 * 1000); // 30分後
+      const mockReminders = [
+        {
+          id: "reminder-1",
+          guildId: "guild-123",
+          channelId: "channel-456",
+          messageId: "msg-789",
+          panelMessageId: null,
+          scheduledAt: futureDate,
+          status: "pending" as const,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ];
+
+      mockRepository.findAllPending.mockResolvedValue(mockReminders);
+      mockRepository.create.mockResolvedValue(mockReminders[0]);
+
+      const taskFactory = jest.fn(() => jest.fn());
+      const result = await manager.restorePendingReminders(taskFactory);
+
+      expect(result).toBe(1);
+      expect(taskFactory).toHaveBeenCalledWith(
+        "guild-123",
+        "channel-456",
+        "msg-789",
+        undefined,
+        undefined,
+      );
+    });
+
+    it("should execute overdue reminders immediately", async () => {
+      const pastDate = new Date(Date.now() - 10 * 60 * 1000); // 10分前
+      const mockReminders = [
+        {
+          id: "reminder-1",
+          guildId: "guild-123",
+          channelId: "channel-456",
+          messageId: null,
+          panelMessageId: null,
+          scheduledAt: pastDate,
+          status: "pending" as const,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ];
+
+      mockRepository.findAllPending.mockResolvedValue(mockReminders);
+
+      const mockTask = jest.fn().mockResolvedValue(undefined);
+      const taskFactory = jest.fn(() => mockTask);
+      const result = await manager.restorePendingReminders(taskFactory);
+
+      // 即座に実行されたので復元数は1
+      expect(result).toBe(1);
+      expect(mockTask).toHaveBeenCalled();
+      expect(mockRepository.updateStatus).toHaveBeenCalledWith(
+        "reminder-1",
+        "sent",
+      );
+    });
+
+    it("should handle empty pending reminders", async () => {
+      mockRepository.findAllPending.mockResolvedValue([]);
+
+      const taskFactory = jest.fn();
+      const result = await manager.restorePendingReminders(taskFactory);
+
+      expect(result).toBe(0);
+      expect(taskFactory).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("clearAll()", () => {
+    it("should clear all reminders", async () => {
+      const scheduledAt = new Date(Date.now() + 2 * 60 * 60 * 1000);
+      const mockReminder1 = {
+        id: "reminder-1",
+        guildId: "guild-123",
+        channelId: "channel-456",
+        messageId: null,
+        panelMessageId: null,
+        scheduledAt,
+        status: "pending" as const,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      const mockReminder2 = {
+        id: "reminder-2",
+        guildId: "guild-456",
+        channelId: "channel-789",
+        messageId: null,
+        panelMessageId: null,
+        scheduledAt,
+        status: "pending" as const,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockRepository.create.mockResolvedValueOnce(mockReminder1);
+      mockRepository.create.mockResolvedValueOnce(mockReminder2);
+
+      // 複数のリマインダー設定
+      await manager.setReminder(
+        "guild-123",
+        "channel-456",
+        undefined,
+        undefined,
+        120,
+        jest.fn(),
+      );
+      await manager.setReminder(
+        "guild-456",
+        "channel-789",
+        undefined,
+        undefined,
+        120,
+        jest.fn(),
+      );
+
+      // 両方存在することを確認
+      expect(manager.hasReminder("guild-123")).toBe(true);
+      expect(manager.hasReminder("guild-456")).toBe(true);
+
+      await manager.clearAll();
+
+      // 両方削除されたことを確認
+      expect(manager.hasReminder("guild-123")).toBe(false);
+      expect(manager.hasReminder("guild-456")).toBe(false);
+    });
+  });
+});

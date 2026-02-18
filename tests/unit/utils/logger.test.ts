@@ -39,6 +39,11 @@ jest.mock("winston-daily-rotate-file", () => {
 
 // 環境変数のモック
 jest.mock("../../../src/shared/config/env", () => ({
+  NODE_ENV: {
+    DEVELOPMENT: "development",
+    PRODUCTION: "production",
+    TEST: "test",
+  },
   env: {
     NODE_ENV: "test",
     LOG_LEVEL: "debug",

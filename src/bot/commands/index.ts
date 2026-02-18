@@ -4,6 +4,12 @@
 import type { Command } from "../../shared/types/discord";
 import { afkCommand } from "./afk";
 import { afkConfigCommand } from "./afk-config";
+import { bumpReminderConfigCommand } from "./bump-reminder-config";
 import { pingCommand } from "./ping";
 
-export const commands: Command[] = [afkCommand, afkConfigCommand, pingCommand];
+export const commands: Command[] = [
+  afkCommand,
+  afkConfigCommand,
+  bumpReminderConfigCommand,
+  pingCommand,
+];

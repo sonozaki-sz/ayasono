@@ -4,10 +4,18 @@
 import "dotenv/config";
 import { z } from "zod";
 
+export const NODE_ENV_VALUES = ["development", "production", "test"] as const;
+
+export const NODE_ENV = {
+  DEVELOPMENT: NODE_ENV_VALUES[0],
+  PRODUCTION: NODE_ENV_VALUES[1],
+  TEST: NODE_ENV_VALUES[2],
+} as const;
+
+export type NodeEnv = (typeof NODE_ENV_VALUES)[number];
+
 const envSchema = z.object({
-  NODE_ENV: z
-    .enum(["development", "production", "test"])
-    .default("development"),
+  NODE_ENV: z.enum(NODE_ENV_VALUES).default(NODE_ENV.DEVELOPMENT),
 
   // Discord
   DISCORD_TOKEN: z.string().min(50, "DISCORD_TOKEN is not configured"),
@@ -27,15 +35,44 @@ const envSchema = z.object({
   // JWT（Web UI認証用）
   JWT_SECRET: z.string().optional(),
 
+  // CORS（本番環境の許可オリジンをカンマ区切りで複数指定可能）
+  CORS_ORIGIN: z.string().optional(),
+
   // ログレベル
   LOG_LEVEL: z
     .enum(["trace", "debug", "info", "warn", "error"])
     .default("info"),
+
+  // テストモード（機能のテスト用動作を有効化）
+  TEST_MODE: z
+    .string()
+    .optional()
+    .transform((val) => val === "true"),
 });
 
 const parseEnv = () => {
   try {
-    return envSchema.parse(process.env);
+    const result = envSchema
+      .superRefine((data, ctx) => {
+        if (data.NODE_ENV === NODE_ENV.PRODUCTION && !data.JWT_SECRET) {
+          ctx.addIssue({
+            code: "custom",
+            message: "JWT_SECRET is required in production",
+            path: ["JWT_SECRET"],
+          });
+        }
+      })
+      .parse(process.env);
+
+    // 開発・テスト環境でも JWT_SECRET 未設定を警告（Web API 認証が無効になる）
+    if (result.NODE_ENV !== NODE_ENV.PRODUCTION && !result.JWT_SECRET) {
+      console.warn(
+        "⚠️  JWT_SECRET is not set — Web API authentication is DISABLED. " +
+          "Set JWT_SECRET in .env to enable API authorization.",
+      );
+    }
+
+    return result;
   } catch (error) {
     if (error instanceof z.ZodError) {
       // Note: tDefaultは使用できない（env.tsはi18n初期化前に実行される）

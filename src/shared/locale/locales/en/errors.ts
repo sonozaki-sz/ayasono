@@ -7,6 +7,7 @@ export const errors = {
   "database.save_config_failed": "Failed to save config",
   "database.update_config_failed": "Failed to update config",
   "database.delete_config_failed": "Failed to delete config",
+  "database.check_existence_failed": "Failed to check existence",
   "database.unknown_error": "unknown error",
 
   // Validation errors
@@ -14,8 +15,11 @@ export const errors = {
   "validation.invalid_subcommand": "Invalid subcommand",
 
   // Permission errors
-  "permission.administrator_required":
-    "Administrator permission is required to execute this command.",
+  "permission.manage_guild_required":
+    "Manage Server (MANAGE_GUILD) permission is required to execute this command.",
+
+  // Interaction errors
+  "interaction.timeout": "Operation timed out.",
 
   // AFK errors
   "afk.not_configured":
@@ -27,6 +31,7 @@ export const errors = {
   "afk.invalid_channel_type": "Please specify a voice channel.",
 
   // General errors
+  "general.error_title": "An Error Occurred",
   "general.unexpected_production":
     "An unexpected error occurred. Please try again later.",
   "general.unexpected_with_message": "Error: {{message}}",

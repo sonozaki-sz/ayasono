@@ -4,6 +4,7 @@
  */
 
 import type { ChatInputCommandInteraction } from "discord.js";
+import { NODE_ENV, env } from "../../../src/shared/config/env";
 import {
   BaseError,
   DatabaseError,
@@ -99,10 +100,10 @@ describe("ErrorHandler", () => {
   });
 
   describe("getUserFriendlyMessage()", () => {
-    const originalEnv = process.env.NODE_ENV;
+    const originalEnv = env.NODE_ENV;
 
     afterEach(() => {
-      process.env.NODE_ENV = originalEnv;
+      env.NODE_ENV = originalEnv;
     });
 
     it("should return operational error message", () => {
@@ -114,7 +115,7 @@ describe("ErrorHandler", () => {
     });
 
     it("should return generic message in production for non-operational errors", () => {
-      process.env.NODE_ENV = "production";
+      env.NODE_ENV = NODE_ENV.PRODUCTION;
       const error = new Error("Internal server error");
 
       const message = getUserFriendlyMessage(error);
@@ -123,7 +124,7 @@ describe("ErrorHandler", () => {
     });
 
     it("should return detailed message in development", () => {
-      process.env.NODE_ENV = "development";
+      env.NODE_ENV = NODE_ENV.DEVELOPMENT;
       const error = new Error("Detailed error message");
 
       const message = getUserFriendlyMessage(error);
@@ -157,10 +158,19 @@ describe("ErrorHandler", () => {
 
       await handleCommandError(mockInteraction, error);
 
-      expect(mockInteraction.reply).toHaveBeenCalledWith({
-        content: "❌ Invalid command",
-        ephemeral: true,
-      });
+      expect(mockInteraction.reply).toHaveBeenCalledWith(
+        expect.objectContaining({
+          embeds: expect.arrayContaining([
+            expect.objectContaining({
+              data: expect.objectContaining({
+                title: expect.stringContaining("❌"),
+                description: "Invalid command",
+              }),
+            }),
+          ]),
+          ephemeral: true,
+        }),
+      );
     });
 
     it("should edit reply when already replied", async () => {
@@ -169,9 +179,18 @@ describe("ErrorHandler", () => {
 
       await handleCommandError(mockInteraction, error);
 
-      expect(mockInteraction.editReply).toHaveBeenCalledWith({
-        content: "❌ Invalid command",
-      });
+      expect(mockInteraction.editReply).toHaveBeenCalledWith(
+        expect.objectContaining({
+          embeds: expect.arrayContaining([
+            expect.objectContaining({
+              data: expect.objectContaining({
+                title: expect.stringContaining("❌"),
+                description: "Invalid command",
+              }),
+            }),
+          ]),
+        }),
+      );
     });
 
     it("should edit reply when deferred", async () => {
@@ -180,9 +199,18 @@ describe("ErrorHandler", () => {
 
       await handleCommandError(mockInteraction, error);
 
-      expect(mockInteraction.editReply).toHaveBeenCalledWith({
-        content: "❌ Connection failed",
-      });
+      expect(mockInteraction.editReply).toHaveBeenCalledWith(
+        expect.objectContaining({
+          embeds: expect.arrayContaining([
+            expect.objectContaining({
+              data: expect.objectContaining({
+                title: expect.stringContaining("❌"),
+                description: "Connection failed",
+              }),
+            }),
+          ]),
+        }),
+      );
     });
 
     it("should log error before replying", async () => {
@@ -207,7 +235,7 @@ describe("ErrorHandler", () => {
   });
 
   describe("Error Message Formatting", () => {
-    it("should prefix error messages with ❌", async () => {
+    it("should prefix error messages title with ❌", async () => {
       const mockInteraction = {
         replied: false,
         deferred: false,
@@ -221,7 +249,13 @@ describe("ErrorHandler", () => {
 
       expect(mockInteraction.reply).toHaveBeenCalledWith(
         expect.objectContaining({
-          content: expect.stringMatching(/^❌/),
+          embeds: expect.arrayContaining([
+            expect.objectContaining({
+              data: expect.objectContaining({
+                title: expect.stringMatching(/^❌/),
+              }),
+            }),
+          ]),
         }),
       );
     });

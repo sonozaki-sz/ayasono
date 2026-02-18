@@ -1,8 +1,9 @@
 // src/shared/locale/i18n.ts
 // i18next設定ファイル
 
-import type { i18n as I18nInstance } from "i18next";
+import type { i18n as I18nInstance, ParseKeys } from "i18next";
 import i18next from "i18next";
+import { NODE_ENV, env } from "../config/env";
 
 /**
  * サポートする言語
@@ -16,20 +17,41 @@ export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 export const DEFAULT_LOCALE: SupportedLocale = "ja";
 
 /**
+ * 全翻訳ネームスペース
+ */
+export type AllNamespaces = [
+  "common",
+  "commands",
+  "errors",
+  "events",
+  "system",
+];
+
+/**
+ * 全ネームスペースにまたがる翻訳キー型
+ * t() / tDefault() の引数型として使用
+ */
+
+export type AllParseKeys = ParseKeys<AllNamespaces>;
+
+/**
  * i18nextインスタンスの初期化
  */
 export const initI18n = async (): Promise<I18nInstance> => {
   await i18next.init({
     lng: DEFAULT_LOCALE,
     fallbackLng: DEFAULT_LOCALE,
-    debug: process.env.NODE_ENV === "development",
+    debug: env.NODE_ENV === NODE_ENV.DEVELOPMENT,
 
     // リソースをコード内で直接管理（ファイルシステム不要）
     resources: {},
 
     interpolation: {
-      escapeValue: false, // Reactなどで不要なエスケープを無効化
+      escapeValue: false,
     },
+
+    // ドットをキーセパレーターとして使わない（フラットキー形式）
+    keySeparator: false,
 
     // 名前空間設定
     ns: ["common", "commands", "errors", "events", "system"],

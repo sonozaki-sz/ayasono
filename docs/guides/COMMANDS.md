@@ -1,0 +1,583 @@
+# コマンドリファレンス
+
+> Bot Commands Reference - スラッシュコマンドの完全リファレンス
+
+最終更新: 2026年2月19日
+
+---
+
+## 📋 概要
+
+### 目的
+
+guild-mng-bot-v2で使用可能なすべてのスラッシュコマンドの詳細リファレンスです。各コマンドの構文、オプション、使用例、必要な権限を記載しています。
+
+### コマンド一覧
+
+| コマンド                | 説明                           | 権限           |
+| ----------------------- | ------------------------------ | -------------- |
+| `/ping`                 | Bot疎通確認                    | なし           |
+| `/afk`                  | ユーザーをAFKチャンネルに移動  | なし           |
+| `/afk-config`           | AFK機能の設定管理              | サーバー管理   |
+| `/bump-reminder-config` | Bumpリマインダー機能の設定管理 | サーバー管理   |
+| `/vac-config`           | VC自動作成機能の設定管理       | サーバー管理   |
+| `/sticky-message`       | メッセージ固定機能の管理       | チャンネル管理 |
+| `/member-log-config`    | メンバーログ設定               | サーバー管理   |
+| `/message-delete`       | メッセージ一括削除             | メッセージ管理 |
+
+---
+
+## 🔧 基本コマンド
+
+### `/ping`
+
+Bot疎通確認コマンド。BotのレイテンシとAPIレスポンス時間を表示します。
+
+**構文:**
+
+```
+/ping
+```
+
+**権限:** なし（全員使用可能）
+
+**使用例:**
+
+```
+/ping
+```
+
+**レスポンス:**
+
+```
+🏓 Pong!
+Botレイテンシ: 45ms
+APIレイテンシ: 120ms
+```
+
+**関連ドキュメント:** なし
+
+---
+
+## 🎤 AFK機能
+
+### `/afk`
+
+指定したユーザー（または自分自身）をAFKチャンネルに移動します。
+
+**構文:**
+
+```
+/afk [user]
+```
+
+**オプション:**
+
+- `user` (オプション): 移動対象のユーザー
+  - 未指定の場合は自分自身を移動
+
+**権限:** なし（全員使用可能、AFK設定が有効な場合）
+
+**使用例:**
+
+```
+# 自分をAFKチャンネルに移動
+/afk
+
+# 他のユーザーをAFKチャンネルに移動
+/afk user:@Username
+```
+
+**エラーケース:**
+
+- AFK機能が無効化されている
+- AFKチャンネルが設定されていない
+- 対象ユーザーがVCに参加していない
+- AFKチャンネルが削除されている
+
+**関連ドキュメント:** [AFK_SPEC.md](../specs/AFK_SPEC.md)
+
+---
+
+### `/afk-config`
+
+AFK機能の設定を管理します。
+
+**構文:**
+
+```
+/afk-config <サブコマンド> [オプション]
+```
+
+**サブコマンド:**
+
+#### `set-ch`
+
+AFKチャンネルを設定します。
+
+```
+/afk-config set-ch channel:<チャンネル>
+```
+
+**オプション:**
+
+- `channel` (必須): AFKチャンネルとして設定するボイスチャンネル
+
+**権限:** サーバー管理（`MANAGE_GUILD`）
+
+**使用例:**
+
+```
+/afk-config set-ch channel:#AFK
+```
+
+---
+
+#### `show`
+
+現在のAFK設定を表示します。
+
+```
+/afk-config show
+```
+
+**権限:** サーバー管理（`MANAGE_GUILD`）
+
+**表示内容:**
+
+- 機能の有効/無効状態
+- 設定されているAFKチャンネル
+
+**関連ドキュメント:** [AFK_SPEC.md](../specs/AFK_SPEC.md)
+
+---
+
+## ⏰ Bumpリマインダー機能
+
+### `/bump-reminder-config`
+
+Disboard/ディス速のBump後の自動リマインダー機能を管理します。
+
+**構文:**
+
+```
+/bump-reminder-config <サブコマンド> [オプション]
+```
+
+**サブコマンド:**
+
+#### `enable`
+
+Bumpリマインダー機能を有効化します。
+
+```
+/bump-reminder-config enable
+```
+
+**権限:** サーバー管理（`MANAGE_GUILD`）
+
+**注意:** デフォルトで有効なため、通常は実行不要です。
+
+---
+
+#### `disable`
+
+Bumpリマインダー機能を無効化します。
+
+```
+/bump-reminder-config disable
+```
+
+**権限:** サーバー管理（`MANAGE_GUILD`）
+
+---
+
+#### `set-mention`
+
+Bumpリマインダー時にメンションするロールまたはユーザーを設定します。
+
+```
+/bump-reminder-config set-mention role:<ロール>
+/bump-reminder-config set-mention user:<ユーザー>
+```
+
+**オプション:**
+
+- `role` (いずれか必須): メンションするロール
+- `user` (いずれか必須): メンションするユーザー
+
+**権限:** サーバー管理（`MANAGE_GUILD`）
+
+**使用例:**
+
+```
+# ロールをメンション
+/bump-reminder-config set-mention role:@BumpRole
+
+# ユーザーをメンション
+/bump-reminder-config set-mention user:@Username
+```
+
+---
+
+#### `remove-mention`
+
+設定されているメンションを削除します。
+
+```
+/bump-reminder-config remove-mention target:<role|user|users|all>
+```
+
+**オプション:**
+
+- `target` (必須): 削除対象
+  - `role`: ロール設定のみ削除
+  - `user`: 登録済みユーザーを選択して削除
+  - `users`: 登録済みユーザーを全削除
+  - `all`: ロール + ユーザーを全削除
+
+**権限:** サーバー管理（`MANAGE_GUILD`）
+
+---
+
+#### `show`
+
+現在のBumpリマインダー設定を表示します。
+
+```
+/bump-reminder-config show
+```
+
+**権限:** サーバー管理（`MANAGE_GUILD`）
+
+**表示内容:**
+
+- 機能の有効/無効状態
+- 設定されているメンション（ロール/ユーザー）
+
+**関連ドキュメント:** [BUMP_REMINDER_SPEC.md](../specs/BUMP_REMINDER_SPEC.md)
+
+---
+
+## 🎤 VC自動作成機能
+
+### `/vac-config`
+
+VC自動作成機能（VAC）の設定を管理します。
+
+**構文:**
+
+```
+/vac-config <サブコマンド> [オプション]
+```
+
+**サブコマンド:**
+
+#### `enable`
+
+VC自動作成機能を有効化します。
+
+```
+/vac-config enable
+```
+
+**権限:** サーバー管理（`MANAGE_GUILD`）
+
+---
+
+#### `disable`
+
+VC自動作成機能を無効化します。
+
+```
+/vac-config disable
+```
+
+**権限:** サーバー管理（`MANAGE_GUILD`）
+
+---
+
+#### `set-trigger`
+
+トリガーチャンネルを設定します。
+
+```
+/vac-config set-trigger channel:<チャンネル>
+```
+
+**オプション:**
+
+- `channel` (必須): トリガーとなるボイスチャンネル
+
+**権限:** サーバー管理（`MANAGE_GUILD`）
+
+**使用例:**
+
+```
+/vac-config set-trigger channel:#VC作成
+```
+
+---
+
+#### `show`
+
+現在のVC自動作成機能の設定を表示します。
+
+```
+/vac-config show
+```
+
+**権限:** サーバー管理（`MANAGE_GUILD`）
+
+**関連ドキュメント:** [VAC_SPEC.md](../specs/VAC_SPEC.md)
+
+---
+
+## 📌 メッセージ固定機能
+
+### `/sticky-message`
+
+チャンネル最下部に常に表示されるメッセージを設定します。
+
+**構文:**
+
+```
+/sticky-message <サブコマンド> [オプション]
+```
+
+**サブコマンド:**
+
+#### `set`
+
+スティッキーメッセージを設定します。
+
+```
+/sticky-message set channel:<チャンネル> message:<メッセージ>
+```
+
+**オプション:**
+
+- `channel` (必須): メッセージを固定するテキストチャンネル
+- `message` (必須): 固定するメッセージ内容
+
+**権限:** チャンネル管理
+
+**使用例:**
+
+```
+/sticky-message set channel:#rules message:サーバールールを守ってください
+```
+
+---
+
+#### `remove`
+
+スティッキーメッセージを削除します。
+
+```
+/sticky-message remove channel:<チャンネル>
+```
+
+**オプション:**
+
+- `channel` (必須): メッセージ固定を解除するチャンネル
+
+**権限:** チャンネル管理
+
+---
+
+#### `list`
+
+設定されているスティッキーメッセージの一覧を表示します。
+
+```
+/sticky-message list
+```
+
+**権限:** チャンネル管理
+
+**関連ドキュメント:** [STICKY_MESSAGE_SPEC.md](../specs/STICKY_MESSAGE_SPEC.md)
+
+---
+
+## 👥 メンバーログ機能
+
+### `/member-log-config`
+
+メンバーの参加・脱退を指定チャンネルに記録する機能を管理します。
+
+**構文:**
+
+```
+/member-log-config <サブコマンド> [オプション]
+```
+
+**サブコマンド:**
+
+#### `enable`
+
+メンバーログ機能を有効化します。
+
+```
+/member-log-config enable
+```
+
+**権限:** サーバー管理（`MANAGE_GUILD`）
+
+---
+
+#### `disable`
+
+メンバーログ機能を無効化します。
+
+```
+/member-log-config disable
+```
+
+**権限:** サーバー管理（`MANAGE_GUILD`）
+
+---
+
+#### `set-channel`
+
+ログを送信するチャンネルを設定します。
+
+```
+/member-log-config set-channel channel:<チャンネル>
+```
+
+**オプション:**
+
+- `channel` (必須): ログを送信するテキストチャンネル
+
+**権限:** サーバー管理（`MANAGE_GUILD`）
+
+**使用例:**
+
+```
+/member-log-config set-channel channel:#welcome-log
+```
+
+---
+
+#### `show`
+
+現在の設定を表示します。
+
+```
+/member-log-config show
+```
+
+**権限:** サーバー管理（`MANAGE_GUILD`）
+
+**関連ドキュメント:** [MEMBER_LOG_SPEC.md](../specs/MEMBER_LOG_SPEC.md)
+
+---
+
+## 🗑️ メッセージ削除機能
+
+### `/message-delete`
+
+チャンネル内のメッセージを一括削除します。
+
+**構文:**
+
+```
+/message-delete [count] [user] [channel]
+```
+
+**オプション:**
+
+- `count` (オプション): 削除するメッセージ数（1以上）
+- `user` (オプション): 特定ユーザーのメッセージのみ削除
+- `channel` (オプション): 削除を実行するチャンネル（未指定時は実行チャンネル）
+
+**権限:** メッセージ管理
+
+**使用例:**
+
+```
+# 最新50件を削除
+/message-delete count:50
+
+# 特定ユーザーのメッセージを10件削除
+/message-delete count:10 user:@Spammer
+
+# 別チャンネルのメッセージを削除
+/message-delete count:20 channel:#spam-channel
+
+# 特定ユーザーのメッセージをすべて削除
+/message-delete user:@BadUser
+```
+
+**注意事項:**
+
+- すべてのオプションを未指定にすることはできません（安全のため）
+- 14日以上前のメッセージは個別削除となり時間がかかります
+- Cooldown: 5秒（連続実行防止）
+
+**エラーケース:**
+
+- すべてのオプションが未指定
+- 権限不足
+- Bot権限不足
+- 削除可能なメッセージが見つからない
+
+**関連ドキュメント:** [MESSAGE_DELETE_SPEC.md](../specs/MESSAGE_DELETE_SPEC.md)
+
+---
+
+## 🔒 権限について
+
+### 権限レベル
+
+| 権限               | 説明                     | 必要なDiscord権限 |
+| ------------------ | ------------------------ | ----------------- |
+| **なし**           | 全メンバーが使用可能     | -                 |
+| **チャンネル管理** | チャンネル管理権限が必要 | `MANAGE_CHANNELS` |
+| **メッセージ管理** | メッセージ管理権限が必要 | `MANAGE_MESSAGES` |
+| **サーバー管理**   | サーバー管理権限が必要   | `MANAGE_GUILD`    |
+
+### Bot権限
+
+Botが正常に動作するために必要な権限：
+
+- `ViewChannel` - チャンネルの閲覧
+- `SendMessages` - メッセージの送信
+- `EmbedLinks` - Embedメッセージの送信
+- `ManageMessages` - メッセージの削除（一括削除機能）
+- `ManageChannels` - チャンネルの作成・削除（VC自動作成機能）
+- `MoveMembers` - メンバーの移動（AFK機能）
+- `ReadMessageHistory` - メッセージ履歴の閲覧
+
+---
+
+## 🌐 多言語対応
+
+すべてのコマンドは多言語対応しており、サーバーごとに日本語または英語を設定可能です。
+
+**ロケール設定:**
+
+- デフォルト: 日本語（ja）
+- サポート言語: 日本語（ja）、英語（en）
+
+詳細は [I18N_GUIDE.md](I18N_GUIDE.md) を参照してください。
+
+---
+
+## 🔗 関連ドキュメント
+
+### 仕様書
+
+- [AFK_SPEC.md](../specs/AFK_SPEC.md) - AFK機能仕様
+- [BUMP_REMINDER_SPEC.md](../specs/BUMP_REMINDER_SPEC.md) - Bumpリマインダー機能仕様
+- [VAC_SPEC.md](../specs/VAC_SPEC.md) - VC自動作成機能仕様
+- [STICKY_MESSAGE_SPEC.md](../specs/STICKY_MESSAGE_SPEC.md) - メッセージ固定機能仕様
+- [MEMBER_LOG_SPEC.md](../specs/MEMBER_LOG_SPEC.md) - メンバー参加・脱退ログ機能仕様
+- [MESSAGE_DELETE_SPEC.md](../specs/MESSAGE_DELETE_SPEC.md) - メッセージ削除コマンド仕様
+
+### ガイド
+
+- [README.md](../README.md) - プロジェクト概要
+- [TODO.md](../TODO.md) - 開発タスク一覧
+- [I18N_GUIDE.md](I18N_GUIDE.md) - 多言語対応ガイド

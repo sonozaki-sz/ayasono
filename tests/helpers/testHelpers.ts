@@ -128,11 +128,10 @@ export const createTestGuildConfig = (guildId: string) => ({
   guildId,
   locale: "ja",
   afkConfig: null,
-  profChannelConfig: null,
   vacConfig: null,
   bumpReminderConfig: null,
   stickMessages: null,
-  joinLeaveLogConfig: null,
+  memberLogConfig: null,
   createdAt: new Date(),
   updatedAt: new Date(),
 });
