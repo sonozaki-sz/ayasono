@@ -17,11 +17,10 @@ model GuildConfig {
 
   // 詳細設定（JSON形式で保存）
   afkConfig              String? // JSON: AfkConfig
-  profChannelConfig      String? // JSON: ProfChannelConfig
   vacConfig              String? // JSON: VacConfig
   bumpReminderConfig     String? // JSON: BumpReminderConfig
   stickMessages          String? // JSON: StickMessage[]
-  joinLeaveLogConfig     String? // JSON: JoinLeaveLogConfig
+  memberLogConfig        String? // JSON: MemberLogConfig
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -29,8 +28,26 @@ model GuildConfig {
   @@map("guild_configs")
 }
 
+// Bump Reminder (Bump通知)
+model BumpReminder {
+  id          String   @id @default(cuid())
+  guildId        String
+  channelId      String   // 通知を送信するチャンネル
+  messageId      String?  // 元のBumpメッセージID (返信用)
+  panelMessageId String?  // Bumpパネルメッセージ ID (リマインダー送信後に削除)
+  serviceName    String?  // サービス名 (Disboard, Dissoku)
+  scheduledAt    DateTime // 通知予定時刻
+  status         String   @default("pending") // pending, sent, cancelled
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([guildId])
+  @@index([status, scheduledAt])
+  @@map("bump_reminders")
+}
+
 // 将来的に追加予定のモデル
 // - VacConfig (VC自動作成設定)
-// - BumpReminderConfig (Bump通知設定)
 // - StickyMessageConfig (固定メッセージ設定)
 // - LeaveMemberLogConfig (退出ログ設定)

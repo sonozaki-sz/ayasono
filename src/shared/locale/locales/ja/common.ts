@@ -2,7 +2,14 @@
 // 共通の翻訳リソース
 
 export const common = {
-  channel: "チャンネル",
+  // 状態ラベル
+  success: "成功",
+  info: "情報",
+  warning: "警告",
+  error: "エラー",
+  enabled: "有効",
+  disabled: "無効",
+  none: "なし",
 } as const;
 
 export type CommonTranslations = typeof common;

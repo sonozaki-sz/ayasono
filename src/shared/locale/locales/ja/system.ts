@@ -16,6 +16,23 @@ export const system = {
     "Botクライアントのシャットダウンが完了しました。",
   "bot.presence_activity": "{{count}}個のサーバーで稼働中 | by sonozaki-sz",
 
+  // Bumpリマインダー検知ログ
+  "bump-reminder.detected":
+    "Guild {{guildId}} でBumpを検知しました ({{service}})",
+  "bump-reminder.detection_failed": "Guild {{guildId}} のBump検知処理に失敗:",
+
+  // ログメッセージ
+  "log.bump_reminder_enabled":
+    "Guild {{guildId}} でBumpリマインダーを有効化しました（Channel: {{channelId}}）",
+  "log.bump_reminder_disabled":
+    "Guild {{guildId}} でBumpリマインダーを無効化しました",
+  "log.bump_reminder_mention_set":
+    "Guild {{guildId}} でBumpリマインダーのメンションロールを設定しました（Role: {{roleId}}）",
+  "log.bump_reminder_mention_removed":
+    "Guild {{guildId}} でBumpリマインダーのメンション設定を削除しました（対象: {{target}}）",
+  "log.bump_reminder_users_removed":
+    "Guild {{guildId}} でBumpリマインダーから{{count}}人のユーザーを削除しました",
+
   // エラーハンドリング
   "error.reply_failed": "エラーメッセージの送信に失敗しました。",
   "error.unhandled_rejection": "未処理のPromise拒否:",
@@ -25,10 +42,6 @@ export const system = {
   "error.node_warning": "Node警告:",
   "error.cleanup_complete": "クリーンアップ完了。",
   "error.cleanup_failed": "クリーンアップ中のエラー:",
-
-  // 環境変数
-  "env.validation_failed": "環境変数の検証に失敗しました:",
-  "env.check_env_file": ".env ファイルを確認してください。",
 
   // ロケール
   "locale.manager_initialized": "LocaleManagerをi18nextで初期化しました。",
@@ -64,6 +77,28 @@ export const system = {
     "Guild {{guildId}} の既存のbump reminderをキャンセル中",
   "scheduler.bump_reminder_cancelled":
     "Guild {{guildId}} のbump reminderをキャンセルしました。",
+  "scheduler.bump_reminder_executing_immediately":
+    "Guild {{guildId}} の期限切れBumpリマインダーを即座に実行します",
+  "scheduler.bump_reminders_restored":
+    "DBから{{count}}個の保留中Bumpリマインダーを復元しました",
+  "scheduler.bump_reminder_sent":
+    "Guild {{guildId}} のChannel {{channelId}} にBumpリマインダーを送信しました",
+  "scheduler.bump_reminder_channel_not_found":
+    "Guild {{guildId}} のChannel {{channelId}} が見つかりません",
+  "scheduler.bump_reminder_disabled":
+    "Guild {{guildId}} のBumpリマインダーは無効化されています",
+  "scheduler.bump_reminder_restore_failed": "Bumpリマインダーの復元に失敗:",
+  "scheduler.bump_reminder_duplicates_cancelled":
+    "重複する保留中のBumpリマインダー {{count}} 件をキャンセルしました",
+  "scheduler.bump_reminder_unregistered_channel":
+    "Guild {{guildId}} の未登録チャンネル {{channelId}} でBumpを検知したためスキップします（設定: {{expectedChannelId}}）",
+  "scheduler.bump_reminder_orphaned_panel_delete_failed":
+    "孤立したBumpパネルメッセージ {{panelMessageId}} の削除に失敗しました",
+  "scheduler.bump_reminder_panel_deleted":
+    "Guild {{guildId}} のBumpパネルメッセージ {{panelMessageId}} を削除しました",
+  "scheduler.bump_reminder_panel_delete_failed":
+    "Bumpパネルメッセージ {{panelMessageId}} の削除に失敗しました",
+  "scheduler.bump_reminder_panel_send_failed": "Bumpパネルの送信に失敗しました",
 
   // シャットダウン
   "shutdown.signal_received":
@@ -81,6 +116,57 @@ export const system = {
   "database.deleted_config": "Guild {{guildId}} の設定を削除しました。",
   "database.check_existence_log": "Guild {{guildId}} の存在確認に失敗:",
 
+  // Bumpリマインダーデータベース操作
+  "database.bump_reminder_created":
+    "Bumpリマインダーを作成しました: {{id}} (Guild: {{guildId}})",
+  "database.bump_reminder_create_failed":
+    "Guild {{guildId}} のBumpリマインダー作成に失敗:",
+  "database.bump_reminder_find_failed": "Bumpリマインダー {{id}} の取得に失敗:",
+  "database.bump_reminder_find_all_failed":
+    "保留中のBumpリマインダーの取得に失敗:",
+  "database.bump_reminder_status_updated":
+    "Bumpリマインダー {{id}} のステータスを {{status}} に更新しました",
+  "database.bump_reminder_update_failed":
+    "Bumpリマインダー {{id}} の更新に失敗:",
+  "database.bump_reminder_deleted": "Bumpリマインダーを削除: {{id}}",
+  "database.bump_reminder_delete_failed":
+    "Bumpリマインダー {{id}} の削除に失敗:",
+  "database.bump_reminder_cancelled_by_guild":
+    "Guild {{guildId}} の保留中Bumpリマインダーをキャンセルしました",
+  "database.bump_reminder_cancelled_by_channel":
+    "Guild {{guildId}} / Channel {{channelId}} の保留中Bumpリマインダーをキャンセルしました",
+  "database.bump_reminder_cancel_failed":
+    "Guild {{guildId}} のBumpリマインダーキャンセルに失敗:",
+  "database.bump_reminder_cleanup_completed":
+    "{{count}}個の古いBumpリマインダーをクリーンアップしました（{{days}}日以前）",
+  "database.bump_reminder_cleanup_failed":
+    "古いBumpリマインダーのクリーンアップに失敗:",
+
+  // Bot起動イベントログ
+  "ready.bot_ready": "✅ Botの準備が完了しました！ {{tag}} としてログイン",
+  "ready.servers": "📊 サーバー数: {{count}}",
+  "ready.users": "👥 ユーザー数: {{count}}",
+  "ready.commands": "💬 コマンド数: {{count}}",
+  "ready.event_registered": "イベント登録: {{name}}",
+
+  // インタラクションイベントログ
+  "interaction.unknown_command": "不明なコマンド: {{commandName}}",
+  "interaction.command_executed":
+    "コマンド実行: {{commandName}} (実行者: {{userTag}})",
+  "interaction.command_error": "コマンド {{commandName}} の実行エラー:",
+  "interaction.autocomplete_error": "{{commandName}} の自動補完エラー:",
+  "interaction.unknown_modal": "不明なモーダル: {{customId}}",
+  "interaction.modal_submitted":
+    "モーダル送信: {{customId}} (送信者: {{userTag}})",
+  "interaction.modal_error": "モーダル {{customId}} の実行エラー:",
+  "interaction.button_error": "ボタン {{customId}} の実行エラー:",
+
+  // AFKコマンドログ
+  "afk.moved_log":
+    "Guild {{guildId}} でユーザー {{userId}} を {{channelId}} に移動。",
+  "afk.configured_log":
+    "Guild {{guildId}} でAFKチャンネル設定, channel {{channelId}}",
+
   // Webサーバー
   "web.server_started": "Web サーバーが起動しました: {{url}}",
   "web.startup_error": "Webサーバー起動エラー:",
@@ -89,6 +175,13 @@ export const system = {
   "web.startup_failed": "Webサーバー起動失敗:",
   "web.api_error": "APIエラー:",
   "web.internal_server_error": "内部サーバーエラー",
+  "web.auth_unauthorized": "[Auth] 未認証リクエスト: {{method}} {{url}}",
+  "web.auth_invalid_token": "[Auth] 無効なトークン: {{method}} {{url}}",
+  "web.auth_unauthorized_error": "Unauthorized",
+  "web.auth_forbidden_error": "Forbidden",
+  "web.auth_header_required":
+    "Authorization: Bearer <api-key> ヘッダーが必要です",
+  "web.auth_invalid_token_message": "無効なトークンです",
 } as const;
 
 export type SystemTranslations = typeof system;

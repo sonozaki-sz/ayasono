@@ -14,5 +14,8 @@ declare module "i18next" {
 
     // 翻訳キーの型安全性を有効化
     returnNull: false;
+
+    // ドットをキーセパレーターとして使わない（フラットキー形式に対応）
+    keySeparator: false;
   }
 }

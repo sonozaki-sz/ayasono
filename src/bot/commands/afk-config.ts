@@ -1,5 +1,5 @@
 // src/bot/commands/afk-config.ts
-// AFK機能の設定コマンド（管理者専用）
+// AFK機能の設定コマンド（サーバー管理権限専用）
 
 import {
   ChannelType,
@@ -7,21 +7,30 @@ import {
   PermissionFlagsBits,
   SlashCommandBuilder,
 } from "discord.js";
-import { IGuildConfigRepository } from "../../shared/database/repositories/GuildConfigRepository";
+import { getGuildConfigRepository } from "../../shared/database";
 import { ValidationError } from "../../shared/errors/CustomErrors";
 import { handleCommandError } from "../../shared/errors/ErrorHandler";
-import { getCommandLocalizations, t, tDefault } from "../../shared/locale";
+import { getCommandLocalizations, tDefault, tGuild } from "../../shared/locale";
 import type { Command } from "../../shared/types/discord";
 import { logger } from "../../shared/utils/logger";
+import {
+  createInfoEmbed,
+  createSuccessEmbed,
+} from "../../shared/utils/messageResponse";
 
-let repository: IGuildConfigRepository;
-
-export const setRepository = (repo: IGuildConfigRepository) => {
-  repository = repo;
-};
+const AFK_CONFIG_COMMAND = {
+  NAME: "afk-config",
+  SUBCOMMAND: {
+    SET_CHANNEL: "set-ch",
+    SHOW: "show",
+  },
+  OPTION: {
+    CHANNEL: "channel",
+  },
+} as const;
 
 /**
- * AFK設定コマンド（管理者専用）
+ * AFK設定コマンド（サーバー管理権限専用）
  */
 export const afkConfigCommand: Command = {
   data: (() => {
@@ -33,18 +42,18 @@ export const afkConfigCommand: Command = {
     const showDesc = getCommandLocalizations("afk-config.show.description");
 
     return new SlashCommandBuilder()
-      .setName("afk-config")
+      .setName(AFK_CONFIG_COMMAND.NAME)
       .setDescription(cmdDesc.ja)
       .setDescriptionLocalizations(cmdDesc.localizations)
-      .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+      .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
       .addSubcommand((subcommand) =>
         subcommand
-          .setName("set-ch")
+          .setName(AFK_CONFIG_COMMAND.SUBCOMMAND.SET_CHANNEL)
           .setDescription(setChDesc.ja)
           .setDescriptionLocalizations(setChDesc.localizations)
           .addChannelOption((option) =>
             option
-              .setName("channel")
+              .setName(AFK_CONFIG_COMMAND.OPTION.CHANNEL)
               .setDescription(channelDesc.ja)
               .setDescriptionLocalizations(channelDesc.localizations)
               .addChannelTypes(ChannelType.GuildVoice)
@@ -53,7 +62,7 @@ export const afkConfigCommand: Command = {
       )
       .addSubcommand((subcommand) =>
         subcommand
-          .setName("show")
+          .setName(AFK_CONFIG_COMMAND.SUBCOMMAND.SHOW)
           .setDescription(showDesc.ja)
           .setDescriptionLocalizations(showDesc.localizations),
       );
@@ -70,11 +79,11 @@ export const afkConfigCommand: Command = {
       const subcommand = interaction.options.getSubcommand();
 
       switch (subcommand) {
-        case "set-ch":
+        case AFK_CONFIG_COMMAND.SUBCOMMAND.SET_CHANNEL:
           await handleSetChannel(interaction, guildId);
           break;
 
-        case "show":
+        case AFK_CONFIG_COMMAND.SUBCOMMAND.SHOW:
           await handleShowSetting(interaction, guildId);
           break;
 
@@ -85,7 +94,7 @@ export const afkConfigCommand: Command = {
       }
     } catch (error) {
       // 統一エラーハンドリング
-      await handleCommandError(interaction, error as Error);
+      await handleCommandError(interaction, error);
     }
   },
 
@@ -99,40 +108,46 @@ async function handleSetChannel(
   interaction: ChatInputCommandInteraction,
   guildId: string,
 ): Promise<void> {
-  // 管理者権限チェック
-  if (!interaction.memberPermissions?.has(PermissionFlagsBits.Administrator)) {
+  // サーバー管理権限チェック
+  if (!interaction.memberPermissions?.has(PermissionFlagsBits.ManageGuild)) {
     throw new ValidationError(
-      await t(guildId, "errors:permission.administrator_required"),
+      await tGuild(guildId, "errors:permission.manage_guild_required"),
     );
   }
 
-  const channel = interaction.options.getChannel("channel", true);
+  const channel = interaction.options.getChannel(
+    AFK_CONFIG_COMMAND.OPTION.CHANNEL,
+    true,
+  );
 
   // VCチャンネルかチェック
   if (channel.type !== ChannelType.GuildVoice) {
     throw new ValidationError(
-      await t(guildId, "errors:afk.invalid_channel_type"),
+      await tGuild(guildId, "errors:afk.invalid_channel_type"),
     );
   }
 
-  // Repository パターンでデータ保存
-  await repository.updateAfkConfig(guildId, {
-    enabled: true,
-    channelId: channel.id,
-  });
+  // Repository パターンでデータ保存（CAS更新で競合時の上書きを抑止）
+  await getGuildConfigRepository().setAfkChannel(guildId, channel.id);
 
   // Guild別言語対応
-  const message = await t(guildId, "commands:afk.configured", {
-    channel: `<#${channel.id}>`,
-  });
+  const description = await tGuild(
+    guildId,
+    "commands:afk-config.embed.set_ch_success",
+    {
+      channel: `<#${channel.id}>`,
+    },
+  );
+
+  const embed = createSuccessEmbed(description);
 
   await interaction.reply({
-    content: `✅ ${message}`,
+    embeds: [embed],
     ephemeral: true,
   });
 
   logger.info(
-    tDefault("commands:afk.configured_log", { guildId, channelId: channel.id }),
+    tDefault("system:afk.configured_log", { guildId, channelId: channel.id }),
   );
 }
 
@@ -143,34 +158,44 @@ async function handleShowSetting(
   interaction: ChatInputCommandInteraction,
   guildId: string,
 ): Promise<void> {
-  // 管理者権限チェック
-  if (!interaction.memberPermissions?.has(PermissionFlagsBits.Administrator)) {
+  // サーバー管理権限チェック
+  if (!interaction.memberPermissions?.has(PermissionFlagsBits.ManageGuild)) {
     throw new ValidationError(
-      await t(guildId, "errors:permission.administrator_required"),
+      await tGuild(guildId, "errors:permission.manage_guild_required"),
     );
   }
 
-  const config = await repository.getAfkConfig(guildId);
+  const config = await getGuildConfigRepository().getAfkConfig(guildId);
+
+  const title = await tGuild(guildId, "commands:afk-config.embed.title");
 
   if (!config || !config.enabled || !config.channelId) {
-    const message = await t(guildId, "commands:afk.not_configured");
+    const description = await tGuild(
+      guildId,
+      "commands:afk-config.embed.not_configured",
+    );
+    const embed = createInfoEmbed(description, { title });
     await interaction.reply({
-      content: `ℹ️ ${message}`,
+      embeds: [embed],
       ephemeral: true,
     });
     return;
   }
 
-  const channelLabel = await t(guildId, "common:channel");
-  const settingsTitle = await t(guildId, "commands:afk.settings_title");
+  const fieldChannel = await tGuild(
+    guildId,
+    "commands:afk-config.embed.field.channel",
+  );
 
-  const message = [
-    settingsTitle,
-    `${channelLabel}: <#${config.channelId}>`,
-  ].join("\n");
+  const embed = createInfoEmbed("", {
+    title,
+    fields: [
+      { name: fieldChannel, value: `<#${config.channelId}>`, inline: true },
+    ],
+  });
 
   await interaction.reply({
-    content: message,
+    embeds: [embed],
     ephemeral: true,
   });
 }

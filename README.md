@@ -7,31 +7,160 @@
 guild-mng-bot-v2は、Discordサーバー（ギルド）の管理を支援する多機能Botです。
 旧プロジェクト（guild-mng-bot）から完全に独立した新規開発として、モダンな技術スタックとクリーンなアーキテクチャで構築されています。
 
-## ✨ 主要機能（予定）
+### 基本方針
 
-- 🔇 **AFK機能**: 非アクティブユーザーの自動チャンネル移動
-- ⏰ **Bump通知**: サーバー宣伝リマインダー
-- 📌 **メッセージ固定機能**: 重要メッセージの自動固定・再送信
-- 🎤 **VC自動作成機能**: ボイスチャンネル自動作成
-- 🌐 **多言語対応**: Guild別言語設定
-- 🖥️ **Web UI**: ブラウザからの設定管理
+- ✅ **新規開発**: 旧コードの流用は行わない
+- ✅ **モダンな技術**: 最新のベストプラクティスを採用
+- ✅ **段階的実装**: MVP → 段階的機能追加
+- ✅ **品質重視**: テスト・型安全性・保守性を優先
+
+## ✨ 主要機能
+
+### ⏰ Bumpリマインダー機能
+
+Disboard/ディス速のBumpコマンド実行を検知し、2時間後にリマインドメッセージを送信します。
+
+- Bump検知と自動タイマー設定
+- メンション付き通知（ロール/ユーザー指定可能）
+- 通知登録のインタラクティブUI
+- `/bump-reminder-config` コマンドで設定管理
+
+[📖 詳細仕様](docs/BUMP_REMINDER_SPEC.md)
+
+### 🎤 AFK機能
+
+VCの非アクティブユーザーをAFKチャンネルに移動する機能です。
+
+- `/afk [user]` コマンドでユーザーを移動
+- `/afk-config` コマンドで機能設定
+- 管理者による柔軟な設定管理
+
+[📖 詳細仕様](docs/AFK_SPEC.md)
+
+### 🎤 VC自動作成機能（VAC）
+
+トリガーVC参加時、専用ボイスチャンネルを自動作成・削除する機能です。
+
+- トリガーチャンネル参加で専用VCを自動作成
+- 全員退出時に自動削除
+- コントロールパネルでVC設定変更
+- `/vac-config` コマンドで機能設定
+
+[📖 詳細仕様](docs/VAC_SPEC.md)
+
+### 📌 メッセージ固定機能
+
+重要メッセージをチャンネル最下部に自動的に再送信して固定表示する機能です。
+
+- 指定メッセージを常にチャンネル最下部に表示
+- 新規メッセージ投稿時に自動再送信
+- `/sticky-message` コマンドで管理
+
+[📖 詳細仕様](docs/STICKY_MESSAGE_SPEC.md)
+
+### 👥 メンバーログ機能
+
+メンバーの参加・脱退を指定チャンネルに記録する機能です。
+
+- 参加・脱退時に詳細情報をEmbed形式で通知
+- カスタムメッセージ設定
+- `/member-log-config` コマンドで設定
+
+[📖 詳細仕様](docs/specs/MEMBER_LOG_SPEC.md)
+
+### 🗑️ メッセージ削除機能
+
+モデレーター向けのメッセージ一括削除機能です。
+
+- `/message-delete` コマンドで一括削除
+- ユーザー指定、件数指定、チャンネル指定
+- 14日以上前のメッセージにも対応
+
+[📖 詳細仕様](docs/specs/MESSAGE_DELETE_SPEC.md)
+
+### 🌐 多言語対応
+
+サーバーごとに日本語/英語の言語設定が可能です。
+
+- i18nextによる多言語システム
+- コマンド、メッセージ、エラー全てを翻訳
+- サーバー単位でのロケール設定
+
+[📖 多言語対応ガイド](docs/I18N_GUIDE.md)
+
+### 🖥️ Web UI
+
+ブラウザからBot設定を管理するWebインターフェースを提供します。
+
+- ギルド設定の管理
+- 統計情報の表示
+- 管理者向けダッシュボード
+
+---
+
+**📌 コマンド一覧:** 全スラッシュコマンドの詳細は [コマンドリファレンス](docs/guides/COMMANDS.md) を参照してください。
+
+**📋 実装状況:** 開発タスクと進捗は [TODO.md](TODO.md) を参照してください。
 
 ## 🛠 技術スタック
 
-- **Runtime**: Node.js 22+
-- **Language**: TypeScript 5.x
-- **Framework**: Discord.js 14.x
-- **Database**: Keyv + SQLite
-- **Web**: Fastify
-- **Logger**: Winston
-- **Validation**: Zod
-- **Package Manager**: pnpm
+### コア技術
+
+- **Runtime**: Node.js 24以上
+- **Language**: TypeScript 5.x - 厳格な型チェックで品質向上
+- **Framework**: Discord.js 14.x - Discord Bot開発フレームワーク
+- **Package Manager**: pnpm - 高速で効率的なパッケージ管理
+
+### データベース
+
+- **Prisma** - タイプセーフなORMとスキーマ管理
+- **libSQL** - SQLite互換のデータベース（ローカル/リモート対応）
+
+### Web・API
+
+- **Fastify** - 高速Webフレームワーク
+- **Zod** - 実行時バリデーションとスキーマ定義
+
+### ロガー・ユーティリティ
+
+- **Winston** - ログ管理（ローテーション、レベル制御）
+- **i18next** - 多言語対応システム
+- **node-cron** - タイマー・スケジューリング処理
+
+### 開発ツール
+
+- **Jest** - テストフレームワーク
+- **ESLint + Prettier** - コード品質とフォーマット
+- **tsx** - TypeScript高速実行
+- **tsc-watch** - ファイル監視ビルド
+
+## 🎯 開発原則
+
+### アーキテクチャ
+
+- **レイヤー分離**: Bot / Web / Shared の明確な責務分離
+- **依存性注入**: テスト可能な設計
+- **型安全性**: TypeScript厳格モード + Zodバリデーション
+- **エラーハンドリング**: 統一されたエラー処理機構
+
+### コード品質
+
+- **自動フォーマット**: ESLint + Prettierによる一貫性
+- **テストカバレッジ**: 重要ロジックは必ずテスト
+- **ドキュメント**: コード内コメント + Markdownドキュメント
+- **レビュー**: 重要な変更はセルフレビュー必須
+
+### 開発フロー
+
+- **ブランチ戦略**: main（安定版）、feature/xxx（開発）
+- **コミット規約**: Conventional Commits（feat/fix/chore など）
+- **バージョニング**: セマンティックバージョニング
 
 ## 🚀 クイックスタート
 
 ### 必要環境
 
-- Node.js 22以上
+- Node.js 24以上
 - pnpm 10以上
 
 ### セットアップ
@@ -109,17 +238,27 @@ guild-mng-bot-v2/
 
 ## 📖 ドキュメント
 
-- [TODO](TODO.md) - 残タスク一覧
-- [開発ロードマップ](docs/DEVELOPMENT_ROADMAP.md) - 開発方針と作業計画
-- [テストガイド](docs/TESTING.md) - テスト方針とガイドライン
-- [国際化ガイド](docs/I18N_GUIDE.md) - 多言語対応ガイド
+### ガイド
+
+- [TODO](TODO.md) - タスク管理・残件リスト
+- [実装進捗](docs/progress/IMPLEMENTATION_PROGRESS.md) - 機能実装の詳細進捗
+- [テスト進捗](docs/progress/TEST_PROGRESS.md) - テスト実装の詳細進捗
+- [コマンドリファレンス](docs/guides/COMMANDS.md) - 全スラッシュコマンドの詳細
+- [開発環境セットアップ](docs/guides/DEVELOPMENT_SETUP.md) - 環境構築とプロジェクト設定の詳細ガイド
+- [テストガイド](docs/guides/TESTING_GUIDELINES.md) - テスト方針とガイドライン
+- [国際化ガイド](docs/guides/I18N_GUIDE.md) - 多言語対応ガイド
 
 ### 機能仕様書
 
-- [Bump通知機能](docs/BUMP_REMINDER_SPEC.md) - Disboard/ディス速のBump通知
-- [VAC機能](docs/VAC_SPEC.md) - ボイスチャンネル自動作成と操作パネル
-- [メンバー通知](docs/JOIN_LEAVE_LOG_SPEC.md) - メンバー加入・脱退通知
-- [メッセージ削除](docs/MSG_DEL_COMMAND_SPEC.md) - モデレーション機能
+各機能の詳細設計と実装仕様を記載したドキュメントです。
+
+- [AFK機能](docs/specs/AFK_SPEC.md) - VCの非アクティブユーザーを手動でAFKチャンネルに移動
+- [Bumpリマインダー機能](docs/specs/BUMP_REMINDER_SPEC.md) - Disboard/ディス速のBump後、次回Bump時刻に自動通知
+- [VC自動作成機能](docs/specs/VAC_SPEC.md) - トリガーチャンネル参加時に専用VCを作成・管理
+- [メッセージ固定機能](docs/specs/STICKY_MESSAGE_SPEC.md) - 指定メッセージをチャンネル最下部に固定表示
+- [メッセージレスポンス](docs/specs/MESSAGE_RESPONSE_SPEC.md) - Embed形式の統一メッセージシステム
+- [メンバーログ機能](docs/specs/MEMBER_LOG_SPEC.md) - メンバーの参加・脱退を指定チャンネルに記録
+- [メッセージ削除](docs/specs/MESSAGE_DELETE_SPEC.md) - モデレーター向けメッセージ一括削除コマンド
 
 ## 🔧 開発環境
 
@@ -195,13 +334,14 @@ REST Client拡張機能で「Send Request」をクリックするだけでテス
 
 ## 📊 プロジェクト状況
 
-**現在のフェーズ**: Phase 2 - コマンド実装（MVP） 🚧
+**現在のフェーズ**: Phase 2 - 主要機能実装中 🚧
 
 - ✅ Phase 0: 環境構築完了
 - ✅ Phase 1: 基盤実装完了（ロガー、Bot基盤、データベース、i18n、テスト）
-- 🚧 Phase 2: 基本コマンド実装中
+- ✅ Bump Reminder機能実装完了
+- 🚧 Phase 2: メッセージシステム統一化、VC自動作成機能、メッセージ固定機能
 
-詳細は [開発ロードマップ](docs/DEVELOPMENT_ROADMAP.md) および [TODO](TODO.md) を参照してください。
+詳細は [TODO.md](TODO.md) を参照してください。
 
 ## 📝 コミット規約
 
@@ -228,4 +368,4 @@ Apache License 2.0 - 詳細は [LICENSE](LICENSE) を参照
 ---
 
 **開発開始**: 2026年2月
-**最終更新**: 2026年2月11日
+**最終更新**: 2026年2月19日

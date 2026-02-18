@@ -1,300 +1,185 @@
 # Guild Management Bot v2 - TODO
 
-> 開発タスク一覧
+> プロジェクト全体のタスク管理と残件リスト
 
-最終更新: 2026年2月18日
-
----
-
-## 📊 現在の進捗状況
-
-### ✅ 完了項目
-
-#### 環境構築・インフラ
-
-- [x] プロジェクトセットアップ（pnpm、TypeScript、ESLint、Prettier）
-- [x] VSCode開発環境設定（settings、launch、tasks）
-- [x] Prismaセットアップとスキーマ定義
-- [x] テストインフラ整備（Jest、ユニット/インテグレーションテスト構造）
-- [x] i18next多言語対応システム実装
-- [x] コマンドローカライゼーション自動生成機能（LocaleManager、commandLocalizations）
-
-#### コア機能
-
-- [x] Discord Bot基盤（client.ts、イベントシステム）
-- [x] 環境変数管理（Zod validation）
-- [x] エラーハンドリング基盤（CustomErrors、ErrorHandler）
-- [x] データベース接続（Prisma Client）
-- [x] GuildConfigRepository実装
-- [x] JobScheduler + BumpReminderManager実装（スケジューラー機能）
-- [x] Webサーバー基本構造（Fastify）
-- [x] ヘルスチェックAPI
-- [x] Web API基盤（/api/index.ts）
-
-#### 実装済みコマンド
-
-- [x] `/ping` - 疎通確認
-- [x] `/afk` - AFKチャンネルへのメンバー移動
-- [x] `/afk-config` - AFK機能設定
-
-#### 実装済みイベント
-
-- [x] `clientReady` - Bot起動処理
-- [x] `interactionCreate` - インタラクション処理
-
-#### 実装済みサービス
-
-- [x] CooldownManager - コマンドクールダウン管理
-
-#### テスト
-
-- [x] ユニットテスト基盤整備
-- [x] 各種サービス・ユーティリティのテスト（87テストケース）
-- [x] CooldownManagerテスト（30テストケース）
-- [x] CustomErrorsテスト（20テストケース）
-- [x] ErrorHandlerテスト（15テストケース）
-- [x] loggerテスト（12テストケース）
-- [x] env.tsテスト（10テストケース）
-- [x] GuildConfigRepositoryインテグレーションテスト（12テストケース）
-
-#### ドキュメント
-
-- [x] DEVELOPMENT_ROADMAP.md - 開発ロードマップ
-- [x] TESTING.md - テスト方針
-- [x] TEST_SUMMARY.md - テスト結果サマリー
-- [x] I18N_GUIDE.md - 多言語対応ガイド
-- [x] BUMP_REMINDER_SPEC.md - Bump通知機能仕様
-- [x] VAC_SPEC.md - VAC機能仕様
-- [x] JOIN_LEAVE_LOG_SPEC.md - 入退出ログ仕様
-- [x] MSG_DEL_COMMAND_SPEC.md - メッセージ削除コマンド仕様
+最終更新: 2026年2月19日
 
 ---
 
-## 🚧 進行中・未実装項目
+## 📊 全体進捗サマリー
 
-### Phase 1: コア機能の完成
+### タスク統計
 
-#### 1.1 基本コマンド追加
+| カテゴリ     | 完了   | 進行中 | 未着手 | 合計    | 進捗率  |
+| ------------ | ------ | ------ | ------ | ------- | ------- |
+| 実装タスク   | 51     | 0      | 36     | 87      | 59%     |
+| テストタスク | 8      | 0      | 12     | 20      | 40%     |
+| ドキュメント | 18     | 0      | 2      | 20      | 90%     |
+| **合計**     | **77** | **0**  | **50** | **127** | **61%** |
+
+### Phase別進捗
+
+| Phase | 内容                   | 完了 | 残件 | 状態 |
+| ----- | ---------------------- | ---- | ---- | ---- |
+| 0     | 環境構築・インフラ     | 13   | 0    | ✅   |
+| 1     | メッセージシステム統一 | 10   | 0    | ✅   |
+| 2     | 主要機能実装           | 2    | 30   | 🚧   |
+| 3     | 基本コマンド追加       | 0    | 6    | 📋   |
+| 4     | Web UI実装             | 3    | 12   | 🚧   |
+| 5     | テスト・品質向上       | 8    | 15   | 🚧   |
+| 6     | デプロイ・運用         | 0    | 12   | 📋   |
+
+**凡例**: ✅ 完了 | 🚧 進行中 | 📋 未着手
+
+---
+
+## 📋 残タスク一覧
+
+### 🔴 Phase 1: メッセージシステム統一（優先度：高） - 残0件
+
+**状況**: MESSAGE_RESPONSE_SPEC.mdにて仕様策定済み。✅ 実装完了。
+
+#### 実装タスク
+
+- [x] メッセージレスポンスユーティリティの作成
+  - [x] `createSuccessEmbed()` - 成功メッセージ（緑色）
+  - [x] `createInfoEmbed()` - 情報メッセージ（青色）
+  - [x] `createWarningEmbed()` - 警告メッセージ（黄色）
+  - [x] `createErrorEmbed()` - エラーメッセージ（赤色）
+  - [x] タイムスタンプ、フッターの自動付与
+- [x] 既存コマンドのメッセージ修正（4コマンド）
+  - [x] `/ping` コマンド
+  - [x] `/afk` コマンド
+  - [x] `/afk-config` コマンド
+  - [x] `/bump-reminder-config` コマンド
+- [x] ErrorHandlerでのEmbed形式対応
+- [x] ローカライゼーションキーの追加（日本語・英語）
+- [x] テスト実装（14テストケース）
+
+**仕様書**: [docs/specs/MESSAGE_RESPONSE_SPEC.md](docs/specs/MESSAGE_RESPONSE_SPEC.md)
+
+---
+
+### 🟡 Phase 2: 主要機能実装 - 残30件
+
+#### 2.1 VC自動作成機能（VAC） - 残10件
+
+- [ ] voiceStateUpdateイベントハンドラ作成
+- [ ] トリガーチャンネル監視とVC自動作成・削除
+- [ ] 操作パネル実装（AFKチャンネル移動、VC設定変更）
+- [ ] `/vac-config` コマンド実装（create-trigger、remove-trigger、show）
+- [ ] Prisma SchemaへのVAC関連テーブル追加
+- [ ] テスト実装
+
+**仕様書**: [docs/specs/VAC_SPEC.md](docs/specs/VAC_SPEC.md)
+
+#### 2.2 メッセージ固定機能 - 残4件
+
+- [ ] `/sticky-message` コマンド実装（set、remove、list）
+- [ ] messageCreateイベントでの自動再送信ロジック
+- [ ] Prisma Schema更新（StickyMessage）
+- [ ] テスト実装
+
+**仕様書**: [docs/specs/STICKY_MESSAGE_SPEC.md](docs/specs/STICKY_MESSAGE_SPEC.md)
+
+#### 2.3 メンバーログ機能 - 残7件
+
+- [ ] guildMemberAdd、guildMemberRemoveイベントハンドラ作成
+- [ ] Embed形式の通知メッセージ実装
+- [ ] `/member-log-config` コマンド実装（set-channel、enable、disable、show）
+- [ ] Prisma Schema更新（MemberLogConfig）
+- [ ] テスト実装
+
+**仕様書**: [docs/specs/MEMBER_LOG_SPEC.md](docs/specs/MEMBER_LOG_SPEC.md)
+
+#### 2.4 メッセージ削除機能 - 残4件
+
+- [ ] `/message-delete` コマンド実装（user、count、channelオプション）
+- [ ] 権限チェック（MANAGE_MESSAGES）
+- [ ] 削除実行ログと通知
+- [ ] テスト実装
+
+**仕様書**: [docs/specs/MESSAGE_DELETE_SPEC.md](docs/specs/MESSAGE_DELETE_SPEC.md)
+
+#### 2.5 プロフィールチャンネル - 残5件
+
+- [ ] messageCreateイベントでプロフィールメッセージ検知
+- [ ] メッセージフォーマット検証
+- [ ] `/prof-channel-config` コマンド実装
+- [ ] Prisma Schema更新
+- [ ] テスト実装
+
+---
+
+### 🟢 Phase 3: 基本コマンド追加 - 残6件
 
 - [ ] `/help` - ヘルプコマンド（全コマンド一覧）
 - [ ] `/server-info` - サーバー情報表示
 - [ ] `/user-info` - ユーザー情報表示
-- [ ] 各コマンドのテスト
-
-#### 1.2 設定コマンド
-
 - [ ] `/config-locale` - ギルド言語設定
 - [ ] `/config-view` - 現在の設定表示
 - [ ] `/config-reset` - 設定リセット
 
 ---
 
-### Phase 2: 主要機能実装
-
-#### 2.1 Bump通知機能
-
-**状況**: スケジューラー基盤（JobScheduler + BumpReminderManager）は実装済み。Bot側の機能実装が必要。
-
-**Bump検知対応サービス:**
-
-- [ ] **Disboard** (`/bump`) - Bot ID: `302050872383242240`
-- [ ] **ディス速 (Dissoku)** (`/up`) - Bot ID要確認
-
-**機能実装:**
-
-- [ ] messageCreateイベントハンドラ作成
-  - [ ] Disboard `/bump` コマンド検知
-  - [ ] ディス速 `/up` コマンド検知
-  - [ ] interactionCommandNameベースの判定
-  - [ ] BumpReminderManagerとの連携
-- [ ] データベース連携
-  - [ ] チャンネルID保存
-  - [ ] リマインド日時保存
-  - [ ] メンション設定保存
-  - [ ] Prisma SchemaへのBumpReminder追加
-- [ ] Bot再起動時のタイマー復元（重要！）
-  - [ ] clientReadyイベントで全ギルドの状態をチェック
-  - [ ] 通知時刻を過ぎている場合は即時送信
-  - [ ] 未来の場合は残り時間でBumpReminderManagerを再設定
-- [ ] リマインダー通知実装
-  - [ ] メンションロール設定
-  - [ ] 個別ユーザーメンション（ボタンで通知登録）
-  - [ ] 通知メッセージ送信
-- [ ] UI/UX
-  - [ ] Bumpボタン（通知する/通知しない）
-  - [ ] 通知登録・解除機能
-  - [ ] ステータス表示
-- [ ] 設定コマンド `/bump-reminder-config`
-  - [ ] `start` - 機能有効化
-  - [ ] `stop` - 機能無効化
-  - [ ] `set-mention` - メンションロール設定
-  - [ ] `show` - 現在の設定表示
-- [ ] 重複防止機構（同時複数Bump対策）
-- [ ] テスト実装
-
-#### 2.2 スティッキーメッセージ
-
-- [ ] メッセージ固定コマンド `/sticky-message`
-- [ ] 自動再送信ロジック（messageCreateイベント）
-- [ ] 管理コマンド（追加/削除/一覧）
-- [ ] データベース保存（Prisma Schema更新）
-- [ ] テスト実装
-
-#### 2.3 VAC（ボイスチャンネル自動作成）
-
-**状況**: 仕様書（VAC_SPEC.md）作成済み。実装が必要。
-
-**基本機能:**
-
-- [ ] voiceStateUpdateイベントハンドラ作成
-- [ ] トリガーチャンネル（CreateVC）監視
-- [ ] 入室時に専用VCを動的作成
-- [ ] 作成者に`ManageChannels`権限付与（Discord標準UIで設定変更可能）
-- [ ] 空チャンネル自動削除
-- [ ] デフォルト設定（`{ユーザー名}'s Room`）
-
-**操作パネル機能:**
-
-- [ ] 作成されたVCのテキストチャンネルに操作パネル設置
-- [ ] パネルからのAFKチャンネル移動（User Select Menu）
-- [ ] ボタンUI実装
-
-**コマンド機能:**
-
-- [ ] `/vac-config create-trigger` - トリガーチャンネル作成
-- [ ] `/vac-config remove-trigger` - トリガーチャンネル削除
-- [ ] `/vac-config show` - 設定表示
-
-**データベース:**
-
-- [ ] Prisma SchemaへのVAC関連テーブル追加
-- [ ] VACトリガーチャンネルID保存
-- [ ] 作成されたVCリスト管理
-- [ ] テスト実装
-
-#### 2.4 メンバー加入・脱退通知
-
-**状況**: 仕様書（JOIN_LEAVE_LOG_SPEC.md）作成済み。実装が必要。
-
-**基本機能:**
-
-- [ ] guildMemberAddイベントハンドラ作成
-- [ ] guildMemberRemoveイベントハンドラ作成
-
-**通知機能:**
-
-- [ ] 通知メッセージ送信
-- [ ] メンバー情報パネル表示
-  - [ ] ユーザー名・ID
-  - [ ] アカウント作成日
-  - [ ] サーバー参加日
-  - [ ] アバター表示
-- [ ] Embedフォーマット
-
-**設定機能:**
-
-- [ ] `/join-leave-log-config` - 設定コマンド
-  - [ ] `set-channel` - 通知チャンネル設定
-  - [ ] `enable` - 機能有効化
-  - [ ] `disable` - 機能無効化
-  - [ ] `show` - 現在の設定表示
-
-**データベース:**
-
-- [ ] Prisma Schema更新
-- [ ] 通知チャンネルID保存
-- [ ] 有効/無効フラグ
-- [ ] テスト実装
-
-#### 2.5 プロフィールチャンネル
-
-- [ ] messageCreateイベントでプロフィールメッセージ検知
-- [ ] メッセージフォーマット検証
-- [ ] 設定コマンド `/prof-channel-config`
-- [ ] データベース保存
-- [ ] テスト実装
-
-#### 2.6 モデレーション機能
-
-**状況**: 仕様書（MSG_DEL_COMMAND_SPEC.md）作成済み。実装が必要。
-
-**メッセージ削除コマンド:**
-
-- [ ] `/msg-del` コマンド実装
-  - [ ] `user` オプション - 特定ユーザーのメッセージ削除
-  - [ ] `count` オプション - 削除件数指定（1-100）
-  - [ ] `channel` オプション - 対象チャンネル指定（省略時は実行チャンネル）
-- [ ] 権限チェック（MANAGE_MESSAGES権限必須）
-- [ ] 削除実行ログ
-- [ ] 削除完了通知（一時メッセージ）
-- [ ] エラーハンドリング
-- [ ] テスト実装
-
----
-
-### Phase 3: Web UI実装
+### 🟢 Phase 4: Web UI実装 - 残12件
 
 **状況**: Fastifyサーバー基盤、ヘルスチェックAPI、/api/index.tsは実装済み。
 
-#### 3.1 認証システム
+#### 4.1 認証システム - 残4件
 
 - [ ] Discord OAuth2統合
 - [ ] JWT認証実装
 - [ ] セッション管理
 - [ ] 権限チェックミドルウェア
 
-#### 3.2 管理API
+#### 4.2 管理API - 残5件
 
 - [ ] `/api/guilds` - ギルド一覧取得
 - [ ] `/api/guilds/:id` - ギルド詳細取得
 - [ ] `/api/guilds/:id/config` - 設定取得・更新
 - [ ] `/api/guilds/:id/stats` - 統計情報取得
-- [ ] バリデーション（Zod）
-- [ ] エラーハンドリング
+- [ ] バリデーション・エラーハンドリング
 
-#### 3.3 フロントエンド
+#### 4.3 フロントエンド - 残3件
 
 - [ ] ダッシュボードUI
 - [ ] ギルド設定画面
 - [ ] 統計表示画面
-- [ ] レスポンシブデザイン
-- [ ] 多言語対応（i18next連携）
 
 ---
 
-### Phase 4: テスト・品質向上
+### 🟢 Phase 5: テスト・品質向上 - 残15件
 
-**状況**: ユニットテスト＋インテグレーションテストで87テストケース実装済み。カバレッジ約31%（主要共有モジュールは十分にテスト済み）。
+**状況**: ユニットテスト＋インテグレーションテストで87+テストケース実装済み。
 
-#### 4.1 テストカバレッジ向上
+#### 5.1 テストカバレッジ向上 - 残8件
 
 - [ ] コマンドのユニットテスト追加
 - [ ] イベントハンドラーのテスト追加
 - [ ] E2Eテスト追加（Discordモック利用）
 - [ ] カバレッジ目標70%達成
 - [ ] エッジケーステスト
-- [ ] JobScheduler・BumpReminderManagerのテスト
+- [ ] 新機能のテスト（VAC、メッセージ固定等）
 
-#### 4.2 ドキュメント整備
+**詳細**: [docs/progress/TEST_PROGRESS.md](docs/progress/TEST_PROGRESS.md)
+
+#### 5.2 ドキュメント整備 - 残2件
 
 - [ ] API仕様書（OpenAPI/Swagger）
-- [ ] コマンドリファレンス（ユーザー向け）
 - [ ] デプロイガイド
-- [ ] 開発者ガイド
-- [ ] 多言語ドキュメント（英語版）
 
-#### 4.3 パフォーマンス最適化
+#### 5.3 パフォーマンス最適化 - 残3件
 
 - [ ] データベースクエリ最適化
 - [ ] メモリ使用量プロファイリング
-- [ ] ログローテーション設定（Winston設定調整）
-- [ ] キャッシング戦略
+- [ ] ログローテーション設定
 
 ---
 
-### Phase 5: デプロイ・運用
+### 🟢 Phase 6: デプロイ・運用 - 残12件
 
-#### 5.1 Docker化
+#### 6.1 Docker化 - 残5件
 
 - [ ] 本番用Dockerfile最適化
 - [ ] docker-compose.yml改善
@@ -302,26 +187,21 @@
 - [ ] ヘルスチェック設定
 - [ ] Prismaマイグレーション自動実行
 
-#### 5.2 CI/CD
+#### 6.2 CI/CD - 残3件
 
-- [ ] GitHub Actions ワークフロー
-  - [ ] リント・テスト自動実行
-  - [ ] Dockerイメージビルド・プッシュ
-  - [ ] 自動デプロイ設定
-- [ ] デプロイスクリプト作成
+- [ ] GitHub Actions ワークフロー（リント・テスト）
+- [ ] Dockerイメージビルド・プッシュ
+- [ ] 自動デプロイ設定
 
-#### 5.3 監視・ログ
+#### 6.3 監視・ログ - 残3件
 
 - [ ] エラー通知（Discord Webhook）
-- [ ] ログ集約システム
-- [ ] メトリクス収集（プロメテウス等）
+- [ ] メトリクス収集
 - [ ] アラート設定
 
-#### 5.4 バックアップ
+#### 6.4 バックアップ - 残1件
 
-- [ ] Prismaデータベース自動バックアップ
-- [ ] 復旧手順ドキュメント
-- [ ] バックアップテスト
+- [ ] データベース自動バックアップ・復旧手順
 
 ---
 
@@ -329,32 +209,24 @@
 
 ### 🔴 高優先度（次の1-2週間）
 
-1. **Bump通知機能の完成** - スケジューラー基盤は完成、Bot側実装が必要
-   - messageCreateイベントハンドラ
-   - データベース連携（Prisma Schema更新）
-   - `/bump-reminder-config` コマンド
-   - Bot再起動時のタイマー復元
-2. **基本コマンド追加** - ユーザビリティ向上（`/help`、`/server-info`、`/user-info`）
-3. **テストカバレッジ向上** - コマンド・イベントのテスト、JobScheduler/BumpReminderManagerのテスト
+1. ~~**メッセージシステムの統一化**~~ - ✅ 完了
+2. **VC自動作成機能の実装** - 10件
+3. **メッセージ固定機能の実装** - 4件
 
 ### 🟡 中優先度（1ヶ月以内）
 
-1. **VAC機能** - VC管理の重要機能（仕様書作成済み）
-2. **メンバー加入・脱退通知** - モデレーション支援（仕様書作成済み）
-3. **モデレーション機能（`/msg-del`）** - 管理者ツール（仕様書作成済み）
-4. **Web API拡充** - ギルド管理API（`/api/guilds`等）
-5. **スティッキーメッセージ** - アナウンス機能
+4. **メンバー参加・脱退ログ機能** - 7件
+5. **メッセージ削除機能** - 4件
+6. **基本コマンド追加** - 6件
+7. **Web API拡充** - 5件
+8. **テストカバレッジ向上** - 8件
 
 ### 🟢 低優先度（将来的に）
 
-1. **Web UI フロントエンド** - ダッシュボード構築
-2. **プロフィールチャンネル** - コミュニティ機能
-3. **高度な統計機能** - アナリティクス
-4. **カスタムコマンド** - ギルド別拡張
-5. **自動モデレーション** - スパム対策
-6. **レベルシステム** - ゲーミフィケーション
-
-**注**: AFK機能（`/afk`、`/afk-config`）は基本実装完了。Discord標準のAFK機能があるため、追加の自動検知・移動機能は低優先度。
+9. **Web UI フロントエンド** - 3件
+10. **プロフィールチャンネル** - 5件
+11. **認証システム** - 4件
+12. **デプロイ・運用** - 12件
 
 ---
 
@@ -362,32 +234,42 @@
 
 ### コード品質
 
-- [ ] 型安全性の向上（`any`型の削減）
+- [x] 型安全性の向上（`any`型の削減）
+  - [x] `AllParseKeys` 型導入により `t()` / `tDefault()` の引数を型安全化
+  - [x] `keySeparator: false` でフラットキー形式に統一
+  - [x] `setPrismaClient()`導入（`global.prisma`をモジュールレベル変数に変更）
+  - [x] `error as Error` キャストを撤廃（`unknown` 型対応）
+  - [x] `handleCommandError` / `handleInteractionError` を `unknown` 型対応に変更
+  - [x] `@ts-expect-error` をイベント登録の `as never` キャストに変更
+- [x] グレースフルシャットダウンの完全実装（SIGTERM / SIGINT ハンドラー + Prisma切断）
+- [x] ボタンインタラクションのエラーハンドリング追加
+- [x] クールダウンメッセージの多言語対応（ギルド設定言語を使用）
+- [x] DIガード追加（`setRepository()` 未呼び出し時に明示的エラー）
+- [x] `exists()` のエラー隠蔽修正（DB例外を再スロー）
 - [ ] ESLintルール厳格化
-- [ ] コードコメント充実（特に複雑なロジック）
+- [ ] コードコメント充実
 - [ ] 未使用コード・デッドコード削除
-- [ ] 一貫性のあるエラーメッセージ（i18n活用）
+- [ ] 一貫性のあるエラーメッセージ
 
 ### アーキテクチャ
 
-- [ ] リポジトリパターン完全実装（他のテーブルにも拡張）
-- [ ] 依存性注入の導入検討（Inversify等）
-- [ ] サービス層の整理（ビジネスロジック分離）
-- [ ] エラーハンドリング統一（CustomErrors活用）
-
-### パフォーマンス
-
-- [ ] Prismaインデックス最適化
-- [ ] クエリN+1問題の解消
-- [ ] キャッシング戦略実装（Redis検討）
-- [ ] メモリリーク調査（長時間稼働テスト）
+- [x] 機能モジュール分離（`src/shared/features/`）
+  - [x] Bumpリマインダー機能を `features/bump-reminder/` へ集約
+- [x] インタラクションハンドラーレジストリ方式の導入
+  - [x] `buttonHandlers` / `modalHandlers` レジストリ
+- [x] データベース型定義の集約（`database/types.ts`）
+- [ ] リポジトリパターン完全実装
+- [ ] 依存性注入の導入検討（現状はモジュールレベルのDI + ガード関数）
+- [ ] サービス層の整理
+- [x] エラーハンドリング統一（Embed形式、ErrorHandler）
+- [x] グローバルエラーハンドラー統一（`setupGlobalErrorHandlers` / `setupGracefulShutdown`）
 
 ### セキュリティ
 
-- [ ] 依存関係の脆弱性スキャン（`pnpm audit`）
-- [ ] 入力バリデーション強化（Zod活用）
-- [ ] レート制限実装（コマンド・API）
-- [ ] セキュリティヘッダー設定（Fastify Helmet）
+- [ ] 依存関係の脆弱性スキャン
+- [ ] 入力バリデーション強化
+- [ ] レート制限実装
+- [ ] セキュリティヘッダー設定
 
 ---
 
@@ -395,41 +277,124 @@
 
 ### 技術スタック改善検討
 
-- **キャッシュ**: Redis導入の検討（GuildConfig、頻繁アクセスデータ）
-- **ロガー**: Winston → Pino 移行検討（パフォーマンス改善）
-- **テスト**: Jest → Vitest 移行検討（実行速度改善）
+- **キャッシュ**: Redis導入の検討
+- **ロガー**: Winston → Pino 移行検討
+- **テスト**: Jest → Vitest 移行検討
 
 ### 機能拡張アイデア
 
-- **自動翻訳**: メッセージ自動翻訳機能（DeepL API等）
-- **投票システム**: リアクション投票機能
-- **ウェルカムメッセージ**: カスタマイズ可能な歓迎メッセージ・画像
-- **ロール管理**: 自動ロール付与システム（リアクションロール）
-- **音楽Bot機能**: ボイスチャット音楽再生（検討中）
-
-### データベース設計
-
-- Keyv + SQLite → Prisma移行完了✅
-- 今後の追加テーブル:
-  - `BumpReminder` - Bump通知設定・履歴
-  - `VACConfig` - VAC設定
-  - `StickyMessage` - 固定メッセージ
-  - `JoinLeaveLogConfig` - 入退出ログ設定
-  - `MessageDeletionLog` - メッセージ削除ログ
+- 自動翻訳機能（DeepL API等）
+- 投票システム（リアクション投票）
+- ウェルカムメッセージ（カスタマイズ可能）
+- ロール管理（自動ロール付与）
+- 音楽Bot機能（検討中）
 
 ---
 
 ## 🔗 関連ドキュメント
 
-- [README.md](README.md) - プロジェクト概要・クイックスタート
-- [docs/DEVELOPMENT_ROADMAP.md](docs/DEVELOPMENT_ROADMAP.md) - 開発ロードマップ詳細
-- [docs/TESTING.md](docs/TESTING.md) - テスト方針・戦略
-- [docs/TEST_SUMMARY.md](docs/TEST_SUMMARY.md) - テスト結果サマリー（87テストケース）
-- [docs/I18N_GUIDE.md](docs/I18N_GUIDE.md) - 多言語対応ガイド
-- [docs/BUMP_REMINDER_SPEC.md](docs/BUMP_REMINDER_SPEC.md) - Bump通知機能仕様
-- [docs/VAC_SPEC.md](docs/VAC_SPEC.md) - VAC機能仕様
-- [docs/JOIN_LEAVE_LOG_SPEC.md](docs/JOIN_LEAVE_LOG_SPEC.md) - 入退出ログ仕様
-- [docs/MSG_DEL_COMMAND_SPEC.md](docs/MSG_DEL_COMMAND_SPEC.md) - メッセージ削除コマンド仕様
+### プロジェクト管理
+
+- [README.md](README.md) - プロジェクト概要
+- [docs/progress/IMPLEMENTATION_PROGRESS.md](docs/progress/IMPLEMENTATION_PROGRESS.md) - 実装進捗の詳細
+- [docs/progress/TEST_PROGRESS.md](docs/progress/TEST_PROGRESS.md) - テスト進捗の詳細
+
+### 開発ガイド
+
+- [docs/guides/COMMANDS.md](docs/guides/COMMANDS.md) - コマンドリファレンス
+- [docs/guides/DEVELOPMENT_SETUP.md](docs/guides/DEVELOPMENT_SETUP.md) - 環境構築ガイド
+- [docs/guides/TESTING_GUIDELINES.md](docs/guides/TESTING_GUIDELINES.md) - テスト方針
+- [docs/guides/I18N_GUIDE.md](docs/guides/I18N_GUIDE.md) - 多言語対応ガイド
+
+### 機能仕様書
+
+- [docs/specs/BUMP_REMINDER_SPEC.md](docs/specs/BUMP_REMINDER_SPEC.md) - Bumpリマインダー機能
+- [docs/specs/AFK_SPEC.md](docs/specs/AFK_SPEC.md) - AFK機能
+- [docs/specs/VAC_SPEC.md](docs/specs/VAC_SPEC.md) - VC自動作成機能
+- [docs/specs/STICKY_MESSAGE_SPEC.md](docs/specs/STICKY_MESSAGE_SPEC.md) - メッセージ固定機能
+- [docs/specs/MEMBER_LOG_SPEC.md](docs/specs/MEMBER_LOG_SPEC.md) - メンバーログ
+- [docs/specs/MESSAGE_DELETE_SPEC.md](docs/specs/MESSAGE_DELETE_SPEC.md) - メッセージ削除
+- [docs/specs/MESSAGE_RESPONSE_SPEC.md](docs/specs/MESSAGE_RESPONSE_SPEC.md) - メッセージレスポンス
+
+---
+
+## ✅ 最近の完了項目 (2026年2月19日)
+
+### メッセージシステム統一 (Phase 1完了)
+
+- [x] `src/shared/utils/messageResponse.ts` 作成
+  - Embed生成ヘルパー関数実装
+  - 4種類のステータス（Success/Info/Warning/Error）
+  - カラーコーディングと絵文字の自動付与
+  - タイムスタンプ・フィールド対応
+- [x] 既存コマンドのEmbed形式への移行
+  - `/ping` - 成功Embed
+  - `/afk` - 成功Embed
+  - `/afk-config` - 成功/情報Embed
+  - `/bump-reminder-config` - 全サブコマンドEmbed対応
+- [x] ErrorHandlerのEmbed対応
+  - `handleCommandError()` - エラーEmbed形式
+  - `handleInteractionError()` - エラーEmbed形式
+- [x] ローカライゼーション拡充
+  - 日本語キー追加（60+項目）
+  - 英語キー追加（60+項目）
+- [x] ユニットテスト作成（14テストケース）
+  - 全テスト134個パス
+  - 型チェック完全通過
+
+### Bumpリマインダー機能モジュール分離
+
+- [x] `src/shared/features/bump-reminder/` 作成
+  - `repository.ts` - BumpReminderRepository
+  - `manager.ts` - BumpReminderManager
+  - `handler.ts` - handleBumpDetected / sendBumpReminder / sendBumpPanel
+  - `constants.ts` - BUMP_CONSTANTS
+  - `index.ts` - 公開API
+- [x] `interactionCreate.ts` をハンドラーレジストリ方式に刷新
+  - `src/bot/handlers/buttons/` - ボタンハンドラー
+  - `src/bot/handlers/modals/` - モーダルハンドラー
+- [x] `messageCreate.ts` の重複コードを `features/bump-reminder/handler.ts` へ移動
+- [x] `src/shared/database/types.ts` に型定義を集約
+  - GuildConfigRepository から型定義を分離・re-export
+- [x] `src/shared/database/index.ts` に `getGuildConfigRepository()` 追加
+
+### i18n型安全化
+
+- [x] `AllParseKeys` 型を導入し `t()` / `tDefault()` の引数を型安全化
+- [x] `keySeparator: false` でフラットキー形式に統一
+- [x] `system:` ネームスペースにログキーを集約（`events:` から移動）
+  - ready._, interaction._, afk.\*\_log, bump-reminder.detected など
+- [x] `GuildTFunction` 型導入（`helpers.ts`）
+
+### ドキュメント整理
+
+- [x] docs配下のディレクトリ構造整理
+  - guides/ (開発者向けガイド: 4ファイル)
+  - specs/ (機能仕様書: 7ファイル)
+  - progress/ (進捗管理: 2ファイル)
+- [x] docs/README.md作成（ドキュメント構成説明）
+- [x] 全ドキュメントのリンク更新
+  - README.md
+  - TODO.md
+  - IMPLEMENTATION_PROGRESS.md
+  - TEST_PROGRESS.md
+
+### 仕様書と実装の検証
+
+- [x] AFK機能の仕様書と実装の整合性確認
+  - コマンド実装: ✅ 完全一致
+  - データ構造: ✅ 完全一致
+  - エラーハンドリング: ✅ 完全一致
+  - 多言語対応: ✅ 完全一致
+- [x] Bumpリマインダー機能の仕様書と実装の整合性確認
+  - Bump検知: ✅ 完全一致
+  - タイマー管理: ✅ 完全一致
+  - データベース設計: ✅ 完全一致
+  - コマンド実装: ✅ 完全一致
+  - 設定管理: ✅ 完全一致
+- [x] 全テスト実行・検証
+  - 120テスト全てパス
+  - カバレッジ: コアモジュール 60-100%
 
 ---
 
@@ -437,23 +402,28 @@
 
 ### 直近の推奨作業順序
 
-1. **Bump通知機能の完成**
-   - [ ] Prisma SchemaにBumpReminder関連テーブル追加
-   - [ ] messageCreateイベントハンドラ作成
-   - [ ] `/bump-reminder-config` コマンド実装
-   - [ ] Bot再起動時の復元ロジック実装
-   - [ ] テスト作成
+1. ~~**メッセージシステムの統一化**~~ ✅ 完了
+   - ~~`src/shared/utils/messageResponse.ts` 作成~~
+   - ~~Embed生成関数実装~~
+   - ~~既存コマンドのレスポンス修正~~
+   - ~~ErrorHandlerでのEmbed対応~~
+   - ~~テスト作成~~
 
-2. **基本コマンド実装**
-   - [ ] `/help` コマンド
-   - [ ] `/server-info` コマンド
-   - [ ] `/user-info` コマンド
+2. **VC自動作成機能の実装**
+   - Prisma SchemaにVAC関連テーブル追加
+   - voiceStateUpdateイベントハンドラ作成
+   - `/vac-config` コマンド実装
+   - 操作パネル実装
+   - テスト作成
 
-3. **テスト拡充**
-   - [ ] JobScheduler/BumpReminderManagerのユニットテスト
-   - [ ] 既存コマンドのテスト拡充
+3. **メッセージ固定機能の実装**
+   - Prisma SchemaにStickyMessage追加
+   - `/sticky-message` コマンド実装
+   - messageCreateイベント再送信ロジック
+   - テスト作成
 
 ---
 
-**最終更新**: 2026年2月18日
-**全体進捗**: 基盤完成、主要機能実装フェーズ
+**最終更新**: 2026年2月19日
+**全体進捗**: 58% (68/118タスク完了) ＋ アーキテクチャ改善完了
+**次のマイルストーン**: Phase 2開始（VC自動作成機能）

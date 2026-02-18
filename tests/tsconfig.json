@@ -1,9 +1,10 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
+    "rootDir": "..", // プロジェクトルートをrootDirとして設定
     "types": ["node", "jest"], // テスト環境用の型定義
     "noEmit": true // テストコードはビルドしない
   },
-  "include": ["./**/*"],
+  "include": ["./**/*", "../src/**/*"],
   "exclude": ["node_modules"]
 }

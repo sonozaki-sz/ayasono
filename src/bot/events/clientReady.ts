@@ -1,24 +1,34 @@
 // src/bot/events/clientReady.ts
 // Bot起動完了イベント
 
+import { ActivityType, Events, PresenceUpdateStatus } from "discord.js";
+import { getGuildConfigRepository } from "../../shared/database";
+import type {
+  BumpReminderTaskFactory,
+  BumpServiceName,
+} from "../../shared/features/bump-reminder";
+import {
+  getBumpReminderManager,
+  sendBumpReminder,
+} from "../../shared/features/bump-reminder";
 import { tDefault } from "../../shared/locale";
 import type { BotEvent } from "../../shared/types/discord";
 import { logger } from "../../shared/utils/logger";
 
-export const clientReadyEvent: BotEvent<"clientReady"> = {
-  name: "clientReady",
+export const clientReadyEvent: BotEvent<typeof Events.ClientReady> = {
+  name: Events.ClientReady,
   once: true,
 
   async execute(client) {
-    logger.info(tDefault("events:ready.bot_ready", { tag: client.user?.tag }));
+    logger.info(tDefault("system:ready.bot_ready", { tag: client.user?.tag }));
     logger.info(
-      tDefault("events:ready.servers", { count: client.guilds.cache.size }),
+      tDefault("system:ready.servers", { count: client.guilds.cache.size }),
     );
     logger.info(
-      tDefault("events:ready.users", { count: client.users.cache.size }),
+      tDefault("system:ready.users", { count: client.users.cache.size }),
     );
     logger.info(
-      tDefault("events:ready.commands", { count: client.commands.size }),
+      tDefault("system:ready.commands", { count: client.commands.size }),
     );
 
     // ステータス設定
@@ -29,10 +39,42 @@ export const clientReadyEvent: BotEvent<"clientReady"> = {
           name: tDefault("system:bot.presence_activity", {
             count: serverCount,
           }),
-          type: 0,
+          type: ActivityType.Playing,
         },
       ],
-      status: "online",
+      status: PresenceUpdateStatus.Online,
     });
+
+    // Bumpリマインダーを復元（DB永続化データから再スケジュール）
+    try {
+      const guildConfigRepository = getGuildConfigRepository();
+      const bumpReminderManager = getBumpReminderManager();
+
+      const taskFactory: BumpReminderTaskFactory = (
+        guildId: string,
+        channelId: string,
+        messageId?: string,
+        panelMessageId?: string,
+        serviceName?: BumpServiceName,
+      ) => {
+        return () =>
+          sendBumpReminder(
+            client,
+            guildId,
+            channelId,
+            messageId,
+            serviceName,
+            guildConfigRepository,
+            panelMessageId,
+          );
+      };
+
+      await bumpReminderManager.restorePendingReminders(taskFactory);
+    } catch (error) {
+      logger.error(
+        tDefault("system:scheduler.bump_reminder_restore_failed"),
+        error,
+      );
+    }
   },
 };

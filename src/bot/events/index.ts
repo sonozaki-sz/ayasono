@@ -3,5 +3,10 @@
 
 import { clientReadyEvent } from "./clientReady";
 import { interactionCreateEvent } from "./interactionCreate";
+import { messageCreateEvent } from "./messageCreate";
 
-export const events = [interactionCreateEvent, clientReadyEvent] as const;
+export const events = [
+  interactionCreateEvent,
+  clientReadyEvent,
+  messageCreateEvent,
+] as const;

@@ -15,6 +15,20 @@ export const system = {
   "bot.client.shutdown_complete": "Bot client shut down successfully",
   "bot.presence_activity": "Running on {{count}} servers | by sonozaki-sz",
 
+  // Log messages
+  "bump-reminder.detected": "Bump detected for guild {{guildId}} ({{service}})",
+  "bump-reminder.detection_failed":
+    "Failed to handle bump detection for guild {{guildId}}:",
+  "log.bump_reminder_enabled":
+    "Enabled bump reminder for guild {{guildId}} (Channel: {{channelId}})",
+  "log.bump_reminder_disabled": "Disabled bump reminder for guild {{guildId}}",
+  "log.bump_reminder_mention_set":
+    "Set bump reminder mention role for guild {{guildId}} (Role: {{roleId}})",
+  "log.bump_reminder_mention_removed":
+    "Removed bump reminder mention settings for guild {{guildId}} (target: {{target}})",
+  "log.bump_reminder_users_removed":
+    "Removed {{count}} user(s) from bump reminder for guild {{guildId}}",
+
   // Error handling
   "error.reply_failed": "Failed to send error message",
   "error.unhandled_rejection": "Unhandled Promise rejection:",
@@ -24,10 +38,6 @@ export const system = {
   "error.node_warning": "Node Warning:",
   "error.cleanup_complete": "Cleanup completed",
   "error.cleanup_failed": "Error during cleanup:",
-
-  // Environment variables
-  "env.validation_failed": "Environment variable validation failed:",
-  "env.check_env_file": "Please check your .env file.",
 
   // Locale
   "locale.manager_initialized": "LocaleManager initialized with i18next",
@@ -60,6 +70,29 @@ export const system = {
     "Cancelling existing bump reminder for guild {{guildId}}",
   "scheduler.bump_reminder_cancelled":
     "Bump reminder cancelled for guild {{guildId}}",
+  "scheduler.bump_reminder_executing_immediately":
+    "Executing overdue bump reminder immediately for guild {{guildId}}",
+  "scheduler.bump_reminders_restored":
+    "Restored {{count}} pending bump reminders from database",
+  "scheduler.bump_reminder_sent":
+    "Bump reminder sent for guild {{guildId}} in channel {{channelId}}",
+  "scheduler.bump_reminder_channel_not_found":
+    "Channel {{channelId}} not found for guild {{guildId}}",
+  "scheduler.bump_reminder_disabled":
+    "Bump reminder disabled for guild {{guildId}}",
+  "scheduler.bump_reminder_restore_failed":
+    "Failed to restore pending bump reminders:",
+  "scheduler.bump_reminder_duplicates_cancelled":
+    "Cancelled {{count}} duplicate pending bump reminder(s)",
+  "scheduler.bump_reminder_unregistered_channel":
+    "Skipping bump detection in unregistered channel {{channelId}} for guild {{guildId}} (expected: {{expectedChannelId}})",
+  "scheduler.bump_reminder_orphaned_panel_delete_failed":
+    "Failed to delete orphaned bump panel message {{panelMessageId}}",
+  "scheduler.bump_reminder_panel_deleted":
+    "Deleted bump panel message {{panelMessageId}} in guild {{guildId}}",
+  "scheduler.bump_reminder_panel_delete_failed":
+    "Failed to delete bump panel message {{panelMessageId}}",
+  "scheduler.bump_reminder_panel_send_failed": "Failed to send bump panel",
 
   // Shutdown
   "shutdown.signal_received":
@@ -80,6 +113,57 @@ export const system = {
   "database.check_existence_log":
     "Failed to check existence for guild {{guildId}}:",
 
+  // Bump Reminder database operations
+  "database.bump_reminder_created":
+    "Bump reminder created: {{id}} for guild {{guildId}}",
+  "database.bump_reminder_create_failed":
+    "Failed to create bump reminder for guild {{guildId}}:",
+  "database.bump_reminder_find_failed": "Failed to find bump reminder {{id}}:",
+  "database.bump_reminder_find_all_failed":
+    "Failed to find all pending bump reminders:",
+  "database.bump_reminder_status_updated":
+    "Bump reminder {{id}} status updated to {{status}}",
+  "database.bump_reminder_update_failed":
+    "Failed to update bump reminder {{id}}:",
+  "database.bump_reminder_deleted": "Bump reminder deleted: {{id}}",
+  "database.bump_reminder_delete_failed":
+    "Failed to delete bump reminder {{id}}:",
+  "database.bump_reminder_cancelled_by_guild":
+    "Cancelled pending bump reminders for guild {{guildId}}",
+  "database.bump_reminder_cancelled_by_channel":
+    "Cancelled pending bump reminders for guild {{guildId}} / channel {{channelId}}",
+  "database.bump_reminder_cancel_failed":
+    "Failed to cancel bump reminders for guild {{guildId}}:",
+  "database.bump_reminder_cleanup_completed":
+    "Cleaned up {{count}} old bump reminders (older than {{days}} days)",
+  "database.bump_reminder_cleanup_failed":
+    "Failed to cleanup old bump reminders:",
+
+  // Bot startup event logs
+  "ready.bot_ready": "✅ Bot is ready! Logged in as {{tag}}",
+  "ready.servers": "📊 Servers: {{count}}",
+  "ready.users": "👥 Users: {{count}}",
+  "ready.commands": "💬 Commands: {{count}}",
+  "ready.event_registered": "Event registered: {{name}}",
+
+  // Interaction event logs
+  "interaction.unknown_command": "Unknown command: {{commandName}}",
+  "interaction.command_executed":
+    "Command executed: {{commandName}} by {{userTag}}",
+  "interaction.command_error": "Error executing command {{commandName}}:",
+  "interaction.autocomplete_error":
+    "Error in autocomplete for {{commandName}}:",
+  "interaction.unknown_modal": "Unknown modal: {{customId}}",
+  "interaction.modal_submitted": "Modal submitted: {{customId}} by {{userTag}}",
+  "interaction.modal_error": "Error executing modal {{customId}}:",
+  "interaction.button_error": "Error executing button {{customId}}:",
+
+  // AFK command logs
+  "afk.moved_log":
+    "Moved user {{userId}} to {{channelId}} in guild {{guildId}}",
+  "afk.configured_log":
+    "AFK channel configured for guild {{guildId}}, channel {{channelId}}",
+
   // Web server
   "web.server_started": "Web server started: {{url}}",
   "web.startup_error": "Web server startup error:",
@@ -88,6 +172,13 @@ export const system = {
   "web.startup_failed": "Web server startup failed:",
   "web.api_error": "API Error:",
   "web.internal_server_error": "Internal Server Error",
+  "web.auth_unauthorized": "[Auth] Unauthorized request: {{method}} {{url}}",
+  "web.auth_invalid_token": "[Auth] Invalid token: {{method}} {{url}}",
+  "web.auth_unauthorized_error": "Unauthorized",
+  "web.auth_forbidden_error": "Forbidden",
+  "web.auth_header_required":
+    "Authorization: Bearer <api-key> header is required",
+  "web.auth_invalid_token_message": "Invalid token",
 } as const;
 
 export type SystemTranslations = typeof system;

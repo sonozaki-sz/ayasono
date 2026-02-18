@@ -5,14 +5,27 @@ import { PrismaLibSql } from "@prisma/adapter-libsql";
 import { PrismaClient } from "@prisma/client";
 import { Routes } from "discord.js";
 import { env } from "../shared/config/env";
-import { createGuildConfigRepository } from "../shared/database/repositories/GuildConfigRepository";
+import { getGuildConfigRepository } from "../shared/database";
+import {
+  setupGlobalErrorHandlers,
+  setupGracefulShutdown,
+} from "../shared/errors/ErrorHandler";
 import { localeManager, tDefault } from "../shared/locale";
+import { registerBotEvent } from "../shared/types/discord";
 import { logger } from "../shared/utils/logger";
+import { setPrismaClient } from "../shared/utils/prisma";
 import { createBotClient } from "./client";
 import { commands } from "./commands";
-import { setRepository as setAfkRepository } from "./commands/afk";
-import { setRepository as setAfkConfigRepository } from "./commands/afk-config";
 import { events } from "./events";
+
+const COMMAND_REGISTRATION_SCOPE = {
+  GUILD: "Guild",
+  GLOBAL: "Global",
+} as const;
+
+const PROCESS_EXIT_CODE = {
+  FAILURE: 1,
+} as const;
 
 async function startBot() {
   const adapter = new PrismaLibSql({
@@ -20,11 +33,11 @@ async function startBot() {
   });
   const prisma = new PrismaClient({ adapter });
   await prisma.$connect();
-  const guildConfigRepository = createGuildConfigRepository(prisma);
 
-  localeManager.setRepository(guildConfigRepository);
-  setAfkRepository(guildConfigRepository);
-  setAfkConfigRepository(guildConfigRepository);
+  // Prismaクライアントをモジュール内に登録（イベントハンドラーからアクセス可能にする）
+  setPrismaClient(prisma);
+
+  localeManager.setRepository(getGuildConfigRepository());
 
   // LocaleManagerを初期化
   await localeManager.initialize();
@@ -33,6 +46,12 @@ async function startBot() {
 
   // クライアント作成
   const client = createBotClient();
+
+  // グレースフルシャットダウンを設定
+  setupGracefulShutdown(async () => {
+    await client.shutdown();
+    await prisma.$disconnect();
+  });
 
   try {
     // RESTクライアントにトークンを設定
@@ -60,13 +79,17 @@ async function startBot() {
           body: commands.map((cmd) => cmd.data.toJSON()),
         },
       );
-      logger.info(tDefault("system:bot.commands.registered") + " (Guild)");
+      logger.info(
+        `${tDefault("system:bot.commands.registered")} (${COMMAND_REGISTRATION_SCOPE.GUILD})`,
+      );
     } else {
       // グローバルコマンドとして登録（本番用）
       await client.rest.put(Routes.applicationCommands(env.DISCORD_APP_ID), {
         body: commands.map((cmd) => cmd.data.toJSON()),
       });
-      logger.info(tDefault("system:bot.commands.registered") + " (Global)");
+      logger.info(
+        `${tDefault("system:bot.commands.registered")} (${COMMAND_REGISTRATION_SCOPE.GLOBAL})`,
+      );
     }
 
     // イベント登録
@@ -75,15 +98,9 @@ async function startBot() {
     );
 
     for (const event of events) {
-      if (event.once) {
-        // @ts-expect-error - イベントハンドラーの型は動的に決まるため
-        client.once(event.name, (...args) => event.execute(...args));
-      } else {
-        // @ts-expect-error - イベントハンドラーの型は動的に決まるため
-        client.on(event.name, (...args) => event.execute(...args));
-      }
+      registerBotEvent(client, event);
       logger.debug(
-        tDefault("events:ready.event_registered", { name: event.name }),
+        tDefault("system:ready.event_registered", { name: event.name }),
       );
     }
 
@@ -93,22 +110,16 @@ async function startBot() {
     await client.login(env.DISCORD_TOKEN);
   } catch (error) {
     logger.error(tDefault("system:bot.startup.error"), error);
-    process.exit(1);
+    await prisma.$disconnect();
+    process.exit(PROCESS_EXIT_CODE.FAILURE);
   }
 }
 
-// エラーハンドリング
-process.on("unhandledRejection", (error) => {
-  logger.error(tDefault("system:error.unhandled_rejection"), error);
-});
-
-process.on("uncaughtException", (error) => {
-  logger.error(tDefault("system:error.uncaught_exception"), error);
-  process.exit(1);
-});
+// グローバルエラーハンドラーを設定
+setupGlobalErrorHandlers();
 
 // 起動
 startBot().catch((error) => {
   logger.error(tDefault("system:bot.startup.failed"), error);
-  process.exit(1);
+  process.exit(PROCESS_EXIT_CODE.FAILURE);
 });
