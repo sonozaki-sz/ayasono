@@ -1,14 +1,16 @@
-// src/bot/features/bump-reminder/bumpMessageCreateHandler.ts
+// src/bot/features/bump-reminder/handlers/bumpMessageCreateHandler.ts
 // messageCreate における Bump 検知のユースケース処理
 
 import type { Message } from "discord.js";
-import { BUMP_COMMANDS, BUMP_SERVICES, resolveBumpService } from ".";
-import { NODE_ENV, env } from "../../../shared/config/env";
-import type { BotClient } from "../../client";
+import { BUMP_COMMANDS, BUMP_SERVICES, resolveBumpService } from "..";
+import { NODE_ENV, env } from "../../../../shared/config/env";
+import type { BotClient } from "../../../client";
 import { handleBumpDetected } from "./bumpReminderHandler";
 
 /**
  * messageCreate から Bump 実行メッセージを検知して処理を開始する関数
+ * @param message 受信した Discord メッセージ
+ * @returns 実行完了を示す Promise
  */
 export async function handleBumpMessageCreate(message: Message): Promise<void> {
   // DMは対象外（ギルド機能のため）

@@ -12,18 +12,16 @@ import {
   type ButtonInteraction,
   type GuildMember,
 } from "discord.js";
-import { safeReply } from "../../../../../bot/utils/interaction";
+import type { ButtonHandler } from "../../../../handlers/interactionCreate/ui/types";
+import {
+  isManagedVacChannel,
+  tGuild,
+} from "../../../../services/shared-access";
+import { safeReply } from "../../../../utils/interaction";
 import {
   createErrorEmbed,
   createSuccessEmbed,
-} from "../../../../../bot/utils/messageResponse";
-import type { ButtonHandler } from "../../../../handlers/interactionCreate/ui/types";
-import {
-  isManagedVacChannel
-} from "../../../../services/shared-access";
-import {
-  tGuild
-} from "../../../../services/shared-access";
+} from "../../../../utils/messageResponse";
 import {
   getVacPanelChannelId,
   sendVacControlPanel,
@@ -31,6 +29,11 @@ import {
 } from "./vacControlPanel";
 
 export const vacPanelButtonHandler: ButtonHandler = {
+  /**
+   * ハンドラー対象の customId かを判定する
+   * @param customId 判定対象の customId
+   * @returns VAC パネルボタンなら true
+   */
   matches(customId) {
     // VAC パネル由来の4系統ボタンのみを受理
     return (
@@ -41,6 +44,11 @@ export const vacPanelButtonHandler: ButtonHandler = {
     );
   },
 
+  /**
+   * VAC パネルのボタン操作を実行する
+   * @param interaction ボタンインタラクション
+   * @returns 実行完了を示す Promise
+   */
   async execute(interaction: ButtonInteraction) {
     // interaction に guild がないケース（DM等）は対象外
     const guild = interaction.guild;
@@ -210,6 +218,8 @@ export const vacPanelButtonHandler: ButtonHandler = {
 
 /**
  * ボタン customId から VAC 対象チャンネル ID を解決する関数
+ * @param customId 解析対象の customId
+ * @returns 解決したチャンネルID（未対応時は空文字）
  */
 function getPanelChannelId(customId: string): string {
   // rename 系ボタン

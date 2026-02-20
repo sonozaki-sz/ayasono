@@ -1,22 +1,20 @@
-// src/bot/features/bump-reminder/bumpReminderService.ts
+// src/bot/features/bump-reminder/services/bumpReminderService.ts
 // Bumpリマインダー用のジョブマネージャー
 // REFACTORING_PLAN.md Phase 2 - タイマー処理の重複リマインド対策
 // DB永続化対応：Bot再起動時もリマインダーを復元可能
 
-import { jobScheduler } from "../../../shared/scheduler/jobScheduler";
-import { logger } from "../../../shared/utils/logger";
-import { requirePrismaClient } from "../../../shared/utils/prisma";
-import {
-  tDefault
-} from "../../services/shared-access";
+import { jobScheduler } from "../../../../shared/scheduler/jobScheduler";
+import { logger } from "../../../../shared/utils/logger";
+import { requirePrismaClient } from "../../../../shared/utils/prisma";
+import { tDefault } from "../../../services/shared-access";
 import {
   BUMP_REMINDER_STATUS,
   isBumpServiceName,
   toBumpReminderJobId,
   toScheduledAt,
   type BumpServiceName,
-} from "./bumpReminderConstants";
-import { getBumpReminderRepository } from "./bumpReminderRepository";
+} from "../constants/bumpReminderConstants";
+import { getBumpReminderRepository } from "../repositories/bumpReminderRepository";
 
 export type BumpReminderTaskFactory = (
   guildId: string,
@@ -25,6 +23,8 @@ export type BumpReminderTaskFactory = (
   panelMessageId?: string,
   serviceName?: BumpServiceName,
 ) => () => Promise<void>;
+
+// 復元時に pending レコードを実行タスクへ変換するためのファクトリ型
 
 /**
  * Bumpリマインダー用のジョブマネージャー
@@ -42,6 +42,7 @@ export class BumpReminderManager {
    * @param delayMinutes 遅延時間（分）
    * @param task 実行するタスク
    * @param serviceName サービス名（Disboard, Dissoku）
+   * @returns 実行完了を示す Promise
    */
   public async setReminder(
     guildId: string,
@@ -96,6 +97,10 @@ export class BumpReminderManager {
   /**
    * タスク実行後に DB ステータスを更新するラッパーを生成する共通ヘルパー
    * 成功時は "sent"、失敗時は "cancelled" に更新する
+   * @param guildId ログ出力に利用するギルドID
+   * @param reminderId 更新対象のリマインダーID
+   * @param task 実行対象タスク
+   * @returns ステータス更新付きの実行関数
    */
   private createTrackedTask(
     guildId: string,
@@ -143,6 +148,7 @@ export class BumpReminderManager {
    * @param reminderId DB上のリマインダーID
    * @param delayMs 実行までの遅延時間（ミリ秒）
    * @param task 実行するタスク
+   * @returns なし
    */
   private scheduleReminderInMemory(
     guildId: string,
@@ -166,6 +172,8 @@ export class BumpReminderManager {
 
   /**
    * リマインダーをキャンセル
+   * @param guildId キャンセル対象のギルドID
+   * @returns キャンセルできた場合は true
    */
   public async cancelReminder(guildId: string): Promise<boolean> {
     // 管理マップ上の予約情報を解決
@@ -201,6 +209,8 @@ export class BumpReminderManager {
 
   /**
    * リマインダーが設定されているか確認
+   * @param guildId 確認対象のギルドID
+   * @returns 予約が存在する場合は true
    */
   public hasReminder(guildId: string): boolean {
     // メモリ上の管理マップに予約情報があるかを返す
@@ -211,6 +221,7 @@ export class BumpReminderManager {
    * Bot起動時にDBから pending のリマインダーを復元
    * DBレコードはそのまま再利用し、メモリ上のスケジュールのみ再登録する
    * @param taskFactory リマインダー実行時のタスクを生成する関数
+   * @returns 復元した件数
    */
   public async restorePendingReminders(
     taskFactory: BumpReminderTaskFactory,
@@ -304,6 +315,7 @@ export class BumpReminderManager {
   /**
    * すべてのリマインダーをクリア
    * 个々のキャンセル失敗時はエラーを記録して続行する
+   * @returns 実行完了を示す Promise
    */
   public async clearAll(): Promise<void> {
     // すべての guild 予約に対してキャンセルを並列実行
@@ -330,6 +342,7 @@ let bumpReminderManager: BumpReminderManager | null = null;
 /**
  * BumpReminderManager のシングルトンインスタンスを取得
  * Prismaクライアントは requirePrismaClient() 経由で遅延取得するため引数不要
+ * @returns 共有の BumpReminderManager インスタンス
  */
 export function getBumpReminderManager(): BumpReminderManager {
   // 初回呼び出し時のみ生成

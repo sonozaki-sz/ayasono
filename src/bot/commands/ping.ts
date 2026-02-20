@@ -2,15 +2,13 @@
 // Pingコマンド - ボットの応答速度を確認
 
 import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
-import type { Command } from "../../bot/types/discord";
-import { createSuccessEmbed } from "../../bot/utils/messageResponse";
 import {
   getCommandLocalizations,
-  tGuild
+  handleCommandError,
+  tGuild,
 } from "../services/shared-access";
-import {
-  handleCommandError
-} from "../services/shared-access";
+import type { Command } from "../types/discord";
+import { createSuccessEmbed } from "../utils/messageResponse";
 
 // Ping コマンドで使用するコマンド名定数
 const PING_COMMAND = {

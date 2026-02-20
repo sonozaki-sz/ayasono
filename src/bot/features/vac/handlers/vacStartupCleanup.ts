@@ -2,7 +2,7 @@
 // VAC の起動時クリーンアップハンドラー
 
 import type { BotClient } from "../../../client";
-import { getVacService } from "../services/vacService";
+import { getVacService } from "../services";
 
 /**
  * Bot 起動時に VAC 設定と実チャンネル状態の不整合を解消する関数

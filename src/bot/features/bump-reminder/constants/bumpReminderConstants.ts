@@ -1,7 +1,7 @@
-// src/bot/features/bump-reminder/bumpReminderConstants.ts
+// src/bot/features/bump-reminder/constants/bumpReminderConstants.ts
 // Bumpリマインダー機能の定数定義
 
-import { env } from "../../../shared/config/env";
+import { env } from "../../../../shared/config/env";
 
 /**
  * Bumpリマインダー機能の定数
@@ -71,6 +71,7 @@ const MS_PER_MINUTE = 60 * 1000;
  * リマインダー遅延時間（分）を取得
  * モジュールロード時に固定しないよう関数として実装
  * TEST_MODE の切り替え（テスト時）を正しく反映する
+ * @returns 遅延時間（分）
  */
 export function getReminderDelayMinutes(): number {
   // テスト時は短縮し、通常運用では本番待機時間を返す
@@ -79,6 +80,8 @@ export function getReminderDelayMinutes(): number {
 
 /**
  * 分単位の遅延から実行予定時刻を生成
+ * @param delayMinutes 現在時刻へ加算する遅延時間（分）
+ * @returns 実行予定時刻
  */
 export function toScheduledAt(delayMinutes: number): Date {
   // 現在時刻に遅延分を加算して実行予定時刻を生成
@@ -96,6 +99,8 @@ export type BumpReminderStatus =
 
 /**
  * 任意文字列が BumpServiceName か判定
+ * @param value 判定対象の文字列
+ * @returns value が BumpServiceName のとき true
  */
 export function isBumpServiceName(value: string): value is BumpServiceName {
   // 定義済みサービス一覧との一致で判定
@@ -104,6 +109,9 @@ export function isBumpServiceName(value: string): value is BumpServiceName {
 
 /**
  * Bot ID とコマンド名からサービス名を解決
+ * @param botId メッセージ送信元 Bot ID
+ * @param commandName 実行されたコマンド名
+ * @returns 一致したサービス名（未一致時は undefined）
  */
 export function resolveBumpService(
   botId: string,
@@ -118,6 +126,8 @@ export function resolveBumpService(
 
 /**
  * BumpリマインダージョブIDを生成
+ * @param guildId ジョブを識別するギルドID
+ * @returns スケジューラー管理用のジョブID
  */
 export function toBumpReminderJobId(guildId: string): string {
   // スケジューラ管理用の一意IDを組み立てる

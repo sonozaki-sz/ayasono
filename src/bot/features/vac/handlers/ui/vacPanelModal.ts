@@ -7,18 +7,16 @@ import {
   type GuildMember,
   type ModalSubmitInteraction,
 } from "discord.js";
-import { safeReply } from "../../../../../bot/utils/interaction";
+import type { ModalHandler } from "../../../../handlers/interactionCreate/ui/types";
+import {
+  isManagedVacChannel,
+  tGuild,
+} from "../../../../services/shared-access";
+import { safeReply } from "../../../../utils/interaction";
 import {
   createErrorEmbed,
   createSuccessEmbed,
-} from "../../../../../bot/utils/messageResponse";
-import type { ModalHandler } from "../../../../handlers/interactionCreate/ui/types";
-import {
-  isManagedVacChannel
-} from "../../../../services/shared-access";
-import {
-  tGuild
-} from "../../../../services/shared-access";
+} from "../../../../utils/messageResponse";
 import { getVacPanelChannelId, VAC_PANEL_CUSTOM_ID } from "./vacControlPanel";
 
 // Discord VC userLimit の許容範囲（0 は無制限）
@@ -26,6 +24,11 @@ const LIMIT_MIN = 0;
 const LIMIT_MAX = 99;
 
 export const vacPanelModalHandler: ModalHandler = {
+  /**
+   * ハンドラー対象の customId かを判定する
+   * @param customId 判定対象の customId
+   * @returns VAC パネルモーダルなら true
+   */
   matches(customId) {
     // rename/limit の2系統モーダルのみを受理
     // customId ルーティングは interactionCreate 側の dispatch 条件と対応させる
@@ -35,6 +38,11 @@ export const vacPanelModalHandler: ModalHandler = {
     );
   },
 
+  /**
+   * VAC パネルのモーダル送信を処理する
+   * @param interaction モーダルインタラクション
+   * @returns 実行完了を示す Promise
+   */
   async execute(interaction: ModalSubmitInteraction) {
     // interaction に guild がないケースは処理対象外
     const guild = interaction.guild;

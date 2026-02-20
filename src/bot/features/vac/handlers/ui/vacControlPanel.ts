@@ -7,10 +7,8 @@ import {
   ButtonStyle,
   type VoiceChannel,
 } from "discord.js";
-import { createInfoEmbed } from "../../../../../bot/utils/messageResponse";
-import {
-  tGuild
-} from "../../../../services/shared-access";
+import { tGuild } from "../../../../services/shared-access";
+import { createInfoEmbed } from "../../../../utils/messageResponse";
 
 // VAC パネルのボタン/モーダル/入力識別に使う customId 定数
 export const VAC_PANEL_CUSTOM_ID = {
@@ -27,6 +25,9 @@ export const VAC_PANEL_CUSTOM_ID = {
 
 /**
  * VAC パネル customId から対象ボイスチャンネル ID を抽出する関数
+ * @param customId 判定対象の customId
+ * @param prefix 対象とする customId プレフィックス
+ * @returns 解決したチャンネルID（不一致時は空文字）
  */
 export function getVacPanelChannelId(customId: string, prefix: string): string {
   // 想定prefix以外は空文字を返し、呼び出し側で不正IDとして扱う
@@ -36,6 +37,8 @@ export function getVacPanelChannelId(customId: string, prefix: string): string {
 
 /**
  * VAC 操作パネルメッセージを対象ボイスチャンネルへ送信する関数
+ * @param voiceChannel 送信先ボイスチャンネル
+ * @returns 実行完了を示す Promise
  */
 export async function sendVacControlPanel(
   voiceChannel: VoiceChannel,

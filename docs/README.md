@@ -2,7 +2,7 @@
 
 > Guild Management Bot v2 のドキュメント一覧
 
-最終更新: 2026年2月19日
+最終更新: 2026年2月21日
 
 ---
 
@@ -24,12 +24,13 @@ docs/
 
 ### [ARCHITECTURE.md](guides/ARCHITECTURE.md)
 
-コードベースの設計とアーキテクチャ概要。
+システム全体の設計方針とアーキテクチャ概要。
 
 **内容:**
 
 - Bot / Web の2プロセス構成図
 - ディレクトリ構成とモジュール境界の設計原則
+- 依存方向と責務境界（bot / web / shared）
 - Discord Gateway Intents の設定と理由
 - Repository / Factory / DI パターンの解説
 - スケジューラー設計（cron + setTimeout の使い分け）
@@ -90,6 +91,23 @@ docs/
 - 時刻依存/環境変数依存テストの安定化パターン（fake timers・キー単位復元）
 
 **対象:** 開発者、テスト担当者
+
+---
+
+### [IMPLEMENTATION_GUIDELINES.md](guides/IMPLEMENTATION_GUIDELINES.md)
+
+実装時の詳細方針とコーディング規約。
+
+**内容:**
+
+- レイヤ責務（commands / features / shared）の分離ルール
+- featureディレクトリ標準テンプレートと `index.ts` 運用ルール
+- 実装時の基本方針（小さく安全な変更、型安全維持）
+- コメント規約（ファイル先頭、関数、共用定数、処理ブロック）
+- リファクタリング手順（定数切り出し、ルーター化、処理分割）
+- 実装チェックリスト
+
+**対象:** 開発者、レビュー担当者
 
 ---
 

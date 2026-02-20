@@ -6,21 +6,17 @@ import {
   ChatInputCommandInteraction,
   SlashCommandBuilder,
 } from "discord.js";
-import type { Command } from "../../bot/types/discord";
 import { logger } from "../../shared/utils/logger";
-import { createSuccessEmbed } from "../../bot/utils/messageResponse";
 import {
-  getBotGuildConfigRepository
-} from "../services/shared-access";
-import {
+  getBotGuildConfigRepository,
   getCommandLocalizations,
-  tDefault,
-  tGuild
-} from "../services/shared-access";
-import {
   handleCommandError,
-  ValidationError
+  tDefault,
+  tGuild,
+  ValidationError,
 } from "../services/shared-access";
+import type { Command } from "../types/discord";
+import { createSuccessEmbed } from "../utils/messageResponse";
 
 // AFK コマンド本体で利用するコマンド名・オプション名定数
 const AFK_COMMAND = {

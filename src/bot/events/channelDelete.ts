@@ -2,14 +2,19 @@
 // VACのチャンネル削除同期イベント
 
 import { Events } from "discord.js";
-import type { BotEvent } from "../../bot/types/discord";
-import { handleVacChannelDelete } from "../features/vac/handlers/vacChannelDelete";
+import { handleVacChannelDelete } from "../features/vac/handlers";
+import type { BotEvent } from "../types/discord";
 
 export const channelDeleteEvent: BotEvent<typeof Events.ChannelDelete> = {
   name: Events.ChannelDelete,
   // チャンネル削除のたびに同期処理を実行
   once: false,
 
+  /**
+   * channelDelete イベント発火時に VAC の同期処理を実行する
+   * @param channel 削除されたチャンネル
+   * @returns 実行完了を示す Promise
+   */
   async execute(channel) {
     // VAC関連の整合性調整は機能ハンドラへ委譲
     await handleVacChannelDelete(channel);

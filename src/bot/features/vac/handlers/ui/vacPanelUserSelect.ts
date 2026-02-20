@@ -7,27 +7,35 @@ import {
   type GuildMember,
   type UserSelectMenuInteraction,
 } from "discord.js";
-import { safeReply } from "../../../../../bot/utils/interaction";
-import {
-  createErrorEmbed,
-  createSuccessEmbed,
-} from "../../../../../bot/utils/messageResponse";
 import type { UserSelectHandler } from "../../../../handlers/interactionCreate/ui/types";
 import {
   getBotGuildConfigRepository,
-  isManagedVacChannel
+  isManagedVacChannel,
+  tGuild,
 } from "../../../../services/shared-access";
+import { safeReply } from "../../../../utils/interaction";
 import {
-  tGuild
-} from "../../../../services/shared-access";
+  createErrorEmbed,
+  createSuccessEmbed,
+} from "../../../../utils/messageResponse";
 import { getVacPanelChannelId, VAC_PANEL_CUSTOM_ID } from "./vacControlPanel";
 
 export const vacPanelUserSelectHandler: UserSelectHandler = {
+  /**
+   * ハンドラー対象の customId かを判定する
+   * @param customId 判定対象の customId
+   * @returns VAC パネルAFKセレクトなら true
+   */
   matches(customId) {
     // AFK 移動セレクトメニューの customId のみを受理
     return customId.startsWith(VAC_PANEL_CUSTOM_ID.AFK_SELECT_PREFIX);
   },
 
+  /**
+   * VAC パネルの AFK ユーザー選択を処理する
+   * @param interaction ユーザーセレクトインタラクション
+   * @returns 実行完了を示す Promise
+   */
   async execute(interaction: UserSelectMenuInteraction) {
     // interaction に guild がないケースは処理対象外
     const guild = interaction.guild;
