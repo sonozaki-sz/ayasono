@@ -2,7 +2,7 @@
 
 > Architecture Guide - コード設計・モジュール構成・設計パターンの解説
 
-最終更新: 2026年2月19日
+最終更新: 2026年2月21日
 
 ---
 
@@ -10,6 +10,12 @@
 
 guild-mng-bot-v2 は **Bot プロセス**と **Web プロセス**の2プロセス構成で動作します。
 それぞれ独立して起動・停止でき、共有コード（`src/shared/`）を通じてロジックを再利用します。
+
+### このドキュメントのスコープ
+
+- 扱う内容: システム全体の構成、依存方向、レイヤ境界、モジュール責務
+- 扱わない内容: 関数分割手順、命名/コメント細則、実装時のチェックリスト
+- 実装細則は [IMPLEMENTATION_GUIDELINES.md](IMPLEMENTATION_GUIDELINES.md) を参照
 
 ---
 
@@ -70,8 +76,10 @@ src/
 │   │   └── discord.ts     # Bot専用のdiscord.js型拡張
 │   ├── commands/          # スラッシュコマンド実装
 │   ├── events/            # Discord イベントハンドラ
+│   ├── features/          # Bot専用機能（bump-reminder, vac など）
 │   ├── handlers/interactionCreate/
 │   │   ├── flow/          # command/components/modal のフロー制御
+│   │   ├── index.ts       # interactionCreate 入口
 │   │   └── ui/            # UIインタラクションハンドラレジストリ
 │   ├── errors/
 │   │   └── interactionErrorHandler.ts
@@ -80,13 +88,15 @@ src/
 │   │   └── messageResponse.ts
 │   └── services/
 │       ├── cooldownManager.ts
-│       └── sharedAccess.ts
+│       ├── botEventRegistration.ts
+│       └── shared-access/ # shared層アクセスの集約入口
 │
 ├── shared/                # Bot・Web 両プロセスで使用する共有コード
 │   ├── config/
 │   │   └── env.ts         # 環境変数定義（Zod バリデーション）
 │   ├── database/
 │   │   ├── types.ts       # ドメイン型定義（GuildConfig, AfkConfig 等）
+│   │   ├── index.ts
 │   │   ├── repositories/  # DB アクセス層（Repository パターン）
 │   │   └── stores/        # 機能別の永続化ストア
 │   ├── errors/
@@ -99,12 +109,14 @@ src/
 │   ├── locale/            # i18n（i18next）
 │   ├── scheduler/
 │   │   └── jobScheduler.ts
+│   ├── types/
 │   └── utils/
 │       ├── logger.ts
 │       └── prisma.ts
 │
 └── web/                   # Web プロセス専用
     ├── server.ts           # Fastify サーバー起動
+    ├── webAppBuilder.ts    # Webアプリ組み立て
     ├── middleware/
     │   └── auth.ts         # Bearer トークン認証
     ├── routes/
@@ -131,6 +143,30 @@ src/
 - 機能定数は `*Constants.ts`（例: `BumpReminderConstants.ts`）
 - 機能Repositoryは `*Repository.ts`（例: `BumpReminderRepository.ts`）
 - 互換ファイルは残さず廃止し、参照先は単一エントリーポイントへ統一する
+
+### Bot feature の標準ディレクトリ構成
+
+Bot 専用機能（`src/bot/features/<feature-name>/`）は、以下の構成を標準とします。
+
+```
+src/bot/features/<feature-name>/
+├── index.ts              # feature公開エントリ（外部公開面）
+├── commands/             # コマンド実行処理
+│   └── index.ts
+├── handlers/             # イベント境界・起動処理
+│   ├── ui/               # Button/Select/Modal などUI境界
+│   │   └── index.ts
+│   └── index.ts
+├── services/             # 業務ロジック
+│   └── index.ts
+├── repositories/         # 永続化アクセス
+│   └── index.ts
+└── constants/            # 共通定数・型ガード・変換ヘルパー
+    └── index.ts
+```
+
+詳細な実装運用（どこまでバレル化するか、内部import規約、公開APIの絞り方）は
+[IMPLEMENTATION_GUIDELINES.md](IMPLEMENTATION_GUIDELINES.md) の「ディレクトリ構成と `index.ts` 運用」を参照してください。
 
 ---
 
@@ -252,7 +288,7 @@ const afkConfig = safeJsonParse<AfkConfig>(record.afkConfig);
 ```
 Bot 起動
   └─ clientReady イベント
-       └─ BumpReminderManager.restoreReminders()
+       └─ BumpReminderManager.restorePendingReminders()
             ├─ DB から status=pending のリマインダーを取得
             ├─ scheduledAt が過去 → 即時実行
             └─ scheduledAt が未来 → setTimeout で再スケジュール
@@ -362,7 +398,7 @@ TEST_MODE=true
 ```
 
 ```typescript
-// src/shared/features/bump-reminder/constants.ts
+// src/bot/features/bump-reminder/constants/bumpReminderConstants.ts
 export function getReminderDelayMinutes(): number {
   return env.TEST_MODE ? 1 : 120;
 }

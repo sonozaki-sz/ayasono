@@ -4,11 +4,9 @@
 import { ActivityType, PresenceUpdateStatus } from "discord.js";
 import { logger } from "../../shared/utils/logger";
 import type { BotClient } from "../client";
-import { restoreBumpRemindersOnStartup } from "../features/bump-reminder/bumpReminderStartup";
-import { cleanupVacOnStartup } from "../features/vac/handlers/vacStartupCleanup";
-import {
-  tDefault
-} from "../services/shared-access";
+import { restoreBumpRemindersOnStartup } from "../features/bump-reminder/handlers";
+import { cleanupVacOnStartup } from "../features/vac/handlers";
+import { tDefault } from "../services/shared-access";
 
 /**
  * clientReady 発火時の初期化後処理をまとめて実行する関数

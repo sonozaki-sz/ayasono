@@ -16,14 +16,14 @@ export {
   toScheduledAt,
   type BumpReminderStatus,
   type BumpServiceName,
-} from "./bumpReminderConstants";
+} from "./constants";
 
 // スケジューリング/復元を担うマネージャー
 export {
   BumpReminderManager,
   getBumpReminderManager,
   type BumpReminderTaskFactory,
-} from "./bumpReminderService";
+} from "./services";
 
 // 永続化アクセス（Prisma実装 + 抽象）
 export {
@@ -31,6 +31,6 @@ export {
   getBumpReminderRepository,
   type BumpReminder,
   type IBumpReminderRepository,
-} from "./bumpReminderRepository";
+} from "./repositories";
 
 // NOTE: 依存方向を明確にするため、ここでは再エクスポートのみを行いロジックは持たない

@@ -1,25 +1,23 @@
-// src/bot/features/bump-reminder/ui/bumpPanelButtonHandler.ts
+// src/bot/features/bump-reminder/handlers/ui/bumpPanelButtonHandler.ts
 // Bumpパネルのボタン処理
 
 import { MessageFlags, type ButtonInteraction } from "discord.js";
-import { BUMP_CONSTANTS } from "..";
-import { safeReply } from "../../../../bot/utils/interaction";
-import { logger } from "../../../../shared/utils/logger";
+import { logger } from "../../../../../shared/utils/logger";
+import type { ButtonHandler } from "../../../../handlers/interactionCreate/ui/types";
+import {
+  BUMP_REMINDER_MENTION_USER_ADD_RESULT,
+  BUMP_REMINDER_MENTION_USER_REMOVE_RESULT,
+  getBumpReminderConfigService,
+  getGuildTranslator,
+  tDefault,
+} from "../../../../services/shared-access";
+import { safeReply } from "../../../../utils/interaction";
 import {
   createErrorEmbed,
   createSuccessEmbed,
   createWarningEmbed,
-} from "../../../../bot/utils/messageResponse";
-import type { ButtonHandler } from "../../../handlers/interactionCreate/ui/types";
-import {
-  BUMP_REMINDER_MENTION_USER_ADD_RESULT,
-  BUMP_REMINDER_MENTION_USER_REMOVE_RESULT,
-  getBumpReminderConfigService
-} from "../../../services/shared-access";
-import {
-  getGuildTranslator,
-  tDefault
-} from "../../../services/shared-access";
+} from "../../../../utils/messageResponse";
+import { BUMP_CONSTANTS } from "../../index";
 
 // Bump パネル操作のログ文言を一貫化するための定数
 const BUMP_PANEL_LOG_CONSTANTS = {
@@ -32,8 +30,14 @@ const BUMP_PANEL_LOG_CONSTANTS = {
   REPLY_FAILED: "Failed to send error reply",
 } as const;
 
+// Bump パネルの ON/OFF ボタン操作を処理する UI ハンドラー
 export const bumpPanelButtonHandler: ButtonHandler = {
-  matches(customId) {
+  /**
+   * ハンドラー対象の customId かを判定する
+   * @param customId 判定対象の customId
+   * @returns Bump パネル ON/OFF ボタンなら true
+   */
+  matches(customId: string) {
     // パネルの ON/OFF customId プレフィックスのみを処理対象とする
     // 設定UI以外のボタンと衝突しないよう prefix で厳密判定する
     return (
@@ -42,6 +46,11 @@ export const bumpPanelButtonHandler: ButtonHandler = {
     );
   },
 
+  /**
+   * Bump パネルの ON/OFF ボタン操作を実行する
+   * @param interaction ボタンインタラクション
+   * @returns 実行完了を示す Promise
+   */
   async execute(interaction: ButtonInteraction) {
     try {
       const customId = interaction.customId;

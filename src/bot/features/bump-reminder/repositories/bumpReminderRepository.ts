@@ -1,18 +1,13 @@
-// src/bot/features/bump-reminder/bumpReminderRepository.ts
+// src/bot/features/bump-reminder/repositories/bumpReminderRepository.ts
 // Bumpリマインダー用リポジトリ
 
 import type { PrismaClient } from "@prisma/client";
-import { logger } from "../../../shared/utils/logger";
-import {
-  tDefault
-} from "../../services/shared-access";
-import {
-  DatabaseError
-} from "../../services/shared-access";
+import { logger } from "../../../../shared/utils/logger";
+import { DatabaseError, tDefault } from "../../../services/shared-access";
 import {
   BUMP_REMINDER_STATUS,
   type BumpReminderStatus,
-} from "./bumpReminderConstants";
+} from "../constants/bumpReminderConstants";
 
 /**
  * Bump Reminder型定義
@@ -61,6 +56,13 @@ export class BumpReminderRepository implements IBumpReminderRepository {
   /**
    * 新しいリマインダーを作成
    * 既存pendingのキャンセルと新規作成をトランザクションで原子的に実行し、競合状態を防ぐ
+   * @param guildId 登録対象のギルドID
+   * @param channelId 通知先チャンネルID
+   * @param scheduledAt 実行予定時刻
+   * @param messageId 元メッセージID
+   * @param panelMessageId パネルメッセージID
+   * @param serviceName サービス名
+   * @returns 作成したリマインダー
    */
   async create(
     guildId: string,
@@ -115,6 +117,8 @@ export class BumpReminderRepository implements IBumpReminderRepository {
 
   /**
    * IDでリマインダーを取得
+   * @param id 取得対象リマインダーID
+   * @returns 該当リマインダー（未存在時は null）
    */
   async findById(id: string): Promise<BumpReminder | null> {
     try {
@@ -135,6 +139,8 @@ export class BumpReminderRepository implements IBumpReminderRepository {
 
   /**
    * ギルドのpendingリマインダーを取得（1つのみ）
+   * @param guildId 取得対象のギルドID
+   * @returns pending リマインダー（未存在時は null）
    */
   async findPendingByGuild(guildId: string): Promise<BumpReminder | null> {
     try {
@@ -163,6 +169,7 @@ export class BumpReminderRepository implements IBumpReminderRepository {
 
   /**
    * すべてのpendingリマインダーを取得
+   * @returns pending リマインダー一覧
    */
   async findAllPending(): Promise<BumpReminder[]> {
     try {
@@ -190,6 +197,9 @@ export class BumpReminderRepository implements IBumpReminderRepository {
 
   /**
    * ステータスを更新
+   * @param id 更新対象リマインダーID
+   * @param status 更新後ステータス
+   * @returns 実行完了を示す Promise
    */
   async updateStatus(id: string, status: BumpReminderStatus): Promise<void> {
     try {
@@ -218,6 +228,8 @@ export class BumpReminderRepository implements IBumpReminderRepository {
 
   /**
    * リマインダーを削除
+   * @param id 削除対象リマインダーID
+   * @returns 実行完了を示す Promise
    */
   async delete(id: string): Promise<void> {
     try {
@@ -240,6 +252,8 @@ export class BumpReminderRepository implements IBumpReminderRepository {
 
   /**
    * ギルドのpendingリマインダーをすべてキャンセル
+   * @param guildId キャンセル対象のギルドID
+   * @returns 実行完了を示す Promise
    */
   async cancelByGuild(guildId: string): Promise<void> {
     try {
@@ -272,6 +286,9 @@ export class BumpReminderRepository implements IBumpReminderRepository {
 
   /**
    * 特定チャンネルのpendingリマインダーをキャンセル（重複防止用）
+   * @param guildId キャンセル対象のギルドID
+   * @param channelId キャンセル対象のチャンネルID
+   * @returns 実行完了を示す Promise
    */
   async cancelByGuildAndChannel(
     guildId: string,
@@ -364,6 +381,8 @@ let _cachedPrisma: PrismaClient | undefined;
 /**
  * BumpReminderRepository のシングルトンインスタンスを取得
  * Prismaクライアントが変わった場合（テスト時のモック差し替えなど）は自動的に再生成する
+ * @param prisma 利用する Prisma クライアント
+ * @returns 共有の BumpReminderRepository インスタンス
  */
 export function getBumpReminderRepository(
   prisma: PrismaClient,

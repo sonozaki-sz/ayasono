@@ -2,7 +2,7 @@
 // コマンドクールダウン管理
 
 import { logger } from "../../shared/utils/logger";
-import { tDefault } from "./shared-access/localeAccess";
+import { tDefault } from "./shared-access";
 
 /**
  * コマンドのクールダウンを管理するクラス

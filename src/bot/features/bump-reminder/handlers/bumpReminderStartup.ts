@@ -1,23 +1,23 @@
-// src/bot/features/bump-reminder/bumpReminderStartup.ts
+// src/bot/features/bump-reminder/handlers/bumpReminderStartup.ts
 // Bump リマインダーの起動時復元処理
 
 import {
   getBumpReminderManager,
   type BumpReminderTaskFactory,
   type BumpServiceName,
-} from ".";
-import { logger } from "../../../shared/utils/logger";
-import type { BotClient } from "../../client";
+} from "..";
+import { logger } from "../../../../shared/utils/logger";
+import type { BotClient } from "../../../client";
 import {
-  getBumpReminderConfigService
-} from "../../services/shared-access";
-import {
-  tDefault
-} from "../../services/shared-access";
+  getBumpReminderConfigService,
+  tDefault,
+} from "../../../services/shared-access";
 import { sendBumpReminder } from "./bumpReminderHandler";
 
 /**
  * 起動時に未実行の Bump リマインダーを復元する関数
+ * @param client 起動済みの Bot クライアント
+ * @returns 復元処理完了を示す Promise
  */
 export async function restoreBumpRemindersOnStartup(
   client: BotClient,

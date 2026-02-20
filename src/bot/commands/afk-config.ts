@@ -8,24 +8,17 @@ import {
   PermissionFlagsBits,
   SlashCommandBuilder,
 } from "discord.js";
-import type { Command } from "../../bot/types/discord";
 import { logger } from "../../shared/utils/logger";
 import {
-  createInfoEmbed,
-  createSuccessEmbed,
-} from "../../bot/utils/messageResponse";
-import {
-  getBotGuildConfigRepository
-} from "../services/shared-access";
-import {
+  getBotGuildConfigRepository,
   getCommandLocalizations,
-  tDefault,
-  tGuild
-} from "../services/shared-access";
-import {
   handleCommandError,
-  ValidationError
+  tDefault,
+  tGuild,
+  ValidationError,
 } from "../services/shared-access";
+import type { Command } from "../types/discord";
+import { createInfoEmbed, createSuccessEmbed } from "../utils/messageResponse";
 
 // AFK 設定コマンドのサブコマンド/オプション名を一元管理する定数
 const AFK_CONFIG_COMMAND = {

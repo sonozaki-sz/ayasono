@@ -100,6 +100,8 @@ VCの非アクティブユーザーをAFKチャンネルに移動する機能で
 
 **📌 コマンド一覧:** 全スラッシュコマンドの詳細は [コマンドリファレンス](docs/guides/COMMANDS.md) を参照してください。
 
+**🧭 実装方針:** 実装時の責務分離・コメント規約は [実装ガイド](docs/guides/IMPLEMENTATION_GUIDELINES.md) を参照してください。
+
 **📋 実装状況:** 開発タスクと進捗は [TODO.md](TODO.md) を参照してください。
 
 ## 🛠 技術スタック
@@ -243,9 +245,11 @@ guild-mng-bot-v2/
 - [TODO](TODO.md) - タスク管理・残件リスト
 - [実装進捗](docs/progress/IMPLEMENTATION_PROGRESS.md) - 機能実装の詳細進捗
 - [テスト進捗](docs/progress/TEST_PROGRESS.md) - テスト実装の詳細進捗
+- [アーキテクチャガイド](docs/guides/ARCHITECTURE.md) - 全体設計方針・依存方向・責務境界
 - [コマンドリファレンス](docs/guides/COMMANDS.md) - 全スラッシュコマンドの詳細
 - [開発環境セットアップ](docs/guides/DEVELOPMENT_SETUP.md) - 環境構築とプロジェクト設定の詳細ガイド
 - [テストガイド](docs/guides/TESTING_GUIDELINES.md) - テスト方針・コメント規約・安定化ガイドライン
+- [実装ガイド](docs/guides/IMPLEMENTATION_GUIDELINES.md) - 実装細則・分割手順・`index.ts`運用
 - [国際化ガイド](docs/guides/I18N_GUIDE.md) - 多言語対応ガイド
 
 ### 機能仕様書

@@ -1,7 +1,7 @@
 // src/bot/commands/index.ts
 // コマンド一覧をエクスポート
 
-import type { Command } from "../../bot/types/discord";
+import type { Command } from "../types/discord";
 import { afkCommand } from "./afk";
 import { afkConfigCommand } from "./afk-config";
 import { bumpReminderConfigCommand } from "./bump-reminder-config";

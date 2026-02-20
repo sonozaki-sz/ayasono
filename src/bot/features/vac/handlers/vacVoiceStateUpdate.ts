@@ -1,8 +1,8 @@
-// src/bot/features/vac/handlers/vacVoiceState.ts
+// src/bot/features/vac/handlers/vacVoiceStateUpdate.ts
 // VAC 用 voiceStateUpdate のハンドラー
 
 import type { VoiceState } from "discord.js";
-import { getVacService } from "../services/vacService";
+import { getVacService } from "../services";
 
 /**
  * voiceStateUpdate を受け、VAC 作成/削除ユースケースを実行する関数

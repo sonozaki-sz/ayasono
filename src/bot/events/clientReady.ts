@@ -2,9 +2,9 @@
 // Bot起動完了イベント
 
 import { Events } from "discord.js";
-import type { BotEvent } from "../../bot/types/discord";
 import type { BotClient } from "../client";
 import { handleClientReady } from "../handlers/clientReadyHandler";
+import type { BotEvent } from "../types/discord";
 
 export const clientReadyEvent: BotEvent<typeof Events.ClientReady> = {
   name: Events.ClientReady,

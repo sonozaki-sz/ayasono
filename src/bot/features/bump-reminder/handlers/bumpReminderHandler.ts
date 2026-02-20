@@ -1,4 +1,4 @@
-// src/bot/features/bump-reminder/bumpReminderHandler.ts
+// src/bot/features/bump-reminder/handlers/bumpReminderHandler.ts
 // Bump検知とリマインダー送信のBot層ハンドラー
 
 import {
@@ -14,20 +14,24 @@ import {
   getReminderDelayMinutes,
   toScheduledAt,
   type BumpServiceName,
-} from ".";
-import { logger } from "../../../shared/utils/logger";
-import { createInfoEmbed } from "../../../bot/utils/messageResponse";
+} from "..";
+import { logger } from "../../../../shared/utils/logger";
 import {
-  getBumpReminderConfigService
-} from "../../services/shared-access";
-import {
+  getBumpReminderConfigService,
   getGuildTranslator,
   tDefault,
-  type GuildTFunction
-} from "../../services/shared-access";
+  type GuildTFunction,
+} from "../../../services/shared-access";
+import { createInfoEmbed } from "../../../utils/messageResponse";
 
 /**
  * Bump 検知時に設定確認、パネル送信、リマインダー登録を行う関数
+ * @param client Discord クライアント
+ * @param guildId 検知ギルドID
+ * @param channelId 検知チャンネルID
+ * @param messageId 検知元メッセージID
+ * @param serviceName 検知サービス名
+ * @returns 実行完了を示す Promise
  */
 export async function handleBumpDetected(
   client: Client,
@@ -146,6 +150,14 @@ export async function handleBumpDetected(
 
 /**
  * スケジュール到達時に Bump リマインダー通知を送信する関数
+ * @param client Discord クライアント
+ * @param guildId 通知対象ギルドID
+ * @param channelId 通知先チャンネルID
+ * @param messageId 返信参照に使う元メッセージID
+ * @param serviceName 通知文言切り替え用サービス名
+ * @param bumpReminderConfigService 設定取得サービス
+ * @param panelMessageId 削除対象の予約パネルメッセージID
+ * @returns 実行完了を示す Promise
  */
 export async function sendBumpReminder(
   client: Client,
@@ -278,6 +290,12 @@ export async function sendBumpReminder(
 
 /**
  * Bump 予約時刻を表示する操作パネルメッセージを送信する関数
+ * @param client Discord クライアント
+ * @param guildId 通知対象ギルドID
+ * @param channelId パネル送信先チャンネルID
+ * @param messageId 返信参照する元メッセージID
+ * @param delayMinutes 予約までの遅延分数
+ * @returns 送信したパネルメッセージID（送信失敗時は undefined）
  */
 export async function sendBumpPanel(
   client: Client,
@@ -336,6 +354,9 @@ export async function sendBumpPanel(
 
 /**
  * Bump パネル用のボタン行を構築する関数
+ * @param guildId customId 埋め込みに使用するギルドID
+ * @param tGuild ギルドロケール用翻訳関数
+ * @returns ON/OFF ボタンを含む ActionRow
  */
 function createBumpPanelButtons(
   guildId: string,
