@@ -235,7 +235,7 @@
   - 完了条件: `VacService` は薄いオーケストレーションのみを保持する
   - コミット例: `refactor: vac service をユースケース単位に分割`
 
-- [ ] **NS-003** `BumpReminderRepository` のクエリ責務を分割
+- [x] **NS-003** `BumpReminderRepository` のクエリ責務を分割
   - 完了条件: pending取得/更新/クリーンアップを内部モジュール化し、重複ロギングを削減
   - コミット例: `refactor: bump reminder repository の責務を整理`
 
