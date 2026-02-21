@@ -13,7 +13,10 @@ import {
   toScheduledAt,
   type BumpServiceName,
 } from "../constants";
-import { getBumpReminderRepository } from "../repositories";
+import {
+  getBumpReminderRepository,
+  type IBumpReminderRepository,
+} from "../repositories";
 
 export type BumpReminderTaskFactory = (
   guildId: string,
@@ -29,6 +32,8 @@ export type BumpReminderTaskFactory = (
  * Bumpリマインダー用のジョブマネージャー
  */
 export class BumpReminderManager {
+  constructor(private readonly repository: IBumpReminderRepository) {}
+
   private reminders: Map<string, { jobId: string; reminderId: string }> =
     new Map();
 
@@ -65,8 +70,7 @@ export class BumpReminderManager {
 
     // DB に pending リマインダーを保存
     const scheduledAt = toScheduledAt(delayMinutes);
-    const repository = getBumpReminderRepository(requirePrismaClient());
-    const reminder = await repository.create(
+    const reminder = await this.repository.create(
       guildId,
       channelId,
       scheduledAt,
@@ -108,11 +112,13 @@ export class BumpReminderManager {
   ): () => Promise<void> {
     return async () => {
       // 実行時点の repository を取得してステータス更新に利用
-      const repository = getBumpReminderRepository(requirePrismaClient());
       try {
         await task();
         // 成功したらDBをsent状態に更新
-        await repository.updateStatus(reminderId, BUMP_REMINDER_STATUS.SENT);
+        await this.repository.updateStatus(
+          reminderId,
+          BUMP_REMINDER_STATUS.SENT,
+        );
       } catch (error) {
         logger.error(
           tDefault("system:scheduler.bump_reminder_task_failed", {
@@ -123,7 +129,7 @@ export class BumpReminderManager {
         // 失敗した場合も pending のまま放置せず cancelled に更新する
         // （Bot 再起動時に不要な再実行が発生しないようにする）
         try {
-          await repository.updateStatus(
+          await this.repository.updateStatus(
             reminderId,
             BUMP_REMINDER_STATUS.CANCELLED,
           );
@@ -186,8 +192,7 @@ export class BumpReminderManager {
 
       // DBをcancelled状態に更新（失敗してもスケジューラー・メモリは既にクリア済みのため続行）
       try {
-        const repository = getBumpReminderRepository(requirePrismaClient());
-        await repository.updateStatus(
+        await this.repository.updateStatus(
           reminder.reminderId,
           BUMP_REMINDER_STATUS.CANCELLED,
         );
@@ -226,8 +231,7 @@ export class BumpReminderManager {
     taskFactory: BumpReminderTaskFactory,
   ): Promise<number> {
     // DB 上の pending レコードを取得
-    const repository = getBumpReminderRepository(requirePrismaClient());
-    const pendingReminders = await repository.findAllPending();
+    const pendingReminders = await this.repository.findAllPending();
     let restoredCount = 0;
 
     // 同一ギルドの複数 pending レコードを最新のもの 1 件に絞り込む
@@ -249,7 +253,7 @@ export class BumpReminderManager {
     // 古い重複 pending をキャンセル（失敗しても続行）
     await Promise.allSettled(
       toCancel.map((r) =>
-        repository.updateStatus(r.id, BUMP_REMINDER_STATUS.CANCELLED),
+        this.repository.updateStatus(r.id, BUMP_REMINDER_STATUS.CANCELLED),
       ),
     );
     if (toCancel.length > 0) {
@@ -337,17 +341,36 @@ export class BumpReminderManager {
 
 // シングルトンインスタンス
 let bumpReminderManager: BumpReminderManager | null = null;
+let cachedRepository: IBumpReminderRepository | undefined;
 
 /**
- * BumpReminderManager のシングルトンインスタンスを取得
- * Prismaクライアントは requirePrismaClient() 経由で遅延取得するため引数不要
+ * BumpReminderManager インスタンスを生成
+ * @param repository 永続化アクセスに利用する repository
+ * @returns 新規 BumpReminderManager
+ */
+export function createBumpReminderManager(
+  repository: IBumpReminderRepository,
+): BumpReminderManager {
+  return new BumpReminderManager(repository);
+}
+
+/**
+ * BumpReminderManager を解決する
+ * repository 未指定時は既存のシングルトン経路へフォールバックする
  * @returns 共有の BumpReminderManager インスタンス
  */
-export function getBumpReminderManager(): BumpReminderManager {
-  // 初回呼び出し時のみ生成
-  if (!bumpReminderManager) {
-    bumpReminderManager = new BumpReminderManager();
+export function getBumpReminderManager(
+  repository?: IBumpReminderRepository,
+): BumpReminderManager {
+  const resolvedRepository =
+    repository ?? getBumpReminderRepository(requirePrismaClient());
+
+  // 初回呼び出し時、または注入 repository の変更時のみ再生成
+  if (!bumpReminderManager || cachedRepository !== resolvedRepository) {
+    bumpReminderManager = createBumpReminderManager(resolvedRepository);
+    cachedRepository = resolvedRepository;
   }
+
   // 共有シングルトンを返す
   return bumpReminderManager;
 }

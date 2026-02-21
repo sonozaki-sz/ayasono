@@ -22,6 +22,7 @@ export {
 export {
   BumpReminderManager,
   createBumpReminderFeatureConfigService,
+  createBumpReminderManager,
   getBumpReminderFeatureConfigService,
   getBumpReminderManager,
   type BumpReminderTaskFactory,
@@ -30,6 +31,7 @@ export {
 // 永続化アクセス（Prisma実装 + 抽象）
 export {
   BumpReminderRepository,
+  createBumpReminderRepository,
   getBumpReminderRepository,
   type BumpReminder,
   type IBumpReminderRepository,

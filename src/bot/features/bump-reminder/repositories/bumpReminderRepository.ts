@@ -372,6 +372,17 @@ export class BumpReminderRepository implements IBumpReminderRepository {
   }
 }
 
+/**
+ * BumpReminderRepository インスタンスを生成する
+ * @param prisma 利用する Prisma クライアント
+ * @returns 新規の BumpReminderRepository インスタンス
+ */
+export function createBumpReminderRepository(
+  prisma: PrismaClient,
+): BumpReminderRepository {
+  return new BumpReminderRepository(prisma);
+}
+
 // シングルトンインスタンス
 let bumpReminderRepository: BumpReminderRepository | null = null;
 let _cachedPrisma: PrismaClient | undefined;
@@ -387,7 +398,7 @@ export function getBumpReminderRepository(
 ): BumpReminderRepository {
   // 初回または Prisma 差し替え時に再生成
   if (!bumpReminderRepository || _cachedPrisma !== prisma) {
-    bumpReminderRepository = new BumpReminderRepository(prisma);
+    bumpReminderRepository = createBumpReminderRepository(prisma);
     _cachedPrisma = prisma;
   }
   // 現在有効なシングルトンを返す

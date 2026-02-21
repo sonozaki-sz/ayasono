@@ -2,12 +2,11 @@
 // VAC機能向けの永続化アクセスリポジトリ
 
 import {
-  getGuildConfigRepository,
   type VacChannelPair,
   type VacConfig,
 } from "../../../../shared/database";
 import {
-  createVacConfigService,
+  getVacConfigService,
   type VacConfigService,
 } from "../../../../shared/features/vac";
 
@@ -69,7 +68,7 @@ export function createVacRepository(
 }
 
 function createDefaultVacRepository(): IVacRepository {
-  const vacConfigService = createVacConfigService(getGuildConfigRepository());
+  const vacConfigService = getVacConfigService();
   return createVacRepository(vacConfigService);
 }
 

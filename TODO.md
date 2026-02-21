@@ -270,6 +270,53 @@
     - [x] write系クエリ（save/update/delete）を `repositories/persistence/guildConfigWritePersistence.ts` へ抽出
 - [x] **P5: singleton依存を明示DIへ段階移行**
   - [x] `vac` / `bump-reminder` から factory + 注入経路を整備
+- [ ] **P6: src整備方針（責務分離/構成整理/スリム化）**
+  - [ ] **依存解決の統一（最優先）**
+    - [ ] `getXxx` 依存を段階的に `createXxx` + 明示注入へ寄せる
+    - [ ] Composition Root を `bot/main.ts` 起点で明確化（生成責務の分散を抑制）
+  - [ ] **高凝集ファイルの分解（効果優先）**
+    - [ ] `bump-reminder`（service/repository/handler）を「ユースケース」「永続化」「スケジューリング」へ分離
+    - [ ] `vac`（service/command）を「入力解決」「設定更新」「表示整形」へ分離
+    - [ ] `guildConfigRepository` を機能別ファサード化して責務面積を縮小
+  - [ ] **ディレクトリ境界の明確化**
+    - [ ] `bot/features/*` は Botユースケース層に限定し、shared 直参照の境界ルールを固定
+    - [ ] `shared/database/*` は設定種別（afk/bump/vac/member-log/sticky）単位の独立性を強化
+  - [ ] **実施ポリシー**
+    - [ ] 当面は `src` 整備を優先し、テスト拡充・修正は構成安定後に再開する
+
+#### P6 実行チェックリスト（コミット単位）
+
+- [x] **C1: bump-reminder の依存解決を明示DI化（入口整備）**
+  - 対象: `bump-reminder` の `repository/manager/index` 公開API
+  - 目標: `createXxx` 追加 + 既存 `getXxx` は互換維持
+  - コミット例: `refactor: bump-reminder の依存解決を明示DI経路へ整理`
+- [x] **C2: vac の既定依存解決を service注入経路へ統一**
+  - 対象: `vacRepository` / `vacService`
+  - 目標: default 経路を factory ベースへ寄せ、生成責務を統一
+  - コミット例: `refactor: vac の依存解決を service factory 経由へ統一`
+- [ ] **C3: vac-config command の薄型化（1）入力解決の抽出**
+  - 対象: `vacConfigCommand.execute.ts` + `commands/helpers/*`
+  - 目標: category解決/trigger探索を helper へ分離
+  - コミット例: `refactor: vac-config の入力解決処理を helper に抽出`
+- [ ] **C4: vac-config command の薄型化（2）表示整形の抽出**
+  - 対象: `vacConfigCommand.execute.ts` + `commands/presenters/*`
+  - 目標: show用の整形/Embed生成前段を presenter 化
+  - コミット例: `refactor: vac-config 表示整形を presenter に分離`
+- [ ] **C5: bump-reminder service の分割（ユースケース/スケジュール）**
+  - 対象: `bumpReminderService.ts` + `services/*`
+  - 目標: 復元/登録/取消ロジックの関心分離
+  - コミット例: `refactor: bump-reminder service を用途別に分割`
+- [ ] **C6: guildConfigRepository のファサード薄化（機能別集約）**
+  - 対象: `shared/database/repositories/*`
+  - 目標: 機能別エントリへ分割し、集約層は委譲のみへ縮小
+  - コミット例: `refactor: guildConfigRepository を機能別ファサードへ再編`
+
+#### コミット運用ルール（P6期間）
+
+- [ ] 1コミット1関心（最大 3〜6 ファイル目安）
+- [ ] 各コミットで `pnpm run typecheck` を通す
+- [ ] 互換レイヤーを先に入れてから呼び出し側を移行する
+- [ ] テスト修正は後段（構成安定後）にまとめて実施する
 
 ### コード品質
 
