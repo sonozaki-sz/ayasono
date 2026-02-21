@@ -10,8 +10,6 @@ import {
 import {
   BUMP_CONSTANTS,
   BUMP_SERVICES,
-  getBumpReminderFeatureConfigService,
-  getBumpReminderManager,
   getReminderDelayMinutes,
   toScheduledAt,
   type BumpServiceName,
@@ -23,6 +21,10 @@ import {
   type GuildTFunction,
 } from "../../../../shared/locale";
 import { logger } from "../../../../shared/utils";
+import {
+  getBotBumpReminderConfigService,
+  getBotBumpReminderManager,
+} from "../../../services/botBumpReminderDependencyResolver";
 import { createInfoEmbed } from "../../../utils/messageResponse";
 
 /**
@@ -43,7 +45,7 @@ export async function handleBumpDetected(
 ): Promise<void> {
   try {
     // Bump 設定サービスを取得し、機能有効状態を確認
-    const bumpReminderConfigService = getBumpReminderFeatureConfigService();
+    const bumpReminderConfigService = getBotBumpReminderConfigService();
 
     const config =
       await bumpReminderConfigService.getBumpReminderConfig(guildId);
@@ -80,7 +82,7 @@ export async function handleBumpDetected(
     // panelMessageId は未送信時 undefined のまま許容する
 
     // 実行時タスク: 設定再取得のうえ通知送信とパネル削除を行う
-    const bumpReminderManager = getBumpReminderManager();
+    const bumpReminderManager = getBotBumpReminderManager();
     const reminderTask = async () => {
       // 実行時点の最新設定を参照するため、送信処理へ委譲
       // 予約時に閉じ込めず実行時再評価することで設定変更を反映する

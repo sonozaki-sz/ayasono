@@ -9,16 +9,14 @@ import {
 import { getGuildTranslator, tDefault } from "../../../../../shared/locale";
 import { logger } from "../../../../../shared/utils";
 import type { ButtonHandler } from "../../../../handlers/interactionCreate/ui";
+import { getBotBumpReminderConfigService } from "../../../../services/botBumpReminderDependencyResolver";
 import { safeReply } from "../../../../utils/interaction";
 import {
   createErrorEmbed,
   createSuccessEmbed,
   createWarningEmbed,
 } from "../../../../utils/messageResponse";
-import {
-  BUMP_CONSTANTS,
-  getBumpReminderFeatureConfigService,
-} from "../../index";
+import { BUMP_CONSTANTS } from "../../index";
 
 // Bump パネル操作のログ文言を一貫化するための定数
 const BUMP_PANEL_LOG_CONSTANTS = {
@@ -78,7 +76,7 @@ export const bumpPanelButtonHandler: ButtonHandler = {
         return;
       }
 
-      const bumpReminderConfigService = getBumpReminderFeatureConfigService();
+      const bumpReminderConfigService = getBotBumpReminderConfigService();
       const userId = interaction.user.id;
       // サービス呼び出しは guild + user 単位で完結
       // ギルドロケールに固定した翻訳関数を取得
