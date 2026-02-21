@@ -1,0 +1,143 @@
+import { vacPanelModalHandler } from "@/bot/features/vac/handlers/ui/vacPanelModal";
+import { safeReply } from "@/bot/utils/interaction";
+
+const isManagedVacChannelMock = jest.fn();
+
+jest.mock("@/shared/locale", () => ({
+  tGuild: jest.fn(
+    async (_guildId: string, key: string, params?: Record<string, unknown>) => {
+      if (key === "commands:vac.embed.renamed") {
+        return `renamed:${String(params?.name)}`;
+      }
+      if (key === "commands:vac.embed.limit_changed") {
+        return `limit:${String(params?.limit)}`;
+      }
+      if (key === "commands:vac.embed.unlimited") {
+        return "unlimited";
+      }
+      return key;
+    },
+  ),
+}));
+
+jest.mock("@/bot/services/botVacDependencyResolver", () => ({
+  getBotVacRepository: jest.fn(() => ({
+    isManagedVacChannel: isManagedVacChannelMock,
+  })),
+}));
+
+jest.mock("@/bot/utils/interaction", () => ({
+  safeReply: jest.fn(),
+}));
+
+jest.mock("@/bot/utils/messageResponse", () => ({
+  createErrorEmbed: jest.fn((message: string) => ({ message })),
+  createSuccessEmbed: jest.fn((message: string) => ({ message })),
+}));
+
+jest.mock("@/bot/features/vac/handlers/ui/vacControlPanel", () => ({
+  VAC_PANEL_CUSTOM_ID: {
+    RENAME_MODAL_PREFIX: "vac:rename-modal:",
+    LIMIT_MODAL_PREFIX: "vac:limit-modal:",
+    RENAME_INPUT: "rename-input",
+    LIMIT_INPUT: "limit-input",
+  },
+  getVacPanelChannelId: jest.fn((customId: string, prefix: string) =>
+    customId.startsWith(prefix) ? customId.slice(prefix.length) : "",
+  ),
+}));
+
+function createBaseInteraction(overrides?: {
+  customId?: string;
+  channel?: unknown;
+  memberChannelId?: string;
+  renameInput?: string;
+  limitInput?: string;
+}) {
+  const channel =
+    overrides?.channel ??
+    ({ id: "voice-1", type: 2, edit: jest.fn() } as const);
+
+  return {
+    guild: {
+      id: "guild-1",
+      channels: {
+        fetch: jest.fn().mockResolvedValue(channel),
+      },
+      members: {
+        fetch: jest.fn().mockResolvedValue({
+          voice: { channelId: overrides?.memberChannelId ?? "voice-1" },
+        }),
+      },
+    },
+    customId: overrides?.customId ?? "vac:rename-modal:voice-1",
+    user: { id: "user-1" },
+    fields: {
+      getTextInputValue: jest.fn((inputId: string) => {
+        if (inputId === "rename-input") {
+          return overrides?.renameInput ?? "Renamed VC";
+        }
+        return overrides?.limitInput ?? "10";
+      }),
+    },
+  };
+}
+
+describe("bot/features/vac/handlers/ui/vacPanelModal", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    isManagedVacChannelMock.mockResolvedValue(true);
+  });
+
+  it("matches only supported modal customId prefixes", () => {
+    expect(vacPanelModalHandler.matches("vac:rename-modal:voice-1")).toBe(true);
+    expect(vacPanelModalHandler.matches("vac:limit-modal:voice-1")).toBe(true);
+    expect(vacPanelModalHandler.matches("other:voice-1")).toBe(false);
+  });
+
+  it("replies error when target channel is not managed by VAC", async () => {
+    isManagedVacChannelMock.mockResolvedValueOnce(false);
+    const interaction = createBaseInteraction();
+
+    await vacPanelModalHandler.execute(interaction as never);
+
+    expect(safeReply).toHaveBeenCalledWith(interaction, {
+      embeds: [{ message: "errors:vac.not_vac_channel" }],
+      flags: 64,
+    });
+  });
+
+  it("renames voice channel and replies success", async () => {
+    const editMock = jest.fn().mockResolvedValue(undefined);
+    const interaction = createBaseInteraction({
+      customId: "vac:rename-modal:voice-1",
+      channel: { id: "voice-1", type: 2, edit: editMock },
+      renameInput: " New Name ",
+    });
+
+    await vacPanelModalHandler.execute(interaction as never);
+
+    expect(editMock).toHaveBeenCalledWith({ name: "New Name" });
+    expect(safeReply).toHaveBeenCalledWith(interaction, {
+      embeds: [{ message: "renamed:New Name" }],
+      flags: 64,
+    });
+  });
+
+  it("replies range error when limit input is invalid", async () => {
+    const editMock = jest.fn().mockResolvedValue(undefined);
+    const interaction = createBaseInteraction({
+      customId: "vac:limit-modal:voice-1",
+      channel: { id: "voice-1", type: 2, edit: editMock },
+      limitInput: "abc",
+    });
+
+    await vacPanelModalHandler.execute(interaction as never);
+
+    expect(editMock).not.toHaveBeenCalled();
+    expect(safeReply).toHaveBeenCalledWith(interaction, {
+      embeds: [{ message: "errors:vac.limit_out_of_range" }],
+      flags: 64,
+    });
+  });
+});
