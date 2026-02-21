@@ -51,13 +51,8 @@ jobs:
     name: Deploy to XServer VPS
     needs: test
     runs-on: ubuntu-latest
-    # mainへのpush、またはmain向けPRがマージされたときに実行（develop -> main を含む）
-    if: |
-      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
-      (github.event_name == 'pull_request' &&
-       github.event.action == 'closed' &&
-       github.event.pull_request.merged == true &&
-       github.event.pull_request.base.ref == 'main')
+    # デプロイ準備完了後に有効化する（VPS契約・Secrets設定後に if: false を削除）
+    if: false
 
     steps:
       - name: SSH 経由でデプロイ
