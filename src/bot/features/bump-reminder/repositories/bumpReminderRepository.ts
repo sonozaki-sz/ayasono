@@ -6,6 +6,16 @@ import { DatabaseError } from "../../../../shared/errors";
 import { tDefault } from "../../../../shared/locale";
 import { logger } from "../../../../shared/utils";
 import { BUMP_REMINDER_STATUS, type BumpReminderStatus } from "../constants";
+import { cleanupOldBumpRemindersUseCase } from "./usecases/cleanupBumpReminders";
+import {
+  findAllPendingUseCase,
+  findPendingByGuildUseCase,
+} from "./usecases/findPendingReminders";
+import {
+  cancelPendingByGuildAndChannelUseCase,
+  cancelPendingByGuildUseCase,
+  updateReminderStatusUseCase,
+} from "./usecases/updateBumpReminderStatus";
 
 /**
  * Bump Reminder型定義
@@ -142,16 +152,7 @@ export class BumpReminderRepository implements IBumpReminderRepository {
    */
   async findPendingByGuild(guildId: string): Promise<BumpReminder | null> {
     try {
-      // 最も近い予定時刻の pending を1件だけ取得
-      const result = await this.prisma.bumpReminder.findFirst({
-        where: {
-          guildId,
-          status: BUMP_REMINDER_STATUS.PENDING,
-        },
-        orderBy: {
-          scheduledAt: "asc",
-        },
-      });
+      const result = await findPendingByGuildUseCase(this.prisma, guildId);
       // manager 復元時は最短時刻1件のみ扱うため findFirst を使う
       return result as BumpReminder | null;
     } catch (error) {
@@ -171,15 +172,7 @@ export class BumpReminderRepository implements IBumpReminderRepository {
    */
   async findAllPending(): Promise<BumpReminder[]> {
     try {
-      // 起動復元用に pending を予定時刻昇順で取得
-      const results = await this.prisma.bumpReminder.findMany({
-        where: {
-          status: BUMP_REMINDER_STATUS.PENDING,
-        },
-        orderBy: {
-          scheduledAt: "asc",
-        },
-      });
+      const results = await findAllPendingUseCase(this.prisma);
       // 復元処理側で順次再登録しやすいよう昇順で返す
       return results as BumpReminder[];
     } catch (error) {
@@ -201,11 +194,7 @@ export class BumpReminderRepository implements IBumpReminderRepository {
    */
   async updateStatus(id: string, status: BumpReminderStatus): Promise<void> {
     try {
-      // 主キー指定で対象レコードを一意更新
-      await this.prisma.bumpReminder.update({
-        where: { id },
-        data: { status },
-      });
+      await updateReminderStatusUseCase(this.prisma, id, status);
 
       logger.debug(
         tDefault("system:database.bump_reminder_status_updated", {
@@ -255,16 +244,7 @@ export class BumpReminderRepository implements IBumpReminderRepository {
    */
   async cancelByGuild(guildId: string): Promise<void> {
     try {
-      // ギルド内 pending を一括キャンセルへ遷移
-      await this.prisma.bumpReminder.updateMany({
-        where: {
-          guildId,
-          status: BUMP_REMINDER_STATUS.PENDING,
-        },
-        data: {
-          status: BUMP_REMINDER_STATUS.CANCELLED,
-        },
-      });
+      await cancelPendingByGuildUseCase(this.prisma, guildId);
 
       logger.debug(
         tDefault("system:database.bump_reminder_cancelled_by_guild", {
@@ -293,17 +273,11 @@ export class BumpReminderRepository implements IBumpReminderRepository {
     channelId: string,
   ): Promise<void> {
     try {
-      // ギルド+チャンネルに一致する pending のみを一括キャンセル
-      await this.prisma.bumpReminder.updateMany({
-        where: {
-          guildId,
-          channelId,
-          status: BUMP_REMINDER_STATUS.PENDING,
-        },
-        data: {
-          status: BUMP_REMINDER_STATUS.CANCELLED,
-        },
-      });
+      await cancelPendingByGuildAndChannelUseCase(
+        this.prisma,
+        guildId,
+        channelId,
+      );
 
       logger.debug(
         tDefault("system:database.bump_reminder_cancelled_by_channel", {
@@ -335,31 +309,17 @@ export class BumpReminderRepository implements IBumpReminderRepository {
    */
   async cleanupOld(daysOld: number = 7): Promise<number> {
     try {
-      // しきい値日時を計算（更新日時ベースで判定）
-      const cutoffDate = new Date();
-      cutoffDate.setDate(cutoffDate.getDate() - daysOld);
-
-      // 完了/取消済みのみを対象に古い履歴を削除
-      const result = await this.prisma.bumpReminder.deleteMany({
-        where: {
-          status: {
-            in: [BUMP_REMINDER_STATUS.SENT, BUMP_REMINDER_STATUS.CANCELLED],
-          },
-          updatedAt: {
-            lt: cutoffDate,
-          },
-        },
-      });
+      const count = await cleanupOldBumpRemindersUseCase(this.prisma, daysOld);
       // PENDING は削除対象外にし、未実行タスクの痕跡を保持する
 
       logger.info(
         tDefault("system:database.bump_reminder_cleanup_completed", {
-          count: result.count,
+          count,
           days: daysOld,
         }),
       );
 
-      return result.count;
+      return count;
     } catch (error) {
       logger.error(
         tDefault("system:database.bump_reminder_cleanup_failed"),
