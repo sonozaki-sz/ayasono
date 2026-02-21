@@ -1,0 +1,23 @@
+import { BUMP_REMINDER_STATUS } from "@/bot/features/bump-reminder";
+import { cleanupOldBumpRemindersUseCase } from "@/bot/features/bump-reminder/repositories/usecases/cleanupBumpReminders";
+
+describe("bot/features/bump-reminder/repositories/usecases/cleanupBumpReminders", () => {
+  it("deletes old sent/cancelled reminders and returns count", async () => {
+    const deleteMany = jest.fn().mockResolvedValue({ count: 2 });
+    const prisma = { bumpReminder: { deleteMany } };
+
+    const result = await cleanupOldBumpRemindersUseCase(prisma as never, 7);
+
+    expect(result).toBe(2);
+    expect(deleteMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          status: {
+            in: [BUMP_REMINDER_STATUS.SENT, BUMP_REMINDER_STATUS.CANCELLED],
+          },
+          updatedAt: expect.objectContaining({ lt: expect.any(Date) }),
+        }),
+      }),
+    );
+  });
+});

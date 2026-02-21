@@ -1,0 +1,43 @@
+import { BUMP_REMINDER_STATUS } from "@/bot/features/bump-reminder";
+import { createBumpReminderUseCase } from "@/bot/features/bump-reminder/repositories/usecases/createBumpReminder";
+
+describe("bot/features/bump-reminder/repositories/usecases/createBumpReminder", () => {
+  it("cancels existing pending and creates new reminder in transaction", async () => {
+    const updateMany = jest.fn().mockResolvedValue({ count: 1 });
+    const create = jest.fn().mockResolvedValue({ id: "r1" });
+    const tx = { bumpReminder: { updateMany, create } };
+    const prisma = {
+      $transaction: jest
+        .fn()
+        .mockImplementation(async (fn: (txArg: unknown) => unknown) => fn(tx)),
+    };
+
+    const scheduledAt = new Date("2026-02-21T00:00:00.000Z");
+    const result = await createBumpReminderUseCase(
+      prisma as never,
+      "guild-1",
+      "channel-1",
+      scheduledAt,
+      "msg-1",
+      "panel-1",
+      "Disboard",
+    );
+
+    expect(result).toEqual({ id: "r1" });
+    expect(updateMany).toHaveBeenCalledWith({
+      where: { guildId: "guild-1", status: BUMP_REMINDER_STATUS.PENDING },
+      data: { status: BUMP_REMINDER_STATUS.CANCELLED },
+    });
+    expect(create).toHaveBeenCalledWith({
+      data: {
+        guildId: "guild-1",
+        channelId: "channel-1",
+        messageId: "msg-1",
+        panelMessageId: "panel-1",
+        serviceName: "Disboard",
+        scheduledAt,
+        status: BUMP_REMINDER_STATUS.PENDING,
+      },
+    });
+  });
+});
