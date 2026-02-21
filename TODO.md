@@ -191,7 +191,7 @@
   - 完了条件: manager/config-service/repository 参照を bot service resolver で解決可能
   - コミット例: `refactor: bump-reminder 依存解決を bot リゾルバ経由に追加`
 
-- [ ] **SR-002** bump-reminder handlers を resolver 経由へ移行
+- [x] **SR-002** bump-reminder handlers を resolver 経由へ移行
   - 完了条件: startup/detected/panel 系で direct `getBumpReminder*` 呼び出しを解消
   - コミット例: `refactor: bump-reminder handlers の依存取得を統一`
 
