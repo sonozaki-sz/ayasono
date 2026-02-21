@@ -2,27 +2,20 @@
 // Bumpリマインダー機能の公開エントリーポイント
 // Bot 層からの import 先をこのファイルに一本化する
 
-// 機能定数・型ガード・変換ヘルパー
+// 機能定数・型ガード・変換ヘルパー（feature外から必要な最小公開）
 export {
   BUMP_COMMANDS,
   BUMP_CONSTANTS,
-  BUMP_DETECTION_RULES,
-  BUMP_REMINDER_STATUS,
   BUMP_SERVICES,
   getReminderDelayMinutes,
-  isBumpServiceName,
   resolveBumpService,
-  toBumpReminderJobId,
   toScheduledAt,
-  type BumpReminderStatus,
   type BumpServiceName,
 } from "./constants";
 
 // スケジューリング/復元を担うマネージャー
 export {
   BumpReminderManager,
-  createBumpReminderFeatureConfigService,
-  createBumpReminderManager,
   getBumpReminderFeatureConfigService,
   getBumpReminderManager,
   type BumpReminderTaskFactory,
@@ -31,9 +24,7 @@ export {
 // 永続化アクセス（Prisma実装 + 抽象）
 export {
   BumpReminderRepository,
-  createBumpReminderRepository,
   getBumpReminderRepository,
-  type BumpReminder,
   type IBumpReminderRepository,
 } from "./repositories";
 
