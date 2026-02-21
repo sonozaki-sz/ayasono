@@ -3,12 +3,12 @@
  * Prisma Repositoryの統合テスト
  */
 
-import { PrismaGuildConfigRepository } from "../../../src/shared/database/repositories/guildConfigRepository";
-import type { GuildConfig } from "../../../src/shared/database/types";
-import { DatabaseError } from "../../../src/shared/errors/customErrors";
+import { PrismaGuildConfigRepository } from "@/shared/database/repositories/guildConfigRepository";
+import type { GuildConfig } from "@/shared/database/types";
+import { DatabaseError } from "@/shared/errors/customErrors";
 
 // Logger のモック
-jest.mock("../../../src/shared/utils/logger", () => ({
+jest.mock("@/shared/utils/logger", () => ({
   logger: {
     debug: jest.fn(),
     info: jest.fn(),
@@ -18,7 +18,7 @@ jest.mock("../../../src/shared/utils/logger", () => ({
 }));
 
 // i18n のモック
-jest.mock("../../../src/shared/locale", () => ({
+jest.mock("@/shared/locale", () => ({
   tDefault: (key: string) => `mocked:${key}`,
 }));
 

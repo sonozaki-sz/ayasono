@@ -195,7 +195,7 @@
 
 - テスト配置は `tests/unit` / `tests/integration` を維持しつつ、各配下で `src` と同じパス構造へ寄せる
 - ファイル名は **camelCase固定にしない**。`src` 側のベース名に一致（`kebab-case` を含む）
-- 今回フェーズは `unit` のみ。`integration` / `e2e` は次フェーズで実施
+- 今回フェーズは `unit` / `integration`。`e2e` は次フェーズで実施
 
 **コミット単位タスク**:
 
@@ -205,10 +205,10 @@
   - 完了条件: `tests/unit` で `src` 参照を `@/` へ統一し、`tests/tsconfig.json` に `paths` を追加
 - [x] **TST-REORG-003**: 回帰確認（テスト実行）
   - 完了条件: `pnpm test` が全件PASS（`431 passed / 0 failed`）
-- [ ] **TST-REORG-004**: `tests/integration` の `src` 対称化マッピング作成（移動はしない）
-  - 完了条件: 既存 `integration` ファイルの移動先候補と非対応ケースを一覧化
-- [ ] **TST-REORG-005**: `tests/integration` 移動・改名 + 参照追随
-  - 完了条件: `integration` を移行し、`pnpm test` 全件PASS
+- [x] **TST-REORG-004**: `tests/integration` の `src` 対称化マッピング作成
+  - 完了条件: 既存 `integration` ファイルの移動先を `src` 対称で確定
+- [x] **TST-REORG-005**: `tests/integration` 移動・改名 + 参照追随
+  - 完了条件: `integration` を移行し、`pnpm test` 全件PASS（`39 suites / 431 tests`）
 - [ ] **TST-REORG-006**: テストガイド更新（再編後の正式構成反映）
   - 完了条件: `docs/guides/TESTING_GUIDELINES.md` の構成図と命名ルールを更新
 

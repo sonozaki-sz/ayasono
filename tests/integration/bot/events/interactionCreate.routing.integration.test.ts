@@ -1,18 +1,18 @@
-import { handleInteractionError } from "../../../src/bot/errors/interactionErrorHandler";
-import { interactionCreateEvent } from "../../../src/bot/events/interactionCreate";
+import { handleInteractionError } from "@/bot/errors/interactionErrorHandler";
+import { interactionCreateEvent } from "@/bot/events/interactionCreate";
 
 // エラーハンドラは呼び出し確認だけ行う
-jest.mock("../../../src/bot/errors/interactionErrorHandler", () => ({
+jest.mock("@/bot/errors/interactionErrorHandler", () => ({
   handleCommandError: jest.fn(),
   handleInteractionError: jest.fn(),
 }));
 
 // ローカライズとロガーは副作用を排除する
-jest.mock("../../../src/shared/locale", () => ({
+jest.mock("@/shared/locale", () => ({
   tDefault: jest.fn((key: string) => key),
   tGuild: jest.fn(async (_guildId: string, key: string) => key),
 }));
-jest.mock("../../../src/shared/utils/logger", () => ({
+jest.mock("@/shared/utils/logger", () => ({
   logger: {
     debug: jest.fn(),
     info: jest.fn(),
@@ -22,7 +22,7 @@ jest.mock("../../../src/shared/utils/logger", () => ({
 }));
 
 // Handler レジストリをテスト専用に差し替え、ルーティングを直接検証できるようにする
-jest.mock("../../../src/bot/handlers/interactionCreate/ui/modals", () => {
+jest.mock("@/bot/handlers/interactionCreate/ui/modals", () => {
   const modalHandler = {
     matches: jest.fn((customId: string) => customId.startsWith("modal:")),
     execute: jest.fn().mockResolvedValue(undefined),
@@ -32,7 +32,7 @@ jest.mock("../../../src/bot/handlers/interactionCreate/ui/modals", () => {
     __modalHandler: modalHandler,
   };
 });
-jest.mock("../../../src/bot/handlers/interactionCreate/ui/buttons", () => {
+jest.mock("@/bot/handlers/interactionCreate/ui/buttons", () => {
   const buttonHandler = {
     matches: jest.fn((customId: string) => customId.startsWith("btn:")),
     execute: jest.fn().mockResolvedValue(undefined),
@@ -42,7 +42,7 @@ jest.mock("../../../src/bot/handlers/interactionCreate/ui/buttons", () => {
     __buttonHandler: buttonHandler,
   };
 });
-jest.mock("../../../src/bot/handlers/interactionCreate/ui/selectMenus", () => {
+jest.mock("@/bot/handlers/interactionCreate/ui/selectMenus", () => {
   const userSelectHandler = {
     matches: jest.fn((customId: string) => customId.startsWith("select:")),
     execute: jest.fn().mockResolvedValue(undefined),
@@ -104,7 +104,7 @@ describe("integration: interactionCreate handler routing", () => {
   // modal submit は modalHandlers へルーティングされることを確認する
   it("routes modal submit to modal handler registry", async () => {
     const modalModule = jest.requireMock(
-      "../../../src/bot/handlers/interactionCreate/ui/modals",
+      "@/bot/handlers/interactionCreate/ui/modals",
     ) as {
       __modalHandler: {
         execute: jest.Mock<Promise<void>, [unknown]>;
@@ -126,7 +126,7 @@ describe("integration: interactionCreate handler routing", () => {
   // button interaction は buttonHandlers を経由して処理されることを確認する
   it("routes button interaction to button handler registry", async () => {
     const buttonModule = jest.requireMock(
-      "../../../src/bot/handlers/interactionCreate/ui/buttons",
+      "@/bot/handlers/interactionCreate/ui/buttons",
     ) as {
       __buttonHandler: {
         execute: jest.Mock<Promise<void>, [unknown]>;
@@ -148,7 +148,7 @@ describe("integration: interactionCreate handler routing", () => {
   // user select の例外は interaction 用エラーハンドラへ委譲されることを確認する
   it("delegates user-select handler failure to interaction error handler", async () => {
     const selectModule = jest.requireMock(
-      "../../../src/bot/handlers/interactionCreate/ui/selectMenus",
+      "@/bot/handlers/interactionCreate/ui/selectMenus",
     ) as {
       __userSelectHandler: {
         execute: jest.Mock<Promise<void>, [unknown]>;

@@ -3,11 +3,11 @@
  * Bumpリマインダータイマー管理の統合テスト
  */
 
-import { BumpReminderManager } from "../../../src/bot/features/bump-reminder";
-import { jobScheduler } from "../../../src/shared/scheduler/jobScheduler";
+import { BumpReminderManager } from "@/bot/features/bump-reminder";
+import { jobScheduler } from "@/shared/scheduler/jobScheduler";
 
 // Logger のモック
-jest.mock("../../../src/shared/utils", () => ({
+jest.mock("@/shared/utils", () => ({
   logger: {
     debug: jest.fn(),
     info: jest.fn(),
@@ -17,12 +17,12 @@ jest.mock("../../../src/shared/utils", () => ({
 }));
 
 // i18n のモック
-jest.mock("../../../src/shared/locale", () => ({
+jest.mock("@/shared/locale", () => ({
   tDefault: (key: string) => `mocked:${key}`,
 }));
 
 // Prismaユーティリティのモック
-jest.mock("../../../src/shared/utils/prisma", () => ({
+jest.mock("@/shared/utils/prisma", () => ({
   requirePrismaClient: jest.fn(() => ({})),
 }));
 
@@ -39,7 +39,7 @@ const mockRepository = {
 };
 
 jest.mock(
-  "../../../src/bot/features/bump-reminder/repositories/bumpReminderRepository",
+  "@/bot/features/bump-reminder/repositories/bumpReminderRepository",
   () => ({
     getBumpReminderRepository: () => mockRepository,
   }),
