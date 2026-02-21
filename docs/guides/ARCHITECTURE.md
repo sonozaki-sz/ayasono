@@ -17,6 +17,26 @@ guild-mng-bot-v2 は **Bot プロセス**と **Web プロセス**の2プロセ�
 - 扱わない内容: 関数分割手順、命名/コメント細則、実装時のチェックリスト
 - 実装細則は [IMPLEMENTATION_GUIDELINES.md](IMPLEMENTATION_GUIDELINES.md) を参照
 
+### 0ベース再監査結果（2026-02-21）
+
+- 責務分離:
+  - `commands/*.execute.ts` の入口は概ね「入力解釈・委譲・共通エラー処理」に収束
+  - ただし `bumpReminderConfigCommand.removeMention.ts` は 300 行級で、追加分割余地あり
+- 依存方向:
+  - `shared -> bot/web` と `bot <-> web` の直接依存は監査時点で検出なし
+  - 依存方向は `bot|web -> shared` の原則を維持
+- 構成/公開面:
+  - feature側の `index.ts` 公開境界は明示exportへ統一済み
+  - `shared/*/index.ts` の一部 `export *` は残存（運用上の要監視項目）
+- 命名:
+  - `stick` と `sticky` は移行途中で混在（互換維持のため段階移行を継続）
+- スリム化:
+  - `src` 全175ファイル中、300行超は3ファイルまで圧縮済み
+  - 引き続き大型ファイルの分割余地を管理する
+- テスト容易性:
+  - Composition Root + resolver注入により、依存切替の経路は確保
+  - テスト失敗は主に import パス追随不足で、POSTのテスト修正対象として扱う
+
 ---
 
 ## 🏗️ プロセス構成
