@@ -1,9 +1,9 @@
 import type { ChatInputCommandInteraction } from "discord.js";
-import { pingCommand } from "../../../src/bot/commands/ping";
-import { interactionCreateEvent } from "../../../src/bot/events/interactionCreate";
+import { pingCommand } from "@/bot/commands/ping";
+import { interactionCreateEvent } from "@/bot/events/interactionCreate";
 
 // コマンド・イベント結合検証のため、翻訳とEmbed生成のみ固定化する
-jest.mock("../../../src/shared/locale", () => ({
+jest.mock("@/shared/locale", () => ({
   getCommandLocalizations: () => ({
     ja: "ping description",
     localizations: { "en-US": "ping description" },
@@ -25,14 +25,14 @@ jest.mock("../../../src/shared/locale", () => ({
     },
   ),
 }));
-jest.mock("../../../src/bot/errors/interactionErrorHandler", () => ({
+jest.mock("@/bot/errors/interactionErrorHandler", () => ({
   handleCommandError: jest.fn(),
   handleInteractionError: jest.fn(),
 }));
-jest.mock("../../../src/bot/utils/messageResponse", () => ({
+jest.mock("@/bot/utils/messageResponse", () => ({
   createSuccessEmbed: jest.fn((description: string) => ({ description })),
 }));
-jest.mock("../../../src/shared/utils/logger", () => ({
+jest.mock("@/shared/utils/logger", () => ({
   logger: {
     debug: jest.fn(),
     info: jest.fn(),
