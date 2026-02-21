@@ -145,7 +145,7 @@ git checkout -b hotfix/fix-crash-on-empty-guild
 
 | scope            | 対象                           |
 | ---------------- | ------------------------------ |
-| `afk`            | AFKシステム                    |
+| `afk`            | AFK機能                        |
 | `bump-reminder`  | Bumpリマインダー               |
 | `member-log`     | 入退室ログ                     |
 | `sticky-message` | スティッキーメッセージ         |
