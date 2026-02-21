@@ -9,12 +9,12 @@ import {
 } from "discord.js";
 import { tGuild } from "../../../../../shared/locale";
 import type { ModalHandler } from "../../../../handlers/interactionCreate/ui";
+import { getBotVacRepository } from "../../../../services/botVacDependencyResolver";
 import { safeReply } from "../../../../utils/interaction";
 import {
   createErrorEmbed,
   createSuccessEmbed,
 } from "../../../../utils/messageResponse";
-import { getVacRepository } from "../../repositories";
 import { getVacPanelChannelId, VAC_PANEL_CUSTOM_ID } from "./vacControlPanel";
 
 // Discord VC userLimit の許容範囲（0 は無制限）
@@ -79,7 +79,7 @@ export const vacPanelModalHandler: ModalHandler = {
     }
 
     // VAC 管理対象チャンネルかを検証
-    const isManaged = await getVacRepository().isManagedVacChannel(
+    const isManaged = await getBotVacRepository().isManagedVacChannel(
       guild.id,
       channel.id,
     );

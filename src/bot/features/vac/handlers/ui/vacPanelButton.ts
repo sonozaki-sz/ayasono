@@ -14,12 +14,12 @@ import {
 } from "discord.js";
 import { tGuild } from "../../../../../shared/locale";
 import type { ButtonHandler } from "../../../../handlers/interactionCreate/ui";
+import { getBotVacRepository } from "../../../../services/botVacDependencyResolver";
 import { safeReply } from "../../../../utils/interaction";
 import {
   createErrorEmbed,
   createSuccessEmbed,
 } from "../../../../utils/messageResponse";
-import { getVacRepository } from "../../repositories";
 import {
   getVacPanelChannelId,
   sendVacControlPanel,
@@ -77,7 +77,7 @@ export const vacPanelButtonHandler: ButtonHandler = {
     }
 
     // VAC 管理対象チャンネルかを検証
-    const isManaged = await getVacRepository().isManagedVacChannel(
+    const isManaged = await getBotVacRepository().isManagedVacChannel(
       guild.id,
       channel.id,
     );
