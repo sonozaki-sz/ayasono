@@ -9,8 +9,8 @@ import {
 import { ValidationError } from "../../../../shared/errors";
 import { tDefault, tGuild } from "../../../../shared/locale";
 import { handleCommandError } from "../../../errors/interactionErrorHandler";
+import { getBotVacRepository } from "../../../services/botVacDependencyResolver";
 import { createSuccessEmbed } from "../../../utils/messageResponse";
-import { getVacRepository } from "../repositories";
 import { VAC_COMMAND } from "./vacCommand.constants";
 
 /**
@@ -70,7 +70,7 @@ async function getManagedVoiceChannel(
     );
   }
 
-  const isManaged = await getVacRepository().isManagedVacChannel(
+  const isManaged = await getBotVacRepository().isManagedVacChannel(
     guildId,
     voiceChannel.id,
   );

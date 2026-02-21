@@ -13,6 +13,10 @@ import {
 import { createVacRepository, getVacRepository } from "../features/vac";
 import { getVacService } from "../features/vac/services";
 import { setBotGuildConfigRepository } from "./botGuildConfigRepositoryResolver";
+import {
+  setBotVacRepository,
+  setBotVacService,
+} from "./botVacDependencyResolver";
 
 /**
  * Botで利用する主要依存を起動時に初期化する
@@ -32,5 +36,7 @@ export function initializeBotCompositionRoot(prisma: PrismaClient): void {
   const vacConfigService = getVacConfigService(guildConfigRepository);
   const vacRepository = createVacRepository(vacConfigService);
   getVacRepository(vacRepository);
-  getVacService(vacRepository);
+  const vacService = getVacService(vacRepository);
+  setBotVacRepository(vacRepository);
+  setBotVacService(vacService);
 }
