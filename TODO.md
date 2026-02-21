@@ -208,7 +208,7 @@
   - 完了条件: 入口関数は薄いオーケストレーションのみ
   - コミット例: `refactor: bump-reminder handler を用途別に分割`
 
-- [ ] **SR-006** エクスポート境界の整理（過剰 re-export 抑制）
+- [x] **SR-006** エクスポート境界の整理（過剰 re-export 抑制）
   - 対象: `bot/features/*/index.ts` の公開面
   - 完了条件: 呼び出し側が必要最小の公開APIのみ参照
   - コミット例: `refactor: feature index の公開境界を最小化`
