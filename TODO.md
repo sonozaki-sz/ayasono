@@ -240,7 +240,7 @@
   - 完了条件: `export *` を段階削除し、外部利用シンボルのみ公開
   - コミット例: `refactor: feature公開APIを明示exportへ統一`
 
-- [ ] **SRC-008** command/event/handler の入口責務を再点検し、過剰処理を feature へ移譲
+- [x] **SRC-008** command/event/handler の入口責務を再点検し、過剰処理を feature へ移譲
   - 完了条件: 入口層は「入力解釈・委譲・共通エラー処理」に限定
   - コミット例: `refactor: 入口層の責務を委譲中心に整理`
 
