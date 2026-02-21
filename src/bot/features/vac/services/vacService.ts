@@ -336,6 +336,13 @@ let vacService: VacService | undefined;
 let cachedRepository: IVacRepository | undefined;
 
 /**
+ * VAC サービスを依存注入で生成する
+ */
+export function createVacService(repository: IVacRepository): VacService {
+  return new VacService(repository);
+}
+
+/**
  * VAC サービスのシングルトンを取得する
  */
 export function getVacService(repository?: IVacRepository): VacService {
@@ -343,7 +350,7 @@ export function getVacService(repository?: IVacRepository): VacService {
   const resolvedRepository = getVacRepository(repository);
   // 依存リポジトリが変わった場合はサービスを再生成
   if (!vacService || cachedRepository !== resolvedRepository) {
-    vacService = new VacService(resolvedRepository);
+    vacService = createVacService(resolvedRepository);
     cachedRepository = resolvedRepository;
   }
   // 現在有効なシングルトンを返す

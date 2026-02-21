@@ -1,13 +1,11 @@
 // src/bot/features/bump-reminder/services/bumpReminderConfigServiceResolver.ts
 // bump-reminder 設定サービスの依存解決
 
-import {
-  getGuildConfigRepository,
-  type IBumpReminderConfigRepository,
-} from "../../../../shared/database";
+import { type IBumpReminderConfigRepository } from "../../../../shared/database";
 import {
   BumpReminderConfigService,
   createBumpReminderConfigService,
+  getBumpReminderConfigService,
 } from "../../../../shared/features/bump-reminder";
 
 let cachedService: BumpReminderConfigService | undefined;
@@ -28,7 +26,11 @@ export function createBumpReminderFeatureConfigService(
 export function getBumpReminderFeatureConfigService(
   repository?: IBumpReminderConfigRepository,
 ): BumpReminderConfigService {
-  const resolvedRepository = repository ?? getGuildConfigRepository();
+  if (!repository) {
+    return getBumpReminderConfigService();
+  }
+
+  const resolvedRepository = repository;
 
   if (!cachedService || cachedRepository !== resolvedRepository) {
     cachedService = createBumpReminderFeatureConfigService(resolvedRepository);
