@@ -113,7 +113,7 @@ export async function handleStickyMessageSet(
       )
       .setStyle(TextInputStyle.Paragraph)
       .setRequired(false)
-      .setMaxLength(4096);
+      .setMaxLength(4000);
 
     const colorInput = new TextInputBuilder()
       .setCustomId(STICKY_MESSAGE_COMMAND.MODAL_INPUT.EMBED_COLOR)

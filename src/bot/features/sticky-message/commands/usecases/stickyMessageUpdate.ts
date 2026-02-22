@@ -115,7 +115,7 @@ export async function handleStickyMessageUpdate(
       )
       .setStyle(TextInputStyle.Paragraph)
       .setRequired(false)
-      .setMaxLength(4096);
+      .setMaxLength(4000);
     if (prev.description) descriptionInput.setValue(prev.description);
 
     const colorInput = new TextInputBuilder()
