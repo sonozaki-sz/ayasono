@@ -9,7 +9,6 @@ import { ValidationError } from "../../../../shared/errors/customErrors";
 import { tDefault } from "../../../../shared/locale/localeManager";
 import { handleCommandError } from "../../../errors/interactionErrorHandler";
 import { STICKY_MESSAGE_COMMAND } from "./stickyMessageCommand.constants";
-import { handleStickyMessageList } from "./usecases/stickyMessageList";
 import { handleStickyMessageRemove } from "./usecases/stickyMessageRemove";
 import { handleStickyMessageSet } from "./usecases/stickyMessageSet";
 import { handleStickyMessageUpdate } from "./usecases/stickyMessageUpdate";
@@ -44,9 +43,6 @@ export async function executeStickyMessageCommand(
         break;
       case STICKY_MESSAGE_COMMAND.SUBCOMMAND.REMOVE:
         await handleStickyMessageRemove(interaction, guildId);
-        break;
-      case STICKY_MESSAGE_COMMAND.SUBCOMMAND.LIST:
-        await handleStickyMessageList(interaction, guildId);
         break;
       case STICKY_MESSAGE_COMMAND.SUBCOMMAND.VIEW:
         await handleStickyMessageView(interaction, guildId);

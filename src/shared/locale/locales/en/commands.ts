@@ -168,10 +168,7 @@ export const commands = {
   "sticky-message.remove.notFound.title": "Not Found",
   "sticky-message.remove.notFound.description":
     "No sticky message is configured for this channel.",
-  // list subcommand
-  "sticky-message.list.description": "List all configured sticky messages",
-  "sticky-message.list.title": "Sticky Messages",
-  "sticky-message.list.empty": "No sticky messages are configured.",
+
   // errors
   "sticky-message.errors.permissionDenied":
     "You do not have permission to do this. Manage Channels permission is required.",
@@ -181,23 +178,29 @@ export const commands = {
   "sticky-message.errors.failed":
     "An error occurred while managing the sticky message.",
   // view subcommand
-  "sticky-message.view.description": "View sticky message settings for a channel",
-  "sticky-message.view.channel.description": "Channel to inspect",
+  "sticky-message.view.description":
+    "View sticky message settings (channel select UI)",
   "sticky-message.view.title": "Sticky Message Settings",
+  "sticky-message.view.select.placeholder": "Select a channel",
   "sticky-message.view.notFound.title": "Not Configured",
+  "sticky-message.view.empty":
+    "No sticky messages are configured for any channel.",
   "sticky-message.view.field.channel": "Channel",
   "sticky-message.view.field.format": "Format",
   "sticky-message.view.field.format_plain": "Plain text",
   "sticky-message.view.field.format_embed": "Embed",
-  "sticky-message.view.field.created_at": "Set at",
+  "sticky-message.view.field.updated_at": "Last updated",
   "sticky-message.view.field.content": "Message content",
   "sticky-message.view.field.embed_title": "Embed title",
   "sticky-message.view.field.embed_color": "Embed color",
   // update subcommand
-  "sticky-message.update.description": "Update the content of an existing sticky message",
-  "sticky-message.update.channel.description": "Channel whose sticky message to update",
+  "sticky-message.update.description":
+    "Update the content of an existing sticky message",
+  "sticky-message.update.channel.description":
+    "Channel whose sticky message to update",
   "sticky-message.update.success.title": "Updated",
-  "sticky-message.update.success.description": "Sticky message has been updated.",
+  "sticky-message.update.success.description":
+    "Sticky message has been updated.",
   "sticky-message.update.notFound.title": "Not Configured",
 } as const;
 

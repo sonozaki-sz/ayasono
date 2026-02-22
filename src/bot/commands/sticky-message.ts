@@ -43,11 +43,7 @@ export const stickyMessageCommand: Command = {
     const removeChannelDesc = getCommandLocalizations(
       "sticky-message.remove.channel.description",
     );
-    const listDesc = getCommandLocalizations("sticky-message.list.description");
     const viewDesc = getCommandLocalizations("sticky-message.view.description");
-    const viewChannelDesc = getCommandLocalizations(
-      "sticky-message.view.channel.description",
-    );
     const updateDesc = getCommandLocalizations(
       "sticky-message.update.description",
     );
@@ -128,22 +124,9 @@ export const stickyMessageCommand: Command = {
       )
       .addSubcommand((sub) =>
         sub
-          .setName(STICKY_MESSAGE_COMMAND.SUBCOMMAND.LIST)
-          .setDescription(listDesc.ja)
-          .setDescriptionLocalizations(listDesc.localizations),
-      )
-      .addSubcommand((sub) =>
-        sub
           .setName(STICKY_MESSAGE_COMMAND.SUBCOMMAND.VIEW)
           .setDescription(viewDesc.ja)
-          .setDescriptionLocalizations(viewDesc.localizations)
-          .addChannelOption((opt) =>
-            opt
-              .setName(STICKY_MESSAGE_COMMAND.OPTION.CHANNEL)
-              .setDescription(viewChannelDesc.ja)
-              .setDescriptionLocalizations(viewChannelDesc.localizations)
-              .setRequired(true),
-          ),
+          .setDescriptionLocalizations(viewDesc.localizations),
       )
       .addSubcommand((sub) =>
         sub

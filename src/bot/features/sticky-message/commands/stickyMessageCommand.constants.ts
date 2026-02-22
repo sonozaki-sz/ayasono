@@ -9,10 +9,11 @@ export const STICKY_MESSAGE_COMMAND = {
   SUBCOMMAND: {
     SET: "set",
     REMOVE: "remove",
-    LIST: "list",
     VIEW: "view",
     UPDATE: "update",
   },
+  /** view コマンドが送信する StringSelectMenu の customId */
+  VIEW_SELECT_CUSTOM_ID: "sticky-message:view-select",
   OPTION: {
     CHANNEL: "channel",
     MESSAGE: "message",
