@@ -135,6 +135,7 @@ export const stickyMessageSetEmbedModalHandler: ModalHandler = {
         channelId,
         content,
         embedData,
+        interaction.user.id,
       );
 
       const sendPayload = buildStickyMessagePayload(stickyRecord);

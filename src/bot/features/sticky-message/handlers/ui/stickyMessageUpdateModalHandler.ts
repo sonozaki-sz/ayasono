@@ -97,6 +97,7 @@ export const stickyMessageUpdateModalHandler: ModalHandler = {
         existing.id,
         content,
         null,
+        interaction.user.id,
       );
 
       const textChannel = guild.channels.cache.get(channelId) as

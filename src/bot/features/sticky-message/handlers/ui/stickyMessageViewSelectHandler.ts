@@ -156,11 +156,18 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
     }
     // タイムスタンプをスティッキーの最終更新日時で上書き
     embed.setTimestamp(sticky.updatedAt);
-    // 実行者をアイコン付きフッターに表示
-    embed.setFooter({
-      text: interaction.user.username,
-      iconURL: interaction.user.displayAvatarURL(),
-    });
+    // フッターに最終設定・更新者を表示（取得失敗時は userId をフォールバックとして使用）
+    if (sticky.updatedBy) {
+      try {
+        const editor = await interaction.client.users.fetch(sticky.updatedBy);
+        embed.setFooter({
+          text: editor.username,
+          iconURL: editor.displayAvatarURL(),
+        });
+      } catch {
+        embed.setFooter({ text: sticky.updatedBy });
+      }
+    }
 
     // セレクトメニューを残したまま詳細 Embed を追加する
     await interaction.update({

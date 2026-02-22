@@ -112,6 +112,7 @@ export const stickyMessageSetModalHandler: ModalHandler = {
         channelId,
         content,
         undefined,
+        interaction.user.id,
       );
 
       // チャンネルに実際にメッセージを送信

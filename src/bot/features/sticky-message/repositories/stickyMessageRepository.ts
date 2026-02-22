@@ -37,6 +37,7 @@ export class StickyMessageRepository implements IStickyMessageRepository {
     channelId: string,
     content: string,
     embedData?: string,
+    updatedBy?: string,
   ): Promise<StickyMessage> {
     return executeWithDatabaseError(
       () =>
@@ -46,6 +47,7 @@ export class StickyMessageRepository implements IStickyMessageRepository {
             channelId,
             content,
             embedData: embedData ?? null,
+            updatedBy: updatedBy ?? null,
           },
         }),
       "StickyMessageRepository.create",
@@ -67,12 +69,18 @@ export class StickyMessageRepository implements IStickyMessageRepository {
     id: string,
     content: string,
     embedData: string | null,
+    updatedBy?: string,
   ): Promise<StickyMessage> {
     return executeWithDatabaseError(
       () =>
         this.prisma.stickyMessage.update({
           where: { id },
-          data: { content, embedData, lastMessageId: null },
+          data: {
+            content,
+            embedData,
+            lastMessageId: null,
+            ...(updatedBy !== undefined && { updatedBy }),
+          },
         }),
       "StickyMessageRepository.updateContent",
     );
