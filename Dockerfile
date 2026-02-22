@@ -4,6 +4,9 @@
 FROM node:24-slim AS base
 WORKDIR /app
 
+# OS パッケージを最新化してセキュリティ脆弱性を修正
+RUN apt-get update && apt-get upgrade -y --no-install-recommends && rm -rf /var/lib/apt/lists/*
+
 # pnpm のインストール
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
@@ -22,6 +25,9 @@ RUN pnpm run build
 # ─── 本番イメージ ───
 FROM node:24-slim AS runner
 WORKDIR /app
+
+# OS パッケージを最新化してセキュリティ脆弱性を修正
+RUN apt-get update && apt-get upgrade -y --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
