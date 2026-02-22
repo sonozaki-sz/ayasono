@@ -47,7 +47,9 @@ export async function handleStickyMessageView(
   // StringSelectMenu を構築して選択肢を返信する
   // 上限 25 件まで選択肢として追加
   const options = stickies.slice(0, MAX_OPTIONS).map((sticky) => {
-    const label = `#${sticky.channelId}`;
+    // キャッシュからチャンネル名を取得し、未キャッシュ時は ID をフォールバックとして使う
+    const channel = interaction.guild?.channels.cache.get(sticky.channelId);
+    const label = channel ? `#${channel.name}` : `#${sticky.channelId}`;
     const preview =
       sticky.content.length > 50
         ? `${sticky.content.substring(0, 50)}...`

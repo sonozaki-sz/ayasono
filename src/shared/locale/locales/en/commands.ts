@@ -143,21 +143,30 @@ export const commands = {
   // Sticky Message command
   "sticky-message.description":
     "Manage sticky messages (pinned to channel bottom) — requires Manage Channels",
-  // set subcommand
-  "sticky-message.set.description": "Set a sticky message",
+  // set subcommand (plain text, modal input)
+  "sticky-message.set.description":
+    "Set a sticky message as plain text (modal input, supports newlines)",
   "sticky-message.set.channel.description":
     "Text channel to set the sticky message in",
-  "sticky-message.set.message.description": "Message content (plain text)",
-  "sticky-message.set.use-embed.description": "Display as embed",
-  "sticky-message.set.embed-title.description": "Embed title",
-  "sticky-message.set.embed-description.description": "Embed description",
-  "sticky-message.set.embed-color.description":
-    "Embed color code (e.g. #5865F2 or 0x5865F2)",
+  // set modal
+  "sticky-message.set.modal.title": "Enter sticky message content",
+  "sticky-message.set.modal.message.label": "Message content",
+  "sticky-message.set.modal.message.placeholder":
+    "Supports multiple lines (max 2000 characters)",
   "sticky-message.set.success.title": "Done",
   "sticky-message.set.success.description": "Sticky message has been set.",
   "sticky-message.set.alreadyExists.title": "Warning",
   "sticky-message.set.alreadyExists.description":
     "A sticky message is already configured for this channel. Remove it first before setting a new one.",
+  // set-embed subcommand (embed format)
+  "sticky-message.set-embed.description":
+    "Set a sticky message in embed format",
+  "sticky-message.set-embed.channel.description":
+    "Text channel to set the sticky message in",
+  "sticky-message.set-embed.embed-title.description": "Embed title",
+  "sticky-message.set-embed.embed-description.description": "Embed description",
+  "sticky-message.set-embed.embed-color.description":
+    "Embed color code (e.g. #5865F2 or 0x5865F2)",
   // remove subcommand
   "sticky-message.remove.description": "Remove a sticky message",
   "sticky-message.remove.channel.description":

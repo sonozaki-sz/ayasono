@@ -143,23 +143,31 @@ export const commands = {
   // スティッキーメッセージコマンド
   "sticky-message.description":
     "スティッキーメッセージ（チャンネル最下部固定）の管理（チャンネル管理者専用）",
-  // set サブコマンド
-  "sticky-message.set.description": "スティッキーメッセージを設定",
+  // set サブコマンド（プレーンテキスト・モーダル入力）
+  "sticky-message.set.description":
+    "プレーンテキストでスティッキーメッセージを設定（入力フォームで改行可）",
   "sticky-message.set.channel.description":
     "スティッキーメッセージを設定するテキストチャンネル",
-  "sticky-message.set.message.description":
-    "メッセージ内容（プレーンテキスト）",
-  "sticky-message.set.use-embed.description": "Embed形式で表示する",
-  "sticky-message.set.embed-title.description": "Embedタイトル",
-  "sticky-message.set.embed-description.description": "Embed説明文",
-  "sticky-message.set.embed-color.description":
-    "Embedカラーコード（例: #5865F2 または 0x5865F2）",
+  // set モーダル
+  "sticky-message.set.modal.title": "スティッキーメッセージの内容を入力",
+  "sticky-message.set.modal.message.label": "メッセージ内容",
+  "sticky-message.set.modal.message.placeholder":
+    "改行して複数行のメッセージを入力できます（最大2000文字）",
   "sticky-message.set.success.title": "設定完了",
   "sticky-message.set.success.description":
     "スティッキーメッセージを設定しました。",
   "sticky-message.set.alreadyExists.title": "警告",
   "sticky-message.set.alreadyExists.description":
     "既にスティッキーメッセージが設定されています。削除してから再度設定してください。",
+  // set-embed サブコマンド（Embed形式）
+  "sticky-message.set-embed.description":
+    "Embed形式でスティッキーメッセージを設定",
+  "sticky-message.set-embed.channel.description":
+    "スティッキーメッセージを設定するテキストチャンネル",
+  "sticky-message.set-embed.embed-title.description": "Embedタイトル",
+  "sticky-message.set-embed.embed-description.description": "Embed説明文",
+  "sticky-message.set-embed.embed-color.description":
+    "Embedカラーコード（例: #5865F2 または 0x5865F2）",
   // remove サブコマンド
   "sticky-message.remove.description": "スティッキーメッセージを削除",
   "sticky-message.remove.channel.description":

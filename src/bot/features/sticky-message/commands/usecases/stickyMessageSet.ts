@@ -1,28 +1,22 @@
 // src/bot/features/sticky-message/commands/usecases/stickyMessageSet.ts
-// sticky-message set ユースケース
+// sticky-message set ユースケース（プレーンテキスト・モーダル入力）
 
 import {
+  ActionRowBuilder,
   ChannelType,
   type ChatInputCommandInteraction,
   MessageFlags,
-  type TextChannel,
+  ModalBuilder,
+  TextInputBuilder,
+  TextInputStyle,
 } from "discord.js";
-import { ValidationError } from "../../../../../shared/errors/customErrors";
-import { tGuild } from "../../../../../shared/locale/localeManager";
-import { logger } from "../../../../../shared/utils/logger";
+import { tDefault, tGuild } from "../../../../../shared/locale/localeManager";
 import { getBotStickyMessageRepository } from "../../../../services/botStickyMessageDependencyResolver";
-import {
-  createSuccessEmbed,
-  createWarningEmbed,
-} from "../../../../utils/messageResponse";
-import {
-  buildStickyMessagePayload,
-  type StickyEmbedData,
-} from "../../services/stickyMessagePayloadBuilder";
+import { createWarningEmbed } from "../../../../utils/messageResponse";
 import { STICKY_MESSAGE_COMMAND } from "../stickyMessageCommand.constants";
 
 /**
- * sticky-message set を実行する
+ * sticky-message set を実行する（モーダルを表示してプレーンテキストを入力させる）
  * @param interaction コマンド実行インタラクション
  * @param guildId 実行対象ギルドID
  * @returns 実行完了を示す Promise
@@ -77,112 +71,26 @@ export async function handleStickyMessageSet(
     return;
   }
 
-  const messageText = interaction.options.getString(
-    STICKY_MESSAGE_COMMAND.OPTION.MESSAGE,
+  // モーダルを構築して表示する（tDefault は同期）
+  const modal = new ModalBuilder()
+    .setCustomId(
+      `${STICKY_MESSAGE_COMMAND.SET_MODAL_ID_PREFIX}${channelOption.id}`,
+    )
+    .setTitle(tDefault("commands:sticky-message.set.modal.title"));
+
+  const messageInput = new TextInputBuilder()
+    .setCustomId(STICKY_MESSAGE_COMMAND.SET_MODAL_MESSAGE_INPUT_ID)
+    .setLabel(tDefault("commands:sticky-message.set.modal.message.label"))
+    .setPlaceholder(
+      tDefault("commands:sticky-message.set.modal.message.placeholder"),
+    )
+    .setStyle(TextInputStyle.Paragraph)
+    .setRequired(true)
+    .setMaxLength(2000);
+
+  modal.addComponents(
+    new ActionRowBuilder<TextInputBuilder>().addComponents(messageInput),
   );
-  const useEmbed =
-    interaction.options.getBoolean(STICKY_MESSAGE_COMMAND.OPTION.USE_EMBED) ??
-    false;
-  const embedTitle = interaction.options.getString(
-    STICKY_MESSAGE_COMMAND.OPTION.EMBED_TITLE,
-  );
-  const embedDescription = interaction.options.getString(
-    STICKY_MESSAGE_COMMAND.OPTION.EMBED_DESCRIPTION,
-  );
-  const embedColorStr = interaction.options.getString(
-    STICKY_MESSAGE_COMMAND.OPTION.EMBED_COLOR,
-  );
 
-  // コンテンツの決定
-  const content = messageText ?? embedDescription ?? embedTitle ?? "";
-
-  if (!content.trim()) {
-    await interaction.reply({
-      embeds: [
-        createWarningEmbed(
-          await tGuild(guildId, "commands:sticky-message.errors.emptyMessage"),
-        ),
-      ],
-      flags: MessageFlags.Ephemeral,
-    });
-    return;
-  }
-
-  // Embed データの生成
-  let embedData: string | undefined;
-  if (useEmbed || embedTitle || embedDescription || embedColorStr) {
-    const embedPayload: StickyEmbedData = {
-      title: embedTitle ?? undefined,
-      description: embedDescription ?? content,
-      color: parseColor(embedColorStr),
-    };
-    embedData = JSON.stringify(embedPayload);
-  }
-
-  // Guild テキストチャンネル取得
-  const textChannel = interaction.guild?.channels.cache.get(
-    channelOption.id,
-  ) as TextChannel | undefined;
-  if (!textChannel) {
-    throw new ValidationError(
-      await tGuild(guildId, "commands:sticky-message.errors.text_channel_only"),
-    );
-  }
-
-  try {
-    // DB に保存
-    const stickyRecord = await repository.create(
-      guildId,
-      channelOption.id,
-      content,
-      embedData,
-    );
-
-    // チャンネルに実際にメッセージを送信
-    const sendPayload = buildStickyMessagePayload(stickyRecord);
-    const sent = await textChannel.send(sendPayload);
-
-    // lastMessageId を更新
-    await repository.updateLastMessageId(stickyRecord.id, sent.id);
-
-    await interaction.reply({
-      embeds: [
-        createSuccessEmbed(
-          await tGuild(
-            guildId,
-            "commands:sticky-message.set.success.description",
-          ),
-          {
-            title: await tGuild(
-              guildId,
-              "commands:sticky-message.set.success.title",
-            ),
-          },
-        ),
-      ],
-      flags: MessageFlags.Ephemeral,
-    });
-  } catch (err) {
-    logger.error("Failed to set sticky message", {
-      channelId: channelOption.id,
-      err,
-    });
-    throw err;
-  }
-}
-
-/**
- * カラーコード文字列を数値に変換する（失敗時はスティッキーメッセージデフォルトカラー）
- * @param colorStr カラーコード文字列（`#RRGGBB` / `0xRRGGBB` / `RRGGBB` 形式、または null）
- * @returns 数値カラーコード
- */
-function parseColor(colorStr: string | null): number {
-  if (!colorStr) return 0x008969;
-  const normalized = colorStr.startsWith("#")
-    ? colorStr.slice(1)
-    : colorStr.startsWith("0x") || colorStr.startsWith("0X")
-      ? colorStr.slice(2)
-      : colorStr;
-  const parsed = parseInt(normalized, 16);
-  return isNaN(parsed) ? 0x008969 : parsed;
+  await interaction.showModal(modal);
 }
