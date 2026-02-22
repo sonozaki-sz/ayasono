@@ -204,6 +204,7 @@ export const commands = {
   "sticky-message.view.field.format_plain": "プレーンテキスト",
   "sticky-message.view.field.format_embed": "Embed",
   "sticky-message.view.field.updated_at": "最終更新",
+  "sticky-message.view.field.updated_by": "設定者",
   "sticky-message.view.field.content": "メッセージ内容",
   "sticky-message.view.field.embed_title": "Embedタイトル",
   "sticky-message.view.field.embed_color": "Embedカラー",

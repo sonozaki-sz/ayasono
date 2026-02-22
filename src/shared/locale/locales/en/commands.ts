@@ -202,6 +202,7 @@ export const commands = {
   "sticky-message.view.field.format_plain": "Plain text",
   "sticky-message.view.field.format_embed": "Embed",
   "sticky-message.view.field.updated_at": "Last updated",
+  "sticky-message.view.field.updated_by": "Set by",
   "sticky-message.view.field.content": "Message content",
   "sticky-message.view.field.embed_title": "Embed title",
   "sticky-message.view.field.embed_color": "Embed color",

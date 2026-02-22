@@ -134,6 +134,25 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
       }
     }
 
+    // 2段目末尾: 最終設定・更新者（Embed メタの直後に追加して右端に配置）
+    if (sticky.updatedBy) {
+      let updatedByLabel = sticky.updatedBy;
+      try {
+        const editor = await interaction.client.users.fetch(sticky.updatedBy);
+        updatedByLabel = editor.username;
+      } catch {
+        // fetch 失敗時は userId をそのまま使用
+      }
+      fields.push({
+        name: await tGuild(
+          guildId,
+          "commands:sticky-message.view.field.updated_by",
+        ),
+        value: updatedByLabel,
+        inline: true,
+      });
+    }
+
     // 3段目: テキスト内容プレビュー（常に末尾）
     const preview =
       sticky.content.length > PREVIEW_MAX
@@ -156,18 +175,6 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
     }
     // タイムスタンプをスティッキーの最終更新日時で上書き
     embed.setTimestamp(sticky.updatedAt);
-    // フッターに最終設定・更新者を表示（取得失敗時は userId をフォールバックとして使用）
-    if (sticky.updatedBy) {
-      try {
-        const editor = await interaction.client.users.fetch(sticky.updatedBy);
-        embed.setFooter({
-          text: editor.username,
-          iconURL: editor.displayAvatarURL(),
-        });
-      } catch {
-        embed.setFooter({ text: sticky.updatedBy });
-      }
-    }
 
     // セレクトメニューを残したまま詳細 Embed を追加する
     await interaction.update({
