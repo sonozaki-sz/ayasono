@@ -44,6 +44,16 @@ export const stickyMessageCommand: Command = {
       "sticky-message.remove.channel.description",
     );
     const listDesc = getCommandLocalizations("sticky-message.list.description");
+    const viewDesc = getCommandLocalizations("sticky-message.view.description");
+    const viewChannelDesc = getCommandLocalizations(
+      "sticky-message.view.channel.description",
+    );
+    const updateDesc = getCommandLocalizations(
+      "sticky-message.update.description",
+    );
+    const updateChannelDesc = getCommandLocalizations(
+      "sticky-message.update.channel.description",
+    );
 
     return new SlashCommandBuilder()
       .setName(STICKY_MESSAGE_COMMAND.NAME)
@@ -121,6 +131,72 @@ export const stickyMessageCommand: Command = {
           .setName(STICKY_MESSAGE_COMMAND.SUBCOMMAND.LIST)
           .setDescription(listDesc.ja)
           .setDescriptionLocalizations(listDesc.localizations),
+      )
+      .addSubcommand((sub) =>
+        sub
+          .setName(STICKY_MESSAGE_COMMAND.SUBCOMMAND.VIEW)
+          .setDescription(viewDesc.ja)
+          .setDescriptionLocalizations(viewDesc.localizations)
+          .addChannelOption((opt) =>
+            opt
+              .setName(STICKY_MESSAGE_COMMAND.OPTION.CHANNEL)
+              .setDescription(viewChannelDesc.ja)
+              .setDescriptionLocalizations(viewChannelDesc.localizations)
+              .setRequired(true),
+          ),
+      )
+      .addSubcommand((sub) =>
+        sub
+          .setName(STICKY_MESSAGE_COMMAND.SUBCOMMAND.UPDATE)
+          .setDescription(updateDesc.ja)
+          .setDescriptionLocalizations(updateDesc.localizations)
+          .addChannelOption((opt) =>
+            opt
+              .setName(STICKY_MESSAGE_COMMAND.OPTION.CHANNEL)
+              .setDescription(updateChannelDesc.ja)
+              .setDescriptionLocalizations(updateChannelDesc.localizations)
+              .setRequired(true),
+          )
+          .addStringOption((opt) =>
+            opt
+              .setName(STICKY_MESSAGE_COMMAND.OPTION.MESSAGE)
+              .setDescription(setMessageDesc.ja)
+              .setDescriptionLocalizations(setMessageDesc.localizations)
+              .setRequired(false)
+              .setMaxLength(2000),
+          )
+          .addBooleanOption((opt) =>
+            opt
+              .setName(STICKY_MESSAGE_COMMAND.OPTION.USE_EMBED)
+              .setDescription(setUseEmbedDesc.ja)
+              .setDescriptionLocalizations(setUseEmbedDesc.localizations)
+              .setRequired(false),
+          )
+          .addStringOption((opt) =>
+            opt
+              .setName(STICKY_MESSAGE_COMMAND.OPTION.EMBED_TITLE)
+              .setDescription(setEmbedTitleDesc.ja)
+              .setDescriptionLocalizations(setEmbedTitleDesc.localizations)
+              .setRequired(false)
+              .setMaxLength(256),
+          )
+          .addStringOption((opt) =>
+            opt
+              .setName(STICKY_MESSAGE_COMMAND.OPTION.EMBED_DESCRIPTION)
+              .setDescription(setEmbedDescriptionDesc.ja)
+              .setDescriptionLocalizations(
+                setEmbedDescriptionDesc.localizations,
+              )
+              .setRequired(false)
+              .setMaxLength(4096),
+          )
+          .addStringOption((opt) =>
+            opt
+              .setName(STICKY_MESSAGE_COMMAND.OPTION.EMBED_COLOR)
+              .setDescription(setEmbedColorDesc.ja)
+              .setDescriptionLocalizations(setEmbedColorDesc.localizations)
+              .setRequired(false),
+          ),
       );
   })(),
 

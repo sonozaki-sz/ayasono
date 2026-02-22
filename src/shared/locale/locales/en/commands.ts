@@ -180,6 +180,25 @@ export const commands = {
     "Sticky messages can only be set in text channels.",
   "sticky-message.errors.failed":
     "An error occurred while managing the sticky message.",
+  // view subcommand
+  "sticky-message.view.description": "View sticky message settings for a channel",
+  "sticky-message.view.channel.description": "Channel to inspect",
+  "sticky-message.view.title": "Sticky Message Settings",
+  "sticky-message.view.notFound.title": "Not Configured",
+  "sticky-message.view.field.channel": "Channel",
+  "sticky-message.view.field.format": "Format",
+  "sticky-message.view.field.format_plain": "Plain text",
+  "sticky-message.view.field.format_embed": "Embed",
+  "sticky-message.view.field.created_at": "Set at",
+  "sticky-message.view.field.content": "Message content",
+  "sticky-message.view.field.embed_title": "Embed title",
+  "sticky-message.view.field.embed_color": "Embed color",
+  // update subcommand
+  "sticky-message.update.description": "Update the content of an existing sticky message",
+  "sticky-message.update.channel.description": "Channel whose sticky message to update",
+  "sticky-message.update.success.title": "Updated",
+  "sticky-message.update.success.description": "Sticky message has been updated.",
+  "sticky-message.update.notFound.title": "Not Configured",
 } as const;
 
 export type CommandsTranslations = typeof commands;

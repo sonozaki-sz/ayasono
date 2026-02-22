@@ -28,6 +28,11 @@ export interface IStickyMessageRepository {
     embedData?: string,
   ): Promise<StickyMessage>;
   updateLastMessageId(id: string, lastMessageId: string): Promise<void>;
+  updateContent(
+    id: string,
+    content: string,
+    embedData: string | null,
+  ): Promise<StickyMessage>;
   delete(id: string): Promise<void>;
   deleteByChannel(channelId: string): Promise<void>;
 }

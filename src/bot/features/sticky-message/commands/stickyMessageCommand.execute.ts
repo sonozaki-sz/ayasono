@@ -12,6 +12,8 @@ import { STICKY_MESSAGE_COMMAND } from "./stickyMessageCommand.constants";
 import { handleStickyMessageList } from "./usecases/stickyMessageList";
 import { handleStickyMessageRemove } from "./usecases/stickyMessageRemove";
 import { handleStickyMessageSet } from "./usecases/stickyMessageSet";
+import { handleStickyMessageUpdate } from "./usecases/stickyMessageUpdate";
+import { handleStickyMessageView } from "./usecases/stickyMessageView";
 
 /**
  * sticky-message コマンド実行入口
@@ -45,6 +47,12 @@ export async function executeStickyMessageCommand(
         break;
       case STICKY_MESSAGE_COMMAND.SUBCOMMAND.LIST:
         await handleStickyMessageList(interaction, guildId);
+        break;
+      case STICKY_MESSAGE_COMMAND.SUBCOMMAND.VIEW:
+        await handleStickyMessageView(interaction, guildId);
+        break;
+      case STICKY_MESSAGE_COMMAND.SUBCOMMAND.UPDATE:
+        await handleStickyMessageUpdate(interaction, guildId);
         break;
       default:
         throw new ValidationError(

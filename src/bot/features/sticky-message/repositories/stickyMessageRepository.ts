@@ -63,6 +63,21 @@ export class StickyMessageRepository implements IStickyMessageRepository {
     );
   }
 
+  async updateContent(
+    id: string,
+    content: string,
+    embedData: string | null,
+  ): Promise<StickyMessage> {
+    return executeWithDatabaseError(
+      () =>
+        this.prisma.stickyMessage.update({
+          where: { id },
+          data: { content, embedData, lastMessageId: null },
+        }),
+      "StickyMessageRepository.updateContent",
+    );
+  }
+
   async delete(id: string): Promise<void> {
     await executeWithDatabaseError(
       () =>

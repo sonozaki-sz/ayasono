@@ -10,6 +10,8 @@ export const STICKY_MESSAGE_COMMAND = {
     SET: "set",
     REMOVE: "remove",
     LIST: "list",
+    VIEW: "view",
+    UPDATE: "update",
   },
   OPTION: {
     CHANNEL: "channel",

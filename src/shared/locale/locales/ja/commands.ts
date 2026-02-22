@@ -182,6 +182,25 @@ export const commands = {
     "テキストチャンネルにのみ設定できます。",
   "sticky-message.errors.failed":
     "スティッキーメッセージの操作中にエラーが発生しました。",
+  // view サブコマンド
+  "sticky-message.view.description": "指定チャンネルのスティッキーメッセージ設定を表示",
+  "sticky-message.view.channel.description": "設定を確認するチャンネル",
+  "sticky-message.view.title": "スティッキーメッセージ設定",
+  "sticky-message.view.notFound.title": "未設定",
+  "sticky-message.view.field.channel": "チャンネル",
+  "sticky-message.view.field.format": "形式",
+  "sticky-message.view.field.format_plain": "プレーンテキスト",
+  "sticky-message.view.field.format_embed": "Embed",
+  "sticky-message.view.field.created_at": "設定日時",
+  "sticky-message.view.field.content": "メッセージ内容",
+  "sticky-message.view.field.embed_title": "Embedタイトル",
+  "sticky-message.view.field.embed_color": "Embedカラー",
+  // update サブコマンド
+  "sticky-message.update.description": "スティッキーメッセージの内容を更新",
+  "sticky-message.update.channel.description": "更新対象のチャンネル",
+  "sticky-message.update.success.title": "更新完了",
+  "sticky-message.update.success.description": "スティッキーメッセージを更新しました。",
+  "sticky-message.update.notFound.title": "未設定",
 } as const;
 
 export type CommandsTranslations = typeof commands;
