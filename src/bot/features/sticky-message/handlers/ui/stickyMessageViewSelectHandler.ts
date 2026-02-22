@@ -58,7 +58,7 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
             },
           ),
         ],
-        components: [],
+        components: interaction.message.components,
       });
       return;
     }
@@ -162,10 +162,10 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
       iconURL: interaction.user.displayAvatarURL(),
     });
 
-    // セレクトメニューを非表示にして詳細 Embed に置き換える
+    // セレクトメニューを残したまま詳細 Embed を追加する
     await interaction.update({
       embeds: [embed],
-      components: [],
+      components: interaction.message.components,
     });
   },
 };
