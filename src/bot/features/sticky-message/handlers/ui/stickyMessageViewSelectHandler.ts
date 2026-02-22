@@ -2,7 +2,7 @@
 // sticky-message view コマンドが送信した StringSelectMenu の選択応答を処理する
 
 import { EmbedBuilder, type StringSelectMenuInteraction } from "discord.js";
-import { tDefault } from "../../../../../shared/locale/localeManager";
+import { tGuild } from "../../../../../shared/locale/localeManager";
 import type { StringSelectHandler } from "../../../../handlers/interactionCreate/ui/types";
 import { getBotStickyMessageRepository } from "../../../../services/botStickyMessageDependencyResolver";
 import { createWarningEmbed } from "../../../../utils/messageResponse";
@@ -17,6 +17,7 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
   },
 
   async execute(interaction: StringSelectMenuInteraction) {
+    const guildId = interaction.guildId ?? undefined;
     const channelId = interaction.values[0];
     if (!channelId) {
       await interaction.update({ components: [] });
@@ -30,8 +31,16 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
       await interaction.update({
         embeds: [
           createWarningEmbed(
-            tDefault("commands:sticky-message.remove.notFound.description"),
-            { title: tDefault("commands:sticky-message.view.notFound.title") },
+            await tGuild(
+              guildId,
+              "commands:sticky-message.remove.notFound.description",
+            ),
+            {
+              title: await tGuild(
+                guildId,
+                "commands:sticky-message.view.notFound.title",
+              ),
+            },
           ),
         ],
         components: [],
@@ -41,29 +50,37 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
 
     const embed = new EmbedBuilder()
       .setColor(0x5865f2)
-      .setTitle(`📌 ${tDefault("commands:sticky-message.view.title")}`)
+      .setTitle(
+        `📌 ${await tGuild(guildId, "commands:sticky-message.view.title")}`,
+      )
       .setTimestamp(sticky.updatedAt);
 
     // チャンネル情報
     embed.addFields({
-      name: tDefault("commands:sticky-message.view.field.channel"),
+      name: await tGuild(guildId, "commands:sticky-message.view.field.channel"),
       value: `<#${sticky.channelId}>`,
       inline: true,
     });
 
     // 形式（プレーン or Embed）
     const format = sticky.embedData
-      ? tDefault("commands:sticky-message.view.field.format_embed")
-      : tDefault("commands:sticky-message.view.field.format_plain");
+      ? await tGuild(guildId, "commands:sticky-message.view.field.format_embed")
+      : await tGuild(
+          guildId,
+          "commands:sticky-message.view.field.format_plain",
+        );
     embed.addFields({
-      name: tDefault("commands:sticky-message.view.field.format"),
+      name: await tGuild(guildId, "commands:sticky-message.view.field.format"),
       value: format,
       inline: true,
     });
 
     // 最終更新日時
     embed.addFields({
-      name: tDefault("commands:sticky-message.view.field.updated_at"),
+      name: await tGuild(
+        guildId,
+        "commands:sticky-message.view.field.updated_at",
+      ),
       value: `<t:${Math.floor(sticky.updatedAt.getTime() / 1000)}:f>`,
       inline: true,
     });
@@ -74,7 +91,7 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
         ? `${sticky.content.substring(0, PREVIEW_MAX)}...`
         : sticky.content;
     embed.addFields({
-      name: tDefault("commands:sticky-message.view.field.content"),
+      name: await tGuild(guildId, "commands:sticky-message.view.field.content"),
       value: `\`\`\`\n${preview}\n\`\`\``,
       inline: false,
     });
@@ -88,14 +105,20 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
         };
         if (parsed.title) {
           embed.addFields({
-            name: tDefault("commands:sticky-message.view.field.embed_title"),
+            name: await tGuild(
+              guildId,
+              "commands:sticky-message.view.field.embed_title",
+            ),
             value: parsed.title,
             inline: true,
           });
         }
         if (parsed.color !== undefined) {
           embed.addFields({
-            name: tDefault("commands:sticky-message.view.field.embed_color"),
+            name: await tGuild(
+              guildId,
+              "commands:sticky-message.view.field.embed_color",
+            ),
             value: `#${parsed.color.toString(16).toUpperCase().padStart(6, "0")}`,
             inline: true,
           });

@@ -8,7 +8,7 @@ import {
   StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder,
 } from "discord.js";
-import { tDefault } from "../../../../../shared/locale/localeManager";
+import { tGuild } from "../../../../../shared/locale/localeManager";
 import { getBotStickyMessageRepository } from "../../../../services/botStickyMessageDependencyResolver";
 import { createInfoEmbed } from "../../../../utils/messageResponse";
 import { STICKY_MESSAGE_COMMAND } from "../stickyMessageCommand.constants";
@@ -30,7 +30,11 @@ export async function handleStickyMessageView(
 
   if (stickies.length === 0) {
     await interaction.reply({
-      embeds: [createInfoEmbed(tDefault("commands:sticky-message.view.empty"))],
+      embeds: [
+        createInfoEmbed(
+          await tGuild(guildId, "commands:sticky-message.view.empty"),
+        ),
+      ],
       flags: MessageFlags.Ephemeral,
     });
     return;
@@ -52,7 +56,9 @@ export async function handleStickyMessageView(
 
   const select = new StringSelectMenuBuilder()
     .setCustomId(STICKY_MESSAGE_COMMAND.VIEW_SELECT_CUSTOM_ID)
-    .setPlaceholder(tDefault("commands:sticky-message.view.select.placeholder"))
+    .setPlaceholder(
+      await tGuild(guildId, "commands:sticky-message.view.select.placeholder"),
+    )
     .addOptions(options);
 
   const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(

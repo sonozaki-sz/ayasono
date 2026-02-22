@@ -7,7 +7,7 @@ import {
   MessageFlags,
   type TextChannel,
 } from "discord.js";
-import { tDefault } from "../../../../../shared/locale/localeManager";
+import { tGuild } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import { getBotStickyMessageRepository } from "../../../../services/botStickyMessageDependencyResolver";
 import {
@@ -29,8 +29,6 @@ export async function handleStickyMessageUpdate(
   interaction: ChatInputCommandInteraction,
   guildId: string,
 ): Promise<void> {
-  void guildId;
-
   const channelOption = interaction.options.getChannel(
     STICKY_MESSAGE_COMMAND.OPTION.CHANNEL,
     true,
@@ -40,7 +38,10 @@ export async function handleStickyMessageUpdate(
     await interaction.reply({
       embeds: [
         createWarningEmbed(
-          tDefault("commands:sticky-message.errors.text_channel_only"),
+          await tGuild(
+            guildId,
+            "commands:sticky-message.errors.text_channel_only",
+          ),
         ),
       ],
       flags: MessageFlags.Ephemeral,
@@ -55,9 +56,15 @@ export async function handleStickyMessageUpdate(
     await interaction.reply({
       embeds: [
         createInfoEmbed(
-          tDefault("commands:sticky-message.remove.notFound.description"),
+          await tGuild(
+            guildId,
+            "commands:sticky-message.remove.notFound.description",
+          ),
           {
-            title: tDefault("commands:sticky-message.update.notFound.title"),
+            title: await tGuild(
+              guildId,
+              "commands:sticky-message.update.notFound.title",
+            ),
           },
         ),
       ],
@@ -93,7 +100,7 @@ export async function handleStickyMessageUpdate(
     await interaction.reply({
       embeds: [
         createWarningEmbed(
-          tDefault("commands:sticky-message.errors.emptyMessage"),
+          await tGuild(guildId, "commands:sticky-message.errors.emptyMessage"),
         ),
       ],
       flags: MessageFlags.Ephemeral,
@@ -162,9 +169,15 @@ export async function handleStickyMessageUpdate(
     await interaction.reply({
       embeds: [
         createSuccessEmbed(
-          tDefault("commands:sticky-message.update.success.description"),
+          await tGuild(
+            guildId,
+            "commands:sticky-message.update.success.description",
+          ),
           {
-            title: tDefault("commands:sticky-message.update.success.title"),
+            title: await tGuild(
+              guildId,
+              "commands:sticky-message.update.success.title",
+            ),
           },
         ),
       ],

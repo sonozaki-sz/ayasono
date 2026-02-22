@@ -8,7 +8,7 @@ import {
   type TextChannel,
 } from "discord.js";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
-import { tDefault } from "../../../../../shared/locale/localeManager";
+import { tGuild } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import { getBotStickyMessageRepository } from "../../../../services/botStickyMessageDependencyResolver";
 import {
@@ -37,7 +37,10 @@ export async function handleStickyMessageSet(
     await interaction.reply({
       embeds: [
         createWarningEmbed(
-          tDefault("commands:sticky-message.errors.text_channel_only"),
+          await tGuild(
+            guildId,
+            "commands:sticky-message.errors.text_channel_only",
+          ),
         ),
       ],
       flags: MessageFlags.Ephemeral,
@@ -53,8 +56,16 @@ export async function handleStickyMessageSet(
     await interaction.reply({
       embeds: [
         createWarningEmbed(
-          tDefault("commands:sticky-message.set.alreadyExists.description"),
-          { title: tDefault("commands:sticky-message.set.alreadyExists.title") },
+          await tGuild(
+            guildId,
+            "commands:sticky-message.set.alreadyExists.description",
+          ),
+          {
+            title: await tGuild(
+              guildId,
+              "commands:sticky-message.set.alreadyExists.title",
+            ),
+          },
         ),
       ],
       flags: MessageFlags.Ephemeral,
@@ -66,8 +77,8 @@ export async function handleStickyMessageSet(
     STICKY_MESSAGE_COMMAND.OPTION.MESSAGE,
   );
   const useEmbed =
-    (interaction.options.getBoolean(STICKY_MESSAGE_COMMAND.OPTION.USE_EMBED) ??
-      false);
+    interaction.options.getBoolean(STICKY_MESSAGE_COMMAND.OPTION.USE_EMBED) ??
+    false;
   const embedTitle = interaction.options.getString(
     STICKY_MESSAGE_COMMAND.OPTION.EMBED_TITLE,
   );
@@ -85,7 +96,7 @@ export async function handleStickyMessageSet(
     await interaction.reply({
       embeds: [
         createWarningEmbed(
-          tDefault("commands:sticky-message.errors.emptyMessage"),
+          await tGuild(guildId, "commands:sticky-message.errors.emptyMessage"),
         ),
       ],
       flags: MessageFlags.Ephemeral,
@@ -110,7 +121,7 @@ export async function handleStickyMessageSet(
   ) as TextChannel | undefined;
   if (!textChannel) {
     throw new ValidationError(
-      tDefault("commands:sticky-message.errors.text_channel_only"),
+      await tGuild(guildId, "commands:sticky-message.errors.text_channel_only"),
     );
   }
 
@@ -133,8 +144,16 @@ export async function handleStickyMessageSet(
     await interaction.reply({
       embeds: [
         createSuccessEmbed(
-          tDefault("commands:sticky-message.set.success.description"),
-          { title: tDefault("commands:sticky-message.set.success.title") },
+          await tGuild(
+            guildId,
+            "commands:sticky-message.set.success.description",
+          ),
+          {
+            title: await tGuild(
+              guildId,
+              "commands:sticky-message.set.success.title",
+            ),
+          },
         ),
       ],
       flags: MessageFlags.Ephemeral,

@@ -7,7 +7,7 @@ import {
   MessageFlags,
   type TextChannel,
 } from "discord.js";
-import { tDefault } from "../../../../../shared/locale/localeManager";
+import { tGuild } from "../../../../../shared/locale/localeManager";
 import { getBotStickyMessageRepository } from "../../../../services/botStickyMessageDependencyResolver";
 import {
   createInfoEmbed,
@@ -23,8 +23,6 @@ export async function handleStickyMessageRemove(
   interaction: ChatInputCommandInteraction,
   guildId: string,
 ): Promise<void> {
-  void guildId;
-
   const channelOption = interaction.options.getChannel(
     STICKY_MESSAGE_COMMAND.OPTION.CHANNEL,
     true,
@@ -34,7 +32,10 @@ export async function handleStickyMessageRemove(
     await interaction.reply({
       embeds: [
         createWarningEmbed(
-          tDefault("commands:sticky-message.errors.text_channel_only"),
+          await tGuild(
+            guildId,
+            "commands:sticky-message.errors.text_channel_only",
+          ),
         ),
       ],
       flags: MessageFlags.Ephemeral,
@@ -49,9 +50,15 @@ export async function handleStickyMessageRemove(
     await interaction.reply({
       embeds: [
         createInfoEmbed(
-          tDefault("commands:sticky-message.remove.notFound.description"),
+          await tGuild(
+            guildId,
+            "commands:sticky-message.remove.notFound.description",
+          ),
           {
-            title: tDefault("commands:sticky-message.remove.notFound.title"),
+            title: await tGuild(
+              guildId,
+              "commands:sticky-message.remove.notFound.title",
+            ),
           },
         ),
       ],
@@ -81,9 +88,15 @@ export async function handleStickyMessageRemove(
   await interaction.reply({
     embeds: [
       createSuccessEmbed(
-        tDefault("commands:sticky-message.remove.success.description"),
+        await tGuild(
+          guildId,
+          "commands:sticky-message.remove.success.description",
+        ),
         {
-          title: tDefault("commands:sticky-message.remove.success.title"),
+          title: await tGuild(
+            guildId,
+            "commands:sticky-message.remove.success.title",
+          ),
         },
       ),
     ],
