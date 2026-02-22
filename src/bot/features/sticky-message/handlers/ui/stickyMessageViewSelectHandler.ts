@@ -136,19 +136,12 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
 
     // 2段目末尾: 最終設定・更新者（Embed メタの直後に追加して右端に配置）
     if (sticky.updatedBy) {
-      let updatedByLabel = sticky.updatedBy;
-      try {
-        const editor = await interaction.client.users.fetch(sticky.updatedBy);
-        updatedByLabel = editor.username;
-      } catch {
-        // fetch 失敗時は userId をそのまま使用
-      }
       fields.push({
         name: await tGuild(
           guildId,
           "commands:sticky-message.view.field.updated_by",
         ),
-        value: updatedByLabel,
+        value: `<@${sticky.updatedBy}>`,
         inline: true,
       });
     }
@@ -166,7 +159,7 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
 
     // createInfoEmbed で構築し、スティッキーの Embed カラーがあればそれで上書き
     const embed = createInfoEmbed("", {
-      title: `📌 ${await tGuild(guildId, "commands:sticky-message.view.title")}`,
+      title: await tGuild(guildId, "commands:sticky-message.view.title"),
       timestamp: true,
       fields,
     });
