@@ -33,6 +33,7 @@ const PROCESS_ERROR_CONSTANTS = {
  * これらは自コードでは修正できないため記録をスキップする
  */
 const IGNORED_DEPRECATION_CODES = new Set([
+  // TODO: discord.js が punycode 依存を解消したら DEP0040 を削除する
   "DEP0040", // punycode（discord.js 依存のライブラリが使用）
 ]);
 

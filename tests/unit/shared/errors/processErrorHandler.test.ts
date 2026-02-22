@@ -185,10 +185,13 @@ describe("shared/errors/processErrorHandler", () => {
     const warningHandler = handlers.get("warning");
     expect(warningHandler).toBeDefined();
 
-    const deprecation = Object.assign(new Error("The `punycode` module is deprecated."), {
-      name: "DeprecationWarning",
-      code: "DEP0040",
-    });
+    const deprecation = Object.assign(
+      new Error("The `punycode` module is deprecated."),
+      {
+        name: "DeprecationWarning",
+        code: "DEP0040",
+      },
+    );
     warningHandler?.(deprecation);
 
     // DEP0040 は無視するため warn が呼ばれないこと
@@ -283,9 +286,9 @@ describe("shared/errors/processErrorHandler", () => {
       onceHandlers.set(event, listener);
       return process;
     }) as typeof process.once);
-    vi
-      .spyOn(process, "exit")
-      .mockImplementation((() => undefined as never) as typeof process.exit);
+    vi.spyOn(process, "exit").mockImplementation(
+      (() => undefined as never) as typeof process.exit,
+    );
 
     let resolveCleanup: (() => void) | undefined;
     const cleanup = vi.fn(
