@@ -18,11 +18,15 @@ import { STICKY_MESSAGE_COMMAND } from "../stickyMessageCommand.constants";
 
 /**
  * sticky-message remove を実行する
+ * @param interaction コマンド実行インタラクション
+ * @param guildId 実行対象ギルドID
+ * @returns 実行完了を示す Promise
  */
 export async function handleStickyMessageRemove(
   interaction: ChatInputCommandInteraction,
   guildId: string,
 ): Promise<void> {
+  // チャンネルオプションを取得し、テキストチャンネルであることを検証する
   const channelOption = interaction.options.getChannel(
     STICKY_MESSAGE_COMMAND.OPTION.CHANNEL,
     true,
@@ -44,6 +48,8 @@ export async function handleStickyMessageRemove(
   }
 
   const repository = getBotStickyMessageRepository();
+
+  // 既存設定の有無を確認する
   const existing = await repository.findByChannel(channelOption.id);
 
   if (!existing) {

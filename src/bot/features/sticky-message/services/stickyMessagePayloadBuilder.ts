@@ -13,6 +13,8 @@ export interface StickyEmbedData {
 
 /**
  * StickyMessage エンティティから Discord 送信ペイロードを生成する
+ * @param sticky スティッキーメッセージエンティティ
+ * @returns Discord 送信ペイロード
  */
 export function buildStickyMessagePayload(
   sticky: StickyMessage,
@@ -27,6 +29,9 @@ export function buildStickyMessagePayload(
 
 /**
  * JSON 文字列から EmbedBuilder を生成する
+ * @param embedDataJson Embed 設定の JSON 文字列
+ * @param fallbackContent JSON パース失敗時のフォールバックテキスト
+ * @returns EmbedBuilder インスタンス
  */
 function parseEmbedData(
   embedDataJson: string,

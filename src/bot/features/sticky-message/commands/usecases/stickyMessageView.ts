@@ -20,11 +20,15 @@ const MAX_OPTIONS = 25;
  * sticky-message view を実行する
  * ギルドで設定済みの全チャンネルを StringSelectMenu で提示し、
  * ユーザーが選択したチャンネルの詳細を表示する
+ * @param interaction コマンド実行インタラクション
+ * @param guildId 実行対象ギルドID
+ * @returns 実行完了を示す Promise
  */
 export async function handleStickyMessageView(
   interaction: ChatInputCommandInteraction,
   guildId: string,
 ): Promise<void> {
+  // ギルド内の全スティッキーメッセージ設定を取得する
   const repository = getBotStickyMessageRepository();
   const stickies = await repository.findAllByGuild(guildId);
 
@@ -40,6 +44,7 @@ export async function handleStickyMessageView(
     return;
   }
 
+  // StringSelectMenu を構築して選択肢を返信する
   // 上限 25 件まで選択肢として追加
   const options = stickies.slice(0, MAX_OPTIONS).map((sticky) => {
     const label = `#${sticky.channelId}`;

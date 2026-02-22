@@ -12,10 +12,20 @@ import { STICKY_MESSAGE_COMMAND } from "../../commands/stickyMessageCommand.cons
 const PREVIEW_MAX = 1024;
 
 export const stickyMessageViewSelectHandler: StringSelectHandler = {
+  /**
+   * ハンドラが指定の customId に协台するかどうかを返す
+   * @param customId セレクトメニューの customId
+   * @returns 一致する場合 true
+   */
   matches(customId) {
     return customId === STICKY_MESSAGE_COMMAND.VIEW_SELECT_CUSTOM_ID;
   },
 
+  /**
+   * StringSelectMenu の選択応答を処理し、選択チャンネルのスティッキー設定詳細を Embed で返信する
+   * @param interaction StringSelectMenu インタラクション
+   * @returns 実行完了を示す Promise
+   */
   async execute(interaction: StringSelectMenuInteraction) {
     const guildId = interaction.guildId ?? undefined;
     const channelId = interaction.values[0];
@@ -25,6 +35,8 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
     }
 
     const repository = getBotStickyMessageRepository();
+
+    // 選択されたチャンネルのスティッキー設定を取得する
     const sticky = await repository.findByChannel(channelId);
 
     if (!sticky) {

@@ -24,6 +24,9 @@ export class StickyMessageResendService {
   /**
    * メッセージ作成イベントでスティッキーメッセージを処理する
    * 連続投稿時はデバウンスして最後のメッセージから5秒後に再送信する
+   * @param channel 再送信対象のテキストチャンネル
+   * @param guildId 対象ギルドID
+   * @returns 実行完了を示す Promise
    */
   async handleMessageCreate(
     channel: TextChannel,
@@ -50,6 +53,9 @@ export class StickyMessageResendService {
 
   /**
    * スティッキーメッセージを実際に再送信する
+   * @param channel 再送信対象のテキストチャンネル
+   * @param guildId 対象ギルドID
+   * @returns 実行完了を示す Promise
    */
   private async resend(channel: TextChannel, guildId: string): Promise<void> {
     const sticky = await this.repository.findByChannel(channel.id);
@@ -77,6 +83,9 @@ export class StickyMessageResendService {
 
   /**
    * 前のスティッキーメッセージを削除する（失敗しても続行）
+   * @param channel チャンネル
+   * @param messageId 削除対象メッセージID
+   * @returns 実行完了を示す Promise
    */
   private async deletePreviousMessage(
     channel: TextChannel,
@@ -96,6 +105,7 @@ export class StickyMessageResendService {
 
   /**
    * チャンネルのタイマーをキャンセルする（チャンネル削除時など）
+   * @param channelId タイマーを解除するチャンネルID
    */
   cancelTimer(channelId: string): void {
     const timer = resendTimers.get(channelId);
@@ -111,6 +121,8 @@ let service: StickyMessageResendService | undefined;
 
 /**
  * スティッキーメッセージ再送信サービスを取得する
+ * @param repository 初回呼び出し時に必要な IStickyMessageRepository
+ * @returns StickyMessageResendService インスタンス
  */
 export function getStickyMessageResendService(
   repository?: IStickyMessageRepository,

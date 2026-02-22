@@ -24,11 +24,15 @@ import { STICKY_MESSAGE_COMMAND } from "../stickyMessageCommand.constants";
 /**
  * sticky-message update を実行する
  * 既存のスティッキーメッセージ内容を上書き更新する
+ * @param interaction コマンド実行インタラクション
+ * @param guildId 実行対象ギルドID
+ * @returns 実行完了を示す Promise
  */
 export async function handleStickyMessageUpdate(
   interaction: ChatInputCommandInteraction,
   guildId: string,
 ): Promise<void> {
+  // チャンネルオプションを取得し、テキストチャンネルであることを検証する
   const channelOption = interaction.options.getChannel(
     STICKY_MESSAGE_COMMAND.OPTION.CHANNEL,
     true,
@@ -50,6 +54,8 @@ export async function handleStickyMessageUpdate(
   }
 
   const repository = getBotStickyMessageRepository();
+
+  // 既存設定の有無を確認する
   const existing = await repository.findByChannel(channelOption.id);
 
   if (!existing) {
@@ -73,6 +79,7 @@ export async function handleStickyMessageUpdate(
     return;
   }
 
+  // 更新オプションを取得する
   const messageText = interaction.options.getString(
     STICKY_MESSAGE_COMMAND.OPTION.MESSAGE,
   );
@@ -192,6 +199,11 @@ export async function handleStickyMessageUpdate(
   }
 }
 
+/**
+ * カラーコード文字列を数値に変換する（失敗時は Discord Blurple）
+ * @param colorStr カラーコード文字列（`#RRGGBB` / `0xRRGGBB` / `RRGGBB` 形式）
+ * @returns 数値カラーコード
+ */
 function parseColor(colorStr: string): number {
   const normalized = colorStr.startsWith("#")
     ? colorStr.slice(1)

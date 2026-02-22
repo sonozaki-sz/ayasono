@@ -16,11 +16,14 @@ import { handleStickyMessageView } from "./usecases/stickyMessageView";
 
 /**
  * sticky-message コマンド実行入口
+ * @param interaction コマンド実行インタラクション
+ * @returns 実行完了を示す Promise
  */
 export async function executeStickyMessageCommand(
   interaction: ChatInputCommandInteraction,
 ): Promise<void> {
   try {
+    // ギルドIDを取得し、サーバー内コマンドであることを確認する
     const guildId = interaction.guildId;
     if (!guildId) {
       throw new ValidationError(tDefault("errors:validation.guild_only"));
