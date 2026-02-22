@@ -225,7 +225,7 @@ guild-mng-bot-v2/
 │   │   ├── client.ts
 │   │   ├── commands/         # スラッシュコマンド定義
 │   │   ├── events/           # イベントハンドラ
-│   │   ├── features/         # 機能モジュール（afk / vac / bump-reminder / ping / sticky-message）
+│   │   ├── features/         # 機能モジュール（機能ごとのユースケース・ハンドラ・リポジトリ）
 │   │   ├── handlers/         # インタラクション処理フロー
 │   │   ├── services/         # Bot起動・依存解決
 │   │   ├── errors/           # エラーハンドラ
@@ -240,7 +240,7 @@ guild-mng-bot-v2/
 │   └── shared/               # 共有コード
 │       ├── config/           # 環境変数定義
 │       ├── database/         # Repository・Store・型定義
-        ├── features/         # 共有サービス（vac / bump-reminder / sticky-message）
+        ├── features/         # 機能モジュール（bot/web 横断で共有するサービス層）
 │       ├── locale/           # i18n（i18next）
 │       ├── scheduler/        # ジョブスケジューラ
 │       ├── errors/           # カスタムエラー・エラーハンドラ
