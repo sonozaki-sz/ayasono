@@ -143,30 +143,33 @@ export const commands = {
   // Sticky Message command
   "sticky-message.description":
     "Manage sticky messages (pinned to channel bottom) — requires Manage Channels",
-  // set subcommand (plain text, modal input)
-  "sticky-message.set.description":
-    "Set a sticky message as plain text (modal input, supports newlines)",
+  // set subcommand
+  "sticky-message.set.description": "Set a sticky message (modal input)",
   "sticky-message.set.channel.description":
-    "Text channel to set the sticky message in",
-  // set modal
+    "Text channel to set the sticky message in (defaults to this channel)",
+  "sticky-message.set.embed.description":
+    "Set as embed format (true: embed modal / false: plain text modal)",
+  // set plain text modal
   "sticky-message.set.modal.title": "Enter sticky message content",
   "sticky-message.set.modal.message.label": "Message content",
   "sticky-message.set.modal.message.placeholder":
     "Supports multiple lines (max 2000 characters)",
+  // set embed modal
+  "sticky-message.set.embed-modal.title": "Set embed sticky message",
+  "sticky-message.set.embed-modal.embed-title.label": "Title",
+  "sticky-message.set.embed-modal.embed-title.placeholder":
+    "Embed title (optional)",
+  "sticky-message.set.embed-modal.embed-description.label": "Description",
+  "sticky-message.set.embed-modal.embed-description.placeholder":
+    "Embed body text (leave blank for none)",
+  "sticky-message.set.embed-modal.embed-color.label": "Color code",
+  "sticky-message.set.embed-modal.embed-color.placeholder":
+    "#5865F2 or 0x5865F2 (leave blank for default)",
   "sticky-message.set.success.title": "Done",
   "sticky-message.set.success.description": "Sticky message has been set.",
   "sticky-message.set.alreadyExists.title": "Warning",
   "sticky-message.set.alreadyExists.description":
     "A sticky message is already configured for this channel. Remove it first before setting a new one.",
-  // set-embed subcommand (embed format)
-  "sticky-message.set-embed.description":
-    "Set a sticky message in embed format",
-  "sticky-message.set-embed.channel.description":
-    "Text channel to set the sticky message in",
-  "sticky-message.set-embed.embed-title.description": "Embed title",
-  "sticky-message.set-embed.embed-description.description": "Embed description",
-  "sticky-message.set-embed.embed-color.description":
-    "Embed color code (e.g. #5865F2 or 0x5865F2)",
   // remove subcommand
   "sticky-message.remove.description": "Remove a sticky message",
   "sticky-message.remove.channel.description":
@@ -204,11 +207,18 @@ export const commands = {
   "sticky-message.view.field.embed_color": "Embed color",
   // update subcommand
   "sticky-message.update.description":
-    "Update the content of an existing sticky message",
+    "Update the content of an existing sticky message (modal input)",
   "sticky-message.update.channel.description":
-    "Channel whose sticky message to update",
-  "sticky-message.update.message.description":
-    "Updated message content (plain text)",
+    "Channel whose sticky message to update (defaults to this channel)",
+  "sticky-message.update.embed.description":
+    "Update as embed format (true: embed modal / false: plain text modal)",
+  // update plain text modal
+  "sticky-message.update.modal.title": "Update sticky message",
+  "sticky-message.update.modal.message.label": "Message content",
+  "sticky-message.update.modal.message.placeholder":
+    "Supports multiple lines (max 2000 characters)",
+  // update embed modal
+  "sticky-message.update.embed-modal.title": "Update embed sticky message",
   "sticky-message.update.success.title": "Updated",
   "sticky-message.update.success.description":
     "Sticky message has been updated.",

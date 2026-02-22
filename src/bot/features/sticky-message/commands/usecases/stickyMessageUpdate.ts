@@ -2,28 +2,26 @@
 // sticky-message update ユースケース
 
 import {
+  ActionRowBuilder,
   ChannelType,
   type ChatInputCommandInteraction,
   MessageFlags,
-  type TextChannel,
+  ModalBuilder,
+  TextInputBuilder,
+  TextInputStyle,
 } from "discord.js";
-import { tGuild } from "../../../../../shared/locale/localeManager";
-import { logger } from "../../../../../shared/utils/logger";
+import { tDefault, tGuild } from "../../../../../shared/locale/localeManager";
 import { getBotStickyMessageRepository } from "../../../../services/botStickyMessageDependencyResolver";
 import {
   createInfoEmbed,
-  createSuccessEmbed,
   createWarningEmbed,
 } from "../../../../utils/messageResponse";
-import {
-  buildStickyMessagePayload,
-  type StickyEmbedData,
-} from "../../services/stickyMessagePayloadBuilder";
+import type { StickyEmbedData } from "../../services/stickyMessagePayloadBuilder";
 import { STICKY_MESSAGE_COMMAND } from "../stickyMessageCommand.constants";
 
 /**
  * sticky-message update を実行する
- * 既存のスティッキーメッセージ内容を上書き更新する
+ * 既存設定を確認し、embed オプションに応じた更新モーダルを表示する
  * @param interaction コマンド実行インタラクション
  * @param guildId 実行対象ギルドID
  * @returns 実行完了を示す Promise
@@ -32,13 +30,14 @@ export async function handleStickyMessageUpdate(
   interaction: ChatInputCommandInteraction,
   guildId: string,
 ): Promise<void> {
-  // チャンネルオプションを取得し、テキストチャンネルであることを検証する
+  // channel: 省略時はコマンド実行チャンネルを対象にする
   const channelOption = interaction.options.getChannel(
     STICKY_MESSAGE_COMMAND.OPTION.CHANNEL,
-    true,
+    false,
   );
+  const targetChannel = channelOption ?? interaction.channel;
 
-  if (channelOption.type !== ChannelType.GuildText) {
+  if (!targetChannel || targetChannel.type !== ChannelType.GuildText) {
     await interaction.reply({
       embeds: [
         createWarningEmbed(
@@ -54,9 +53,7 @@ export async function handleStickyMessageUpdate(
   }
 
   const repository = getBotStickyMessageRepository();
-
-  // 既存設定の有無を確認する
-  const existing = await repository.findByChannel(channelOption.id);
+  const existing = await repository.findByChannel(targetChannel.id);
 
   if (!existing) {
     await interaction.reply({
@@ -79,137 +76,102 @@ export async function handleStickyMessageUpdate(
     return;
   }
 
-  // 更新オプションを取得する
-  const messageText = interaction.options.getString(
-    STICKY_MESSAGE_COMMAND.OPTION.MESSAGE,
-  );
   const useEmbed =
-    interaction.options.getBoolean(STICKY_MESSAGE_COMMAND.OPTION.USE_EMBED) ??
+    interaction.options.getBoolean(STICKY_MESSAGE_COMMAND.OPTION.EMBED) ??
     false;
-  const embedTitle = interaction.options.getString(
-    STICKY_MESSAGE_COMMAND.OPTION.EMBED_TITLE,
-  );
-  const embedDescription = interaction.options.getString(
-    STICKY_MESSAGE_COMMAND.OPTION.EMBED_DESCRIPTION,
-  );
-  const embedColorStr = interaction.options.getString(
-    STICKY_MESSAGE_COMMAND.OPTION.EMBED_COLOR,
-  );
 
-  // 何も指定されていなければエラー
-  if (
-    !messageText &&
-    !embedTitle &&
-    !embedDescription &&
-    !useEmbed &&
-    !embedColorStr
-  ) {
-    await interaction.reply({
-      embeds: [
-        createWarningEmbed(
-          await tGuild(guildId, "commands:sticky-message.errors.emptyMessage"),
-        ),
-      ],
-      flags: MessageFlags.Ephemeral,
-    });
-    return;
-  }
-
-  // 新しいコンテンツの決定（指定なしは既存値を引き継ぐ）
-  const content =
-    messageText ?? embedDescription ?? embedTitle ?? existing.content;
-
-  // Embed データの生成（useEmbed または Embed オプションのいずれかが指定された場合）
-  let embedData: string | null = existing.embedData;
-  if (useEmbed || embedTitle || embedDescription || embedColorStr) {
+  if (useEmbed) {
+    // 既存の Embed データを読み込んでモーダルを事前入力する
     const prev = existing.embedData
       ? (JSON.parse(existing.embedData) as StickyEmbedData)
       : {};
-    const updated: StickyEmbedData = {
-      title: embedTitle ?? prev.title,
-      description:
-        embedDescription ?? messageText ?? prev.description ?? content,
-      color: embedColorStr
-        ? parseColor(embedColorStr)
-        : (prev.color ?? 0x008969),
-    };
-    embedData = JSON.stringify(updated);
-  } else if (messageText && !useEmbed && !existing.embedData) {
-    // プレーンテキストのみ更新でかつ元々プレーン形式の場合 null のまま
-    embedData = null;
-  }
 
-  try {
-    // DB 更新
-    const updated = await repository.updateContent(
-      existing.id,
-      content,
-      embedData,
-    );
+    const titleInput = new TextInputBuilder()
+      .setCustomId(STICKY_MESSAGE_COMMAND.MODAL_INPUT.EMBED_TITLE)
+      .setLabel(
+        tDefault("commands:sticky-message.set.embed-modal.embed-title.label"),
+      )
+      .setPlaceholder(
+        tDefault(
+          "commands:sticky-message.set.embed-modal.embed-title.placeholder",
+        ),
+      )
+      .setStyle(TextInputStyle.Short)
+      .setRequired(false)
+      .setMaxLength(256);
+    if (prev.title) titleInput.setValue(prev.title);
 
-    // 古いスティッキーメッセージをチャンネルから削除
-    if (existing.lastMessageId) {
-      const textChannel = interaction.guild?.channels.cache.get(
-        channelOption.id,
-      ) as TextChannel | undefined;
-      if (textChannel) {
-        try {
-          const msg = await textChannel.messages.fetch(existing.lastMessageId);
-          await msg.delete();
-        } catch {
-          // 既に削除済みは無視
-        }
-        // 新しい内容でスティッキーメッセージを送信
-        try {
-          const payload = buildStickyMessagePayload(updated);
-          const sent = await textChannel.send(payload);
-          await repository.updateLastMessageId(updated.id, sent.id);
-        } catch (err) {
-          logger.error("Failed to resend sticky message after update", {
-            channelId: channelOption.id,
-            err,
-          });
-        }
-      }
+    const descriptionInput = new TextInputBuilder()
+      .setCustomId(STICKY_MESSAGE_COMMAND.MODAL_INPUT.EMBED_DESCRIPTION)
+      .setLabel(
+        tDefault(
+          "commands:sticky-message.set.embed-modal.embed-description.label",
+        ),
+      )
+      .setPlaceholder(
+        tDefault(
+          "commands:sticky-message.set.embed-modal.embed-description.placeholder",
+        ),
+      )
+      .setStyle(TextInputStyle.Paragraph)
+      .setRequired(false)
+      .setMaxLength(4096);
+    if (prev.description) descriptionInput.setValue(prev.description);
+
+    const colorInput = new TextInputBuilder()
+      .setCustomId(STICKY_MESSAGE_COMMAND.MODAL_INPUT.EMBED_COLOR)
+      .setLabel(
+        tDefault("commands:sticky-message.set.embed-modal.embed-color.label"),
+      )
+      .setPlaceholder(
+        tDefault(
+          "commands:sticky-message.set.embed-modal.embed-color.placeholder",
+        ),
+      )
+      .setStyle(TextInputStyle.Short)
+      .setRequired(false)
+      .setMaxLength(20);
+    if (prev.color) {
+      // 数値カラーを #RRGGBB 形式の文字列に変換して事前入力する
+      colorInput.setValue(`#${prev.color.toString(16).padStart(6, "0")}`);
     }
 
-    await interaction.reply({
-      embeds: [
-        createSuccessEmbed(
-          await tGuild(
-            guildId,
-            "commands:sticky-message.update.success.description",
-          ),
-          {
-            title: await tGuild(
-              guildId,
-              "commands:sticky-message.update.success.title",
-            ),
-          },
+    const modal = new ModalBuilder()
+      .setCustomId(
+        `${STICKY_MESSAGE_COMMAND.UPDATE_EMBED_MODAL_ID_PREFIX}${targetChannel.id}`,
+      )
+      .setTitle(tDefault("commands:sticky-message.update.embed-modal.title"))
+      .addComponents(
+        new ActionRowBuilder<TextInputBuilder>().addComponents(titleInput),
+        new ActionRowBuilder<TextInputBuilder>().addComponents(
+          descriptionInput,
         ),
-      ],
-      flags: MessageFlags.Ephemeral,
-    });
-  } catch (err) {
-    logger.error("Failed to update sticky message", {
-      channelId: channelOption.id,
-      err,
-    });
-    throw err;
-  }
-}
+        new ActionRowBuilder<TextInputBuilder>().addComponents(colorInput),
+      );
 
-/**
- * カラーコード文字列を数値に変換する（失敗時はスティッキーメッセージデフォルトカラー）
- * @param colorStr カラーコード文字列（`#RRGGBB` / `0xRRGGBB` / `RRGGBB` 形式）
- * @returns 数値カラーコード
- */
-function parseColor(colorStr: string): number {
-  const normalized = colorStr.startsWith("#")
-    ? colorStr.slice(1)
-    : colorStr.startsWith("0x") || colorStr.startsWith("0X")
-      ? colorStr.slice(2)
-      : colorStr;
-  const parsed = parseInt(normalized, 16);
-  return isNaN(parsed) ? 0x008969 : parsed;
+    await interaction.showModal(modal);
+  } else {
+    // 既存のテキスト内容を事前入力してプレーンテキストモーダルを表示する
+    const messageInput = new TextInputBuilder()
+      .setCustomId(STICKY_MESSAGE_COMMAND.MODAL_INPUT.MESSAGE)
+      .setLabel(tDefault("commands:sticky-message.update.modal.message.label"))
+      .setPlaceholder(
+        tDefault("commands:sticky-message.update.modal.message.placeholder"),
+      )
+      .setStyle(TextInputStyle.Paragraph)
+      .setRequired(true)
+      .setMaxLength(2000)
+      .setValue(existing.content.substring(0, 2000));
+
+    const modal = new ModalBuilder()
+      .setCustomId(
+        `${STICKY_MESSAGE_COMMAND.UPDATE_MODAL_ID_PREFIX}${targetChannel.id}`,
+      )
+      .setTitle(tDefault("commands:sticky-message.update.modal.title"))
+      .addComponents(
+        new ActionRowBuilder<TextInputBuilder>().addComponents(messageInput),
+      );
+
+    await interaction.showModal(modal);
+  }
 }

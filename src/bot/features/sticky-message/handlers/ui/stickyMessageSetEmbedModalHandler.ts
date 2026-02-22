@@ -1,5 +1,5 @@
-// src/bot/features/sticky-message/handlers/ui/stickyMessageSetModalHandler.ts
-// sticky-message set モーダル送信処理（プレーンテキスト入力）
+// src/bot/features/sticky-message/handlers/ui/stickyMessageSetEmbedModalHandler.ts
+// sticky-message set（Embed 形式）モーダル送信処理
 
 import {
   MessageFlags,
@@ -16,25 +16,30 @@ import {
   createWarningEmbed,
 } from "../../../../utils/messageResponse";
 import { STICKY_MESSAGE_COMMAND } from "../../commands/stickyMessageCommand.constants";
-import { buildStickyMessagePayload } from "../../services/stickyMessagePayloadBuilder";
+import {
+  buildStickyMessagePayload,
+  parseColorStr,
+  type StickyEmbedData,
+} from "../../services/stickyMessagePayloadBuilder";
 
-export const stickyMessageSetModalHandler: ModalHandler = {
+export const stickyMessageSetEmbedModalHandler: ModalHandler = {
   /**
    * ハンドラー対象の customId かを判定する
    * @param customId 判定対象の customId
-   * @returns sticky-message set モーダルなら true
+   * @returns sticky-message set Embed モーダルなら true
    */
   matches(customId) {
-    return customId.startsWith(STICKY_MESSAGE_COMMAND.SET_MODAL_ID_PREFIX);
+    return customId.startsWith(
+      STICKY_MESSAGE_COMMAND.SET_EMBED_MODAL_ID_PREFIX,
+    );
   },
 
   /**
-   * sticky-message set モーダルの送信を処理する
+   * sticky-message set Embed モーダルの送信を処理する
    * @param interaction モーダルインタラクション
    * @returns 実行完了を示す Promise
    */
   async execute(interaction: ModalSubmitInteraction) {
-    // guild がないコンテキスト（DM 等）は処理対象外
     const guild = interaction.guild;
     if (!guild) {
       return;
@@ -44,15 +49,25 @@ export const stickyMessageSetModalHandler: ModalHandler = {
 
     // customId からチャンネル ID を抽出する
     const channelId = interaction.customId.slice(
-      STICKY_MESSAGE_COMMAND.SET_MODAL_ID_PREFIX.length,
+      STICKY_MESSAGE_COMMAND.SET_EMBED_MODAL_ID_PREFIX.length,
     );
 
-    // モーダルのテキスト入力値を取得する
-    const content = interaction.fields.getTextInputValue(
-      STICKY_MESSAGE_COMMAND.MODAL_INPUT.MESSAGE,
-    );
+    // 各入力値を取得する（optional なのでエラーにはならない）
+    const embedTitle =
+      interaction.fields.getTextInputValue(
+        STICKY_MESSAGE_COMMAND.MODAL_INPUT.EMBED_TITLE,
+      ) || null;
+    const embedDescription =
+      interaction.fields.getTextInputValue(
+        STICKY_MESSAGE_COMMAND.MODAL_INPUT.EMBED_DESCRIPTION,
+      ) || null;
+    const embedColorStr =
+      interaction.fields.getTextInputValue(
+        STICKY_MESSAGE_COMMAND.MODAL_INPUT.EMBED_COLOR,
+      ) || null;
 
-    if (!content.trim()) {
+    // タイトルか説明文のどちらかは必須
+    if (!embedTitle && !embedDescription) {
       await interaction.reply({
         embeds: [
           createWarningEmbed(
@@ -67,9 +82,11 @@ export const stickyMessageSetModalHandler: ModalHandler = {
       return;
     }
 
+    const content = embedDescription ?? embedTitle ?? "";
+
     const repository = getBotStickyMessageRepository();
 
-    // モーダル表示から送信までの間に他のユーザーが設定した可能性があるため再確認する
+    // モーダル表示から送信までの間に変更された可能性があるため再確認する
     const existing = await repository.findByChannel(channelId);
     if (existing) {
       await interaction.reply({
@@ -105,20 +122,23 @@ export const stickyMessageSetModalHandler: ModalHandler = {
       );
     }
 
+    const embedPayload: StickyEmbedData = {
+      title: embedTitle ?? undefined,
+      description: embedDescription ?? undefined,
+      color: parseColorStr(embedColorStr),
+    };
+    const embedData = JSON.stringify(embedPayload);
+
     try {
-      // DB に保存（プレーンテキストなので embedData は undefined）
       const stickyRecord = await repository.create(
         guildId,
         channelId,
         content,
-        undefined,
+        embedData,
       );
 
-      // チャンネルに実際にメッセージを送信
       const sendPayload = buildStickyMessagePayload(stickyRecord);
       const sent = await textChannel.send(sendPayload);
-
-      // lastMessageId を更新
       await repository.updateLastMessageId(stickyRecord.id, sent.id);
 
       await interaction.reply({
@@ -139,7 +159,7 @@ export const stickyMessageSetModalHandler: ModalHandler = {
         flags: MessageFlags.Ephemeral,
       });
     } catch (err) {
-      logger.error("Failed to set sticky message via modal", {
+      logger.error("Failed to set sticky message (embed modal)", {
         channelId,
         guildId,
         err,

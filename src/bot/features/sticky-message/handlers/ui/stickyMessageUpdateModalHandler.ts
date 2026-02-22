@@ -1,40 +1,39 @@
-// src/bot/features/sticky-message/handlers/ui/stickyMessageSetModalHandler.ts
-// sticky-message set モーダル送信処理（プレーンテキスト入力）
+// src/bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandler.ts
+// sticky-message update（プレーンテキスト）モーダル送信処理
 
 import {
   MessageFlags,
   type ModalSubmitInteraction,
   type TextChannel,
 } from "discord.js";
-import { ValidationError } from "../../../../../shared/errors/customErrors";
 import { tGuild } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import type { ModalHandler } from "../../../../handlers/interactionCreate/ui/types";
 import { getBotStickyMessageRepository } from "../../../../services/botStickyMessageDependencyResolver";
 import {
+  createInfoEmbed,
   createSuccessEmbed,
   createWarningEmbed,
 } from "../../../../utils/messageResponse";
 import { STICKY_MESSAGE_COMMAND } from "../../commands/stickyMessageCommand.constants";
 import { buildStickyMessagePayload } from "../../services/stickyMessagePayloadBuilder";
 
-export const stickyMessageSetModalHandler: ModalHandler = {
+export const stickyMessageUpdateModalHandler: ModalHandler = {
   /**
    * ハンドラー対象の customId かを判定する
    * @param customId 判定対象の customId
-   * @returns sticky-message set モーダルなら true
+   * @returns sticky-message update テキストモーダルなら true
    */
   matches(customId) {
-    return customId.startsWith(STICKY_MESSAGE_COMMAND.SET_MODAL_ID_PREFIX);
+    return customId.startsWith(STICKY_MESSAGE_COMMAND.UPDATE_MODAL_ID_PREFIX);
   },
 
   /**
-   * sticky-message set モーダルの送信を処理する
+   * sticky-message update プレーンテキストモーダルの送信を処理する
    * @param interaction モーダルインタラクション
    * @returns 実行完了を示す Promise
    */
   async execute(interaction: ModalSubmitInteraction) {
-    // guild がないコンテキスト（DM 等）は処理対象外
     const guild = interaction.guild;
     if (!guild) {
       return;
@@ -44,7 +43,7 @@ export const stickyMessageSetModalHandler: ModalHandler = {
 
     // customId からチャンネル ID を抽出する
     const channelId = interaction.customId.slice(
-      STICKY_MESSAGE_COMMAND.SET_MODAL_ID_PREFIX.length,
+      STICKY_MESSAGE_COMMAND.UPDATE_MODAL_ID_PREFIX.length,
     );
 
     // モーダルのテキスト入力値を取得する
@@ -69,20 +68,20 @@ export const stickyMessageSetModalHandler: ModalHandler = {
 
     const repository = getBotStickyMessageRepository();
 
-    // モーダル表示から送信までの間に他のユーザーが設定した可能性があるため再確認する
+    // モーダル表示から送信までの間に削除された可能性があるため再確認する
     const existing = await repository.findByChannel(channelId);
-    if (existing) {
+    if (!existing) {
       await interaction.reply({
         embeds: [
-          createWarningEmbed(
+          createInfoEmbed(
             await tGuild(
               guildId,
-              "commands:sticky-message.set.alreadyExists.description",
+              "commands:sticky-message.remove.notFound.description",
             ),
             {
               title: await tGuild(
                 guildId,
-                "commands:sticky-message.set.alreadyExists.title",
+                "commands:sticky-message.update.notFound.title",
               ),
             },
           ),
@@ -92,46 +91,50 @@ export const stickyMessageSetModalHandler: ModalHandler = {
       return;
     }
 
-    // Guild テキストチャンネル取得
-    const textChannel = guild.channels.cache.get(channelId) as
-      | TextChannel
-      | undefined;
-    if (!textChannel) {
-      throw new ValidationError(
-        await tGuild(
-          guildId,
-          "commands:sticky-message.errors.text_channel_only",
-        ),
-      );
-    }
-
     try {
-      // DB に保存（プレーンテキストなので embedData は undefined）
-      const stickyRecord = await repository.create(
-        guildId,
-        channelId,
+      // プレーンテキストとして更新する（embedData を null に設定）
+      const updated = await repository.updateContent(
+        existing.id,
         content,
-        undefined,
+        null,
       );
 
-      // チャンネルに実際にメッセージを送信
-      const sendPayload = buildStickyMessagePayload(stickyRecord);
-      const sent = await textChannel.send(sendPayload);
+      const textChannel = guild.channels.cache.get(channelId) as
+        | TextChannel
+        | undefined;
 
-      // lastMessageId を更新
-      await repository.updateLastMessageId(stickyRecord.id, sent.id);
+      if (textChannel && existing.lastMessageId) {
+        // 古いスティッキーメッセージを削除する
+        try {
+          const msg = await textChannel.messages.fetch(existing.lastMessageId);
+          await msg.delete();
+        } catch {
+          // 既に削除済みは無視する
+        }
+        // 新しい内容でスティッキーメッセージを送信する
+        try {
+          const payload = buildStickyMessagePayload(updated);
+          const sent = await textChannel.send(payload);
+          await repository.updateLastMessageId(updated.id, sent.id);
+        } catch (err) {
+          logger.error("Failed to resend sticky message after update", {
+            channelId,
+            err,
+          });
+        }
+      }
 
       await interaction.reply({
         embeds: [
           createSuccessEmbed(
             await tGuild(
               guildId,
-              "commands:sticky-message.set.success.description",
+              "commands:sticky-message.update.success.description",
             ),
             {
               title: await tGuild(
                 guildId,
-                "commands:sticky-message.set.success.title",
+                "commands:sticky-message.update.success.title",
               ),
             },
           ),
@@ -139,7 +142,7 @@ export const stickyMessageSetModalHandler: ModalHandler = {
         flags: MessageFlags.Ephemeral,
       });
     } catch (err) {
-      logger.error("Failed to set sticky message via modal", {
+      logger.error("Failed to update sticky message via modal", {
         channelId,
         guildId,
         err,

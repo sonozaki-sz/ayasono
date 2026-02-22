@@ -143,31 +143,35 @@ export const commands = {
   // スティッキーメッセージコマンド
   "sticky-message.description":
     "スティッキーメッセージ（チャンネル最下部固定）の管理（チャンネル管理者専用）",
-  // set サブコマンド（プレーンテキスト・モーダル入力）
+  // set サブコマンド（プレーンテキスト or Embed モーダル入力）
   "sticky-message.set.description":
-    "プレーンテキストでスティッキーメッセージを設定（入力フォームで改行可）",
+    "スティッキーメッセージを設定（モーダル入力）",
   "sticky-message.set.channel.description":
-    "スティッキーメッセージを設定するテキストチャンネル",
-  // set モーダル
+    "設定するテキストチャンネル（省略時はこのチャンネル）",
+  "sticky-message.set.embed.description":
+    "Embed形式で設定するか（true: Embdedフォーム / false: テキストフォーム）",
+  // set プレーンテキストモーダル
   "sticky-message.set.modal.title": "スティッキーメッセージの内容を入力",
   "sticky-message.set.modal.message.label": "メッセージ内容",
   "sticky-message.set.modal.message.placeholder":
     "改行して複数行のメッセージを入力できます（最大2000文字）",
+  // set Embed モーダル
+  "sticky-message.set.embed-modal.title": "Embed スティッキーメッセージを設定",
+  "sticky-message.set.embed-modal.embed-title.label": "タイトル",
+  "sticky-message.set.embed-modal.embed-title.placeholder":
+    "Embed のタイトルを入力（最大256文字）",
+  "sticky-message.set.embed-modal.embed-description.label": "説明文",
+  "sticky-message.set.embed-modal.embed-description.placeholder":
+    "Embed の説明文を入力（最大4096文字）",
+  "sticky-message.set.embed-modal.embed-color.label": "カラーコード",
+  "sticky-message.set.embed-modal.embed-color.placeholder":
+    "#5865F2 または 0x5865F2 形式で入力",
   "sticky-message.set.success.title": "設定完了",
   "sticky-message.set.success.description":
     "スティッキーメッセージを設定しました。",
   "sticky-message.set.alreadyExists.title": "警告",
   "sticky-message.set.alreadyExists.description":
     "既にスティッキーメッセージが設定されています。削除してから再度設定してください。",
-  // set-embed サブコマンド（Embed形式）
-  "sticky-message.set-embed.description":
-    "Embed形式でスティッキーメッセージを設定",
-  "sticky-message.set-embed.channel.description":
-    "スティッキーメッセージを設定するテキストチャンネル",
-  "sticky-message.set-embed.embed-title.description": "Embedタイトル",
-  "sticky-message.set-embed.embed-description.description": "Embed説明文",
-  "sticky-message.set-embed.embed-color.description":
-    "Embedカラーコード（例: #5865F2 または 0x5865F2）",
   // remove サブコマンド
   "sticky-message.remove.description": "スティッキーメッセージを削除",
   "sticky-message.remove.channel.description":
@@ -204,10 +208,20 @@ export const commands = {
   "sticky-message.view.field.embed_title": "Embedタイトル",
   "sticky-message.view.field.embed_color": "Embedカラー",
   // update サブコマンド
-  "sticky-message.update.description": "スティッキーメッセージの内容を更新",
-  "sticky-message.update.channel.description": "更新対象のチャンネル",
-  "sticky-message.update.message.description":
-    "更新後のメッセージ内容（プレーンテキスト）",
+  "sticky-message.update.description":
+    "スティッキーメッセージの内容を更新（モーダル入力）",
+  "sticky-message.update.channel.description":
+    "更新対象のチャンネル（省略時はこのチャンネル）",
+  "sticky-message.update.embed.description":
+    "Embed形式に更新するか（true: Embed入力フォーム / false: テキスト入力フォーム）",
+  // update プレーンテキストモーダル
+  "sticky-message.update.modal.title": "スティッキーメッセージを更新",
+  "sticky-message.update.modal.message.label": "メッセージ内容",
+  "sticky-message.update.modal.message.placeholder":
+    "改行して複数行入力できます（最大2000文字）",
+  // update Embed モーダル
+  "sticky-message.update.embed-modal.title":
+    "Embed スティッキーメッセージを更新",
   "sticky-message.update.success.title": "更新完了",
   "sticky-message.update.success.description":
     "スティッキーメッセージを更新しました。",

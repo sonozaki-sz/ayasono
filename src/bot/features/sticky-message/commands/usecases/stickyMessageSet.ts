@@ -1,5 +1,5 @@
 // src/bot/features/sticky-message/commands/usecases/stickyMessageSet.ts
-// sticky-message set ユースケース（プレーンテキスト・モーダル入力）
+// sticky-message set ユースケース
 
 import {
   ActionRowBuilder,
@@ -16,7 +16,8 @@ import { createWarningEmbed } from "../../../../utils/messageResponse";
 import { STICKY_MESSAGE_COMMAND } from "../stickyMessageCommand.constants";
 
 /**
- * sticky-message set を実行する（モーダルを表示してプレーンテキストを入力させる）
+ * sticky-message set を実行する
+ * チャンネルを検証し、embed オプションに応じたモーダルを表示する
  * @param interaction コマンド実行インタラクション
  * @param guildId 実行対象ギルドID
  * @returns 実行完了を示す Promise
@@ -25,13 +26,14 @@ export async function handleStickyMessageSet(
   interaction: ChatInputCommandInteraction,
   guildId: string,
 ): Promise<void> {
-  // チャンネルオプションを取得し、テキストチャンネルであることを検証する
+  // channel: 第2引数 false で任意。省略時はコマンド実行チャンネルを対象にする
   const channelOption = interaction.options.getChannel(
     STICKY_MESSAGE_COMMAND.OPTION.CHANNEL,
-    true,
+    false,
   );
+  const targetChannel = channelOption ?? interaction.channel;
 
-  if (channelOption.type !== ChannelType.GuildText) {
+  if (!targetChannel || targetChannel.type !== ChannelType.GuildText) {
     await interaction.reply({
       embeds: [
         createWarningEmbed(
@@ -49,7 +51,7 @@ export async function handleStickyMessageSet(
   const repository = getBotStickyMessageRepository();
 
   // 同チャンネルに既存設定がないか確認する
-  const existing = await repository.findByChannel(channelOption.id);
+  const existing = await repository.findByChannel(targetChannel.id);
   if (existing) {
     await interaction.reply({
       embeds: [
@@ -71,26 +73,91 @@ export async function handleStickyMessageSet(
     return;
   }
 
-  // モーダルを構築して表示する（tDefault は同期）
-  const modal = new ModalBuilder()
-    .setCustomId(
-      `${STICKY_MESSAGE_COMMAND.SET_MODAL_ID_PREFIX}${channelOption.id}`,
-    )
-    .setTitle(tDefault("commands:sticky-message.set.modal.title"));
+  const useEmbed =
+    interaction.options.getBoolean(STICKY_MESSAGE_COMMAND.OPTION.EMBED) ??
+    false;
 
-  const messageInput = new TextInputBuilder()
-    .setCustomId(STICKY_MESSAGE_COMMAND.SET_MODAL_MESSAGE_INPUT_ID)
-    .setLabel(tDefault("commands:sticky-message.set.modal.message.label"))
-    .setPlaceholder(
-      tDefault("commands:sticky-message.set.modal.message.placeholder"),
-    )
-    .setStyle(TextInputStyle.Paragraph)
-    .setRequired(true)
-    .setMaxLength(2000);
+  if (useEmbed) {
+    // Embed モーダルを表示する（tDefault は同期）
+    const modal = new ModalBuilder()
+      .setCustomId(
+        `${STICKY_MESSAGE_COMMAND.SET_EMBED_MODAL_ID_PREFIX}${targetChannel.id}`,
+      )
+      .setTitle(tDefault("commands:sticky-message.set.embed-modal.title"));
 
-  modal.addComponents(
-    new ActionRowBuilder<TextInputBuilder>().addComponents(messageInput),
-  );
+    const titleInput = new TextInputBuilder()
+      .setCustomId(STICKY_MESSAGE_COMMAND.MODAL_INPUT.EMBED_TITLE)
+      .setLabel(
+        tDefault("commands:sticky-message.set.embed-modal.embed-title.label"),
+      )
+      .setPlaceholder(
+        tDefault(
+          "commands:sticky-message.set.embed-modal.embed-title.placeholder",
+        ),
+      )
+      .setStyle(TextInputStyle.Short)
+      .setRequired(false)
+      .setMaxLength(256);
 
-  await interaction.showModal(modal);
+    const descriptionInput = new TextInputBuilder()
+      .setCustomId(STICKY_MESSAGE_COMMAND.MODAL_INPUT.EMBED_DESCRIPTION)
+      .setLabel(
+        tDefault(
+          "commands:sticky-message.set.embed-modal.embed-description.label",
+        ),
+      )
+      .setPlaceholder(
+        tDefault(
+          "commands:sticky-message.set.embed-modal.embed-description.placeholder",
+        ),
+      )
+      .setStyle(TextInputStyle.Paragraph)
+      .setRequired(false)
+      .setMaxLength(4096);
+
+    const colorInput = new TextInputBuilder()
+      .setCustomId(STICKY_MESSAGE_COMMAND.MODAL_INPUT.EMBED_COLOR)
+      .setLabel(
+        tDefault("commands:sticky-message.set.embed-modal.embed-color.label"),
+      )
+      .setPlaceholder(
+        tDefault(
+          "commands:sticky-message.set.embed-modal.embed-color.placeholder",
+        ),
+      )
+      .setStyle(TextInputStyle.Short)
+      .setRequired(false)
+      .setMaxLength(20);
+
+    modal.addComponents(
+      new ActionRowBuilder<TextInputBuilder>().addComponents(titleInput),
+      new ActionRowBuilder<TextInputBuilder>().addComponents(descriptionInput),
+      new ActionRowBuilder<TextInputBuilder>().addComponents(colorInput),
+    );
+
+    await interaction.showModal(modal);
+  } else {
+    // プレーンテキストモーダルを表示する
+    const modal = new ModalBuilder()
+      .setCustomId(
+        `${STICKY_MESSAGE_COMMAND.SET_MODAL_ID_PREFIX}${targetChannel.id}`,
+      )
+      .setTitle(tDefault("commands:sticky-message.set.modal.title"));
+
+    const messageInput = new TextInputBuilder()
+      .setCustomId(STICKY_MESSAGE_COMMAND.MODAL_INPUT.MESSAGE)
+      .setLabel(tDefault("commands:sticky-message.set.modal.message.label"))
+      .setPlaceholder(
+        tDefault("commands:sticky-message.set.modal.message.placeholder"),
+      )
+      .setStyle(TextInputStyle.Paragraph)
+      .setRequired(true)
+      .setMaxLength(2000);
+
+    modal.addComponents(
+      new ActionRowBuilder<TextInputBuilder>().addComponents(messageInput),
+    );
+
+    await interaction.showModal(modal);
+  }
 }

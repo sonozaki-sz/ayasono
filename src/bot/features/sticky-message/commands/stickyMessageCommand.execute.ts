@@ -11,7 +11,6 @@ import { handleCommandError } from "../../../errors/interactionErrorHandler";
 import { STICKY_MESSAGE_COMMAND } from "./stickyMessageCommand.constants";
 import { handleStickyMessageRemove } from "./usecases/stickyMessageRemove";
 import { handleStickyMessageSet } from "./usecases/stickyMessageSet";
-import { handleStickyMessageSetEmbed } from "./usecases/stickyMessageSetEmbed";
 import { handleStickyMessageUpdate } from "./usecases/stickyMessageUpdate";
 import { handleStickyMessageView } from "./usecases/stickyMessageView";
 
@@ -47,9 +46,6 @@ export async function executeStickyMessageCommand(
     switch (subcommand) {
       case STICKY_MESSAGE_COMMAND.SUBCOMMAND.SET:
         await handleStickyMessageSet(interaction, guildId);
-        break;
-      case STICKY_MESSAGE_COMMAND.SUBCOMMAND.SET_EMBED:
-        await handleStickyMessageSetEmbed(interaction, guildId);
         break;
       case STICKY_MESSAGE_COMMAND.SUBCOMMAND.REMOVE:
         await handleStickyMessageRemove(interaction, guildId);

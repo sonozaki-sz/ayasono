@@ -52,3 +52,19 @@ function parseEmbedData(
       .setDescription(fallbackContent);
   }
 }
+
+/**
+ * カラーコード文字列を数値に変換する（失敗時はスティッキーメッセージデフォルトカラー）
+ * @param colorStr カラーコード文字列（`#RRGGBB` / `0xRRGGBB` / `RRGGBB` 形式、または null/undefined）
+ * @returns 数値カラーコード
+ */
+export function parseColorStr(colorStr: string | null | undefined): number {
+  if (!colorStr) return 0x008969;
+  const normalized = colorStr.startsWith("#")
+    ? colorStr.slice(1)
+    : colorStr.startsWith("0x") || colorStr.startsWith("0X")
+      ? colorStr.slice(2)
+      : colorStr;
+  const parsed = parseInt(normalized, 16);
+  return isNaN(parsed) ? 0x008969 : parsed;
+}

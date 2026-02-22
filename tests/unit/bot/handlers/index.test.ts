@@ -1,5 +1,8 @@
 import { bumpPanelButtonHandler } from "@/bot/features/bump-reminder/handlers/ui/bumpPanelButtonHandler";
+import { stickyMessageSetEmbedModalHandler } from "@/bot/features/sticky-message/handlers/ui/stickyMessageSetEmbedModalHandler";
 import { stickyMessageSetModalHandler } from "@/bot/features/sticky-message/handlers/ui/stickyMessageSetModalHandler";
+import { stickyMessageUpdateEmbedModalHandler } from "@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler";
+import { stickyMessageUpdateModalHandler } from "@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandler";
 import { vacPanelButtonHandler } from "@/bot/features/vac/handlers/ui/vacPanelButton";
 import { vacPanelModalHandler } from "@/bot/features/vac/handlers/ui/vacPanelModal";
 import { vacPanelUserSelectHandler } from "@/bot/features/vac/handlers/ui/vacPanelUserSelect";
@@ -38,6 +41,33 @@ vi.mock(
     },
   }),
 );
+vi.mock(
+  "@/bot/features/sticky-message/handlers/ui/stickyMessageSetEmbedModalHandler",
+  () => ({
+    stickyMessageSetEmbedModalHandler: {
+      matches: vi.fn(() => true),
+      execute: vi.fn(),
+    },
+  }),
+);
+vi.mock(
+  "@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandler",
+  () => ({
+    stickyMessageUpdateModalHandler: {
+      matches: vi.fn(() => true),
+      execute: vi.fn(),
+    },
+  }),
+);
+vi.mock(
+  "@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler",
+  () => ({
+    stickyMessageUpdateEmbedModalHandler: {
+      matches: vi.fn(() => true),
+      execute: vi.fn(),
+    },
+  }),
+);
 vi.mock("@/bot/features/vac/handlers/ui/vacPanelUserSelect", () => ({
   vacPanelUserSelectHandler: {
     matches: vi.fn(() => true),
@@ -59,6 +89,9 @@ describe("bot/handlers/interactionCreate/ui", () => {
     expect(modalHandlers).toEqual([
       vacPanelModalHandler,
       stickyMessageSetModalHandler,
+      stickyMessageSetEmbedModalHandler,
+      stickyMessageUpdateModalHandler,
+      stickyMessageUpdateEmbedModalHandler,
     ]);
   });
 
