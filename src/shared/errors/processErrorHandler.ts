@@ -30,11 +30,11 @@ const PROCESS_ERROR_CONSTANTS = {
 
 /**
  * 依存ライブラリ由来の既知 DeprecationWarning コード
- * これらは自コードでは修正できないため記録をスキップする
+ * 自コードでは修正できないものをここに列挙した場合はアプリログへの出力をスキップする。
+ * Node.js 本来の stderr への出力は維持される（意図的な非抑制）。
  */
-const IGNORED_DEPRECATION_CODES = new Set([
-  // TODO: discord.js が punycode 依存を解消したら DEP0040 を削除する
-  "DEP0040", // punycode（discord.js 依存のライブラリが使用）
+const IGNORED_DEPRECATION_CODES = new Set<string>([
+  // 現在、アプリログのみ抑制している既知コードはない
 ]);
 
 // setupGlobalErrorHandlers の重複登録を防ぐフラグ
