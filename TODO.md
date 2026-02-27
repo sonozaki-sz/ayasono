@@ -2,7 +2,7 @@
 
 > プロジェクト全体のタスク管理と残件リスト
 
-最終更新: 2026年2月26日（ソースコメント整備完了）
+最終更新: 2026年2月27日（Botエラー Discord通知実装完了）
 
 ---
 
@@ -10,9 +10,9 @@
 
 ### 残タスク統計
 
-- 残タスク合計: **46件**
+- 残タスク合計: **45件**
 - bot優先対象（1～3）: **21件**
-- デプロイ・運用（4）: **12件**
+- デプロイ・運用（4）: **11件**
 - Web UI実装（5 / 凍結中）: **12件**
 
 ### 優先カテゴリ別進捗
@@ -22,7 +22,7 @@
 | 1   | 主要機能実装       | 10   | 🚧   |
 | 2   | 基本コマンド追加   | 6    | 📋   |
 | 3   | テスト・品質向上   | 6    | 🚧   |
-| 4   | デプロイ・運用     | 12   | 📋   |
+| 4   | デプロイ・運用     | 11   | 🚧   |
 | 5   | Web UI実装（凍結） | 12   | ⏸️   |
 
 **凡例**: 🚧 進行中 | 📋 未着手 | ⏸️ 凍結中
@@ -131,9 +131,9 @@
 - [ ] Dockerイメージビルド・プッシュ
 - [ ] 自動デプロイ設定
 
-#### 4.3 監視・ログ - 残3件
+#### 4.3 監視・ログ - 残2件
 
-- [ ] **Botエラー時の Discord 通知**: Winston にカスタムトランスポートを追加し、`logger.error()` 呼び出し時に Discord Webhook へ自動通知（`processErrorHandler.ts` が既存のため、プロセスエラーも含め追加実装不要）
+- [x] **Botエラー時の Discord 通知**: Winston にカスタムトランスポートを追加し、`logger.error()` 呼び出し時に Discord Webhook へ自動通知（`processErrorHandler.ts` が既存のため、プロセスエラーも含め追加実装不要）
 - [ ] メトリクス収集
 - [ ] アラート設定
 
@@ -314,9 +314,11 @@
    - `src/` 全 169 ファイル: ファイル先頭コメント・JSDoc・インラインコメント確認済み（欠落 0）
    - `tests/` 全 207 ファイル: ファイル先頭コメント補完（187 ファイル追加）+ 80 行以上のテストファイル全件に観点コメント補完
 
-2. **Botエラー時の Discord 通知実装**（セクション 4.3）
-   - Winston にカスタムトランスポートを追加し、`logger.error()` 呼び出し時に Discord Webhook へ自動通知
-   - `unhandledRejection` / `uncaughtException` は既存の `processErrorHandler.ts` が `logger.error()` 経由で記録するため、トランスポート追加のみで全エラーを網羅できる
+2. ~~**Botエラー時の Discord 通知実装**（セクション 4.3）~~ ✅ **完了**
+   - `DISCORD_ERROR_WEBHOOK_URL` 環境変数追加（任意）
+   - `DiscordWebhookTransport` を `src/shared/utils/discordWebhookTransport.ts` に実装
+   - `logger.error()` 呼び出し時に Discord Webhook へ Embed 形式で自動通知
+   - ユニットテスト 10 件追加（`tests/unit/shared/utils/discordWebhookTransport.test.ts`）
 
 3. **主要機能実装**（セクション 1）
    - メンバーログ機能（`guildMemberAdd` / `guildMemberRemove` + `/member-log-config`）
@@ -334,6 +336,6 @@
 
 ---
 
-**最終更新**: 2026年2月26日
-**全体進捗**: src再監査完了、テスト再編完了、`index.ts`撤廃完了、sticky-message実装完了、**単体テストカバレッジ 100%（statements/functions/lines）達成**、CIデプロイ高速化完了、**ソースコメント整備完了**
-**次のマイルストーン**: Botエラー Discord通知 → 主要機能実装
+**最終更新**: 2026年2月27日
+**全体進捗**: src再監査完了、テスト再編完了、`index.ts`撤廃完了、sticky-message実装完了、**単体テストカバレッジ 100%（statements/functions/lines）達成**、CIデプロイ高速化完了、**ソースコメント整備完了**、**Bot Discord エラー通知実装完了**
+**次のマイルストーン**: 主要機能実装（メンバーログ・メッセージ削除）→ E2E テスト着手
