@@ -4,6 +4,7 @@
 import winston from "winston";
 import DailyRotateFile from "winston-daily-rotate-file";
 import { NODE_ENV, env } from "../config/env";
+import { DiscordWebhookTransport } from "./discordWebhookTransport";
 
 // 実行環境を判定し、コンソール出力の粒度を切り替える
 const isDevelopment = env.NODE_ENV === NODE_ENV.DEVELOPMENT;
@@ -78,6 +79,11 @@ if (!isDevelopment) {
       level: "info",
     }),
   );
+}
+
+// Discord Webhook URL が設定されている場合のみエラー通知トランスポートを追加
+if (env.DISCORD_ERROR_WEBHOOK_URL) {
+  transports.push(new DiscordWebhookTransport(env.DISCORD_ERROR_WEBHOOK_URL));
 }
 
 // アプリ全体で共有するロガーインスタンス
