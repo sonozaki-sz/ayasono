@@ -52,7 +52,7 @@ jobs:
   # CD: デプロイ（mainへの直接push、またはmain向けPRのマージ完了時のみ）
   # ─────────────────────────────────────────────
   deploy:
-    name: Deploy to Portainer
+    name: Deploy to VPS
     needs: test
     runs-on: ubuntu-latest
     if: |
@@ -89,23 +89,19 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Portainer API でスタックを再デプロイ（最新イメージをプル）
-        run: |
-          BASE="http://${{ secrets.PORTAINER_HOST }}:9000/api"
-          HEADERS=(-H "X-API-Key: ${{ secrets.PORTAINER_TOKEN }}" -H "Content-Type: application/json")
-          STACK_ID="${{ secrets.PORTAINER_STACK_ID }}"
-          ENDPOINT_ID="${{ secrets.PORTAINER_ENDPOINT_ID }}"
-
-          # 現在のスタックファイルと環境変数を取得
-          STACK_FILE=$(curl -fsS "${HEADERS[@]}" "$BASE/stacks/$STACK_ID/file" | jq -r '.StackFileContent')
-          ENV_VARS=$(curl -fsS "${HEADERS[@]}" "$BASE/stacks/$STACK_ID" | jq '.Env // []')
-
-          # pullImage=true でスタックを更新（最新イメージをプルして再デプロイ）
-          curl -fsS -X PUT "${HEADERS[@]}" \
-            "$BASE/stacks/$STACK_ID?endpointId=$ENDPOINT_ID" \
-            -d "{\"pullImage\":true,\"prune\":false,\"stackFileContent\":$(echo "$STACK_FILE" | jq -Rs .),\"env\":$ENV_VARS}"
-
-          echo "==> デプロイ完了: $(date '+%Y-%m-%d %H:%M:%S %Z')"
+      - name: SSH でデプロイ
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /opt/ayasono
+            echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            docker compose -f docker-compose.prod.yml pull
+            docker compose -f docker-compose.prod.yml up -d --remove-orphans
+            docker logout ghcr.io
+            echo "==> デプロイ完了: $(date '+%Y-%m-%d %H:%M:%S %Z')"
 
   # ─────────────────────────────────────────────
   # Discord 通知（成功）
@@ -168,7 +164,7 @@ jobs:
           if [ "${{ needs.test.result }}" = "failure" ]; then
             FAILED_JOB="test (Test)"
           else
-            FAILED_JOB="deploy (Deploy to Portainer)"
+            FAILED_JOB="deploy (Deploy to VPS)"
           fi
 
           curl -fsSL -X POST "${{ secrets.DISCORD_WEBHOOK_URL }}" \
