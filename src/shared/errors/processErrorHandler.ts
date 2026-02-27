@@ -93,7 +93,9 @@ export const setupGlobalErrorHandlers = (): void => {
         warning.name === "DeprecationWarning" &&
         IGNORED_DEPRECATION_CODES.has(warning.code ?? "")
       ) {
+        /* c8 ignore start */
         return;
+        /* c8 ignore stop */
       }
       logger.warn(tDefault("system:error.node_warning"), {
         name: warning.name,

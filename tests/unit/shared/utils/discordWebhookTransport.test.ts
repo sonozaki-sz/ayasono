@@ -190,4 +190,35 @@ describe("shared/utils/discordWebhookTransport", () => {
 
     expect(loggedHandler).toHaveBeenCalledWith(info);
   });
+
+  // message が文字列以外（数値）の場合に String() で変換されることを確認する（type guard の false ブランチ）
+  it("converts non-string message to string in description", () => {
+    const transport = new DiscordWebhookTransport(TEST_WEBHOOK_URL);
+    const callback = vi.fn();
+
+    // message に数値を渡して非文字列パスを通す
+    transport.log({ level: "error", message: 42 }, callback);
+
+    const fetchArgs = fetchMock.mock.calls[0] as [string, RequestInit];
+    const body = JSON.parse(fetchArgs[1].body as string) as {
+      embeds: { description: string }[];
+    };
+    expect(body.embeds[0]?.description).toContain("42");
+  });
+
+  // message が undefined の場合に空文字列へフォールバックすることを確認する（nullish coalescing の右辺ブランチ）
+  it("falls back to empty string when message is undefined", () => {
+    const transport = new DiscordWebhookTransport(TEST_WEBHOOK_URL);
+    const callback = vi.fn();
+
+    // message を省略して undefined パスを通す
+    transport.log({ level: "error" }, callback);
+
+    const fetchArgs = fetchMock.mock.calls[0] as [string, RequestInit];
+    const body = JSON.parse(fetchArgs[1].body as string) as {
+      embeds: { description: string }[];
+    };
+    // 空文字列を String() した結果は "**" のみになる
+    expect(body.embeds[0]?.description).toBe("****");
+  });
 });
