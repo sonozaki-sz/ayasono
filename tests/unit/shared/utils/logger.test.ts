@@ -1,16 +1,19 @@
 // tests/unit/shared/utils/logger.test.ts
 // NODE_ENV と LOG_LEVEL の組み合わせに応じてトランスポート構成・ログレベル・
-// フォーマット関数の出力が正しく切り替わるかを検証する
+// フォーマット関数の出力が正しく切り替わるかを検証する。
+// DISCORD_ERROR_WEBHOOK_URL 設定時の DiscordWebhookTransport 追加も確認する
 describe("Logger", () => {
   const loadLoggerModule = async (
     nodeEnv: "development" | "production" | "test",
     logLevel?: string,
+    webhookUrl?: string,
   ) => {
     vi.resetModules();
 
     const consoleTransportMock = vi.fn();
     const dailyRotateMock = vi.fn();
     const createLoggerMock = vi.fn((options) => ({ ...options }));
+    const discordWebhookTransportMock = vi.fn();
 
     const winstonMock = {
       createLogger: createLoggerMock,
@@ -23,12 +26,16 @@ describe("Logger", () => {
       transports: {
         Console: consoleTransportMock,
       },
+      Transport: class {},
     };
 
     vi.doMock("winston", () => ({ __esModule: true, default: winstonMock }));
     vi.doMock("winston-daily-rotate-file", () => ({
       __esModule: true,
       default: dailyRotateMock,
+    }));
+    vi.doMock("@/shared/utils/discordWebhookTransport", () => ({
+      DiscordWebhookTransport: discordWebhookTransportMock,
     }));
     vi.doMock("@/shared/config/env", () => ({
       NODE_ENV: {
@@ -39,6 +46,7 @@ describe("Logger", () => {
       env: {
         NODE_ENV: nodeEnv,
         LOG_LEVEL: logLevel,
+        DISCORD_ERROR_WEBHOOK_URL: webhookUrl,
       },
     }));
 
@@ -49,6 +57,7 @@ describe("Logger", () => {
       createLoggerMock,
       consoleTransportMock,
       dailyRotateMock,
+      discordWebhookTransportMock,
     };
   };
 
@@ -162,5 +171,32 @@ describe("Logger", () => {
     expect(consoleTransportMock).toHaveBeenCalledWith(
       expect.objectContaining({ level: "debug" }),
     );
+  });
+
+  // DISCORD_ERROR_WEBHOOK_URL が設定されている場合に DiscordWebhookTransport が追加され4トランスポートになることを確認する
+  it("adds DiscordWebhookTransport when DISCORD_ERROR_WEBHOOK_URL is set", async () => {
+    const { createLoggerMock, discordWebhookTransportMock } =
+      await loadLoggerModule(
+        "production",
+        undefined,
+        "https://discord.com/api/webhooks/123/token",
+      );
+
+    expect(discordWebhookTransportMock).toHaveBeenCalledTimes(1);
+    expect(discordWebhookTransportMock).toHaveBeenCalledWith(
+      "https://discord.com/api/webhooks/123/token",
+    );
+    const createLoggerArgs = createLoggerMock.mock.calls[0][0];
+    expect(createLoggerArgs.transports).toHaveLength(4);
+  });
+
+  // DISCORD_ERROR_WEBHOOK_URL が未設定の場合は DiscordWebhookTransport が追加されないことを確認する
+  it("does not add DiscordWebhookTransport when DISCORD_ERROR_WEBHOOK_URL is not set", async () => {
+    const { createLoggerMock, discordWebhookTransportMock } =
+      await loadLoggerModule("production", undefined);
+
+    expect(discordWebhookTransportMock).not.toHaveBeenCalled();
+    const createLoggerArgs = createLoggerMock.mock.calls[0][0];
+    expect(createLoggerArgs.transports).toHaveLength(3);
   });
 });
