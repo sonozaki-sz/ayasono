@@ -22,6 +22,7 @@ const envSchema = z.object({
   DISCORD_TOKEN: z.string().min(50, "DISCORD_TOKEN is not configured"),
   DISCORD_APP_ID: z.string().min(10, "DISCORD_APP_ID is not configured"),
   DISCORD_GUILD_ID: z.string().optional(), // 開発用：設定するとギルドコマンドとして即座に登録
+  DISCORD_ERROR_WEBHOOK_URL: z.string().optional(), // エラー通知用 Discord Webhook URL（任意）
 
   // ロケール
   LOCALE: z.string().default("ja"),
