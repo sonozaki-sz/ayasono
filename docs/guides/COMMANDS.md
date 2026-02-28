@@ -809,6 +809,8 @@ Botが正常に動作するために必要な権限：
 - [MEMBER_LOG_SPEC.md](../specs/MEMBER_LOG_SPEC.md) - メンバー参加・脱退ログ機能仕様
 - [MESSAGE_DELETE_SPEC.md](../specs/MESSAGE_DELETE_SPEC.md) - メッセージ削除コマンド仕様
 - [VC_RECRUIT_SPEC.md](../specs/VC_RECRUIT_SPEC.md) - VC募集機能仕様
+- [GUILD_CONFIG_SPEC.md](../specs/GUILD_CONFIG_SPEC.md) - ギルド設定機能仕様
+- [BASIC_COMMANDS_SPEC.md](../specs/BASIC_COMMANDS_SPEC.md) - 基本コマンド仕様
 
 ### ガイド
 
