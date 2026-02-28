@@ -2,7 +2,7 @@
 
 > Bot Commands Reference - スラッシュコマンドの完全リファレンス
 
-最終更新: 2026年2月27日（message-delete 仕様拡張・VC募集機能追加）
+最終更新: 2026年3月1日（member-log 実装済みに更新）
 
 ---
 
@@ -23,9 +23,9 @@ ayasonoで使用可能なすべてのスラッシュコマンドの詳細リフ�
 | `/vac-config`            | VC自動作成機能の設定管理               | サーバー管理   | ✅ 実装済み |
 | `/vac`                   | 作成済みVCの名前・人数制限を変更       | なし           | ✅ 実装済み |
 | `/sticky-message`        | メッセージ固定機能の管理               | チャンネル管理 | ✅ 実装済み |
-| `/member-log-config`     | メンバーログ設定                       | サーバー管理   | 📋 未実装   |
-| `/message-delete`        | メッセージ一括削除（全チャンネル対応） | メッセージ管理 | 📋 未実装   |
-| `/message-delete-config` | メッセージ削除の挙動設定               | なし           | 📋 未実装   |
+| `/member-log-config`     | メンバーログ設定                       | サーバー管理   | ✅ 実装済み |
+| `/message-delete`        | メッセージ一括削除（全チャンネル対応） | メッセージ管理 | ✅ 実装済み |
+| `/message-delete-config` | メッセージ削除の挙動設定               | なし           | ✅ 実装済み |
 | `/vc-recruit-config`     | VC募集機能の設定管理                   | サーバー管理   | 📋 未実装   |
 
 ---
@@ -417,33 +417,29 @@ VC自動作成機能（VAC）の設定を管理します。トリガーVCの追�
 
 #### `set`
 
-スティッキーメッセージを設定します。
+スティッキーメッセージを設定します。コマンド実行後にモーダルポップアップで内容を入力します。
 
 ```
-/sticky-message set channel:<チャンネル> [message:<メッセージ>] [use-embed:<true/false>] ...
+/sticky-message set [channel:<チャンネル>] [mode:<text|embed>]
 ```
 
-**主なオプション:**
+**オプション:**
 
-- `channel` (必須): スティッキーメッセージを設定するテキストチャンネル
-- `message` (任意): メッセージ内容（プレーンテキスト）
-- `use-embed` (任意): Embed 形式で表示する場合 true
-- `embed-title` (任意): Embed タイトル
-- `embed-description` (任意): Embed 説明文
-- `embed-color` (任意): Embed カラーコード（例: `#008969`）
+- `channel` (任意): スティッキーメッセージを設定するテキストチャンネル（省略時はコマンド実行チャンネル）
+- `mode` (任意): 表示形式— `text`（デフォルト）または `embed`
 
-> `message` / `embed-description` / `embed-title` のいずれか1つ以上の指定が必要。
+> メッセージ内容（テキスト / Embed タイトル・説明・カラー）はコマンド実行後に表示される**モーダル**で入力します。
 
 **権限:** チャンネル管理（`MANAGE_CHANNELS`）
 
 **使用例:**
 
 ```
-# プレーンテキスト
-/sticky-message set channel:#rules message:サーバールールを守ってください
+# プレーンテキスト（mode 未指定）
+/sticky-message set channel:#rules
 
 # Embed形式
-/sticky-message set channel:#rules use-embed:true embed-title:サーバールール embed-description:ルールを守ってください embed-color:#008969
+/sticky-message set channel:#rules mode:embed
 ```
 
 ---
@@ -469,19 +465,26 @@ VC自動作成機能（VAC）の設定を管理します。トリガーVCの追�
 既存のスティッキーメッセージの内容を上書き更新します。旧メッセージを削除し新しい内容で即時再送信します。
 
 ```
-/sticky-message update channel:<チャンネル> [各オプション]
+/sticky-message update [channel:<チャンネル>] [mode:<text|embed>]
 ```
+
+**オプション:**
+
+- `channel` (任意): 更新対象のチャンネル（省略時はコマンド実行チャンネル）
+- `mode` (任意): 表示形式— `text`（デフォルト）または `embed`
+
+> 更新内容はコマンド実行後に表示される**モーダル**で入力します。`mode` を切り替えることでテキスト↔Embed間の変更も可能です。
 
 **権限:** チャンネル管理（`MANAGE_CHANNELS`）
 
 **使用例:**
 
 ```
-# テキスト内容だけ変更
-/sticky-message update channel:#rules message:新しいルールになりました
+# テキスト内容を変更する
+/sticky-message update channel:#rules
 
-# Embedタイトルだけ変更
-/sticky-message update channel:#rules embed-title:【重要】サーバールール
+# Embed形式に切り替えてタイトル・内容を変更する
+/sticky-message update channel:#rules mode:embed
 ```
 
 ---
@@ -501,8 +504,6 @@ VC自動作成機能（VAC）の設定を管理します。トリガーVCの追�
 ---
 
 ## 👥 メンバーログ機能
-
-> ⚠️ **このコマンドは未実装です。** 仕様書のみ作成済みで、実装待ちの機能です。
 
 ### `/member-log-config`
 
@@ -577,8 +578,6 @@ VC自動作成機能（VAC）の設定を管理します。トリガーVCの追�
 ---
 
 ## 🗑️ メッセージ削除機能
-
-> ⚠️ **このコマンドは未実装です。** 仕様書のみ作成済みで、実装待ちの機能です。
 
 ### `/message-delete`
 
@@ -813,6 +812,8 @@ Botが正常に動作するために必要な権限：
 - [MEMBER_LOG_SPEC.md](../specs/MEMBER_LOG_SPEC.md) - メンバー参加・脱退ログ機能仕様
 - [MESSAGE_DELETE_SPEC.md](../specs/MESSAGE_DELETE_SPEC.md) - メッセージ削除コマンド仕様
 - [VC_RECRUIT_SPEC.md](../specs/VC_RECRUIT_SPEC.md) - VC募集機能仕様
+- [GUILD_CONFIG_SPEC.md](../specs/GUILD_CONFIG_SPEC.md) - ギルド設定機能仕様
+- [BASIC_COMMANDS_SPEC.md](../specs/BASIC_COMMANDS_SPEC.md) - 基本コマンド仕様
 
 ### ガイド
 

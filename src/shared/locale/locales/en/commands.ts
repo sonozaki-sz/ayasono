@@ -258,7 +258,46 @@ export const commands = {
   "message-delete.modal.before.label": "End date/time",
   "message-delete.modal.before.placeholder":
     "e.g. 2026-02-28 or 2026-02-28T23:59:59",
-
+  // Member log config command (Discord UI labels)
+  // Slash command and subcommand descriptions
+  "member-log-config.description":
+    "Configure member log feature (administrators only)",
+  "member-log-config.set-channel.description": "Set the notification channel",
+  "member-log-config.set-channel.channel.description":
+    "Text channel to send notifications to",
+  "member-log-config.enable.description": "Enable member log feature",
+  "member-log-config.disable.description": "Disable member log feature",
+  "member-log-config.set-join-message.description": "Set a custom join message",
+  "member-log-config.set-join-message.message.description":
+    "Join message ({user}, {username}, {count} placeholders supported)",
+  "member-log-config.set-leave-message.description":
+    "Set a custom leave message",
+  "member-log-config.set-leave-message.message.description":
+    "Leave message ({user}, {username}, {count} placeholders supported)",
+  "member-log-config.view.description": "Show current settings",
+  // Member log config command responses
+  "member-log-config.embed.success_title": "Settings Updated",
+  "member-log-config.embed.title": "Member Log",
+  "member-log-config.embed.not_configured": "Member log is not configured.",
+  "member-log-config.embed.set_channel_success":
+    "Notification channel set to {{channel}}",
+  "member-log-config.embed.enable_success":
+    "Member log feature has been enabled",
+  "member-log-config.embed.enable_error_no_channel":
+    "No notification channel is configured. Run /member-log-config set-channel first.",
+  "member-log-config.embed.disable_success":
+    "Member log feature has been disabled",
+  "member-log-config.embed.set_join_message_success":
+    "Join message has been set",
+  "member-log-config.embed.set_leave_message_success":
+    "Leave message has been set",
+  "member-log-config.embed.field.status": "Status",
+  "member-log-config.embed.field.channel": "Notification Channel",
+  "member-log-config.embed.field.join_message": "Join Message",
+  "member-log-config.embed.field.leave_message": "Leave Message",
+  // errors
+  "member-log-config.errors.text_channel_only":
+    "Please specify a text channel.",
   // Sticky Message command
   "sticky-message.description":
     "Manage sticky messages (pinned to channel bottom) — requires Manage Channels",
@@ -266,8 +305,8 @@ export const commands = {
   "sticky-message.set.description": "Set a sticky message (modal input)",
   "sticky-message.set.channel.description":
     "Text channel to set the sticky message in (defaults to this channel)",
-  "sticky-message.set.embed.description":
-    "Set as embed format (true: embed modal / false: plain text modal)",
+  "sticky-message.set.mode.description":
+    "Display format (text: plain text / embed: embed)",
   // set plain text modal
   "sticky-message.set.modal.title": "Enter sticky message content",
   "sticky-message.set.modal.message.label": "Message content",
@@ -330,8 +369,8 @@ export const commands = {
     "Update the content of an existing sticky message (modal input)",
   "sticky-message.update.channel.description":
     "Channel whose sticky message to update (defaults to this channel)",
-  "sticky-message.update.embed.description":
-    "Update as embed format (true: embed modal / false: plain text modal)",
+  "sticky-message.update.mode.description":
+    "Display format (text: plain text / embed: embed)",
   // update plain text modal
   "sticky-message.update.modal.title": "Update sticky message",
   "sticky-message.update.modal.message.label": "Message content",

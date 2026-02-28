@@ -2,7 +2,7 @@
 
 > Implementation Guidelines - 実装方針とコーディング規約
 
-最終更新: 2026年2月28日
+最終更新: 2026年3月1日
 
 ---
 
@@ -405,6 +405,8 @@ src整備スプリントでは、次の順序を固定する。
 - [ ] 共用定数に説明コメントがある
 - [ ] 処理ブロックの意図コメントがある
 - [ ] テストの全 `it()` ブロックの直前に `//` コメントがある
+- [ ] 新機能実装時は `bot/commands/`・`bot/events/`・`bot/services/*DependencyResolver.ts` のテストも作成している（[テストチェックリスト参照](TESTING_GUIDELINES.md#-新機能テスト実装チェックリスト)）
+- [ ] `pnpm test:coverage` で Stmts/Funcs/Lines 100%・Branches 99%以上を確認した
 - [ ] `typecheck` が通る
 - [ ] ユーザー向け応答文字列（`editReply` / `followUp` / `reply` の `content`・ボタンラベル・Embedタイトル/説明文等）に生文字列をハードコードしていない
 - [ ] エラー・警告・情報・成功のステータス通知を `create*Embed` ユーティリティ（`createErrorEmbed` 等）で返しており、`editReply(string)` のようなプレーンテキスト返しを使っていない
@@ -412,6 +414,7 @@ src整備スプリントでは、次の順序を固定する。
 - [ ] ログメッセージは `tDefault("system:...")` 経由になっている（生文字列を logger に渡していない）
 - [ ] `create*Embed` ユーティリティに渡すロケール文字列に絵文字を含めていない（絵文字はタイトルに自動付与されるため二重になる）
 - [ ] （src整備時）再分析 → コメント反映 → ドキュメント同期 → TODO同期の順序を守っている
+- [ ] **Dockerfile / docker-compose / deploy.yml を変更した場合は `docker build --target runner .` でローカルビルドが通ることを確認している**（[詳細](DEPLOYMENT.md#️⃣-6-dockerデプロイ関連ファイルの変更ルール)）
 
 ---
 

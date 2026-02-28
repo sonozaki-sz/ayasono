@@ -60,13 +60,12 @@ VCの非アクティブユーザーをAFKチャンネルに移動する機能で
 
 ### 👥 メンバーログ機能
 
-メンバーの参加・脱退を指定チャンネルに記録する機能です。
+メンバーの参加・脱退を指定チャンネルに詳細情報つきで自動記録する機能です。
 
-- 参加・脱退時に詳細情報をEmbed形式で通知
-- カスタムメッセージ設定
+- 参加通知（緑）：アカウント作成日時（経過年齢）・サーバー参加日時・メンバー数
+- 退出通知（赤）：アカウント作成日時・サーバー参加日時・退出日時・滞在日数・メンバー数
+- Discord タイムスタンプ形式で表示、アカウント年齢は年・月・日単位で算出
 - `/member-log-config` コマンドで設定
-
-> 📋 **機能は仕様書作成済みで、現在実装中です**
 
 [📖 詳細仕様](docs/specs/MEMBER_LOG_SPEC.md)
 
@@ -79,8 +78,6 @@ VCの非アクティブユーザーをAFKチャンネルに移動する機能で
 - 実行前の確認ダイアログ（`/message-delete-config` でユーザーごとにスキップ設定可能）
 - 削除結果をページネイション＋フィルター付き Embed で詳細表示
 - 14日以上前のメッセージにも対応
-
-> 📋 **機能は仕様書作成済みで、現在実装中です**
 
 [📖 詳細仕様](docs/specs/MESSAGE_DELETE_SPEC.md)
 
@@ -97,6 +94,31 @@ VCの非アクティブユーザーをAFKチャンネルに移動する機能で
 > 📋 **機能は仕様書作成済みで、現在実装中です**
 
 [📖 詳細仕様](docs/specs/VC_RECRUIT_SPEC.md)
+
+### 🔧 ギルド設定機能
+
+サーバーの共通設定をまとめて管理するコマンド群です。
+
+- `/guild-config set-locale` でサーバーの言語（ja / en）を設定
+- `/guild-config view` で全機能の設定状況を8ページパネルで一覧表示
+- `/guild-config reset` で全設定をリセット（確認ダイアログ付き）
+
+> 📋 **機能は仕様書作成済みで、現在実装中です**
+
+[📖 詳細仕様](docs/specs/GUILD_CONFIG_SPEC.md)
+
+### 🛠️ 基本コマンド
+
+Bot の基本的なユーティリティコマンドです。
+
+- `/ping` — APIレイテンシ・WebSocket pingを表示（実装済み）
+- `/help` — カテゴリ別コマンド一覧とユーザーマニュアルリンクを表示
+- `/server-info` — サーバーの詳細情報を表示
+- `/user-info` — ユーザーの詳細情報を表示（対象ユーザー省略可）
+
+> 📋 **`/help` `/server-info` `/user-info` は仕様書作成済みで、現在実装中です**
+
+[📖 詳細仕様](docs/specs/BASIC_COMMANDS_SPEC.md)
 
 ### 🌐 多言語対応
 
@@ -255,7 +277,7 @@ ayasono/
 │   └── shared/               # 共有コード
 │       ├── config/           # 環境変数定義
 │       ├── database/         # Repository・Store・型定義
-        ├── features/         # 機能モジュール（bot/web 横断で共有するサービス層）
+│       ├── features/         # 機能モジュール（bot/web 横断で共有するサービス層）
 │       ├── locale/           # i18n（i18next）
 │       ├── scheduler/        # ジョブスケジューラ
 │       ├── errors/           # カスタムエラー・エラーハンドラ
@@ -297,6 +319,8 @@ ayasono/
 - [メンバーログ機能](docs/specs/MEMBER_LOG_SPEC.md) - メンバーの参加・脱退を指定チャンネルに記録
 - [メッセージ削除](docs/specs/MESSAGE_DELETE_SPEC.md) - モデレーター向けメッセージ一括削除コマンド
 - [VC募集機能](docs/specs/VC_RECRUIT_SPEC.md) - 専用チャンネルでVC参加者を募る投稿を作成
+- [ギルド設定機能](docs/specs/GUILD_CONFIG_SPEC.md) - ロケール設定・機能設定一覧表示・設定リセット
+- [基本コマンド](docs/specs/BASIC_COMMANDS_SPEC.md) - ping / help / server-info / user-info
 
 ## 🔧 開発環境
 
@@ -391,4 +415,4 @@ Apache License 2.0 - 詳細は [LICENSE](LICENSE) を参照
 ---
 
 **開発開始**: 2026年2月
-**最終更新**: 2026年2月28日
+**最終更新**: 2026年3月1日
