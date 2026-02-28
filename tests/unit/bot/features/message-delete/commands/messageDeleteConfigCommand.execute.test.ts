@@ -45,6 +45,7 @@ describe("bot/features/message-delete/commands/messageDeleteConfigCommand.execut
     updateUserSettingMock.mockResolvedValue(undefined);
   });
 
+  // guildId が null のインタラクションでは guild_only エラーメッセージを返して処理を終了することを検証
   it("guildId がない場合は guild_only メッセージを返して終了する", async () => {
     const { executeMessageDeleteConfigCommand } =
       await import("@/bot/features/message-delete/commands/messageDeleteConfigCommand.execute");
@@ -58,6 +59,7 @@ describe("bot/features/message-delete/commands/messageDeleteConfigCommand.execut
     expect(updateUserSettingMock).not.toHaveBeenCalled();
   });
 
+  // confirmEnabled=true のとき skipConfirm=false で設定更新し confirm_on ラベルで応答することを検証
   it("confirmEnabled=true の場合、skipConfirm=false で設定を更新し confirm_on ラベルで応答する", async () => {
     const { executeMessageDeleteConfigCommand } =
       await import("@/bot/features/message-delete/commands/messageDeleteConfigCommand.execute");
@@ -73,6 +75,7 @@ describe("bot/features/message-delete/commands/messageDeleteConfigCommand.execut
     );
   });
 
+  // confirmEnabled=false のとき skipConfirm=true で設定更新し confirm_off ラベルで応答することを検証
   it("confirmEnabled=false の場合、skipConfirm=true で設定を更新し confirm_off ラベルで応答する", async () => {
     const { executeMessageDeleteConfigCommand } =
       await import("@/bot/features/message-delete/commands/messageDeleteConfigCommand.execute");
@@ -88,6 +91,7 @@ describe("bot/features/message-delete/commands/messageDeleteConfigCommand.execut
     );
   });
 
+  // updateUserSetting が例外を投げた場合に handleCommandError が呼ばれることを検証
   it("例外が発生した場合は handleCommandError を呼ぶ", async () => {
     const { executeMessageDeleteConfigCommand } =
       await import("@/bot/features/message-delete/commands/messageDeleteConfigCommand.execute");

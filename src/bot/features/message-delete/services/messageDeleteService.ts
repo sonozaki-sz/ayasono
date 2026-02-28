@@ -44,6 +44,9 @@ export interface MessageDeleteResult {
 
 /**
  * 指定チャンネルリストから条件に一致するメッセージを削除する
+ * @param channels 削除対象のテキストチャンネル一覧
+ * @param options 削除オプション（件数上限・フィルタ・進捗コールバックなど）
+ * @returns 削除結果（合計件数・チャンネル別内訳・削除済みレコード）を示す Promise
  */
 export async function deleteMessages(
   channels: GuildTextBasedChannel[],
@@ -236,6 +239,9 @@ export async function deleteMessages(
 /**
  * 日付文字列をパースして Date オブジェクトを返す。
  * `YYYY-MM-DD` のみの場合は時刻を補完する。
+ * @param str パース対象の日付文字列（`YYYY-MM-DD` または ISO 8601 形式）
+ * @param endOfDay true の場合は時刻を `23:59:59` で補完する
+ * @returns パースに成功した場合は Date、不正な文字列の場合は null
  */
 export function parseDateStr(str: string, endOfDay: boolean): Date | null {
   const normalized = /^\d{4}-\d{2}-\d{2}$/.test(str)
@@ -245,7 +251,11 @@ export function parseDateStr(str: string, endOfDay: boolean): Date | null {
   return isNaN(d.getTime()) ? null : d;
 }
 
-/** スリープユーティリティ */
+/**
+ * スリープユーティリティ
+ * @param ms スリープする時間（ミリ秒）
+ * @returns 指定時間後に解決する Promise
+ */
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }

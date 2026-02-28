@@ -7,6 +7,7 @@ let cachedUserSettingService: MessageDeleteUserSettingService | undefined;
 
 /**
  * Bot 層で利用する MessageDeleteUserSettingService を設定する
+ * @param service 登録する MessageDeleteUserSettingService インスタンス
  */
 export function setBotMessageDeleteUserSettingService(
   service: MessageDeleteUserSettingService,
@@ -16,6 +17,8 @@ export function setBotMessageDeleteUserSettingService(
 
 /**
  * Bot 層で利用する MessageDeleteUserSettingService を取得する
+ * @returns 登録済みの MessageDeleteUserSettingService
+ * @throws 未初期化の場合は Error をスロー
  */
 export function getBotMessageDeleteUserSettingService(): MessageDeleteUserSettingService {
   if (!cachedUserSettingService) {
