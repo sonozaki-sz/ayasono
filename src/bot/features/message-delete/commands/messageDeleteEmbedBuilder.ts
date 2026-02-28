@@ -18,6 +18,9 @@ import {
 
 /**
  * 削除完了サマリー Embed を生成する
+ * @param totalDeleted 合計削除件数
+ * @param channelBreakdown チャンネル別削除件数のマップ
+ * @returns 削除完了サマリーを表示する EmbedBuilder
  */
 export function buildSummaryEmbed(
   totalDeleted: number,
@@ -51,6 +54,9 @@ export function buildSummaryEmbed(
 
 /**
  * フィルターを適用した削除済みメッセージ一覧を返す
+ * @param records 全削除済みメッセージレコード
+ * @param filter 適用するフィルター条件
+ * @returns フィルター適用後のメッセージレコード配列
  */
 export function buildFilteredRecords(
   records: DeletedMessageRecord[],
@@ -84,6 +90,11 @@ export function buildFilteredRecords(
 
 /**
  * 削除メッセージ詳細 Embed（ページネイション）を生成する
+ * @param filtered フィルター適用済みのメッセージレコード
+ * @param page 表示するページ番号（0-indexed）
+ * @param totalPages 総ページ数
+ * @param filter 現在適用中のフィルター条件
+ * @returns ページネイション付きの詳細 EmbedBuilder
  */
 export function buildDetailEmbed(
   filtered: DeletedMessageRecord[],
@@ -141,6 +152,11 @@ export function buildDetailEmbed(
 
 /**
  * ページネイション + フィルター用コンポーネントを生成する
+ * @param allRecords 全削除済みメッセージレコード（投稿者一覧の構築に使用）
+ * @param page 現在のページ番号（0-indexed）
+ * @param totalPages 総ページ数
+ * @param filter 現在適用中のフィルター条件
+ * @returns 投稿者セレクト・フィルターボタン・ナビゲーションボタンの ActionRow 配列
  */
 export function buildPaginationComponents(
   allRecords: DeletedMessageRecord[],

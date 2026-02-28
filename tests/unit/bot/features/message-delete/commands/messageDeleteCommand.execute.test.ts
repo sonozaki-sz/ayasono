@@ -328,6 +328,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
     );
   });
 
+  // ユーザー入力が不正形式（mentions/ID 以外）の場合に user_invalid_format 警告が返ることを検証
   it("ユーザー入力が不正形式の場合は user_invalid_format 警告を返す", async () => {
     const { executeMessageDeleteCommand } =
       await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
@@ -343,6 +344,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
     );
   });
 
+  // メンション形式のユーザー入力が正常に解析されバリデーションエラーにならないことを検証
   it("メンション形式のユーザー入力は正常に解析する", async () => {
     const { executeMessageDeleteCommand } =
       await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
@@ -358,6 +360,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
     );
   });
 
+  // 生 ID 形式のユーザー入力が正常に解析されバリデーションエラーにならないことを検証
   it("生ID形式のユーザー入力は正常に解析する", async () => {
     const { executeMessageDeleteCommand } =
       await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
@@ -372,6 +375,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
     );
   });
 
+  // フィルタ条件が何もない組み合わせで no_filter 警告が返ることを検証
   it("フィルタ条件が何もない場合は no_filter 警告を返す", async () => {
     const { executeMessageDeleteCommand } =
       await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
@@ -392,6 +396,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
     );
   });
 
+  // days と after が同時指定された場合に days_and_date_conflict 警告が返ることを検証
   it("days と after が同時に指定された場合は days_and_date_conflict 警告を返す", async () => {
     const { executeMessageDeleteCommand } =
       await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
@@ -407,6 +412,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
     );
   });
 
+  // days と before が同時指定された場合に days_and_date_conflict 警告が返ることを検証
   it("days と before が同時に指定された場合は days_and_date_conflict 警告を返す", async () => {
     const { executeMessageDeleteCommand } =
       await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
@@ -422,6 +428,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
     );
   });
 
+  // channelOption と count が両方未指定の場合に no_channel_no_count 警告が返ることを検証
   it("チャンネル未指定かつ count 未指定の場合は no_channel_no_count 警告を返す", async () => {
     const { executeMessageDeleteCommand } =
       await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
@@ -438,6 +445,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
     );
   });
 
+  // after の日付形式が不正な場合に after_invalid_format 警告が返ることを検証
   it("after の日付形式が不正の場合は after_invalid_format 警告を返す", async () => {
     const { executeMessageDeleteCommand } =
       await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
@@ -451,6 +459,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
     );
   });
 
+  // before の日付形式が不正な場合に before_invalid_format 警告が返ることを検証
   it("before の日付形式が不正の場合は before_invalid_format 警告を返す", async () => {
     const { executeMessageDeleteCommand } =
       await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
@@ -468,6 +477,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
     );
   });
 
+  // after > before の場合に date_range_invalid 警告が返ることを検証
   it("after > before の場合は date_range_invalid 警告を返す", async () => {
     const { executeMessageDeleteCommand } =
       await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
@@ -486,6 +496,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
     );
   });
 
+  // ManageMessages 権限も Administrator 権限もない場合に no_permission エラーが返ることを検証
   it("ManageMessages 権限がない場合は no_permission エラーを返す", async () => {
     const { executeMessageDeleteCommand } =
       await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
@@ -501,6 +512,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
     );
   });
 
+  // Administrator 権限がある場合は no_permission エラーを出さずに権限チェックを通過することを検証
   it("Administrator 権限がある場合は権限チェックを通過する", async () => {
     const { executeMessageDeleteCommand } =
       await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
@@ -516,6 +528,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
     );
   });
 
+  // guild が null の場合は guild_only メッセージを返して終了することを検証
   it("guild が null の場合は guild_only メッセージを返す", async () => {
     const { executeMessageDeleteCommand } =
       await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
@@ -528,6 +541,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
     );
   });
 
+  // テキスト以外のチャンネル（GuildCategory など）が指定された場合に text_channel_only 警告が返ることを検証
   it("テキスト以外のチャンネルが指定された場合は text_channel_only 警告を返す", async () => {
     const { executeMessageDeleteCommand } =
       await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
@@ -580,6 +594,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
     expect(guild.channels.fetch).toHaveBeenCalled();
   });
 
+  // days オプション指定時に afterTs が現在時刻から計算されて deleteMessages に渡されることを検証
   it("days オプションが指定された場合 after タイムスタンプが計算される", async () => {
     const { executeMessageDeleteCommand } =
       await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
@@ -649,6 +664,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
     );
   });
 
+  // 削除済みメッセージのコンテンツが空文字の場合に empty_content キーが使用されることを検証
   it("削除結果が1件でコンテンツが空の場合は empty_content キーを使用する", async () => {
     const { executeMessageDeleteCommand } =
       await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
@@ -741,12 +757,14 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       return { interaction, collector, records, promise };
     }
 
+    // ページネイション付きで結果の Embed とコレクタが正しく設定されることを検証
     it("ページネイション付きで結果を表示する", async () => {
       const { interaction } = await runWithPagination();
       expect(interaction.editReply).toHaveBeenCalled();
       expect(buildDetailEmbedMock).toHaveBeenCalled();
     });
 
+    // 他ユーザーのボタン操作に対して not_authorized エラーが Ephemeral で応答されることを検証
     it("他ユーザーのボタン操作は not_authorized エラーで応答する", async () => {
       const { collector } = await runWithPagination();
       const diffUserI = makeButtonI({
@@ -759,6 +777,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       );
     });
 
+    // PREV ボタン押下でページ番号が減り Embed が再構築されることを検証
     it("PREV ボタンでページが減る", async () => {
       const { collector } = await runWithPagination();
       const i = makeButtonI({ customId: MSG_DEL_CUSTOM_ID.PREV });
@@ -766,6 +785,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       expect(i.update).toHaveBeenCalled();
     });
 
+    // NEXT ボタン押下でページ番号が増え Embed が再構築されることを検証
     it("NEXT ボタンでページが増える", async () => {
       const { collector } = await runWithPagination();
       const i = makeButtonI({ customId: MSG_DEL_CUSTOM_ID.NEXT });
@@ -773,6 +793,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       expect(i.update).toHaveBeenCalled();
     });
 
+    // FILTER_AUTHOR セレクトメニューで有効な authorTag が選択されたときフィルターが設定されることを検証
     it("FILTER_AUTHOR (SelectMenu 有効値) でフィルターが設定される", async () => {
       const { collector, records } = await runWithPagination();
       const i = makeButtonI({
@@ -784,6 +805,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       expect(i.update).toHaveBeenCalled();
     });
 
+    // FILTER_AUTHOR セレクトメニューで空値が選択されたとき authorId が undefined になることを検証
     it("FILTER_AUTHOR (SelectMenu 空値) で authorId が undefined になる", async () => {
       const { collector } = await runWithPagination();
       const i = makeButtonI({
@@ -795,6 +817,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       expect(i.update).toHaveBeenCalled();
     });
 
+    // FILTER_AUTHOR のインタラクションが StringSelectMenu でない場合はフィルター更新をスキップすることを検証
     it("FILTER_AUTHOR (isStringSelectMenu=false) では何も更新しない", async () => {
       const { collector } = await runWithPagination();
       const i = makeButtonI({
@@ -805,6 +828,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       expect(i.update).toHaveBeenCalled();
     });
 
+    // FILTER_RESET でフィルターがすべてリセットされることを検証
     it("FILTER_RESET でフィルターがリセットされる", async () => {
       const { collector } = await runWithPagination();
       const i = makeButtonI({ customId: MSG_DEL_CUSTOM_ID.FILTER_RESET });
@@ -812,6 +836,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       expect(i.update).toHaveBeenCalled();
     });
 
+    // collector の end イベント発火時にボタンコンポーネントが削除されることを検証
     it("collector.on('end') でボタンが削除される", async () => {
       const { collector, interaction, promise } = await runWithPagination();
       await collector.triggerEnd("time");
@@ -858,6 +883,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       expect(interaction.editReply).toHaveBeenCalled();
     });
 
+    // FILTER_KEYWORD モーダルで空値を入力するとキーワードフィルターが undefined になることを検証
     it("FILTER_KEYWORD モーダル: 空値をクリアするとフィルターが undefined になる", async () => {
       const { collector, interaction } = await runWithPagination();
       const modalSubmit = {
@@ -888,6 +914,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       expect(interaction.editReply).toHaveBeenCalled();
     });
 
+    // FILTER_DAYS モーダルで空文字を入力すると days フィルターがクリアされることを検証
     it("FILTER_DAYS モーダル: 空値を入力するとフィルターがクリアされる", async () => {
       const { collector, interaction } = await runWithPagination();
       const modalSubmit = {
@@ -902,6 +929,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       expect(interaction.editReply).toHaveBeenCalled();
     });
 
+    // FILTER_DAYS モーダルで NaN になる値を入力すると days_invalid_value 警告が出るがリビルドが実行されることを検証
     it("FILTER_DAYS モーダル: 不正値 (NaN) を入力すると days_invalid_value 警告が出るがリビルドする", async () => {
       const { collector, interaction } = await runWithPagination();
       const modalSubmit = {
@@ -918,6 +946,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       );
     });
 
+    // FILTER_DAYS モーダルで 0 以下の値を入力すると days_invalid_value 警告が出ることを検証
     it("FILTER_DAYS モーダル: 不正値 (0 以下) を入力すると days_invalid_value 警告が出る", async () => {
       const { collector, interaction } = await runWithPagination();
       const modalSubmit = {
@@ -951,6 +980,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       expect(interaction.editReply).toHaveBeenCalled();
     });
 
+    // FILTER_AFTER モーダルで不正な日付形式を入力すると after_invalid_format 警告が出ることを検証
     it("FILTER_AFTER モーダル: 不正な日付形式は after_invalid_format 警告を出す", async () => {
       const { collector, interaction } = await runWithPagination();
       parseDateStrMock.mockReturnValue(null);
@@ -968,6 +998,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       );
     });
 
+    // FILTER_AFTER モーダルで after > 既存 before になる日付を入力すると date_range_invalid 警告が出ることを検証
     it("FILTER_AFTER モーダル: after > 既存 before の場合は date_range_invalid 警告を出す", async () => {
       const { collector, interaction } = await runWithPagination();
       // 先に before フィルターをセット
@@ -1003,6 +1034,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       );
     });
 
+    // FILTER_AFTER モーダルで空値を入力すると after フィルターがクリアされることを検証
     it("FILTER_AFTER モーダル: 空値を入力すると after フィルターがクリアされる", async () => {
       const { collector, interaction } = await runWithPagination();
       const modalSubmit = {
@@ -1034,6 +1066,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       expect(interaction.editReply).toHaveBeenCalled();
     });
 
+    // FILTER_BEFORE モーダルで不正な日付形式を入力すると before_invalid_format 警告が出ることを検証
     it("FILTER_BEFORE モーダル: 不正な日付形式は before_invalid_format 警告を出す", async () => {
       const { collector, interaction } = await runWithPagination();
       parseDateStrMock.mockReturnValue(null);
@@ -1051,6 +1084,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       );
     });
 
+    // FILTER_BEFORE モーダルで既存 after > before になる日付を入力すると date_range_invalid 警告が出ることを検証
     it("FILTER_BEFORE モーダル: 既存 after > before の場合は date_range_invalid 警告を出す", async () => {
       const { collector, interaction } = await runWithPagination();
       const afterDate = new Date("2025-02-01");
@@ -1085,6 +1119,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       );
     });
 
+    // FILTER_BEFORE モーダルで空値を入力すると before フィルターがクリアされることを検証
     it("FILTER_BEFORE モーダル: 空値を入力すると before フィルターがクリアされる", async () => {
       const { collector, interaction } = await runWithPagination();
       const modalSubmit = {
@@ -1120,6 +1155,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       await expect(collector.triggerCollect(i)).resolves.toBeUndefined();
     });
 
+    // collector end 時に editReply が失敗しても例外がスローされずに無視されることを検証
     it("collector end の editReply が失敗しても無視する", async () => {
       const { collector, interaction } = await runWithPagination();
       (interaction.editReply as ReturnType<typeof vi.fn>).mockRejectedValue(
@@ -1128,6 +1164,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       await expect(collector.triggerEnd("time")).resolves.toBeUndefined();
     });
 
+    // FILTER_DAYS 不正値のときフォローアップ送信が失敗しても例外がスローされないことを検証
     it("FILTER_DAYS 不正値: followUp が失敗しても無視する", async () => {
       const { collector, interaction } = await runWithPagination();
       (interaction.followUp as ReturnType<typeof vi.fn>).mockRejectedValue(
@@ -1147,6 +1184,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       await expect(collector.triggerCollect(i)).resolves.toBeUndefined();
     });
 
+    // FILTER_AFTER 不正形式のときフォローアップ送信が失敗しても例外がスローされないことを検証
     it("FILTER_AFTER 不正形式: followUp が失敗しても無視する", async () => {
       const { collector, interaction } = await runWithPagination();
       parseDateStrMock.mockReturnValue(null);
@@ -1167,6 +1205,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       await expect(collector.triggerCollect(i)).resolves.toBeUndefined();
     });
 
+    // FILTER_AFTER > before 競合のときフォローアップ送信が失敗しても例外がスローされないことを検証
     it("FILTER_AFTER > before 競合: followUp が失敗しても無視する", async () => {
       const { collector, interaction } = await runWithPagination();
       // まず valid な before フィルターをセット
@@ -1201,6 +1240,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       await expect(collector.triggerCollect(i)).resolves.toBeUndefined();
     });
 
+    // FILTER_BEFORE 不正形式のときフォローアップ送信が失敗しても例外がスローされないことを検証
     it("FILTER_BEFORE 不正形式: followUp が失敗しても無視する", async () => {
       const { collector, interaction } = await runWithPagination();
       parseDateStrMock.mockReturnValue(null);
@@ -1221,6 +1261,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       await expect(collector.triggerCollect(i)).resolves.toBeUndefined();
     });
 
+    // FILTER_BEFORE < after 競合のときフォローアップ送信が失敗しても例外がスローされないことを検証
     it("FILTER_BEFORE < after 競合: followUp が失敗しても無視する", async () => {
       const { collector, interaction } = await runWithPagination();
       // まず valid な after フィルターをセット
@@ -1255,6 +1296,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       await expect(collector.triggerCollect(i)).resolves.toBeUndefined();
     });
 
+    // モーダル値が有効なとき editReply が失敗しても例外がスローされないことを検証
     it("有効なモーダル更新: editReply が失敗しても無視する", async () => {
       const { collector, interaction } = await runWithPagination();
       (interaction.editReply as ReturnType<typeof vi.fn>).mockRejectedValue(
@@ -1319,6 +1361,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       };
     }
 
+    // skipConfirm=false のときユーザーに確認ダイアログが表示されることを検証
     it("skipConfirm=false の場合は確認ダイアログを表示する", async () => {
       const { interaction } = await runWithConfirmDialog();
       expect(tDefaultMock).toHaveBeenCalledWith(
@@ -1328,6 +1371,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       expect(interaction.editReply).toHaveBeenCalled();
     });
 
+    // skipConfirm=false かつ channelOption なしのとき channel_all ラベルが表示されることを検証
     it("skipConfirm=false かつ channelOption なし の場合 channel_all を表示する", async () => {
       const { interaction } = await runWithConfirmDialog({
         channelOption: null,
@@ -1338,6 +1382,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       expect(interaction.editReply).toHaveBeenCalled();
     });
 
+    // 確認ダイアログで他ユーザーがボタン操作した場合に not_authorized で応答されることを検証
     it("他ユーザーのボタン操作は not_authorized で応答する", async () => {
       const { confirmCollector } = await runWithConfirmDialog();
       const i = makeButtonI({
@@ -1350,6 +1395,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       );
     });
 
+    // CONFIRM_SKIP_TOGGLE ボタンで skipNext フラグがトグルされることを検証
     it("CONFIRM_SKIP_TOGGLE で skipNext がトグルされる", async () => {
       const { confirmCollector } = await runWithConfirmDialog();
       const i = makeButtonI({
@@ -1359,6 +1405,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       expect(i.update).toHaveBeenCalled();
     });
 
+    // CONFIRM_YES (skipNext=false) で削除処理が実行されることを検証
     it("CONFIRM_YES (skipNext=false) で削除処理が実行される", async () => {
       const { confirmCollector, promise } = await runWithConfirmDialog();
 
@@ -1373,6 +1420,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       expect(updateUserSettingMock).not.toHaveBeenCalled();
     });
 
+    // CONFIRM_YES (skipNext=true) で削除処理実行とともにユーザー設定が保存されることを検証
     it("CONFIRM_YES (skipNext=true) でユーザー設定が保存される", async () => {
       const { confirmCollector, promise } = await runWithConfirmDialog();
 
@@ -1391,6 +1439,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       });
     });
 
+    // CONFIRM_YES (skipNext=true) で updateUserSetting が失敗しても削除処理が続行されることを検証
     it("CONFIRM_YES (skipNext=true) で updateUserSetting が失敗しても処理が続く", async () => {
       const { confirmCollector, promise } = await runWithConfirmDialog();
 
@@ -1407,6 +1456,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       expect(loggerMock.warn).toHaveBeenCalled();
     });
 
+    // CONFIRM_NO でキャンセルメッセージが表示されて処理が終了することを検証
     it("CONFIRM_NO でキャンセルメッセージを表示して終了する", async () => {
       const { confirmCollector, interaction, promise } =
         await runWithConfirmDialog();
@@ -1420,6 +1470,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       expect(deleteMessagesMock).not.toHaveBeenCalled();
     });
 
+    // 確認ダイアログがタイムアウトした場合に timed_out 警告が表示されることを検証
     it("タイムアウトの場合は timed_out 警告を表示して終了する", async () => {
       const { confirmCollector, interaction, promise } =
         await runWithConfirmDialog();
@@ -1433,6 +1484,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       expect(deleteMessagesMock).not.toHaveBeenCalled();
     });
 
+    // bot/keyword/days オプションが指定されたときの確認ダイアログラベル生成を検証
     it("confirm ダイアログで各条件ラベルが生成される (bot, keyword, days)", async () => {
       await runWithConfirmDialog({
         botOption: true,
@@ -1454,6 +1506,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       );
     });
 
+    // user/after/before オプションが指定されたときの確認ダイアログラベル生成を検証
     it("confirm ダイアログで各条件ラベルが生成される (user, after, before)", async () => {
       parseDateStrMock
         .mockReturnValueOnce(new Date("2025-01-01"))
@@ -1479,6 +1532,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       );
     });
 
+    // countOption が null のとき condition_count ラベルが追加されないことを検証
     it("countOption が null の場合 condition_count は追加されない", async () => {
       const { confirmCollector, promise } = await runWithConfirmDialog({
         countOption: null,
@@ -1505,6 +1559,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       await expect(promise).resolves.toBeUndefined();
     });
 
+    // 確認ダイアログのタイムアウト時に editReply が失敗しても例外がスローされないことを検証
     it("タイムアウト: editReply が失敗しても無視する", async () => {
       const { confirmCollector, interaction, promise } =
         await runWithConfirmDialog();
@@ -1544,6 +1599,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
   // ---- ログ記録（削除後のログメッセージ）----
 
   describe("削除後のログ記録", () => {
+    // ページネイションを含む削除成功後にログが記録されることを検証
     it("削除成功後にログを記録する（複数件ページネイション）", async () => {
       const { executeMessageDeleteCommand } =
         await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
@@ -1576,6 +1632,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       );
     });
 
+    // after/before 指定での削除成功後にログが記録されることを検証
     it("削除成功後にログを記録する（after/before 指定）", async () => {
       const { executeMessageDeleteCommand } =
         await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
@@ -1608,6 +1665,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       );
     });
 
+    // onProgress コールバックが削除処理中に呼ばれることを検証
     it("onProgress コールバックが呼ばれる", async () => {
       const { executeMessageDeleteCommand } =
         await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
@@ -1635,6 +1693,7 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
       expect(interaction.editReply).toHaveBeenCalledWith("進捗メッセージ");
     });
 
+    // daysOption 指定での削除成功後にログが記録されることを検証
     it("削除成功後にログを記録する（daysOption 指定）", async () => {
       const { executeMessageDeleteCommand } = await import(
         "@/bot/features/message-delete/commands/messageDeleteCommand.execute"

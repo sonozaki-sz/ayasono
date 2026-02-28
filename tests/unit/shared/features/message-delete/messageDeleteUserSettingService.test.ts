@@ -25,6 +25,7 @@ describe("shared/features/message-delete/messageDeleteUserSettingService", () =>
   // ---- MessageDeleteUserSettingService ----
 
   describe("MessageDeleteUserSettingService", () => {
+    // DB にレコードが存在する場合に skipConfirm の値がそのまま返されることを検証
     it("getUserSetting: DB に設定が存在する場合はその値を返す", async () => {
       const { MessageDeleteUserSettingService } = await loadModule();
       const repo = makeRepository();
@@ -37,6 +38,7 @@ describe("shared/features/message-delete/messageDeleteUserSettingService", () =>
       expect(result).toEqual({ skipConfirm: true });
     });
 
+    // DB にレコードが存在しない場合にデフォルト値 skipConfirm:false が返されることを検証
     it("getUserSetting: DB に設定がない場合はデフォルト値 (skipConfirm: false) を返す", async () => {
       const { MessageDeleteUserSettingService } = await loadModule();
       const repo = makeRepository();
@@ -48,6 +50,7 @@ describe("shared/features/message-delete/messageDeleteUserSettingService", () =>
       expect(result).toEqual({ skipConfirm: false });
     });
 
+    // updateUserSetting が repository.upsert を正しい引数で呼び出し結果を返すことを検証
     it("updateUserSetting: repository.upsert を呼んで結果を返す", async () => {
       const { MessageDeleteUserSettingService } = await loadModule();
       const repo = makeRepository();
@@ -69,6 +72,7 @@ describe("shared/features/message-delete/messageDeleteUserSettingService", () =>
   // ---- シングルトン管理関数 ----
 
   describe("createMessageDeleteUserSettingService", () => {
+    // createMessageDeleteUserSettingService でサービスが生成され getMessageDeleteUserSettingService で取得できることを検証
     it("サービスを生成しシングルトンキャッシュに登録する", async () => {
       const {
         createMessageDeleteUserSettingService,
@@ -83,6 +87,7 @@ describe("shared/features/message-delete/messageDeleteUserSettingService", () =>
   });
 
   describe("setMessageDeleteUserSettingService / getMessageDeleteUserSettingService", () => {
+    // setMessageDeleteUserSettingService で登録したサービスが getMessageDeleteUserSettingService で取得できることを検証
     it("set したサービスを get で取得できる", async () => {
       const {
         setMessageDeleteUserSettingService,
@@ -97,6 +102,7 @@ describe("shared/features/message-delete/messageDeleteUserSettingService", () =>
       expect(getMessageDeleteUserSettingService()).toBe(service);
     });
 
+    // シングルトン未登録の状態で getMessageDeleteUserSettingService を呼ぶと undefined が返されることを検証
     it("未登録の場合は undefined を返す", async () => {
       const { getMessageDeleteUserSettingService } = await loadModule();
 

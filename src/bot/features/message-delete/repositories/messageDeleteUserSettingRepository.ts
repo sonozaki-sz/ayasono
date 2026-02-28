@@ -15,6 +15,12 @@ import { executeWithDatabaseError } from "../../../../shared/utils/errorHandling
 export class MessageDeleteUserSettingRepository implements IMessageDeleteUserSettingRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
+  /**
+   * ユーザーIDとギルドIDの複合キーで設定レコードを検索する
+   * @param userId 検索対象のユーザーID
+   * @param guildId 検索対象のギルドID
+   * @returns 設定レコード、存在しない場合は null を示す Promise
+   */
   async findByUserAndGuild(
     userId: string,
     guildId: string,
@@ -28,6 +34,13 @@ export class MessageDeleteUserSettingRepository implements IMessageDeleteUserSet
     );
   }
 
+  /**
+   * ユーザー設定を作成または更新する（upsert）
+   * @param userId 更新対象のユーザーID
+   * @param guildId 更新対象のギルドID
+   * @param patch 更新するフィールド（skipConfirm）
+   * @returns 更新後の設定レコードを示す Promise
+   */
   async upsert(
     userId: string,
     guildId: string,
@@ -52,6 +65,8 @@ let cachedRepository: MessageDeleteUserSettingRepository | undefined;
 
 /**
  * MessageDeleteUserSettingRepository のシングルトンを取得する
+ * @param prisma Prisma クライアントインスタンス
+ * @returns MessageDeleteUserSettingRepository の唯一のインスタンス
  */
 export function getMessageDeleteUserSettingRepository(
   prisma: PrismaClient,

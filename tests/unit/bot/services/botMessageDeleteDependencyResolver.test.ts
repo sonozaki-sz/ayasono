@@ -5,6 +5,7 @@ describe("bot/services/botMessageDeleteDependencyResolver", () => {
     vi.resetModules();
   });
 
+  // setBotMessageDeleteUserSettingService で登録したサービスが getBotMessageDeleteUserSettingService で取得できることを検証
   it("set したサービスを get で取得できる", async () => {
     const module =
       await import("@/bot/services/botMessageDeleteDependencyResolver");
@@ -18,6 +19,7 @@ describe("bot/services/botMessageDeleteDependencyResolver", () => {
     expect(module.getBotMessageDeleteUserSettingService()).toBe(service);
   });
 
+  // サービス未登録の状態で getBotMessageDeleteUserSettingService を呼ぶと Error がスローされることを検証
   it("初期化前に get すると例外を投げる", async () => {
     const module =
       await import("@/bot/services/botMessageDeleteDependencyResolver");
