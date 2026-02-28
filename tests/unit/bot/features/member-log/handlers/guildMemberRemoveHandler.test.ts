@@ -310,6 +310,56 @@ describe("bot/features/member-log/handlers/guildMemberRemoveHandler", () => {
       expect(callArgs.content).toBeUndefined();
     });
 
+    // calcDuration が years=0, months=0 の場合でも送信されることを確認（分岐カバレッジ）
+    it("sends embed when calcDuration returns years=0 months=0", async () => {
+      const { handleGuildMemberRemove } =
+        await import("@/bot/features/member-log/handlers/guildMemberRemoveHandler");
+      calcDurationMock.mockReturnValueOnce({ years: 0, months: 0, days: 5 });
+      getMemberLogConfigMock.mockResolvedValue({
+        enabled: true,
+        channelId: "ch-1",
+        leaveMessage: null,
+      });
+      const member = makeGuildMember();
+
+      await handleGuildMemberRemove(member as never);
+
+      expect(member._channel.send).toHaveBeenCalled();
+    });
+
+    // calcDuration が years>0, months=0, days=0 の場合でも送信されることを確認（days分岐カバレッジ）
+    it("sends embed when calcDuration returns months=0 days=0", async () => {
+      const { handleGuildMemberRemove } =
+        await import("@/bot/features/member-log/handlers/guildMemberRemoveHandler");
+      calcDurationMock.mockReturnValueOnce({ years: 1, months: 0, days: 0 });
+      getMemberLogConfigMock.mockResolvedValue({
+        enabled: true,
+        channelId: "ch-1",
+        leaveMessage: null,
+      });
+      const member = makeGuildMember();
+
+      await handleGuildMemberRemove(member as never);
+
+      expect(member._channel.send).toHaveBeenCalled();
+    });
+
+    // joinedTimestamp が undefined の場合に stayDays の ?? 0 分岐を通ることを確認
+    it("sends embed when joinedTimestamp is undefined (covers ?? 0 branch)", async () => {
+      const { handleGuildMemberRemove } =
+        await import("@/bot/features/member-log/handlers/guildMemberRemoveHandler");
+      getMemberLogConfigMock.mockResolvedValue({
+        enabled: true,
+        channelId: "ch-1",
+        leaveMessage: null,
+      });
+      const member = makeGuildMember({ joinedTimestamp: undefined as never });
+
+      await handleGuildMemberRemove(member as never);
+
+      expect(member._channel.send).toHaveBeenCalled();
+    });
+
     // 送信成功後に logger.debug が呼ばれることを確認
     it("logs debug after successful send", async () => {
       const { handleGuildMemberRemove } =

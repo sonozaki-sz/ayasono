@@ -262,6 +262,40 @@ describe("bot/features/member-log/handlers/guildMemberAddHandler", () => {
       expect(member._channel.send).toHaveBeenCalled();
     });
 
+    // calcDuration が years=0, months=0 の場合でも送信されることを確認（分岐カバレッジ）
+    it("sends embed when calcDuration returns years=0 months=0", async () => {
+      const { handleGuildMemberAdd } =
+        await import("@/bot/features/member-log/handlers/guildMemberAddHandler");
+      calcDurationMock.mockReturnValueOnce({ years: 0, months: 0, days: 5 });
+      getMemberLogConfigMock.mockResolvedValue({
+        enabled: true,
+        channelId: "ch-1",
+        joinMessage: null,
+      });
+      const member = makeGuildMember();
+
+      await handleGuildMemberAdd(member as never);
+
+      expect(member._channel.send).toHaveBeenCalled();
+    });
+
+    // calcDuration が years>0, months=0, days=0 の場合でも送信されることを確認（days分岐カバレッジ）
+    it("sends embed when calcDuration returns months=0 days=0", async () => {
+      const { handleGuildMemberAdd } =
+        await import("@/bot/features/member-log/handlers/guildMemberAddHandler");
+      calcDurationMock.mockReturnValueOnce({ years: 1, months: 0, days: 0 });
+      getMemberLogConfigMock.mockResolvedValue({
+        enabled: true,
+        channelId: "ch-1",
+        joinMessage: null,
+      });
+      const member = makeGuildMember();
+
+      await handleGuildMemberAdd(member as never);
+
+      expect(member._channel.send).toHaveBeenCalled();
+    });
+
     // 送信成功後に logger.debug が呼ばれることを確認
     it("logs debug after successful send", async () => {
       const { handleGuildMemberAdd } =
