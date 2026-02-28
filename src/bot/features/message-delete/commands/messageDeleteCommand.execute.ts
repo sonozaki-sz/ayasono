@@ -47,9 +47,9 @@ export async function executeMessageDeleteCommand(
   interaction: ChatInputCommandInteraction,
 ): Promise<void> {
   try {
-    logger.info("[MsgDel][DBG] 1: start");
+    logger.debug("[MsgDel][DBG] 1: start");
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
-    logger.info("[MsgDel][DBG] 2: deferred");
+    logger.debug("[MsgDel][DBG] 2: deferred");
 
     const guildId = interaction.guildId;
     if (!guildId) {
@@ -60,7 +60,7 @@ export async function executeMessageDeleteCommand(
     // ---- オプション取得 ----
     const countOption = interaction.options.getInteger("count");
     const userInput = interaction.options.getString("user", false);
-    logger.info("[MsgDel][DBG] 3: options parsed");
+    logger.debug("[MsgDel][DBG] 3: options parsed");
     const botOption = interaction.options.getBoolean("bot", false);
     const keyword = interaction.options.getString("keyword", false);
 
@@ -186,7 +186,7 @@ export async function executeMessageDeleteCommand(
     }
 
     // ---- 権限チェック ----
-    logger.info("[MsgDel][DBG] 4: permission check");
+    logger.debug("[MsgDel][DBG] 4: permission check");
     if (
       !interaction.memberPermissions?.has(PermissionFlagsBits.ManageMessages) &&
       !interaction.memberPermissions?.has(PermissionFlagsBits.Administrator)
@@ -208,7 +208,7 @@ export async function executeMessageDeleteCommand(
     }
 
     // ---- 対象チャンネルリストの構築 ----
-    logger.info("[MsgDel][DBG] 5: building channel list");
+    logger.debug("[MsgDel][DBG] 5: building channel list");
     let targetChannels: GuildTextBasedChannel[];
     if (channelOption) {
       const isText =
@@ -230,9 +230,9 @@ export async function executeMessageDeleteCommand(
       targetChannels = [channelOption as GuildTextBasedChannel];
     } else {
       // サーバー内の全テキストチャンネル
-      logger.info("[MsgDel][DBG] 5a: fetching all channels");
+      logger.debug("[MsgDel][DBG] 5a: fetching all channels");
       const allChannels = await guild.channels.fetch();
-      logger.info(`[MsgDel][DBG] 5b: fetched ${allChannels.size} channels`);
+      logger.debug(`[MsgDel][DBG] 5b: fetched ${allChannels.size} channels`);
       const me = guild.members.me;
       targetChannels = allChannels
         .filter(
@@ -252,13 +252,13 @@ export async function executeMessageDeleteCommand(
     }
 
     // ---- 実行確認ダイアログ ----
-    logger.info("[MsgDel][DBG] 6: getting user setting");
+    logger.debug("[MsgDel][DBG] 6: getting user setting");
     const settingService = getBotMessageDeleteUserSettingService();
     const { skipConfirm } = await settingService.getUserSetting(
       interaction.user.id,
       guildId,
     );
-    logger.info(`[MsgDel][DBG] 7: skipConfirm=${skipConfirm}`);
+    logger.debug(`[MsgDel][DBG] 7: skipConfirm=${skipConfirm}`);
 
     if (!skipConfirm) {
       const conditionLines: string[] = [];
@@ -323,7 +323,7 @@ export async function executeMessageDeleteCommand(
     }
 
     // ---- 削除処理 ----
-    logger.info("[MsgDel][DBG] 8: start deleteMessages");
+    logger.debug("[MsgDel][DBG] 8: start deleteMessages");
     const count = countOption ?? Infinity;
 
     try {
