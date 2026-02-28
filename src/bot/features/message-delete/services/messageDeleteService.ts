@@ -75,12 +75,14 @@ export async function deleteMessages(
     }
   };
 
-  logger.info(
+  logger.debug(
     `[MsgDel][SVC] channels=${channels.length}, count=${count}, targetUserId=${targetUserId}, targetBot=${targetBot}`,
   );
 
   for (const [channelIdx, channel] of channels.entries()) {
-    logger.info(`[MsgDel][SVC] channel start: ${channel.name} (${channel.id})`);
+    logger.debug(
+      `[MsgDel][SVC] channel start: ${channel.name} (${channel.id})`,
+    );
     // Bot のアクセス権チェック（サーバー全体対象時にスキップされた分）
     const me = channel.guild.members.me;
     if (
@@ -106,7 +108,7 @@ export async function deleteMessages(
     let fetchBatchNum = 0;
     while (totalDeleted + collected.length < count) {
       fetchBatchNum++;
-      logger.info(
+      logger.debug(
         `[MsgDel][SVC] fetch batch #${fetchBatchNum} ch=${channel.name} collected=${collected.length}`,
       );
       await report(
@@ -117,7 +119,7 @@ export async function deleteMessages(
         ...(lastId ? { before: lastId } : {}),
       });
 
-      logger.info(
+      logger.debug(
         `[MsgDel][SVC] fetch batch #${fetchBatchNum} got=${batch.size}`,
       );
       if (batch.size === 0) break;
@@ -152,7 +154,7 @@ export async function deleteMessages(
       if (batch.size < MSG_DEL_FETCH_BATCH_SIZE) break;
     }
 
-    logger.info(
+    logger.debug(
       `[MsgDel][SVC] channel ${channel.name}: collected=${collected.length}`,
     );
     if (collected.length === 0) continue;
@@ -171,14 +173,14 @@ export async function deleteMessages(
 
     await reportProgress(0, collected.length);
 
-    logger.info(
+    logger.debug(
       `[MsgDel][SVC] ch=${channel.name} newMsgs=${newMsgs.length} oldMsgs=${oldMsgs.length}`,
     );
 
     // bulkDelete（14日以内）
     for (let i = 0; i < newMsgs.length; i += MSG_DEL_BULK_BATCH_SIZE) {
       const chunk = newMsgs.slice(i, i + MSG_DEL_BULK_BATCH_SIZE);
-      logger.info(`[MsgDel][SVC] bulkDelete chunk size=${chunk.length}`);
+      logger.debug(`[MsgDel][SVC] bulkDelete chunk size=${chunk.length}`);
       await (channel as import("discord.js").TextChannel).bulkDelete(
         chunk,
         true,
