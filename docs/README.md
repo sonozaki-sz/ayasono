@@ -294,6 +294,31 @@ VC募集機能 - 専用チャンネルでVC参加者を募る投稿を作成。
 
 ---
 
+#### [GUILD_CONFIG_SPEC.md](specs/GUILD_CONFIG_SPEC.md)
+
+ギルド設定機能 - サーバー全体の設定を管理するコマンド群。
+
+**主要機能:**
+
+- `/guild-config set-locale` — サーバーのロケール設定（ja / en）
+- `/guild-config view` — 8ページパネル（概要＋各機能設定）、ページネーションボタン＋セレクトメニュー
+- `/guild-config reset` — 全設定リセット（確認ダイアログ付き）
+
+---
+
+#### [BASIC_COMMANDS_SPEC.md](specs/BASIC_COMMANDS_SPEC.md)
+
+基本コマンド - 汎用ユーティリティコマンド群。
+
+**主要機能:**
+
+- `/ping` — APIレイテンシ・WSping表示（実装済み）
+- `/help` — カテゴリ別コマンド一覧 Embed＋ユーザーマニュアルリンク
+- `/server-info` — サーバー情報 Embed
+- `/user-info` — ユーザー情報 Embed（対象ユーザー省略可）
+
+---
+
 ## 📊 進捗管理 (progress/)
 
 プロジェクトの実装とテストの進捗状況を管理します。

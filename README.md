@@ -95,6 +95,31 @@ VCの非アクティブユーザーをAFKチャンネルに移動する機能で
 
 [📖 詳細仕様](docs/specs/VC_RECRUIT_SPEC.md)
 
+### 🔧 ギルド設定機能
+
+サーバーの共通設定をまとめて管理するコマンド群です。
+
+- `/guild-config set-locale` でサーバーの言語（ja / en）を設定
+- `/guild-config view` で全機能の設定状況を8ページパネルで一覧表示
+- `/guild-config reset` で全設定をリセット（確認ダイアログ付き）
+
+> 📋 **機能は仕様書作成済みで、現在実装中です**
+
+[📖 詳細仕様](docs/specs/GUILD_CONFIG_SPEC.md)
+
+### 🛠️ 基本コマンド
+
+Bot の基本的なユーティリティコマンドです。
+
+- `/ping` — APIレイテンシ・WebSocket pingを表示（実装済み）
+- `/help` — カテゴリ別コマンド一覧とユーザーマニュアルリンクを表示
+- `/server-info` — サーバーの詳細情報を表示
+- `/user-info` — ユーザーの詳細情報を表示（対象ユーザー省略可）
+
+> 📋 **`/help` `/server-info` `/user-info` は仕様書作成済みで、現在実装中です**
+
+[📖 詳細仕様](docs/specs/BASIC_COMMANDS_SPEC.md)
+
 ### 🌐 多言語対応
 
 サーバーごとに日本語/英語の言語設定が可能です。
@@ -294,6 +319,8 @@ ayasono/
 - [メンバーログ機能](docs/specs/MEMBER_LOG_SPEC.md) - メンバーの参加・脱退を指定チャンネルに記録
 - [メッセージ削除](docs/specs/MESSAGE_DELETE_SPEC.md) - モデレーター向けメッセージ一括削除コマンド
 - [VC募集機能](docs/specs/VC_RECRUIT_SPEC.md) - 専用チャンネルでVC参加者を募る投稿を作成
+- [ギルド設定機能](docs/specs/GUILD_CONFIG_SPEC.md) - ロケール設定・機能設定一覧表示・設定リセット
+- [基本コマンド](docs/specs/BASIC_COMMANDS_SPEC.md) - ping / help / server-info / user-info
 
 ## 🔧 開発環境
 
