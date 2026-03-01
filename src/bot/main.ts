@@ -4,6 +4,7 @@
 import { PrismaLibSql } from "@prisma/adapter-libsql";
 import { PrismaClient } from "@prisma/client";
 import { Routes } from "discord.js";
+import { resolve } from "path";
 import { env } from "../shared/config/env";
 import {
   setupGlobalErrorHandlers,
@@ -66,9 +67,15 @@ async function startBot() {
     client.rest.setToken(env.DISCORD_TOKEN);
 
     // commands/ ディレクトリから自動スキャンしてコマンドをロード
-    const commands = await loadCommands();
+    // tsup の splitting で chunk ファイルに移動しても正しいパスになるよう
+    // import.meta.dirname（= dist/bot/）を基準にパスを渡す
+    const commands = await loadCommands(
+      resolve(import.meta.dirname, "commands"),
+    );
     // events/ ディレクトリから自動スキャンしてイベントをロード
-    const events = await loadEvents();
+    // tsup の splitting で chunk ファイルに移動しても正しいパスになるよう
+    // import.meta.dirname（= dist/bot/）を基準にパスを渡す
+    const events = await loadEvents(resolve(import.meta.dirname, "events"));
 
     // ローカルレジストリへコマンド登録
     logger.info(

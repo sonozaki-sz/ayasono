@@ -28,12 +28,29 @@ function isBotEvent(value: unknown): value is BotEvent {
  * - 開発時（tsx）: .ts ファイルをそのまま import
  * - 本番時（tsup ビルド後）: .js ファイルを import
  *
+ * @param eventsDir イベントファイルが格納されたディレクトリの絶対パス。
+ *   tsup の splitting により import.meta.dirname が共有チャンクのパスに変わるため、
+ *   呼び出し元（main.ts）から正しいパスを渡すこと。
+ *   省略した場合は import.meta.dirname を基準に解決する（開発時用フォールバック）。
  * @returns ロードされた BotEvent オブジェクトの配列
  */
-export async function loadEvents(): Promise<BotEvent[]> {
-  const eventsDir = resolve(import.meta.dirname, "../events");
-
-  const files = readdirSync(eventsDir).filter(
+export async function loadEvents(
+  eventsDir: string = resolve(import.meta.dirname, "../events"),
+): Promise<BotEvent[]> {
+  let files: string[];
+  try {
+    files = readdirSync(eventsDir);
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === "ENOENT") {
+      throw new Error(
+        `[eventLoader] events ディレクトリが見つかりません: ${eventsDir}\n` +
+          `tsup の splitting により import.meta.dirname がチャンクファイルの場所に変わる場合があります。\n` +
+          `loadEvents() を呼び出す際は、呼び出し元の import.meta.dirname を基準とした絶対パスを引数に渡してください。`,
+      );
+    }
+    throw err;
+  }
+  files = files.filter(
     (f) =>
       // .ts（開発）または .js（本番）のみ対象、型定義・マップファイルは除外
       (f.endsWith(".ts") || f.endsWith(".js")) &&
