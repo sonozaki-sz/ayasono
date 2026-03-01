@@ -98,14 +98,6 @@ jobs:
           source: docker-compose.prod.yml
           target: /opt/ayasono/
 
-      - name: GHCR の古いイメージを削除（最新 3 件を保持）
-        uses: actions/delete-package-versions@v5
-        with:
-          package-name: ayasono
-          package-type: container
-          min-versions-to-keep: 3
-          ignore-versions: "^latest$"
-
       - name: SSH でデプロイ
         uses: appleboy/ssh-action@v1
         with:
