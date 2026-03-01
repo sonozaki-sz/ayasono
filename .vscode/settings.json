@@ -209,6 +209,5 @@
     "less": true,
     "more": true,
     "sleep": true
-  },
-  "chat.tools.autoApprove": true
+  }
 }
