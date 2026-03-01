@@ -13,12 +13,12 @@
 
 ### コマンド一覧
 
-| コマンド | 権限 | 説明 | 状態 |
-| -- | -- | -- | -- |
-| `/ping` | なし | Bot の応答速度（レイテンシー）を確認 | ✅実装済 |
-| `/help` | なし | コマンド一覧とユーザーマニュアルリンクを表示 | 未実装 |
-| `/server-info` | なし | サーバー（ギルド）情報を表示 | 未実装 |
-| `/user-info` | なし | ユーザー情報を表示 | 未実装 |
+| コマンド       | 権限 | 説明                                         | 状態     |
+| -------------- | ---- | -------------------------------------------- | -------- |
+| `/ping`        | なし | Bot の応答速度（レイテンシー）を確認         | ✅実装済 |
+| `/help`        | なし | コマンド一覧とユーザーマニュアルリンクを表示 | 未実装   |
+| `/server-info` | なし | サーバー（ギルド）情報を表示                 | 未実装   |
+| `/user-info`   | なし | ユーザー情報を表示                           | 未実装   |
 
 ---
 
@@ -61,33 +61,34 @@
 
 **表示形式（Embed）:**
 
-```
-┌──────────────────────────────────────────────────────┐
-│ 📖 ayasono コマンド一覧                               │
-├──────────────────────────────────────────────────────┤
-│ 🔧 基本                                               │
-│ /ping         Bot の応答速度を確認                    │
-│ /help         このヘルプを表示                        │
-│ /server-info  サーバー情報を表示                      │
-│ /user-info    ユーザー情報を表示                      │
-│                                                      │
-│ ⚙️ 設定（管理者）                                     │
-│ /guild-config     ギルド全体の設定                    │
-│ /vac-config       VC自動作成の設定                    │
-│ /vc-recruit-config  VC募集の設定                      │
-│ /sticky-message   メッセージ固定の設定                │
-│ /member-log-config  メンバーログの設定                │
-│ /message-delete-config  メッセージ削除の設定          │
-│ /bump-reminder-config  Bumpリマインダーの設定         │
-│ /afk-config       AFK の設定                         │
-│                                                      │
-│ 🛠️ 操作                                               │
-│ /afk              AFK チャンネルへ移動                │
-│ /message-delete   メッセージを一括削除                │
-├──────────────────────────────────────────────────────┤
-│ 📚 詳しい使い方: [ユーザーマニュアル]                  │
-└──────────────────────────────────────────────────────┘
-```
+<table border="1" cellpadding="8" width="480">
+<tr><th align="left">📖 ayasono コマンド一覧</th></tr>
+<tr><td>
+<b>🔧 基本</b><br>
+<code>/ping</code> &emsp; Bot の応答速度を確認<br>
+<code>/help</code> &emsp; このヘルプを表示<br>
+<code>/user-info</code> &emsp; ユーザー情報を表示<br>
+<code>/server-info</code> &emsp; サーバー情報を表示
+</td></tr>
+<tr><td>
+<b>⚙️ 設定（管理者）</b><br>
+<code>/guild-config</code> &emsp; ギルド全体の設定<br>
+<code>/afk-config</code> &emsp; AFK の設定<br>
+<code>/vac-config</code> &emsp; VC自動作成の設定<br>
+<code>/vc-recruit-config</code> &emsp; VC募集の設定<br>
+<code>/sticky-message</code> &emsp; メッセージ固定の設定<br>
+<code>/member-log-config</code> &emsp; メンバーログの設定<br>
+<code>/message-delete-config</code> &emsp; メッセージ削除の設定<br>
+<code>/bump-reminder-config</code> &emsp; Bumpリマインダーの設定
+</td></tr>
+<tr><td>
+<b>🛠️ 操作</b><br>
+<code>/afk</code> &emsp; AFK チャンネルへ移動<br>
+<code>/vac</code> &emsp; VC名・人数制限を変更<br>
+<code>/message-delete</code> &emsp; メッセージを一括削除
+</td></tr>
+<tr><td>📚 詳しい使い方: <a href="../guides/USER_MANUAL.md">ユーザーマニュアル</a></td></tr>
+</table>
 
 **ユーザーマニュアルリンク**: `docs/guides/USER_MANUAL.md` の URL または GitHub Pages 等のホスト先 URL
 
@@ -109,16 +110,16 @@
 
 **表示フィールド:**
 
-| フィールド | 内容 |
-| -- | -- |
-| サーバー名 | `guild.name` |
-| サーバーID | `guild.id` |
-| オーナー | `<@ownerId>` |
-| メンバー数 | `guild.memberCount` |
-| 作成日時 | Discord の `:f` フォーマット |
-| 認証レベル | `guild.verificationLevel`（数値→テキスト変換） |
-| ブースト数 | `guild.premiumSubscriptionCount` |
-| ブーストレベル | `guild.premiumTier` |
+| フィールド     | 内容                                           |
+| -------------- | ---------------------------------------------- |
+| サーバー名     | `guild.name`                                   |
+| サーバーID     | `guild.id`                                     |
+| オーナー       | `<@ownerId>`                                   |
+| メンバー数     | `guild.memberCount`                            |
+| 作成日時       | Discord の `:f` フォーマット                   |
+| 認証レベル     | `guild.verificationLevel`（数値→テキスト変換） |
+| ブースト数     | `guild.premiumSubscriptionCount`               |
+| ブーストレベル | `guild.premiumTier`                            |
 
 **サムネイル**: `guild.iconURL()`（設定されている場合）
 
@@ -133,20 +134,20 @@
 
 **オプション:**
 
-| オプション名 | 型 | 必須 | 説明 |
-| -- | -- | -- | -- |
-| `user` | User | ❌ | 対象ユーザー（省略時は自分自身） |
+| オプション名 | 型   | 必須 | 説明                             |
+| ------------ | ---- | ---- | -------------------------------- |
+| `user`       | User | ❌   | 対象ユーザー（省略時は自分自身） |
 
 **表示フィールド:**
 
-| フィールド | 内容 |
-| -- | -- |
-| ユーザー名 | `user.username`（`user.globalName` があれば優先） |
-| ユーザーID | `user.id` |
-| アカウント作成日 | Discord の `:f` フォーマット |
-| サーバー参加日 | `member.joinedAt`（取得可能な場合のみ） |
-| ロール | 所持ロール一覧（`@everyone` 除く） |
-| Bot フラグ | Bot の場合 `🤖 Bot` を表示 |
+| フィールド       | 内容                                              |
+| ---------------- | ------------------------------------------------- |
+| ユーザー名       | `user.username`（`user.globalName` があれば優先） |
+| ユーザーID       | `user.id`                                         |
+| アカウント作成日 | Discord の `:f` フォーマット                      |
+| サーバー参加日   | `member.joinedAt`（取得可能な場合のみ）           |
+| ロール           | 所持ロール一覧（`@everyone` 除く）                |
+| Bot フラグ       | Bot の場合 `🤖 Bot` を表示                        |
 
 **サムネイル**: `user.displayAvatarURL()`
 
