@@ -2,7 +2,7 @@
 
 > テストの実装状況と今後の計画
 
-最終更新: 2026年3月1日
+最終更新: 2026年3月2日
 
 **関連**: [TODO.md](../../TODO.md) - タスク管理 | [IMPLEMENTATION_PROGRESS.md](IMPLEMENTATION_PROGRESS.md) - 実装進捗
 
@@ -10,19 +10,19 @@
 
 ## 📊 現在のテスト状況
 
-### 最新テスト実行結果（2026年3月1日）
+### 最新テスト実行結果（2026年3月2日）
 
-- ✅ **全テスト PASSED**: 1264/1264
+- ✅ **全テスト PASSED**: 1276/1276
 - ✅ **全スイート PASSED**: 232/232
 - ⏱️ **実行時間**: ~4秒
-- 📦 **カバレッジ（global）**: statements 100% / functions 100% / lines 100% / branches 99.28%
-- 🎯 **ブランチ残差0.72%**: v8が async/await を Generator 変換する際に生成する内部追跡ブランチのアーティファクトであり、実際のロジックブランチはすべてカバー済
+- 📦 **カバレッジ（global）**: statements 100% / functions 100% / lines 100% / branches 99.16%
+- 🎯 **ブランチ残差0.84%**: v8が async/await を Generator 変換する際に生成する内部追跡ブランチのアーティファクトに加え、意味上到達不能な防御的分岐（`stickyMessage{Set,Update}EmbedModalHandler` 内の空文字列フォールバック等）は `/* c8 ignore */` で除外済み
 - ✅ **カバレッジしきい値**: `branches: 99, functions: 100, lines: 100, statements: 100`（`vitest.config.ts` 設定済み / 全クリア）
 
 ### ✅ カバレッジ100% 作業ステータス（完了）
 
-- **達成日**: 2026年2月25日
-- **結果**: statements 100% / functions 100% / lines 100% / branches 99.28%（v8 async内部ブランチのみ残差）
+- **最終達成日**: 2026年3月2日（branches 閾値厳格化対応含む）
+- **結果**: statements 100% / functions 100% / lines 100% / branches 99.16%
 - **`vitest.config.ts` thresholds**: `{ branches: 99, functions: 100, lines: 100, statements: 100 }` 設定済み
 - **除外ファイル（型専用/再エクスポートのみ）**:
   - `src/shared/database/stores/usecases/bumpReminderStoreContext.ts`
@@ -30,6 +30,24 @@
   - `src/bot/features/sticky-message/repositories/types.ts`
   - `src/bot/handlers/interactionCreate/ui/types.ts`
   - `src/shared/errors/errorHandler.ts`
+
+**カバレッジ閾値修正対応（2026-03-02）**
+
+`vitest.config.ts` の `branches: 99, statements: 100` 閾値を達成するため以下を実施:
+
+| 対象ファイル | 対応内容 |
+| --- | --- |
+| `src/shared/errors/processErrorHandler.ts` | `IGNORED_DEPRECATION_CODES` が空 Set のため到達不能な if ブロックを `/* c8 ignore start/stop */` で除外 |
+| `src/bot/features/sticky-message/handlers/ui/stickyMessageSetEmbedModalHandler.ts` | 入力ガードにより到達不能な `??　""` フォールバックを `/* c8 ignore next */` で除外 |
+| `src/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler.ts` | 同上 |
+| `src/bot/utils/eventLoader.ts` | `if (key === "default") continue` をリファクタして `if (key !== "default" && isBotEvent(...))` に一本化し uncovered statement を解消 |
+| `tests/unit/bot/commands/index.test.ts` | ENOENT / ENOTDIR ケースのテスト追加 |
+| `tests/unit/bot/events/index.test.ts` | ENOENT / ENOTDIR ケースのテスト追加 |
+| `tests/unit/bot/features/member-log/handlers/guildMemberRemoveHandler.test.ts` | `joinedTimestamp: undefined` ケースのテスト追加（`?? 0` ブランチ到達） |
+| `tests/unit/bot/features/message-delete/commands/messageDeleteCommand.execute.test.ts` | `allChannels` に `null` チャンネルを含むケースのテスト追加 |
+| `tests/unit/bot/features/bump-reminder/handlers/usecases/sendBumpReminder.test.ts` | finally 内で再 fetch したチャンネルが `null` のケースのテスト追加 |
+
+---
 
 **主な追加テストファイル（2026-02-25）**
 
@@ -225,7 +243,8 @@
 - [x] 全モジュールの statements/functions/lines 100%
 - [x] v8 thresholds 設定 `{ branches: 99, functions: 100, lines: 100, statements: 100 }`
 - [x] 型専用ファイル5件を coverage.exclude に追加
-- **完了**: 2026年2月25日
+- [x] 到達不能ブランチへの `/* c8 ignore */` 適用 + テスト追加による branches 閾値維持（2026-03-02）
+- **完了**: 2026年3月2日（継続的維持）
 
 ### Phase 3: Web UIと統合テスト
 

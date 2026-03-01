@@ -295,4 +295,35 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
       expect.any(Error),
     );
   });
+
+  // finally で再フェッチしたチャンネルが null（取得失敗）の場合、
+  // ch?.isTextBased() が falsy になりパネルクリーンアップをスキップすることを確認する
+  it("skips panel cleanup when re-fetched channel is null in finally", async () => {
+    // 1回目フェッチ: テキスト以外 → try ブロックで warn して return
+    // 2回目フェッチ: null（取得失敗） → ch?.isTextBased() が falsy → クリーンアップスキップ
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(makeChannel({ isTextBased: false }))
+      .mockResolvedValueOnce(null);
+    const client = { channels: { fetch: fetchMock } };
+    const service = makeConfigService({ enabled: false });
+
+    const { sendBumpReminder } =
+      await import("@/bot/features/bump-reminder/handlers/usecases/sendBumpReminder");
+    await sendBumpReminder(
+      client as never,
+      "guild-1",
+      "ch-1",
+      undefined,
+      "Disboard",
+      service as never,
+      "panel-msg-1",
+    );
+
+    // 2回フェッチされ、かつ panel_deleted ログは記録されないことを確認
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(loggerMock.debug).not.toHaveBeenCalledWith(
+      expect.stringContaining("panel_deleted"),
+    );
+  });
 });
