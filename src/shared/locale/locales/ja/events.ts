@@ -14,9 +14,9 @@ export const events = {
   "bump-reminder.panel.title": "Bumpリマインダー機能",
   "bump-reminder.panel.scheduled_at":
     "<t:{{timestamp}}:R>にリマインドが通知されます。",
-  // パネルボタンラベル（メンションON/OFF）
-  "bump-reminder.panel.button_mention_on": "メンションする",
-  "bump-reminder.panel.button_mention_off": "メンションしない",
+  // パネルボタンラベル（メンション登録/解除）
+  "bump-reminder.panel.button_mention_on": "メンション登録",
+  "bump-reminder.panel.button_mention_off": "メンション解除",
   // パネル操作結果（追加/削除/状態通知）
   "bump-reminder.panel.mention_added":
     "{{user}} をBumpリマインダーのメンションリストに追加しました。",

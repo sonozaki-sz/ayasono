@@ -13,9 +13,9 @@ export const events = {
   "bump-reminder.panel.title": "Bump Reminder",
   "bump-reminder.panel.scheduled_at":
     "Reminder will be sent <t:{{timestamp}}:R>.",
-  // Panel button labels (mention on/off)
-  "bump-reminder.panel.button_mention_on": "Get mentioned",
-  "bump-reminder.panel.button_mention_off": "Don't mention me",
+  // Panel button labels (mention register/unregister)
+  "bump-reminder.panel.button_mention_on": "Register Mention",
+  "bump-reminder.panel.button_mention_off": "Unregister Mention",
   // Panel action result messages
   "bump-reminder.panel.mention_added":
     "{{user}} has been added to bump reminder mentions.",
