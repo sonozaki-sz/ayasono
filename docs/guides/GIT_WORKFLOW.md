@@ -30,15 +30,15 @@ refactor/xxx  ← リファクタリング
 
 ### 各ブランチの役割
 
-| ブランチ     | 説明                                            | 直接push | マージ先           |
-| ------------ | ----------------------------------------------- | -------- | ------------------ |
-| `main`       | 本番デプロイ済みコード。CI/CDが自動デプロイする | ❌       | -                  |
-| `develop`    | 開発統合ブランチ（次リリース向けの集約点）      | ❌       | `main`             |
-| `feature/*`  | 新機能の開発                                    | ✅       | `develop`          |
-| `fix/*`      | バグ修正                                        | ✅       | `develop`          |
-| `hotfix/*`   | 本番障害の緊急修正                              | ✅       | `main` + `develop` |
-| `docs/*`     | ドキュメントのみの変更                          | ✅       | `develop`          |
-| `refactor/*` | リファクタリング                                | ✅       | `develop`          |
+| ブランチ | 説明 | 直接push | マージ先 |
+| -- | -- | -- | -- |
+| `main` | 本番デプロイ済みコード。 CI/CDが自動デプロイする | ❌ | - |
+| `develop` | 開発統合ブランチ （次リリース向けの集約点） | ❌ | `main` |
+| `feature/*` | 新機能の開発 | ✅ | `develop` |
+| `fix/*` | バグ修正 | ✅ | `develop` |
+| `hotfix/*` | 本番障害の緊急修正 | ✅ | `main` + `develop` |
+| `docs/*` | ドキュメントのみの変更 | ✅ | `develop` |
+| `refactor/*` | リファクタリング | ✅ | `develop` |
 
 ---
 
@@ -124,35 +124,35 @@ gh pr merge <develop向けPR番号> --squash --auto   # develop はSquash and me
 
 ### type 一覧
 
-| type       | 用途                                       | 例                                              |
-| ---------- | ------------------------------------------ | ----------------------------------------------- |
-| `feat`     | 新機能の追加                               | `feat(afk): 自動解除機能を追加`                 |
-| `fix`      | バグ修正                                   | `fix(bump-reminder): 二重送信を修正`            |
-| `docs`     | ドキュメントのみの変更                     | `docs: GIT_WORKFLOWを追加`                      |
-| `style`    | フォーマット・セミコロン等（動作に無影響） | `style: prettierによる整形`                     |
-| `refactor` | 機能変更・バグ修正を伴わないコード変更     | `refactor(scheduler): 責務を分離`               |
-| `perf`     | パフォーマンス改善                         | `perf(db): クエリにインデックスを追加`          |
-| `test`     | テストの追加・修正                         | `test(afk): エッジケースのユニットテストを追加` |
-| `chore`    | ビルド・補助ツールの変更                   | `chore: pnpmをアップデート`                     |
-| `ci`       | CI設定の変更                               | `ci: commitlintワークフローを追加`              |
-| `build`    | ビルドシステム・外部依存の変更             | `build: tsconfig.jsonのtargetをES2022に変更`    |
-| `revert`   | 過去のコミットを revert                    | `revert: feat(afk): 自動解除機能を追加`         |
+| type | 用途 | 例 |
+| -- | -- | -- |
+| `feat` | 新機能の追加 | `feat(afk): 自動解除機能を追加` |
+| `fix` | バグ修正 | `fix(bump-reminder): 二重送信を修正` |
+| `docs` | ドキュメントのみの変更 | `docs: GIT_WORKFLOWを追加` |
+| `style` | フォーマット・セミコロン等 （動作に無影響） | `style: prettierによる整形` |
+| `refactor` | 機能変更・バグ修正を伴わない コード変更 | `refactor(scheduler): 責務を分離` |
+| `perf` | パフォーマンス改善 | `perf(db): クエリにインデックスを追加` |
+| `test` | テストの追加・修正 | `test(afk): エッジケースの ユニットテストを追加` |
+| `chore` | ビルド・補助ツールの変更 | `chore: pnpmをアップデート` |
+| `ci` | CI設定の変更 | `ci: commitlintワークフローを追加` |
+| `build` | ビルドシステム・外部依存の変更 | `build: tsconfig.jsonの targetをES2022に変更` |
+| `revert` | 過去のコミットを revert | `revert: feat(afk): 自動解除機能を追加` |
 
 ### scope（省略可）
 
 主要な scope の例：
 
-| scope            | 対象                           |
-| ---------------- | ------------------------------ |
-| `afk`            | AFK機能                        |
-| `bump-reminder`  | Bumpリマインダー               |
-| `member-log`     | 入退室ログ                     |
-| `sticky-message` | スティッキーメッセージ         |
-| `vac`            | VAC（VC自動作成機能）          |
-| `scheduler`      | スケジューラー                 |
-| `db`             | データベース・マイグレーション |
-| `web`            | Webサーバー・API               |
-| `ci`             | CI/CD設定                      |
+| scope | 対象 |
+| -- | -- |
+| `afk` | AFK機能 |
+| `bump-reminder` | Bumpリマインダー |
+| `member-log` | 入退室ログ |
+| `sticky-message` | スティッキーメッセージ |
+| `vac` | VAC（VC自動作成機能） |
+| `scheduler` | スケジューラー |
+| `db` | データベース・マイグレーション |
+| `web` | Webサーバー・API |
+| `ci` | CI/CD設定 |
 
 ### subject のルール
 
@@ -201,13 +201,13 @@ git commit -m "test(afk): AFK自動解除のユニットテストを追加"
 <type>/<kebab-case-description>
 ```
 
-| 例                                   | 用途             |
-| ------------------------------------ | ---------------- |
-| `feature/bump-reminder-mention-role` | 新機能           |
-| `fix/afk-status-not-cleared`         | バグ修正         |
-| `hotfix/crash-on-empty-guild`        | 緊急修正         |
-| `refactor/db-repository-split`       | リファクタリング |
-| `docs/git-workflow`                  | ドキュメント     |
+| 例 | 用途 |
+| -- | -- |
+| `feature/bump-reminder-mention-role` | 新機能 |
+| `fix/afk-status-not-cleared` | バグ修正 |
+| `hotfix/crash-on-empty-guild` | 緊急修正 |
+| `refactor/db-repository-split` | リファクタリング |
+| `docs/git-workflow` | ドキュメント |
 
 - **すべて小文字のkebab-case** を使用
 - 日本語・スペースは使用しない
@@ -228,19 +228,19 @@ git commit -m "test(afk): AFK自動解除のユニットテストを追加"
 
 PR に対して以下の CI が自動で実行される：
 
-| チェック                 | ワークフロー     | 内容                         |
-| ------------------------ | ---------------- | ---------------------------- |
-| **Test**                 | `deploy.yml`     | 型チェック + 全テスト実行    |
+| チェック | ワークフロー | 内容 |
+| -- | -- | -- |
+| **Test** | `deploy.yml` | 型チェック + 全テスト実行 |
 | **Lint Commit Messages** | `commitlint.yml` | コミットメッセージ形式の検証 |
 
 `develop` / `main` へのPRは、すべて ✅ でないとマージできない（ブランチ保護設定による）。
 
 ### マージ戦略
 
-| マージ先  | 推奨方式             | CLI オプション  | 理由                                       |
-| --------- | -------------------- | --------------- | ------------------------------------------ |
-| `develop` | **Squash and merge** | `--squash`      | feature ブランチの細かいコミットをまとめる |
-| `main`    | **Merge commit**     | `--merge`       | リリース履歴を明確に残す                   |
+| マージ先 | 推奨方式 | CLI オプション | 理由 |
+| -- | -- | -- | -- |
+| `develop` | **Squash and merge** | `--squash` | feature ブランチの 細かいコミットをまとめる |
+| `main` | **Merge commit** | `--merge` | リリース履歴を 明確に残す |
 
 > **auto-merge 有効**: `--auto` を付けると CI 通過後に自動マージされる。`gh pr merge <番号> --squash --auto` のように使う。
 
@@ -254,23 +254,23 @@ PR に対して以下の CI が自動で実行される：
 
 直接pushは禁止。PR経由でのみ変更可能で、CIが通らないとマージできない。
 
-| 設定                                  | 値                               |
-| ------------------------------------- | -------------------------------- |
-| Require a pull request before merging | ✅（レビュー承認は不要）         |
+| 設定 | 値 |
+| -- | -- |
+| Require a pull request before merging | ✅（レビュー承認は不要） |
 | Require status checks to pass: `Test` | ✅（strict: ベース最新化が必要） |
-| Block force pushes                    | ✅                               |
-| Allow auto-merge                      | ✅                               |
+| Block force pushes | ✅ |
+| Allow auto-merge | ✅ |
 
 ### `develop` ブランチ
 
 直接 push は禁止。`feature/*` 等から PR 経由でのみ変更可能で、CI が通らないとマージできない。
 
-| 設定                                  | 値                               |
-| ------------------------------------- | -------------------------------- |
-| Require a pull request before merging | ✅（レビュー承認は不要）         |
+| 設定 | 値 |
+| -- | -- |
+| Require a pull request before merging | ✅（レビュー承認は不要） |
 | Require status checks to pass: `Test` | ✅（strict: ベース最新化が必要） |
-| Block force pushes                    | ✅                               |
-| Allow auto-merge                      | ✅                               |
+| Block force pushes | ✅ |
+| Allow auto-merge | ✅ |
 
 ---
 

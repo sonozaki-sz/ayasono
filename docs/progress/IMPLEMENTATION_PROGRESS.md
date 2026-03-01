@@ -10,13 +10,13 @@
 
 ### 全体進捗
 
-| カテゴリ             | 実装済み | 未実装 | 進捗率 |
-| -------------------- | -------- | ------ | ------ |
-| コア機能             | 13       | 0      | 100%   |
-| コマンド             | 11       | 5      | 69%    |
-| イベント             | 7        | 0      | 100%   |
-| サービス             | 7        | 0      | 100%   |
-| 主要機能             | 6        | 1      | 86%    |
+| カテゴリ | 実装済み | 未実装 | 進捗率 |
+| -------- | -------- | ------ | ------ |
+| コア機能 | 13       | 0      | 100%   |
+| コマンド | 11       | 5      | 69%    |
+| イベント | 7        | 0      | 100%   |
+| サービス | 7        | 0      | 100%   |
+| 主要機能 | 6        | 1      | 86%    |
 
 ### 機能別実装状況
 
@@ -460,19 +460,19 @@
 
 | コマンド                 | 説明                                         | 状態 | 備考     |
 | ------------------------ | -------------------------------------------- | ---- | -------- |
-| `/ping`                  | 疎通確認                                         | ✅   | 完全実装 |
-| `/afk`                   | AFKチャンネルへ移動                              | ✅   | 完全実装 |
-| `/afk-config`            | AFK機能設定                                      | ✅   | 完全実装 |
-| `/bump-reminder-config`  | Bumpリマインダー機能設定                         | ✅   | 完全実装 |
-| `/vac-config`            | VAC設定（作成/削除/表示）                        | ✅   | 完全実装 |
-| `/vac`                   | VAC VC操作（名前/人数）                          | ✅   | 完全実装 |
-| `/sticky-message set`    | スティッキーメッセージ設定                       | ✅   | 完全実装 |
-| `/sticky-message remove` | スティッキーメッセージ削除                       | ✅   | 完全実装 |
-| `/sticky-message update` | スティッキーメッセージ更新                       | ✅   | 完全実装 |
-| `/sticky-message view`   | スティッキーメッセージ一覧表示（SelectMenu）     | ✅   | 完全実装 |
-| `/member-log-config`     | メンバーログ機能設定                             | ✅   | 完全実装 |
-| `/message-delete`        | メッセージ一括削除                               | ✅   | 完全実装 |
-| `/message-delete-config` | メッセージ削除内容設定                           | ✅   | 完全実装 |
+| `/ping`                  | 疎通確認                                     | ✅   | 完全実装 |
+| `/afk`                   | AFKチャンネルへ移動                          | ✅   | 完全実装 |
+| `/afk-config`            | AFK機能設定                                  | ✅   | 完全実装 |
+| `/bump-reminder-config`  | Bumpリマインダー機能設定                     | ✅   | 完全実装 |
+| `/vac-config`            | VAC設定（作成/削除/表示）                    | ✅   | 完全実装 |
+| `/vac`                   | VAC VC操作（名前/人数）                      | ✅   | 完全実装 |
+| `/sticky-message set`    | スティッキーメッセージ設定                   | ✅   | 完全実装 |
+| `/sticky-message remove` | スティッキーメッセージ削除                   | ✅   | 完全実装 |
+| `/sticky-message update` | スティッキーメッセージ更新                   | ✅   | 完全実装 |
+| `/sticky-message view`   | スティッキーメッセージ一覧表示（SelectMenu） | ✅   | 完全実装 |
+| `/member-log-config`     | メンバーログ機能設定                         | ✅   | 完全実装 |
+| `/message-delete`        | メッセージ一括削除                           | ✅   | 完全実装 |
+| `/message-delete-config` | メッセージ削除内容設定                       | ✅   | 完全実装 |
 
 **関連ファイル**:
 
@@ -486,7 +486,7 @@
 - `src/bot/commands/member-log-config.ts`
 - `src/bot/commands/message-delete.ts`
 - `src/bot/commands/message-delete-config.ts`
-- `src/bot/commands/commands.ts`
+- `src/bot/utils/commandLoader.ts` ← `commands/` ディレクトリを自動スキャンして動的ロード
 - `src/shared/utils/messageResponse.ts`
 
 ---
@@ -500,8 +500,8 @@
 | `messageCreate`     | メッセージ作成（Bump検知・sticky再送信） | ✅   | 完全実装 |
 | `voiceStateUpdate`  | VAC自動作成・自動削除                    | ✅   | 完全実装 |
 | `channelDelete`     | VAC設定同期                              | ✅   | 完全実装 |
-| `guildMemberAdd`    | メンバー参加通知（メンバーログ）           | ✅   | 完全実装 |
-| `guildMemberRemove` | メンバー退出通知（メンバーログ）           | ✅   | 完全実装 |
+| `guildMemberAdd`    | メンバー参加通知（メンバーログ）         | ✅   | 完全実装 |
+| `guildMemberRemove` | メンバー退出通知（メンバーログ）         | ✅   | 完全実装 |
 
 **関連ファイル**:
 
@@ -512,7 +512,7 @@
 - `src/bot/events/channelDelete.ts`
 - `src/bot/events/guildMemberAdd.ts`
 - `src/bot/events/guildMemberRemove.ts`
-- `src/bot/events/events.ts`
+- `src/bot/utils/eventLoader.ts` ← `events/` ディレクトリを自動スキャンして動的ロード
 - `src/bot/handlers/interactionCreate/ui/buttons.ts`
 - `src/bot/handlers/interactionCreate/ui/modals.ts`
 - `src/bot/handlers/interactionCreate/ui/selectMenus.ts`
@@ -528,8 +528,8 @@
 | messageResponse            | Embedメッセージユーティリティ              | ✅   | 完全実装 |
 | VacControlPanel            | VAC操作パネル送信ユーティリティ            | ✅   | 完全実装 |
 | StickyMessageResendService | スティッキーメッセージ再送信（デバウンス） | ✅   | 完全実装 |
-| MemberLogConfigService     | メンバーログ設定管理                         | ✅   | 完全実装 |
-| MessageDeleteService       | メッセージ削除実行ロジック                   | ✅   | 完全実装 |
+| MemberLogConfigService     | メンバーログ設定管理                       | ✅   | 完全実装 |
+| MessageDeleteService       | メッセージ削除実行ロジック                 | ✅   | 完全実装 |
 
 **関連ファイル**:
 

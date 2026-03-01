@@ -127,13 +127,13 @@ src/
 
 ### 設計原則
 
-| ルール                                                          | 理由                                 |
-| --------------------------------------------------------------- | ------------------------------------ |
-| `src/bot/` → `src/shared/` への依存のみ許可                     | Bot と Web の疎結合を維持            |
-| `src/web/` → `src/shared/` への依存のみ許可                     | 同上                                 |
-| `src/shared/` は Bot・Web どちらにも依存しない                  | 共有コードの独立性を保証             |
-| 共有可能な機能ロジックは `src/shared/features/<機能名>/` に配置 | Bot/Web での再利用性を維持           |
-| Bot専用機能は `src/bot/features/<機能名>/` に配置               | Discord依存・Bot専用責務の混在を防止 |
+| ルール | 理由 |
+| -- | -- |
+| `src/bot/` → `src/shared/` への依存のみ許可 | Bot と Web の疎結合を維持 |
+| `src/web/` → `src/shared/` への依存のみ許可 | 同上 |
+| `src/shared/` は Bot・Web どちらにも依存しない | 共有コードの独立性を保証 |
+| 共有可能な機能ロジックは `src/shared/features/<機能名>/` に配置 | Bot/Web での再利用性を維持 |
+| Bot専用機能は `src/bot/features/<機能名>/` に配置 | Discord依存・Bot専用責務の混在を防止 |
 
 ### src整備フェーズの運用境界
 
@@ -143,7 +143,8 @@ src/
 
 ### 機能モジュールの命名規約
 
-- エントリーポイントは役割名ファイル（例: `commands.ts`, `events.ts`, `apiRoutes.ts`, `handleInteractionCreate.ts`, `resources.ts`）に統一する
+- エントリーポイントは役割名ファイル（例: `apiRoutes.ts`, `handleInteractionCreate.ts`, `resources.ts`）に統一する
+  - `src/bot/commands/` と `src/bot/events/` ではバレルファイルを持たず、`commandLoader.ts` / `eventLoader.ts` がディレクトリを自動スキャンして動的ロードする
 - 機能サービスは `*Service.ts`（例: `VacConfigService.ts`, `BumpReminderService.ts`）
 - 機能定数は `*Constants.ts`（例: `BumpReminderConstants.ts`）
 - 機能Repositoryは `*Repository.ts`（例: `BumpReminderRepository.ts`）
@@ -201,6 +202,25 @@ class BotClient extends Client {
   modals: Collection<string, Modal>; // 登録済みモーダル
   cooldownManager: CooldownManager; // クールダウン管理
 }
+```
+
+### コマンド・イベントの自動ロード
+
+`src/bot/commands/` と `src/bot/events/` 内のファイルは、**バレルファイルなし**で自動ロードされます。
+
+| ローダー | スキャン対象 | 判定条件 |
+| -- | -- | -- |
+| `src/bot/utils/commandLoader.ts` | `src/bot/commands/*.ts` | `data` + `execute` を持つ |
+| `src/bot/utils/eventLoader.ts` | `src/bot/events/*.ts` | `name` + `execute` を持つ |
+
+**コマンド追加手順**: `src/bot/commands/<name>.ts` に `Command` 型を満たすオブジェクトをエクスポートするだけで、配列への手動追加は不要です。
+
+```typescript
+// src/bot/commands/hello.ts
+export const helloCommand: Command = {
+  data: new SlashCommandBuilder().setName("hello").setDescription("..."),
+  async execute(interaction) { ... },
+};
 ```
 
 ### コマンド・モーダルの型インターフェース
@@ -266,13 +286,13 @@ const afkConfig = safeJsonParse<AfkConfig>(record.afkConfig);
 
 **各設定の型**:
 
-| フィールド名         | 型                   | 用途                                                            |
-| -------------------- | -------------------- | --------------------------------------------------------------- |
-| `afkConfig`          | `AfkConfig`          | enabled フラグ + AFKチャンネルID                                |
-| `bumpReminderConfig` | `BumpReminderConfig` | Bump通知の enabled + mention設定                                |
-| `vacConfig`          | `VacConfig`          | VC自動作成設定                                                  |
-| `memberLogConfig`    | `MemberLogConfig`    | メンバーログ設定（未実装）                                      |
-| `stickMessages`      | `StickMessage[]`     | 固定メッセージ一覧（専用テーブル `sticky_messages` に移行済み） |
+| フィールド名 | 型 | 用途 |
+| -- | -- | -- |
+| `afkConfig` | `AfkConfig` | enabled フラグ + AFKチャンネルID |
+| `bumpReminderConfig` | `BumpReminderConfig` | Bump通知の enabled + mention設定 |
+| `vacConfig` | `VacConfig` | VC自動作成設定 |
+| `memberLogConfig` | `MemberLogConfig` | メンバーログ設定（未実装） |
+| `stickMessages` | `StickMessage[]` | 固定メッセージ一覧 （専用テーブル `sticky_messages` に移行済み） |
 
 ---
 
@@ -280,10 +300,10 @@ const afkConfig = safeJsonParse<AfkConfig>(record.afkConfig);
 
 `JobScheduler` は2種類のジョブをサポートします。
 
-| 種別           | メソッド          | 仕組み                  | 用途                |
-| -------------- | ----------------- | ----------------------- | ------------------- |
-| 繰り返しジョブ | `addJob()`        | node-cron               | 定期実行タスク      |
-| 1回限りジョブ  | `addOneTimeJob()` | setTimeout + `.unref()` | Bump リマインダー等 |
+| 種別 | メソッド | 仕組み | 用途 |
+| -- | -- | -- | -- |
+| 繰り返しジョブ | `addJob()` | node-cron | 定期実行タスク |
+| 1回限りジョブ | `addOneTimeJob()` | setTimeout + `.unref()` | Bump リマインダー等 |
 
 `setTimeout` に `.unref()` を呼び出しているため、**タイマーが残っていても Node.js プロセスは正常終了**できます。
 
@@ -304,11 +324,11 @@ Bot 起動
 
 ### エンドポイント一覧
 
-| メソッド | パス      | 認証   | 説明                              |
-| -------- | --------- | ------ | --------------------------------- |
-| `GET`    | `/health` | なし   | サーバー稼働確認                  |
-| `GET`    | `/ready`  | なし   | DB 接続確認（起動完了チェック用） |
-| `GET`    | `/api/*`  | Bearer | API ルート（未実装）              |
+| メソッド | パス | 認証 | 説明 |
+| -- | -- | -- | -- |
+| `GET` | `/health` | なし | サーバー稼働確認 |
+| `GET` | `/ready` | なし | DB 接続確認（起動完了チェック用） |
+| `GET` | `/api/*` | Bearer | API ルート（未実装） |
 
 ### `/health` レスポンス例
 
@@ -342,10 +362,10 @@ Bot 起動
 
 ### CORS
 
-| 環境                           | 許可オリジン                               |
-| ------------------------------ | ------------------------------------------ |
-| 開発（`NODE_ENV=development`） | すべて許可                                 |
-| 本番（`NODE_ENV=production`）  | `CORS_ORIGIN` 環境変数をカンマ区切りで指定 |
+| 環境 | 許可オリジン |
+| -- | -- |
+| 開発（`NODE_ENV=development`） | すべて許可 |
+| 本番（`NODE_ENV=production`） | `CORS_ORIGIN` 環境変数をカンマ区切りで指定 |
 
 ---
 
@@ -355,25 +375,25 @@ Bot 起動
 
 すべて `BaseError` を継承しています。
 
-| クラス               | statusCode | 用途                     |
-| -------------------- | ---------- | ------------------------ |
-| `ValidationError`    | 400        | 入力値バリデーション失敗 |
-| `PermissionError`    | 403        | 権限不足                 |
-| `NotFoundError`      | 404        | リソースが見つからない   |
-| `TimeoutError`       | 408        | タイムアウト             |
-| `RateLimitError`     | 429        | レート制限               |
-| `ConfigurationError` | 500        | 設定ミス（環境変数等）   |
-| `DatabaseError`      | 500        | DB 操作失敗              |
-| `DiscordApiError`    | 500        | Discord API エラー       |
+| クラス | statusCode | 用途 |
+| -- | -- | -- |
+| `ValidationError` | 400 | 入力値バリデーション失敗 |
+| `PermissionError` | 403 | 権限不足 |
+| `NotFoundError` | 404 | リソースが見つからない |
+| `TimeoutError` | 408 | タイムアウト |
+| `RateLimitError` | 429 | レート制限 |
+| `ConfigurationError` | 500 | 設定ミス（環境変数等） |
+| `DatabaseError` | 500 | DB 操作失敗 |
+| `DiscordApiError` | 500 | Discord API エラー |
 
 ### `isOperational` フラグ
 
 `BaseError` は `isOperational: boolean` を持ちます。
 
-| 値                  | 意味                                       | ログレベル |
-| ------------------- | ------------------------------------------ | ---------- |
-| `true` (デフォルト) | 想定済みの運用エラー（ユーザー操作ミス等） | `warn`     |
-| `false`             | プログラミングエラー・バグ                 | `error`    |
+| 値 | 意味 | ログレベル |
+| -- | -- | -- |
+| `true` (デフォルト) | 想定済みの運用エラー（ユーザー操作ミス等） | `warn` |
+| `false` | プログラミングエラー・バグ | `error` |
 
 `isOperational: false` のエラーはバグの可能性があるため、本番環境ではユーザーに詳細を返しません。
 

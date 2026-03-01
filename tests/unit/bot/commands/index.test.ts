@@ -1,62 +1,80 @@
 // tests/unit/bot/commands/index.test.ts
-import { afkCommand } from "@/bot/commands/afk";
-import { afkConfigCommand } from "@/bot/commands/afk-config";
-import { bumpReminderConfigCommand } from "@/bot/commands/bump-reminder-config";
-import { commands } from "@/bot/commands/commands";
-import { memberLogConfigCommand } from "@/bot/commands/member-log-config";
-import { messageDeleteCommand } from "@/bot/commands/message-delete";
-import { messageDeleteConfigCommand } from "@/bot/commands/message-delete-config";
-import { pingCommand } from "@/bot/commands/ping";
-import { stickyMessageCommand } from "@/bot/commands/sticky-message";
-import { vacCommand } from "@/bot/commands/vac";
-import { vacConfigCommand } from "@/bot/commands/vac-config";
+// commandLoader が commands/ ディレクトリを自動スキャンして
+// 有効な Command オブジェクトのみを返すことを検証する
 
-// 各コマンドモジュールを軽量スタブ化して index の配列構成のみを検証する
-vi.mock("@/bot/commands/afk", () => ({
-  afkCommand: { data: { name: "afk" } },
+import { loadCommands } from "@/bot/utils/commandLoader";
+
+// コマンドファイルが依存する外部モジュールをスタブ化（実行時コストを削減）
+vi.mock("@/shared/locale/commandLocalizations", () => ({
+  getCommandLocalizations: vi.fn(() => ({
+    ja: "test-description",
+    localizations: {},
+  })),
 }));
-vi.mock("@/bot/commands/afk-config", () => ({
-  afkConfigCommand: { data: { name: "afk-config" } },
+vi.mock("@/shared/locale/localeManager", () => ({
+  tShared: vi.fn((key: string) => key),
+  tDefault: vi.fn((key: string) => key),
 }));
-vi.mock("@/bot/commands/bump-reminder-config", () => ({
-  bumpReminderConfigCommand: { data: { name: "bump-reminder-config" } },
+vi.mock("@/shared/utils/prisma", () => ({
+  getPrismaClient: vi.fn(),
 }));
-vi.mock("@/bot/commands/member-log-config", () => ({
-  memberLogConfigCommand: { data: { name: "member-log-config" } },
-}));
-vi.mock("@/bot/commands/message-delete", () => ({
-  messageDeleteCommand: { data: { name: "message-delete" } },
-}));
-vi.mock("@/bot/commands/message-delete-config", () => ({
-  messageDeleteConfigCommand: { data: { name: "message-delete-config" } },
-}));
-vi.mock("@/bot/commands/sticky-message", () => ({
-  stickyMessageCommand: { data: { name: "sticky-message" } },
-}));
-vi.mock("@/bot/commands/vac", () => ({
-  vacCommand: { data: { name: "vac" } },
-}));
-vi.mock("@/bot/commands/vac-config", () => ({
-  vacConfigCommand: { data: { name: "vac-config" } },
-}));
-vi.mock("@/bot/commands/ping", () => ({
-  pingCommand: { data: { name: "ping" } },
+vi.mock("@/bot/services/botCompositionRoot", () => ({
+  getBotCompositionRoot: vi.fn(() => ({
+    afkService: {},
+    memberLogService: {},
+    bumpReminderService: {},
+    messageDeleteService: {},
+    stickyMessageService: {},
+    vacService: {},
+  })),
 }));
 
-describe("bot/commands index", () => {
-  // index.ts が想定順で全コマンドを公開していることを確認する
-  it("exports all commands in expected order", () => {
-    expect(commands).toEqual([
-      afkCommand,
-      afkConfigCommand,
-      bumpReminderConfigCommand,
-      memberLogConfigCommand,
-      messageDeleteCommand,
-      messageDeleteConfigCommand,
-      stickyMessageCommand,
-      vacCommand,
-      vacConfigCommand,
-      pingCommand,
-    ]);
+// 現在 commands/ に登録済みのコマンド名（新規追加時はここへの手動追加不要）
+const KNOWN_COMMAND_NAMES = [
+  "afk",
+  "afk-config",
+  "bump-reminder-config",
+  "member-log-config",
+  "message-delete",
+  "message-delete-config",
+  "sticky-message",
+  "vac",
+  "vac-config",
+  "ping",
+];
+
+describe("commandLoader", () => {
+  it("commands/ ディレクトリから Command オブジェクトを自動ロードする", async () => {
+    const commands = await loadCommands();
+
+    expect(commands.length).toBeGreaterThan(0);
+  });
+
+  it("ロードされた各コマンドは data と execute を持つ", async () => {
+    const commands = await loadCommands();
+
+    for (const cmd of commands) {
+      expect(cmd.data).toBeDefined();
+      expect(typeof cmd.execute).toBe("function");
+      expect(typeof cmd.data.name).toBe("string");
+    }
+  });
+
+  it("コマンド名が重複していない（export default との二重収集がない）", async () => {
+    const commands = await loadCommands();
+    const names = commands.map((c) => c.data.name);
+    const uniqueNames = new Set(names);
+
+    // export default と named export の両方を持つファイルで同一コマンドが二重登録されないことを保証
+    expect(names.length).toBe(uniqueNames.size);
+  });
+
+  it("既知のコマンドがすべて含まれている", async () => {
+    const commands = await loadCommands();
+    const names = commands.map((c) => c.data.name);
+
+    for (const expectedName of KNOWN_COMMAND_NAMES) {
+      expect(names).toContain(expectedName);
+    }
   });
 });

@@ -27,11 +27,11 @@ XServer VPS (Ubuntu 24.04)
 
 ### 必要なもの
 
-| 項目              | 内容                               |
-| ----------------- | ---------------------------------- |
-| XServer VPS       | 2GB プラン推奨（Ubuntu 24.04 LTS） |
-| GitHub リポジトリ | リポジトリへの管理者権限           |
-| Discord Bot       | トークン + アプリケーション ID     |
+| 項目 | 内容 |
+| -- | -- |
+| XServer VPS | 2GB プラン推奨（Ubuntu 24.04 LTS） |
+| GitHub リポジトリ | リポジトリへの管理者権限 |
+| Discord Bot | トークン + アプリケーション ID |
 
 ---
 
@@ -41,10 +41,10 @@ XServer VPS (Ubuntu 24.04)
 
 [XServer VPS](https://vps.xserver.ne.jp/) のサービスページからサーバーを申し込む。
 
-| 項目           | 推奨設定                                              |
-| -------------- | ----------------------------------------------------- |
-| プラン         | 2GB（月額 990円）                                     |
-| OS             | Ubuntu 24.04 LTS                                      |
+| 項目 | 推奨設定 |
+| -- | -- |
+| プラン | 2GB（月額 990円） |
+| OS | Ubuntu 24.04 LTS |
 | アプリイメージ | **Docker**（Docker + Compose が初期インストール済み） |
 
 > アプリイメージで「Docker」を選択すると Docker / Docker Compose が最初から使える状態で起動する。
@@ -197,9 +197,9 @@ docker compose -f /opt/infra/docker-compose.infra.yml -p infra ps
 
 ### 4-1. 管理者アカウントの作成
 
-| 項目     | 設定                         |
-| -------- | ---------------------------- |
-| Username | `admin`（任意）              |
+| 項目 | 設定 |
+| -- | -- |
+| Username | `admin`（任意） |
 | Password | 12文字以上の強力なパスワード |
 
 ### 4-2. 環境の追加
@@ -289,14 +289,14 @@ docker logs ayasono-bot --tail 50
 
 GitHub リポジトリ → **Settings → Secrets and variables → Actions → New repository secret** から以下を登録する。
 
-| Secret 名               | 内容                                    | 取得方法                              |
-| ----------------------- | --------------------------------------- | ------------------------------------- |
-| `SSH_HOST`              | VPS の IP アドレス                      | コントロールパネルで確認              |
-| `SSH_USER`              | SSH ユーザー名（例: `deploy`）          | 固定値                                |
-| `SSH_PRIVATE_KEY`       | デプロイ用 SSH 秘密鍵                   | セクション 5-3 で生成した秘密鍵の中身 |
-| `PORTAINER_HOST`        | VPS の IP アドレス                      | コントロールパネルで確認（通知用）    |
-| `PORTAINER_ENDPOINT_ID` | Portainer エンドポイント ID（通常 `3`） | セクション 4-3 参照（通知用）         |
-| `DISCORD_WEBHOOK_URL`   | Discord の Webhook URL                  | Discord チャンネル設定から取得        |
+| Secret 名 | 内容 | 取得方法 |
+| -- | -- | -- |
+| `SSH_HOST` | VPS の IP アドレス | コントロールパネルで確認 |
+| `SSH_USER` | SSH ユーザー名（例: `deploy`） | 固定値 |
+| `SSH_PRIVATE_KEY` | デプロイ用 SSH 秘密鍵 | セクション 5-3 で生成した秘密鍵の中身 |
+| `PORTAINER_HOST` | VPS の IP アドレス | コントロールパネルで確認（通知用） |
+| `PORTAINER_ENDPOINT_ID` | Portainer エンドポイント ID（通常 `3`） | セクション 4-3 参照（通知用） |
+| `DISCORD_WEBHOOK_URL` | Discord の Webhook URL | Discord チャンネル設定から取得 |
 
 > `PORTAINER_HOST` と `PORTAINER_ENDPOINT_ID` の2つはデプロイには使用しない。Discord 通知の Portainer 管理リンク生成のみに使用する。
 
