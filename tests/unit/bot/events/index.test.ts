@@ -1,47 +1,69 @@
 // tests/unit/bot/events/index.test.ts
-import { channelDeleteEvent } from "@/bot/events/channelDelete";
-import { clientReadyEvent } from "@/bot/events/clientReady";
-import { events } from "@/bot/events/events";
-import { guildMemberAddEvent } from "@/bot/events/guildMemberAdd";
-import { guildMemberRemoveEvent } from "@/bot/events/guildMemberRemove";
-import { interactionCreateEvent } from "@/bot/events/interactionCreate";
-import { messageCreateEvent } from "@/bot/events/messageCreate";
-import { voiceStateUpdateEvent } from "@/bot/events/voiceStateUpdate";
+// eventLoader が events/ ディレクトリを自動スキャンして
+// 有効な BotEvent オブジェクトのみを返すことを検証する
 
-// 各イベントモジュールをスタブ化し、index の束ね方に焦点を当てる
-vi.mock("@/bot/events/channelDelete", () => ({
-  channelDeleteEvent: { name: "channelDelete" },
+import { loadEvents } from "@/bot/utils/eventLoader";
+
+// イベントファイルが依存する外部モジュールをスタブ化
+vi.mock("@/shared/utils/prisma", () => ({
+  getPrismaClient: vi.fn(),
 }));
-vi.mock("@/bot/events/clientReady", () => ({
-  clientReadyEvent: { name: "clientReady" },
+vi.mock("@/shared/utils/logger", () => ({
+  logger: {
+    info: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+    debug: vi.fn(),
+  },
 }));
-vi.mock("@/bot/events/guildMemberAdd", () => ({
-  guildMemberAddEvent: { name: "guildMemberAdd" },
+vi.mock("@/shared/locale/localeManager", () => ({
+  tShared: vi.fn((key: string) => key),
+  tDefault: vi.fn((key: string) => key),
 }));
-vi.mock("@/bot/events/guildMemberRemove", () => ({
-  guildMemberRemoveEvent: { name: "guildMemberRemove" },
-}));
-vi.mock("@/bot/events/interactionCreate", () => ({
-  interactionCreateEvent: { name: "interactionCreate" },
-}));
-vi.mock("@/bot/events/messageCreate", () => ({
-  messageCreateEvent: { name: "messageCreate" },
-}));
-vi.mock("@/bot/events/voiceStateUpdate", () => ({
-  voiceStateUpdateEvent: { name: "voiceStateUpdate" },
+vi.mock("@/bot/services/botCompositionRoot", () => ({
+  getBotCompositionRoot: vi.fn(() => ({
+    afkService: {},
+    memberLogService: {},
+    bumpReminderService: {},
+    messageDeleteService: {},
+    stickyMessageService: {},
+    vacService: {},
+  })),
 }));
 
-describe("bot/events index", () => {
-  // イベント配列に必要なイベントが順序どおり並ぶことを保証する
-  it("exports all events in expected order", () => {
-    expect(events).toEqual([
-      channelDeleteEvent,
-      guildMemberAddEvent,
-      guildMemberRemoveEvent,
-      interactionCreateEvent,
-      clientReadyEvent,
-      messageCreateEvent,
-      voiceStateUpdateEvent,
-    ]);
+// 現在 events/ に登録済みのイベント名（新規追加時はここへの手動追加不要）
+const KNOWN_EVENT_NAMES = [
+  "channelDelete",
+  "clientReady",
+  "guildMemberAdd",
+  "guildMemberRemove",
+  "interactionCreate",
+  "messageCreate",
+  "voiceStateUpdate",
+];
+
+describe("eventLoader", () => {
+  it("events/ ディレクトリから BotEvent オブジェクトを自動ロードする", async () => {
+    const events = await loadEvents();
+
+    expect(events.length).toBeGreaterThan(0);
+  });
+
+  it("ロードされた各イベントは name と execute を持つ", async () => {
+    const events = await loadEvents();
+
+    for (const event of events) {
+      expect(event.name).toBeDefined();
+      expect(typeof event.execute).toBe("function");
+    }
+  });
+
+  it("既知のイベントがすべて含まれている", async () => {
+    const events = await loadEvents();
+    const names = events.map((e) => e.name);
+
+    for (const expectedName of KNOWN_EVENT_NAMES) {
+      expect(names).toContain(expectedName);
+    }
   });
 });

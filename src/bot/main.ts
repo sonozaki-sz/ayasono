@@ -13,10 +13,10 @@ import { localeManager, tDefault } from "../shared/locale/localeManager";
 import { logger } from "../shared/utils/logger";
 import { setPrismaClient } from "../shared/utils/prisma";
 import { createBotClient } from "./client";
-import { commands } from "./commands/commands";
-import { events } from "./events/events";
 import { initializeBotCompositionRoot } from "./services/botCompositionRoot";
 import { registerBotEvents } from "./services/botEventRegistration";
+import { loadCommands } from "./utils/commandLoader";
+import { loadEvents } from "./utils/eventLoader";
 
 // コマンド登録先（ギルド/グローバル）をログ表示で識別するための定数
 const COMMAND_REGISTRATION_SCOPE = {
@@ -65,6 +65,11 @@ async function startBot() {
     // RESTクライアントにトークンを設定
     client.rest.setToken(env.DISCORD_TOKEN);
 
+    // commands/ ディレクトリから自動スキャンしてコマンドをロード
+    const commands = await loadCommands();
+    // events/ ディレクトリから自動スキャンしてイベントをロード
+    const events = await loadEvents();
+
     // ローカルレジストリへコマンド登録
     logger.info(
       tDefault("system:bot.commands.registering", { count: commands.length }),
@@ -87,6 +92,14 @@ async function startBot() {
           body: commands.map((cmd) => cmd.data.toJSON()),
         },
       );
+      // Discord API への登録成功後にコマンド名を列挙してから完了ログを出力
+      for (const command of commands) {
+        logger.info(
+          tDefault("system:bot.commands.command_registered", {
+            name: command.data.name,
+          }),
+        );
+      }
       logger.info(
         `${tDefault("system:bot.commands.registered")} (${COMMAND_REGISTRATION_SCOPE.GUILD})`,
       );
@@ -95,17 +108,16 @@ async function startBot() {
       await client.rest.put(Routes.applicationCommands(env.DISCORD_APP_ID), {
         body: commands.map((cmd) => cmd.data.toJSON()),
       });
+      // Discord API への登録成功後にコマンド名を列挙してから完了ログを出力
+      for (const command of commands) {
+        logger.info(
+          tDefault("system:bot.commands.command_registered", {
+            name: command.data.name,
+          }),
+        );
+      }
       logger.info(
         `${tDefault("system:bot.commands.registered")} (${COMMAND_REGISTRATION_SCOPE.GLOBAL})`,
-      );
-    }
-
-    // 登録したコマンドを 1 件ずつログ出力
-    for (const command of commands) {
-      logger.info(
-        tDefault("system:bot.commands.command_registered", {
-          name: command.data.name,
-        }),
       );
     }
 

@@ -130,13 +130,13 @@ Discord ユーザーの目に触れる **すべての文字列** をロケール
 
 対象は以下をすべて含む:
 
-| 対象                                                 | 例                         |
-| ---------------------------------------------------- | -------------------------- |
-| `editReply` / `followUp` / `reply` の `content:`     | エラー通知・確認メッセージ |
-| Embed のタイトル・説明文・フィールド名/値            | サマリー・結果表示         |
-| ボタンのラベル（`setLabel`）                         | 「削除する」「キャンセル」 |
-| セレクトメニューのプレースホルダー・オプションラベル | 「チャンネルを選択」       |
-| モーダルのタイトル・ラベル・プレースホルダー         | 入力フォーム               |
+| 対象 | 例 |
+| -- | -- |
+| `editReply` / `followUp` / `reply` の `content:` | エラー通知・確認メッセージ |
+| Embed のタイトル・説明文・フィールド名/値 | サマリー・結果表示 |
+| ボタンのラベル（`setLabel`） | 「削除する」「キャンセル」 |
+| セレクトメニューのプレースホルダー・オプションラベル | 「チャンネルを選択」 |
+| モーダルのタイトル・ラベル・プレースホルダー | 入力フォーム |
 
 ```typescript
 // ❌ 禁止: 生文字列のハードコード
@@ -152,13 +152,13 @@ new ButtonBuilder().setLabel(tDefault("commands:foo.btn_delete"));
 
 ## 🔧 名前空間
 
-| 名前空間   | 用途                 | 例                             |
-| ---------- | -------------------- | ------------------------------ |
-| `common`   | 共通の単語・フレーズ | `common:success`               |
-| `commands` | コマンド関連         | `commands:example.description` |
-| `errors`   | エラーメッセージ     | `errors:not_found`             |
-| `events`   | イベントメッセージ   | `events:ready.logged_in`       |
-| `system`   | オペレーター向けログ | `system:vac.channel_created`   |
+| 名前空間 | 用途 | 例 |
+| -- | -- | -- |
+| `common` | 共通の単語・フレーズ | `common:success` |
+| `commands` | コマンド関連 | `commands:example.description` |
+| `errors` | エラーメッセージ | `errors:not_found` |
+| `events` | イベントメッセージ | `events:ready.logged_in` |
+| `system` | オペレーター向けログ | `system:vac.channel_created` |
 
 ## 💡 型安全性
 
@@ -231,17 +231,17 @@ logger.info("VAC channel created");
 
 ### system名前空間のキー構造
 
-| プレフィックス     | 用途                       | 例                                          |
-| ------------------ | -------------------------- | ------------------------------------------- |
-| `bot.*`            | Bot起動・シャットダウン    | `system:bot.starting`                       |
-| `bump-reminder.*`  | Bumpリマインダー操作       | `system:bump-reminder.config_enabled`       |
-| `database.*`       | DB操作の成否               | `system:database.vac_channel_registered`    |
-| `error.*`          | グローバルエラーハンドラー | `system:error.global_handlers_registered`   |
-| `shutdown.*`       | シャットダウン処理         | `system:shutdown.cleanup_complete`          |
-| `afk.*`            | AFK操作ログ                | `system:afk.moved`                          |
-| `vac.*`            | VAC操作ログ                | `system:vac.channel_created`                |
-| `sticky-message.*` | スティッキーメッセージログ | `system:sticky-message.send_failed`         |
-| `scheduler.*`      | スケジューラー操作         | `system:scheduler.bump_reminder_cancelling` |
+| プレフィックス | 用途 | 例 |
+| -- | -- | -- |
+| `bot.*` | Bot起動・シャットダウン | `system:bot.starting` |
+| `bump-reminder.*` | Bumpリマインダー操作 | `system:bump-reminder.config_enabled` |
+| `database.*` | DB操作の成否 | `system:database.vac_channel_registered` |
+| `error.*` | グローバルエラーハンドラー | `system:error.global_handlers_registered` |
+| `shutdown.*` | シャットダウン処理 | `system:shutdown.cleanup_complete` |
+| `afk.*` | AFK操作ログ | `system:afk.moved` |
+| `vac.*` | VAC操作ログ | `system:vac.channel_created` |
+| `sticky-message.*` | スティッキーメッセージログ | `system:sticky-message.send_failed` |
+| `scheduler.*` | スケジューラー操作 | `system:scheduler.bump_reminder_cancelling` |
 
 ## �📌 ベストプラクティス
 

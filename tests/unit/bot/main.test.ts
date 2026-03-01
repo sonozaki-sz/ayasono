@@ -145,25 +145,26 @@ vi.mock("@/bot/client", () => ({
   createBotClient: vi.fn(() => mutableMocks.client),
 }));
 
-vi.mock("@/bot/commands/commands", () => ({
-  commands: [
+vi.mock("@/bot/utils/commandLoader", () => ({
+  loadCommands: vi.fn().mockResolvedValue([
     {
       data: {
         name: "ping",
         toJSON: vi.fn(() => ({ name: "ping" })),
       },
+      execute: vi.fn(),
     },
-  ],
+  ]),
 }));
 
-vi.mock("@/bot/events/events", () => ({
-  events: [
+vi.mock("@/bot/utils/eventLoader", () => ({
+  loadEvents: vi.fn().mockResolvedValue([
     {
       name: "ready",
       once: true,
       execute: vi.fn(),
     },
-  ],
+  ]),
 }));
 
 // import 時に起動される main.ts を安全に検証するため、依存を全面モックしてブートする

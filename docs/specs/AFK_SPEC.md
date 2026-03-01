@@ -35,9 +35,9 @@
 
 **引数:**
 
-| 引数名 | 型   | 必須 | 説明                                     |
-| ------ | ---- | ---- | ---------------------------------------- |
-| user   | User | ❌   | 移動対象のユーザー（省略時は実行者自身） |
+| 引数名 | 型 | 必須 | 説明 |
+| -- | -- | -- | -- |
+| user | User | ❌ | 移動対象のユーザー（省略時は実行者自身） |
 
 **動作:**
 
@@ -76,9 +76,9 @@ AFKチャンネルを設定します。
 
 **引数:**
 
-| 引数名  | 型           | 必須 | 説明                                        |
-| ------- | ------------ | ---- | ------------------------------------------- |
-| channel | VoiceChannel | ✅   | AFKチャンネルとして使用するボイスチャンネル |
+| 引数名 | 型 | 必須 | 説明 |
+| -- | -- | -- | -- |
+| channel | VoiceChannel | ✅ | AFKチャンネルとして使用するボイスチャンネル |
 
 **動作:**
 
@@ -203,12 +203,12 @@ interface AfkConfig {
 
 **エラーケース:**
 
-| エラー                 | 条件                                | メッセージ                     |
-| ---------------------- | ----------------------------------- | ------------------------------ |
-| AFK未設定              | enabled=false または channelId=null | `errors:afk.not_configured`    |
-| メンバーが見つからない | Guild内にメンバーが存在しない       | `errors:afk.member_not_found`  |
-| VC未参加               | ボイスチャンネルに参加していない    | `errors:afk.user_not_in_voice` |
-| チャンネルが無効       | AFKチャンネルが存在しない/削除済み  | `errors:afk.channel_not_found` |
+| エラー | 条件 | メッセージ |
+| -- | -- | -- |
+| AFK未設定 | enabled=false または channelId=null | `errors:afk.not_configured` |
+| メンバーが見つからない | Guild内にメンバーが存在しない | `errors:afk.member_not_found` |
+| VC未参加 | ボイスチャンネルに参加していない | `errors:afk.user_not_in_voice` |
+| チャンネルが無効 | AFKチャンネルが存在しない/削除済み | `errors:afk.channel_not_found` |
 
 #### `/afk-config` コマンド
 

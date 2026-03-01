@@ -54,16 +54,16 @@
 
 ### 対象ファイルマップ（例: member-log 機能）
 
-| src/ ファイル                                     | テスト必須 | 備考                                   |
-| ------------------------------------------------- | ---------- | -------------------------------------- |
-| `bot/commands/xxx-config.ts`                      | ✅         | コマンド名・execute委譲を検証          |
-| `bot/events/xxxEvent.ts`                          | ✅         | イベント名・once・execute委譲を検証    |
-| `bot/services/botXxxDependencyResolver.ts`        | ✅         | set/get・未初期化例外を検証            |
-| `bot/features/xxx/commands/xxxCommand.execute.ts` | ✅         | サブコマンドルーティングを検証         |
-| `bot/features/xxx/commands/xxxCommand.guard.ts`   | ✅         | 権限チェック分岐を検証                 |
-| `bot/features/xxx/commands/xxxCommand.yyyy.ts`    | ✅         | 各サブコマンドの正常・エラーを検証     |
-| `bot/features/xxx/handlers/xxxHandler.ts`         | ✅         | 早期リターン・正常フロー・エラーを検証 |
-| `shared/features/xxx/xxxConfigService.ts`         | ✅         | DB操作の全分岐を検証                   |
+| src/ ファイル | テスト必須 | 備考 |
+| -- | -- | -- |
+| `bot/commands/xxx-config.ts` | ✅ | コマンド名・execute委譲を検証 |
+| `bot/events/xxxEvent.ts` | ✅ | イベント名・once・execute委譲を検証 |
+| `bot/services/botXxxDependencyResolver.ts` | ✅ | set/get・未初期化例外を検証 |
+| `bot/features/xxx/commands/xxxCommand.execute.ts` | ✅ | サブコマンドルーティングを検証 |
+| `bot/features/xxx/commands/xxxCommand.guard.ts` | ✅ | 権限チェック分岐を検証 |
+| `bot/features/xxx/commands/xxxCommand.yyyy.ts` | ✅ | 各サブコマンドの正常・エラーを検証 |
+| `bot/features/xxx/handlers/xxxHandler.ts` | ✅ | 早期リターン・正常フロー・エラーを検証 |
+| `shared/features/xxx/xxxConfigService.ts` | ✅ | DB操作の全分岐を検証 |
 
 ### チェックリスト
 
@@ -382,13 +382,13 @@ async function loadModule() {
 
 ### コメントの書き方まとめ
 
-| 場所                            | 必須/推奨 | 内容                                      |
-| ------------------------------- | --------- | ----------------------------------------- |
-| ファイル先頭                    | 必須      | `// tests/path/to/file.test.ts`           |
-| `describe` 直前                 | 必須      | 検証グループの目的（1行）                 |
-| `beforeEach` / `afterEach` 直前 | 必須      | セットアップ・後処理の理由（1行）         |
-| `it` 直前                       | **必須**  | 検証内容・条件・制約の補足（1行）         |
-| 動的インポート関数              | 必須      | モジュールキャッシュリセットの理由（1行） |
+| 場所 | 必須/推奨 | 内容 |
+| -- | -- | -- |
+| ファイル先頭 | 必須 | `// tests/path/to/file.test.ts` |
+| `describe` 直前 | 必須 | 検証グループの目的（1行） |
+| `beforeEach` / `afterEach` 直前 | 必須 | セットアップ・後処理の理由（1行） |
+| `it` 直前 | **必須** | 検証内容・条件・制約の補足（1行） |
+| 動的インポート関数 | 必須 | モジュールキャッシュリセットの理由（1行） |
 
 ---
 
