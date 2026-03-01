@@ -3,20 +3,30 @@
 
 export const system = {
   // Bot起動・シャットダウン
-  "bot.starting": "[Bot] Discord Botを起動しています...",
-  "bot.commands.registering": "[Bot] {{count}}個のコマンドを登録しています...",
-  "bot.commands.registered": "[Bot] コマンド登録完了。",
-  "bot.commands.command_registered": "  ✓ /{{name}}",
-  "bot.events.registering": "[Bot] {{count}}個のイベントを登録しています...",
-  "bot.events.registered": "[Bot] イベント登録完了。",
-  "bot.startup.error": "[Bot] 起動中にエラーが発生しました:",
-  "bot.startup.failed": "[Bot] 起動失敗:",
-  "bot.client.initialized": "[Bot] Discord Botクライアントを初期化しました。",
+  "bot.starting":
+    "[Bot] Discord Botを起動しています...",
+  "bot.commands.registering":
+    "[Bot] {{count}}個のコマンドを登録しています...",
+  "bot.commands.registered":
+    "[Bot] コマンド登録完了",
+  "bot.commands.command_registered":
+    "  ✓ /{{name}}",
+  "bot.events.registering":
+    "[Bot] {{count}}個のイベントを登録しています...",
+  "bot.events.registered":
+    "[Bot] イベント登録完了",
+  "bot.startup.error":
+    "[Bot] 起動中にエラーが発生しました:",
+  "bot.startup.failed":
+    "[Bot] 起動失敗:",
+  "bot.client.initialized":
+    "[Bot] Discord Botクライアントを初期化しました。",
   "bot.client.shutting_down":
     "[Bot] Botクライアントをシャットダウンしています...",
   "bot.client.shutdown_complete":
     "[Bot] Botクライアントのシャットダウンが完了しました。",
-  "bot.presence_activity": "{{count}}個のサーバーで稼働中 | by sonozaki",
+  "bot.presence_activity":
+    "{{count}}個のサーバーで稼働中 | by sonozaki",
 
   // Bumpリマインダー検知ログ
   "bump-reminder.detected":
@@ -44,12 +54,18 @@ export const system = {
     "[Bumpリマインダー機能] メンションユーザー削除 GuildId: {{guildId}} UserIds: {{userIds}}",
 
   // エラーハンドリング
-  "error.reply_failed": "[Bot] エラーメッセージの送信に失敗しました。",
-  "error.unhandled_rejection": "[Bot] 未処理のPromise拒否:",
-  "error.uncaught_exception": "[Bot] 未処理の例外:",
-  "error.unhandled_rejection_log": "[Bot] 未処理のPromise拒否:",
-  "error.uncaught_exception_log": "[Bot] 未捕捉の例外:",
-  "error.node_warning": "[Bot] Node警告:",
+  "error.reply_failed":
+    "[Bot] エラーメッセージの送信に失敗しました。",
+  "error.unhandled_rejection":
+    "[Bot] 未処理のPromise拒否:",
+  "error.uncaught_exception":
+    "[Bot] 未処理の例外:",
+  "error.unhandled_rejection_log":
+    "[Bot] 未処理のPromise拒否:",
+  "error.uncaught_exception_log":
+    "[Bot] 未捕捉の例外:",
+  "error.node_warning":
+    "[Bot] Node警告:",
   "error.global_handlers_already_registered":
     "[Bot] グローバルエラーハンドラーは既に登録済みです。スキップします。",
   "error.shutdown_handlers_already_registered":
@@ -78,13 +94,18 @@ export const system = {
     "[スケジューラー] すべてのスケジュール済みジョブを停止中...",
   "scheduler.job_exists":
     "[スケジューラー] Job既存のため古いJobを削除 JobId: {{jobId}}",
-  "scheduler.executing_job": "[スケジューラー] Job実行中 JobId: {{jobId}}",
-  "scheduler.job_completed": "[スケジューラー] Job完了 JobId: {{jobId}}",
-  "scheduler.job_error": "[スケジューラー] Jobエラー JobId: {{jobId}}",
+  "scheduler.executing_job":
+    "[スケジューラー] Job実行中 JobId: {{jobId}}",
+  "scheduler.job_completed":
+    "[スケジューラー] Job完了 JobId: {{jobId}}",
+  "scheduler.job_error":
+    "[スケジューラー] Jobエラー JobId: {{jobId}}",
   "scheduler.schedule_failed":
     "[スケジューラー] Jobスケジュール失敗 JobId: {{jobId}}",
-  "scheduler.job_removed": "[スケジューラー] Job削除 JobId: {{jobId}}",
-  "scheduler.job_stopped": "[スケジューラー] Job停止 JobId: {{jobId}}",
+  "scheduler.job_removed":
+    "[スケジューラー] Job削除 JobId: {{jobId}}",
+  "scheduler.job_stopped":
+    "[スケジューラー] Job停止 JobId: {{jobId}}",
   "scheduler.job_scheduled":
     "[スケジューラー] Jobスケジュール完了 JobId: {{jobId}}",
   // Bump リマインダーのスケジューリング/復元ログ
@@ -98,7 +119,7 @@ export const system = {
   "scheduler.bump_reminder_cancelling":
     "[Bumpリマインダー機能] 既存リマインダーをキャンセル中 GuildId: {{guildId}}",
   "scheduler.bump_reminder_cancelled":
-    "[Bumpリマインダー機能] リマインダーをキャンセルしました GuildId: {{guildId}}",
+    "[Bumpリマインダー機能] リマインダーをキャンセルしました。 GuildId: {{guildId}}",
   "scheduler.bump_reminder_executing_immediately":
     "[Bumpリマインダー機能] 期限切れリマインダーを即座に実行 GuildId: {{guildId}}",
   "scheduler.bump_reminders_restored":
@@ -108,9 +129,9 @@ export const system = {
   "scheduler.bump_reminder_sent":
     "[Bumpリマインダー機能] リマインダーを送信 GuildId: {{guildId}} ChannelId: {{channelId}}",
   "scheduler.bump_reminder_channel_not_found":
-    "[Bumpリマインダー機能] チャンネルが見つかりません GuildId: {{guildId}} ChannelId: {{channelId}}",
+    "[Bumpリマインダー機能] チャンネルが見つかりません。 GuildId: {{guildId}} ChannelId: {{channelId}}",
   "scheduler.bump_reminder_disabled":
-    "[Bumpリマインダー機能] 無効化されています GuildId: {{guildId}}",
+    "[Bumpリマインダー機能] 無効化されています。 GuildId: {{guildId}}",
   "scheduler.bump_reminder_restore_failed":
     "[Bumpリマインダー機能] 復元に失敗:",
   "scheduler.bump_reminder_duplicates_cancelled":
@@ -135,30 +156,34 @@ export const system = {
     "[Bot] {{signal}} を受信、適切にシャットダウンしています...",
   "shutdown.already_in_progress":
     "[Bot] {{signal}} を受信しましたが、シャットダウンは既に進行中です。",
-  "shutdown.cleanup_complete": "[Bot] クリーンアップ完了。",
-  "shutdown.cleanup_failed": "[Bot] クリーンアップ中のエラー:",
-  "shutdown.gracefully": "[Bot] 適切にシャットダウンしています...",
-  "shutdown.sigterm": "[Bot] SIGTERMを受信、シャットダウンしています...",
+  "shutdown.cleanup_complete":
+    "[Bot] クリーンアップ完了",
+  "shutdown.cleanup_failed":
+    "[Bot] クリーンアップ中のエラー:",
+  "shutdown.gracefully":
+    "[Bot] 適切にシャットダウンしています...",
+  "shutdown.sigterm":
+    "[Bot] SIGTERMを受信、シャットダウンしています...",
 
   // データベース操作ログ
   // Prisma クライアント
   "database.prisma_not_available":
-    "[データベース] Prismaクライアントが利用できません",
+    "[データベース] Prismaクライアントが利用できません。",
   // GuildConfig 操作ログ
   "database.get_config_log":
     "[データベース] 設定取得に失敗 GuildId: {{guildId}}",
   "database.save_config_log":
     "[データベース] 設定保存に失敗 GuildId: {{guildId}}",
   "database.saved_config":
-    "[データベース] 設定を保存しました GuildId: {{guildId}}",
+    "[データベース] 設定を保存 GuildId: {{guildId}}",
   "database.update_config_log":
     "[データベース] 設定更新に失敗 GuildId: {{guildId}}",
   "database.updated_config":
-    "[データベース] 設定を更新しました GuildId: {{guildId}}",
+    "[データベース] 設定を更新 GuildId: {{guildId}}",
   "database.delete_config_log":
     "[データベース] 設定削除に失敗 GuildId: {{guildId}}",
   "database.deleted_config":
-    "[データベース] 設定を削除しました GuildId: {{guildId}}",
+    "[データベース] 設定を削除 GuildId: {{guildId}}",
   "database.check_existence_log":
     "[データベース] 存在確認に失敗 GuildId: {{guildId}}",
 
@@ -248,10 +273,14 @@ export const system = {
   // 起動完了時のサマリーログ
   "ready.bot_ready":
     "[Bot] ✅ Botの準備が完了しました！ {{tag}} としてログイン",
-  "ready.servers": "[Bot] 📊 サーバー数: {{count}}",
-  "ready.users": "[Bot] 👥 ユーザー数: {{count}}",
-  "ready.commands": "[Bot] 💬 コマンド数: {{count}}",
-  "ready.event_registered": "  ✓ {{name}}",
+  "ready.servers":
+    "[Bot] 📊 サーバー数: {{count}}",
+  "ready.users":
+    "[Bot] 👥 ユーザー数: {{count}}",
+  "ready.commands":
+    "[Bot] 💬 コマンド数: {{count}}",
+  "ready.event_registered":
+    "  ✓ {{name}}",
 
   // インタラクションイベントログ
   // command / modal / button / select 実行トレース
@@ -323,44 +352,59 @@ export const system = {
     "[VAC機能] 起動クリーンアップ完了 トリガー {{removedTriggers}} 件・チャンネル {{removedChannels}} 件を削除",
   "vac.startup_cleanup_done_none":
     "[VAC機能] 起動クリーンアップ完了 不整合なし",
-  "vac.voice_state_update_failed": "[VAC機能] voiceStateUpdate処理失敗",
+  "vac.voice_state_update_failed":
+    "[VAC機能] voiceStateUpdate処理失敗",
   "vac.channel_created":
     "[VAC機能] VCチャンネル作成 GuildId: {{guildId}} ChannelId: {{channelId}} OwnerId: {{ownerId}}",
   "vac.channel_deleted":
     "[VAC機能] VCチャンネル削除 GuildId: {{guildId}} ChannelId: {{channelId}}",
   "vac.category_full":
-    "[VAC機能] カテゴリがチャンネル上限に達しました GuildId: {{guildId}} CategoryId: {{categoryId}}",
+    "[VAC機能] カテゴリがチャンネル上限に達しました。 GuildId: {{guildId}} CategoryId: {{categoryId}}",
   "vac.trigger_removed_by_delete":
     "[VAC機能] 削除されたトリガーチャンネルを設定から除外 GuildId: {{guildId}} ChannelId: {{channelId}}",
-  "vac.channel_delete_sync_failed": "[VAC機能] channelDelete同期処理失敗",
-  "vac.panel_send_failed": "[VAC機能] 操作パネル送信失敗",
-  "vac.startup_cleanup_failed": "[VAC機能] 起動時クリーンアップ失敗",
+  "vac.channel_delete_sync_failed":
+    "[VAC機能] channelDelete同期処理失敗",
+  "vac.panel_send_failed":
+    "[VAC機能] 操作パネル送信失敗",
+  "vac.startup_cleanup_failed":
+    "[VAC機能] 起動時クリーンアップ失敗",
 
   // Webサーバー
   // 起動/例外処理
   // web.auth_* は API ミドルウェアの認証分岐と対応付ける
-  "web.server_started": "[Webサーバー] 起動 URL: {{url}}",
-  "web.startup_error": "[Webサーバー] 起動エラー:",
-  "web.unhandled_rejection": "[Webサーバー] 未処理のPromise拒否:",
-  "web.uncaught_exception": "[Webサーバー] 未処理の例外:",
-  "web.startup_failed": "[Webサーバー] 起動失敗:",
-  "web.api_error": "[Webサーバー] APIエラー:",
-  "web.internal_server_error": "[Webサーバー] 内部サーバーエラー",
+  "web.server_started":
+    "[Webサーバー] 起動 URL: {{url}}",
+  "web.startup_error":
+    "[Webサーバー] 起動エラー:",
+  "web.unhandled_rejection":
+    "[Webサーバー] 未処理のPromise拒否:",
+  "web.uncaught_exception":
+    "[Webサーバー] 未処理の例外:",
+  "web.startup_failed":
+    "[Webサーバー] 起動失敗:",
+  "web.api_error":
+    "[Webサーバー] APIエラー:",
+  "web.internal_server_error":
+    "[Webサーバー] 内部サーバーエラー",
   // API認証（Bearer API Key）
   // 認証結果ログとAPI応答文言
   "web.auth_unauthorized":
     "[Webサーバー] [Auth] 未認証リクエスト Method: {{method}} URL: {{url}}",
   "web.auth_invalid_token":
     "[Webサーバー] [Auth] 無効なトークン Method: {{method}} URL: {{url}}",
-  "web.auth_unauthorized_error": "Unauthorized",
-  "web.auth_forbidden_error": "Forbidden",
+  "web.auth_unauthorized_error":
+    "Unauthorized",
+  "web.auth_forbidden_error":
+    "Forbidden",
   // Authorization ヘッダー不足/不正時の利用者向けガイダンス
   "web.auth_header_required":
-    "Authorization: Bearer <api-key> ヘッダーが必要です",
-  "web.auth_invalid_token_message": "無効なトークンです",
+    "Authorization: Bearer <api-key> ヘッダーが必要です。",
+  "web.auth_invalid_token_message":
+    "無効なトークンです。",
 
   // Discord エラー通知
-  "discord.error_notification_title": "🚨 {{appName}} エラー通知",
+  "discord.error_notification_title":
+    "🚨 {{appName}} エラー通知",
 
   // メンバーログ機能ログ
   // guildMemberAdd/Remove イベント処理結果ログ
@@ -371,11 +415,12 @@ export const system = {
   "member-log.notification_failed":
     "[メンバーログ機能] 通知送信失敗 GuildId: {{guildId}}",
   "member-log.channel_not_found":
-    "[メンバーログ機能] チャンネルが見つかりません GuildId: {{guildId}} ChannelId: {{channelId}}",
+    "[メンバーログ機能] チャンネルが見つかりません。 GuildId: {{guildId}} ChannelId: {{channelId}}",
   // 設定コマンド操作ログ
   "member-log.config_set_channel":
     "[メンバーログ機能] チャンネル設定 GuildId: {{guildId}} ChannelId: {{channelId}}",
-  "member-log.config_enabled": "[メンバーログ機能] 有効化 GuildId: {{guildId}}",
+  "member-log.config_enabled":
+    "[メンバーログ機能] 有効化 GuildId: {{guildId}}",
   "member-log.config_disabled":
     "[メンバーログ機能] 無効化 GuildId: {{guildId}}",
   "member-log.config_join_message_set":
