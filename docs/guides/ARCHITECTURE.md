@@ -127,13 +127,13 @@ src/
 
 ### 設計原則
 
-| ルール | 理由 |
-| -- | -- |
-| `src/bot/` → `src/shared/` への依存のみ許可 | Bot と Web の疎結合を維持 |
-| `src/web/` → `src/shared/` への依存のみ許可 | 同上 |
-| `src/shared/` は Bot・Web どちらにも依存しない | 共有コードの独立性を保証 |
-| 共有可能な機能ロジックは `src/shared/features/<機能名>/` に配置 | Bot/Web での再利用性を維持 |
-| Bot専用機能は `src/bot/features/<機能名>/` に配置 | Discord依存・Bot専用責務の混在を防止 |
+| ルール                                                          | 理由                                 |
+| --------------------------------------------------------------- | ------------------------------------ |
+| `src/bot/` → `src/shared/` への依存のみ許可                     | Bot と Web の疎結合を維持            |
+| `src/web/` → `src/shared/` への依存のみ許可                     | 同上                                 |
+| `src/shared/` は Bot・Web どちらにも依存しない                  | 共有コードの独立性を保証             |
+| 共有可能な機能ロジックは `src/shared/features/<機能名>/` に配置 | Bot/Web での再利用性を維持           |
+| Bot専用機能は `src/bot/features/<機能名>/` に配置               | Discord依存・Bot専用責務の混在を防止 |
 
 ### src整備フェーズの運用境界
 
@@ -208,12 +208,26 @@ class BotClient extends Client {
 
 `src/bot/commands/` と `src/bot/events/` 内のファイルは、**バレルファイルなし**で自動ロードされます。
 
-| ローダー | スキャン対象 | 判定条件 |
-| -- | -- | -- |
+| ローダー                         | スキャン対象            | 判定条件                  |
+| -------------------------------- | ----------------------- | ------------------------- |
 | `src/bot/utils/commandLoader.ts` | `src/bot/commands/*.ts` | `data` + `execute` を持つ |
-| `src/bot/utils/eventLoader.ts` | `src/bot/events/*.ts` | `name` + `execute` を持つ |
+| `src/bot/utils/eventLoader.ts`   | `src/bot/events/*.ts`   | `name` + `execute` を持つ |
 
 **コマンド追加手順**: `src/bot/commands/<name>.ts` に `Command` 型を満たすオブジェクトをエクスポートするだけで、配列への手動追加は不要です。
+
+> **tsup `splitting` と `import.meta.dirname` の注意点**
+>
+> tsup の `splitting: true` が有効なとき、複数エントリーから参照される関数は `dist/chunk-XXXXXXXX.js` のような共有チャンクに移動する。この場合、関数内の `import.meta.dirname` はチャンクの置き場所（`dist/` 直下）を返すため、ローダー内でパスを解決すると実際のディレクトリ（`dist/bot/commands/`）とずれる。
+>
+> これを防ぐため、`loadCommands()` と `loadEvents()` は **ディレクトリパスを引数で受け取る**設計になっている。`bot/main.ts`（`dist/bot/main.js` にコンパイルされるため `import.meta.dirname` が確実に `dist/bot/` を返す）から正しいパスを渡す：
+>
+> ```typescript
+> // src/bot/main.ts
+> const commands = await loadCommands(resolve(import.meta.dirname, "commands")); // → dist/bot/commands/
+> const events = await loadEvents(resolve(import.meta.dirname, "events")); // → dist/bot/events/
+> ```
+>
+> ローダー関数内で `import.meta.dirname` を使ってパスを解決してはいけない。将来新しいローダーを追加する場合も同様に呼び出し元からパスを渡すこと。
 
 ```typescript
 // src/bot/commands/hello.ts
@@ -286,13 +300,13 @@ const afkConfig = safeJsonParse<AfkConfig>(record.afkConfig);
 
 **各設定の型**:
 
-| フィールド名 | 型 | 用途 |
-| -- | -- | -- |
-| `afkConfig` | `AfkConfig` | enabled フラグ + AFKチャンネルID |
-| `bumpReminderConfig` | `BumpReminderConfig` | Bump通知の enabled + mention設定 |
-| `vacConfig` | `VacConfig` | VC自動作成設定 |
-| `memberLogConfig` | `MemberLogConfig` | メンバーログ設定（未実装） |
-| `stickMessages` | `StickMessage[]` | 固定メッセージ一覧 （専用テーブル `sticky_messages` に移行済み） |
+| フィールド名         | 型                   | 用途                                                             |
+| -------------------- | -------------------- | ---------------------------------------------------------------- |
+| `afkConfig`          | `AfkConfig`          | enabled フラグ + AFKチャンネルID                                 |
+| `bumpReminderConfig` | `BumpReminderConfig` | Bump通知の enabled + mention設定                                 |
+| `vacConfig`          | `VacConfig`          | VC自動作成設定                                                   |
+| `memberLogConfig`    | `MemberLogConfig`    | メンバーログ設定（未実装）                                       |
+| `stickMessages`      | `StickMessage[]`     | 固定メッセージ一覧 （専用テーブル `sticky_messages` に移行済み） |
 
 ---
 
@@ -300,10 +314,10 @@ const afkConfig = safeJsonParse<AfkConfig>(record.afkConfig);
 
 `JobScheduler` は2種類のジョブをサポートします。
 
-| 種別 | メソッド | 仕組み | 用途 |
-| -- | -- | -- | -- |
-| 繰り返しジョブ | `addJob()` | node-cron | 定期実行タスク |
-| 1回限りジョブ | `addOneTimeJob()` | setTimeout + `.unref()` | Bump リマインダー等 |
+| 種別           | メソッド          | 仕組み                  | 用途                |
+| -------------- | ----------------- | ----------------------- | ------------------- |
+| 繰り返しジョブ | `addJob()`        | node-cron               | 定期実行タスク      |
+| 1回限りジョブ  | `addOneTimeJob()` | setTimeout + `.unref()` | Bump リマインダー等 |
 
 `setTimeout` に `.unref()` を呼び出しているため、**タイマーが残っていても Node.js プロセスは正常終了**できます。
 
@@ -324,11 +338,11 @@ Bot 起動
 
 ### エンドポイント一覧
 
-| メソッド | パス | 認証 | 説明 |
-| -- | -- | -- | -- |
-| `GET` | `/health` | なし | サーバー稼働確認 |
-| `GET` | `/ready` | なし | DB 接続確認（起動完了チェック用） |
-| `GET` | `/api/*` | Bearer | API ルート（未実装） |
+| メソッド | パス      | 認証   | 説明                              |
+| -------- | --------- | ------ | --------------------------------- |
+| `GET`    | `/health` | なし   | サーバー稼働確認                  |
+| `GET`    | `/ready`  | なし   | DB 接続確認（起動完了チェック用） |
+| `GET`    | `/api/*`  | Bearer | API ルート（未実装）              |
 
 ### `/health` レスポンス例
 
@@ -362,10 +376,10 @@ Bot 起動
 
 ### CORS
 
-| 環境 | 許可オリジン |
-| -- | -- |
-| 開発（`NODE_ENV=development`） | すべて許可 |
-| 本番（`NODE_ENV=production`） | `CORS_ORIGIN` 環境変数をカンマ区切りで指定 |
+| 環境                           | 許可オリジン                               |
+| ------------------------------ | ------------------------------------------ |
+| 開発（`NODE_ENV=development`） | すべて許可                                 |
+| 本番（`NODE_ENV=production`）  | `CORS_ORIGIN` 環境変数をカンマ区切りで指定 |
 
 ---
 
@@ -375,25 +389,25 @@ Bot 起動
 
 すべて `BaseError` を継承しています。
 
-| クラス | statusCode | 用途 |
-| -- | -- | -- |
-| `ValidationError` | 400 | 入力値バリデーション失敗 |
-| `PermissionError` | 403 | 権限不足 |
-| `NotFoundError` | 404 | リソースが見つからない |
-| `TimeoutError` | 408 | タイムアウト |
-| `RateLimitError` | 429 | レート制限 |
-| `ConfigurationError` | 500 | 設定ミス（環境変数等） |
-| `DatabaseError` | 500 | DB 操作失敗 |
-| `DiscordApiError` | 500 | Discord API エラー |
+| クラス               | statusCode | 用途                     |
+| -------------------- | ---------- | ------------------------ |
+| `ValidationError`    | 400        | 入力値バリデーション失敗 |
+| `PermissionError`    | 403        | 権限不足                 |
+| `NotFoundError`      | 404        | リソースが見つからない   |
+| `TimeoutError`       | 408        | タイムアウト             |
+| `RateLimitError`     | 429        | レート制限               |
+| `ConfigurationError` | 500        | 設定ミス（環境変数等）   |
+| `DatabaseError`      | 500        | DB 操作失敗              |
+| `DiscordApiError`    | 500        | Discord API エラー       |
 
 ### `isOperational` フラグ
 
 `BaseError` は `isOperational: boolean` を持ちます。
 
-| 値 | 意味 | ログレベル |
-| -- | -- | -- |
-| `true` (デフォルト) | 想定済みの運用エラー（ユーザー操作ミス等） | `warn` |
-| `false` | プログラミングエラー・バグ | `error` |
+| 値                  | 意味                                       | ログレベル |
+| ------------------- | ------------------------------------------ | ---------- |
+| `true` (デフォルト) | 想定済みの運用エラー（ユーザー操作ミス等） | `warn`     |
+| `false`             | プログラミングエラー・バグ                 | `error`    |
 
 `isOperational: false` のエラーはバグの可能性があるため、本番環境ではユーザーに詳細を返しません。
 
