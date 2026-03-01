@@ -380,6 +380,40 @@ describe("bot/features/member-log/handlers/guildMemberRemoveHandler", () => {
         "system:member-log.leave_notification_sent",
       );
     });
+
+    // joinedTimestamp が undefined（number | null 型に対して TypeScript 上 undefined は来ないが、
+    // 実行時には起き得る）の場合に stayDays の `?? 0` フォールバックが動作することを確認する
+    it("sends embed when joinedTimestamp is undefined at runtime (covers ?? 0 branch)", async () => {
+      const { handleGuildMemberRemove } =
+        await import("@/bot/features/member-log/handlers/guildMemberRemoveHandler");
+      getMemberLogConfigMock.mockResolvedValue({
+        enabled: true,
+        channelId: "ch-1",
+        leaveMessage: null,
+      });
+      const channel = makeTextChannel();
+      // makeGuildMember ヘルパーは undefined を渡すとデフォルト値を使ってしまうため、
+      // joinedTimestamp: undefined を直接持つオブジェクトを構築する
+      const member = {
+        user: {
+          id: "user-1",
+          displayName: "TestUser",
+          createdTimestamp: new Date("2021-06-15").getTime(),
+          displayAvatarURL: vi.fn(() => "https://cdn.example.com/avatar.png"),
+        },
+        guild: {
+          id: "guild-1",
+          memberCount: 99,
+          channels: { cache: new Map([["ch-1", channel]]) },
+        },
+        joinedTimestamp: undefined,
+        _channel: channel,
+      };
+
+      await handleGuildMemberRemove(member as never);
+
+      expect(channel.send).toHaveBeenCalled();
+    });
   });
 
   // エラー発生時に Bot がクラッシュしないことを検証

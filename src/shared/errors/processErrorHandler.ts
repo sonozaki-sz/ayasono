@@ -84,14 +84,14 @@ export const setupGlobalErrorHandlers = (): void => {
   process.on(
     PROCESS_ERROR_CONSTANTS.PROCESS_EVENT.WARNING,
     (warning: Error & { code?: string }) => {
+      /* c8 ignore start -- IGNORED_DEPRECATION_CODES は現在空のため構造上到達不可 */
       if (
         warning.name === "DeprecationWarning" &&
         IGNORED_DEPRECATION_CODES.has(warning.code ?? "")
       ) {
-        /* c8 ignore start */
         return;
-        /* c8 ignore stop */
       }
+      /* c8 ignore stop */
       logger.warn(tDefault("system:error.node_warning"), {
         name: warning.name,
         message: warning.message,

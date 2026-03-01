@@ -66,4 +66,20 @@ describe("eventLoader", () => {
       expect(names).toContain(expectedName);
     }
   });
+
+  // events ディレクトリが存在しない場合に ENOENT を詳細メッセージ付きで再スローすることを確認
+  it("存在しないパスを指定すると ENOENT 専用メッセージで投げる", async () => {
+    await expect(
+      loadEvents("/absolutely/nonexistent/xyz/events"),
+    ).rejects.toThrow("[eventLoader]");
+  });
+
+  // ENOENT 以外のエラー（ファイルをパスに指定 → ENOTDIR）はそのまま再スローすることを確認
+  it("ENOENT 以外のファイルシステムエラーはそのまま再スローする", async () => {
+    const thisFilePath = new URL(import.meta.url).pathname;
+    await expect(loadEvents(thisFilePath)).rejects.not.toThrow(
+      "[eventLoader]",
+    );
+    await expect(loadEvents(thisFilePath)).rejects.toThrow();
+  });
 });

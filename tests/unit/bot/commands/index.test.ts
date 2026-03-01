@@ -77,4 +77,21 @@ describe("commandLoader", () => {
       expect(names).toContain(expectedName);
     }
   });
+
+  // commands ディレクトリが存在しない場合に ENOENT を詳細メッセージ付きで再スローすることを確認
+  it("存在しないパスを指定すると ENOENT 専用メッセージで投げる", async () => {
+    await expect(
+      loadCommands("/absolutely/nonexistent/xyz/commands"),
+    ).rejects.toThrow("[commandLoader]");
+  });
+
+  // ENOENT 以外のエラー（ファイルをパスに指定 → ENOTDIR）はそのまま再スローすることを確認
+  it("ENOENT 以外のファイルシステムエラーはそのまま再スローする", async () => {
+    // import.meta.url はこのファイル自体のパス（ファイルなのでディレクトリとして読もうとすると ENOTDIR）
+    const thisFilePath = new URL(import.meta.url).pathname;
+    await expect(loadCommands(thisFilePath)).rejects.not.toThrow(
+      "[commandLoader]",
+    );
+    await expect(loadCommands(thisFilePath)).rejects.toThrow();
+  });
 });

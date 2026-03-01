@@ -82,6 +82,9 @@ export const stickyMessageUpdateEmbedModalHandler: ModalHandler = {
       return;
     }
 
+    // ガード（line 70）で embedTitle と embedDescription が両方 falsy な場合は already return されるため、
+    // ?? "" のフォールバックは構造上到達しない
+    /* c8 ignore next */
     const content = embedDescription ?? embedTitle ?? "";
 
     const service = getBotStickyMessageConfigService();

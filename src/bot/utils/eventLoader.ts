@@ -66,8 +66,7 @@ export async function loadEvents(
 
     for (const [key, value] of Object.entries(mod)) {
       // default export は named export と同一オブジェクトになるためスキップして重複を防ぐ
-      if (key === "default") continue;
-      if (isBotEvent(value)) {
+      if (key !== "default" && isBotEvent(value)) {
         events.push(value);
       }
     }
