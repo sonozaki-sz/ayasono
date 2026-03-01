@@ -13,20 +13,19 @@ export const events = {
   "bump-reminder.panel.title": "Bump Reminder",
   "bump-reminder.panel.scheduled_at":
     "Reminder will be sent <t:{{timestamp}}:R>.",
-  // Panel button labels (mention register/unregister)
-  "bump-reminder.panel.button_mention_on": "Register Mention",
-  "bump-reminder.panel.button_mention_off": "Unregister Mention",
+  // Panel button labels (notification on/off)
+  "bump-reminder.panel.button_mention_on": "Receive Notifications",
+  "bump-reminder.panel.button_mention_off": "Don't Receive Notifications",
   // Panel action result messages
   "bump-reminder.panel.mention_added":
-    "{{user}} has been added to bump reminder mentions.",
+    "{{user}} has been added to the notification list.",
   "bump-reminder.panel.mention_removed":
-    "{{user}} has been removed from bump reminder mentions.",
+    "{{user}} has been removed from the notification list.",
   "bump-reminder.panel.already_added":
-    "You are already in the bump reminder mention list.",
-  "bump-reminder.panel.not_in_list":
-    "You are not in the bump reminder mention list.",
+    "You are already in the notification list.",
+  "bump-reminder.panel.not_in_list": "You are not in the notification list.",
   "bump-reminder.panel.success_title": "Settings Updated",
-  "bump-reminder.panel.error": "Failed to update mention settings",
+  "bump-reminder.panel.error": "Failed to update the notification list.",
 
   // Member log feature embeds
   // Join notification embed field labels and footer
