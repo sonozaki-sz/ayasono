@@ -46,5 +46,14 @@ export default defineConfig({
   platform: "node",
   target: "node24",
   // コマンド・イベントファイルを個別チャンクで出力するためコード分割を有効化
+  //
+  // ⚠️  splitting: true を使うと、複数エントリから参照される関数は
+  //    dist/chunk-XXXXXXXX.js のような共有チャンクに移動する。
+  //    その場合、関数内の import.meta.dirname はチャンクの置き場所
+  //    （dist/ 直下）になり、相対パスで隣接ディレクトリを参照すると
+  //    実際のパスとずれる。
+  //    ファイルシステムのパスに依存する関数は、呼び出し元
+  //    （例: bot/main.ts）から import.meta.dirname を基準とした
+  //    絶対パスを引数として渡すこと。
   splitting: true,
 });

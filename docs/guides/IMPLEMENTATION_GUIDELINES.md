@@ -212,13 +212,13 @@ await interaction.followUp({
 
 ステータス通知（エラー・警告・情報・成功）には、`src/bot/utils/messageResponse.ts` のユーティリティ関数を使う。
 
-| 関数 | ステータス | タイトル自動付与 | カラー |
-| -- | -- | -- | -- |
-| `createSuccessEmbed(description)` | success | `✅ 成功` | 緑 |
-| `createInfoEmbed(description)` | info | `ℹ️ 情報` | 青 |
-| `createWarningEmbed(description)` | warning | `⚠️ 警告` | 黄 |
-| `createErrorEmbed(description)` | error | `❌ エラー` | 赤 |
-| `createStatusEmbed(status, title, description)` | 任意 | 任意（絵文字は自動プレフィックス） | status依存 |
+| 関数                                            | ステータス | タイトル自動付与                   | カラー     |
+| ----------------------------------------------- | ---------- | ---------------------------------- | ---------- |
+| `createSuccessEmbed(description)`               | success    | `✅ 成功`                          | 緑         |
+| `createInfoEmbed(description)`                  | info       | `ℹ️ 情報`                          | 青         |
+| `createWarningEmbed(description)`               | warning    | `⚠️ 警告`                          | 黄         |
+| `createErrorEmbed(description)`                 | error      | `❌ エラー`                        | 赤         |
+| `createStatusEmbed(status, title, description)` | 任意       | 任意（絵文字は自動プレフィックス） | status依存 |
 
 #### ⚠️ 絵文字の二重付加に注意
 
@@ -243,12 +243,12 @@ await interaction.editReply({
 
 #### 使い分け
 
-| 用途 | 手段 | 必須/任意 |
-| -- | -- | -- |
-| バリデーションエラー・権限エラー等のフィードバック | `create*Embed` ユーティリティ | **必須** |
-| 情報・成功通知 | `create*Embed` ユーティリティ | **必須** |
-| カスタムレイアウトが必要なドメイン固有Embed（削除サマリー等） | `new EmbedBuilder()` を直接使用 | 任意 |
-| ダイアログ本文・確認メッセージ等（Embed でなくてよい） | `content:` に文字列 | 任意 |
+| 用途                                                          | 手段                            | 必須/任意 |
+| ------------------------------------------------------------- | ------------------------------- | --------- |
+| バリデーションエラー・権限エラー等のフィードバック            | `create*Embed` ユーティリティ   | **必須**  |
+| 情報・成功通知                                                | `create*Embed` ユーティリティ   | **必須**  |
+| カスタムレイアウトが必要なドメイン固有Embed（削除サマリー等） | `new EmbedBuilder()` を直接使用 | 任意      |
+| ダイアログ本文・確認メッセージ等（Embed でなくてよい）        | `content:` に文字列             | 任意      |
 
 `new EmbedBuilder().setTitle(tDefault("..."))` の場合はユーティリティを経由しないため、ロケール文字列中に絵文字を含めても二重にはならない。
 
@@ -265,10 +265,10 @@ new EmbedBuilder().setTitle(tDefault("commands:foo.embed.summary_title"));
 
 ### ファイル名
 
-| 対象 | 規則 | 例 |
-| -- | -- | -- |
-| ソースファイル（基本） | camelCase | `guildConfig.ts`, `memberLogService.ts` |
-| SlashCommand 系ファイル | kebab-case | `afk-config.ts`, `bump-reminder.ts` |
+| 対象                    | 規則       | 例                                      |
+| ----------------------- | ---------- | --------------------------------------- |
+| ソースファイル（基本）  | camelCase  | `guildConfig.ts`, `memberLogService.ts` |
+| SlashCommand 系ファイル | kebab-case | `afk-config.ts`, `bump-reminder.ts`     |
 
 - SlashCommand 系とは `src/bot/commands/` 配下のコマンドエントリファイルを指す
 - それ以外の `features/`, `services/`, `handlers/`, `shared/` 等は camelCase を使う
@@ -417,6 +417,7 @@ src整備スプリントでは、次の順序を固定する。
 - [ ] `create*Embed` ユーティリティに渡すロケール文字列に絵文字を含めていない（絵文字はタイトルに自動付与されるため二重になる）
 - [ ] （src整備時）再分析 → コメント反映 → ドキュメント同期 → TODO同期の順序を守っている
 - [ ] **Dockerfile / docker-compose / deploy.yml を変更した場合は `docker build --target runner .` でローカルビルドが通ることを確認している**（[詳細](DEPLOYMENT.md#️⃣-6-dockerデプロイ関連ファイルの変更ルール)）
+- [ ] **ファイルシステムのパスに `import.meta.dirname` を使う関数を新たに追加する場合、tsup の `splitting: true` でチャンクに移動される可能性があるため、パスは引数で受け取り呼び出し元（`main.ts` 等）から渡す**（[詳細](ARCHITECTURE.md#コマンドイベントの自動ロード)）
 
 ---
 

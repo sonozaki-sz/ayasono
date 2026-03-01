@@ -2,7 +2,7 @@
 
 > SSH + GitHub Actions による ayasono のデプロイフロー詳細
 
-最終更新: 2026年2月28日（Portainer API → SSH デプロイに移行）
+最終更新: 2026年3月1日（`ENOENT: scandir '/app/commands'` トラブルシューティング追加）
 
 ---
 
@@ -32,20 +32,20 @@ main へ push / PR マージ
 
 ### トリガー条件
 
-| イベント | 実行されるジョブ |
-| -- | -- |
-| `main` / `develop` へ直接 push | Test + Deploy（main のみ）+ Discord 通知 |
-| `main` / `develop` への PR オープン・更新 | Test のみ |
-| `main` への PR がマージ完了 | Test + Deploy + Discord 通知 |
+| イベント                                  | 実行されるジョブ                         |
+| ----------------------------------------- | ---------------------------------------- |
+| `main` / `develop` へ直接 push            | Test + Deploy（main のみ）+ Discord 通知 |
+| `main` / `develop` への PR オープン・更新 | Test のみ                                |
+| `main` への PR がマージ完了               | Test + Deploy + Discord 通知             |
 
 ### ジョブ構成
 
-| ジョブ | 条件 | 内容 |
-| -- | -- | -- |
-| `test` | push/PR すべて（close 除く） | pnpm typecheck + pnpm test |
-| `deploy` | main への push のみ | GHCR イメージビルド + SSH デプロイ |
-| `notify-success` | deploy 成功時 | Discord に成功 Embed を送信 |
-| `notify-failure` | test または deploy 失敗時 | Discord に失敗 Embed を送信 |
+| ジョブ           | 条件                         | 内容                               |
+| ---------------- | ---------------------------- | ---------------------------------- |
+| `test`           | push/PR すべて（close 除く） | pnpm typecheck + pnpm test         |
+| `deploy`         | main への push のみ          | GHCR イメージビルド + SSH デプロイ |
+| `notify-success` | deploy 成功時                | Discord に成功 Embed を送信        |
+| `notify-failure` | test または deploy 失敗時    | Discord に失敗 Embed を送信        |
 
 ---
 
@@ -68,10 +68,10 @@ main へ push / PR マージ
 
 `docker/build-push-action` を使って `Dockerfile` の `runner` ステージをビルドし、以下のタグで GHCR にプッシュする。
 
-| タグ | 用途 |
-| -- | -- |
+| タグ                                 | 用途               |
+| ------------------------------------ | ------------------ |
 | `ghcr.io/sonozaki-sz/ayasono:latest` | VPS が参照するタグ |
-| `ghcr.io/sonozaki-sz/ayasono:<SHA>` | ロールバック用 |
+| `ghcr.io/sonozaki-sz/ayasono:<SHA>`  | ロールバック用     |
 
 GitHub Actions のキャッシュ（`cache-from/cache-to: type=gha`）によりビルド時間を短縮している。
 
@@ -192,6 +192,27 @@ docker exec ayasono-bot ls -la /app/storage/
 
 > **恒久対応済み**: `docker-entrypoint.sh` がコンテナ起動時に自動で `chown -R node:node /app/storage` を実行するよう修正済み。次回デプロイ後は自動的に解消される。
 
+### `ENOENT: no such file or directory, scandir '/app/commands'` が発生する
+
+**症状**: Bot コンテナ起動直後に以下のエラーでクラッシュする。
+
+```
+Error: ENOENT: no such file or directory, scandir '/app/commands'
+  at loadCommands (dist/chunk-XXXXXXXX.js:...)
+```
+
+**原因**: tsup の `splitting: true` により `loadCommands` / `loadEvents` のコードが共有チャンク（`dist/chunk-XXXXXXXX.js`）に移動したとき、関数内の `import.meta.dirname` がチャンクの置き場所（`/app/dist/`）を返す。相対パス `../commands` を解決すると存在しない `/app/commands` になる。
+
+**対処済み（2026-03-01）**: `loadCommands()` / `loadEvents()` はディレクトリパスを引数で受け取る設計に変更済み。`main.ts`（= `/app/dist/bot/main.js`）から `import.meta.dirname` を基準にした正しいパスを渡している。
+
+**同様の問題が再発した場合**: `src/bot/main.ts` で `loadCommands()` / `loadEvents()` を呼ぶ際に明示パスが渡されているか確認する。
+
+```typescript
+// 正しい呼び出し（main.ts の import.meta.dirname = dist/bot/）
+const commands = await loadCommands(resolve(import.meta.dirname, "commands"));
+const events = await loadEvents(resolve(import.meta.dirname, "events"));
+```
+
 ### Discord 通知の Portainer リンクが機能しない
 
 - `PORTAINER_HOST` / `PORTAINER_ENDPOINT_ID` が正しく設定されているか確認
@@ -205,11 +226,11 @@ docker exec ayasono-bot ls -la /app/storage/
 
 ### 対象ファイル
 
-| ファイル | ローカルテスト方法 |
-| -- | -- |
-| `Dockerfile` | `docker build --target runner .` が成功すること |
-| `docker-compose.prod.yml` | `docker compose -f docker-compose.prod.yml config` でバリデーションが通ること |
-| `docker-compose.infra.yml` | `docker compose -f docker-compose.infra.yml config` でバリデーションが通ること |
+| ファイル                       | ローカルテスト方法                                                                  |
+| ------------------------------ | ----------------------------------------------------------------------------------- |
+| `Dockerfile`                   | `docker build --target runner .` が成功すること                                     |
+| `docker-compose.prod.yml`      | `docker compose -f docker-compose.prod.yml config` でバリデーションが通ること       |
+| `docker-compose.infra.yml`     | `docker compose -f docker-compose.infra.yml config` でバリデーションが通ること      |
 | `.github/workflows/deploy.yml` | [act](https://github.com/nektos/act) または PR を作成してテストジョブを確認すること |
 
 > **ローカルで `docker-compose.prod.yml config` を実行する場合の注意**
