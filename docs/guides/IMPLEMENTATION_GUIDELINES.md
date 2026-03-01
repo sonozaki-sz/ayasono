@@ -162,7 +162,8 @@ src/bot/features/<feature-name>/
 - import は常に実体モジュールを直接参照する
   - 例: `../locale/localeManager`, `../utils/logger`, `../../database/types`
 - 入口ファイルは `index.ts` ではなく役割名ファイルを使う
-  - 例: `commands.ts`, `events.ts`, `apiRoutes.ts`, `handleInteractionCreate.ts`, `resources.ts`
+  - 例: `apiRoutes.ts`, `handleInteractionCreate.ts`, `resources.ts`
+  - `src/bot/commands/` と `src/bot/events/` は **バレル不要**。`commandLoader.ts` / `eventLoader.ts` がディレクトリを自動スキャンするため、ファイルを追加するだけで自動登録される
 - 参照先を変更した場合は、関連テストの `vi.mock()` / `import()` パスも実解決先へ追従する
 
 ### import / モック追従ルール（2026-02-22 追加）
@@ -211,13 +212,13 @@ await interaction.followUp({
 
 ステータス通知（エラー・警告・情報・成功）には、`src/bot/utils/messageResponse.ts` のユーティリティ関数を使う。
 
-| 関数                                            | ステータス | タイトル自動付与                   | カラー     |
-| ----------------------------------------------- | ---------- | ---------------------------------- | ---------- |
-| `createSuccessEmbed(description)`               | success    | `✅ 成功`                          | 緑         |
-| `createInfoEmbed(description)`                  | info       | `ℹ️ 情報`                          | 青         |
-| `createWarningEmbed(description)`               | warning    | `⚠️ 警告`                          | 黄         |
-| `createErrorEmbed(description)`                 | error      | `❌ エラー`                        | 赤         |
-| `createStatusEmbed(status, title, description)` | 任意       | 任意（絵文字は自動プレフィックス） | status依存 |
+| 関数 | ステータス | タイトル自動付与 | カラー |
+| -- | -- | -- | -- |
+| `createSuccessEmbed(description)` | success | `✅ 成功` | 緑 |
+| `createInfoEmbed(description)` | info | `ℹ️ 情報` | 青 |
+| `createWarningEmbed(description)` | warning | `⚠️ 警告` | 黄 |
+| `createErrorEmbed(description)` | error | `❌ エラー` | 赤 |
+| `createStatusEmbed(status, title, description)` | 任意 | 任意（絵文字は自動プレフィックス） | status依存 |
 
 #### ⚠️ 絵文字の二重付加に注意
 
@@ -242,12 +243,12 @@ await interaction.editReply({
 
 #### 使い分け
 
-| 用途                                                          | 手段                            | 必須/任意 |
-| ------------------------------------------------------------- | ------------------------------- | --------- |
-| バリデーションエラー・権限エラー等のフィードバック            | `create*Embed` ユーティリティ   | **必須**  |
-| 情報・成功通知                                                | `create*Embed` ユーティリティ   | **必須**  |
-| カスタムレイアウトが必要なドメイン固有Embed（削除サマリー等） | `new EmbedBuilder()` を直接使用 | 任意      |
-| ダイアログ本文・確認メッセージ等（Embed でなくてよい）        | `content:` に文字列             | 任意      |
+| 用途 | 手段 | 必須/任意 |
+| -- | -- | -- |
+| バリデーションエラー・権限エラー等のフィードバック | `create*Embed` ユーティリティ | **必須** |
+| 情報・成功通知 | `create*Embed` ユーティリティ | **必須** |
+| カスタムレイアウトが必要なドメイン固有Embed（削除サマリー等） | `new EmbedBuilder()` を直接使用 | 任意 |
+| ダイアログ本文・確認メッセージ等（Embed でなくてよい） | `content:` に文字列 | 任意 |
 
 `new EmbedBuilder().setTitle(tDefault("..."))` の場合はユーティリティを経由しないため、ロケール文字列中に絵文字を含めても二重にはならない。
 
@@ -264,10 +265,10 @@ new EmbedBuilder().setTitle(tDefault("commands:foo.embed.summary_title"));
 
 ### ファイル名
 
-| 対象                    | 規則       | 例                                      |
-| ----------------------- | ---------- | --------------------------------------- |
-| ソースファイル（基本）  | camelCase  | `guildConfig.ts`, `memberLogService.ts` |
-| SlashCommand 系ファイル | kebab-case | `afk-config.ts`, `bump-reminder.ts`     |
+| 対象 | 規則 | 例 |
+| -- | -- | -- |
+| ソースファイル（基本） | camelCase | `guildConfig.ts`, `memberLogService.ts` |
+| SlashCommand 系ファイル | kebab-case | `afk-config.ts`, `bump-reminder.ts` |
 
 - SlashCommand 系とは `src/bot/commands/` 配下のコマンドエントリファイルを指す
 - それ以外の `features/`, `services/`, `handlers/`, `shared/` 等は camelCase を使う
@@ -406,6 +407,7 @@ src整備スプリントでは、次の順序を固定する。
 - [ ] 処理ブロックの意図コメントがある
 - [ ] テストの全 `it()` ブロックの直前に `//` コメントがある
 - [ ] 新機能実装時は `bot/commands/`・`bot/events/`・`bot/services/*DependencyResolver.ts` のテストも作成している（[テストチェックリスト参照](TESTING_GUIDELINES.md#-新機能テスト実装チェックリスト)）
+  - `bot/commands/<name>.ts` と `bot/events/<name>.ts` は **バレルへの手動追加不要**。ファイルを置くだけで `commandLoader.ts` / `eventLoader.ts` が自動ロードする
 - [ ] `pnpm test:coverage` で Stmts/Funcs/Lines 100%・Branches 99%以上を確認した
 - [ ] `typecheck` が通る
 - [ ] ユーザー向け応答文字列（`editReply` / `followUp` / `reply` の `content`・ボタンラベル・Embedタイトル/説明文等）に生文字列をハードコードしていない

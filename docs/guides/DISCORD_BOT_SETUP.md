@@ -39,10 +39,10 @@
 
 **Bot** ページ下部の **Privileged Gateway Intents** で以下 **2つ** を有効にする。
 
-| Intent                     | 用途                                                 |
-| -------------------------- | ---------------------------------------------------- |
-| **Server Members Intent**  | メンバーの参加・退出イベント取得（メンバーログ機能） |
-| **Message Content Intent** | メッセージ本文の読み取り（Bump 検知）                |
+| Intent | 用途 |
+| -- | -- |
+| **Server Members Intent** | メンバーの参加・退出イベント取得（メンバーログ機能） |
+| **Message Content Intent** | メッセージ本文の読み取り（Bump 検知） |
 
 > これらを有効にしないと、Bump 検知・メンバーログ機能が動作しない。
 
@@ -62,23 +62,23 @@
 1. 左メニュー → **OAuth2** → **URL Generator**
 2. **SCOPES** で以下を選択:
 
-| Scope                   | 用途                     |
-| ----------------------- | ------------------------ |
-| `bot`                   | Bot としてサーバーに参加 |
+| Scope | 用途 |
+| -- | -- |
+| `bot` | Bot としてサーバーに参加 |
 | `applications.commands` | スラッシュコマンドを登録 |
 
 3. **BOT PERMISSIONS** で以下を選択:
 
-| 権限                     | 用途                                                     |
-| ------------------------ | -------------------------------------------------------- |
-| View Channels            | チャンネルの閲覧（基本動作）                             |
-| Send Messages            | メッセージ送信                                           |
-| Send Messages in Threads | スレッド内メッセージ送信                                 |
-| Embed Links              | Embed 形式での送信                                       |
-| Read Message History     | メッセージ履歴の読み取り（Bump 検知）                    |
-| Manage Messages          | メッセージの削除（スティッキーメッセージ・一括削除機能） |
-| Manage Channels          | チャンネルの作成・削除（VAC 機能）                       |
-| Move Members             | メンバーの VC 移動（AFK 機能）                           |
+| 権限 | 用途 |
+| -- | -- |
+| View Channels | チャンネルの閲覧（基本動作） |
+| Send Messages | メッセージ送信 |
+| Send Messages in Threads | スレッド内メッセージ送信 |
+| Embed Links | Embed 形式での送信 |
+| Read Message History | メッセージ履歴の読み取り（Bump 検知） |
+| Manage Messages | メッセージの削除（スティッキーメッセージ・一括削除機能） |
+| Manage Channels | チャンネルの作成・削除（VAC 機能） |
+| Move Members | メンバーの VC 移動（AFK 機能） |
 
 ### 4-2. 招待 URL の生成とサーバー追加
 

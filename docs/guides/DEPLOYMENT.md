@@ -32,33 +32,31 @@ main へ push / PR マージ
 
 ### トリガー条件
 
-| イベント                                  | 実行されるジョブ                         |
-| ----------------------------------------- | ---------------------------------------- |
-| `main` / `develop` へ直接 push            | Test + Deploy（main のみ）+ Discord 通知 |
-| `main` / `develop` への PR オープン・更新 | Test のみ                                |
-| `main` への PR がマージ完了               | Test + Deploy + Discord 通知             |
+| イベント | 実行されるジョブ |
+| -- | -- |
+| `main` / `develop` へ直接 push | Test + Deploy（main のみ）+ Discord 通知 |
+| `main` / `develop` への PR オープン・更新 | Test のみ |
+| `main` への PR がマージ完了 | Test + Deploy + Discord 通知 |
 
 ### ジョブ構成
 
-| ジョブ           | 条件                         | 内容                               |
-| ---------------- | ---------------------------- | ---------------------------------- |
-| `test`           | push/PR すべて（close 除く） | pnpm typecheck + pnpm test         |
-| `deploy`         | main への push のみ          | GHCR イメージビルド + SSH デプロイ |
-| `notify-success` | deploy 成功時                | Discord に成功 Embed を送信        |
-| `notify-failure` | test または deploy 失敗時    | Discord に失敗 Embed を送信        |
+| ジョブ | 条件 | 内容 |
+| -- | -- | -- |
+| `test` | push/PR すべて（close 除く） | pnpm typecheck + pnpm test |
+| `deploy` | main への push のみ | GHCR イメージビルド + SSH デプロイ |
+| `notify-success` | deploy 成功時 | Discord に成功 Embed を送信 |
+| `notify-failure` | test または deploy 失敗時 | Discord に失敗 Embed を送信 |
 
 ---
 
 ## 🔑 2. 必要な GitHub Secrets
 
-| Secret 名               | 内容                                                                        |
-| ----------------------- | --------------------------------------------------------------------------- |
-| `SSH_HOST`              | VPS の IP アドレス（例: `220.158.17.101`）                                  |
-| `SSH_USER`              | SSH ユーザー名（例: `deploy`）                                              |
-| `SSH_PRIVATE_KEY`       | デプロイ用 SSH 秘密鍵（`-----BEGIN OPENSSH PRIVATE KEY-----` から末尾まで） |
-| `PORTAINER_HOST`        | VPS の IP アドレス（Discord 通知の Portainer リンク用）                     |
-| `PORTAINER_ENDPOINT_ID` | Portainer エンドポイント ID（Discord 通知のリンク用）                       |
-| `DISCORD_WEBHOOK_URL`   | Discord の Webhook URL                                                      |
+- **`SSH_HOST`**: VPS の IP アドレス（例: `220.158.17.101`）
+- **`SSH_USER`**: SSH ユーザー名（例: `deploy`）
+- **`SSH_PRIVATE_KEY`**: デプロイ用 SSH 秘密鍵（`-----BEGIN OPENSSH PRIVATE KEY-----` から末尾まで）
+- **`PORTAINER_HOST`**: VPS の IP アドレス（Discord 通知の Portainer リンク用）
+- **`PORTAINER_ENDPOINT_ID`**: Portainer エンドポイント ID（Discord 通知のリンク用）
+- **`DISCORD_WEBHOOK_URL`**: Discord の Webhook URL
 
 > `PORTAINER_HOST` と `PORTAINER_ENDPOINT_ID` の2つはデプロイには使用しない。Discord 通知の Portainer 管理リンク生成のみに使用する。
 
@@ -70,10 +68,10 @@ main へ push / PR マージ
 
 `docker/build-push-action` を使って `Dockerfile` の `runner` ステージをビルドし、以下のタグで GHCR にプッシュする。
 
-| タグ                                 | 用途               |
-| ------------------------------------ | ------------------ |
+| タグ | 用途 |
+| -- | -- |
 | `ghcr.io/sonozaki-sz/ayasono:latest` | VPS が参照するタグ |
-| `ghcr.io/sonozaki-sz/ayasono:<SHA>`  | ロールバック用     |
+| `ghcr.io/sonozaki-sz/ayasono:<SHA>` | ロールバック用 |
 
 GitHub Actions のキャッシュ（`cache-from/cache-to: type=gha`）によりビルド時間を短縮している。
 
@@ -207,11 +205,11 @@ docker exec ayasono-bot ls -la /app/storage/
 
 ### 対象ファイル
 
-| ファイル                       | ローカルテスト方法                                                                  |
-| ------------------------------ | ----------------------------------------------------------------------------------- |
-| `Dockerfile`                   | `docker build --target runner .` が成功すること                                     |
-| `docker-compose.prod.yml`      | `docker compose -f docker-compose.prod.yml config` でバリデーションが通ること       |
-| `docker-compose.infra.yml`     | `docker compose -f docker-compose.infra.yml config` でバリデーションが通ること      |
+| ファイル | ローカルテスト方法 |
+| -- | -- |
+| `Dockerfile` | `docker build --target runner .` が成功すること |
+| `docker-compose.prod.yml` | `docker compose -f docker-compose.prod.yml config` でバリデーションが通ること |
+| `docker-compose.infra.yml` | `docker compose -f docker-compose.infra.yml config` でバリデーションが通ること |
 | `.github/workflows/deploy.yml` | [act](https://github.com/nektos/act) または PR を作成してテストジョブを確認すること |
 
 > **ローカルで `docker-compose.prod.yml config` を実行する場合の注意**
