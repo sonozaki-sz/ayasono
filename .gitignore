@@ -145,7 +145,6 @@ vite.config.ts.timestamp-*
 # Prisma
 *.db
 *.db-journal
-prisma/migrations/**/migration.sql
 
 # Database
 storage/*.sqlite
