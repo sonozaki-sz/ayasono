@@ -337,7 +337,7 @@ await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
 
   ```
   [Embed: 通知時刻表示]
-  [Button: メンション登録] [Button: メンション解除]
+  [Button: 通知を受け取る] [Button: 通知を受け取らない]
   ```
 
   - 理由: 既にEmbed形式であり、ボタンUIとの組み合わせが機能的
