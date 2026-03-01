@@ -26,6 +26,7 @@ export default {
         "revert", // コミットの revert
         "merge", // マージコミット
         "release", // develop → main リリースコミット
+        "i18n", // 国際化・ローカライズ関連の変更
       ],
     ],
     // subject は小文字で始めることを強制しない（日本語対応）

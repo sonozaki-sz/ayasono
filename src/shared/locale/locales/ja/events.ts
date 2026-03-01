@@ -14,20 +14,18 @@ export const events = {
   "bump-reminder.panel.title": "Bumpリマインダー機能",
   "bump-reminder.panel.scheduled_at":
     "<t:{{timestamp}}:R>にリマインドが通知されます。",
-  // パネルボタンラベル（メンション登録/解除）
-  "bump-reminder.panel.button_mention_on": "メンション登録",
-  "bump-reminder.panel.button_mention_off": "メンション解除",
+  // パネルボタンラベル（通知受け取り ON/OFF）
+  "bump-reminder.panel.button_mention_on": "通知を受け取る",
+  "bump-reminder.panel.button_mention_off": "通知を受け取らない",
   // パネル操作結果（追加/削除/状態通知）
   "bump-reminder.panel.mention_added":
-    "{{user}} をBumpリマインダーのメンションリストに追加しました。",
+    "{{user}} をBump通知リストに登録しました。",
   "bump-reminder.panel.mention_removed":
-    "{{user}} をBumpリマインダーのメンションリストから削除しました。",
-  "bump-reminder.panel.already_added":
-    "既にBumpリマインダーのメンションリストに登録されています。",
-  "bump-reminder.panel.not_in_list":
-    "Bumpリマインダーのメンションリストに登録されていません。",
+    "{{user}} をBump通知リストから解除しました。",
+  "bump-reminder.panel.already_added": "既にBump通知リストに登録されています。",
+  "bump-reminder.panel.not_in_list": "Bump通知リストに登録されていません。",
   "bump-reminder.panel.success_title": "設定完了",
-  "bump-reminder.panel.error": "メンション設定の更新に失敗しました",
+  "bump-reminder.panel.error": "Bump通知リストの更新に失敗しました。",
 
   // メンバーログ機能のEmbed
   // 参加通知Embedのフィールドラベル・フッター

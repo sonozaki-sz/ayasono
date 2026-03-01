@@ -52,6 +52,9 @@
     // REST Client (API開発・テスト用)
     "humao.rest-client",
 
+    // Markdown Mermaid プレビュー
+    "bierner.markdown-mermaid",
+
     // Docker
     "ms-azuretools.vscode-docker",
 

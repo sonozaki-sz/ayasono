@@ -64,9 +64,9 @@ export const commands = {
   "bump-reminder-config.embed.set_mention_role_success":
     "Mention role set to {{role}}",
   "bump-reminder-config.embed.set_mention_user_added":
-    "Added {{user}} to mention list",
+    "Added {{user}} to notification list",
   "bump-reminder-config.embed.set_mention_user_removed":
-    "Removed {{user}} from mention list",
+    "Removed {{user}} from notification list",
   "bump-reminder-config.embed.set_mention_error_title": "Input Error",
   "bump-reminder-config.embed.set_mention_error":
     "Please specify a role or user",
@@ -77,7 +77,7 @@ export const commands = {
   "bump-reminder-config.embed.remove_mention_all":
     "All mention settings have been removed",
   "bump-reminder-config.embed.remove_mention_select":
-    "Removed the following users from mention list:\n{{users}}",
+    "Removed the following users from notification list:\n{{users}}",
   "bump-reminder-config.embed.remove_mention_error_title": "Deletion Error",
   "bump-reminder-config.embed.remove_mention_error_no_users":
     "No users are registered to remove",
