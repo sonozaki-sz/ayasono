@@ -3,9 +3,11 @@ export default {
   extends: ["@commitlint/config-conventional"],
   // "Merge: <branch> → <target>" 形式の手動マージコミットをスキップ
   // PR スカッシュマージ時に生成される複合 type（例: "test/ci:" や "chore/feat/docs:"）も許容
+  // GitHub PR スカッシュマージコミット（"subject (#NNN)" 形式）は develop→main 時の再チェックをスキップ
   ignores: [
     (commit) => /^Merge: .+ → .+/.test(commit),
     (commit) => /^(\w+\/)+\w+:/.test(commit),
+    (commit) => /\(#\d+\)$/.test(commit.split("\n")[0]),
   ],
   rules: {
     // type の許可リスト（Conventional Commits 標準 + このプロジェクト独自）
@@ -26,7 +28,6 @@ export default {
         "revert", // コミットの revert
         "merge", // マージコミット
         "release", // develop → main リリースコミット
-        "i18n", // 国際化・ローカライズ関連の変更
       ],
     ],
     // subject は小文字で始めることを強制しない（日本語対応）

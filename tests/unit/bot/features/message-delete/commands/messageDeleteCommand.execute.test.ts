@@ -594,6 +594,20 @@ describe("bot/features/message-delete/commands/messageDeleteCommand.execute", ()
     expect(guild.channels.fetch).toHaveBeenCalled();
   });
 
+  // allChannels に null を含む場合（Discord API が null チャンネルを返すケース）、
+  // ch !== null フィルタにより除外されて処理が継続することを確認する
+  it("null チャンネルを含む全チャンネルでも正常にフィルタして処理する", async () => {
+    const { executeMessageDeleteCommand } =
+      await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
+    // null チャンネルを含む collection を返す guild を使う
+    const guild = makeGuild({ channels: [null, makeChannel()] as never });
+    const interaction = createInteraction({ channelOption: null, guild });
+
+    await executeMessageDeleteCommand(interaction as never);
+
+    expect(guild.channels.fetch).toHaveBeenCalled();
+  });
+
   // days オプション指定時に afterTs が現在時刻から計算されて deleteMessages に渡されることを検証
   it("days オプションが指定された場合 after タイムスタンプが計算される", async () => {
     const { executeMessageDeleteCommand } =
