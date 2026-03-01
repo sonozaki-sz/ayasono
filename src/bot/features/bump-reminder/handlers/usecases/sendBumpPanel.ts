@@ -105,7 +105,7 @@ function createBumpPanelButtons(
     new ButtonBuilder()
       .setCustomId(`${BUMP_CONSTANTS.CUSTOM_ID_PREFIX.MENTION_OFF}${guildId}`)
       .setLabel(tGuild("events:bump-reminder.panel.button_mention_off"))
-      .setStyle(ButtonStyle.Danger)
+      .setStyle(ButtonStyle.Secondary)
       .setEmoji("🔕"),
   );
 }
