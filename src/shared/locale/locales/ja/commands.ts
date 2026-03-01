@@ -64,9 +64,9 @@ export const commands = {
   "bump-reminder-config.embed.set_mention_role_success":
     "メンションロールを {{role}} に設定しました",
   "bump-reminder-config.embed.set_mention_user_added":
-    "{{user}} をメンションリストに追加しました",
+    "{{user}} を通知リストに登録しました",
   "bump-reminder-config.embed.set_mention_user_removed":
-    "{{user}} をメンションリストから削除しました",
+    "{{user}} を通知リストから解除しました",
   "bump-reminder-config.embed.set_mention_error_title": "入力エラー",
   "bump-reminder-config.embed.set_mention_error":
     "ロールまたはユーザーを指定してください",
@@ -77,7 +77,7 @@ export const commands = {
   "bump-reminder-config.embed.remove_mention_all":
     "全てのメンション設定を削除しました",
   "bump-reminder-config.embed.remove_mention_select":
-    "以下のユーザーをメンションリストから削除しました：\n{{users}}",
+    "以下のユーザーを通知リストから解除しました：\n{{users}}",
   "bump-reminder-config.embed.remove_mention_error_title": "削除エラー",
   "bump-reminder-config.embed.remove_mention_error_no_users":
     "削除するユーザーが登録されていません",
