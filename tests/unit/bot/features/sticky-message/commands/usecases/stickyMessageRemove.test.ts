@@ -63,7 +63,14 @@ function createInteractionMock({
     guild: guildChannels
       ? {
           channels: {
-            cache: new Map([["ch-1", { messages: { fetch: fetchMsgMock } }]]),
+            fetch: vi.fn(async (id: string) =>
+              id === "ch-1"
+                ? {
+                    type: ChannelType.GuildText,
+                    messages: { fetch: fetchMsgMock },
+                  }
+                : null,
+            ),
           },
         }
       : null,

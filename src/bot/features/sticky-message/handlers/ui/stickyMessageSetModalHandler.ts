@@ -2,6 +2,7 @@
 // sticky-message set モーダル送信処理（プレーンテキスト入力）
 
 import {
+  ChannelType,
   MessageFlags,
   type ModalSubmitInteraction,
   type TextChannel,
@@ -92,10 +93,14 @@ export const stickyMessageSetModalHandler: ModalHandler = {
       return;
     }
 
-    // Guild テキストチャンネル取得
-    const textChannel = guild.channels.cache.get(channelId) as
-      | TextChannel
-      | undefined;
+    // Guild テキストチャンネル取得（キャッシュ未登録でも API で取得）
+    const fetchedSetChannel = await guild.channels
+      .fetch(channelId)
+      .catch(() => null);
+    const textChannel =
+      fetchedSetChannel?.type === ChannelType.GuildText
+        ? (fetchedSetChannel as TextChannel)
+        : undefined;
     if (!textChannel) {
       throw new ValidationError(
         await tGuild(

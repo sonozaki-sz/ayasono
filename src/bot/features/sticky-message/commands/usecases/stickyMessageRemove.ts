@@ -73,11 +73,15 @@ export async function handleStickyMessageRemove(
     return;
   }
 
-  // チャンネルの最後のスティッキーメッセージを削除
+  // チャンネルの最後のスティッキーメッセージを削除（キャッシュ未登録でも API で取得）
   if (existing.lastMessageId) {
-    const textChannel = interaction.guild?.channels.cache.get(
-      channelOption.id,
-    ) as TextChannel | undefined;
+    const fetchedRemoveChannel = await interaction.guild?.channels
+      .fetch(channelOption.id)
+      .catch(() => null);
+    const textChannel =
+      fetchedRemoveChannel?.type === ChannelType.GuildText
+        ? (fetchedRemoveChannel as TextChannel)
+        : undefined;
     if (textChannel) {
       try {
         const msg = await textChannel.messages.fetch(existing.lastMessageId);
