@@ -91,6 +91,7 @@ function makeGuildMember(
 ) {
   const channel = makeTextChannel();
   const channelId = overrides.channelId ?? "ch-1";
+  const channelMap = new Map<string, unknown>([[channelId, channel]]);
   return {
     user:
       overrides.user !== undefined
@@ -105,7 +106,8 @@ function makeGuildMember(
       id: "guild-1",
       memberCount: overrides.memberCount ?? 99,
       channels: {
-        cache: new Map([[channelId, channel]]),
+        fetch: vi.fn(async (id: string) => channelMap.get(id) ?? null),
+        _map: channelMap,
       },
     },
     joinedTimestamp:
@@ -167,7 +169,7 @@ describe("bot/features/member-log/handlers/guildMemberRemoveHandler", () => {
       expect(member._channel.send).not.toHaveBeenCalled();
     });
 
-    // チャンネルが cache に存在しない場合に logger.warn が呼ばれることを確認
+    // チャンネルが fetch で見つからない場合に logger.warn が呼ばれることを確認
     it("warns and returns early when channel is not in cache", async () => {
       const { handleGuildMemberRemove } =
         await import("@/bot/features/member-log/handlers/guildMemberRemoveHandler");
@@ -195,7 +197,7 @@ describe("bot/features/member-log/handlers/guildMemberRemoveHandler", () => {
       });
       const member = makeGuildMember();
       const voiceChannel = { type: ChannelType.GuildVoice, send: vi.fn() };
-      (member.guild.channels.cache as Map<string, unknown>).set(
+      (member.guild.channels._map as Map<string, unknown>).set(
         "ch-voice",
         voiceChannel,
       );
@@ -404,7 +406,11 @@ describe("bot/features/member-log/handlers/guildMemberRemoveHandler", () => {
         guild: {
           id: "guild-1",
           memberCount: 99,
-          channels: { cache: new Map([["ch-1", channel]]) },
+          channels: {
+            fetch: vi.fn(async (id: string) =>
+              id === "ch-1" ? channel : null,
+            ),
+          },
         },
         joinedTimestamp: undefined,
         _channel: channel,

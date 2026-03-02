@@ -1,6 +1,6 @@
 // tests/unit/bot/features/sticky-message/handlers/ui/stickyMessageSetEmbedModalHandler.test.ts
 
-import { MessageFlags } from "discord.js";
+import { ChannelType, MessageFlags } from "discord.js";
 
 const findByChannelMock = vi.fn();
 const createMock = vi.fn();
@@ -24,7 +24,10 @@ vi.mock(
     parseColorStr: parseColorStrMock,
   }),
 );
-vi.mock("@/shared/locale/localeManager", () => ({ tGuild: tGuildMock, tDefault: vi.fn((key: string) => key) }));
+vi.mock("@/shared/locale/localeManager", () => ({
+  tGuild: tGuildMock,
+  tDefault: vi.fn((key: string) => key),
+}));
 vi.mock("@/shared/utils/logger", () => ({ logger: loggerMock }));
 vi.mock("@/bot/utils/messageResponse", () => ({
   createWarningEmbed: vi.fn((msg: string) => ({ type: "warning", msg })),
@@ -50,14 +53,20 @@ function createInteractionMock({
 } = {}) {
   const replyMock = vi.fn().mockResolvedValue(undefined);
   const sendMock = vi.fn().mockResolvedValue(sendResult);
-  const textChannel = channelInCache ? { send: sendMock } : null;
+  const textChannel = channelInCache
+    ? { type: ChannelType.GuildText, send: sendMock }
+    : null;
   return {
     customId,
     reply: replyMock,
     guild: guild
       ? {
           id: "guild-1",
-          channels: { cache: new Map([["ch-1", textChannel]]) },
+          channels: {
+            fetch: vi.fn(async (id: string) =>
+              id === "ch-1" ? textChannel : null,
+            ),
+          },
         }
       : null,
     fields: {
