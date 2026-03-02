@@ -128,7 +128,7 @@ describe("shared/features/sticky-message/stickyMessageConfigService", () => {
 
   it("deleteByChannel delegates to repository", async () => {
     const repo = createRepoMock();
-    repo.deleteByChannel.mockResolvedValue(undefined);
+    repo.deleteByChannel.mockResolvedValue(0);
 
     const { StickyMessageConfigService } = await loadModule();
     const service = new StickyMessageConfigService(repo as never);
@@ -144,29 +144,5 @@ describe("shared/features/sticky-message/stickyMessageConfigService", () => {
 
     const service = createStickyMessageConfigService(repo as never);
     expect(service).toBeInstanceOf(StickyMessageConfigService);
-  });
-
-  // set より前に get を呼び出した場合は例外となり、初期化前アクセスを防止していることを確認
-  it("getStickyMessageConfigService throws when not initialized", async () => {
-    const { getStickyMessageConfigService } = await loadModule();
-
-    expect(() => getStickyMessageConfigService()).toThrow(
-      "StickyMessageConfigService is not initialized",
-    );
-  });
-
-  // set → get のライフサイクルで同一インスタンスが返ることを確認し、シングルトン登録の一貫性を検証する
-  it("setStickyMessageConfigService and getStickyMessageConfigService work together", async () => {
-    const repo = createRepoMock();
-    const {
-      createStickyMessageConfigService,
-      setStickyMessageConfigService,
-      getStickyMessageConfigService,
-    } = await loadModule();
-
-    const service = createStickyMessageConfigService(repo as never);
-    setStickyMessageConfigService(service);
-
-    expect(getStickyMessageConfigService()).toBe(service);
   });
 });

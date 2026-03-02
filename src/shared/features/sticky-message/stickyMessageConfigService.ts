@@ -8,8 +8,6 @@ import type {
 
 export type { StickyMessage };
 
-let cachedService: StickyMessageConfigService | undefined;
-
 /**
  * スティッキーメッセージの永続化アクセスを担当するサービス
  */
@@ -78,7 +76,7 @@ export class StickyMessageConfigService {
   /**
    * チャンネルに紐づくスティッキーメッセージ設定を削除する
    */
-  async deleteByChannel(channelId: string): Promise<void> {
+  async deleteByChannel(channelId: string): Promise<number> {
     return this.repository.deleteByChannel(channelId);
   }
 }
@@ -90,25 +88,4 @@ export function createStickyMessageConfigService(
   repository: IStickyMessageRepository,
 ): StickyMessageConfigService {
   return new StickyMessageConfigService(repository);
-}
-
-/**
- * キャッシュ済みのサービスを登録する（composition root から呼び出す）
- */
-export function setStickyMessageConfigService(
-  service: StickyMessageConfigService,
-): void {
-  cachedService = service;
-}
-
-/**
- * キャッシュ済みのサービスを取得する
- */
-export function getStickyMessageConfigService(): StickyMessageConfigService {
-  if (!cachedService) {
-    throw new Error(
-      "StickyMessageConfigService is not initialized. Call setStickyMessageConfigService in composition root first.",
-    );
-  }
-  return cachedService;
 }

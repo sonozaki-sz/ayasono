@@ -266,7 +266,7 @@ export interface IStickyMessageRepository {
     updatedBy?: string,
   ): Promise<StickyMessage>;
   delete(id: string): Promise<void>;
-  deleteByChannel(channelId: string): Promise<void>;
+  deleteByChannel(channelId: string): Promise<number>;
 }
 
 /**

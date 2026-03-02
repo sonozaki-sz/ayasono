@@ -27,10 +27,13 @@ export async function handleStickyMessageChannelDelete(
 
   // DB にレコードがあれば削除する
   try {
-    await getBotStickyMessageConfigService().deleteByChannel(channelId);
-    logger.debug(
-      tDefault("system:sticky-message.channel_delete_cleanup", { channelId }),
-    );
+    const deleted =
+      await getBotStickyMessageConfigService().deleteByChannel(channelId);
+    if (deleted > 0) {
+      logger.debug(
+        tDefault("system:sticky-message.channel_delete_cleanup", { channelId }),
+      );
+    }
   } catch (err) {
     logger.error(
       tDefault("system:sticky-message.channel_delete_cleanup_failed", {
