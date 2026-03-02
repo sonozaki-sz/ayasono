@@ -3,10 +3,17 @@
 
 /** UI コンポーネントの customId 定数 */
 export const MSG_DEL_CUSTOM_ID = {
-  // 確認ダイアログ
+  // 確認ダイアログ（プレビュー）
   CONFIRM_YES: "msgdel_confirm_yes",
   CONFIRM_NO: "msgdel_confirm_no",
   CONFIRM_SKIP_TOGGLE: "msgdel_confirm_skip_toggle",
+  CONFIRM_EXCLUDE: "msgdel_confirm_exclude",
+  // 最終確認ダイアログ
+  FINAL_YES: "msgdel_final_yes",
+  FINAL_BACK: "msgdel_final_back",
+  FINAL_NO: "msgdel_final_no",
+  FINAL_PREV: "msgdel_final_prev",
+  FINAL_NEXT: "msgdel_final_next",
   // ページネイション
   PREV: "msgdel_prev",
   NEXT: "msgdel_next",
