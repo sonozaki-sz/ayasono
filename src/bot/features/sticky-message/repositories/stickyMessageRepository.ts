@@ -109,8 +109,8 @@ export class StickyMessageRepository implements IStickyMessageRepository {
     );
   }
 
-  async deleteByChannel(channelId: string): Promise<void> {
-    await executeWithDatabaseError(
+  async deleteByChannel(channelId: string): Promise<number> {
+    const result = await executeWithDatabaseError(
       () =>
         this.prisma.stickyMessage.deleteMany({
           where: { channelId },
@@ -119,6 +119,7 @@ export class StickyMessageRepository implements IStickyMessageRepository {
         channelId,
       }),
     );
+    return result.count;
   }
 }
 

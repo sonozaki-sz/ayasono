@@ -63,7 +63,7 @@
 
 **仕様書**: [docs/specs/MEMBER_LOG_SPEC.md](docs/specs/MEMBER_LOG_SPEC.md)
 
-#### 1.4 メッセージ削除機能 - ✅ 完了
+#### 1.4 メッセージ削除機能 - ✅ 完了（新仕様移行中）
 
 - [x] `/message-delete` コマンド実装（user / bot / keyword / count / days / after / before / channel オプション）
 - [x] 容認範囲内チャンネル削除（channel 未指定時は現在チャンネル）
@@ -72,12 +72,20 @@
 - [x] 削除結果表示（Embed形式）
 - [x] 権限チェック（MANAGE_MESSAGES）
 - [x] テスト実装
+- [ ] 🔄 **新仕様移行**: 確認ダイアログを2段階構成（プレビュー + 最終確認）に刷新
+  - [ ] 削除前プレスキャン（事前スキャン → プレビューダイアログ表示）
+  - [ ] プレビューダイアログ（フィルター・除外機能・5件/ページページネーション）
+  - [ ] 最終確認ダイアログ（除外後の対象一覧・`⚠️ この操作は取り消せません`）
+  - [ ] `/message-delete-config confirm` スキップ設定の廃止
+  - [ ] 削除後の詳細表示（ページネーション付き）の廃止 → 完了メッセージのみに変更
 
-**仕様書**: [docs/specs/MESSAGE_DELETE_SPEC.md](docs/specs/MESSAGE_DELETE_SPEC.md)
+**仕様書（旧）**: [docs/specs/MESSAGE_DELETE_SPEC.md](docs/specs/MESSAGE_DELETE_SPEC.md)
+**仕様書（新）**: [docs/specs/MESSAGE_DELETE_SPEC_V2.md](docs/specs/MESSAGE_DELETE_SPEC_V2.md)
 
 #### 1.5 VC募集機能 - 残6件
 
 - [ ] `/vc-recruit-config` コマンド実装（setup / teardown / add-role / remove-role / view）
+  - [ ] `teardown` サブコマンド: `category` オプションを廃止し、StringSelectMenu → 確認パネル → 撤去処理の新UIフローに変更
 - [ ] パネルチャンネル・投稿チャンネルの自動作成・権限設定
 - [ ] ボタン→モーダル→セレクトメニューの2ステップ募集フロー
 - [ ] 新規VC作成・設定パネル送信・全員退出時の自動削除
@@ -213,6 +221,11 @@
 - [x] コードコメント充実
 - [ ] 未使用コード・デッドコード削除
 - [ ] 一貫性のあるエラーメッセージ
+
+### 設計見直し
+
+- [ ] `/message-delete-config confirm` のスキップ設定を廃止する（メッセージ削除は不可逆操作のため、確認ダイアログは必須とすべき）→ **新仕様（V2）で対応予定**（[MESSAGE_DELETE_SPEC_V2.md](docs/specs/MESSAGE_DELETE_SPEC_V2.md) 参照）
+- [ ] `teardown` サブコマンドの UI を StringSelectMenu + 確認パネルに変更 → **新仕様で対応予定**（[VC_RECRUIT_SPEC.md](docs/specs/VC_RECRUIT_SPEC.md) 参照）
 
 ### アーキテクチャ
 

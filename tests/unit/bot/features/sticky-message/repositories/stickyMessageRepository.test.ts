@@ -196,15 +196,16 @@ describe("bot/features/sticky-message/repositories/stickyMessageRepository", () 
 
   it("deleteByChannel delegates to prisma.stickyMessage.deleteMany", async () => {
     const prisma = createPrismaMock();
-    prisma.stickyMessage.deleteMany.mockResolvedValue(undefined);
+    prisma.stickyMessage.deleteMany.mockResolvedValue({ count: 1 });
 
     const { StickyMessageRepository } = await loadModule();
     const repo = new StickyMessageRepository(prisma as never);
-    await repo.deleteByChannel("ch-1");
+    const count = await repo.deleteByChannel("ch-1");
 
     expect(prisma.stickyMessage.deleteMany).toHaveBeenCalledWith({
       where: { channelId: "ch-1" },
     });
+    expect(count).toBe(1);
   });
 
   it("getStickyMessageRepository throws when not initialized without prisma", async () => {
