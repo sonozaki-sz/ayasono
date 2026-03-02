@@ -4,7 +4,7 @@ import { VAC_CONFIG_COMMAND } from "@/bot/features/vac/commands/vacConfigCommand
 import { ChannelType } from "discord.js";
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  tGuild: vi.fn(async (_guildId: string, _key: string) => "TOP"),
+  tDefault: vi.fn((_key: string) => "TOP"),
 }));
 
 type CategoryLike = { id: string; name: string; type: ChannelType };
