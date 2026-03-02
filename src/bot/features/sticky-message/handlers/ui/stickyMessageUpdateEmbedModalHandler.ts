@@ -2,6 +2,7 @@
 // sticky-message update（Embed 形式）モーダル送信処理
 
 import {
+  ChannelType,
   MessageFlags,
   type ModalSubmitInteraction,
   type TextChannel,
@@ -127,9 +128,13 @@ export const stickyMessageUpdateEmbedModalHandler: ModalHandler = {
         interaction.user.id,
       );
 
-      const textChannel = guild.channels.cache.get(channelId) as
-        | TextChannel
-        | undefined;
+      const fetchedUpdateEmbedChannel = await guild.channels
+        .fetch(channelId)
+        .catch(() => null);
+      const textChannel =
+        fetchedUpdateEmbedChannel?.type === ChannelType.GuildText
+          ? (fetchedUpdateEmbedChannel as TextChannel)
+          : undefined;
 
       if (textChannel && existing.lastMessageId) {
         // 古いスティッキーメッセージを削除する

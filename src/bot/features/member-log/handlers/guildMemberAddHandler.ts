@@ -50,8 +50,8 @@ export async function handleGuildMemberAdd(member: GuildMember): Promise<void> {
       return;
     }
 
-    // 通知先チャンネルを取得
-    const channel = member.guild.channels.cache.get(config.channelId);
+    // 通知先チャンネルを取得（キャッシュ未登録の場合も API で取得）
+    const channel = await member.guild.channels.fetch(config.channelId);
     if (!channel || channel.type !== ChannelType.GuildText) {
       // チャンネルが見つからない場合はスキップ
       logger.warn(

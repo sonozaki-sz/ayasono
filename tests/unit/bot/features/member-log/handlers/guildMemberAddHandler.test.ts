@@ -83,6 +83,7 @@ function makeTextChannel(overrides: Record<string, unknown> = {}) {
 /** 標準的なギルドメンバーモックを生成する */
 function makeGuildMember(overrides: Record<string, unknown> = {}) {
   const defaultChannel = makeTextChannel();
+  const channelMap = new Map<string, unknown>([["ch-1", defaultChannel]]);
   return {
     user: {
       id: "user-1",
@@ -94,7 +95,8 @@ function makeGuildMember(overrides: Record<string, unknown> = {}) {
       id: "guild-1",
       memberCount: 100,
       channels: {
-        cache: new Map([["ch-1", defaultChannel]]),
+        fetch: vi.fn(async (id: string) => channelMap.get(id) ?? null),
+        _map: channelMap,
       },
     },
     joinedTimestamp: new Date("2025-01-01").getTime(),
@@ -154,7 +156,7 @@ describe("bot/features/member-log/handlers/guildMemberAddHandler", () => {
       expect(member._channel.send).not.toHaveBeenCalled();
     });
 
-    // チャンネルが cache に存在しない場合に logger.warn が呼ばれ channel.send は呼ばれないことを確認
+    // チャンネルが fetch で見つからない場合に logger.warn が呼ばれ、 channel.send は呼ばれないことを確認
     it("warns and returns early when channel is not in cache", async () => {
       const { handleGuildMemberAdd } =
         await import("@/bot/features/member-log/handlers/guildMemberAddHandler");
@@ -182,7 +184,7 @@ describe("bot/features/member-log/handlers/guildMemberAddHandler", () => {
       });
       const voiceChannel = { type: ChannelType.GuildVoice, send: vi.fn() };
       const member = makeGuildMember();
-      (member.guild.channels.cache as Map<string, unknown>).set(
+      (member.guild.channels._map as Map<string, unknown>).set(
         "ch-voice",
         voiceChannel,
       );
