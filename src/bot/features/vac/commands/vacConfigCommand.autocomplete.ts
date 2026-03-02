@@ -2,7 +2,7 @@
 // VAC 設定コマンドの autocomplete 処理
 
 import { AutocompleteInteraction, ChannelType } from "discord.js";
-import { tGuild } from "../../../../shared/locale/localeManager";
+import { tDefault } from "../../../../shared/locale/localeManager";
 import { VAC_CONFIG_COMMAND } from "./vacConfigCommand.constants";
 
 /**
@@ -32,8 +32,9 @@ export async function autocompleteVacConfigCommand(
     return;
   }
 
-  const topLabel = await tGuild(
-    guild.id,
+  // autocomplete は Discord の3秒タイムアウト制約があるため、
+  // DB クエリを伴う tGuild ではなく同期的な tDefault を使用する
+  const topLabel = tDefault(
     "commands:vac-config.remove-trigger-vc.category.top",
   );
 
