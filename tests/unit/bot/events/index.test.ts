@@ -39,6 +39,7 @@ const KNOWN_EVENT_NAMES = [
   "guildMemberRemove",
   "interactionCreate",
   "messageCreate",
+  "messageDelete",
   "voiceStateUpdate",
 ];
 
@@ -77,9 +78,7 @@ describe("eventLoader", () => {
   // ENOENT 以外のエラー（ファイルをパスに指定 → ENOTDIR）はそのまま再スローすることを確認
   it("ENOENT 以外のファイルシステムエラーはそのまま再スローする", async () => {
     const thisFilePath = new URL(import.meta.url).pathname;
-    await expect(loadEvents(thisFilePath)).rejects.not.toThrow(
-      "[eventLoader]",
-    );
+    await expect(loadEvents(thisFilePath)).rejects.not.toThrow("[eventLoader]");
     await expect(loadEvents(thisFilePath)).rejects.toThrow();
   });
 });
