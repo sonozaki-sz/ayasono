@@ -1,9 +1,9 @@
-// tests/unit/bot/features/vac/handlers/ui/vacControlPanel.test.ts
+// tests/unit/bot/features/vc-panel/vcControlPanel.test.ts
 import {
   VAC_PANEL_CUSTOM_ID,
   getVacPanelChannelId,
-  sendVacControlPanel,
-} from "@/bot/features/vac/handlers/ui/vacControlPanel";
+  sendVcControlPanel,
+} from "@/bot/features/vc-panel/vcControlPanel";
 import { createInfoEmbed } from "@/bot/utils/messageResponse";
 import { tGuild } from "@/shared/locale/localeManager";
 
@@ -20,9 +20,8 @@ vi.mock("@/bot/utils/messageResponse", () => ({
   ),
 }));
 
-// VACコントロールパネルのカスタムIDパース・送信可否チェック・送信ペイロード内容を検証する
-describe("bot/features/vac/handlers/ui/vacControlPanel", () => {
-  // ロケール翻訳・Embed生成モックの状態をテスト間でリセット
+// VCコントロールパネルのカスタムIDパース・送信可否チェック・送信ペイロード内容を検証する
+describe("bot/features/vc-panel/vcControlPanel", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -45,7 +44,6 @@ describe("bot/features/vac/handlers/ui/vacControlPanel", () => {
     ).toBe("");
   });
 
-  // isTextBased()がfalseの場合、isSendableも送信も呼ばれずに早期リターンすることを確認
   it("returns early when voice channel is not text based", async () => {
     const send = vi.fn();
     const voiceChannel = {
@@ -56,7 +54,7 @@ describe("bot/features/vac/handlers/ui/vacControlPanel", () => {
       send,
     };
 
-    await sendVacControlPanel(voiceChannel as never);
+    await sendVcControlPanel(voiceChannel as never);
 
     expect(voiceChannel.isSendable).not.toHaveBeenCalled();
     expect(send).not.toHaveBeenCalled();
@@ -72,13 +70,12 @@ describe("bot/features/vac/handlers/ui/vacControlPanel", () => {
       send,
     };
 
-    await sendVacControlPanel(voiceChannel as never);
+    await sendVcControlPanel(voiceChannel as never);
 
     expect(send).not.toHaveBeenCalled();
   });
 
-  // 送信ペイロードが4行のボタンとembedを持ち、各ボタンのcustom_idにチャンネルIDが正しく組み込まれているか確認
-  it("sends VAC control panel with four button rows", async () => {
+  it("sends VC control panel with four button rows", async () => {
     const send = vi.fn().mockResolvedValue(undefined);
     const voiceChannel = {
       id: "voice-1",
@@ -88,7 +85,7 @@ describe("bot/features/vac/handlers/ui/vacControlPanel", () => {
       send,
     };
 
-    await sendVacControlPanel(voiceChannel as never);
+    await sendVcControlPanel(voiceChannel as never);
 
     expect(tGuild).toHaveBeenCalledWith("guild-1", "commands:vac.panel.title");
     expect(createInfoEmbed).toHaveBeenCalledWith(

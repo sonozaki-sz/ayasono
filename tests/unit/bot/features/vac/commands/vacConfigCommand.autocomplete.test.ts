@@ -1,133 +1,27 @@
 // tests/unit/bot/features/vac/commands/vacConfigCommand.autocomplete.test.ts
 import { autocompleteVacConfigCommand } from "@/bot/features/vac/commands/vacConfigCommand.autocomplete";
 import { VAC_CONFIG_COMMAND } from "@/bot/features/vac/commands/vacConfigCommand.constants";
-import { ChannelType } from "discord.js";
 
-vi.mock("@/shared/locale/localeManager", () => ({
-  tDefault: vi.fn((_key: string) => "TOP"),
+const mockRespondCategoryAutocomplete = vi.fn();
+vi.mock("@/bot/utils/categoryAutocomplete", () => ({
+  respondCategoryAutocomplete: (...args: unknown[]) =>
+    mockRespondCategoryAutocomplete(...args),
 }));
 
-type CategoryLike = { id: string; name: string; type: ChannelType };
-
-function createCache(items: CategoryLike[]) {
-  return {
-    filter: (predicate: (item: CategoryLike) => boolean) => ({
-      map: <T>(mapper: (item: CategoryLike) => T) =>
-        items.filter(predicate).map(mapper),
-    }),
-  };
-}
-
 describe("bot/features/vac/commands/vacConfigCommand.autocomplete", () => {
-  // サブコマンド判定・入力絞り込み・件数制限の分岐を検証する
-  it("responds empty for non-vac-config command", async () => {
-    const respond = vi.fn();
-    const interaction = {
-      commandName: "other-command",
-      options: {
-        getSubcommand: vi.fn(() => "any"),
-        getFocused: vi.fn(() => ""),
-      },
-      guild: null,
-      respond,
-    };
+  it("delegates to respondCategoryAutocomplete with correct options", async () => {
+    const interaction = { commandName: VAC_CONFIG_COMMAND.NAME } as never;
 
-    await autocompleteVacConfigCommand(interaction as never);
+    await autocompleteVacConfigCommand(interaction);
 
-    expect(respond).toHaveBeenCalledWith([]);
-  });
-
-  it("responds empty when guild context is missing", async () => {
-    const respond = vi.fn();
-    const interaction = {
+    expect(mockRespondCategoryAutocomplete).toHaveBeenCalledWith(interaction, {
       commandName: VAC_CONFIG_COMMAND.NAME,
-      options: {
-        getSubcommand: vi.fn(
-          () => VAC_CONFIG_COMMAND.SUBCOMMAND.CREATE_TRIGGER,
-        ),
-        getFocused: vi.fn(() => ""),
-      },
-      guild: null,
-      respond,
-    };
-
-    await autocompleteVacConfigCommand(interaction as never);
-
-    expect(respond).toHaveBeenCalledWith([]);
-  });
-
-  it("returns TOP and matching categories with case-insensitive filtering", async () => {
-    const respond = vi.fn();
-    const interaction = {
-      commandName: VAC_CONFIG_COMMAND.NAME,
-      options: {
-        getSubcommand: vi.fn(
-          () => VAC_CONFIG_COMMAND.SUBCOMMAND.CREATE_TRIGGER,
-        ),
-        getFocused: vi.fn(() => "ga"),
-      },
-      guild: {
-        id: "guild-1",
-        channels: {
-          cache: createCache([
-            {
-              id: "cat-1",
-              name: "Game",
-              type: ChannelType.GuildCategory,
-            },
-            {
-              id: "cat-2",
-              name: "General",
-              type: ChannelType.GuildCategory,
-            },
-            { id: "text-1", name: "chat", type: ChannelType.GuildText },
-          ]),
-        },
-      },
-      respond,
-    };
-
-    await autocompleteVacConfigCommand(interaction as never);
-
-    expect(respond).toHaveBeenCalledWith([{ name: "Game", value: "cat-1" }]);
-  });
-
-  it("limits autocomplete choices to 25", async () => {
-    const respond = vi.fn();
-    const categories = Array.from({ length: 30 }, (_, index) => ({
-      id: `cat-${index}`,
-      name: `Category-${index}`,
-      type: ChannelType.GuildCategory,
-    }));
-
-    const interaction = {
-      commandName: VAC_CONFIG_COMMAND.NAME,
-      options: {
-        getSubcommand: vi.fn(
-          () => VAC_CONFIG_COMMAND.SUBCOMMAND.REMOVE_TRIGGER,
-        ),
-        getFocused: vi.fn(() => ""),
-      },
-      guild: {
-        id: "guild-1",
-        channels: {
-          cache: createCache(categories),
-        },
-      },
-      respond,
-    };
-
-    await autocompleteVacConfigCommand(interaction as never);
-
-    const choices = respond.mock.calls[0][0] as Array<{
-      name: string;
-      value: string;
-    }>;
-
-    expect(choices).toHaveLength(25);
-    expect(choices[0]).toEqual({
-      name: "TOP",
-      value: VAC_CONFIG_COMMAND.TARGET.TOP,
+      subcommands: [
+        VAC_CONFIG_COMMAND.SUBCOMMAND.CREATE_TRIGGER,
+        VAC_CONFIG_COMMAND.SUBCOMMAND.REMOVE_TRIGGER,
+      ],
+      topLocaleKey: "commands:vac-config.remove-trigger-vc.category.top",
+      topValue: VAC_CONFIG_COMMAND.TARGET.TOP,
     });
   });
 });

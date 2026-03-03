@@ -42,7 +42,9 @@ export async function handleVacConfigCreateTrigger(
   );
   const targetCategoryId = category?.id ?? null;
 
-  const config = await getBotVacRepository().getVacConfigOrDefault(guildId);
+  const repo = getBotVacRepository();
+
+  const config = await repo.getVacConfigOrDefault(guildId);
   // 同一カテゴリへの重複トリガー作成を防止
   const existingTrigger = await findTriggerChannelByCategory(
     guild,
@@ -73,7 +75,7 @@ export async function handleVacConfigCreateTrigger(
   });
 
   // 作成したトリガーVCを設定へ反映して永続化する
-  await getBotVacRepository().addTriggerChannel(guildId, triggerChannel.id);
+  await repo.addTriggerChannel(guildId, triggerChannel.id);
 
   const embed = createSuccessEmbed(
     await tGuild(guildId, "commands:vac-config.embed.trigger_created", {

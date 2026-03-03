@@ -1,18 +1,18 @@
 // tests/unit/bot/features/vac/handlers/ui/vacPanelHandlers.test.ts
-import { vacPanelButtonHandler } from "@/bot/features/vac/handlers/ui/vacPanelButton";
-import { vacPanelModalHandler } from "@/bot/features/vac/handlers/ui/vacPanelModal";
-import { vacPanelUserSelectHandler } from "@/bot/features/vac/handlers/ui/vacPanelUserSelect";
+import { vcPanelButtonHandler } from "@/bot/features/vc-panel/handlers/ui/vcPanelButton";
+import { vcPanelModalHandler } from "@/bot/features/vc-panel/handlers/ui/vcPanelModal";
+import { vcPanelUserSelectHandler } from "@/bot/features/vc-panel/handlers/ui/vcPanelUserSelect";
 import { safeReply } from "@/bot/utils/interaction";
 import type { Mock } from "vitest";
 
-const isManagedVacChannelMock = vi.fn().mockResolvedValue(true);
+const isVcPanelManagedChannelMock = vi.fn().mockResolvedValue(true);
 const getAfkConfigMock = vi.fn();
 const getGuildConfigRepositoryMock = vi.fn(() => ({
   getAfkConfig: (...args: unknown[]) => getAfkConfigMock(...args),
 }));
 
-// VAC パネル customId 定数を固定化して matches 判定を検証しやすくする
-vi.mock("@/bot/features/vac/handlers/ui/vacControlPanel", () => ({
+// VC操作パネル customId 定数を固定化して matches 判定を検証しやすくする
+vi.mock("@/bot/features/vc-panel/vcControlPanel", () => ({
   VAC_PANEL_CUSTOM_ID: {
     RENAME_BUTTON_PREFIX: "vac:rename-btn:",
     LIMIT_BUTTON_PREFIX: "vac:limit-btn:",
@@ -25,17 +25,13 @@ vi.mock("@/bot/features/vac/handlers/ui/vacControlPanel", () => ({
     LIMIT_INPUT: "limit-input",
   },
   getVacPanelChannelId: vi.fn(() => "voice-1"),
-  sendVacControlPanel: vi.fn(),
+  sendVcControlPanel: vi.fn(),
 }));
 
-// 外部依存の副作用を抑えるため、呼び出し不要なモジュールはダミー化
-vi.mock("@/bot/services/botVacDependencyResolver", () => ({
-  getBotVacRepository: vi.fn(() => ({
-    isManagedVacChannel: isManagedVacChannelMock,
-  })),
-}));
-vi.mock("@/shared/features/vac/vacConfigService", () => ({
-  isManagedVacChannel: isManagedVacChannelMock,
+// 所有権レジストリをモックして管理対象チェックを制御する
+vi.mock("@/bot/features/vc-panel/vcPanelOwnershipRegistry", () => ({
+  isVcPanelManagedChannel: (...args: unknown[]) =>
+    isVcPanelManagedChannelMock(...args),
 }));
 vi.mock("@/shared/features/afk/afkConfigService", () => ({
   getAfkConfig: (...args: unknown[]) => getAfkConfigMock(...args),
@@ -59,10 +55,15 @@ vi.mock("@/bot/utils/messageResponse", () => ({
 
 // VACパネルのボタン・モーダル・ユーザーセレクト 3種ハンドラについて、
 // customId マッチング／VC 存在確認／操作者在籍チェック／各アクションの正常系と異常系を網羅的に検証する
+// NOTE: テスト内変数名は旧名称のまま維持（実態は vc-panel の新ハンドラーを指す）
+const vacPanelButtonHandler = vcPanelButtonHandler;
+const vacPanelModalHandler = vcPanelModalHandler;
+const vacPanelUserSelectHandler = vcPanelUserSelectHandler;
 describe("bot/features/vac/ui handlers", () => {
   // 各ケース前にモックを初期化する
   beforeEach(() => {
     vi.clearAllMocks();
+    isVcPanelManagedChannelMock.mockResolvedValue(true);
     getAfkConfigMock.mockResolvedValue({ enabled: true, channelId: "afk-1" });
   });
 
@@ -178,12 +179,7 @@ describe("bot/features/vac/ui handlers", () => {
       showModal: vi.fn(),
     };
 
-    const featureModule = (await vi.importMock(
-      "@/shared/features/vac/vacConfigService",
-    )) as {
-      isManagedVacChannel: Mock;
-    };
-    featureModule.isManagedVacChannel.mockResolvedValue(false);
+    isVcPanelManagedChannelMock.mockResolvedValue(false);
 
     await vacPanelButtonHandler.execute(interaction as never);
 
@@ -366,6 +362,41 @@ describe("bot/features/vac/ui handlers", () => {
     );
   });
 
+  // VC にメンバーが 0 人の場合は not_in_vc エラーを返す
+  it("replies error when AFK button is pressed but VC has no members", async () => {
+    const interaction = {
+      guild: {
+        id: "guild-1",
+        channels: {
+          fetch: vi.fn().mockResolvedValue({
+            id: "voice-1",
+            type: 2,
+            members: {
+              size: 0,
+              values: () => [][Symbol.iterator](),
+            },
+          }),
+        },
+        members: {
+          fetch: vi.fn().mockResolvedValue({
+            voice: { channelId: "voice-1" },
+          }),
+        },
+      },
+      customId: "vac:afk-btn:voice-1",
+      user: { id: "user-1" },
+      message: { deletable: false, delete: vi.fn() },
+      showModal: vi.fn(),
+    };
+
+    await vacPanelButtonHandler.execute(interaction as never);
+
+    expect(safeReply).toHaveBeenCalledWith(
+      interaction,
+      expect.objectContaining({ flags: 64 }),
+    );
+  });
+
   it("refreshes panel and replies success when refresh button pressed", async () => {
     const deleteMock = vi.fn().mockResolvedValue(undefined);
     const interaction = {
@@ -398,15 +429,15 @@ describe("bot/features/vac/ui handlers", () => {
     featureModule.isManagedVacChannel.mockResolvedValue(true);
 
     const panelModule = (await vi.importMock(
-      "@/bot/features/vac/handlers/ui/vacControlPanel",
+      "@/bot/features/vc-panel/vcControlPanel",
     )) as {
-      sendVacControlPanel: Mock;
+      sendVcControlPanel: Mock;
     };
 
     await vacPanelButtonHandler.execute(interaction as never);
 
     expect(deleteMock).toHaveBeenCalledTimes(1);
-    expect(panelModule.sendVacControlPanel).toHaveBeenCalledWith({
+    expect(panelModule.sendVcControlPanel).toHaveBeenCalledWith({
       id: "voice-1",
       type: 2,
       members: { size: 3 },
@@ -449,15 +480,15 @@ describe("bot/features/vac/ui handlers", () => {
     featureModule.isManagedVacChannel.mockResolvedValue(true);
 
     const panelModule = (await vi.importMock(
-      "@/bot/features/vac/handlers/ui/vacControlPanel",
+      "@/bot/features/vc-panel/vcControlPanel",
     )) as {
-      sendVacControlPanel: Mock;
+      sendVcControlPanel: Mock;
     };
 
     await vacPanelButtonHandler.execute(interaction as never);
 
     expect(deleteMock).not.toHaveBeenCalled();
-    expect(panelModule.sendVacControlPanel).toHaveBeenCalledTimes(1);
+    expect(panelModule.sendVcControlPanel).toHaveBeenCalledTimes(1);
     expect(safeReply).toHaveBeenCalledWith(interaction, {
       embeds: [{ message: "commands:vac.embed.panel_refreshed" }],
       flags: 64,
@@ -496,15 +527,15 @@ describe("bot/features/vac/ui handlers", () => {
     featureModule.isManagedVacChannel.mockResolvedValue(true);
 
     const panelModule = (await vi.importMock(
-      "@/bot/features/vac/handlers/ui/vacControlPanel",
+      "@/bot/features/vc-panel/vcControlPanel",
     )) as {
-      sendVacControlPanel: Mock;
+      sendVcControlPanel: Mock;
     };
 
     await vacPanelButtonHandler.execute(interaction as never);
 
     expect(deleteMock).toHaveBeenCalledTimes(1);
-    expect(panelModule.sendVacControlPanel).toHaveBeenCalledTimes(1);
+    expect(panelModule.sendVcControlPanel).toHaveBeenCalledTimes(1);
     expect(safeReply).toHaveBeenCalledWith(interaction, {
       embeds: [{ message: "commands:vac.embed.panel_refreshed" }],
       flags: 64,
@@ -558,15 +589,15 @@ describe("bot/features/vac/ui handlers", () => {
     featureModule.isManagedVacChannel.mockResolvedValue(true);
 
     const panelModule = (await vi.importMock(
-      "@/bot/features/vac/handlers/ui/vacControlPanel",
+      "@/bot/features/vc-panel/vcControlPanel",
     )) as {
-      sendVacControlPanel: Mock;
+      sendVcControlPanel: Mock;
     };
 
     await vacPanelButtonHandler.execute(interaction as never);
 
     expect(interaction.showModal).not.toHaveBeenCalled();
-    expect(panelModule.sendVacControlPanel).not.toHaveBeenCalled();
+    expect(panelModule.sendVcControlPanel).not.toHaveBeenCalled();
     expect(safeReply).not.toHaveBeenCalledWith(
       interaction,
       expect.objectContaining({
@@ -685,12 +716,7 @@ describe("bot/features/vac/ui handlers", () => {
       },
     };
 
-    const featureModule = (await vi.importMock(
-      "@/shared/features/vac/vacConfigService",
-    )) as {
-      isManagedVacChannel: Mock;
-    };
-    featureModule.isManagedVacChannel.mockResolvedValue(false);
+    isVcPanelManagedChannelMock.mockResolvedValue(false);
 
     await vacPanelModalHandler.execute(interaction as never);
 
@@ -1082,12 +1108,7 @@ describe("bot/features/vac/ui handlers", () => {
       values: ["user-1"],
     };
 
-    const featureModule = (await vi.importMock(
-      "@/shared/features/vac/vacConfigService",
-    )) as {
-      isManagedVacChannel: Mock;
-    };
-    featureModule.isManagedVacChannel.mockResolvedValue(false);
+    isVcPanelManagedChannelMock.mockResolvedValue(false);
 
     await vacPanelUserSelectHandler.execute(interaction as never);
 

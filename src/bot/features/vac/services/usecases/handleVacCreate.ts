@@ -9,7 +9,7 @@ import {
 } from "discord.js";
 import { tDefault } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
-import { sendVacControlPanel } from "../../handlers/ui/vacControlPanel";
+import { sendVcControlPanel } from "../../../vc-panel/vcControlPanel";
 import type { IVacRepository } from "../../repositories/vacRepository";
 
 const VAC_EVENT = {
@@ -96,7 +96,7 @@ export async function handleVacCreateUseCase(
     return;
   }
 
-  await sendVacControlPanel(voiceChannel).catch((error) => {
+  await sendVcControlPanel(voiceChannel).catch((error) => {
     logger.error(tDefault("system:vac.panel_send_failed"), error);
   });
 
