@@ -2,7 +2,7 @@
 
 > Git Workflow & Commit Convention Guide
 
-最終更新: 2026年3月4日（マージ戦略を squash/rebase 使い分けに変更）
+最終更新: 2026年3月4日（develop への直接 push を許可する運用に変更）
 
 ---
 
@@ -20,8 +20,8 @@
 main          ← 本番環境（常にデプロイ可能な状態）
   ↑ PR only
 develop       ← 開発統合ブランチ（次リリース向けの集約点）
-  ↑ PR only
-feature/xxx   ← 機能開発
+  ↑ 直接 push 可（CI・commitlint は push 時に自動実行）
+feature/xxx   ← 機能開発（大規模変更や履歴を整理したい場合に使用）
 fix/xxx       ← バグ修正
 hotfix/xxx    ← 本番障害の緊急修正（main から直接分岐）
 docs/xxx      ← ドキュメントのみの変更
@@ -33,8 +33,8 @@ refactor/xxx  ← リファクタリング
 | ブランチ     | 説明                                             | 直接push | マージ先           |
 | ------------ | ------------------------------------------------ | -------- | ------------------ |
 | `main`       | 本番デプロイ済みコード。 CI/CDが自動デプロイする | ❌       | -                  |
-| `develop`    | 開発統合ブランチ （次リリース向けの集約点）      | ❌       | `main`             |
-| `feature/*`  | 新機能の開発                                     | ✅       | `develop`          |
+| `develop`    | 開発統合ブランチ （次リリース向けの集約点）      | ✅       | `main`             |
+| `feature/*`  | 新機能の開発（大規模・履歴整理が必要な場合）     | ✅       | `develop`          |
 | `fix/*`      | バグ修正                                         | ✅       | `develop`          |
 | `hotfix/*`   | 本番障害の緊急修正                               | ✅       | `main` + `develop` |
 | `docs/*`     | ドキュメントのみの変更                           | ✅       | `develop`          |
@@ -44,40 +44,43 @@ refactor/xxx  ← リファクタリング
 
 ## 🔄 通常の開発フロー
 
-**全ての変更はフィーチャーブランチ → PR 経由で行う。** `develop` / `main` への直接 push は禁止。
+**`develop` には直接 push できる。`main` へは必ず PR 経由でのみ変更する。**
 
-### 手順
-
-#### 1. フィーチャーブランチを作成
+### パターン A: develop に直接 push（通常の小〜中規模の変更）
 
 ```bash
 # developを最新化
 git checkout develop
 git pull origin develop
 
-# フィーチャーブランチを作成
-git checkout -b feature/bump-reminder-mention-role
-```
-
-#### 2. 開発・コミット
-
-```bash
+# 開発・コミット
 git add src/bot/features/bump-reminder/
 git commit -m "feat(bump-reminder): メンションロール設定機能を追加"
+
+# develop に直接 push（push 後に CI・commitlint が自動で実行される）
+git push origin develop
 ```
 
-#### 3. フィーチャーブランチを push して develop への PR を作成
+> push 後、GitHub Actions で lint・型チェック・テスト・commitlint が自動で走る。
+> 失敗した場合は次の push で修正するか、`git push --force-with-lease` で修正コミットを上書きする。
+
+### パターン B: フィーチャーブランチ → PR（大規模変更・履歴を整理したい場合）
 
 ```bash
-git push origin feature/bump-reminder-mention-role
-# GitHub で feature/* → develop の PR を作成
-gh pr create --base develop --title "feat(bump-reminder): ..." --body "..."
-# CI 通過後に自動でマージ（戦略はコミット構成に応じて選択 → 下記「マージ戦略」参照）
-gh pr merge <PR番号> --rebase --auto  # コミットを整理している場合
-gh pr merge <PR番号> --squash --auto  # WIPコミットが混在している場合
+# フィーチャーブランチを作成
+git checkout -b feature/vc-recruit
+
+# 開発・コミット
+git commit -m "feat(vc-recruit): ..."
+
+# push して PR を作成
+git push origin feature/vc-recruit
+gh pr create --base develop --title "feat(vc-recruit): ..." --body "..."
+# CI 通過後に自動でマージ（rebase 推奨）
+gh pr merge <PR番号> --rebase --auto
 ```
 
-#### 4. develop から main への PR を作成してリリース
+### develop から main へのリリース（必ず PR 経由）
 
 機能がまとまったタイミングで `develop → main` の PR を作成してリリースする。
 
@@ -100,13 +103,17 @@ git checkout main
 git pull origin main
 git checkout -b hotfix/fix-crash-on-empty-guild
 
-# 修正・コミット・push 後、main と develop 両方に PR を作成
-gh pr create --base main    --title "fix(...): ..." --body "..."
-gh pr create --base develop --title "fix(...): ... を develop にバックポート" --body "..."
+# 修正・コミット・push後、main への PR を作成
+gh pr create --base main --title "fix(...): ..." --body "..."
 
 # CI 通過後に自動マージ
-gh pr merge <main向けPR番号>    --merge  --auto   # main は Merge commit
-gh pr merge <develop向けPR番号> --rebase --auto   # develop は Rebase merge
+gh pr merge <main向けPR番号> --merge --auto   # main は Merge commit
+
+# develop へはバックポートとして直接 push
+git checkout develop
+git pull origin develop
+git cherry-pick <fixのコミットSHA>
+git push origin develop
 ```
 
 ---
@@ -219,48 +226,42 @@ git commit -m "test(afk): AFK自動解除のユニットテストを追加"
 
 ## 🔍 PR 運用規則
 
-### PR 作成時のチェック
+### develop への直接 push 時のチェック
+
+- [ ] コミットメッセージが Conventional Commits 形式になっている
+- [ ] `pnpm test` がローカルで通っている（任意だが推奨）
+
+### PR 作成時のチェック（feature/* → develop、または develop → main）
 
 - [ ] ブランチ名が命名規則に従っている
-- [ ] ベースブランチが正しい（`feature/*` → `develop`、`develop` → `main`、`hotfix/*` → `main`）
 - [ ] コミットメッセージが Conventional Commits 形式になっている
 - [ ] `pnpm test` がローカルで通っている
 - [ ] `pnpm typecheck` がローカルで通っている
 
-### CI のステータスチェック
+### CI の自動実行
 
-PR に対して以下の CI が自動で実行される：
+| トリガー                         | ワークフロー     | 実行内容                         |
+| -------------------------------- | ---------------- | -------------------------------- |
+| **develop への直接 push**        | `deploy.yml`     | lint・型チェック・テスト実行     |
+| **develop への直接 push**        | `commitlint.yml` | コミットメッセージ形式の検証     |
+| **main / develop 向け PR**       | `deploy.yml`     | lint・型チェック・テスト実行     |
+| **main / develop 向け PR**       | `commitlint.yml` | コミットメッセージ形式の検証     |
+| **main への push（PRマージ後）** | `deploy.yml`     | VPS へ自動デプロイ               |
 
-| チェック                 | ワークフロー     | 内容                         |
-| ------------------------ | ---------------- | ---------------------------- |
-| **Test**                 | `deploy.yml`     | 型チェック + 全テスト実行    |
-| **Lint Commit Messages** | `commitlint.yml` | コミットメッセージ形式の検証 |
+> develop への直接 push は CI 完了前にコミットが反映されるため、**ローカルでテストを通してから push することを強く推奨**する。
 
-`develop` / `main` へのPRは、すべて ✅ でないとマージできない（ブランチ保護設定による）。
-
-### マージ戦略
+### マージ戦略（PR 経由の場合）
 
 | マージ先  | 方式                                     | CLI オプション          | 理由                                       |
 | --------- | ---------------------------------------- | ----------------------- | ------------------------------------------ |
-| `develop` | **Rebase merge** または **Squash merge** | `--rebase` / `--squash` | コミット構成に応じて使い分ける（下記参照） |
+| `develop` | **Rebase merge** または **Squash merge** | `--rebase` / `--squash` | コミット構成に応じて使い分ける             |
 | `main`    | **Merge commit**                         | `--merge`               | リリース履歴を明確に残す                   |
 
-#### develop へのマージ戦略の使い分け
-
-**Rebase merge を使う**（推奨）— コミットを意味のある粒度に分割している場合
-
-- `fix` / `refactor` / `feat` など役割が明確に分かれている
-- 各コミットが単独でビルド・テストが通る状態になっている
-- 例: 今回の `feat(vc-recruit)` `refactor(vac)` `fix:` が分かれているケース
+**Rebase merge を使う**（推奨）— コミットが意味のある粒度に分割されている場合
 
 **Squash merge を使う** — WIP コミットが混在している場合
 
-- 「fix typo」「wip」「途中」などの作業ログ的なコミットがある
-- PR の内容が1件にまとめた方が自然なほど小さい
-
-**Merge commit は develop では使わない**（履歴がノイジーになるため）
-
-> **auto-merge 有効**: `--auto` を付けると CI 通過後に自動マージされる。`gh pr merge <番号> --rebase --auto` のように使う。
+> **auto-merge**: `gh pr merge <番号> --rebase --auto` で CI 通過後に自動マージ。
 
 ---
 
@@ -281,14 +282,15 @@ PR に対して以下の CI が自動で実行される：
 
 ### `develop` ブランチ
 
-直接 push は禁止。`feature/*` 等から PR 経由でのみ変更可能で、CI が通らないとマージできない。
+直接 push 可。ブランチ保護は設定しない。
 
-| 設定                                  | 値                               |
-| ------------------------------------- | -------------------------------- |
-| Require a pull request before merging | ✅（レビュー承認は不要）         |
-| Require status checks to pass: `Test` | ✅（strict: ベース最新化が必要） |
-| Block force pushes                    | ✅                               |
-| Allow auto-merge                      | ✅                               |
+| 設定                                  | 値  |
+| ------------------------------------- | --- |
+| Require a pull request before merging | ❌  |
+| Require status checks to pass         | ❌  |
+| Block force pushes                    | ❌  |
+
+> CI（テスト・commitlint）は push 後に GitHub Actions で自動実行されるが、push 自体はブロックされない。**push 前にローカルで `pnpm test` を実行することを推奨する。**
 
 ---
 
