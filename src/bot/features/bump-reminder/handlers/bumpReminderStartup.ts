@@ -10,7 +10,7 @@ import {
 } from "../../../services/botBumpReminderDependencyResolver";
 import { type BumpServiceName } from "../constants/bumpReminderConstants";
 import { type BumpReminderTaskFactory } from "../services/bumpReminderService";
-import { sendBumpReminder } from "./bumpReminderHandler";
+import { sendBumpReminder } from "./usecases/sendBumpReminder";
 
 /**
  * 起動時に未実行の Bump リマインダーを復元する関数
