@@ -32,22 +32,11 @@ export interface IVacRepository {
   ): Promise<boolean>;
 }
 
-type VacConfigServicePort = Pick<
-  VacConfigService,
-  | "getVacConfigOrDefault"
-  | "saveVacConfig"
-  | "addTriggerChannel"
-  | "removeTriggerChannel"
-  | "addCreatedVacChannel"
-  | "removeCreatedVacChannel"
-  | "isManagedVacChannel"
->;
-
 /**
  * VAC設定サービスを注入して VAC リポジトリを生成する
  */
 export function createVacRepository(
-  vacConfigService: VacConfigServicePort,
+  vacConfigService: VacConfigService,
 ): IVacRepository {
   return {
     getVacConfigOrDefault: (guildId) =>

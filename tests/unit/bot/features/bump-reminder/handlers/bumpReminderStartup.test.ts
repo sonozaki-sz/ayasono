@@ -20,9 +20,12 @@ vi.mock("@/shared/utils/logger", () => ({
   },
 }));
 
-vi.mock("@/bot/features/bump-reminder/handlers/bumpReminderHandler", () => ({
-  sendBumpReminder: (...args: unknown[]) => sendBumpReminderMock(...args),
-}));
+vi.mock(
+  "@/bot/features/bump-reminder/handlers/usecases/sendBumpReminder",
+  () => ({
+    sendBumpReminder: (...args: unknown[]) => sendBumpReminderMock(...args),
+  }),
+);
 
 // Bot 起動時のバンプリマインダー復元処理が
 // タスクファクトリーを正しく構築して sendBumpReminder に委譲するか、

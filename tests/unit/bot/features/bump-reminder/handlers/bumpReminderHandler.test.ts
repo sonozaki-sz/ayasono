@@ -1,9 +1,7 @@
 // tests/unit/bot/features/bump-reminder/handlers/bumpReminderHandler.test.ts
-import {
-  handleBumpDetected,
-  sendBumpPanel,
-  sendBumpReminder,
-} from "@/bot/features/bump-reminder/handlers/bumpReminderHandler";
+import { handleBumpDetected } from "@/bot/features/bump-reminder/handlers/bumpReminderHandler";
+import { sendBumpPanel } from "@/bot/features/bump-reminder/handlers/usecases/sendBumpPanel";
+import { sendBumpReminder } from "@/bot/features/bump-reminder/handlers/usecases/sendBumpReminder";
 
 const getBotBumpReminderConfigServiceMock = vi.fn();
 const scheduleBumpReminderMock = vi.fn();

@@ -258,6 +258,36 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler
     expect(updateMock).toHaveBeenCalled();
   });
 
+  // embedData に title も color もない場合はどちらの if ブロックもスキップする
+  it("does not add title/color fields when embedData has neither title nor color", async () => {
+    const { stickyMessageViewSelectHandler } =
+      await import("@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler");
+    // title も color もない embedData
+    const embedData = JSON.stringify({ content: "embed-only content" });
+    findByChannelMock.mockResolvedValue({
+      id: "sticky-1",
+      channelId: "ch-1",
+      content: "Sticky content",
+      embedData,
+      updatedAt: new Date("2025-01-01T00:00:00Z"),
+      updatedBy: null,
+    });
+    const updateMock = vi.fn().mockResolvedValue(undefined);
+    const interaction = createInteractionMock({ updateMock });
+
+    await stickyMessageViewSelectHandler.execute(interaction as never);
+
+    // embed_title / embed_color キーは呼ばれない
+    const tGuildKeys = tGuildMock.mock.calls.map((c) => c[1]);
+    expect(tGuildKeys).not.toContain(
+      "commands:sticky-message.view.field.embed_title",
+    );
+    expect(tGuildKeys).not.toContain(
+      "commands:sticky-message.view.field.embed_color",
+    );
+    expect(updateMock).toHaveBeenCalled();
+  });
+
   // guildId が null の場合に null 合体演算子で undefined にフォールバックし、クラッシュせず更新できることを検証
   it("treats guildId as undefined when null (null-coalescing fallback)", async () => {
     const { stickyMessageViewSelectHandler } =

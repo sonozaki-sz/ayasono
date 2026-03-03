@@ -12,9 +12,6 @@ import {
 import { scheduleBumpReminder } from "./usecases/scheduleBumpReminder";
 import { sendBumpPanel } from "./usecases/sendBumpPanel";
 
-export { sendBumpPanel } from "./usecases/sendBumpPanel";
-export { sendBumpReminder } from "./usecases/sendBumpReminder";
-
 /**
  * Bump 検知時に設定確認、パネル送信、リマインダー登録を行う関数
  * @param client Discord クライアント

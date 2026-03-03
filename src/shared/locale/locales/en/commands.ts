@@ -538,6 +538,145 @@ export const commands = {
     "Sticky message has been updated.",
   "sticky-message.update.notFound.title":
     "Not Configured",
+
+  // VC Recruit config command
+  "vc-recruit-config.description":
+    "VC recruit feature settings (server administrators only)",
+  "vc-recruit-config.setup.description":
+    "Set up VC recruit channels",
+  "vc-recruit-config.setup.category.description":
+    "Target category (TOP or category name; defaults to this channel's category)",
+  "vc-recruit-config.setup.category.top": "TOP (No category)",
+  "vc-recruit-config.setup.thread-archive.description":
+    "Auto-archive duration for recruit threads (1h/24h/3d/1w; default: 24h)",
+  "vc-recruit-config.teardown.description":
+    "Remove VC recruit channels (via selection UI)",
+  // teardown select menu UI
+  "vc-recruit-config.teardown.select.placeholder":
+    "Select categories to teardown",
+  "vc-recruit-config.teardown.select.top":
+    "TOP (No category)",
+  "vc-recruit-config.teardown.select.unknown_category":
+    "Unknown category (ID: {{id}})",
+  // teardown confirm panel
+  "vc-recruit-config.teardown.confirm.title":
+    "Remove VC recruit channels?",
+  "vc-recruit-config.teardown.confirm.field_categories":
+    "Target categories",
+  "vc-recruit-config.teardown.confirm.warning":
+    "The panel channel and post channel for the selected categories will be deleted. This action cannot be undone.",
+  "vc-recruit-config.teardown.confirm.button_confirm":
+    "🗑️ Remove",
+  "vc-recruit-config.teardown.confirm.button_cancel":
+    "Cancel",
+  "vc-recruit-config.teardown.confirm.button_redo":
+    "Reselect",
+  "vc-recruit-config.add-role.description":
+    "Add a role to the mention candidates",
+  "vc-recruit-config.add-role.role.description":
+    "Role to add",
+  "vc-recruit-config.remove-role.description":
+    "Remove a role from the mention candidates",
+  "vc-recruit-config.remove-role.role.description":
+    "Role to remove",
+  "vc-recruit-config.view.description":
+    "Show current VC recruit settings",
+  // setup success
+  "vc-recruit-config.embed.setup_success":
+    "VC recruit channels created",
+  "vc-recruit-config.embed.setup_panel_channel":
+    "Recruit panel: {{channel}}",
+  "vc-recruit-config.embed.setup_post_channel":
+    "Recruit board: {{channel}}",
+  // teardown
+  "vc-recruit-config.embed.teardown_success":
+    "VC recruit channels removed",
+  "vc-recruit-config.embed.teardown_category_item":
+    "🗑️ {{category}}",
+  "vc-recruit-config.embed.teardown_partial_error":
+    "⚠️ The following categories had errors:",
+  "vc-recruit-config.embed.teardown_cancelled":
+    "Cancelled.",
+  // add-role/remove-role success
+  "vc-recruit-config.embed.add_role_success":
+    "Added {{role}} to mention candidates",
+  "vc-recruit-config.embed.remove_role_success":
+    "Removed {{role}} from mention candidates",
+  // view
+  "vc-recruit-config.embed.view_title":
+    "VC Recruit Settings",
+  "vc-recruit-config.embed.field_setups":
+    "Configured categories",
+  "vc-recruit-config.embed.field_roles":
+    "Mention candidate roles",
+  "vc-recruit-config.embed.no_setups":
+    "Not configured",
+  "vc-recruit-config.embed.no_roles":
+    "None",
+  "vc-recruit-config.embed.top":
+    "TOP",
+  "vc-recruit-config.embed.setup_item":
+    "• {{category}}\n　Panel: {{panel}}\n　Board: {{post}}",
+  "vc-recruit-config.embed.success_title":
+    "Settings Updated",
+
+  // VC recruit channel names
+  "vcRecruit.channelName.panel":
+    "vc-recruit",
+  "vcRecruit.channelName.post":
+    "vc-recruit-board",
+
+  // VC recruit panel
+  "vcRecruit.panel.title":
+    "🎤 VC Recruit",
+  "vcRecruit.panel.description":
+    "Looking for VC participants?\nPress the button to create a recruitment post.",
+  "vcRecruit.panel.create_button":
+    "Create VC Recruit",
+
+  // VC recruit modal (step 2)
+  "vcRecruit.modal.title":
+    "Create VC Recruit (2/2)",
+  "vcRecruit.modal.content_label":
+    "Recruit message",
+  "vcRecruit.modal.content_placeholder":
+    "Enter your recruit message (max 200 characters)",
+  "vcRecruit.modal.vc_name_label":
+    "New VC name (optional)",
+  "vcRecruit.modal.vc_name_placeholder":
+    "Used only if \"Create new VC\" is selected (blank: DisplayName's Room)",
+
+  // VC recruit select (step 1)
+  "vcRecruit.select.title":
+    "📋 Step 1/2 — Select VC and mention",
+  "vcRecruit.select.mention_placeholder":
+    "Mention (none)",
+  "vcRecruit.select.vc_placeholder":
+    "Select VC",
+  "vcRecruit.select.open_modal_button":
+    "📝 Next: Enter details",
+  "vcRecruit.select.no_mention":
+    "None (no mention)",
+  "vcRecruit.select.new_vc_label":
+    "🆕 Create new VC",
+
+  // Recruit message
+  "vcRecruit.embed.title":
+    "📢 VC Recruit",
+  "vcRecruit.embed.field_content":
+    "Recruit message",
+  "vcRecruit.embed.field_vc":
+    "VC",
+  "vcRecruit.embed.field_recruiter":
+    "Recruiter",
+
+  // Thread name
+  "vcRecruit.thread_name":
+    "{{recruiter}}'s recruit",
+
+  // Auto-move skip notification
+  "vcRecruit.embed.not_in_vc_skipped":
+    "⚠️ Could not auto-move: you are not in a voice channel",
 } as const;
 
 export type CommandsTranslations = typeof commands;

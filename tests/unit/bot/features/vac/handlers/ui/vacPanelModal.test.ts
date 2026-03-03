@@ -1,8 +1,8 @@
 // tests/unit/bot/features/vac/handlers/ui/vacPanelModal.test.ts
-import { vacPanelModalHandler } from "@/bot/features/vac/handlers/ui/vacPanelModal";
+import { vcPanelModalHandler } from "@/bot/features/vc-panel/handlers/ui/vcPanelModal";
 import { safeReply } from "@/bot/utils/interaction";
 
-const isManagedVacChannelMock = vi.fn();
+const isVcPanelManagedChannelMock = vi.fn();
 
 vi.mock("@/shared/locale/localeManager", () => ({
   tGuild: vi.fn(
@@ -21,10 +21,9 @@ vi.mock("@/shared/locale/localeManager", () => ({
   ),
 }));
 
-vi.mock("@/bot/services/botVacDependencyResolver", () => ({
-  getBotVacRepository: vi.fn(() => ({
-    isManagedVacChannel: isManagedVacChannelMock,
-  })),
+vi.mock("@/bot/features/vc-panel/vcPanelOwnershipRegistry", () => ({
+  isVcPanelManagedChannel: (...args: unknown[]) =>
+    isVcPanelManagedChannelMock(...args),
 }));
 
 vi.mock("@/bot/utils/interaction", () => ({
@@ -36,7 +35,7 @@ vi.mock("@/bot/utils/messageResponse", () => ({
   createSuccessEmbed: vi.fn((message: string) => ({ message })),
 }));
 
-vi.mock("@/bot/features/vac/handlers/ui/vacControlPanel", () => ({
+vi.mock("@/bot/features/vc-panel/vcControlPanel", () => ({
   VAC_PANEL_CUSTOM_ID: {
     RENAME_MODAL_PREFIX: "vac:rename-modal:",
     LIMIT_MODAL_PREFIX: "vac:limit-modal:",
@@ -56,8 +55,7 @@ function createBaseInteraction(overrides?: {
   limitInput?: string;
 }) {
   const channel =
-    overrides?.channel ??
-    ({ id: "voice-1", type: 2, edit: vi.fn() } as const);
+    overrides?.channel ?? ({ id: "voice-1", type: 2, edit: vi.fn() } as const);
 
   return {
     guild: {
@@ -90,20 +88,20 @@ describe("bot/features/vac/handlers/ui/vacPanelModal", () => {
   // 毎テストで isManagedVacChannel が true を返すデフォルト正常状態に戻す
   beforeEach(() => {
     vi.clearAllMocks();
-    isManagedVacChannelMock.mockResolvedValue(true);
+    isVcPanelManagedChannelMock.mockResolvedValue(true);
   });
 
   it("matches only supported modal customId prefixes", () => {
-    expect(vacPanelModalHandler.matches("vac:rename-modal:voice-1")).toBe(true);
-    expect(vacPanelModalHandler.matches("vac:limit-modal:voice-1")).toBe(true);
-    expect(vacPanelModalHandler.matches("other:voice-1")).toBe(false);
+    expect(vcPanelModalHandler.matches("vac:rename-modal:voice-1")).toBe(true);
+    expect(vcPanelModalHandler.matches("vac:limit-modal:voice-1")).toBe(true);
+    expect(vcPanelModalHandler.matches("other:voice-1")).toBe(false);
   });
 
   it("replies error when target channel is not managed by VAC", async () => {
-    isManagedVacChannelMock.mockResolvedValueOnce(false);
+    isVcPanelManagedChannelMock.mockResolvedValueOnce(false);
     const interaction = createBaseInteraction();
 
-    await vacPanelModalHandler.execute(interaction as never);
+    await vcPanelModalHandler.execute(interaction as never);
 
     expect(safeReply).toHaveBeenCalledWith(interaction, {
       embeds: [{ message: "errors:vac.not_vac_channel" }],
@@ -120,7 +118,7 @@ describe("bot/features/vac/handlers/ui/vacPanelModal", () => {
       renameInput: " New Name ",
     });
 
-    await vacPanelModalHandler.execute(interaction as never);
+    await vcPanelModalHandler.execute(interaction as never);
 
     expect(editMock).toHaveBeenCalledWith({ name: "New Name" });
     expect(safeReply).toHaveBeenCalledWith(interaction, {
@@ -138,7 +136,7 @@ describe("bot/features/vac/handlers/ui/vacPanelModal", () => {
       limitInput: "abc",
     });
 
-    await vacPanelModalHandler.execute(interaction as never);
+    await vcPanelModalHandler.execute(interaction as never);
 
     expect(editMock).not.toHaveBeenCalled();
     expect(safeReply).toHaveBeenCalledWith(interaction, {

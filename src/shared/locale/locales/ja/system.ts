@@ -427,6 +427,20 @@ export const system = {
     "[メンバーログ機能] 参加メッセージ設定 GuildId: {{guildId}}",
   "member-log.config_leave_message_set":
     "[メンバーログ機能] 退出メッセージ設定 GuildId: {{guildId}}",
+
+  // VC募集機能ログ
+  "vc-recruit.voice_state_update_failed":
+    "[VC募集機能] voiceStateUpdate処理失敗",
+  "vc-recruit.channel_created":
+    "[VC募集機能] 新規VC作成 GuildId: {{guildId}} ChannelId: {{channelId}}",
+  "vc-recruit.channel_deleted":
+    "[VC募集機能] VC削除 GuildId: {{guildId}} ChannelId: {{channelId}}",
+  "vc-recruit.recruit_posted":
+    "[VC募集機能] 募集メッセージ投稿 GuildId: {{guildId}} UserId: {{userId}}",
+  "vc-recruit.setup_created":
+    "[VC募集機能] セットアップ作成 GuildId: {{guildId}} CategoryId: {{categoryId}}",
+  "vc-recruit.setup_removed":
+    "[VC募集機能] セットアップ削除 GuildId: {{guildId}} CategoryId: {{categoryId}}",
 } as const;
 
 export type SystemTranslations = typeof system;

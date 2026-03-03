@@ -40,6 +40,7 @@ const KNOWN_COMMAND_NAMES = [
   "sticky-message",
   "vac",
   "vac-config",
+  "vc-recruit-config",
   "ping",
 ];
 

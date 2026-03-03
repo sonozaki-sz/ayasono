@@ -2,7 +2,7 @@
 
 > 機能実装の詳細な進捗状況
 
-最終更新: 2026年3月1日（メンバーログ・メッセージ削除機能実装完了）
+最終更新: 2026年3月4日（VC募集機能実装完了）
 
 ---
 
@@ -13,10 +13,10 @@
 | カテゴリ | 実装済み | 未実装 | 進捗率 |
 | -------- | -------- | ------ | ------ |
 | コア機能 | 13       | 0      | 100%   |
-| コマンド | 11       | 5      | 69%    |
-| イベント | 7        | 0      | 100%   |
-| サービス | 7        | 0      | 100%   |
-| 主要機能 | 6        | 1      | 86%    |
+| コマンド | 12       | 4      | 75%    |
+| イベント | 8        | 0      | 100%   |
+| サービス | 8        | 0      | 100%   |
+| 主要機能 | 7        | 0      | 100%   |
 
 ### 機能別実装状況
 
@@ -30,7 +30,7 @@
 | メッセージ固定       | ✅   | 100%   | 完全実装（set/remove/update/view） |
 | 参加・脱退ログ       | ✅   | 100%   | 完全実装                           |
 | メッセージ削除       | ✅   | 100%   | 完全実装                           |
-| VC募集               | 📋   | 0%     | 仕様書のみ                         |
+| VC募集               | ✅   | 100%   | 完全実装・テスト済み               |
 | ギルド設定           | 📋   | 0%     | 仕様書のみ（データ層は実装済み）   |
 | 基本コマンド         | 🚧   | 25%    | `/ping` のみ実装済み               |
 | Web UI               | 🚧   | 10%    | 基盤のみ                           |
@@ -343,7 +343,46 @@
 
 **テスト**:
 
-- ✅ ユニットテスト・インテグレーションテスト実装済み（1264 tests / 232 suites）
+- ✅ ユニットテスト・インテグレーションテスト実装済み（1361 tests / 189 suites）
+
+---
+
+### 📢 VC募集機能（100%完了）
+
+**状態**: ✅ 完全実装・テスト済み
+
+**仕様書**: [docs/specs/VC_RECRUIT_SPEC.md](../specs/VC_RECRUIT_SPEC.md)
+
+**実装内容**:
+
+- `/vc-recruit-config` コマンド（`setup` / `teardown` / `add-role` / `remove-role` / `view`）
+- `setup`: 指定カテゴリにパネルチャンネル・投稿チャンネルを自動作成・権限設定
+- `teardown`: StringSelectMenu → 確認パネル → 撤去処理の UI フロー
+- ボタン → 2ステップモーダル → StringSelectMenu で募集内容・VC・メンションを設定
+- 「🆕 新規VC作成」選択時に専用VCを作成、全員退出で自動削除
+- 募集投稿後にパネル送信・募集者を対象VCへ自動移動・スレッド作成
+- vac との共通 UI モジュールを `vc-panel/` として分離
+- `vcRecruitVoiceStateUpdate`: 参加者0人の募集VCを自動削除
+- `vcRecruitChannelDeleteHandler`: チャンネル削除時のペアチャンネル連携削除
+- `vcRecruitMessageDeleteHandler`: パネルメッセージ削除時の整合性保全
+- `messageDelete` イベントハンドラ追加
+- Prismaスキーマ追加（`GuildVcRecruitConfig` テーブル）
+- 日英両方のロケール追加
+- `categoryAutocomplete` 共通 autocomplete ユーティリティを追加（VAC・VC募集で共用）
+
+**関連ファイル**:
+
+- `src/bot/commands/vc-recruit-config.ts`
+- `src/bot/features/vc-recruit/` （コマンド・ハンドラ・リポジトリ）
+- `src/bot/features/vc-panel/` （vc-panel 共通モジュール）
+- `src/bot/events/messageDelete.ts`
+- `src/shared/features/vc-recruit/vcRecruitConfigService.ts`
+- `src/shared/database/stores/guildVcRecruitConfigStore.ts`
+- `src/bot/utils/categoryAutocomplete.ts`
+
+**テスト**:
+
+- ✅ 40件以上のテストファイル
 
 ---
 
@@ -458,21 +497,22 @@
 
 ### 🎮 実装済みコマンド
 
-| コマンド                 | 説明                                         | 状態 | 備考     |
-| ------------------------ | -------------------------------------------- | ---- | -------- |
-| `/ping`                  | 疎通確認                                     | ✅   | 完全実装 |
-| `/afk`                   | AFKチャンネルへ移動                          | ✅   | 完全実装 |
-| `/afk-config`            | AFK機能設定                                  | ✅   | 完全実装 |
-| `/bump-reminder-config`  | Bumpリマインダー機能設定                     | ✅   | 完全実装 |
-| `/vac-config`            | VAC設定（作成/削除/表示）                    | ✅   | 完全実装 |
-| `/vac`                   | VAC VC操作（名前/人数）                      | ✅   | 完全実装 |
-| `/sticky-message set`    | スティッキーメッセージ設定                   | ✅   | 完全実装 |
-| `/sticky-message remove` | スティッキーメッセージ削除                   | ✅   | 完全実装 |
-| `/sticky-message update` | スティッキーメッセージ更新                   | ✅   | 完全実装 |
-| `/sticky-message view`   | スティッキーメッセージ一覧表示（SelectMenu） | ✅   | 完全実装 |
-| `/member-log-config`     | メンバーログ機能設定                         | ✅   | 完全実装 |
-| `/message-delete`        | メッセージ一括削除                           | ✅   | 完全実装 |
-| `/message-delete-config` | メッセージ削除内容設定                       | ✅   | 完全実装 |
+| コマンド                 | 説明                                                       | 状態 | 備考     |
+| ------------------------ | ---------------------------------------------------------- | ---- | -------- |
+| `/ping`                  | 疎通確認                                                   | ✅   | 完全実装 |
+| `/afk`                   | AFKチャンネルへ移動                                        | ✅   | 完全実装 |
+| `/afk-config`            | AFK機能設定                                                | ✅   | 完全実装 |
+| `/bump-reminder-config`  | Bumpリマインダー機能設定                                   | ✅   | 完全実装 |
+| `/vac-config`            | VAC設定（作成/削除/表示）                                  | ✅   | 完全実装 |
+| `/vac`                   | VAC VC操作（名前/人数）                                    | ✅   | 完全実装 |
+| `/sticky-message set`    | スティッキーメッセージ設定                                 | ✅   | 完全実装 |
+| `/sticky-message remove` | スティッキーメッセージ削除                                 | ✅   | 完全実装 |
+| `/sticky-message update` | スティッキーメッセージ更新                                 | ✅   | 完全実装 |
+| `/sticky-message view`   | スティッキーメッセージ一覧表示（SelectMenu）               | ✅   | 完全実装 |
+| `/member-log-config`     | メンバーログ機能設定                                       | ✅   | 完全実装 |
+| `/message-delete`        | メッセージ一括削除                                         | ✅   | 完全実装 |
+| `/message-delete-config` | メッセージ削除内容設定                                     | ✅   | 完全実装 |
+| `/vc-recruit-config`     | VC募集機能設定（setup/teardown/view/add-role/remove-role） | ✅   | 完全実装 |
 
 **関連ファイル**:
 
@@ -486,6 +526,7 @@
 - `src/bot/commands/member-log-config.ts`
 - `src/bot/commands/message-delete.ts`
 - `src/bot/commands/message-delete-config.ts`
+- `src/bot/commands/vc-recruit-config.ts`
 - `src/bot/utils/commandLoader.ts` ← `commands/` ディレクトリを自動スキャンして動的ロード
 - `src/shared/utils/messageResponse.ts`
 
@@ -498,8 +539,9 @@
 | `clientReady`       | Bot起動処理                              | ✅   | 完全実装 |
 | `interactionCreate` | インタラクション処理                     | ✅   | 完全実装 |
 | `messageCreate`     | メッセージ作成（Bump検知・sticky再送信） | ✅   | 完全実装 |
-| `voiceStateUpdate`  | VAC自動作成・自動削除                    | ✅   | 完全実装 |
-| `channelDelete`     | VAC設定同期                              | ✅   | 完全実装 |
+| `voiceStateUpdate`  | VAC自動作成・自動削除 / VC募集空き検知   | ✅   | 完全実装 |
+| `channelDelete`     | VAC設定同期 / VC募集ペアチャンネル削除   | ✅   | 完全実装 |
+| `messageDelete`     | VC募集パネルメッセージ削除時の整合性保全 | ✅   | 完全実装 |
 | `guildMemberAdd`    | メンバー参加通知（メンバーログ）         | ✅   | 完全実装 |
 | `guildMemberRemove` | メンバー退出通知（メンバーログ）         | ✅   | 完全実装 |
 
@@ -510,6 +552,7 @@
 - `src/bot/events/messageCreate.ts`
 - `src/bot/events/voiceStateUpdate.ts`
 - `src/bot/events/channelDelete.ts`
+- `src/bot/events/messageDelete.ts`
 - `src/bot/events/guildMemberAdd.ts`
 - `src/bot/events/guildMemberRemove.ts`
 - `src/bot/utils/eventLoader.ts` ← `events/` ディレクトリを自動スキャンして動的ロード
@@ -521,15 +564,16 @@
 
 ### 🔧 実装済みサービス
 
-| サービス                   | 説明                                       | 状態 | 備考     |
-| -------------------------- | ------------------------------------------ | ---- | -------- |
-| CooldownManager            | コマンドクールダウン管理                   | ✅   | 完全実装 |
-| BumpReminderService        | Bumpリマインダースケジューラー管理         | ✅   | 完全実装 |
-| messageResponse            | Embedメッセージユーティリティ              | ✅   | 完全実装 |
-| VacControlPanel            | VAC操作パネル送信ユーティリティ            | ✅   | 完全実装 |
-| StickyMessageResendService | スティッキーメッセージ再送信（デバウンス） | ✅   | 完全実装 |
-| MemberLogConfigService     | メンバーログ設定管理                       | ✅   | 完全実装 |
-| MessageDeleteService       | メッセージ削除実行ロジック                 | ✅   | 完全実装 |
+| サービス                   | 説明                                        | 状態 | 備考     |
+| -------------------------- | ------------------------------------------- | ---- | -------- |
+| CooldownManager            | コマンドクールダウン管理                    | ✅   | 完全実装 |
+| BumpReminderService        | Bumpリマインダースケジューラー管理          | ✅   | 完全実装 |
+| messageResponse            | Embedメッセージユーティリティ               | ✅   | 完全実装 |
+| VacControlPanel            | VAC操作パネル送信ユーティリティ             | ✅   | 完全実装 |
+| StickyMessageResendService | スティッキーメッセージ再送信（デバウンス）  | ✅   | 完全実装 |
+| MemberLogConfigService     | メンバーログ設定管理                        | ✅   | 完全実装 |
+| MessageDeleteService       | メッセージ削除実行ロジック                  | ✅   | 完全実装 |
+| VcRecruitConfigService     | VC募集設定管理（setup/teardown/ロール管理） | ✅   | 完全実装 |
 
 **関連ファイル**:
 
@@ -611,26 +655,32 @@ model BumpReminder {
 }
 ```
 
+**GuildVcRecruitConfig**
+
+```prisma
+model GuildVcRecruitConfig {
+  id            String   @id @default(cuid())
+  guildId       String
+  panelChannelId  String
+  postChannelId   String
+  categoryId      String?
+  allowedRoleIds  String   @default("[]") // JSON: string[]
+  setupMessageId  String?
+  createdChannelIds String @default("[]") // JSON: string[] 作成済みVCのID一覧
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([guildId])
+  @@map("guild_vc_recruit_configs")
+}
+```
+
 ---
 
 ## 📋 未実装機能
 
 以下は仕様書が作成済みで、実装待ちの機能です。
-
-### 📢 VC募集機能
-
-**状態**: 📋 仕様書作成済み、実装待ち
-
-**仕様書**: [docs/specs/VC_RECRUIT_SPEC.md](../specs/VC_RECRUIT_SPEC.md)
-
-**実装予定内容**:
-
-- `/vc-recruit-config setup` / `teardown` / `add-role` / `remove-role` / `view`
-- 2ステップモーダルフロー（募集画面作成）
-- VC作成・削除の自動管理
-- Prismaスキーマ追加（`VcRecruitConfig`・`VcRecruitSession` テーブル）
-
----
 
 ### ⚙️ ギルド設定機能
 
@@ -679,11 +729,11 @@ model BumpReminder {
 
 | コンポーネント | 実装済み | 未実装 | 合計 |
 | -------------- | -------- | ------ | ---- |
-| コマンド       | 11       | 5      | 16   |
-| イベント       | 7        | 0      | 7    |
-| サービス       | 7        | 0      | 7    |
-| リポジトリ     | 4        | 3      | 7    |
-| ユーティリティ | 9        | 1      | 10   |
+| コマンド       | 12       | 4      | 16   |
+| イベント       | 8        | 0      | 8    |
+| サービス       | 8        | 0      | 8    |
+| リポジトリ     | 5        | 2      | 7    |
+| ユーティリティ | 10       | 1      | 11   |
 
 ---
 

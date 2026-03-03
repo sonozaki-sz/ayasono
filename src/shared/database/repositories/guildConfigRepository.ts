@@ -8,6 +8,7 @@ import { GuildBumpReminderConfigStore } from "../stores/guildBumpReminderConfigS
 import { GuildMemberLogConfigStore } from "../stores/guildMemberLogConfigStore";
 import { GuildStickMessageStore } from "../stores/guildStickMessageStore";
 import { GuildVacConfigStore } from "../stores/guildVacConfigStore";
+import { GuildVcRecruitConfigStore } from "../stores/guildVcRecruitConfigStore";
 import type {
   AfkConfig,
   BumpReminderConfig,
@@ -21,6 +22,7 @@ import type {
   MemberLogConfig,
   StickMessage,
   VacConfig,
+  VcRecruitConfig,
 } from "../types";
 import { parseJsonSafe } from "./serializers/guildConfigSerializer";
 import {
@@ -48,6 +50,7 @@ export class PrismaGuildConfigRepository implements IGuildConfigRepository {
   private readonly vacConfigStore: GuildVacConfigStore;
   private readonly stickMessageStore: GuildStickMessageStore;
   private readonly memberLogConfigStore: GuildMemberLogConfigStore;
+  private readonly vcRecruitConfigStore: GuildVcRecruitConfigStore;
   private readonly toDatabaseError = (
     prefix: string,
     error: unknown,
@@ -83,6 +86,11 @@ export class PrismaGuildConfigRepository implements IGuildConfigRepository {
       prisma,
       parseJsonSafe,
       this.updateConfig.bind(this),
+    );
+    this.vcRecruitConfigStore = new GuildVcRecruitConfigStore(
+      prisma,
+      this.DEFAULT_LOCALE,
+      parseJsonSafe,
     );
   }
 
@@ -293,6 +301,28 @@ export class PrismaGuildConfigRepository implements IGuildConfigRepository {
     await this.memberLogConfigStore.updateMemberLogConfig(
       guildId,
       memberLogConfig,
+    );
+  }
+
+  /**
+   * VC募集設定を取得する
+   */
+  async getVcRecruitConfig(guildId: string): Promise<VcRecruitConfig | null> {
+    // VC募集設定取得は専用ストアへ委譲
+    return this.vcRecruitConfigStore.getVcRecruitConfig(guildId);
+  }
+
+  /**
+   * VC募集設定を更新する
+   */
+  async updateVcRecruitConfig(
+    guildId: string,
+    vcRecruitConfig: VcRecruitConfig,
+  ): Promise<void> {
+    // VC募集設定更新は専用ストアへ委譲
+    await this.vcRecruitConfigStore.updateVcRecruitConfig(
+      guildId,
+      vcRecruitConfig,
     );
   }
 }
