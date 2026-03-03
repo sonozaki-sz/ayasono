@@ -1,5 +1,5 @@
-// src/bot/features/vac/handlers/ui/vacPanelButton.ts
-// VAC操作パネルのボタン処理
+// src/bot/features/vc-panel/handlers/ui/vcPanelButton.ts
+// VC操作パネルのボタン処理（VAC・VC募集など共用）
 
 import {
   ActionRowBuilder,
@@ -15,7 +15,6 @@ import {
 } from "discord.js";
 import { tGuild } from "../../../../../shared/locale/localeManager";
 import type { ButtonHandler } from "../../../../handlers/interactionCreate/ui/types";
-import { getBotVacRepository } from "../../../../services/botVacDependencyResolver";
 import { safeReply } from "../../../../utils/interaction";
 import {
   createErrorEmbed,
@@ -23,18 +22,18 @@ import {
 } from "../../../../utils/messageResponse";
 import {
   getVacPanelChannelId,
-  sendVacControlPanel,
+  sendVcControlPanel,
   VAC_PANEL_CUSTOM_ID,
-} from "./vacControlPanel";
+} from "../../vcControlPanel";
+import { isVcPanelManagedChannel } from "../../vcPanelOwnershipRegistry";
 
-export const vacPanelButtonHandler: ButtonHandler = {
+export const vcPanelButtonHandler: ButtonHandler = {
   /**
    * ハンドラー対象の customId かを判定する
    * @param customId 判定対象の customId
-   * @returns VAC パネルボタンなら true
+   * @returns VC操作パネルボタンなら true
    */
   matches(customId) {
-    // VAC パネル由来の4系統ボタンのみを受理
     return (
       customId.startsWith(VAC_PANEL_CUSTOM_ID.RENAME_BUTTON_PREFIX) ||
       customId.startsWith(VAC_PANEL_CUSTOM_ID.LIMIT_BUTTON_PREFIX) ||
@@ -44,26 +43,21 @@ export const vacPanelButtonHandler: ButtonHandler = {
   },
 
   /**
-   * VAC パネルのボタン操作を実行する
+   * VC操作パネルのボタン操作を実行する
    * @param interaction ボタンインタラクション
    * @returns 実行完了を示す Promise
    */
   async execute(interaction: ButtonInteraction) {
-    // interaction に guild がないケース（DM等）は対象外
     const guild = interaction.guild;
     if (!guild) {
       return;
     }
 
-    // ボタン customId から操作対象 VC を抽出
     const channelId = getPanelChannelId(interaction.customId);
     if (!channelId) {
-      // customId 不整合時は何も返さず安全側で終了
-      // エラーレスポンスを返さないことで未知ID連打時のノイズを抑える
       return;
     }
 
-    // 対象チャンネルが存在し、かつ VoiceChannel であることを検証
     const channel = await guild.channels.fetch(channelId).catch(() => null);
     if (!channel || channel.type !== ChannelType.GuildVoice) {
       await safeReply(interaction, {
@@ -77,13 +71,8 @@ export const vacPanelButtonHandler: ButtonHandler = {
       return;
     }
 
-    // VAC 管理対象チャンネルかを検証
-    const isManaged = await getBotVacRepository().isManagedVacChannel(
-      guild.id,
-      channel.id,
-    );
-    if (!isManaged) {
-      // 操作対象が通常VCだった場合は VAC 専用エラーで統一
+    // 登録済みチェッカー（VAC・VC募集など）で管理対象かを判定
+    if (!(await isVcPanelManagedChannel(guild.id, channel.id))) {
       await safeReply(interaction, {
         embeds: [
           createErrorEmbed(
@@ -95,14 +84,11 @@ export const vacPanelButtonHandler: ButtonHandler = {
       return;
     }
 
-    // 操作者が対象 VC に接続中かを検証
     const member = (await guild.members
       .fetch(interaction.user.id)
       .catch(() => null)) as GuildMember | null;
 
     if (!member || member.voice.channelId !== channel.id) {
-      // パネルの誤操作を防ぐため、同一VC参加者のみに限定
-      // VC外ユーザーには操作内容を隠し、汎用エラーのみ返す
       await safeReply(interaction, {
         embeds: [
           createErrorEmbed(await tGuild(guild.id, "errors:vac.not_in_vc")),
@@ -112,14 +98,10 @@ export const vacPanelButtonHandler: ButtonHandler = {
       return;
     }
 
-    // チャンネル名変更モーダルを表示
     if (
       interaction.customId.startsWith(VAC_PANEL_CUSTOM_ID.RENAME_BUTTON_PREFIX)
     ) {
-      // rename は入力前に modal へ遷移して値検証を後段に委譲
-      // ボタン段階では対象確定のみ行い、文言/長さ検証は modal 側へ集約
       const title = await tGuild(guild.id, "commands:vac.panel.rename_button");
-      // rename はモーダル入力（短文）でのみ受け付ける
       const modal = new ModalBuilder()
         .setCustomId(`${VAC_PANEL_CUSTOM_ID.RENAME_MODAL_PREFIX}${channel.id}`)
         .setTitle(title)
@@ -135,18 +117,13 @@ export const vacPanelButtonHandler: ButtonHandler = {
         );
 
       await interaction.showModal(modal);
-      // モーダル表示で処理完了（以降は modal ハンドラーへ委譲）
       return;
     }
 
-    // ユーザー上限変更モーダルを表示
     if (
       interaction.customId.startsWith(VAC_PANEL_CUSTOM_ID.LIMIT_BUTTON_PREFIX)
     ) {
-      // limit も modal 側で数値範囲チェックを実施する
-      // ここでは入力UI提示のみに責務を限定し、判定分岐を減らす
       const title = await tGuild(guild.id, "commands:vac.panel.limit_button");
-      // limit もモーダル入力経由で受け取り、後段で数値検証する
       const modal = new ModalBuilder()
         .setCustomId(`${VAC_PANEL_CUSTOM_ID.LIMIT_MODAL_PREFIX}${channel.id}`)
         .setTitle(title)
@@ -168,19 +145,15 @@ export const vacPanelButtonHandler: ButtonHandler = {
         );
 
       await interaction.showModal(modal);
-      // モーダル表示で処理完了（以降は modal ハンドラーへ委譲）
       return;
     }
 
-    // AFK 移動対象ユーザー選択メニューを返信
     if (
       interaction.customId.startsWith(VAC_PANEL_CUSTOM_ID.AFK_BUTTON_PREFIX)
     ) {
-      // 接続中メンバーのみを選択肢として提示
       const vcMembers = [...channel.members.values()];
 
       if (vcMembers.length === 0) {
-        // VC に誰もいない場合は選択メニューを出さずエラー
         await safeReply(interaction, {
           embeds: [
             createErrorEmbed(await tGuild(guild.id, "errors:vac.not_in_vc")),
@@ -190,18 +163,18 @@ export const vacPanelButtonHandler: ButtonHandler = {
         return;
       }
 
-      const options = vcMembers.slice(0, 25).map((m) =>
-        new StringSelectMenuOptionBuilder()
-          // 表示名が長い場合でも label 上限(100)に収める
-          .setLabel(m.displayName.slice(0, 100))
-          .setValue(m.id),
-      );
+      const options = vcMembers
+        .slice(0, 25)
+        .map((m) =>
+          new StringSelectMenuOptionBuilder()
+            .setLabel(m.displayName.slice(0, 100))
+            .setValue(m.id),
+        );
 
       const selectMenu = new StringSelectMenuBuilder()
         .setCustomId(`${VAC_PANEL_CUSTOM_ID.AFK_SELECT_PREFIX}${channel.id}`)
         .setPlaceholder(await tGuild(guild.id, "commands:vac.panel.afk_button"))
         .setMinValues(1)
-        // Discord StringSelect の上限(25)と接続人数から選択可能数を決定
         .setMaxValues(Math.min(25, vcMembers.length))
         .addOptions(options);
 
@@ -213,23 +186,17 @@ export const vacPanelButtonHandler: ButtonHandler = {
         ],
         flags: MessageFlags.Ephemeral,
       });
-      // 選択メニュー送信後の処理は stringSelect handler に委譲
       return;
     }
 
-    // 既存パネルを置き換えて再送し、完了通知を返す
     if (
       interaction.customId.startsWith(VAC_PANEL_CUSTOM_ID.REFRESH_BUTTON_PREFIX)
     ) {
-      // 古いパネルを消し、同チャンネル最下部へ新規パネルを再配置
       if (interaction.message.deletable) {
-        // 削除失敗でも再送自体は継続し、操作不能状態を避ける
         await interaction.message.delete().catch(() => null);
       }
-      // delete 可否に関わらず再送して、常に最新構成のパネルを再配置する
-      await sendVacControlPanel(channel);
+      await sendVcControlPanel(channel);
 
-      // リフレッシュ完了を操作ユーザーへ通知
       await safeReply(interaction, {
         embeds: [
           createSuccessEmbed(
@@ -243,33 +210,29 @@ export const vacPanelButtonHandler: ButtonHandler = {
 };
 
 /**
- * ボタン customId から VAC 対象チャンネル ID を解決する関数
+ * ボタン customId から VC操作パネル対象チャンネル ID を解決する関数
  * @param customId 解析対象の customId
  * @returns 解決したチャンネルID（未対応時は空文字）
  */
 function getPanelChannelId(customId: string): string {
-  // rename 系ボタン
   if (customId.startsWith(VAC_PANEL_CUSTOM_ID.RENAME_BUTTON_PREFIX)) {
     return getVacPanelChannelId(
       customId,
       VAC_PANEL_CUSTOM_ID.RENAME_BUTTON_PREFIX,
     );
   }
-  // limit 系ボタン
   if (customId.startsWith(VAC_PANEL_CUSTOM_ID.LIMIT_BUTTON_PREFIX)) {
     return getVacPanelChannelId(
       customId,
       VAC_PANEL_CUSTOM_ID.LIMIT_BUTTON_PREFIX,
     );
   }
-  // afk 系ボタン
   if (customId.startsWith(VAC_PANEL_CUSTOM_ID.AFK_BUTTON_PREFIX)) {
     return getVacPanelChannelId(
       customId,
       VAC_PANEL_CUSTOM_ID.AFK_BUTTON_PREFIX,
     );
   }
-  // refresh 系ボタン
   if (customId.startsWith(VAC_PANEL_CUSTOM_ID.REFRESH_BUTTON_PREFIX)) {
     return getVacPanelChannelId(
       customId,

@@ -1,7 +1,7 @@
 // tests/unit/bot/features/vac/services/usecases/handleVacCreate.test.ts
-import { sendVacControlPanel } from "@/bot/features/vac/handlers/ui/vacControlPanel";
 import type { IVacRepository } from "@/bot/features/vac/repositories/vacRepository";
 import { handleVacCreateUseCase } from "@/bot/features/vac/services/usecases/handleVacCreate";
+import { sendVcControlPanel } from "@/bot/features/vc-panel/vcControlPanel";
 import { ChannelType, PermissionFlagsBits } from "discord.js";
 import type { Mock, Mocked } from "vitest";
 
@@ -21,8 +21,8 @@ vi.mock("@/shared/utils/logger", () => ({
   },
 }));
 
-vi.mock("@/bot/features/vac/handlers/ui/vacControlPanel", () => ({
-  sendVacControlPanel: vi.fn(),
+vi.mock("@/bot/features/vc-panel/vcControlPanel", () => ({
+  sendVcControlPanel: vi.fn(),
 }));
 
 function createRepositoryMock(): Mocked<IVacRepository> {
@@ -114,7 +114,7 @@ describe("bot/features/vac/services/usecases/handleVacCreate", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.spyOn(Date, "now").mockReturnValue(1700000000000);
-    (sendVacControlPanel as Mock).mockResolvedValue(undefined);
+    (sendVcControlPanel as Mock).mockResolvedValue(undefined);
   });
 
   afterEach(() => {
@@ -259,7 +259,7 @@ describe("bot/features/vac/services/usecases/handleVacCreate", () => {
         },
       ],
     });
-    expect(sendVacControlPanel).toHaveBeenCalledTimes(1);
+    expect(sendVcControlPanel).toHaveBeenCalledTimes(1);
     expect(setChannelMock).toHaveBeenCalledWith({
       id: "created-voice-1",
       type: ChannelType.GuildVoice,
@@ -290,7 +290,7 @@ describe("bot/features/vac/services/usecases/handleVacCreate", () => {
     await handleVacCreateUseCase(repository, newState as never);
 
     expect(createMock).toHaveBeenCalledTimes(1);
-    expect(sendVacControlPanel).not.toHaveBeenCalled();
+    expect(sendVcControlPanel).not.toHaveBeenCalled();
     expect(setChannelMock).not.toHaveBeenCalled();
     expect(repository.addCreatedVacChannel).not.toHaveBeenCalled();
   });
@@ -304,7 +304,7 @@ describe("bot/features/vac/services/usecases/handleVacCreate", () => {
       triggerChannelIds: ["trigger-1"],
       createdChannels: [],
     });
-    (sendVacControlPanel as Mock).mockRejectedValueOnce(
+    (sendVcControlPanel as Mock).mockRejectedValueOnce(
       new Error("panel failed"),
     );
 

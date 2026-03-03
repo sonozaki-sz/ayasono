@@ -43,7 +43,8 @@ export async function handleVacConfigRemoveTrigger(
   const targetCategoryId = category?.id ?? null;
 
   // 設定上の対象トリガーを特定
-  const config = await getBotVacRepository().getVacConfigOrDefault(guildId);
+  const repo = getBotVacRepository();
+  const config = await repo.getVacConfigOrDefault(guildId);
   const triggerChannel = await findTriggerChannelByCategory(
     guild,
     config.triggerChannelIds,
@@ -58,7 +59,7 @@ export async function handleVacConfigRemoveTrigger(
   }
 
   // 設定を先に更新し、実体削除は後続で試行する
-  await getBotVacRepository().removeTriggerChannel(guildId, triggerChannel.id);
+  await repo.removeTriggerChannel(guildId, triggerChannel.id);
 
   const guildChannel = await interaction.guild?.channels
     .fetch(triggerChannel.id)

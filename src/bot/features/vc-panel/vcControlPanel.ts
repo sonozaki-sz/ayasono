@@ -1,5 +1,5 @@
-// src/bot/features/vac/handlers/ui/vacControlPanel.ts
-// VAC操作パネルの送信ユーティリティ
+// src/bot/features/vc-panel/vcControlPanel.ts
+// VC操作パネルの送信ユーティリティ（VAC・VC募集などVC自動作成機能で共用）
 
 import {
   ActionRowBuilder,
@@ -7,10 +7,11 @@ import {
   ButtonStyle,
   type VoiceChannel,
 } from "discord.js";
-import { tGuild } from "../../../../../shared/locale/localeManager";
-import { createInfoEmbed } from "../../../../utils/messageResponse";
+import { tGuild } from "../../../shared/locale/localeManager";
+import { createInfoEmbed } from "../../utils/messageResponse";
 
-// VAC パネルのボタン/モーダル/入力識別に使う customId 定数
+// VC操作パネルのボタン/モーダル/入力識別に使う customId 定数
+// 既存の Discord パネルとの互換性維持のため `vac:` プレフィックスを継続使用
 export const VAC_PANEL_CUSTOM_ID = {
   RENAME_BUTTON_PREFIX: "vac:rename:",
   LIMIT_BUTTON_PREFIX: "vac:limit:",
@@ -24,23 +25,22 @@ export const VAC_PANEL_CUSTOM_ID = {
 } as const;
 
 /**
- * VAC パネル customId から対象ボイスチャンネル ID を抽出する関数
+ * VC操作パネル customId から対象ボイスチャンネル ID を抽出する関数
  * @param customId 判定対象の customId
  * @param prefix 対象とする customId プレフィックス
  * @returns 解決したチャンネルID（不一致時は空文字）
  */
 export function getVacPanelChannelId(customId: string, prefix: string): string {
   // 想定prefix以外は空文字を返し、呼び出し側で不正IDとして扱う
-  // 例外を投げず空文字へ寄せることで UI ハンドラ側の分岐を単純化する
   return customId.startsWith(prefix) ? customId.slice(prefix.length) : "";
 }
 
 /**
- * VAC 操作パネルメッセージを対象ボイスチャンネルへ送信する関数
+ * VC操作パネルメッセージを対象ボイスチャンネルへ送信する関数
  * @param voiceChannel 送信先ボイスチャンネル
  * @returns 実行完了を示す Promise
  */
-export async function sendVacControlPanel(
+export async function sendVcControlPanel(
   voiceChannel: VoiceChannel,
 ): Promise<void> {
   // VoiceChannel でも send 不可な状態（権限不足など）は送信しない
@@ -61,11 +61,8 @@ export async function sendVacControlPanel(
     "commands:vac.panel.refresh_button",
   );
 
-  // 操作説明付きの固定Embedを作成
   const embed = createInfoEmbed(description, { title });
 
-  // 1行1ボタン構成で操作ごとの customId を明確化
-  // ボタン行を分けることで誤タップ時の視認性を高める
   const renameRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
       .setCustomId(
@@ -95,7 +92,6 @@ export async function sendVacControlPanel(
   );
 
   const refreshRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
-    // refresh は同一VCにパネルを再送して最新位置へ移動させる
     new ButtonBuilder()
       .setCustomId(
         `${VAC_PANEL_CUSTOM_ID.REFRESH_BUTTON_PREFIX}${voiceChannel.id}`,
@@ -105,8 +101,6 @@ export async function sendVacControlPanel(
       .setStyle(ButtonStyle.Primary),
   );
 
-  // パネル本体を送信（後続操作は interaction ハンドラー側で処理）
-  // 送信順（rename→limit→afk→refresh）は UI 説明順と一致させる
   await voiceChannel.send({
     embeds: [embed],
     components: [renameRow, limitRow, afkRow, refreshRow],
