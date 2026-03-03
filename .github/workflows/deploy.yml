@@ -42,6 +42,9 @@ jobs:
       - name: Prisma Client 生成
         run: pnpm db:generate
 
+      - name: リント
+        run: pnpm lint
+
       - name: 型チェック
         run: pnpm typecheck
 
