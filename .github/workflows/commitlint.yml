@@ -1,12 +1,9 @@
 name: Commit Lint
 
 # コミットメッセージを Conventional Commits 形式で検証する
-# - develop への直接 push: push されたコミット範囲を検証
 # - main/develop 向け PR: PR に含まれるコミット範囲を検証
+# （develop への直接 push は husky commit-msg フックでローカル検証）
 on:
-  push:
-    branches:
-      - develop
   pull_request:
     branches:
       - main
@@ -33,10 +30,5 @@ jobs:
       - name: 依存関係のインストール
         run: pnpm install --frozen-lockfile
 
-      - name: コミットメッセージの検証（push）
-        if: github.event_name == 'push'
-        run: pnpm exec commitlint --from ${{ github.event.before }} --to ${{ github.sha }} --verbose
-
       - name: コミットメッセージの検証（PR）
-        if: github.event_name == 'pull_request'
         run: pnpm exec commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose

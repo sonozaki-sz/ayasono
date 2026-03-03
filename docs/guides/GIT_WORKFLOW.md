@@ -2,7 +2,7 @@
 
 > Git Workflow & Commit Convention Guide
 
-最終更新: 2026年3月4日（develop への直接 push を許可する運用に変更）
+最終更新: 2026年3月4日（husky で commit/push 時のローカルチェックに統一）
 
 ---
 
@@ -20,7 +20,7 @@
 main          ← 本番環境（常にデプロイ可能な状態）
   ↑ PR only
 develop       ← 開発統合ブランチ（次リリース向けの集約点）
-  ↑ 直接 push 可（CI・commitlint は push 時に自動実行）
+  ↑ 直接 push 可（commit 時: lint・typecheck・commitlint、push 時: test を husky で自動実行）
 feature/xxx   ← 機能開発（大規模変更や履歴を整理したい場合に使用）
 fix/xxx       ← バグ修正
 hotfix/xxx    ← 本番障害の緊急修正（main から直接分岐）
@@ -57,12 +57,12 @@ git pull origin develop
 git add src/bot/features/bump-reminder/
 git commit -m "feat(bump-reminder): メンションロール設定機能を追加"
 
-# develop に直接 push（push 後に CI・commitlint が自動で実行される）
+# develop に直接 push（push 前に husky が pnpm test を自動実行してブロック）
 git push origin develop
 ```
 
-> push 後、GitHub Actions で lint・型チェック・テスト・commitlint が自動で走る。
-> 失敗した場合は次の push で修正するか、`git push --force-with-lease` で修正コミットを上書きする。
+> commit 時に husky が lint・typecheck・commitlint を、push 時に test を自動実行する。
+> いずれかが失敗すると commit / push がブロックされる（`--no-verify` で強制スキップも可）。
 
 ### パターン B: フィーチャーブランチ → PR（大規模変更・履歴を整理したい場合）
 
@@ -228,34 +228,38 @@ git commit -m "test(afk): AFK自動解除のユニットテストを追加"
 
 ### develop への直接 push 時のチェック
 
-- [ ] コミットメッセージが Conventional Commits 形式になっている
-- [ ] `pnpm test` がローカルで通っている（任意だが推奨）
+- [ ] コミットメッセージが Conventional Commits 形式になっている（husky が自動検証）
+- [ ] `pnpm test` が通っている（husky が push 前に自動実行）
 
-### PR 作成時のチェック（feature/* → develop、または develop → main）
+### PR 作成時のチェック（feature/\* → develop、または develop → main）
 
 - [ ] ブランチ名が命名規則に従っている
 - [ ] コミットメッセージが Conventional Commits 形式になっている
 - [ ] `pnpm test` がローカルで通っている
 - [ ] `pnpm typecheck` がローカルで通っている
 
-### CI の自動実行
+### ローカル自動チェック（husky）
 
-| トリガー                         | ワークフロー     | 実行内容                         |
-| -------------------------------- | ---------------- | -------------------------------- |
-| **develop への直接 push**        | `deploy.yml`     | lint・型チェック・テスト実行     |
-| **develop への直接 push**        | `commitlint.yml` | コミットメッセージ形式の検証     |
-| **main / develop 向け PR**       | `deploy.yml`     | lint・型チェック・テスト実行     |
-| **main / develop 向け PR**       | `commitlint.yml` | コミットメッセージ形式の検証     |
-| **main への push（PRマージ後）** | `deploy.yml`     | VPS へ自動デプロイ               |
+| タイミング    | フック       | 実行内容                                   |
+| ------------- | ------------ | ------------------------------------------ |
+| **commit 時** | `pre-commit` | typecheck・lint（lint-staged で自動修正）  |
+| **commit 時** | `commit-msg` | コミットメッセージ形式の検証（commitlint） |
+| **push 前**   | `pre-push`   | テスト実行（`pnpm test`）                  |
 
-> develop への直接 push は CI 完了前にコミットが反映されるため、**ローカルでテストを通してから push することを強く推奨**する。
+### CI の自動実行（GitHub Actions）
+
+| トリガー                         | ワークフロー     | 実行内容                     |
+| -------------------------------- | ---------------- | ---------------------------- |
+| **main / develop 向け PR**       | `deploy.yml`     | lint・型チェック・テスト実行 |
+| **main / develop 向け PR**       | `commitlint.yml` | コミットメッセージ形式の検証 |
+| **main への push（PRマージ後）** | `deploy.yml`     | VPS へ自動デプロイ           |
 
 ### マージ戦略（PR 経由の場合）
 
-| マージ先  | 方式                                     | CLI オプション          | 理由                                       |
-| --------- | ---------------------------------------- | ----------------------- | ------------------------------------------ |
-| `develop` | **Rebase merge** または **Squash merge** | `--rebase` / `--squash` | コミット構成に応じて使い分ける             |
-| `main`    | **Merge commit**                         | `--merge`               | リリース履歴を明確に残す                   |
+| マージ先  | 方式                                     | CLI オプション          | 理由                           |
+| --------- | ---------------------------------------- | ----------------------- | ------------------------------ |
+| `develop` | **Rebase merge** または **Squash merge** | `--rebase` / `--squash` | コミット構成に応じて使い分ける |
+| `main`    | **Merge commit**                         | `--merge`               | リリース履歴を明確に残す       |
 
 **Rebase merge を使う**（推奨）— コミットが意味のある粒度に分割されている場合
 
@@ -290,7 +294,7 @@ git commit -m "test(afk): AFK自動解除のユニットテストを追加"
 | Require status checks to pass         | ❌  |
 | Block force pushes                    | ❌  |
 
-> CI（テスト・commitlint）は push 後に GitHub Actions で自動実行されるが、push 自体はブロックされない。**push 前にローカルで `pnpm test` を実行することを推奨する。**
+> commit・push 時は husky フックが自動実行される（pre-commit: typecheck・lint、commit-msg: commitlint、pre-push: test）。`--no-verify` オプションで強制スキップも可能だが、基本不要。
 
 ---
 
