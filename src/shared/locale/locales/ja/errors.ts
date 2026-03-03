@@ -78,6 +78,26 @@ export const errors = {
     "予期しないエラーが発生しました。後ほど再度お試しください。",
   "general.unexpected_with_message":
     "エラー: {{message}}",
+
+  // VC募集エラー
+  "vcRecruit.already_setup":
+    "このカテゴリーには既にVC募集チャンネルが設置されています。",
+  "vcRecruit.not_setup":
+    "このカテゴリーにはVC募集チャンネルが設置されていません。",
+  "vcRecruit.role_already_added":
+    "{{role}} は既に追加されています。",
+  "vcRecruit.role_not_found":
+    "{{role}} はメンション候補に登録されていません。",
+  "vcRecruit.role_limit_exceeded":
+    "メンション候補ロールは最夤25件までです。",
+  "vcRecruit.vc_deleted":
+    "選択したVCは既に削除されています。",
+  "vcRecruit.category_full":
+    "カテゴリーのチャンネル数が上限（50）に達しているため作成できません。",
+  "vcRecruit.panel_channel_not_found":
+    "VC募集パネルチャンネルが見つかりません。セットアップが削除された可能性があります。",
+  "vcRecruit.voice_state_update_failed":
+    "[VC募集機能] voiceStateUpdate処理失敗",
 } as const;
 
 export type ErrorsTranslations = typeof errors;

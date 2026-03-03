@@ -3,6 +3,7 @@
 
 import { Events, type VoiceState } from "discord.js";
 import { handleVacVoiceStateUpdate } from "../features/vac/handlers/vacVoiceStateUpdate";
+import { handleVcRecruitVoiceStateUpdate } from "../features/vc-recruit/handlers/vcRecruitVoiceStateUpdate";
 import type { BotEvent } from "../types/discord";
 
 export const voiceStateUpdateEvent: BotEvent<typeof Events.VoiceStateUpdate> = {
@@ -19,5 +20,7 @@ export const voiceStateUpdateEvent: BotEvent<typeof Events.VoiceStateUpdate> = {
   async execute(oldState: VoiceState, newState: VoiceState) {
     // VAC同期ロジックは専用ハンドラへ委譲
     await handleVacVoiceStateUpdate(oldState, newState);
+    // VC募集で作成したVCの空き検知・自動削除
+    await handleVcRecruitVoiceStateUpdate(oldState, newState);
   },
 };

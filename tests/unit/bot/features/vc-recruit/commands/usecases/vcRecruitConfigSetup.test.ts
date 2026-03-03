@@ -1,0 +1,264 @@
+// tests/unit/bot/features/vc-recruit/commands/usecases/vcRecruitConfigSetup.test.ts
+import { handleVcRecruitConfigSetup } from "@/bot/features/vc-recruit/commands/usecases/vcRecruitConfigSetup";
+import { ValidationError } from "@/shared/errors/customErrors";
+import { ChannelType } from "discord.js";
+
+// ---- モック定義 ----
+
+const findSetupByCategoryIdMock = vi.fn();
+const addSetupMock = vi.fn();
+const resolveTargetCategoryMock = vi.fn();
+const tGuildMock = vi.fn(async (_guildId: string, key: string) => key);
+const tDefaultMock = vi.fn((key: string) => key);
+
+vi.mock("@/bot/services/botVcRecruitDependencyResolver", () => ({
+  getBotVcRecruitRepository: () => ({
+    findSetupByCategoryId: (...args: unknown[]) =>
+      findSetupByCategoryIdMock(...args),
+    addSetup: (...args: unknown[]) => addSetupMock(...args),
+  }),
+}));
+vi.mock(
+  "@/bot/features/vc-recruit/commands/helpers/vcRecruitTargetResolver",
+  () => ({
+    resolveTargetCategory: (...args: unknown[]) =>
+      resolveTargetCategoryMock(...args),
+  }),
+);
+vi.mock("@/shared/locale/localeManager", () => ({
+  tGuild: (...args: unknown[]) =>
+    tGuildMock(...(args as Parameters<typeof tGuildMock>)),
+  tDefault: (...args: unknown[]) =>
+    tDefaultMock(...(args as Parameters<typeof tDefaultMock>)),
+}));
+
+// ---- ヘルパー ----
+
+const GUILD_ID = "guild-1";
+
+const panelSendMock = vi.fn();
+const createChannelMock = vi.fn();
+
+function makeGuild(
+  opts: {
+    categoryChildren?: number;
+    categoryViewAllowed?: boolean;
+    categoryId?: string | null;
+  } = {},
+) {
+  const {
+    categoryChildren = 0,
+    categoryViewAllowed = true,
+    categoryId = null,
+  } = opts;
+
+  const everyoneRole = { id: "everyone-role" };
+  const meId = "bot-me";
+
+  const channelCounter = { count: 0 };
+  createChannelMock.mockImplementation(
+    (opts: { name: string; type: number }) => {
+      channelCounter.count++;
+      const id = `created-ch-${channelCounter.count}`;
+      if (opts.type === ChannelType.GuildText) {
+        return Promise.resolve({ id, send: panelSendMock });
+      }
+      return Promise.resolve({ id });
+    },
+  );
+
+  panelSendMock.mockResolvedValue({ id: "panel-msg-1" });
+
+  const category = categoryId
+    ? {
+        id: categoryId,
+        children: { cache: { size: categoryChildren } },
+        permissionsFor: () => ({
+          has: () => categoryViewAllowed,
+        }),
+      }
+    : null;
+
+  return {
+    id: GUILD_ID,
+    roles: { everyone: everyoneRole },
+    members: { me: { id: meId } },
+    channels: {
+      create: createChannelMock,
+    },
+    _category: category,
+  };
+}
+
+function makeInteraction(
+  opts: {
+    hasGuild?: boolean;
+    guildObj?: ReturnType<typeof makeGuild> | null;
+    categoryOption?: string | null;
+    threadArchiveOption?: string | null;
+    channelId?: string;
+  } = {},
+) {
+  const {
+    hasGuild = true,
+    guildObj,
+    categoryOption = null,
+    threadArchiveOption = null,
+    channelId = "cmd-channel-1",
+  } = opts;
+
+  const guild =
+    guildObj !== undefined ? guildObj : hasGuild ? makeGuild() : null;
+
+  return {
+    guild,
+    guildId: GUILD_ID,
+    channelId,
+    options: {
+      getString: (key: string) => {
+        if (key === "category") return categoryOption;
+        if (key === "thread-archive") return threadArchiveOption;
+        return null;
+      },
+    },
+    reply: vi.fn().mockResolvedValue(undefined),
+  };
+}
+
+describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigSetup", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    findSetupByCategoryIdMock.mockResolvedValue(null);
+    addSetupMock.mockResolvedValue(undefined);
+    // デフォルト: カテゴリーなし（TOP）
+    resolveTargetCategoryMock.mockResolvedValue(null);
+  });
+
+  // guild が null の場合は ValidationError を投げる
+  it("throws ValidationError when interaction has no guild", async () => {
+    const interaction = makeInteraction({ hasGuild: false });
+    await expect(
+      handleVcRecruitConfigSetup(interaction as never, GUILD_ID),
+    ).rejects.toBeInstanceOf(ValidationError);
+  });
+
+  // 既にセットアップ済みの場合は ValidationError を投げる
+  it("throws ValidationError when same category is already set up", async () => {
+    findSetupByCategoryIdMock.mockResolvedValue({
+      panelChannelId: "old-panel",
+    });
+
+    const guild = makeGuild();
+    const interaction = makeInteraction({ guildObj: guild });
+    await expect(
+      handleVcRecruitConfigSetup(interaction as never, GUILD_ID),
+    ).rejects.toBeInstanceOf(ValidationError);
+  });
+
+  // カテゴリーが満杯（50チャンネル）の場合は ValidationError を投げる
+  it("throws ValidationError when category has reached channel limit", async () => {
+    const category = {
+      id: "cat-full",
+      children: { cache: { size: 50 } },
+      permissionsFor: () => ({ has: () => true }),
+    };
+    resolveTargetCategoryMock.mockResolvedValue(category);
+
+    const guild = makeGuild({ categoryId: "cat-full", categoryChildren: 50 });
+    const interaction = makeInteraction({ guildObj: guild });
+    await expect(
+      handleVcRecruitConfigSetup(interaction as never, GUILD_ID),
+    ).rejects.toBeInstanceOf(ValidationError);
+  });
+
+  // カテゴリーなし（TOP）で正常にセットアップできる
+  it("creates panel/post channels and saves setup to DB for TOP category", async () => {
+    const guild = makeGuild();
+    const interaction = makeInteraction({ guildObj: guild });
+    await handleVcRecruitConfigSetup(interaction as never, GUILD_ID);
+
+    // 2チャンネル作成確認
+    expect(createChannelMock).toHaveBeenCalledTimes(2);
+    // パネルメッセージ送信確認
+    expect(panelSendMock).toHaveBeenCalled();
+    // DB 保存確認
+    expect(addSetupMock).toHaveBeenCalledWith(
+      GUILD_ID,
+      expect.objectContaining({
+        categoryId: null,
+        panelChannelId: expect.any(String),
+        postChannelId: expect.any(String),
+        panelMessageId: expect.any(String),
+      }),
+    );
+    // 返信確認
+    expect(interaction.reply).toHaveBeenCalledWith(
+      expect.objectContaining({
+        embeds: expect.any(Array),
+        flags: expect.anything(),
+      }),
+    );
+  });
+
+  // カテゴリーあり（49チャンネル）で正常にセットアップできる
+  it("creates channels under a specific category", async () => {
+    const category = {
+      id: "cat-1",
+      name: "ゲームカテゴリー",
+      children: { cache: { size: 49 } },
+      permissionsFor: () => ({ has: () => true }),
+    };
+    resolveTargetCategoryMock.mockResolvedValue(category);
+
+    const guild = makeGuild({ categoryId: "cat-1", categoryChildren: 49 });
+    const interaction = makeInteraction({ guildObj: guild });
+    await handleVcRecruitConfigSetup(interaction as never, GUILD_ID);
+
+    expect(addSetupMock).toHaveBeenCalledWith(
+      GUILD_ID,
+      expect.objectContaining({ categoryId: "cat-1" }),
+    );
+  });
+
+  // threadArchiveOption が指定されている場合は正しい分数に変換される
+  it("uses specified thread archive duration", async () => {
+    const guild = makeGuild();
+    const interaction = makeInteraction({
+      guildObj: guild,
+      threadArchiveOption: "1h",
+    });
+    await handleVcRecruitConfigSetup(interaction as never, GUILD_ID);
+
+    expect(addSetupMock).toHaveBeenCalledWith(
+      GUILD_ID,
+      expect.objectContaining({ threadArchiveDuration: 60 }),
+    );
+  });
+
+  // @everyone が ViewChannel を持たないカテゴリーでは everyoneViewAllowed=false となり
+  // パーミッションオーバーライドに @everyone への deny が追加されない
+  it("creates channels without everyone-view overwrites when everyone cannot view category", async () => {
+    const category = {
+      id: "cat-restricted",
+      name: "制限カテゴリー",
+      children: { cache: { size: 0 } },
+      // ViewChannel なし → everyoneViewAllowed = false
+      permissionsFor: () => ({ has: () => false }),
+    };
+    resolveTargetCategoryMock.mockResolvedValue(category);
+
+    const guild = makeGuild({
+      categoryId: "cat-restricted",
+      categoryViewAllowed: false,
+    });
+    const interaction = makeInteraction({ guildObj: guild });
+    await handleVcRecruitConfigSetup(interaction as never, GUILD_ID);
+
+    expect(addSetupMock).toHaveBeenCalledWith(
+      GUILD_ID,
+      expect.objectContaining({ categoryId: "cat-restricted" }),
+    );
+    // チャンネルは everyoneViewAllowed=false でも正常に作成される
+    expect(createChannelMock).toHaveBeenCalledTimes(2);
+  });
+});

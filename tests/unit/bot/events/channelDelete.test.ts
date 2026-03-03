@@ -3,6 +3,7 @@ import { channelDeleteEvent } from "@/bot/events/channelDelete";
 import { ChannelType, Events } from "discord.js";
 const handleVacChannelDeleteMock = vi.fn();
 const handleStickyMessageChannelDeleteMock = vi.fn();
+const handleVcRecruitChannelDeleteMock = vi.fn();
 
 vi.mock("@/bot/features/vac/handlers/vacChannelDelete", () => ({
   handleVacChannelDelete: (...args: unknown[]) =>
@@ -14,6 +15,14 @@ vi.mock(
   () => ({
     handleStickyMessageChannelDelete: (...args: unknown[]) =>
       handleStickyMessageChannelDeleteMock(...args),
+  }),
+);
+
+vi.mock(
+  "@/bot/features/vc-recruit/handlers/vcRecruitChannelDeleteHandler",
+  () => ({
+    handleVcRecruitChannelDelete: (...args: unknown[]) =>
+      handleVcRecruitChannelDeleteMock(...args),
   }),
 );
 
@@ -62,5 +71,14 @@ describe("bot/events/channelDelete", () => {
     await channelDeleteEvent.execute(channel as never);
 
     expect(handleStickyMessageChannelDeleteMock).toHaveBeenCalledWith(channel);
+  });
+
+  // VC募集のクリーンアップハンドラーへ委譲されることを検証
+  it("delegates channel to vc-recruit channel-delete handler", async () => {
+    const channel = createChannel({ type: ChannelType.GuildText });
+
+    await channelDeleteEvent.execute(channel as never);
+
+    expect(handleVcRecruitChannelDeleteMock).toHaveBeenCalledWith(channel);
   });
 });

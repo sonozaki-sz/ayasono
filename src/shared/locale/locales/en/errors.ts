@@ -78,6 +78,26 @@ export const errors = {
     "An unexpected error occurred. Please try again later.",
   "general.unexpected_with_message":
     "Error: {{message}}",
+
+  // VC Recruit errors
+  "vcRecruit.already_setup":
+    "A VC recruit setup already exists for this category.",
+  "vcRecruit.not_setup":
+    "No VC recruit channels are configured for this category.",
+  "vcRecruit.role_already_added":
+    "{{role}} is already added.",
+  "vcRecruit.role_not_found":
+    "{{role}} is not registered as a mention candidate.",
+  "vcRecruit.role_limit_exceeded":
+    "Mention candidate roles are limited to 25.",
+  "vcRecruit.vc_deleted":
+    "The selected VC has already been deleted.",
+  "vcRecruit.category_full":
+    "The category has reached the channel limit (50), so the VC cannot be created.",
+  "vcRecruit.panel_channel_not_found":
+    "VC recruit panel channel not found. It may have been deleted.",
+  "vcRecruit.voice_state_update_failed":
+    "[VcRecruit] Failed to process voiceStateUpdate",
 } as const;
 
 export type ErrorsTranslations = typeof errors;

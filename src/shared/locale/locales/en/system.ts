@@ -431,6 +431,20 @@ export const system = {
     "[MemberLog] join message set GuildId: {{guildId}}",
   "member-log.config_leave_message_set":
     "[MemberLog] leave message set GuildId: {{guildId}}",
+
+  // VC Recruit feature logs
+  "vc-recruit.voice_state_update_failed":
+    "[VcRecruit] Failed to process voiceStateUpdate",
+  "vc-recruit.channel_created":
+    "[VcRecruit] new VC created GuildId: {{guildId}} ChannelId: {{channelId}}",
+  "vc-recruit.channel_deleted":
+    "[VcRecruit] VC deleted GuildId: {{guildId}} ChannelId: {{channelId}}",
+  "vc-recruit.recruit_posted":
+    "[VcRecruit] recruit message posted GuildId: {{guildId}} UserId: {{userId}}",
+  "vc-recruit.setup_created":
+    "[VcRecruit] setup created GuildId: {{guildId}} CategoryId: {{categoryId}}",
+  "vc-recruit.setup_removed":
+    "[VcRecruit] setup removed GuildId: {{guildId}} CategoryId: {{categoryId}}",
 } as const;
 
 export type SystemTranslations = typeof system;

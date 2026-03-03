@@ -5,12 +5,15 @@ import { stickyMessageSetEmbedModalHandler } from "../../../features/sticky-mess
 import { stickyMessageSetModalHandler } from "../../../features/sticky-message/handlers/ui/stickyMessageSetModalHandler";
 import { stickyMessageUpdateEmbedModalHandler } from "../../../features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler";
 import { stickyMessageUpdateModalHandler } from "../../../features/sticky-message/handlers/ui/stickyMessageUpdateModalHandler";
-import { vacPanelModalHandler } from "../../../features/vac/handlers/ui/vacPanelModal";
+import { vcPanelModalHandler } from "../../../features/vc-panel/handlers/ui/vcPanelModal";
+import { vcRecruitModalHandler } from "../../../features/vc-recruit/handlers/ui/vcRecruitModal";
 import type { ModalHandler } from "./types";
 
 export const modalHandlers: ModalHandler[] = [
-  // VAC 操作パネルのモーダル送信を処理
-  vacPanelModalHandler,
+  // VC操作パネルのモーダル送信を処理（VAC・VC募集など共用）
+  vcPanelModalHandler,
+  // VC募集モーダル送信（ステップ1→2）を処理
+  vcRecruitModalHandler,
   // sticky-message set プレーンテキストモーダルを処理
   stickyMessageSetModalHandler,
   // sticky-message set Embed モーダルを処理
