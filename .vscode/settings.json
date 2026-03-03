@@ -12,8 +12,9 @@
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "typescript.suggest.autoImports": true,
   // 開いていないファイルを含むプロジェクト全体を常時チェック（乖離防止の核心）
-  // ※ node_modules の診断はスキップ（skipLibCheck で制御）
-  "typescript.tsserver.experimental.enableProjectDiagnostics": true,
+  // ※ true にすると skipLibCheck を部分的にバイパスし、node_modules 内の .d.ts エラーが
+  //   誤検知として表示される (vite v7 + pnpm の subpath imports 問題)。無効化で抑制。
+  "typescript.tsserver.experimental.enableProjectDiagnostics": false,
   // tsconfig/jsconfig のないファイルが implicit project に入ったとき .d.ts エラーを抑制
   "typescript.implicitProjectConfig.skipLibCheck": true,
   // JS ファイル（eslint.config.js 等）の TypeScript 診断をオフ
