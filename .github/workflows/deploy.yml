@@ -19,12 +19,15 @@ on:
 jobs:
   # ─────────────────────────────────────────────
   # CI: 型チェック・テスト
-  #   - PR時のみ実行（push to mainはPRでCIが通過済みのためスキップ）
+  #   - develop への直接 push、および main/develop 向け PR（closed 以外）で実行
+  #   - push to main はデプロイ時に test が skipped 扱いで続行（PR で CI 通過済みのため）
   # ─────────────────────────────────────────────
   test:
     name: Test
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && github.event.action != 'closed'
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/develop') ||
+      (github.event_name == 'pull_request' && github.event.action != 'closed')
 
     steps:
       - uses: actions/checkout@v4
