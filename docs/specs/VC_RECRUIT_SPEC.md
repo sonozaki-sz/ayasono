@@ -2,7 +2,7 @@
 
 > コマンドで専用チャンネルを自動作成し、VC参加者を募るメッセージをモーダルで投稿する機能
 
-最終更新: 2026年2月27日（新規VC作成・設定パネル・チャンネル名変更・投稿スレッド自動作成）
+最終更新: 2026年3月4日（ファイル構成・カスタムID表を実装に同期）
 
 ---
 
@@ -450,11 +450,11 @@ flowchart TD
 
 **ボタン:**
 
-| ボタン     | スタイル  | カスタムID                    |
-| ---------- | --------- | ----------------------------- |
-| 撤去する   | Danger    | `vc-recruit-teardown-confirm` |
-| 選び直す   | Secondary | `vc-recruit-teardown-redo`    |
-| キャンセル | Secondary | `vc-recruit-teardown-cancel`  |
+| ボタン     | スタイル  | カスタムID プレフィックス                 |
+| ---------- | --------- | ----------------------------------------- |
+| 撤去する   | Danger    | `vc-recruit-teardown-confirm:<sessionId>` |
+| 選び直す   | Secondary | `vc-recruit-teardown-redo:<sessionId>`    |
+| キャンセル | Secondary | `vc-recruit-teardown-cancel:<sessionId>`  |
 
 - **タイムアウト**: 60秒。期限切れ後はメッセージを更新してボタンを無効化する
 
@@ -797,19 +797,29 @@ VC
 ```
 src/bot/features/vc-recruit/
 ├── commands/
-│   └── vc-recruit-config.ts      # /vc-recruit-config コマンド定義
+│   ├── helpers/
+│   │   └── vcRecruitTargetResolver.ts          # autocomplete 用ターゲット解決
+│   ├── usecases/
+│   │   ├── vcRecruitConfigAddRole.ts            # add-role サブコマンド処理
+│   │   ├── vcRecruitConfigRemoveRole.ts         # remove-role サブコマンド処理
+│   │   ├── vcRecruitConfigSetup.ts              # setup サブコマンド処理（チャンネル作成・権限・パネル送信・DB保存）
+│   │   ├── vcRecruitConfigTeardown.ts           # teardown サブコマンド処理（チャンネル削除・DB削除）
+│   │   └── vcRecruitConfigView.ts               # view サブコマンド処理
+│   ├── vcRecruitConfigCommand.autocomplete.ts   # /vc-recruit-config autocomplete
+│   ├── vcRecruitConfigCommand.constants.ts      # customId 定数・サブコマンド名定数
+│   └── vcRecruitConfigCommand.execute.ts        # /vc-recruit-config コマンドエントリ
 ├── handlers/
-│   ├── buttonHandler.ts          # 「VC募集を作成」ボタン → セレクトメニュー表示 / 「次へ」ボタン → モーダル表示
-│   ├── modalHandler.ts           # モーダル送信 → VC作成・パネル送信・投稿・移動
-│   ├── selectMenuHandler.ts      # セレクトメニュー選択 → セッション更新
-│   └── voiceStateHandler.ts      # voiceStateUpdate → 作成VCの空検知・自動削除
-├── repositories/
-│   └── vcRecruitRepository.ts    # GuildConfig の vcRecruitConfig 読み書き
-└── services/
-    ├── setupService.ts           # チャンネル作成・削除・権限設定
-    ├── panelService.ts           # パネルメッセージの生成・送信
-    ├── recruitVcService.ts       # 新規VC作成・設定パネル送信・自動削除管理
-    └── recruitService.ts         # 募集メッセージの生成・送信・VC移動
+│   ├── ui/
+│   │   ├── vcRecruitButton.ts                   # ボタン押下ハンドラー（作成ボタン / open-modal / teardown系）
+│   │   ├── vcRecruitModal.ts                    # モーダル送信ハンドラー（VC作成・募集投稿・スレッド・自動移動）
+│   │   ├── vcRecruitPanelState.ts               # パネルセレクトメニューのセッション管理
+│   │   ├── vcRecruitStringSelect.ts             # セレクトメニュー選択ハンドラー（メンション・VC）
+│   │   └── vcRecruitTeardownState.ts            # teardown セレクトメニューのセッション管理
+│   ├── vcRecruitChannelDeleteHandler.ts         # channelDelete → ペアチャンネル削除・DB自動クリーンアップ
+│   ├── vcRecruitMessageDeleteHandler.ts         # messageDelete → パネルメッセージ再送信・DB更新
+│   └── vcRecruitVoiceStateUpdate.ts             # voiceStateUpdate → 作成VCの空検知・自動削除
+└── repositories/
+    └── vcRecruitRepository.ts                   # GuildConfig の vcRecruitConfig 読み書き
 ```
 
 > 設定パネルの Embed ・ボタン・ボタンハンドラー（VC名変更・人数制限・ AFK 移動・パネル再送信）は VAC の `vacPanelService` / ボタンハンドラーと共通要素を流用します。
@@ -844,13 +854,17 @@ vcRecruit: {
 
 ### カスタムID 設計
 
-| コンポーネント             | カスタムID パターン                         | 説明                         |
-| -------------------------- | ------------------------------------------- | ---------------------------- |
-| 「VC募集を作成」ボタン     | `vc-recruit:create:<panelChannelId>`        | パネルチャンネルIDを埋め込む |
-| メンションセレクトメニュー | `vc-recruit:select-mention:<interactionId>` | インタラクションIDで紐付け   |
-| VCセレクトメニュー         | `vc-recruit:select-vc:<interactionId>`      | インタラクションIDで紐付け   |
-| 「次へ（詳細入力）」ボタン | `vc-recruit:open-modal:<interactionId>`     | インタラクションIDで紐付け   |
-| モーダルカスタムID         | `vc-recruit:modal:<interactionId>`          | セッション特定に使用         |
+| コンポーネント             | カスタムID パターン                                 | 説明                          |
+| -------------------------- | --------------------------------------------------- | ----------------------------- |
+| 「VC募集を作成」ボタン     | `vc-recruit:create:<panelChannelId>`                | パネルチャンネルIDを埋め込む  |
+| メンションセレクトメニュー | `vc-recruit:select-mention:<interactionId>`         | インタラクションIDで紐付け    |
+| VCセレクトメニュー         | `vc-recruit:select-vc:<interactionId>`              | インタラクションIDで紐付け    |
+| 「次へ（詳細入力）」ボタン | `vc-recruit:open-modal:<interactionId>`             | インタラクションIDで紐付け    |
+| モーダルカスタムID         | `vc-recruit:modal:<interactionId>`                  | セッション特定に使用          |
+| teardown セレクトメニュー  | `vc-recruit-teardown-select:<interactionId>`        | teardown セッションIDで紐付け |
+| 「撤去する」ボタン         | `vc-recruit-teardown-confirm:<selectInteractionId>` | teardown 確認ダイアログ       |
+| 「選び直す」ボタン         | `vc-recruit-teardown-redo:<selectInteractionId>`    | teardown セレクト再表示       |
+| 「キャンセル」ボタン       | `vc-recruit-teardown-cancel:<selectInteractionId>`  | teardown キャンセル           |
 
 ### チャンネル作成・権限設定
 
