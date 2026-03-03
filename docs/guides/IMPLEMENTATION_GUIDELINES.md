@@ -185,7 +185,7 @@ src/bot/features/<feature-name>/
 
 ---
 
-## � Discord レスポンスパターン
+## 💬 Discord レスポンスパターン
 
 ### 必須ルール: ステータス通知は必ず Embed で返す
 
@@ -261,7 +261,7 @@ new EmbedBuilder().setTitle(tDefault("commands:foo.embed.summary_title"));
 
 ---
 
-## �📂 命名規則
+## 📂 命名規則
 
 ### ファイル名
 
