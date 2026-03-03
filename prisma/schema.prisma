@@ -21,6 +21,7 @@ model GuildConfig {
   bumpReminderConfig     String? // JSON: BumpReminderConfig
   stickMessages          String? // JSON: StickMessage[]
   memberLogConfig        String? // JSON: MemberLogConfig
+  vcRecruitConfig        String? // JSON: VcRecruitConfig
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

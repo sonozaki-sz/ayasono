@@ -7,6 +7,7 @@ import { createMemberLogConfigService } from "../../shared/features/member-log/m
 import { createMessageDeleteUserSettingService } from "../../shared/features/message-delete/messageDeleteUserSettingService";
 import { createStickyMessageConfigService } from "../../shared/features/sticky-message/stickyMessageConfigService";
 import { getVacConfigService } from "../../shared/features/vac/vacConfigService";
+import { getVcRecruitConfigService } from "../../shared/features/vc-recruit/vcRecruitConfigService";
 import { localeManager } from "../../shared/locale/localeManager";
 import { getBumpReminderRepository } from "../features/bump-reminder/repositories/bumpReminderRepository";
 import { getBumpReminderFeatureConfigService } from "../features/bump-reminder/services/bumpReminderConfigServiceResolver";
@@ -19,6 +20,8 @@ import {
   getVacRepository,
 } from "../features/vac/repositories/vacRepository";
 import { getVacService } from "../features/vac/services/vacService";
+import { registerVcPanelOwnershipChecker } from "../features/vc-panel/vcPanelOwnershipRegistry";
+import { createVcRecruitRepository } from "../features/vc-recruit/repositories/vcRecruitRepository";
 import {
   setBotBumpReminderConfigService,
   setBotBumpReminderManager,
@@ -32,9 +35,14 @@ import {
   setBotStickyMessageResendService,
 } from "./botStickyMessageDependencyResolver";
 import {
+  getBotVacRepository,
   setBotVacRepository,
   setBotVacService,
 } from "./botVacDependencyResolver";
+import {
+  getBotVcRecruitRepository,
+  setBotVcRecruitRepository,
+} from "./botVcRecruitDependencyResolver";
 
 /**
  * Botで利用する主要依存を起動時に初期化する
@@ -88,4 +96,22 @@ export function initializeBotCompositionRoot(prisma: PrismaClient): void {
     guildConfigRepository,
   );
   setBotMemberLogConfigService(memberLogConfigService);
+
+  // VC募集 の設定サービス/リポジトリを初期化
+  const vcRecruitConfigService = getVcRecruitConfigService(
+    guildConfigRepository,
+  );
+  const vcRecruitRepository = createVcRecruitRepository(vcRecruitConfigService);
+  setBotVcRecruitRepository(vcRecruitRepository);
+
+  // VC操作パネルの所有権チェッカーを登録（VAC・VC募集）
+  // これ以降のインタラクションで isVcPanelManagedChannel が呼び出されるたびに各リポジトリに問い合わせる
+  registerVcPanelOwnershipChecker({
+    isManagedVcPanelChannel: (guildId, channelId) =>
+      getBotVacRepository().isManagedVacChannel(guildId, channelId),
+  });
+  registerVcPanelOwnershipChecker({
+    isManagedVcPanelChannel: (guildId, channelId) =>
+      getBotVcRecruitRepository().isCreatedVcRecruitChannel(guildId, channelId),
+  });
 }

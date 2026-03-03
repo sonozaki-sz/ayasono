@@ -1,0 +1,87 @@
+// tests/unit/bot/features/vc-recruit/commands/usecases/vcRecruitConfigAddRole.test.ts
+import { handleVcRecruitConfigAddRole } from "@/bot/features/vc-recruit/commands/usecases/vcRecruitConfigAddRole";
+import { ValidationError } from "@/shared/errors/customErrors";
+
+// ---- モック定義 ----
+
+const addMentionRoleIdMock = vi.fn();
+const tGuildMock = vi.fn(
+  async (_guildId: string, key: string, opts?: Record<string, unknown>) =>
+    opts ? `${key}:${JSON.stringify(opts)}` : key,
+);
+const tDefaultMock = vi.fn((key: string) => key);
+
+vi.mock("@/bot/services/botVcRecruitDependencyResolver", () => ({
+  getBotVcRecruitRepository: () => ({
+    addMentionRoleId: (...args: unknown[]) => addMentionRoleIdMock(...args),
+  }),
+}));
+vi.mock("@/shared/locale/localeManager", () => ({
+  tGuild: (...args: unknown[]) =>
+    tGuildMock(...(args as Parameters<typeof tGuildMock>)),
+  tDefault: (...args: unknown[]) =>
+    tDefaultMock(...(args as Parameters<typeof tDefaultMock>)),
+}));
+
+// ---- ヘルパー ----
+
+const GUILD_ID = "guild-1";
+const ROLE_ID = "role-42";
+
+function makeInteraction(opts: { hasGuild?: boolean; roleId?: string } = {}) {
+  const { hasGuild = true, roleId = ROLE_ID } = opts;
+  return {
+    guild: hasGuild ? { id: GUILD_ID } : null,
+    options: {
+      getRole: vi.fn().mockReturnValue({ id: roleId }),
+    },
+    reply: vi.fn().mockResolvedValue(undefined),
+  };
+}
+
+describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigAddRole", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  // guild が null の場合は ValidationError を投げる
+  it("throws ValidationError when interaction has no guild", async () => {
+    const interaction = makeInteraction({ hasGuild: false });
+    await expect(
+      handleVcRecruitConfigAddRole(interaction as never, GUILD_ID),
+    ).rejects.toBeInstanceOf(ValidationError);
+  });
+
+  // ロールが既に追加済みの場合は ValidationError を投げる
+  it("throws ValidationError when role is already added", async () => {
+    addMentionRoleIdMock.mockResolvedValue("already_exists");
+    const interaction = makeInteraction();
+    await expect(
+      handleVcRecruitConfigAddRole(interaction as never, GUILD_ID),
+    ).rejects.toBeInstanceOf(ValidationError);
+  });
+
+  // ロール数が上限超えの場合は ValidationError を投げる
+  it("throws ValidationError when role limit is exceeded", async () => {
+    addMentionRoleIdMock.mockResolvedValue("limit_exceeded");
+    const interaction = makeInteraction();
+    await expect(
+      handleVcRecruitConfigAddRole(interaction as never, GUILD_ID),
+    ).rejects.toBeInstanceOf(ValidationError);
+  });
+
+  // 正常時は success embed でエフェメラル返信する
+  it("replies with success embed on successful role addition", async () => {
+    addMentionRoleIdMock.mockResolvedValue("added");
+    const interaction = makeInteraction();
+    await handleVcRecruitConfigAddRole(interaction as never, GUILD_ID);
+
+    expect(interaction.reply).toHaveBeenCalledWith(
+      expect.objectContaining({
+        embeds: expect.any(Array),
+        flags: expect.anything(),
+      }),
+    );
+    expect(addMentionRoleIdMock).toHaveBeenCalledWith(GUILD_ID, ROLE_ID);
+  });
+});

@@ -537,6 +537,145 @@ export const commands = {
     "スティッキーメッセージを更新しました。",
   "sticky-message.update.notFound.title":
     "未設定",
+
+  // VC募集設定コマンド
+  "vc-recruit-config.description":
+    "VC募集機能の設定（サーバー管理者向け）",
+  "vc-recruit-config.setup.description":
+    "VC募集チャンネルをセットアップ",
+  "vc-recruit-config.setup.category.description":
+    "作成先カテゴリー（TOP またはカテゴリー名。未指定時は実行チャンネルのカテゴリー）",
+  "vc-recruit-config.setup.category.top": "TOP（カテゴリーなし）",
+  "vc-recruit-config.setup.thread-archive.description":
+    "招募スレッドの自動アーカイブ時間（1h/24h/3d/1w、未指定: 24h）",
+  "vc-recruit-config.teardown.description":
+    "VC募集チャンネルを削除（選択UI経由）",
+  // teardown セレクトメニュー UI
+  "vc-recruit-config.teardown.select.placeholder":
+    "撤去するカテゴリーを選択してください",
+  "vc-recruit-config.teardown.select.top":
+    "TOP（カテゴリーなし）",
+  "vc-recruit-config.teardown.select.unknown_category":
+    "不明なカテゴリー（ID: {{id}}）",
+  // teardown 確認パネル
+  "vc-recruit-config.teardown.confirm.title":
+    "VC募集チャンネルを撤去しますか？",
+  "vc-recruit-config.teardown.confirm.field_categories":
+    "対象カテゴリー",
+  "vc-recruit-config.teardown.confirm.warning":
+    "選択したカテゴリーのパネルチャンネル・投稿チャンネルが削除されます。この操作は取り消せません。",
+  "vc-recruit-config.teardown.confirm.button_confirm":
+    "🗑️ 撤去する",
+  "vc-recruit-config.teardown.confirm.button_cancel":
+    "キャンセル",
+  "vc-recruit-config.teardown.confirm.button_redo":
+    "選び直す",
+  "vc-recruit-config.add-role.description":
+    "メンション候補ロールを追加",
+  "vc-recruit-config.add-role.role.description":
+    "追加するロール",
+  "vc-recruit-config.remove-role.description":
+    "メンション候補ロールを削除",
+  "vc-recruit-config.remove-role.role.description":
+    "削除するロール",
+  "vc-recruit-config.view.description":
+    "現在のVC募集設定を表示",
+  // setup 成功
+  "vc-recruit-config.embed.setup_success":
+    "VC募集チャンネルを作成しました",
+  "vc-recruit-config.embed.setup_panel_channel":
+    "募集作成: {{channel}}",
+  "vc-recruit-config.embed.setup_post_channel":
+    "募集投稿: {{channel}}",
+  // teardown
+  "vc-recruit-config.embed.teardown_success":
+    "VC募集チャンネルを撤去しました",
+  "vc-recruit-config.embed.teardown_category_item":
+    "🗑️ {{category}}",
+  "vc-recruit-config.embed.teardown_partial_error":
+    "⚠️ 以下のカテゴリーで一部エラーが発生しました：",
+  "vc-recruit-config.embed.teardown_cancelled":
+    "キャンセルしました",
+  // add-role/remove-role 成功
+  "vc-recruit-config.embed.add_role_success":
+    "{{role}} をメンション候補に追加しました",
+  "vc-recruit-config.embed.remove_role_success":
+    "{{role}} をメンション候補から削除しました",
+  // view
+  "vc-recruit-config.embed.view_title":
+    "VC募集設定",
+  "vc-recruit-config.embed.field_setups":
+    "セットアップ済みカテゴリー",
+  "vc-recruit-config.embed.field_roles":
+    "メンション候補ロール",
+  "vc-recruit-config.embed.no_setups":
+    "未設定",
+  "vc-recruit-config.embed.no_roles":
+    "なし",
+  "vc-recruit-config.embed.top":
+    "TOP",
+  "vc-recruit-config.embed.setup_item":
+    "• {{category}}\n　募集作成: {{panel}}\n　募集投稿: {{post}}",
+  "vc-recruit-config.embed.success_title":
+    "設定完了",
+
+  // VC募集機能 チャンネル名
+  "vcRecruit.channelName.panel":
+    "vc募集",
+  "vcRecruit.channelName.post":
+    "vc募集板",
+
+  // VC募集パネル
+  "vcRecruit.panel.title":
+    "🎤 VC募集",
+  "vcRecruit.panel.description":
+    "VC参加者を募集しましょう！\nボタンを押して募集を作成してください。",
+  "vcRecruit.panel.create_button":
+    "VC募集を作成",
+
+  // VC募集モーダル（ステップ2）
+  "vcRecruit.modal.title":
+    "VC募集を作成（2/2）",
+  "vcRecruit.modal.content_label":
+    "募集内容",
+  "vcRecruit.modal.content_placeholder":
+    "招待メッセージを入力してください（最大200文字）",
+  "vcRecruit.modal.vc_name_label":
+    "新規VC名（任意）",
+  "vcRecruit.modal.vc_name_placeholder":
+    "「新規VC作成」選択時のみ使用（未入力: 表示名's Room）",
+
+  // VC募集セレクトメニュー（ステップ1）
+  "vcRecruit.select.title":
+    "📋 ステップ 1/2 — VC・メンションを選択してください",
+  "vcRecruit.select.mention_placeholder":
+    "メンション（なし）",
+  "vcRecruit.select.vc_placeholder":
+    "VCを選択",
+  "vcRecruit.select.open_modal_button":
+    "📝 内容を入力する",
+  "vcRecruit.select.no_mention":
+    "なし（メンションしない）",
+  "vcRecruit.select.new_vc_label":
+    "🆕 新規VC作成",
+
+  // 募集メッセージ
+  "vcRecruit.embed.title":
+    "📢 VC募集",
+  "vcRecruit.embed.field_content":
+    "募集内容",
+  "vcRecruit.embed.field_vc":
+    "VC",
+  "vcRecruit.embed.field_recruiter":
+    "募集者",
+
+  // スレッド名
+  "vcRecruit.thread_name":
+    "{{recruiter}}の募集",
+
+  // 自動移動スキップ通知
+  "vcRecruit.embed.not_in_vc_skipped":
+    "⚠️ VCに参加していないため自動移動できませんでした",
 } as const;
 
 export type CommandsTranslations = typeof commands;

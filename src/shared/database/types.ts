@@ -16,6 +16,7 @@ export interface GuildConfig {
   bumpReminderConfig?: BumpReminderConfig;
   stickMessages?: StickMessage[];
   memberLogConfig?: MemberLogConfig;
+  vcRecruitConfig?: VcRecruitConfig;
   // DB監査用タイムスタンプ
   createdAt: Date;
   updatedAt: Date;
@@ -135,6 +136,35 @@ export interface MemberLogConfig {
 }
 
 // ============================================================
+// VcRecruit（VC募集機能）
+// ============================================================
+
+export interface VcRecruitConfig {
+  // 機能有効フラグ
+  enabled: boolean;
+  // モーダルのメンション選択肢に表示するロールID一覧（最大25）
+  mentionRoleIds: string[];
+  // セットアップ済みの募集チャンネルセット一覧
+  setups: VcRecruitSetup[];
+}
+
+export interface VcRecruitSetup {
+  // セットアップしたカテゴリーID。TOP レベルの場合は null
+  categoryId: string | null;
+  // 募集作成チャンネル（vc-recruit）
+  panelChannelId: string;
+  // 募集投稿チャンネル（vc-recruit-board）
+  postChannelId: string;
+  // パネルメッセージID
+  panelMessageId: string;
+  // 募集スレッドの自動アーカイブ時間（分）
+  // Discord 許容値: 60 / 1440 / 4320 / 10080
+  threadArchiveDuration: 60 | 1440 | 4320 | 10080;
+  // 「新規VC作成」で作成したVCのID一覧
+  createdVoiceChannelIds: string[];
+}
+
+// ============================================================
 // 機能別リポジトリインターフェース（必要な範囲だけ依存できる）
 // ============================================================
 
@@ -203,6 +233,14 @@ export interface IMemberLogRepository {
   updateMemberLogConfig(
     guildId: string,
     memberLogConfig: MemberLogConfig,
+  ): Promise<void>;
+}
+
+export interface IVcRecruitRepository {
+  getVcRecruitConfig(guildId: string): Promise<VcRecruitConfig | null>;
+  updateVcRecruitConfig(
+    guildId: string,
+    vcRecruitConfig: VcRecruitConfig,
   ): Promise<void>;
 }
 
@@ -279,4 +317,5 @@ export interface IGuildConfigRepository
     IBumpReminderConfigRepository,
     IVacRepository,
     IStickMessageRepository,
-    IMemberLogRepository {}
+    IMemberLogRepository,
+    IVcRecruitRepository {}
