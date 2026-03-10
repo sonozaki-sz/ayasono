@@ -4,7 +4,6 @@
     // TypeScript/JavaScript
     "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode",
-    "ms-vscode.vscode-typescript-next",
     "yoavbls.pretty-ts-errors",
 
     // エラー表示
@@ -42,10 +41,6 @@
     "ms-ceintl.vscode-language-pack-ja",
 
     // === プロジェクト固有 ===
-    // テスト
-    "orta.vscode-jest",
-    "firsttris.vscode-jest-runner",
-
     // データベース
     "prisma.prisma",
 
@@ -56,7 +51,7 @@
     "bierner.markdown-mermaid",
 
     // Docker
-    "ms-azuretools.vscode-docker",
+    "docker.docker",
 
     // === オプション ===
     // コラボレーション
