@@ -1,252 +1,499 @@
 // src/bot/features/message-delete/services/messageDeleteService.ts
 // メッセージ削除コアロジック
 
-import type { Collection, GuildTextBasedChannel, Message } from "discord.js";
+import type {
+  Collection,
+  GuildTextBasedChannel,
+  Message,
+  PartialMessage,
+} from "discord.js";
 import { PermissionFlagsBits } from "discord.js";
+import { tDefault } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import {
+  DISCORD_EPOCH,
   MSG_DEL_BULK_BATCH_SIZE,
   MSG_DEL_BULK_MAX_AGE_MS,
   MSG_DEL_BULK_WAIT_MS,
   MSG_DEL_CONTENT_MAX_LENGTH,
   MSG_DEL_FETCH_BATCH_SIZE,
   MSG_DEL_INDIVIDUAL_WAIT_MS,
-  type DeletedMessageRecord,
+  MSG_DEL_REFILL_WAIT_MS,
+  type ScannedMessageWithChannel,
 } from "../constants/messageDeleteConstants";
 
-/** メッセージ収集・削除オプション */
-export interface MessageDeleteOptions {
-  /** 削除するメッセージの上限件数（未指定で無限） */
+/** メッセージスキャンオプション（収集のみ、削除なし） */
+export interface MessageScanOptions {
+  /** 収集するメッセージの上限件数（未指定で無限） */
   count: number;
   /** 対象ユーザーID（未指定で全ユーザー） */
   targetUserId?: string;
-  /** true のときボット・webhookのメッセージのみ対象 */
-  targetBot?: boolean;
   /** キーワード部分一致（case-insensitive、未指定でフィルタなし） */
   keyword?: string;
   /** afterTs の Unix ミリ秒（0 = 制限なし） */
   afterTs: number;
   /** beforeTs の Unix ミリ秒（Infinity = 制限なし） */
   beforeTs: number;
-  /** 進捗コールバック */
-  onProgress?: (message: string) => Promise<void>;
+  /** 進捗コールバック（スキャン中の表示更新に使用） */
+  onProgress?: (data: ScanProgressData) => Promise<void>;
+  /** キャンセルシグナル（abort() 呼び出しでスキャンを中断） */
+  signal?: AbortSignal;
+}
+
+/** scanMessages 進捗データ */
+export interface ScanProgressData {
+  /** API からフェッチした総件数 */
+  totalScanned: number;
+  /** フィルタ後に収集した件数 */
+  collected: number;
+  /** 収集上限 */
+  limit: number;
+}
+
+/** チャンネル単位の削除状態（進捗表示用） */
+export interface ChannelDeleteStatus {
+  channelId: string;
+  name: string;
+  deleted: number;
+  total: number;
+}
+
+/** deleteScannedMessages 進捗データ */
+export interface DeleteProgressData {
+  /** 合計削除済み件数 */
+  totalDeleted: number;
+  /** 削除対象の総件数 */
+  total: number;
+  /** チャンネル別削除状態リスト */
+  channelStatuses: ChannelDeleteStatus[];
 }
 
 /** 削除結果 */
 export interface MessageDeleteResult {
   /** 合計削除件数 */
   totalDeleted: number;
-  /** チャンネル別削除件数 */
-  channelBreakdown: Record<string, number>;
-  /** 削除済みメッセージの記録 */
-  deletedRecords: DeletedMessageRecord[];
+  /** チャンネル別削除件数（キー: チャンネルID） */
+  channelBreakdown: Record<string, { name: string; count: number }>;
 }
 
 /**
- * 指定チャンネルリストから条件に一致するメッセージを削除する
- * @param channels 削除対象のテキストチャンネル一覧
- * @param options 削除オプション（件数上限・フィルタ・進捗コールバックなど）
- * @returns 削除結果（合計件数・チャンネル別内訳・削除済みレコード）を示す Promise
+ * スロットリング付き進捗レポーターを生成する
+ * @param callback 進捗コールバック（未指定時は何もしない）
+ * @param intervalMs 最小呼び出し間隔（デフォルト 3000ms）
+ * @returns 前回呼び出しから intervalMs 経過していない場合はスキップするレポーター関数
  */
-export async function deleteMessages(
+function createThrottledReporter<T>(
+  callback: ((data: T) => Promise<void>) | undefined,
+  intervalMs = 3000,
+) {
+  let lastTs = 0;
+  return async (data: T, force = false) => {
+    if (!callback) return;
+    const now = Date.now();
+    if (force || now - lastTs >= intervalMs) {
+      lastTs = now;
+      await callback(data);
+    }
+  };
+}
+
+/**
+ * Discord メッセージの表示用本文を組み立てる。
+ * テキスト本文・添付ファイル・Embed の概要を結合し、全体を MSG_DEL_CONTENT_MAX_LENGTH 文字以内に収める。
+ * @param msg 対象の Discord Message オブジェクト
+ * @returns 組み立てた表示用本文（MSG_DEL_CONTENT_MAX_LENGTH 超過時は末尾に `…` を付与）
+ */
+function buildDisplayContent(msg: Message): string {
+  const parts: string[] = [];
+
+  if (msg.content) {
+    parts.push(msg.content);
+  }
+
+  if (msg.attachments.size > 0) {
+    parts.push(
+      tDefault("commands:message-delete.result.attachments", {
+        count: msg.attachments.size,
+      }),
+    );
+  }
+
+  for (const embed of msg.embeds) {
+    parts.push(
+      embed.title
+        ? `🔗 ${embed.title}`
+        : tDefault("commands:message-delete.result.embed_no_title"),
+    );
+  }
+
+  const result = parts.join("\n");
+  return (
+    result.slice(0, MSG_DEL_CONTENT_MAX_LENGTH) +
+    (result.length > MSG_DEL_CONTENT_MAX_LENGTH ? "…" : "")
+  );
+}
+
+/**
+ * 指定チャンネルリストから条件に一致するメッセージをスキャンして収集する（削除は行わない）
+ * @param channels スキャン対象のテキストチャンネル一覧
+ * @param options スキャンオプション（件数上限・フィルタ・進捗コールバックなど）
+ * @returns 収集したスキャン済みメッセージ配列を示す Promise
+ */
+export async function scanMessages(
   channels: GuildTextBasedChannel[],
-  options: MessageDeleteOptions,
-): Promise<MessageDeleteResult> {
+  options: MessageScanOptions,
+): Promise<ScannedMessageWithChannel[]> {
   const {
     count,
     targetUserId,
-    targetBot,
     keyword,
     afterTs,
     beforeTs,
     onProgress,
+    signal,
   } = options;
 
-  const twoWeeksAgo = Date.now() - MSG_DEL_BULK_MAX_AGE_MS;
-  const deletedRecords: DeletedMessageRecord[] = [];
-  const channelBreakdown: Record<string, number> = {};
-  let totalDeleted = 0;
+  const scanned: ScannedMessageWithChannel[] = [];
 
-  // 進捗表示ヘルパー（スキャン中・削除中共通、最大3秒に1回 + force=trueで即時）
-  let lastProgressTs = 0;
-  const report = async (msg: string, force = false) => {
-    if (!onProgress) return;
-    const now = Date.now();
-    if (force || now - lastProgressTs >= 3000) {
-      lastProgressTs = now;
-      await onProgress(msg);
-    }
-  };
+  // beforeTs を Discord Snowflake に変換（最初のフェッチを beforeTs 直前から開始するため）
+  const beforeSnowflake =
+    beforeTs !== Infinity
+      ? ((BigInt(Math.floor(beforeTs)) - DISCORD_EPOCH) << 22n).toString()
+      : undefined;
+
+  let totalScanned = 0;
+  const report = createThrottledReporter(onProgress);
 
   logger.debug(
-    `[MsgDel][SVC] channels=${channels.length}, count=${count}, targetUserId=${targetUserId}, targetBot=${targetBot}`,
+    tDefault("system:message-delete.svc_scan_start", {
+      channelCount: channels.length,
+      count,
+      targetUserId: targetUserId ?? "none",
+    }),
   );
 
-  for (const [channelIdx, channel] of channels.entries()) {
-    logger.debug(
-      `[MsgDel][SVC] channel start: ${channel.name} (${channel.id})`,
-    );
-    // Bot のアクセス権チェック（サーバー全体対象時にスキップされた分）
+  // コマンド層でフィルタ済みのチャンネルが渡されるが、
+  // scanMessages を直接呼び出すケースに備えて再チェックする
+  const accessibleChannels = channels.filter((channel) => {
     const me = channel.guild.members.me;
     if (
       me &&
       !channel
         .permissionsFor(me)
         ?.has([
+          PermissionFlagsBits.ViewChannel,
           PermissionFlagsBits.ReadMessageHistory,
           PermissionFlagsBits.ManageMessages,
         ])
     ) {
       logger.debug(
-        `[MsgDel] チャンネル ${channel.name} はアクセス権なし、スキップ`,
+        tDefault("system:message-delete.svc_channel_no_access", {
+          channelId: channel.id,
+        }),
       );
-      continue;
+      return false;
     }
+    return true;
+  });
 
-    const collected: Message[] = [];
-    let lastId: string | undefined;
-    let totalScanned = 0;
+  if (accessibleChannels.length === 0) return scanned;
 
-    // メッセージ収集（count の残り件数まで）
-    let fetchBatchNum = 0;
-    while (totalDeleted + collected.length < count) {
-      fetchBatchNum++;
+  // チャンネルごとのカーソル
+  type ChannelCursor = {
+    channel: GuildTextBasedChannel;
+    buffer: Message[];
+    lastId: string | undefined;
+    exhausted: boolean;
+  };
+
+  /**
+   * フェッチ結果をカーソルに反映する。
+   * - exhausted: バッチが空 or 100件未満 or afterTs より古い最古メッセージ
+   * - buffer: afterTs より新しいメッセージのみ残す
+   */
+  const applyBatch = (
+    cursor: ChannelCursor,
+    batch: Collection<string, Message>,
+  ): void => {
+    const msgs = [...batch.values()];
+    totalScanned += batch.size;
+    cursor.lastId = batch.last()?.id;
+
+    const isSparse = batch.size === 0 || batch.size < MSG_DEL_FETCH_BATCH_SIZE;
+    const oldestExceedsAfter =
+      afterTs > 0 &&
+      msgs.length > 0 &&
+      msgs[msgs.length - 1].createdTimestamp < afterTs;
+
+    cursor.exhausted = isSparse || oldestExceedsAfter;
+
+    if (oldestExceedsAfter) {
+      cursor.buffer = msgs.filter((m) => m.createdTimestamp >= afterTs);
+      return;
+    }
+    cursor.buffer = msgs;
+  };
+
+  // ━━ 初期フェッチ: 全チャンネルを並列取得 ━━
+  const cursors: ChannelCursor[] = await Promise.all(
+    accessibleChannels.map(async (channel) => {
       logger.debug(
-        `[MsgDel][SVC] fetch batch #${fetchBatchNum} ch=${channel.name} collected=${collected.length}`,
+        tDefault("system:message-delete.svc_initial_fetch", {
+          channelId: channel.id,
+        }),
       );
-      await report(
-        `スキャン中... (${channelIdx + 1}/${channels.length}) ${channel.name} — ${totalScanned}件スキャン済`,
-      );
+      const cursor: ChannelCursor = {
+        channel,
+        buffer: [],
+        lastId: undefined,
+        exhausted: false,
+      };
       const batch: Collection<string, Message> = await channel.messages.fetch({
         limit: MSG_DEL_FETCH_BATCH_SIZE,
-        ...(lastId ? { before: lastId } : {}),
+        before: beforeSnowflake,
       });
+      applyBatch(cursor, batch);
+      return cursor;
+    }),
+  );
 
-      logger.debug(
-        `[MsgDel][SVC] fetch batch #${fetchBatchNum} got=${batch.size}`,
-      );
-      if (batch.size === 0) break;
+  await report({ totalScanned, collected: scanned.length, limit: count });
 
-      let batchOldestTs = Infinity;
-      totalScanned += batch.size;
+  // ━━ k-way マージ: 常に全チャンネル中で最も新しいメッセージを選択 ━━
+  while (scanned.length < count) {
+    // キャンセル確認
+    if (signal?.aborted) break;
 
-      for (const msg of batch.values()) {
-        batchOldestTs = Math.min(batchOldestTs, msg.createdTimestamp);
-        // 期間フィルター
-        if (afterTs > 0 && msg.createdTimestamp < afterTs) continue;
-        if (beforeTs !== Infinity && msg.createdTimestamp > beforeTs) continue;
-        // ユーザーフィルター
-        if (targetUserId && msg.author.id !== targetUserId) continue;
-        // ボット・webhookフィルター（author.bot が true のメッセージのみ対象）
-        if (targetBot && !msg.author.bot) continue;
-        // キーワード部分一致フィルター（case-insensitive）
-        if (
-          keyword &&
-          !msg.content.toLowerCase().includes(keyword.toLowerCase())
-        )
-          continue;
-        collected.push(msg);
-        if (totalDeleted + collected.length >= count) break;
-      }
-
-      lastId = batch.last()?.id;
-      // フェッチ間の小ウェイト（APIレート制限への配慮）
-      await sleep(200);
-      // バッチ最古メッセージが afterTs より前なら、それ以降を取得しても範囲外なので打ち切り
-      if (afterTs > 0 && batchOldestTs < afterTs) break;
-      if (batch.size < MSG_DEL_FETCH_BATCH_SIZE) break;
-    }
-
-    logger.debug(
-      `[MsgDel][SVC] channel ${channel.name}: collected=${collected.length}`,
-    );
-    if (collected.length === 0) continue;
-
-    // 14日以内/以降に分類
-    const newMsgs = collected.filter((m) => m.createdTimestamp > twoWeeksAgo);
-    const oldMsgs = collected.filter((m) => m.createdTimestamp <= twoWeeksAgo);
-
-    // 削除進捗ヘルパー
-    const reportProgress = async (deleted: number, total: number) => {
-      await report(
-        `削除中... (${channel.name}) ${deleted} / ${total}件`,
-        deleted === total,
-      );
-    };
-
-    await reportProgress(0, collected.length);
-
-    logger.debug(
-      `[MsgDel][SVC] ch=${channel.name} newMsgs=${newMsgs.length} oldMsgs=${oldMsgs.length}`,
-    );
-
-    // bulkDelete（14日以内）
-    for (let i = 0; i < newMsgs.length; i += MSG_DEL_BULK_BATCH_SIZE) {
-      const chunk = newMsgs.slice(i, i + MSG_DEL_BULK_BATCH_SIZE);
-      logger.debug(`[MsgDel][SVC] bulkDelete chunk size=${chunk.length}`);
-      await (channel as import("discord.js").TextChannel).bulkDelete(
-        chunk,
-        true,
-      );
-      totalDeleted += chunk.length;
-      await reportProgress(totalDeleted, collected.length);
-      if (i + MSG_DEL_BULK_BATCH_SIZE < newMsgs.length) {
-        await sleep(MSG_DEL_BULK_WAIT_MS);
-      }
-    }
-
-    // 個別削除（14日以降）
-    let channelDeleted = newMsgs.length;
-    const deletedOldMsgs: Message[] = [];
-    for (const msg of oldMsgs) {
-      try {
-        await msg.delete();
-        totalDeleted++;
-        channelDeleted++;
-        deletedOldMsgs.push(msg);
-      } catch (err) {
-        logger.warn(
-          `[MsgDel] メッセージ削除失敗 messageId=${msg.id}:`,
-          String(err),
+    // バッファが空かつ未消耗のチャンネルをリフィル（直列・レートリミット配慮）
+    for (const cursor of cursors) {
+      if (cursor.buffer.length === 0 && !cursor.exhausted) {
+        logger.debug(
+          tDefault("system:message-delete.svc_refill", {
+            channelId: cursor.channel.id,
+            lastId: cursor.lastId ?? "none",
+          }),
         );
+        const batch: Collection<string, Message> =
+          await cursor.channel.messages.fetch({
+            limit: MSG_DEL_FETCH_BATCH_SIZE,
+            before: cursor.lastId,
+          });
+        applyBatch(cursor, batch);
+        await sleep(MSG_DEL_REFILL_WAIT_MS);
+        await report({ totalScanned, collected: scanned.length, limit: count });
       }
-      await reportProgress(channelDeleted, collected.length);
-      await sleep(MSG_DEL_INDIVIDUAL_WAIT_MS);
     }
 
-    // 削除済みメッセージを記録（成功分のみ）
-    const successfullyDeleted = [...newMsgs, ...deletedOldMsgs];
-    for (const msg of successfullyDeleted) {
-      const content = msg.content;
-      deletedRecords.push({
-        authorId: msg.author.id,
-        authorTag: msg.author.tag,
-        channelId: channel.id,
-        channelName: channel.name,
-        createdAt: msg.createdAt,
-        content:
-          content.slice(0, MSG_DEL_CONTENT_MAX_LENGTH) +
-          (content.length > MSG_DEL_CONTENT_MAX_LENGTH ? "…" : ""),
-      });
+    // 全チャンネルのバッファ先頭で最新メッセージを持つカーソルを選択
+    let bestCursor: ChannelCursor | null = null;
+    for (const cursor of cursors) {
+      if (cursor.buffer.length > 0) {
+        if (
+          !bestCursor ||
+          cursor.buffer[0].createdTimestamp >
+            bestCursor.buffer[0].createdTimestamp
+        ) {
+          bestCursor = cursor;
+        }
+      }
     }
 
-    channelBreakdown[channel.name] = channelDeleted;
+    if (!bestCursor) break;
+
+    const msg = bestCursor.buffer.shift();
+    if (!msg) break;
+
+    // フィルタ適用
+    if (
+      targetUserId &&
+      msg.author.id !== targetUserId &&
+      msg.webhookId !== targetUserId
+    )
+      continue;
+    if (keyword && !msg.content.toLowerCase().includes(keyword.toLowerCase()))
+      continue;
+
+    scanned.push({
+      messageId: msg.id,
+      guildId: bestCursor.channel.guildId,
+      authorId: msg.author.id,
+      // サーバーニックネーム → グローバル表示名 → ユーザー名 の優先順で取得
+      authorDisplayName: msg.member?.displayName ?? msg.author.displayName,
+      channelId: bestCursor.channel.id,
+      channelName: bestCursor.channel.name,
+      createdAt: msg.createdAt,
+      content: buildDisplayContent(msg),
+      _channel: bestCursor.channel,
+    });
   }
 
-  return { totalDeleted, channelBreakdown, deletedRecords };
+  logger.debug(
+    tDefault("system:message-delete.svc_scan_complete", {
+      count: scanned.length,
+    }),
+  );
+  return scanned;
+}
+
+/**
+ * bulkDelete をサポートするチャンネルかどうかを判定する型ガード
+ * VoiceChannel など bulkDelete を持たないチャンネルを安全に除外する
+ * @param channel チェック対象のオブジェクト
+ * @returns bulkDelete メソッドを持つ場合は true
+ */
+function hasBulkDelete(channel: object): channel is {
+  bulkDelete: (
+    messages: readonly string[],
+    filterOld?: boolean,
+  ) => Promise<Collection<string, Message | PartialMessage>>;
+} {
+  return "bulkDelete" in channel;
+}
+
+/**
+ * スキャン済みメッセージ（除外済み除く）を実際に削除する
+ * @param messages 削除対象のスキャン済みメッセージ配列
+ * @param onProgress 削除進捗コールバック
+ * @param signal キャンセルシグナル（abort() 呼び出しで削除を中断）
+ * @returns 削除結果（合計件数・チャンネル別内訳）を示す Promise
+ */
+export async function deleteScannedMessages(
+  messages: ScannedMessageWithChannel[],
+  onProgress?: (data: DeleteProgressData) => Promise<void>,
+  signal?: AbortSignal,
+): Promise<MessageDeleteResult> {
+  const twoWeeksAgo = Date.now() - MSG_DEL_BULK_MAX_AGE_MS;
+  const channelBreakdown: Record<string, { name: string; count: number }> = {};
+  let totalDeleted = 0;
+
+  const report = createThrottledReporter(onProgress);
+
+  // チャンネル別にグループ化
+  const byChannel = new Map<string, ScannedMessageWithChannel[]>();
+  for (const msg of messages) {
+    const arr = byChannel.get(msg.channelId) ?? [];
+    arr.push(msg);
+    byChannel.set(msg.channelId, arr);
+  }
+
+  const channelStatusMap = new Map<string, ChannelDeleteStatus>(
+    [...byChannel.entries()].map(([channelId, msgs]) => [
+      channelId,
+      { channelId, name: msgs[0].channelName, deleted: 0, total: msgs.length },
+    ]),
+  );
+  const channelStatuses = [...channelStatusMap.values()];
+
+  for (const channelMessages of byChannel.values()) {
+    // キャンセルシグナル確認（Phase 3 タイムアウト時に削除を中断）
+    if (signal?.aborted) break;
+
+    const channelId = channelMessages[0].channelId;
+    const channelName = channelMessages[0].channelName;
+    const rawChannel = channelMessages[0]._channel;
+    // byChannel と channelStatusMap は同じキーセットで構築されるため必ず存在する
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const channelStatus = channelStatusMap.get(channelId)!;
+
+    const newMsgs = channelMessages.filter(
+      (m) => m.createdAt.getTime() > twoWeeksAgo,
+    );
+    const oldMsgs = channelMessages.filter(
+      (m) => m.createdAt.getTime() <= twoWeeksAgo,
+    );
+
+    await report({ totalDeleted, total: messages.length, channelStatuses });
+
+    // チャンネル開始時点の削除合計を記録（チャンネル別集計用）
+    const channelStartDeleted = totalDeleted;
+
+    // bulkDelete（14日以内・bulkDelete サポートチャンネルのみ）
+    if (hasBulkDelete(rawChannel) && newMsgs.length > 0) {
+      for (let i = 0; i < newMsgs.length; i += MSG_DEL_BULK_BATCH_SIZE) {
+        if (signal?.aborted) break;
+        const chunk = newMsgs.slice(i, i + MSG_DEL_BULK_BATCH_SIZE);
+        logger.debug(
+          tDefault("system:message-delete.svc_bulk_delete_chunk", {
+            size: chunk.length,
+          }),
+        );
+        const deleted = await rawChannel.bulkDelete(
+          chunk.map((m) => m.messageId),
+          true,
+        );
+        totalDeleted += deleted.size;
+        channelStatus.deleted += deleted.size;
+        await report({ totalDeleted, total: messages.length, channelStatuses });
+        if (i + MSG_DEL_BULK_BATCH_SIZE < newMsgs.length) {
+          await sleep(MSG_DEL_BULK_WAIT_MS);
+        }
+      }
+    }
+
+    // 個別削除（14日超 + bulkDelete 非サポートチャンネルの新メッセージも対象）
+    const individualMsgs = hasBulkDelete(rawChannel)
+      ? oldMsgs
+      : channelMessages;
+    for (let idx = 0; idx < individualMsgs.length; idx++) {
+      if (signal?.aborted) break;
+      const scanned = individualMsgs[idx];
+      try {
+        await rawChannel.messages.delete(scanned.messageId);
+        totalDeleted++;
+        channelStatus.deleted++;
+      } catch (err) {
+        logger.warn(
+          tDefault("system:message-delete.svc_message_delete_failed", {
+            messageId: scanned.messageId,
+            error: String(err),
+          }),
+        );
+      }
+      await report({ totalDeleted, total: messages.length, channelStatuses });
+      if (idx < individualMsgs.length - 1) {
+        await sleep(MSG_DEL_INDIVIDUAL_WAIT_MS);
+      }
+    }
+
+    channelBreakdown[channelId] = {
+      name: channelName,
+      count: totalDeleted - channelStartDeleted,
+    };
+  }
+
+  return { totalDeleted, channelBreakdown };
 }
 
 /**
  * 日付文字列をパースして Date オブジェクトを返す。
- * `YYYY-MM-DD` のみの場合は時刻を補完する。
+ * `YYYY-MM-DD` のみの場合は時刻を補完し、timezoneOffset を付与する。
+ * `YYYY-MM-DDTHH:MM:SS` のみ（オフセットなし）の場合も timezoneOffset を付与する。
+ * オフセット付き形式（`YYYY-MM-DDTHH:MM:SS±HH:MM`）はそのまま解釈する。
  * @param str パース対象の日付文字列（`YYYY-MM-DD` または ISO 8601 形式）
- * @param endOfDay true の場合は時刻を `23:59:59` で補完する
+ * @param endOfDay true の場合は時刻を `23:59:59` で補完する（`before` に使用）
+ * @param timezoneOffset `YYYY-MM-DD` または `YYYY-MM-DDTHH:MM:SS` 形式のときに付与するタイムゾーンオフセット（例: "+09:00"）
  * @returns パースに成功した場合は Date、不正な文字列の場合は null
  */
-export function parseDateStr(str: string, endOfDay: boolean): Date | null {
-  const normalized = /^\d{4}-\d{2}-\d{2}$/.test(str)
-    ? `${str}T${endOfDay ? "23:59:59" : "00:00:00"}`
-    : str;
+export function parseDateStr(
+  str: string,
+  endOfDay: boolean,
+  timezoneOffset: string,
+): Date | null {
+  let normalized: string;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+    // 日付のみ → 時刻を補完（before は 23:59:59、after は 00:00:00）してオフセットを付与
+    normalized = `${str}T${endOfDay ? "23:59:59" : "00:00:00"}${timezoneOffset}`;
+  } else if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(str)) {
+    // 日時のみ（オフセットなし）→ ロケールから推定したタイムゾーンオフセットを付与（UX 向上のため）
+    normalized = `${str}${timezoneOffset}`;
+  } else if (
+    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}([+-]\d{2}:\d{2}|Z)$/.test(str)
+  ) {
+    // 日時＋オフセット付き（YYYY-MM-DDTHH:MM:SS±HH:MM または Z）→ そのまま使用
+    normalized = str;
+  } else {
+    return null;
+  }
   const d = new Date(normalized);
   return isNaN(d.getTime()) ? null : d;
 }

@@ -245,32 +245,6 @@ export interface IVcRecruitRepository {
 }
 
 // ============================================================
-// MessageDeleteUserSetting エンティティ（message-delete 機能のユーザー個別設定）
-// ============================================================
-
-export interface MessageDeleteUserSetting {
-  id: string;
-  userId: string;
-  guildId: string;
-  /** message-delete 実行確認ダイアログをスキップするか（デフォルト: false） */
-  skipConfirm: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface IMessageDeleteUserSettingRepository {
-  findByUserAndGuild(
-    userId: string,
-    guildId: string,
-  ): Promise<MessageDeleteUserSetting | null>;
-  upsert(
-    userId: string,
-    guildId: string,
-    patch: { skipConfirm: boolean },
-  ): Promise<MessageDeleteUserSetting>;
-}
-
-// ============================================================
 // StickyMessage エンティティ（専用テーブル、GuildConfig とは別）
 // ============================================================
 

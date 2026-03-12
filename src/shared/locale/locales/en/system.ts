@@ -293,7 +293,7 @@ export const system = {
   "interaction.unknown_command":
     "[Interaction] Unknown command CommandName: {{commandName}}",
   "interaction.command_executed":
-    "[Interaction] Command executed CommandName: {{commandName}} UserTag: {{userTag}}",
+    "[Interaction] Command executed CommandName: {{commandName}} UserId: {{userId}}",
   "interaction.command_error":
     "[Interaction] Command error CommandName: {{commandName}}",
   "interaction.autocomplete_error":
@@ -301,7 +301,7 @@ export const system = {
   "interaction.unknown_modal":
     "[Interaction] Unknown modal CustomId: {{customId}}",
   "interaction.modal_submitted":
-    "[Interaction] Modal submitted CustomId: {{customId}} UserTag: {{userTag}}",
+    "[Interaction] Modal submitted CustomId: {{customId}} UserId: {{userId}}",
   "interaction.modal_error":
     "[Interaction] Modal error CustomId: {{customId}}",
   "interaction.button_error":
@@ -445,6 +445,32 @@ export const system = {
     "[VcRecruit] setup created GuildId: {{guildId}} CategoryId: {{categoryId}}",
   "vc-recruit.setup_removed":
     "[VcRecruit] setup removed GuildId: {{guildId}} CategoryId: {{categoryId}}",
+
+  // Message Delete feature logs
+  "message-delete.cmd_all_channels_start":
+    "[MsgDel][CMD] fetching all channels",
+  "message-delete.cmd_channel_count":
+    "[MsgDel][CMD] channel count={{count}}",
+  "message-delete.svc_scan_start":
+    "[MsgDel][SVC] scan start channels={{channelCount}} count={{count}} targetUserId={{targetUserId}}",
+  "message-delete.svc_initial_fetch":
+    "[MsgDel][SVC] initial fetch ch={{channelId}}",
+  "message-delete.svc_refill":
+    "[MsgDel][SVC] refill ch={{channelId}} before={{lastId}}",
+  "message-delete.svc_scan_complete":
+    "[MsgDel][SVC] scan complete total={{count}}",
+  "message-delete.svc_channel_no_access":
+    "[MsgDel] channel {{channelId}} skipped (no access)",
+  "message-delete.svc_bulk_delete_chunk":
+    "[MsgDel][SVC] bulkDelete chunk size={{size}}",
+  "message-delete.svc_message_delete_failed":
+    "[MsgDel] failed to delete messageId={{messageId}}: {{error}}",
+  "message-delete.scan_error":
+    "[MsgDel] scan error: {{error}}",
+  "message-delete.delete_error":
+    "[MsgDel] delete error: {{error}}",
+  "message-delete.deleted":
+    "[MsgDel] {{userId}} deleted {{count}} messages{{countPart}}{{targetPart}}{{keywordPart}}{{periodPart}} channels=[{{channels}}]",
 } as const;
 
 export type SystemTranslations = typeof system;
