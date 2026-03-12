@@ -67,9 +67,13 @@ export const events = {
     "Member Count",
   "member-log.leave.footer":
     "See you!",
+  "member-log.leave.footer_with_number":
+    "See you! • Member #{{number}}",
   // Days unit label
   "member-log.days":
     "{{count}} days",
+  "member-log.member_count":
+    "{{count}} members",
   "member-log.unknown":
     "Unknown",
   // Duration format

@@ -67,9 +67,13 @@ export const events = {
     "メンバー数",
   "member-log.leave.footer":
     "またね！",
+  "member-log.leave.footer_with_number":
+    "またね！ • Member #{{number}}",
   // 日・単位ラベル
   "member-log.days":
     "{{count}}日",
+  "member-log.member_count":
+    "{{count}}名",
   "member-log.unknown":
     "不明",
   // 経過期間フォーマット

@@ -201,7 +201,7 @@ async function handleUserSelectionUI(
         .fetch(userId)
         .catch(() => null);
       const displayName =
-        member?.displayName ?? member?.user.username ?? userId;
+        member?.displayName ?? member?.user.displayName ?? userId;
       return {
         label: displayName.slice(0, 100),
         description: `ID: ${userId}`,

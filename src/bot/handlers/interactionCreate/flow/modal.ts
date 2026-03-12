@@ -31,7 +31,7 @@ export async function handleModalSubmit(
     logger.debug(
       tDefault("system:interaction.modal_submitted", {
         customId: interaction.customId,
-        userTag: interaction.user.tag,
+        userId: interaction.user.id,
       }),
     );
   } catch (error) {

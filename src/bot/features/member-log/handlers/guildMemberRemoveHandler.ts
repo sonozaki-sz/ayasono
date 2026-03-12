@@ -110,7 +110,7 @@ export async function handleGuildMemberRemove(
                 name: t("events:member-log.leave.fields.accountCreated"),
                 value: `<t:${createdTimestamp}:f>(${(() => {
                   const { years, months, days } = calcDuration(
-                    member.user!.createdTimestamp,
+                    member.user?.createdTimestamp ?? 0,
                   );
                   const parts: string[] = [];
                   if (years > 0)
@@ -155,12 +155,14 @@ export async function handleGuildMemberRemove(
         },
         {
           name: t("events:member-log.leave.fields.memberCount"),
-          value: `${memberCount.toLocaleString()}名`,
+          value: t("events:member-log.member_count", { count: memberCount }),
           inline: true,
         },
       )
       .setFooter({
-        text: `${t("events:member-log.leave.footer")} • Member #${memberCount + 1}`,
+        text: t("events:member-log.leave.footer_with_number", {
+          number: memberCount + 1,
+        }),
       })
       .setTimestamp();
 

@@ -86,9 +86,14 @@ export async function handleVcRecruitConfigSetup(
       .permissionsFor(guild.roles.everyone)
       ?.has(PermissionFlagsBits.ViewChannel) === true;
 
+  const botMember = guild.members.me;
+  if (!botMember) {
+    throw new Error("Bot member not found in guild cache");
+  }
+
   const panelPermissionOverwrites: OverwriteResolvable[] = [
     {
-      id: guild.members.me!.id,
+      id: botMember.id,
       allow: [
         PermissionFlagsBits.SendMessages,
         PermissionFlagsBits.ManageMessages,
@@ -105,7 +110,7 @@ export async function handleVcRecruitConfigSetup(
 
   const postPermissionOverwrites: OverwriteResolvable[] = [
     {
-      id: guild.members.me!.id,
+      id: botMember.id,
       allow: [
         PermissionFlagsBits.SendMessages,
         PermissionFlagsBits.ManageMessages,
