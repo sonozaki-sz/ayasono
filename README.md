@@ -262,20 +262,22 @@ ayasono/
 │   │   ├── events/           # イベントハンドラ
 │   │   ├── features/         # 機能モジュール（機能ごとのユースケース・ハンドラ・リポジトリ）
 │   │   ├── handlers/         # インタラクション処理フロー
-│   │   ├── services/         # Bot起動・依存解決
+│   │   ├── services/         # Bot起動・依存解決・クールダウン管理
+│   │   ├── shared/           # Bot内共有（i18nキー・権限ガード）
 │   │   ├── errors/           # エラーハンドラ
 │   │   ├── types/            # discord.js 型拡張
 │   │   └── utils/            # Bot共通ユーティリティ
 │   ├── web/                  # Web UI（凍結中）
 │   │   ├── server.ts
+│   │   ├── webAppBuilder.ts
 │   │   ├── routes/
-│   │   ├── middleware/
-│   │   ├── schemas/
-│   │   └── public/
+│   │   └── middleware/
 │   └── shared/               # 共有コード
 │       ├── config/           # 環境変数定義
 │       ├── database/         # リポジトリ・型定義
-│       ├── features/         # 機能モジュール（bot/web 横断で共有するサービス層）
+│       │   ├── repositories/ # 機能別リポジトリ（persistence / serializers / usecases）
+│       │   └── types/        # エンティティ・リポジトリ型定義
+│       ├── features/         # 機能モジュール（機能ごとの configService・configDefaults）
 │       ├── locale/           # i18n（i18next）
 │       ├── scheduler/        # ジョブスケジューラ
 │       ├── errors/           # カスタムエラー・エラーハンドラ
