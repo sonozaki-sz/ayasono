@@ -15,14 +15,6 @@ model GuildConfig {
   guildId   String   @unique
   locale    String   @default("ja")
 
-  // 詳細設定（JSON形式で保存）
-  afkConfig              String? // JSON: AfkConfig
-  vacConfig              String? // JSON: VacConfig
-  bumpReminderConfig     String? // JSON: BumpReminderConfig
-  stickMessages          String? // JSON: StickMessage[]
-  memberLogConfig        String? // JSON: MemberLogConfig
-  vcRecruitConfig        String? // JSON: VcRecruitConfig
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -46,6 +38,59 @@ model BumpReminder {
   @@index([guildId])
   @@index([status, scheduledAt])
   @@map("bump_reminders")
+}
+
+// 機能別設定テーブル（GuildConfig JSON カラムから分割）
+
+// AFK設定
+model GuildAfkConfig {
+  guildId   String  @id @map("guild_id")
+  enabled   Boolean @default(false)
+  channelId String? @map("channel_id")
+
+  @@map("guild_afk_configs")
+}
+
+// Bumpリマインダー設定
+model GuildBumpReminderConfig {
+  guildId        String  @id @map("guild_id")
+  enabled        Boolean @default(false)
+  channelId      String? @map("channel_id")
+  mentionRoleId  String? @map("mention_role_id")
+  mentionUserIds String  @default("[]") @map("mention_user_ids") // JSON: string[]
+
+  @@map("guild_bump_reminder_configs")
+}
+
+// VAC（ボイスチャンネル自動作成）設定
+model GuildVacConfig {
+  guildId           String  @id @map("guild_id")
+  enabled           Boolean @default(false)
+  triggerChannelIds String  @default("[]") @map("trigger_channel_ids") // JSON: string[]
+  createdChannels   String  @default("[]") @map("created_channels")    // JSON: VacChannelPair[]
+
+  @@map("guild_vac_configs")
+}
+
+// メンバーログ設定
+model GuildMemberLogConfig {
+  guildId      String  @id @map("guild_id")
+  enabled      Boolean @default(false)
+  channelId    String? @map("channel_id")
+  joinMessage  String? @map("join_message")
+  leaveMessage String? @map("leave_message")
+
+  @@map("guild_member_log_configs")
+}
+
+// VC募集設定
+model GuildVcRecruitConfig {
+  guildId        String  @id @map("guild_id")
+  enabled        Boolean @default(false)
+  mentionRoleIds String  @default("[]") @map("mention_role_ids") // JSON: string[]
+  setups         String  @default("[]")                          // JSON: VcRecruitSetup[]
+
+  @@map("guild_vc_recruit_configs")
 }
 
 // Sticky Message (スティッキーメッセージ)

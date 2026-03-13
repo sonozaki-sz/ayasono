@@ -4,7 +4,8 @@
 import { type ChatInputCommandInteraction, MessageFlags } from "discord.js";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
 import { tDefault } from "../../../../../shared/locale/localeManager";
-import { getBotVacRepository } from "../../../../services/botVacDependencyResolver";
+import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
+import { getBotVacConfigService } from "../../../../services/botCompositionRoot";
 import { createInfoEmbed } from "../../../../utils/messageResponse";
 import { presentVacConfigView } from "../presenters/vacConfigViewPresenter";
 
@@ -21,10 +22,10 @@ export async function handleVacConfigView(
   // 最新設定を読み込み、表示用の文字列へ整形
   const guild = interaction.guild;
   if (!guild) {
-    throw new ValidationError(tDefault("errors:validation.guild_only"));
+    throw new ValidationError(tDefault(COMMON_I18N_KEYS.GUILD_ONLY));
   }
 
-  const config = await getBotVacRepository().getVacConfigOrDefault(guildId);
+  const config = await getBotVacConfigService().getVacConfigOrDefault(guildId);
   const presentation = await presentVacConfigView(guild, guildId, config);
 
   // トリガー一覧と作成済みVC一覧を Embed で返す

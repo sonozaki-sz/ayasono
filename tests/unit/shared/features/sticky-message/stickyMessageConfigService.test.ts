@@ -34,7 +34,7 @@ describe("shared/features/sticky-message/stickyMessageConfigService", () => {
     return import("@/shared/features/sticky-message/stickyMessageConfigService");
   }
 
-  it("findByChannel delegates to repository", async () => {
+  it("findByChannel がリポジトリへ委譲すること", async () => {
     const repo = createRepoMock();
     const expected = { id: "s1", channelId: "ch-1", content: "hello" };
     repo.findByChannel.mockResolvedValue(expected);
@@ -47,7 +47,7 @@ describe("shared/features/sticky-message/stickyMessageConfigService", () => {
     expect(result).toBe(expected);
   });
 
-  it("findAllByGuild delegates to repository", async () => {
+  it("findAllByGuild がリポジトリへ委譲すること", async () => {
     const repo = createRepoMock();
     const expected = [{ id: "s1" }, { id: "s2" }];
     repo.findAllByGuild.mockResolvedValue(expected);
@@ -60,8 +60,7 @@ describe("shared/features/sticky-message/stickyMessageConfigService", () => {
     expect(result).toBe(expected);
   });
 
-  // 引数が多い create メソッドが全引数を過不足なくリポジトリに転送することを確認
-  it("create delegates to repository with all args", async () => {
+  it("create が全引数をリポジトリへ委譲すること", async () => {
     const repo = createRepoMock();
     const expected = { id: "s1" };
     repo.create.mockResolvedValue(expected);
@@ -86,7 +85,7 @@ describe("shared/features/sticky-message/stickyMessageConfigService", () => {
     expect(result).toBe(expected);
   });
 
-  it("updateLastMessageId delegates to repository", async () => {
+  it("updateLastMessageId がリポジトリへ委譲すること", async () => {
     const repo = createRepoMock();
     repo.updateLastMessageId.mockResolvedValue(undefined);
 
@@ -97,7 +96,7 @@ describe("shared/features/sticky-message/stickyMessageConfigService", () => {
     expect(repo.updateLastMessageId).toHaveBeenCalledWith("s1", "msg-id");
   });
 
-  it("updateContent delegates to repository", async () => {
+  it("updateContent がリポジトリへ委譲すること", async () => {
     const repo = createRepoMock();
     const expected = { id: "s1", content: "new" };
     repo.updateContent.mockResolvedValue(expected);
@@ -115,7 +114,7 @@ describe("shared/features/sticky-message/stickyMessageConfigService", () => {
     expect(result).toBe(expected);
   });
 
-  it("delete delegates to repository", async () => {
+  it("delete がリポジトリへ委譲すること", async () => {
     const repo = createRepoMock();
     repo.delete.mockResolvedValue(undefined);
 
@@ -126,7 +125,7 @@ describe("shared/features/sticky-message/stickyMessageConfigService", () => {
     expect(repo.delete).toHaveBeenCalledWith("s1");
   });
 
-  it("deleteByChannel delegates to repository", async () => {
+  it("deleteByChannel がリポジトリへ委譲すること", async () => {
     const repo = createRepoMock();
     repo.deleteByChannel.mockResolvedValue(0);
 
@@ -137,7 +136,7 @@ describe("shared/features/sticky-message/stickyMessageConfigService", () => {
     expect(repo.deleteByChannel).toHaveBeenCalledWith("ch-1");
   });
 
-  it("createStickyMessageConfigService returns new service instance", async () => {
+  it("createStickyMessageConfigService が新しいサービスインスタンスを返すこと", async () => {
     const repo = createRepoMock();
     const { createStickyMessageConfigService, StickyMessageConfigService } =
       await loadModule();

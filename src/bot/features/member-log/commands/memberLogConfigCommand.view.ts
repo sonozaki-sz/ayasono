@@ -3,7 +3,7 @@
 
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
 import { tGuild } from "../../../../shared/locale/localeManager";
-import { getBotMemberLogConfigService } from "../../../services/botMemberLogDependencyResolver";
+import { getBotMemberLogConfigService } from "../../../services/botCompositionRoot";
 import { createInfoEmbed } from "../../../utils/messageResponse";
 import { ensureMemberLogManageGuildPermission } from "./memberLogConfigCommand.guard";
 

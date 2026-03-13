@@ -1,10 +1,12 @@
 // src/bot/features/vac/commands/vacConfigCommand.execute.ts
 // VAC 設定コマンド実行処理
 
-import { ChatInputCommandInteraction, PermissionFlagsBits } from "discord.js";
+import { ChatInputCommandInteraction } from "discord.js";
 import { ValidationError } from "../../../../shared/errors/customErrors";
 import { tDefault } from "../../../../shared/locale/localeManager";
 import { handleCommandError } from "../../../errors/interactionErrorHandler";
+import { COMMON_I18N_KEYS } from "../../../shared/i18nKeys";
+import { ensureManageGuildPermission } from "../../../shared/permissionGuards";
 import { handleVacConfigCreateTrigger } from "./usecases/vacConfigCreateTrigger";
 import { handleVacConfigRemoveTrigger } from "./usecases/vacConfigRemoveTrigger";
 import { handleVacConfigView } from "./usecases/vacConfigView";
@@ -22,11 +24,11 @@ export async function executeVacConfigCommand(
     // Guild 外実行は設定変更対象外
     const guildId = interaction.guildId;
     if (!guildId) {
-      throw new ValidationError(tDefault("errors:validation.guild_only"));
+      throw new ValidationError(tDefault(COMMON_I18N_KEYS.GUILD_ONLY));
     }
 
     // 実行前に管理権限を検証
-    ensureManageGuildPermission(interaction, guildId);
+    await ensureManageGuildPermission(interaction, guildId);
 
     // サブコマンド別に処理を委譲
     const subcommand = interaction.options.getSubcommand();
@@ -42,28 +44,10 @@ export async function executeVacConfigCommand(
         break;
       default:
         throw new ValidationError(
-          tDefault("errors:validation.invalid_subcommand"),
+          tDefault(COMMON_I18N_KEYS.INVALID_SUBCOMMAND),
         );
     }
   } catch (error) {
     await handleCommandError(interaction, error);
-  }
-}
-
-/**
- * 実行ユーザーがサーバー管理権限を持つか検証する関数
- * @param interaction コマンド実行インタラクション
- * @param guildId 実行対象ギルドID
- * @returns 検証完了（権限不足時は例外送出）
- */
-function ensureManageGuildPermission(
-  interaction: ChatInputCommandInteraction,
-  guildId: string,
-): void {
-  // Discord UI 側の既定権限に依存せず、実行時にも管理権限を確認
-  if (!interaction.memberPermissions?.has(PermissionFlagsBits.ManageGuild)) {
-    throw new ValidationError(
-      tDefault("errors:permission.manage_guild_required", { guildId }),
-    );
   }
 }

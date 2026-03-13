@@ -2,7 +2,7 @@
 // VAC の channelDelete ハンドラー
 
 import type { Channel } from "discord.js";
-import { getBotVacService } from "../../../services/botVacDependencyResolver";
+import { getBotVacService } from "../../../services/botCompositionRoot";
 
 /**
  * channelDelete 時に VAC 設定と管理対象チャンネル情報を同期する関数

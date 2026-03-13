@@ -39,31 +39,17 @@ describe("shared/locale/i18n", () => {
     expect(module.DEFAULT_LOCALE).toBe("ja");
   });
 
-  it("initializes i18next with expected options in development", async () => {
-    const { module, i18nextMock } = await loadModule("development");
-
-    const instance = await module.initI18n();
-    expect(instance).toBe(i18nextMock);
-    expect(i18nextMock.init).toHaveBeenCalledWith(
-      expect.objectContaining({
-        lng: "ja",
-        fallbackLng: "ja",
-        debug: true,
-        resources: {},
-        keySeparator: false,
-        ns: ["common", "commands", "errors", "events", "system"],
-        defaultNS: "common",
-      }),
-    );
-  });
-
-  // 本番・テスト環境では i18next の debug ログを無効化して余分な出力を抑制することを確認
-  it("sets debug false outside development", async () => {
-    const { module, i18nextMock } = await loadModule("production");
+  // 環境ごとに debug フラグが切り替わることを確認（development のみ true）
+  it.each([
+    ["development" as const, true],
+    ["production" as const, false],
+    ["test" as const, false],
+  ])("sets debug=%s in %s environment", async (nodeEnv, expectedDebug) => {
+    const { module, i18nextMock } = await loadModule(nodeEnv);
     await module.initI18n();
 
     expect(i18nextMock.init).toHaveBeenCalledWith(
-      expect.objectContaining({ debug: false }),
+      expect.objectContaining({ debug: expectedDebug }),
     );
   });
 

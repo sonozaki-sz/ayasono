@@ -12,7 +12,8 @@ import {
 import type { VcRecruitSetup } from "../../../../../shared/database/types";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
 import { tDefault, tGuild } from "../../../../../shared/locale/localeManager";
-import { getBotVcRecruitRepository } from "../../../../services/botVcRecruitDependencyResolver";
+import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
+import { getBotVcRecruitRepository } from "../../../../services/botCompositionRoot";
 import { VC_RECRUIT_TEARDOWN_CUSTOM_ID } from "../vcRecruitConfigCommand.constants";
 
 /**
@@ -61,7 +62,7 @@ export async function handleVcRecruitConfigTeardown(
 ): Promise<void> {
   const guild = interaction.guild;
   if (!guild) {
-    throw new ValidationError(tDefault("errors:validation.guild_only"));
+    throw new ValidationError(tDefault(COMMON_I18N_KEYS.GUILD_ONLY));
   }
 
   const repo = getBotVcRecruitRepository();

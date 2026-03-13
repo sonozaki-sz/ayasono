@@ -4,7 +4,7 @@ import {
   resolveTargetCategory,
 } from "@/bot/features/vac/commands/helpers/vacConfigTargetResolver";
 import { handleVacConfigCreateTrigger } from "@/bot/features/vac/commands/usecases/vacConfigCreateTrigger";
-import { getBotVacRepository } from "@/bot/services/botVacDependencyResolver";
+import { getBotVacConfigService } from "@/bot/services/botCompositionRoot";
 import { createSuccessEmbed } from "@/bot/utils/messageResponse";
 import { ValidationError } from "@/shared/errors/customErrors";
 import { ChannelType, MessageFlags } from "discord.js";
@@ -15,8 +15,8 @@ vi.mock("@/shared/locale/localeManager", () => ({
   tGuild: vi.fn(async (_guildId: string, key: string) => key),
 }));
 
-vi.mock("@/bot/services/botVacDependencyResolver", () => ({
-  getBotVacRepository: vi.fn(),
+vi.mock("@/bot/services/botCompositionRoot", () => ({
+  getBotVacConfigService: vi.fn(),
 }));
 
 vi.mock("@/bot/utils/messageResponse", () => ({
@@ -55,7 +55,7 @@ describe("bot/features/vac/commands/usecases/vacConfigCreateTrigger", () => {
     const getVacConfigOrDefault = vi.fn().mockResolvedValue({
       triggerChannelIds: ["trigger-1"],
     });
-    (getBotVacRepository as Mock).mockReturnValue({
+    (getBotVacConfigService as Mock).mockReturnValue({
       getVacConfigOrDefault,
       addTriggerChannel: vi.fn(),
     });
@@ -82,7 +82,7 @@ describe("bot/features/vac/commands/usecases/vacConfigCreateTrigger", () => {
     const getVacConfigOrDefault = vi.fn().mockResolvedValue({
       triggerChannelIds: [],
     });
-    (getBotVacRepository as Mock).mockReturnValue({
+    (getBotVacConfigService as Mock).mockReturnValue({
       getVacConfigOrDefault,
       addTriggerChannel: vi.fn(),
     });
@@ -110,7 +110,7 @@ describe("bot/features/vac/commands/usecases/vacConfigCreateTrigger", () => {
     const getVacConfigOrDefault = vi.fn().mockResolvedValue({
       triggerChannelIds: [],
     });
-    (getBotVacRepository as Mock).mockReturnValue({
+    (getBotVacConfigService as Mock).mockReturnValue({
       getVacConfigOrDefault,
       addTriggerChannel,
     });

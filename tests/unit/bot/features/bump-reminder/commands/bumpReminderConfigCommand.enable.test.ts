@@ -16,7 +16,7 @@ vi.mock("@/shared/utils/logger", () => ({
   logger: { info: vi.fn() },
 }));
 
-vi.mock("@/bot/services/botBumpReminderDependencyResolver", () => ({
+vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotBumpReminderConfigService: () => ({
     setBumpReminderEnabled: (...args: unknown[]) => setEnabledMock(...args),
   }),

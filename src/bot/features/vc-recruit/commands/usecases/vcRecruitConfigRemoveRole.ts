@@ -4,9 +4,11 @@
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
 import { tDefault, tGuild } from "../../../../../shared/locale/localeManager";
-import { getBotVcRecruitRepository } from "../../../../services/botVcRecruitDependencyResolver";
+import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
+import { getBotVcRecruitRepository } from "../../../../services/botCompositionRoot";
 import { createSuccessEmbed } from "../../../../utils/messageResponse";
 import { VC_RECRUIT_CONFIG_COMMAND } from "../vcRecruitConfigCommand.constants";
+import { VC_RECRUIT_MENTION_ROLE_REMOVE_RESULT } from "../../../../../shared/database/types";
 
 /**
  * vc-recruit-config remove-role を実行する
@@ -18,7 +20,7 @@ export async function handleVcRecruitConfigRemoveRole(
   guildId: string,
 ): Promise<void> {
   if (!interaction.guild) {
-    throw new ValidationError(tDefault("errors:validation.guild_only"));
+    throw new ValidationError(tDefault(COMMON_I18N_KEYS.GUILD_ONLY));
   }
 
   const role = interaction.options.getRole(
@@ -31,7 +33,7 @@ export async function handleVcRecruitConfigRemoveRole(
     role.id,
   );
 
-  if (result === "not_found") {
+  if (result === VC_RECRUIT_MENTION_ROLE_REMOVE_RESULT.NOT_FOUND) {
     throw new ValidationError(
       await tGuild(guildId, "errors:vcRecruit.role_not_found", {
         role: `<@&${role.id}>`,

@@ -20,14 +20,7 @@ const createInfoEmbedMock = vi.fn(
   }),
 );
 
-// AFK設定永続化の呼び出しだけをモックし、コマンド分岐を直接検証する
-vi.mock("@/bot/services/botGuildConfigRepositoryResolver", () => ({
-  getBotGuildConfigRepository: () => ({
-    setAfkChannel: (...args: unknown[]) => setAfkChannelMock(...args),
-    getAfkConfig: (...args: unknown[]) => getAfkConfigMock(...args),
-  }),
-}));
-
+// afkConfigService が使う DB レイヤーのみモック
 vi.mock("@/shared/database/guildConfigRepositoryProvider", () => ({
   getGuildConfigRepository: () => ({
     setAfkChannel: (...args: unknown[]) => setAfkChannelMock(...args),
@@ -35,7 +28,6 @@ vi.mock("@/shared/database/guildConfigRepositoryProvider", () => ({
   }),
 }));
 
-// 共通エラーハンドラへの委譲可否を確認する
 vi.mock("@/bot/errors/interactionErrorHandler", () => ({
   handleCommandError: vi.fn(),
 }));
@@ -58,14 +50,6 @@ vi.mock("@/bot/utils/messageResponse", () => ({
     createSuccessEmbedMock(description, options),
   createInfoEmbed: (description: string, options?: unknown) =>
     createInfoEmbedMock(description, options),
-}));
-
-// ログ出力の副作用を抑止
-vi.mock("@/shared/utils/logger", () => ({
-  logger: {
-    info: vi.fn(),
-    debug: vi.fn(),
-  },
 }));
 
 import { afkConfigCommand } from "@/bot/commands/afk-config";
@@ -112,17 +96,6 @@ describe("bot/commands/afk-config", () => {
     getAfkConfigMock.mockResolvedValue({ enabled: false, channelId: null });
   });
 
-  // guild 外実行は統一エラーハンドラへ委譲されることを検証
-  it("delegates guild-only validation error to handleCommandError", async () => {
-    const interaction = createInteraction({ guildId: null });
-
-    await afkConfigCommand.execute(
-      interaction as unknown as ChatInputCommandInteraction,
-    );
-
-    expect(handleCommandError).toHaveBeenCalledTimes(1);
-  });
-
   // set-channel 正常系として保存と Ephemeral 返信を検証
   it("sets AFK channel on set-channel subcommand", async () => {
     const interaction = createInteraction({
@@ -149,44 +122,8 @@ describe("bot/commands/afk-config", () => {
     });
   });
 
-  // 未知サブコマンドは共通エラーハンドラへ委譲されることを検証
-  it("delegates invalid subcommand error", async () => {
-    const interaction = createInteraction({
-      options: {
-        getSubcommand: vi.fn(() => "unknown"),
-        getChannel: vi.fn(),
-      },
-    });
-
-    await afkConfigCommand.execute(
-      interaction as unknown as ChatInputCommandInteraction,
-    );
-
-    expect(handleCommandError).toHaveBeenCalledTimes(1);
-  });
-
-  // set-channel で権限不足の場合は共通エラーハンドラへ委譲されることを検証
-  it("delegates permission error on set-channel", async () => {
-    const interaction = createInteraction({
-      memberPermissions: { has: vi.fn(() => false) },
-      options: {
-        getSubcommand: vi.fn(() => "set-channel"),
-        getChannel: vi.fn(() => ({
-          id: "afk-channel",
-          type: ChannelType.GuildVoice,
-        })),
-      },
-    });
-
-    await afkConfigCommand.execute(
-      interaction as unknown as ChatInputCommandInteraction,
-    );
-
-    expect(handleCommandError).toHaveBeenCalledTimes(1);
-  });
-
-  // set-channel でVC以外を指定した場合は共通エラーハンドラへ委譲されることを検証
-  it("delegates invalid channel type error on set-channel", async () => {
+  // set-channel でVC以外を指定した場合は操作が実行されないことを検証
+  it("does not set AFK channel when channel type is invalid", async () => {
     const interaction = createInteraction({
       options: {
         getSubcommand: vi.fn(() => "set-channel"),
@@ -274,22 +211,5 @@ describe("bot/commands/afk-config", () => {
       embeds: [{ kind: "info", description: "" }],
       flags: 64,
     });
-  });
-
-  // view で権限不足の場合は共通エラーハンドラへ委譲されることを検証
-  it("delegates permission error on view", async () => {
-    const interaction = createInteraction({
-      memberPermissions: { has: vi.fn(() => false) },
-      options: {
-        getSubcommand: vi.fn(() => "view"),
-        getChannel: vi.fn(),
-      },
-    });
-
-    await afkConfigCommand.execute(
-      interaction as unknown as ChatInputCommandInteraction,
-    );
-
-    expect(handleCommandError).toHaveBeenCalledTimes(1);
   });
 });

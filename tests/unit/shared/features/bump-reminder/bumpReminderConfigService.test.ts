@@ -44,7 +44,7 @@ describe("shared/features/bump-reminder/bumpReminderConfigService", () => {
     };
   };
 
-  it("re-exports reminder result constants", async () => {
+  it("リマインダー結果定数を再エクスポートすること", async () => {
     const { module } = await loadModule();
 
     expect(module.BUMP_REMINDER_MENTION_CLEAR_RESULT).toBe(CLEAR);
@@ -54,8 +54,7 @@ describe("shared/features/bump-reminder/bumpReminderConfigService", () => {
     expect(module.BUMP_REMINDER_MENTION_USERS_CLEAR_RESULT).toBe(USERS_CLEAR);
   });
 
-  // 取得したコンフィグが参照ではなくディープコピーとして返り、元データと別インスタンスになることを検証
-  it("returns normalized config and null when repository has no config", async () => {
+  it("repository に設定がない場合は null を返し、ある場合は正規化コピーを返すこと", async () => {
     const { module } = await loadModule();
     const repository = createRepositoryMock();
     const service = new module.BumpReminderConfigService(repository as never);
@@ -77,8 +76,7 @@ describe("shared/features/bump-reminder/bumpReminderConfigService", () => {
     expect(config?.mentionUserIds).not.toBe(rawConfig.mentionUserIds);
   });
 
-  // リポジトリにデータがない場合に毎回新しいデフォルト配列インスタンスを返し、呼び出し間で共有されないことを検証
-  it("returns fresh default config when repository config is missing", async () => {
+  it("設定が未登録の場合はデフォルト値を返し、配列は呼び出しごとに別インスタンスになること", async () => {
     const { module } = await loadModule();
     const repository = createRepositoryMock();
     const service = new module.BumpReminderConfigService(repository as never);
@@ -92,7 +90,7 @@ describe("shared/features/bump-reminder/bumpReminderConfigService", () => {
     expect(first.mentionUserIds).not.toBe(second.mentionUserIds);
   });
 
-  it("returns existing config in getBumpReminderConfigOrDefault when present", async () => {
+  it("設定が存在する場合は getBumpReminderConfigOrDefault がその値を返すこと", async () => {
     const { module } = await loadModule();
     const repository = createRepositoryMock();
     const service = new module.BumpReminderConfigService(repository as never);
@@ -110,7 +108,7 @@ describe("shared/features/bump-reminder/bumpReminderConfigService", () => {
     ).resolves.toEqual(existing);
   });
 
-  it("normalizes config before save and delegates repository operations", async () => {
+  it("保存時に正規化済みコピーが渡され、repository の各操作に委譲されること", async () => {
     const { module } = await loadModule();
     const repository = createRepositoryMock();
     const service = new module.BumpReminderConfigService(repository as never);
@@ -175,8 +173,7 @@ describe("shared/features/bump-reminder/bumpReminderConfigService", () => {
     );
   });
 
-  // 同一リポジトリインスタンスに対してはシングルトンが返り、異なるリポジトリでは別インスタンスが生成されることを検証
-  it("reuses singleton for same repository and recreates for different repository", async () => {
+  it("同一 repository ではシングルトンを返し、異なる repository では新しいインスタンスを生成すること", async () => {
     const { module } = await loadModule();
     const repositoryA = createRepositoryMock();
     const repositoryB = createRepositoryMock();
@@ -189,11 +186,10 @@ describe("shared/features/bump-reminder/bumpReminderConfigService", () => {
     expect(serviceA1).not.toBe(serviceB);
   });
 
-  // モジュールが公開するトップレベル関数がリポジトリファクトリ経由のシングルトンサービスに処理を委譲することを検証
-  it("function APIs delegate to singleton service resolved from repository factory", async () => {
-    const { module, getGuildConfigRepositoryMock } = await loadModule();
+  it("サービスインスタンスの各 API が repository へ委譲すること", async () => {
+    const { module } = await loadModule();
     const repository = createRepositoryMock();
-    getGuildConfigRepositoryMock.mockReturnValue(repository);
+    const service = module.getBumpReminderConfigService(repository as never);
 
     repository.getBumpReminderConfig.mockResolvedValue({
       enabled: true,
@@ -201,13 +197,13 @@ describe("shared/features/bump-reminder/bumpReminderConfigService", () => {
       mentionRoleId: "role-1",
       mentionUserIds: ["user-1"],
     });
-    await module.getBumpReminderConfig("guild-1");
+    await service.getBumpReminderConfig("guild-1");
     expect(repository.getBumpReminderConfig).toHaveBeenCalledWith("guild-1");
 
     repository.getBumpReminderConfig.mockResolvedValueOnce(null);
-    await module.getBumpReminderConfigOrDefault("guild-1");
+    await service.getBumpReminderConfigOrDefault("guild-1");
 
-    await module.saveBumpReminderConfig("guild-1", {
+    await service.saveBumpReminderConfig("guild-1", {
       enabled: false,
       mentionUserIds: ["u"],
     });
@@ -216,7 +212,7 @@ describe("shared/features/bump-reminder/bumpReminderConfigService", () => {
       expect.objectContaining({ enabled: false, mentionUserIds: ["u"] }),
     );
 
-    await module.setBumpReminderEnabled("guild-1", true, "channel-3");
+    await service.setBumpReminderEnabled("guild-1", true, "channel-3");
     expect(repository.setBumpReminderEnabled).toHaveBeenCalledWith(
       "guild-1",
       true,
@@ -225,26 +221,26 @@ describe("shared/features/bump-reminder/bumpReminderConfigService", () => {
 
     repository.setBumpReminderMentionRole.mockResolvedValue(ROLE);
     await expect(
-      module.setBumpReminderMentionRole("guild-1", "role-2"),
+      service.setBumpReminderMentionRole("guild-1", "role-2"),
     ).resolves.toBe(ROLE);
 
     repository.addBumpReminderMentionUser.mockResolvedValue(ADD);
     await expect(
-      module.addBumpReminderMentionUser("guild-1", "user-2"),
+      service.addBumpReminderMentionUser("guild-1", "user-2"),
     ).resolves.toBe(ADD);
 
     repository.removeBumpReminderMentionUser.mockResolvedValue(REMOVE);
     await expect(
-      module.removeBumpReminderMentionUser("guild-1", "user-2"),
+      service.removeBumpReminderMentionUser("guild-1", "user-2"),
     ).resolves.toBe(REMOVE);
 
     repository.clearBumpReminderMentionUsers.mockResolvedValue(USERS_CLEAR);
-    await expect(module.clearBumpReminderMentionUsers("guild-1")).resolves.toBe(
+    await expect(service.clearBumpReminderMentionUsers("guild-1")).resolves.toBe(
       USERS_CLEAR,
     );
 
     repository.clearBumpReminderMentions.mockResolvedValue(CLEAR);
-    await expect(module.clearBumpReminderMentions("guild-1")).resolves.toBe(
+    await expect(service.clearBumpReminderMentions("guild-1")).resolves.toBe(
       CLEAR,
     );
   });

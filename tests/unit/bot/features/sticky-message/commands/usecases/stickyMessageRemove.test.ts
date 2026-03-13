@@ -6,7 +6,7 @@ const findByChannelMock = vi.fn();
 const deleteMock = vi.fn();
 const tGuildMock = vi.fn(async (_guildId: string, key: string) => `[${key}]`);
 
-vi.mock("@/bot/services/botStickyMessageDependencyResolver", () => ({
+vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotStickyMessageConfigService: vi.fn(() => ({
     findByChannel: findByChannelMock,
     delete: deleteMock,

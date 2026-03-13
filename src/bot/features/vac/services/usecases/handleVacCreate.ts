@@ -10,7 +10,7 @@ import {
 import { tDefault } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import { sendVcControlPanel } from "../../../vc-panel/vcControlPanel";
-import type { IVacRepository } from "../../repositories/vacRepository";
+import type { VacConfigService } from "../../../../../shared/features/vac/vacConfigService";
 
 const VAC_EVENT = {
   DEFAULT_LIMIT: 99,
@@ -26,7 +26,7 @@ type GuildChannelsCache = GuildMember["guild"]["channels"]["cache"];
  * @returns 実行完了
  */
 export async function handleVacCreateUseCase(
-  vacRepository: IVacRepository,
+  vacRepository: VacConfigService,
   newState: VoiceState,
 ): Promise<void> {
   const member = newState.member;

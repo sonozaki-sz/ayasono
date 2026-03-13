@@ -4,7 +4,7 @@
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
 import { tDefault, tGuild } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
-import { getBotMemberLogConfigService } from "../../../services/botMemberLogDependencyResolver";
+import { getBotMemberLogConfigService } from "../../../services/botCompositionRoot";
 import { createSuccessEmbed } from "../../../utils/messageResponse";
 import { MEMBER_LOG_CONFIG_COMMAND } from "./memberLogConfigCommand.constants";
 import { ensureMemberLogManageGuildPermission } from "./memberLogConfigCommand.guard";

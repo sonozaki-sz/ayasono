@@ -1,5 +1,5 @@
 // tests/unit/bot/features/vac/services/usecases/handleVacCreate.test.ts
-import type { IVacRepository } from "@/bot/features/vac/repositories/vacRepository";
+import type { VacConfigService } from "@/shared/features/vac/vacConfigService";
 import { handleVacCreateUseCase } from "@/bot/features/vac/services/usecases/handleVacCreate";
 import { sendVcControlPanel } from "@/bot/features/vc-panel/vcControlPanel";
 import { ChannelType, PermissionFlagsBits } from "discord.js";
@@ -25,7 +25,7 @@ vi.mock("@/bot/features/vc-panel/vcControlPanel", () => ({
   sendVcControlPanel: vi.fn(),
 }));
 
-function createRepositoryMock(): Mocked<IVacRepository> {
+function createRepositoryMock(): Mocked<VacConfigService> {
   return {
     getVacConfigOrDefault: vi.fn(),
     saveVacConfig: vi.fn(),
@@ -34,7 +34,7 @@ function createRepositoryMock(): Mocked<IVacRepository> {
     addCreatedVacChannel: vi.fn(),
     removeCreatedVacChannel: vi.fn(),
     isManagedVacChannel: vi.fn(),
-  };
+  } as unknown as Mocked<VacConfigService>;
 }
 
 function createVoiceStateInput(options?: {

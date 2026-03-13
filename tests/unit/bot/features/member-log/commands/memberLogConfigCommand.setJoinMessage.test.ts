@@ -26,7 +26,7 @@ vi.mock(
   }),
 );
 
-vi.mock("@/bot/services/botMemberLogDependencyResolver", () => ({
+vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotMemberLogConfigService: () => ({
     setJoinMessage: (...args: unknown[]) => setJoinMessageMock(...args),
   }),

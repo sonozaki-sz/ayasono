@@ -10,7 +10,7 @@ const parseColorStrMock = vi.fn(() => 0x008969);
 const tGuildMock = vi.fn(async (_guildId: string, key: string) => `[${key}]`);
 const loggerMock = { error: vi.fn() };
 
-vi.mock("@/bot/services/botStickyMessageDependencyResolver", () => ({
+vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotStickyMessageConfigService: vi.fn(() => ({
     findByChannel: findByChannelMock,
     create: createMock,

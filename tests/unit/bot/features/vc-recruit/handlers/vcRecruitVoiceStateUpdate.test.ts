@@ -7,7 +7,7 @@ import { ChannelType } from "discord.js";
 const findSetupByCreatedVcIdMock = vi.fn();
 const removeCreatedVoiceChannelIdMock = vi.fn();
 
-vi.mock("@/bot/services/botVcRecruitDependencyResolver", () => ({
+vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotVcRecruitRepository: () => ({
     findSetupByCreatedVcId: (...args: unknown[]) =>
       findSetupByCreatedVcIdMock(...args),

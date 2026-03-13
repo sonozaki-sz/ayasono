@@ -48,6 +48,13 @@ export const MSG_DEL_PAGE_SIZE = 5;
 /** 確認ダイアログのタイムアウト（14分）- Discord Interaction token 15分制限に対して1分のバッファ */
 export const MSG_DEL_CONFIRM_TIMEOUT_MS = 840_000;
 
+/**
+ * Phase 2 コレクターのアイドルタイムアウト（3分）
+ * エフェメラルメッセージをユーザーが非表示にしても MESSAGE_DELETE イベントは発火しないため、
+ * 無操作が続いた場合にコレクターを自動終了してロックを解放する
+ */
+export const MSG_DEL_COLLECTOR_IDLE_MS = 180_000;
+
 /** モーダル送信タイムアウト（60秒） */
 export const MSG_DEL_MODAL_TIMEOUT_MS = 60_000;
 

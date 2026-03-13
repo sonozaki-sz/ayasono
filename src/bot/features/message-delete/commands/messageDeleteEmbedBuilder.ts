@@ -141,6 +141,7 @@ export function buildPreviewEmbed(
  * @param filter 現在のフィルター条件
  * @param deleteCount 削除予定件数（スキャン結果全体から除外済みを差し引いた件数）
  * @param excludedIds 除外済みメッセージIDのセット（選択状態の復元に使用）
+ * @param timezoneOffset 除外セレクトのラベルに使用するタイムゾーンオフセット（例: "+09:00"）
  * @returns 5行の ActionRow 配列
  */
 export function buildPreviewComponents(
@@ -151,6 +152,7 @@ export function buildPreviewComponents(
   filter: MessageDeleteFilter,
   deleteCount: number,
   excludedIds: ReadonlySet<string> = new Set(),
+  timezoneOffset: string = "+00:00",
 ): ActionRowBuilder<ButtonBuilder | StringSelectMenuBuilder>[] {
   const hasDays = !!filter.days;
   const hasAfterOrBefore = !!(filter.after || filter.before);
@@ -289,11 +291,17 @@ export function buildPreviewComponents(
       pageSlice.length > 0
         ? pageSlice.map((m, idx) => ({
             // SelectMenu ラベルはプレーンテキストのため ISO 形式を使用（タイムスタンプタグは描画されない）
-            label:
-              `[${start + idx + 1}] ${m.createdAt.toISOString().slice(0, 16).replace("T", " ")} UTC`.slice(
+            // ロケールのタイムゾーンオフセットを適用してローカル時刻で表示する
+            label: (() => {
+              const sign = timezoneOffset.startsWith("-") ? -1 : 1;
+              const [h, min] = timezoneOffset.slice(1).split(":").map(Number);
+              const offsetMs = sign * (h * 60 + min) * 60_000;
+              const local = new Date(m.createdAt.getTime() + offsetMs);
+              return `[${start + idx + 1}] ${local.toISOString().slice(0, 16).replace("T", " ")}`.slice(
                 0,
                 100,
-              ),
+              );
+            })(),
             description:
               `${m.authorDisplayName} | ${m.content || tDefault("commands:message-delete.result.empty_content")}`.slice(
                 0,

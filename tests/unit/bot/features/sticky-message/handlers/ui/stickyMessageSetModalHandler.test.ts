@@ -9,7 +9,7 @@ const buildPayloadMock = vi.fn(() => ({ content: "sticky" }));
 const tGuildMock = vi.fn(async (_guildId: string, key: string) => `[${key}]`);
 const loggerMock = { error: vi.fn() };
 
-vi.mock("@/bot/services/botStickyMessageDependencyResolver", () => ({
+vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotStickyMessageConfigService: vi.fn(() => ({
     findByChannel: findByChannelMock,
     create: createMock,

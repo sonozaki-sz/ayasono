@@ -7,9 +7,10 @@ import { getAfkConfig } from "../../../../shared/features/afk/afkConfigService";
 import { tDefault, tGuild } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import { createSuccessEmbed } from "../../../utils/messageResponse";
+import { COMMON_I18N_KEYS } from "../../../shared/i18nKeys";
 
 const AFK_I18N_KEYS = {
-  ERROR_GUILD_ONLY: "errors:validation.guild_only",
+  ERROR_GUILD_ONLY: COMMON_I18N_KEYS.GUILD_ONLY,
   ERROR_NOT_CONFIGURED: "errors:afk.not_configured",
   ERROR_MEMBER_NOT_FOUND: "errors:afk.member_not_found",
   ERROR_USER_NOT_IN_VOICE: "errors:afk.user_not_in_voice",

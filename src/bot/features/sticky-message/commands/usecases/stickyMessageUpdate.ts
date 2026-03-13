@@ -11,7 +11,7 @@ import {
   TextInputStyle,
 } from "discord.js";
 import { tDefault, tGuild } from "../../../../../shared/locale/localeManager";
-import { getBotStickyMessageConfigService } from "../../../../services/botStickyMessageDependencyResolver";
+import { getBotStickyMessageConfigService } from "../../../../services/botCompositionRoot";
 import {
   createInfoEmbed,
   createWarningEmbed,

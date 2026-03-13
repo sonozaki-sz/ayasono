@@ -29,7 +29,7 @@ vi.mock(
   }),
 );
 
-vi.mock("@/bot/services/botMemberLogDependencyResolver", () => ({
+vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotMemberLogConfigService: () => ({
     setChannelId: (...args: unknown[]) => setChannelIdMock(...args),
   }),

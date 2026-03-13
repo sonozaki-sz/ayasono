@@ -2,7 +2,7 @@
 // VAC 用 voiceStateUpdate のハンドラー
 
 import type { VoiceState } from "discord.js";
-import { getBotVacService } from "../../../services/botVacDependencyResolver";
+import { getBotVacService } from "../../../services/botCompositionRoot";
 
 /**
  * voiceStateUpdate を受け、VAC 作成/削除ユースケースを実行する関数

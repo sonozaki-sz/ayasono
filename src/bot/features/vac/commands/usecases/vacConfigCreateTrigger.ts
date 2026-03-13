@@ -8,7 +8,8 @@ import {
 } from "discord.js";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
 import { tDefault, tGuild } from "../../../../../shared/locale/localeManager";
-import { getBotVacRepository } from "../../../../services/botVacDependencyResolver";
+import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
+import { getBotVacConfigService } from "../../../../services/botCompositionRoot";
 import { createSuccessEmbed } from "../../../../utils/messageResponse";
 import {
   findTriggerChannelByCategory,
@@ -29,7 +30,7 @@ export async function handleVacConfigCreateTrigger(
   // 実行コンテキストから対象カテゴリを解決
   const guild = interaction.guild;
   if (!guild) {
-    throw new ValidationError(tDefault("errors:validation.guild_only"));
+    throw new ValidationError(tDefault(COMMON_I18N_KEYS.GUILD_ONLY));
   }
 
   const categoryOption = interaction.options.getString(
@@ -42,7 +43,7 @@ export async function handleVacConfigCreateTrigger(
   );
   const targetCategoryId = category?.id ?? null;
 
-  const repo = getBotVacRepository();
+  const repo = getBotVacConfigService();
 
   const config = await repo.getVacConfigOrDefault(guildId);
   // 同一カテゴリへの重複トリガー作成を防止

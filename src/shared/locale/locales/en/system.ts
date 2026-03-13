@@ -420,6 +420,8 @@ export const system = {
     "[MemberLog] failed to send notification GuildId: {{guildId}}",
   "member-log.channel_not_found":
     "[MemberLog] channel not found GuildId: {{guildId}} ChannelId: {{channelId}}",
+  "member-log.channel_deleted_config_cleared":
+    "[MemberLog] channel deleted, config cleared GuildId: {{guildId}} ChannelId: {{channelId}}",
   // Config command operation logs
   "member-log.config_set_channel":
     "[MemberLog] channel configured GuildId: {{guildId}} ChannelId: {{channelId}}",

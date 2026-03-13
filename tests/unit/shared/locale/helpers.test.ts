@@ -1,6 +1,7 @@
 // tests/unit/shared/locale/helpers.test.ts
 import {
   getGuildTranslator,
+  getTimezoneOffsetForLocale,
   invalidateGuildLocaleCache,
 } from "@/shared/locale/helpers";
 
@@ -50,5 +51,30 @@ describe("shared/locale/helpers", () => {
     await invalidateGuildLocaleCache("guild-3");
 
     expect(invalidateLocaleCacheMock).toHaveBeenCalledWith("guild-3");
+  });
+
+  describe("getTimezoneOffsetForLocale", () => {
+    it.each([
+      ["ja", "+09:00"],
+      ["ko", "+09:00"],
+      ["zh-CN", "+08:00"],
+      ["zh-TW", "+08:00"],
+      ["zh-HK", "+08:00"],
+      ["ru", "+03:00"],
+      ["tr", "+03:00"],
+      ["vi", "+07:00"],
+      ["th", "+07:00"],
+      ["id", "+07:00"],
+      ["en-US", "+00:00"],
+      ["en-GB", "+00:00"],
+    ])("returns %s -> %s", (locale, expected) => {
+      expect(getTimezoneOffsetForLocale(locale)).toBe(expected);
+    });
+
+    // Discord はタイムゾーンを公開しないため言語設定から代表値を推定する。
+    // 未定義ロケールは UTC+0 にフォールバックし、日付表示がずれても許容する設計。
+    it("未定義ロケールは UTC+0 にフォールバックする", () => {
+      expect(getTimezoneOffsetForLocale("unknown-locale")).toBe("+00:00");
+    });
   });
 });

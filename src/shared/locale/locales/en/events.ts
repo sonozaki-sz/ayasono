@@ -85,6 +85,9 @@ export const events = {
     "{{count}}d",
   "member-log.age.separator":
     " ",
+  // Notice sent to system channel when log channel is deleted
+  "member-log.channel_deleted_notice":
+    "⚠️ The member log notification channel has been deleted.\nSettings have been reset. Please reconfigure with `/member-log-config set-channel`.",
 } as const;
 
 export type EventsTranslations = typeof events;

@@ -12,7 +12,7 @@ import {
 } from "discord.js";
 import { tGuild } from "../../../../../shared/locale/localeManager";
 import type { ModalHandler } from "../../../../handlers/interactionCreate/ui/types";
-import { getBotVcRecruitRepository } from "../../../../services/botVcRecruitDependencyResolver";
+import { getBotVcRecruitRepository } from "../../../../services/botCompositionRoot";
 import { safeReply } from "../../../../utils/interaction";
 import {
   createErrorEmbed,

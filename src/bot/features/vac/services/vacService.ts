@@ -7,9 +7,9 @@ import { executeWithLoggedError } from "../../../../shared/utils/errorHandling";
 import { logger } from "../../../../shared/utils/logger";
 import type { BotClient } from "../../../client";
 import {
-  getVacRepository,
-  type IVacRepository,
-} from "../repositories/vacRepository";
+  getVacConfigService,
+  type VacConfigService,
+} from "../../../../shared/features/vac/vacConfigService";
 import { cleanupVacOnStartupUseCase } from "./usecases/cleanupVacOnStartup";
 import { handleVacCreateUseCase } from "./usecases/handleVacCreate";
 import { handleVacDeleteUseCase } from "./usecases/handleVacDelete";
@@ -18,7 +18,7 @@ import { handleVacDeleteUseCase } from "./usecases/handleVacDelete";
  * VAC機能のユースケースを担当するサービス
  */
 export class VacService {
-  constructor(private readonly vacRepository: IVacRepository) {}
+  constructor(private readonly vacRepository: VacConfigService) {}
 
   /**
    * voiceStateUpdate を受け、VAC 作成/削除ユースケースを実行する
@@ -99,25 +99,25 @@ export class VacService {
 }
 
 let vacService: VacService | undefined;
-let cachedRepository: IVacRepository | undefined;
+let cachedRepository: VacConfigService | undefined;
 
 /**
  * VAC サービスを依存注入で生成する
  */
-export function createVacService(repository: IVacRepository): VacService {
+export function createVacService(repository: VacConfigService): VacService {
   return new VacService(repository);
 }
 
 /**
  * VAC サービスのシングルトンを取得する
  */
-export function getVacService(repository?: IVacRepository): VacService {
-  // テスト時は注入リポジトリ、本番は既定リポジトリを解決
-  const resolvedRepository = getVacRepository(repository);
-  // 依存リポジトリが変わった場合はサービスを再生成
-  if (!vacService || cachedRepository !== resolvedRepository) {
-    vacService = createVacService(resolvedRepository);
-    cachedRepository = resolvedRepository;
+export function getVacService(repository?: VacConfigService): VacService {
+  // テスト時は注入サービスでモジュールキャッシュを上書きし、本番は遅延初期化を使用
+  const resolved = repository ?? getVacConfigService();
+  // 依存サービスが変わった場合はサービスを再生成
+  if (!vacService || cachedRepository !== resolved) {
+    vacService = createVacService(resolved);
+    cachedRepository = resolved;
   }
   // 現在有効なシングルトンを返す
   return vacService;

@@ -98,4 +98,83 @@ describe("bot/features/afk/commands/afkCommand.execute", () => {
     });
     expect(loggerInfoMock).toHaveBeenCalledTimes(1);
   });
+
+  it("throws ValidationError when config is null", async () => {
+    getAfkConfigMock.mockResolvedValue(null);
+    const interaction = createInteraction();
+
+    await expect(
+      executeAfkCommand(interaction as never),
+    ).rejects.toBeInstanceOf(ValidationError);
+  });
+
+  it("throws ValidationError when config.enabled is false", async () => {
+    getAfkConfigMock.mockResolvedValue({ enabled: false, channelId: "afk-channel" });
+    const interaction = createInteraction();
+
+    await expect(
+      executeAfkCommand(interaction as never),
+    ).rejects.toBeInstanceOf(ValidationError);
+  });
+
+  it("throws ValidationError when config.channelId is missing", async () => {
+    getAfkConfigMock.mockResolvedValue({ enabled: true, channelId: undefined });
+    const interaction = createInteraction();
+
+    await expect(
+      executeAfkCommand(interaction as never),
+    ).rejects.toBeInstanceOf(ValidationError);
+  });
+
+  it("throws ValidationError when member is not found", async () => {
+    const interaction = createInteraction();
+    interaction.guild.members.fetch = vi.fn().mockResolvedValue(null);
+
+    await expect(
+      executeAfkCommand(interaction as never),
+    ).rejects.toBeInstanceOf(ValidationError);
+  });
+
+  it("throws ValidationError when member is not in a voice channel", async () => {
+    const interaction = createInteraction();
+    interaction.guild.members.fetch = vi.fn().mockResolvedValue({
+      voice: { channel: null },
+    });
+
+    await expect(
+      executeAfkCommand(interaction as never),
+    ).rejects.toBeInstanceOf(ValidationError);
+  });
+
+  it("throws ValidationError when afk channel is not found", async () => {
+    const interaction = createInteraction();
+    interaction.guild.channels.fetch = vi.fn().mockResolvedValue(null);
+
+    await expect(
+      executeAfkCommand(interaction as never),
+    ).rejects.toBeInstanceOf(ValidationError);
+  });
+
+  it("throws ValidationError when afk channel is not a GuildVoice channel", async () => {
+    const interaction = createInteraction();
+    // ChannelType.GuildText = 0
+    interaction.guild.channels.fetch = vi.fn().mockResolvedValue({
+      id: "afk-channel",
+      type: 0, // GuildText, not GuildVoice (2)
+    });
+
+    await expect(
+      executeAfkCommand(interaction as never),
+    ).rejects.toBeInstanceOf(ValidationError);
+  });
+
+  it("uses explicit user option if provided", async () => {
+    const interaction = createInteraction();
+    const explicitUser = { id: "user-2" };
+    interaction.options.getUser = vi.fn().mockReturnValue(explicitUser);
+
+    await executeAfkCommand(interaction as never);
+
+    expect(interaction.guild.members.fetch).toHaveBeenCalledWith("user-2");
+  });
 });

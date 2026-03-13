@@ -1,7 +1,7 @@
 // tests/unit/bot/features/vac/commands/usecases/vacVoiceChannelGuard.test.ts
 import type { Mock } from "vitest";
 import { getManagedVacVoiceChannel } from "@/bot/features/vac/commands/usecases/vacVoiceChannelGuard";
-import { getBotVacRepository } from "@/bot/services/botVacDependencyResolver";
+import { getBotVacConfigService } from "@/bot/services/botCompositionRoot";
 import { ValidationError } from "@/shared/errors/customErrors";
 import { ChannelType } from "discord.js";
 
@@ -9,8 +9,8 @@ vi.mock("@/shared/locale/localeManager", () => ({
   tGuild: vi.fn(async (_guildId: string, key: string) => key),
 }));
 
-vi.mock("@/bot/services/botVacDependencyResolver", () => ({
-  getBotVacRepository: vi.fn(),
+vi.mock("@/bot/services/botCompositionRoot", () => ({
+  getBotVacConfigService: vi.fn(),
 }));
 
 describe("bot/features/vac/commands/usecases/vacVoiceChannelGuard", () => {
@@ -37,7 +37,7 @@ describe("bot/features/vac/commands/usecases/vacVoiceChannelGuard", () => {
   });
 
   it("throws ValidationError when current voice channel is not managed VAC", async () => {
-    (getBotVacRepository as Mock).mockReturnValue({
+    (getBotVacConfigService as Mock).mockReturnValue({
       isManagedVacChannel: vi.fn().mockResolvedValue(false),
     });
 
@@ -61,7 +61,7 @@ describe("bot/features/vac/commands/usecases/vacVoiceChannelGuard", () => {
 
   it("returns voice channel id when user is in managed VAC channel", async () => {
     const isManagedVacChannel = vi.fn().mockResolvedValue(true);
-    (getBotVacRepository as Mock).mockReturnValue({
+    (getBotVacConfigService as Mock).mockReturnValue({
       isManagedVacChannel,
     });
 

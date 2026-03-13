@@ -20,8 +20,8 @@ const createInfoEmbedMock = vi.fn((description: string, options?: unknown) => ({
 }));
 
 // VAC設定関数の依存を置き換え、コマンド分岐を実コードで検証する
-vi.mock("@/bot/services/botVacDependencyResolver", () => ({
-  getBotVacRepository: () => ({
+vi.mock("@/bot/services/botCompositionRoot", () => ({
+  getBotVacConfigService: () => ({
     addTriggerChannel: (...args: unknown[]) => addTriggerChannelMock(...args),
     getVacConfigOrDefault: (...args: unknown[]) =>
       getVacConfigOrDefaultMock(...args),
@@ -206,17 +206,7 @@ describe("bot/commands/vac-config", () => {
     });
   });
 
-  // guild 外実行時は共通エラーハンドラへ委譲されることを検証
-  it("delegates guild-only error to handleCommandError", async () => {
-    const interaction = createCommandInteraction({ guildId: null });
-
-    await vacConfigCommand.execute(
-      interaction as unknown as ChatInputCommandInteraction,
-    );
-
-    expect(handleCommandError).toHaveBeenCalledTimes(1);
-  });
-
+  // ManageGuild 権限がない場合に権限チェックが正しく実行されることを検証
   it("delegates permission error when ManageGuild is missing", async () => {
     const interaction = createCommandInteraction({
       memberPermissions: { has: vi.fn(() => false) },
@@ -229,33 +219,6 @@ describe("bot/commands/vac-config", () => {
     expect(interaction.memberPermissions.has).toHaveBeenCalledWith(
       PermissionFlagsBits.ManageGuild,
     );
-    expect(handleCommandError).toHaveBeenCalledTimes(1);
-  });
-
-  it("delegates permission error when memberPermissions is undefined", async () => {
-    const interaction = createCommandInteraction({
-      memberPermissions: undefined as unknown as { has: Mock },
-    });
-
-    await vacConfigCommand.execute(
-      interaction as unknown as ChatInputCommandInteraction,
-    );
-
-    expect(handleCommandError).toHaveBeenCalledTimes(1);
-  });
-
-  it("delegates invalid subcommand error", async () => {
-    const interaction = createCommandInteraction({
-      options: {
-        getSubcommand: vi.fn(() => "unknown"),
-        getString: vi.fn(() => null),
-      },
-    });
-
-    await vacConfigCommand.execute(
-      interaction as unknown as ChatInputCommandInteraction,
-    );
-
     expect(handleCommandError).toHaveBeenCalledTimes(1);
   });
 

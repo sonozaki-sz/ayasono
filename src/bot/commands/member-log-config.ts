@@ -7,6 +7,7 @@ import {
   SlashCommandBuilder,
 } from "discord.js";
 import { getCommandLocalizations } from "../../shared/locale/commandLocalizations";
+import { handleCommandError } from "../errors/interactionErrorHandler";
 import { MEMBER_LOG_CONFIG_COMMAND } from "../features/member-log/commands/memberLogConfigCommand.constants";
 import { executeMemberLogConfigCommand } from "../features/member-log/commands/memberLogConfigCommand.execute";
 import type { Command } from "../types/discord";
@@ -135,5 +136,11 @@ export const memberLogConfigCommand: Command = {
    * @param interaction コマンド実行インタラクション
    * @returns 実行完了を示す Promise
    */
-  execute: executeMemberLogConfigCommand,
+  async execute(interaction) {
+    try {
+      await executeMemberLogConfigCommand(interaction);
+    } catch (error) {
+      await handleCommandError(interaction, error);
+    }
+  },
 };

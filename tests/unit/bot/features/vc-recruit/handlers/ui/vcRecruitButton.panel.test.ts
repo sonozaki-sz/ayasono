@@ -14,16 +14,14 @@ const setVcRecruitSessionMock = vi.fn();
 const safeReplyMock = vi.fn();
 const tGuildMock = vi.fn(async (_guildId: string, key: string) => key);
 
-vi.mock("@/bot/services/botVcRecruitDependencyResolver", () => ({
+vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotVcRecruitRepository: () => ({
     findSetupByPanelChannelId: (...args: unknown[]) =>
       findSetupByPanelChannelIdMock(...args),
     getVcRecruitConfigOrDefault: (...args: unknown[]) =>
       getVcRecruitConfigOrDefaultMock(...args),
   }),
-}));
-vi.mock("@/bot/services/botVacDependencyResolver", () => ({
-  getBotVacRepository: () => ({
+  getBotVacConfigService: () => ({
     getVacConfigOrDefault: (...args: unknown[]) =>
       getVacConfigOrDefaultMock(...args),
   }),

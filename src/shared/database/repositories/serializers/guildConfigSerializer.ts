@@ -1,67 +1,23 @@
 // src/shared/database/repositories/serializers/guildConfigSerializer.ts
 // GuildConfig の serializer / deserializer
 
-import type {
-  AfkConfig,
-  BumpReminderConfig,
-  GuildConfig,
-  MemberLogConfig,
-  StickMessage,
-  VacConfig,
-} from "../../types";
+import type { GuildConfig } from "../../types";
 
 type GuildConfigRecord = {
   id: string;
   guildId: string;
   locale: string;
-  afkConfig: string | null;
-  vacConfig: string | null;
-  bumpReminderConfig: string | null;
-  stickMessages: string | null;
-  memberLogConfig: string | null;
   createdAt: Date;
   updatedAt: Date;
 };
 
 /**
- * undefined 以外の値を JSON 文字列へ変換する
- * @param value 変換対象値
- * @returns JSON 文字列（undefined の場合は null）
- */
-function stringifyIfDefined(value: unknown): string | null {
-  return value !== undefined ? JSON.stringify(value) : null;
-}
-
-/**
- * JSON文字列を安全にパースする
- * @param json パース対象JSON
- * @returns パース結果（失敗時は undefined）
- */
-export function parseJsonSafe<T>(json: string | null): T | undefined {
-  if (!json) return undefined;
-  try {
-    return JSON.parse(json) as T;
-  } catch {
-    return undefined;
-  }
-}
-
-/**
  * DBレコードをドメインの GuildConfig へ変換する
- * @param record DBレコード
- * @returns ドメインモデル
  */
 export function toGuildConfig(record: GuildConfigRecord): GuildConfig {
   return {
     guildId: record.guildId,
     locale: record.locale,
-    afkConfig: parseJsonSafe<AfkConfig>(record.afkConfig),
-    vacConfig: parseJsonSafe<VacConfig>(record.vacConfig),
-    bumpReminderConfig: parseJsonSafe<BumpReminderConfig>(
-      record.bumpReminderConfig,
-    ),
-    stickMessages: parseJsonSafe<StickMessage[]>(record.stickMessages),
-    memberLogConfig: parseJsonSafe<MemberLogConfig>(record.memberLogConfig),
     createdAt: record.createdAt,
     updatedAt: record.updatedAt,
   };
@@ -69,9 +25,6 @@ export function toGuildConfig(record: GuildConfigRecord): GuildConfig {
 
 /**
  * GuildConfig から create 用DBデータを生成する
- * @param config ドメイン設定
- * @param defaultLocale 既定ロケール
- * @returns create 用データ
  */
 export function toGuildConfigCreateData(
   config: GuildConfig,
@@ -79,27 +32,15 @@ export function toGuildConfigCreateData(
 ): {
   guildId: string;
   locale: string;
-  afkConfig: string | null;
-  vacConfig: string | null;
-  bumpReminderConfig: string | null;
-  stickMessages: string | null;
-  memberLogConfig: string | null;
 } {
   return {
     guildId: config.guildId,
     locale: config.locale || defaultLocale,
-    afkConfig: stringifyIfDefined(config.afkConfig),
-    vacConfig: stringifyIfDefined(config.vacConfig),
-    bumpReminderConfig: stringifyIfDefined(config.bumpReminderConfig),
-    stickMessages: stringifyIfDefined(config.stickMessages),
-    memberLogConfig: stringifyIfDefined(config.memberLogConfig),
   };
 }
 
 /**
  * GuildConfig の部分更新データを DB update 形式へ変換する
- * @param updates 部分更新データ
- * @returns update 用データ
  */
 export function toGuildConfigUpdateData(
   updates: Partial<GuildConfig>,
@@ -107,21 +48,6 @@ export function toGuildConfigUpdateData(
   const data: Record<string, unknown> = {};
 
   if (updates.locale !== undefined) data.locale = updates.locale;
-  if (updates.afkConfig !== undefined) {
-    data.afkConfig = JSON.stringify(updates.afkConfig);
-  }
-  if (updates.vacConfig !== undefined) {
-    data.vacConfig = JSON.stringify(updates.vacConfig);
-  }
-  if (updates.bumpReminderConfig !== undefined) {
-    data.bumpReminderConfig = JSON.stringify(updates.bumpReminderConfig);
-  }
-  if (updates.stickMessages !== undefined) {
-    data.stickMessages = JSON.stringify(updates.stickMessages);
-  }
-  if (updates.memberLogConfig !== undefined) {
-    data.memberLogConfig = JSON.stringify(updates.memberLogConfig);
-  }
 
   return data;
 }

@@ -4,7 +4,8 @@
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
 import { tDefault, tGuild } from "../../../../../shared/locale/localeManager";
-import { getBotVcRecruitRepository } from "../../../../services/botVcRecruitDependencyResolver";
+import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
+import { getBotVcRecruitRepository } from "../../../../services/botCompositionRoot";
 import { createInfoEmbed } from "../../../../utils/messageResponse";
 
 /**
@@ -18,7 +19,7 @@ export async function handleVcRecruitConfigView(
 ): Promise<void> {
   const guild = interaction.guild;
   if (!guild) {
-    throw new ValidationError(tDefault("errors:validation.guild_only"));
+    throw new ValidationError(tDefault(COMMON_I18N_KEYS.GUILD_ONLY));
   }
 
   const config =

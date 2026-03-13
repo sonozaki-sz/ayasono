@@ -1,11 +1,8 @@
 // tests/unit/shared/database/repositories/persistence/guildConfigReadPersistence.test.ts
 import {
   existsGuildConfigRecord,
-  findAfkConfigJson,
   findGuildConfigRecord,
   findGuildLocale,
-  findMemberLogConfigJson,
-  findStickMessagesJson,
 } from "@/shared/database/repositories/persistence/guildConfigReadPersistence";
 
 // guildConfigReadPersistence の各読み取り関数が Prisma の findUnique を
@@ -64,49 +61,6 @@ describe("shared/database/repositories/persistence/guildConfigReadPersistence", 
     prisma.guildConfig.findUnique.mockResolvedValueOnce(null);
     await expect(
       findGuildLocale(prisma as never, "guild-2"),
-    ).resolves.toBeNull();
-  });
-
-  it("findAfkConfigJson returns json string or null", async () => {
-    const prisma = createPrisma();
-    prisma.guildConfig.findUnique.mockResolvedValueOnce({ afkConfig: "{}" });
-    await expect(findAfkConfigJson(prisma as never, "guild-1")).resolves.toBe(
-      "{}",
-    );
-
-    prisma.guildConfig.findUnique.mockResolvedValueOnce(null);
-    await expect(
-      findAfkConfigJson(prisma as never, "guild-2"),
-    ).resolves.toBeNull();
-  });
-
-  it("findStickMessagesJson returns json string or null", async () => {
-    const prisma = createPrisma();
-    prisma.guildConfig.findUnique.mockResolvedValueOnce({
-      stickMessages: "[]",
-    });
-    await expect(
-      findStickMessagesJson(prisma as never, "guild-1"),
-    ).resolves.toBe("[]");
-
-    prisma.guildConfig.findUnique.mockResolvedValueOnce(null);
-    await expect(
-      findStickMessagesJson(prisma as never, "guild-2"),
-    ).resolves.toBeNull();
-  });
-
-  it("findMemberLogConfigJson returns json string or null", async () => {
-    const prisma = createPrisma();
-    prisma.guildConfig.findUnique.mockResolvedValueOnce({
-      memberLogConfig: '{"channelId":"x"}',
-    });
-    await expect(
-      findMemberLogConfigJson(prisma as never, "guild-1"),
-    ).resolves.toBe('{"channelId":"x"}');
-
-    prisma.guildConfig.findUnique.mockResolvedValueOnce(null);
-    await expect(
-      findMemberLogConfigJson(prisma as never, "guild-2"),
     ).resolves.toBeNull();
   });
 });

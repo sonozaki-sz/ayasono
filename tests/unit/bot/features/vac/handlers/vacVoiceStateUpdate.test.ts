@@ -3,7 +3,7 @@ import { handleVacVoiceStateUpdate } from "@/bot/features/vac/handlers/vacVoiceS
 
 const handleVoiceStateUpdateMock = vi.fn();
 
-vi.mock("@/bot/services/botVacDependencyResolver", () => ({
+vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotVacService: vi.fn(() => ({
     handleVoiceStateUpdate: (...args: unknown[]) =>
       handleVoiceStateUpdateMock(...args),

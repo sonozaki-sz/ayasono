@@ -7,6 +7,7 @@ import {
   SlashCommandBuilder,
 } from "discord.js";
 import { getCommandLocalizations } from "../../shared/locale/commandLocalizations";
+import { handleCommandError } from "../errors/interactionErrorHandler";
 import { STICKY_MESSAGE_COMMAND } from "../features/sticky-message/commands/stickyMessageCommand.constants";
 import { executeStickyMessageCommand } from "../features/sticky-message/commands/stickyMessageCommand.execute";
 import type { Command } from "../types/discord";
@@ -138,7 +139,11 @@ export const stickyMessageCommand: Command = {
   })(),
 
   async execute(interaction: ChatInputCommandInteraction) {
-    await executeStickyMessageCommand(interaction);
+    try {
+      await executeStickyMessageCommand(interaction);
+    } catch (error) {
+      await handleCommandError(interaction, error);
+    }
   },
 
   cooldown: 3,

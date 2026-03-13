@@ -7,7 +7,7 @@ const restorePendingRemindersMock = vi.fn();
 const loggerErrorMock = vi.fn();
 const sendBumpReminderMock = vi.fn();
 
-vi.mock("@/bot/services/botBumpReminderDependencyResolver", () => ({
+vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotBumpReminderConfigService: (...args: unknown[]) =>
     getBotBumpReminderConfigServiceMock(...args),
   getBotBumpReminderManager: (...args: unknown[]) =>

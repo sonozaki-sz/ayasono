@@ -2,48 +2,22 @@
 // VAC設定のサービス実装（Repositoryパターン準拠）
 
 import { getGuildConfigRepository } from "../../database/guildConfigRepositoryProvider";
+import { createServiceGetter } from "../../utils/serviceFactory";
 import {
-  type IVacRepository,
+  type IVacConfigRepository,
   type VacChannelPair,
   type VacConfig,
 } from "../../database/types";
 import { tDefault } from "../../locale/localeManager";
 import { executeWithDatabaseError } from "../../utils/errorHandling";
 import { logger } from "../../utils/logger";
+import {
+  DEFAULT_VAC_CONFIG,
+  createDefaultVacConfig,
+  normalizeVacConfig,
+} from "./vacConfigDefaults";
 
-export const DEFAULT_VAC_CONFIG: VacConfig = {
-  enabled: false,
-  triggerChannelIds: [],
-  createdChannels: [],
-};
-
-// VAC設定サービスのシングルトンキャッシュ
-let vacConfigService: VacConfigService | undefined;
-let cachedRepository: IVacRepository | undefined;
-
-/**
- * VAC設定の初期値を生成する
- */
-function createDefaultVacConfig(): VacConfig {
-  // 既定値をもとに空配列を持つ新規設定を生成する
-  return {
-    enabled: DEFAULT_VAC_CONFIG.enabled,
-    triggerChannelIds: [],
-    createdChannels: [],
-  };
-}
-
-/**
- * VAC設定を正規化し、配列参照を分離する
- */
-function normalizeVacConfig(config: VacConfig): VacConfig {
-  // 可変配列を複製して設定オブジェクトを正規化する
-  return {
-    enabled: config.enabled,
-    triggerChannelIds: [...config.triggerChannelIds],
-    createdChannels: [...config.createdChannels],
-  };
-}
+export { DEFAULT_VAC_CONFIG };
 
 /**
  * 指定VCが管理対象に含まれるか判定する
@@ -57,10 +31,10 @@ function hasCreatedChannel(config: VacConfig, voiceChannelId: string): boolean {
 
 /**
  * VAC設定の取得・更新を担当するサービス
- * DBアクセスは IVacRepository 経由に統一する
+ * DBアクセスは IVacConfigRepository 経由に統一する
  */
 export class VacConfigService {
-  constructor(private readonly guildConfigRepository: IVacRepository) {}
+  constructor(private readonly guildConfigRepository: IVacConfigRepository) {}
 
   /**
    * VAC設定を取得（未設定時は初期値を返す）
@@ -114,6 +88,8 @@ export class VacConfigService {
         }
 
         if (updated) {
+          // saveVacConfig が失敗すると executeWithDatabaseError が例外を再スローするため、
+          // return config に到達するのは保存成功時のみ
           await this.saveVacConfig(guildId, config);
           logger.debug(
             tDefault("system:database.vac_trigger_added", {
@@ -123,6 +99,7 @@ export class VacConfigService {
           );
         }
 
+        // 変更不要だった場合も保存成功後も、DB と一致した最新の config を返す
         return config;
       },
       tDefault("system:database.vac_trigger_add_failed", {
@@ -149,6 +126,8 @@ export class VacConfigService {
         );
 
         if (config.triggerChannelIds.length !== previousLength) {
+          // saveVacConfig が失敗すると executeWithDatabaseError が例外を再スローするため、
+          // return config に到達するのは保存成功時のみ
           await this.saveVacConfig(guildId, config);
           logger.debug(
             tDefault("system:database.vac_trigger_removed", {
@@ -158,6 +137,7 @@ export class VacConfigService {
           );
         }
 
+        // 変更不要だった場合も保存成功後も、DB と一致した最新の config を返す
         return config;
       },
       tDefault("system:database.vac_trigger_remove_failed", {
@@ -181,6 +161,8 @@ export class VacConfigService {
         const exists = hasCreatedChannel(config, channel.voiceChannelId);
         if (!exists) {
           config.createdChannels.push(channel);
+          // saveVacConfig が失敗すると executeWithDatabaseError が例外を再スローするため、
+          // return config に到達するのは保存成功時のみ
           await this.saveVacConfig(guildId, config);
           logger.debug(
             tDefault("system:database.vac_channel_registered", {
@@ -189,6 +171,7 @@ export class VacConfigService {
             }),
           );
         }
+        // 変更不要だった場合も保存成功後も、DB と一致した最新の config を返す
         return config;
       },
       tDefault("system:database.vac_channel_register_failed", {
@@ -215,6 +198,8 @@ export class VacConfigService {
         );
 
         if (config.createdChannels.length !== previousLength) {
+          // saveVacConfig が失敗すると executeWithDatabaseError が例外を再スローするため、
+          // return config に到達するのは保存成功時のみ
           await this.saveVacConfig(guildId, config);
           logger.debug(
             tDefault("system:database.vac_channel_unregistered", {
@@ -224,6 +209,7 @@ export class VacConfigService {
           );
         }
 
+        // 変更不要だった場合も保存成功後も、DB と一致した最新の config を返す
         return config;
       },
       tDefault("system:database.vac_channel_unregister_failed", {
@@ -253,7 +239,7 @@ export class VacConfigService {
  * VAC設定サービスを依存注入で生成する
  */
 export function createVacConfigService(
-  repository: IVacRepository,
+  repository: IVacConfigRepository,
 ): VacConfigService {
   return new VacConfigService(repository);
 }
@@ -261,90 +247,7 @@ export function createVacConfigService(
 /**
  * VAC設定サービスのシングルトンを取得する
  */
-export function getVacConfigService(
-  repository?: IVacRepository,
-): VacConfigService {
-  // 引数優先で repository を解決し、同一インスタンスなら既存 service を再利用
-  const resolvedRepository = repository ?? getGuildConfigRepository();
-  if (!vacConfigService || cachedRepository !== resolvedRepository) {
-    vacConfigService = createVacConfigService(resolvedRepository);
-    cachedRepository = resolvedRepository;
-  }
-  return vacConfigService;
-}
-
-/**
- * VAC設定を取得（未設定時は初期値を返す）
- */
-export async function getVacConfigOrDefault(
-  guildId: string,
-): Promise<VacConfig> {
-  // 関数APIはシングルトンサービスへ委譲
-  return getVacConfigService().getVacConfigOrDefault(guildId);
-}
-
-/**
- * VAC設定を永続化する
- */
-export async function saveVacConfig(
-  guildId: string,
-  config: VacConfig,
-): Promise<void> {
-  // 関数APIはシングルトンサービスへ委譲
-  await getVacConfigService().saveVacConfig(guildId, config);
-}
-
-/**
- * トリガーチャンネルを追加し、VACを有効化する
- */
-export async function addTriggerChannel(
-  guildId: string,
-  channelId: string,
-): Promise<VacConfig> {
-  // 関数APIはシングルトンサービスへ委譲
-  return getVacConfigService().addTriggerChannel(guildId, channelId);
-}
-
-/**
- * トリガーチャンネルを設定から削除する
- */
-export async function removeTriggerChannel(
-  guildId: string,
-  channelId: string,
-): Promise<VacConfig> {
-  // 関数APIはシングルトンサービスへ委譲
-  return getVacConfigService().removeTriggerChannel(guildId, channelId);
-}
-
-/**
- * 管理対象VC（自動作成VC）を設定に登録する
- */
-export async function addCreatedVacChannel(
-  guildId: string,
-  channel: VacChannelPair,
-): Promise<VacConfig> {
-  // 関数APIはシングルトンサービスへ委譲
-  return getVacConfigService().addCreatedVacChannel(guildId, channel);
-}
-
-/**
- * 管理対象VC（自動作成VC）を設定から削除する
- */
-export async function removeCreatedVacChannel(
-  guildId: string,
-  voiceChannelId: string,
-): Promise<VacConfig> {
-  // 関数APIはシングルトンサービスへ委譲
-  return getVacConfigService().removeCreatedVacChannel(guildId, voiceChannelId);
-}
-
-/**
- * 指定VCがVAC管理下か判定する
- */
-export async function isManagedVacChannel(
-  guildId: string,
-  voiceChannelId: string,
-): Promise<boolean> {
-  // 関数APIはシングルトンサービスへ委譲
-  return getVacConfigService().isManagedVacChannel(guildId, voiceChannelId);
-}
+export const getVacConfigService = createServiceGetter(
+  createVacConfigService,
+  getGuildConfigRepository,
+);

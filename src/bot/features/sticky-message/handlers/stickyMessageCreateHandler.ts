@@ -4,7 +4,7 @@
 import { ChannelType, type Message } from "discord.js";
 import { tDefault } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
-import { getBotStickyMessageResendService } from "../../../services/botStickyMessageDependencyResolver";
+import { getBotStickyMessageResendService } from "../../../services/botCompositionRoot";
 
 /**
  * messageCreate イベントでスティッキーメッセージを処理する

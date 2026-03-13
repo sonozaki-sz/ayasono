@@ -17,7 +17,7 @@ const infoEmbedInstance: { setColor: Mock; setTimestamp: Mock } = {
 };
 const infoEmbedMock: Mock = vi.fn(() => infoEmbedInstance);
 
-vi.mock("@/bot/services/botStickyMessageDependencyResolver", () => ({
+vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotStickyMessageConfigService: vi.fn(() => ({
     findByChannel: findByChannelMock,
   })),

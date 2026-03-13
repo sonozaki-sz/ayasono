@@ -7,7 +7,7 @@ const showModalMock = vi.fn().mockResolvedValue(undefined);
 const tGuildMock = vi.fn(async (_guildId: string, key: string) => `[${key}]`);
 const tDefaultMock = vi.fn((_key: string) => "mock text");
 
-vi.mock("@/bot/services/botStickyMessageDependencyResolver", () => ({
+vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotStickyMessageConfigService: vi.fn(() => ({
     findByChannel: findByChannelMock,
   })),

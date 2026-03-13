@@ -5,7 +5,7 @@ import { ChannelType } from "discord.js";
 const handleMessageCreateMock = vi.fn();
 const loggerMock = { error: vi.fn() };
 
-vi.mock("@/bot/services/botStickyMessageDependencyResolver", () => ({
+vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotStickyMessageResendService: vi.fn(() => ({
     handleMessageCreate: handleMessageCreateMock,
   })),

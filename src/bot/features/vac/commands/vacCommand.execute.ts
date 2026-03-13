@@ -5,6 +5,7 @@ import { ChatInputCommandInteraction } from "discord.js";
 import { ValidationError } from "../../../../shared/errors/customErrors";
 import { tDefault } from "../../../../shared/locale/localeManager";
 import { handleCommandError } from "../../../errors/interactionErrorHandler";
+import { COMMON_I18N_KEYS } from "../../../shared/i18nKeys";
 import { executeVacLimit } from "./usecases/vacLimit";
 import { executeVacRename } from "./usecases/vacRename";
 import { getManagedVacVoiceChannel } from "./usecases/vacVoiceChannelGuard";
@@ -22,7 +23,7 @@ export async function executeVacCommand(
     // Guild 外実行は対象外
     const guildId = interaction.guildId;
     if (!guildId) {
-      throw new ValidationError(tDefault("errors:validation.guild_only"));
+      throw new ValidationError(tDefault(COMMON_I18N_KEYS.GUILD_ONLY));
     }
 
     // 実行者が操作可能な VAC 管理VCかを先に確定
@@ -39,7 +40,7 @@ export async function executeVacCommand(
         break;
       default:
         throw new ValidationError(
-          tDefault("errors:validation.invalid_subcommand"),
+          tDefault(COMMON_I18N_KEYS.INVALID_SUBCOMMAND),
         );
     }
   } catch (error) {

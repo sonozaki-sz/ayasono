@@ -14,6 +14,7 @@ const handleVcRecruitConfigRemoveRoleMock = vi
 const handleVcRecruitConfigViewMock = vi.fn().mockResolvedValue(undefined);
 const handleCommandErrorMock = vi.fn().mockResolvedValue(undefined);
 const tDefaultMock = vi.fn((key: string) => key);
+const tGuildMock = vi.fn(async (_guildId: string, key: string) => key);
 
 vi.mock(
   "@/bot/features/vc-recruit/commands/usecases/vcRecruitConfigSetup",
@@ -56,6 +57,7 @@ vi.mock("@/bot/errors/interactionErrorHandler", () => ({
 vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: (...args: unknown[]) =>
     tDefaultMock(...(args as Parameters<typeof tDefaultMock>)),
+  tGuild: (guildId: string, key: string) => tGuildMock(guildId, key),
 }));
 
 // ---- ヘルパー ----

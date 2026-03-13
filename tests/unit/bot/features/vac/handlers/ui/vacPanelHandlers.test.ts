@@ -36,7 +36,7 @@ vi.mock("@/bot/features/vc-panel/vcPanelOwnershipRegistry", () => ({
 vi.mock("@/shared/features/afk/afkConfigService", () => ({
   getAfkConfig: (...args: unknown[]) => getAfkConfigMock(...args),
 }));
-vi.mock("@/bot/services/botGuildConfigRepositoryResolver", () => ({
+vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotGuildConfigRepository: vi.fn(() => getGuildConfigRepositoryMock()),
 }));
 vi.mock("@/shared/database/guildConfigRepositoryProvider", () => ({
@@ -208,12 +208,6 @@ describe("bot/features/vac/ui handlers", () => {
       showModal: vi.fn(),
     };
 
-    const featureModule = (await vi.importMock(
-      "@/shared/features/vac/vacConfigService",
-    )) as {
-      isManagedVacChannel: Mock;
-    };
-    featureModule.isManagedVacChannel.mockResolvedValue(true);
 
     await vacPanelButtonHandler.execute(interaction as never);
 
@@ -240,12 +234,6 @@ describe("bot/features/vac/ui handlers", () => {
       showModal: vi.fn(),
     };
 
-    const featureModule = (await vi.importMock(
-      "@/shared/features/vac/vacConfigService",
-    )) as {
-      isManagedVacChannel: Mock;
-    };
-    featureModule.isManagedVacChannel.mockResolvedValue(true);
 
     await vacPanelButtonHandler.execute(interaction as never);
 
@@ -274,12 +262,6 @@ describe("bot/features/vac/ui handlers", () => {
       showModal: vi.fn().mockResolvedValue(undefined),
     };
 
-    const featureModule = (await vi.importMock(
-      "@/shared/features/vac/vacConfigService",
-    )) as {
-      isManagedVacChannel: Mock;
-    };
-    featureModule.isManagedVacChannel.mockResolvedValue(true);
 
     await vacPanelButtonHandler.execute(interaction as never);
 
@@ -305,12 +287,6 @@ describe("bot/features/vac/ui handlers", () => {
       showModal: vi.fn().mockResolvedValue(undefined),
     };
 
-    const featureModule = (await vi.importMock(
-      "@/shared/features/vac/vacConfigService",
-    )) as {
-      isManagedVacChannel: Mock;
-    };
-    featureModule.isManagedVacChannel.mockResolvedValue(true);
 
     await vacPanelButtonHandler.execute(interaction as never);
 
@@ -344,12 +320,6 @@ describe("bot/features/vac/ui handlers", () => {
       showModal: vi.fn(),
     };
 
-    const featureModule = (await vi.importMock(
-      "@/shared/features/vac/vacConfigService",
-    )) as {
-      isManagedVacChannel: Mock;
-    };
-    featureModule.isManagedVacChannel.mockResolvedValue(true);
 
     await vacPanelButtonHandler.execute(interaction as never);
 
@@ -421,12 +391,6 @@ describe("bot/features/vac/ui handlers", () => {
       showModal: vi.fn(),
     };
 
-    const featureModule = (await vi.importMock(
-      "@/shared/features/vac/vacConfigService",
-    )) as {
-      isManagedVacChannel: Mock;
-    };
-    featureModule.isManagedVacChannel.mockResolvedValue(true);
 
     const panelModule = (await vi.importMock(
       "@/bot/features/vc-panel/vcControlPanel",
@@ -472,12 +436,6 @@ describe("bot/features/vac/ui handlers", () => {
       showModal: vi.fn(),
     };
 
-    const featureModule = (await vi.importMock(
-      "@/shared/features/vac/vacConfigService",
-    )) as {
-      isManagedVacChannel: Mock;
-    };
-    featureModule.isManagedVacChannel.mockResolvedValue(true);
 
     const panelModule = (await vi.importMock(
       "@/bot/features/vc-panel/vcControlPanel",
@@ -519,12 +477,6 @@ describe("bot/features/vac/ui handlers", () => {
       showModal: vi.fn(),
     };
 
-    const featureModule = (await vi.importMock(
-      "@/shared/features/vac/vacConfigService",
-    )) as {
-      isManagedVacChannel: Mock;
-    };
-    featureModule.isManagedVacChannel.mockResolvedValue(true);
 
     const panelModule = (await vi.importMock(
       "@/bot/features/vc-panel/vcControlPanel",
@@ -581,12 +533,6 @@ describe("bot/features/vac/ui handlers", () => {
       showModal: vi.fn(),
     };
 
-    const featureModule = (await vi.importMock(
-      "@/shared/features/vac/vacConfigService",
-    )) as {
-      isManagedVacChannel: Mock;
-    };
-    featureModule.isManagedVacChannel.mockResolvedValue(true);
 
     const panelModule = (await vi.importMock(
       "@/bot/features/vc-panel/vcControlPanel",
@@ -631,12 +577,6 @@ describe("bot/features/vac/ui handlers", () => {
       },
     };
 
-    const featureModule = (await vi.importMock(
-      "@/shared/features/vac/vacConfigService",
-    )) as {
-      isManagedVacChannel: Mock;
-    };
-    featureModule.isManagedVacChannel.mockResolvedValue(true);
 
     await vacPanelModalHandler.execute(interaction as never);
 
@@ -750,12 +690,6 @@ describe("bot/features/vac/ui handlers", () => {
       },
     };
 
-    const featureModule = (await vi.importMock(
-      "@/shared/features/vac/vacConfigService",
-    )) as {
-      isManagedVacChannel: Mock;
-    };
-    featureModule.isManagedVacChannel.mockResolvedValue(true);
 
     await vacPanelModalHandler.execute(interaction as never);
 
@@ -787,12 +721,6 @@ describe("bot/features/vac/ui handlers", () => {
       },
     };
 
-    const featureModule = (await vi.importMock(
-      "@/shared/features/vac/vacConfigService",
-    )) as {
-      isManagedVacChannel: Mock;
-    };
-    featureModule.isManagedVacChannel.mockResolvedValue(true);
 
     await vacPanelModalHandler.execute(interaction as never);
 
@@ -828,12 +756,6 @@ describe("bot/features/vac/ui handlers", () => {
       },
     };
 
-    const featureModule = (await vi.importMock(
-      "@/shared/features/vac/vacConfigService",
-    )) as {
-      isManagedVacChannel: Mock;
-    };
-    featureModule.isManagedVacChannel.mockResolvedValue(true);
 
     await vacPanelModalHandler.execute(interaction as never);
 
@@ -870,12 +792,6 @@ describe("bot/features/vac/ui handlers", () => {
       },
     };
 
-    const featureModule = (await vi.importMock(
-      "@/shared/features/vac/vacConfigService",
-    )) as {
-      isManagedVacChannel: Mock;
-    };
-    featureModule.isManagedVacChannel.mockResolvedValue(true);
 
     await vacPanelModalHandler.execute(interaction as never);
 
@@ -912,12 +828,6 @@ describe("bot/features/vac/ui handlers", () => {
       },
     };
 
-    const featureModule = (await vi.importMock(
-      "@/shared/features/vac/vacConfigService",
-    )) as {
-      isManagedVacChannel: Mock;
-    };
-    featureModule.isManagedVacChannel.mockResolvedValue(true);
 
     await vacPanelModalHandler.execute(interaction as never);
 
@@ -955,12 +865,6 @@ describe("bot/features/vac/ui handlers", () => {
       },
     };
 
-    const featureModule = (await vi.importMock(
-      "@/shared/features/vac/vacConfigService",
-    )) as {
-      isManagedVacChannel: Mock;
-    };
-    featureModule.isManagedVacChannel.mockResolvedValue(true);
 
     await vacPanelModalHandler.execute(interaction as never);
 
@@ -1019,12 +923,6 @@ describe("bot/features/vac/ui handlers", () => {
       values: ["move-user", "skip-user"],
     };
 
-    const featureModule = (await vi.importMock(
-      "@/shared/features/vac/vacConfigService",
-    )) as {
-      isManagedVacChannel: Mock;
-    };
-    featureModule.isManagedVacChannel.mockResolvedValue(true);
 
     const databaseModule = (await vi.importMock(
       "@/shared/database/guildConfigRepositoryProvider",
@@ -1136,12 +1034,6 @@ describe("bot/features/vac/ui handlers", () => {
       values: ["user-1"],
     };
 
-    const featureModule = (await vi.importMock(
-      "@/shared/features/vac/vacConfigService",
-    )) as {
-      isManagedVacChannel: Mock;
-    };
-    featureModule.isManagedVacChannel.mockResolvedValue(true);
 
     await vacPanelUserSelectHandler.execute(interaction as never);
 
@@ -1167,12 +1059,6 @@ describe("bot/features/vac/ui handlers", () => {
       values: ["user-1"],
     };
 
-    const featureModule = (await vi.importMock(
-      "@/shared/features/vac/vacConfigService",
-    )) as {
-      isManagedVacChannel: Mock;
-    };
-    featureModule.isManagedVacChannel.mockResolvedValue(true);
 
     await vacPanelUserSelectHandler.execute(interaction as never);
 
@@ -1201,12 +1087,6 @@ describe("bot/features/vac/ui handlers", () => {
       values: ["user-1"],
     };
 
-    const featureModule = (await vi.importMock(
-      "@/shared/features/vac/vacConfigService",
-    )) as {
-      isManagedVacChannel: Mock;
-    };
-    featureModule.isManagedVacChannel.mockResolvedValue(true);
 
     getAfkConfigMock.mockResolvedValueOnce(null);
 
@@ -1240,12 +1120,6 @@ describe("bot/features/vac/ui handlers", () => {
       values: ["user-1"],
     };
 
-    const featureModule = (await vi.importMock(
-      "@/shared/features/vac/vacConfigService",
-    )) as {
-      isManagedVacChannel: Mock;
-    };
-    featureModule.isManagedVacChannel.mockResolvedValue(true);
 
     const databaseModule = (await vi.importMock(
       "@/shared/database/guildConfigRepositoryProvider",
@@ -1288,12 +1162,6 @@ describe("bot/features/vac/ui handlers", () => {
       values: ["user-1"],
     };
 
-    const featureModule = (await vi.importMock(
-      "@/shared/features/vac/vacConfigService",
-    )) as {
-      isManagedVacChannel: Mock;
-    };
-    featureModule.isManagedVacChannel.mockResolvedValue(true);
 
     const databaseModule = (await vi.importMock(
       "@/shared/database/guildConfigRepositoryProvider",
@@ -1350,12 +1218,6 @@ describe("bot/features/vac/ui handlers", () => {
       values: ["move-user"],
     };
 
-    const featureModule = (await vi.importMock(
-      "@/shared/features/vac/vacConfigService",
-    )) as {
-      isManagedVacChannel: Mock;
-    };
-    featureModule.isManagedVacChannel.mockResolvedValue(true);
 
     const databaseModule = (await vi.importMock(
       "@/shared/database/guildConfigRepositoryProvider",
@@ -1419,12 +1281,6 @@ describe("bot/features/vac/ui handlers", () => {
       values: ["broken-user", "move-user"],
     };
 
-    const featureModule = (await vi.importMock(
-      "@/shared/features/vac/vacConfigService",
-    )) as {
-      isManagedVacChannel: Mock;
-    };
-    featureModule.isManagedVacChannel.mockResolvedValue(true);
 
     const databaseModule = (await vi.importMock(
       "@/shared/database/guildConfigRepositoryProvider",

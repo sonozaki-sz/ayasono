@@ -9,7 +9,7 @@ const { cancelTimerMock, deleteByChannelMock, debugMock } = vi.hoisted(() => ({
   debugMock: vi.fn(),
 }));
 
-vi.mock("@/bot/services/botStickyMessageDependencyResolver", () => ({
+vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotStickyMessageResendService: vi.fn(() => ({
     cancelTimer: cancelTimerMock,
   })),

@@ -19,7 +19,7 @@ vi.mock("@/bot/features/vc-recruit/handlers/ui/vcRecruitPanelState", () => ({
   NEW_VC_VALUE: "__new__",
   NO_MENTION_VALUE: "__none__",
 }));
-vi.mock("@/bot/services/botVcRecruitDependencyResolver", () => ({
+vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotVcRecruitRepository: () => ({
     findSetupByPanelChannelId: (...args: unknown[]) =>
       findSetupByPanelChannelIdMock(...args),

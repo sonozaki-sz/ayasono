@@ -14,7 +14,7 @@ vi.mock("@/bot/features/bump-reminder/constants/bumpReminderConstants", () => ({
     getReminderDelayMinutesMock(...args),
 }));
 
-vi.mock("@/bot/services/botBumpReminderDependencyResolver", () => ({
+vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotBumpReminderManager: (...args: unknown[]) =>
     getBotBumpReminderManagerMock(...args),
 }));

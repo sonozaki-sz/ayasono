@@ -19,8 +19,10 @@ import {
 } from "discord.js";
 import { tGuild } from "../../../../../shared/locale/localeManager";
 import type { ButtonHandler } from "../../../../handlers/interactionCreate/ui/types";
-import { getBotVacRepository } from "../../../../services/botVacDependencyResolver";
-import { getBotVcRecruitRepository } from "../../../../services/botVcRecruitDependencyResolver";
+import {
+  getBotVacConfigService,
+  getBotVcRecruitRepository,
+} from "../../../../services/botCompositionRoot";
 import { safeReply } from "../../../../utils/interaction";
 import {
   createErrorEmbed,
@@ -149,7 +151,7 @@ export const vcRecruitButtonHandler: ButtonHandler = {
         .addOptions(mentionOptions);
 
       // ── VCセレクトメニューを構築 ────────────────────────────────
-      const vacConfig = await getBotVacRepository().getVacConfigOrDefault(
+      const vacConfig = await getBotVacConfigService().getVacConfigOrDefault(
         guild.id,
       );
       const vacTriggerIds = new Set(vacConfig.triggerChannelIds);

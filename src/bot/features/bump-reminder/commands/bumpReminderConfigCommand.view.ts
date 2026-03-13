@@ -3,7 +3,7 @@
 
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
 import { tGuild } from "../../../../shared/locale/localeManager";
-import { getBotBumpReminderConfigService } from "../../../services/botBumpReminderDependencyResolver";
+import { getBotBumpReminderConfigService } from "../../../services/botCompositionRoot";
 import { createInfoEmbed } from "../../../utils/messageResponse";
 import { ensureManageGuildPermission } from "./bumpReminderConfigCommand.guard";
 

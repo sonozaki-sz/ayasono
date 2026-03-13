@@ -10,7 +10,7 @@ import { getGuildTranslator } from "../../../../../shared/locale/helpers";
 import { tDefault } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import type { ButtonHandler } from "../../../../handlers/interactionCreate/ui/types";
-import { getBotBumpReminderConfigService } from "../../../../services/botBumpReminderDependencyResolver";
+import { getBotBumpReminderConfigService } from "../../../../services/botCompositionRoot";
 import { safeReply } from "../../../../utils/interaction";
 import {
   createErrorEmbed,

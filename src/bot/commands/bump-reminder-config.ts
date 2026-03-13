@@ -3,6 +3,7 @@
 
 import { PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 import { getCommandLocalizations } from "../../shared/locale/commandLocalizations";
+import { handleCommandError } from "../errors/interactionErrorHandler";
 import { BUMP_REMINDER_CONFIG_COMMAND } from "../features/bump-reminder/commands/bumpReminderConfigCommand.constants";
 import { executeBumpReminderConfigCommand } from "../features/bump-reminder/commands/bumpReminderConfigCommand.execute";
 import type { Command } from "../types/discord";
@@ -147,8 +148,11 @@ export const bumpReminderConfigCommand: Command = {
    * @returns 実行完了を示す Promise
    */
   async execute(interaction) {
-    // 実行処理は features 側のルーターへ委譲
-    await executeBumpReminderConfigCommand(interaction);
+    try {
+      await executeBumpReminderConfigCommand(interaction);
+    } catch (error) {
+      await handleCommandError(interaction, error);
+    }
   },
 
   cooldown: 3,

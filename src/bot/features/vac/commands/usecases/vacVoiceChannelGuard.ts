@@ -4,7 +4,7 @@
 import { ChannelType, type ChatInputCommandInteraction } from "discord.js";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
 import { tGuild } from "../../../../../shared/locale/localeManager";
-import { getBotVacRepository } from "../../../../services/botVacDependencyResolver";
+import { getBotVacConfigService } from "../../../../services/botCompositionRoot";
 
 /**
  * 実行者が参加中のVCがVAC管理下かを確認する
@@ -26,7 +26,7 @@ export async function getManagedVacVoiceChannel(
     );
   }
 
-  const isManaged = await getBotVacRepository().isManagedVacChannel(
+  const isManaged = await getBotVacConfigService().isManagedVacChannel(
     guildId,
     voiceChannel.id,
   );

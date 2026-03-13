@@ -11,7 +11,7 @@ import { ValidationError } from "../../../../../shared/errors/customErrors";
 import { tDefault, tGuild } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import type { ModalHandler } from "../../../../handlers/interactionCreate/ui/types";
-import { getBotStickyMessageConfigService } from "../../../../services/botStickyMessageDependencyResolver";
+import { getBotStickyMessageConfigService } from "../../../../services/botCompositionRoot";
 import {
   createSuccessEmbed,
   createWarningEmbed,

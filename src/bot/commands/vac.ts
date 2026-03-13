@@ -6,6 +6,7 @@ import {
   SlashCommandBuilder,
 } from "discord.js";
 import { getCommandLocalizations } from "../../shared/locale/commandLocalizations";
+import { handleCommandError } from "../errors/interactionErrorHandler";
 import { VAC_COMMAND } from "../features/vac/commands/vacCommand.constants";
 import { executeVacCommand } from "../features/vac/commands/vacCommand.execute";
 import type { Command } from "../types/discord";
@@ -67,7 +68,11 @@ export const vacCommand: Command = {
    * @returns 実行完了を示す Promise
    */
   async execute(interaction: ChatInputCommandInteraction) {
-    await executeVacCommand(interaction);
+    try {
+      await executeVacCommand(interaction);
+    } catch (error) {
+      await handleCommandError(interaction, error);
+    }
   },
 
   cooldown: 3,

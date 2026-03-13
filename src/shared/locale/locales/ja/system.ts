@@ -416,6 +416,8 @@ export const system = {
     "[メンバーログ機能] 通知送信失敗 GuildId: {{guildId}}",
   "member-log.channel_not_found":
     "[メンバーログ機能] チャンネルが見つかりません。 GuildId: {{guildId}} ChannelId: {{channelId}}",
+  "member-log.channel_deleted_config_cleared":
+    "[メンバーログ機能] チャンネルが削除されたため設定をリセットしました。 GuildId: {{guildId}} ChannelId: {{channelId}}",
   // 設定コマンド操作ログ
   "member-log.config_set_channel":
     "[メンバーログ機能] チャンネル設定 GuildId: {{guildId}} ChannelId: {{channelId}}",

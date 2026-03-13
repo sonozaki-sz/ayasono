@@ -1,5 +1,5 @@
 // tests/unit/bot/features/vac/services/vacService.test.ts
-import type { IVacRepository } from "@/bot/features/vac/repositories/vacRepository";
+import type { VacConfigService } from "@/shared/features/vac/vacConfigService";
 import { cleanupVacOnStartupUseCase } from "@/bot/features/vac/services/usecases/cleanupVacOnStartup";
 import { handleVacCreateUseCase } from "@/bot/features/vac/services/usecases/handleVacCreate";
 import { handleVacDeleteUseCase } from "@/bot/features/vac/services/usecases/handleVacDelete";
@@ -17,7 +17,7 @@ const executeWithLoggedErrorMock = vi.fn(
   },
 );
 const loggerInfoMock = vi.fn();
-const getVacRepositoryMock = vi.fn();
+const getVacConfigServiceMock = vi.fn();
 
 vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: vi.fn((key: string) => `default:${key}`),
@@ -34,9 +34,9 @@ vi.mock("@/shared/utils/logger", () => ({
   },
 }));
 
-vi.mock("@/bot/features/vac/repositories/vacRepository", () => ({
-  getVacRepository: (repository?: IVacRepository) =>
-    getVacRepositoryMock(repository),
+vi.mock("@/shared/features/vac/vacConfigService", () => ({
+  getVacConfigService: (service?: VacConfigService) =>
+    getVacConfigServiceMock(service),
 }));
 
 vi.mock("@/bot/features/vac/services/usecases/handleVacCreate", () => ({
@@ -51,7 +51,7 @@ vi.mock("@/bot/features/vac/services/usecases/cleanupVacOnStartup", () => ({
   cleanupVacOnStartupUseCase: vi.fn(),
 }));
 
-function createRepositoryMock(): Mocked<IVacRepository> {
+function createRepositoryMock(): Mocked<VacConfigService> {
   return {
     getVacConfigOrDefault: vi.fn(),
     saveVacConfig: vi.fn(),
@@ -60,7 +60,7 @@ function createRepositoryMock(): Mocked<IVacRepository> {
     addCreatedVacChannel: vi.fn(),
     removeCreatedVacChannel: vi.fn(),
     isManagedVacChannel: vi.fn(),
-  };
+  } as unknown as Mocked<VacConfigService>;
 }
 
 // VacService クラスがボイス状態変化・チャンネル削除・起動時クリーンアップの各しきいを
@@ -69,11 +69,11 @@ describe("bot/features/vac/services/vacService", () => {
   const defaultRepository = createRepositoryMock();
 
   // 各テストのモック呼び出し記録をリセットし、
-  // getVacRepositoryMock が注入されたリポジトリをそのまま返すデフォルト動作を再設定する
+  // getVacConfigServiceMock が注入されたサービスをそのまま返すデフォルト動作を再設定する
   beforeEach(() => {
     vi.clearAllMocks();
-    getVacRepositoryMock.mockImplementation(
-      (repository?: IVacRepository) => repository ?? defaultRepository,
+    getVacConfigServiceMock.mockImplementation(
+      (service?: VacConfigService) => service ?? defaultRepository,
     );
   });
 
