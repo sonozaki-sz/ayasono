@@ -7,7 +7,7 @@ import { logger } from "../../../../shared/utils/logger";
 import {
   getBotStickyMessageConfigService,
   getBotStickyMessageResendService,
-} from "../../../services/botStickyMessageDependencyResolver";
+} from "../../../services/botCompositionRoot";
 
 /**
  * channelDelete 時にスティッキーメッセージの DB レコードとタイマーを破棄する

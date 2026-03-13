@@ -40,4 +40,41 @@ export async function invalidateGuildLocaleCache(
   localeManager.invalidateLocaleCache(guildId);
 }
 
+/**
+ * Discord のロケール文字列からタイムゾーンオフセット文字列を返す。
+ * Discord は言語設定のみを公開しており、タイムゾーンは取得不可能なため
+ * 言語から代表的なオフセットを推定する。特定不可能なロケールは UTC にフォールバックする。
+ *
+ * 将来 GuildConfig にタイムゾーン設定が追加された場合は、
+ * `guildTimezone ?? getTimezoneOffsetForLocale(locale)` で差し替え可能。
+ *
+ * @param locale Discord の interaction.locale または guildLocale
+ * @returns UTC オフセット文字列（例: "+09:00", "+00:00"）
+ */
+export function getTimezoneOffsetForLocale(locale: string): string {
+  switch (locale) {
+    case "ja":
+      return "+09:00"; // JST (Japan)
+    case "ko":
+      return "+09:00"; // KST (Korea)
+    case "zh-CN":
+      return "+08:00"; // CST (China)
+    case "zh-TW":
+    case "zh-HK":
+      return "+08:00"; // CST (Taiwan/HongKong)
+    case "ru":
+      return "+03:00"; // MSK (Moscow, 主要都市)
+    case "tr":
+      return "+03:00"; // TRT (Turkey)
+    case "vi":
+      return "+07:00"; // ICT (Vietnam)
+    case "th":
+      return "+07:00"; // ICT (Thailand)
+    case "id":
+      return "+07:00"; // WIB (Indonesia 西部)
+    default:
+      return "+00:00"; // UTC (en-US 等は地域分散のためフォールバック)
+  }
+}
+
 export type { SupportedLocale };

@@ -5,6 +5,7 @@ import { type ChatInputCommandInteraction } from "discord.js";
 import { ValidationError } from "../../../../shared/errors/customErrors";
 import { tDefault } from "../../../../shared/locale/localeManager";
 import { handleCommandError } from "../../../errors/interactionErrorHandler";
+import { COMMON_I18N_KEYS } from "../../../shared/i18nKeys";
 import { BUMP_REMINDER_CONFIG_COMMAND } from "./bumpReminderConfigCommand.constants";
 import { handleBumpReminderConfigDisable } from "./bumpReminderConfigCommand.disable";
 import { handleBumpReminderConfigEnable } from "./bumpReminderConfigCommand.enable";
@@ -26,7 +27,7 @@ export async function executeBumpReminderConfigCommand(
     // Guild外実行は対象外
     const guildId = interaction.guildId;
     if (!guildId) {
-      throw new ValidationError(tDefault("errors:validation.guild_only"));
+      throw new ValidationError(tDefault(COMMON_I18N_KEYS.GUILD_ONLY));
     }
 
     // 管理権限を統一ガードで検証
@@ -59,7 +60,7 @@ export async function executeBumpReminderConfigCommand(
       default:
         // 定義外サブコマンドは共通バリデーションエラー
         throw new ValidationError(
-          tDefault("errors:validation.invalid_subcommand"),
+          tDefault(COMMON_I18N_KEYS.INVALID_SUBCOMMAND),
         );
     }
   } catch (error) {

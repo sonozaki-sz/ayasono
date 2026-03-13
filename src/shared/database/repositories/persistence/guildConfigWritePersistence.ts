@@ -14,11 +14,6 @@ export async function createGuildConfigRecord(
   data: {
     guildId: string;
     locale: string;
-    afkConfig: string | null;
-    vacConfig: string | null;
-    bumpReminderConfig: string | null;
-    stickMessages: string | null;
-    memberLogConfig: string | null;
   },
 ): Promise<void> {
   await prisma.guildConfig.create({ data });

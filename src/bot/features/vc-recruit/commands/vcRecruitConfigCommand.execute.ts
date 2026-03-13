@@ -1,10 +1,12 @@
 // src/bot/features/vc-recruit/commands/vcRecruitConfigCommand.execute.ts
 // VC募集設定コマンド実行処理
 
-import { ChatInputCommandInteraction, PermissionFlagsBits } from "discord.js";
+import { ChatInputCommandInteraction } from "discord.js";
 import { ValidationError } from "../../../../shared/errors/customErrors";
 import { tDefault } from "../../../../shared/locale/localeManager";
 import { handleCommandError } from "../../../errors/interactionErrorHandler";
+import { COMMON_I18N_KEYS } from "../../../shared/i18nKeys";
+import { ensureManageGuildPermission } from "../../../shared/permissionGuards";
 import { handleVcRecruitConfigAddRole } from "./usecases/vcRecruitConfigAddRole";
 import { handleVcRecruitConfigRemoveRole } from "./usecases/vcRecruitConfigRemoveRole";
 import { handleVcRecruitConfigSetup } from "./usecases/vcRecruitConfigSetup";
@@ -22,10 +24,10 @@ export async function executeVcRecruitConfigCommand(
   try {
     const guildId = interaction.guildId;
     if (!guildId) {
-      throw new ValidationError(tDefault("errors:validation.guild_only"));
+      throw new ValidationError(tDefault(COMMON_I18N_KEYS.GUILD_ONLY));
     }
 
-    ensureManageGuildPermission(interaction);
+    await ensureManageGuildPermission(interaction, guildId);
 
     const subcommand = interaction.options.getSubcommand();
     switch (subcommand) {
@@ -46,23 +48,10 @@ export async function executeVcRecruitConfigCommand(
         break;
       default:
         throw new ValidationError(
-          tDefault("errors:validation.invalid_subcommand"),
+          tDefault(COMMON_I18N_KEYS.INVALID_SUBCOMMAND),
         );
     }
   } catch (error) {
     await handleCommandError(interaction, error);
-  }
-}
-
-/**
- * 実行ユーザーがサーバー管理権限を持つか検証する
- */
-function ensureManageGuildPermission(
-  interaction: ChatInputCommandInteraction,
-): void {
-  if (!interaction.memberPermissions?.has(PermissionFlagsBits.ManageGuild)) {
-    throw new ValidationError(
-      tDefault("errors:permission.manage_guild_required"),
-    );
   }
 }

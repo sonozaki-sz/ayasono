@@ -2,7 +2,7 @@
 
 > 機能実装の詳細な進捗状況
 
-最終更新: 2026年3月4日（VC募集機能実装完了）
+最終更新: 2026年3月13日（DBアーキテクチャ刷新・メッセージ削除機能 V2 完了）
 
 ---
 
@@ -13,7 +13,7 @@
 | カテゴリ | 実装済み | 未実装 | 進捗率 |
 | -------- | -------- | ------ | ------ |
 | コア機能 | 13       | 0      | 100%   |
-| コマンド | 12       | 4      | 75%    |
+| コマンド | 10       | 4      | 71%    |
 | イベント | 8        | 0      | 100%   |
 | サービス | 8        | 0      | 100%   |
 | 主要機能 | 7        | 0      | 100%   |
@@ -29,7 +29,7 @@
 | VAC                  | ✅   | 100%   | 自動作成・操作パネルまで実装完了   |
 | メッセージ固定       | ✅   | 100%   | 完全実装（set/remove/update/view） |
 | 参加・脱退ログ       | ✅   | 100%   | 完全実装                           |
-| メッセージ削除       | ✅   | 100%   | 完全実装                           |
+| メッセージ削除       | ✅   | 100%   | 完全実装（V2: 2段階確認フロー）    |
 | VC募集               | ✅   | 100%   | 完全実装・テスト済み               |
 | ギルド設定           | 📋   | 0%     | 仕様書のみ（データ層は実装済み）   |
 | 基本コマンド         | 🚧   | 25%    | `/ping` のみ実装済み               |
@@ -108,23 +108,23 @@
 #### データベース
 
 - ✅ Prisma Client接続管理
-- ✅ GuildConfigRepositoryパターン実装
-  - findByGuildId
-  - upsert
-  - update
+- ✅ GuildConfigRepository実装（ロケール管理）
+  - findByGuildId / upsert / update
   - トランザクション対応
-- ✅ BumpReminderRepositoryパターン実装（`src/bot/features/bump-reminder/repositories/bumpReminderRepository.ts`）
-  - findPendingByGuild
-  - findAllPending
-  - create / findById / delete
+- ✅ BumpReminderRepository実装（`src/bot/features/bump-reminder/repositories/bumpReminderRepository.ts`）
+  - findPendingByGuild / findAllPending / create / findById / delete
   - cancelByGuild / cleanupOld
-- ✅ GuildBumpReminderConfigStore実装（`src/shared/database/repositories/guildBumpReminderConfigStore.ts`）
-  - getBumpReminderConfig / setBumpReminderConfig
-  - mentionRoleの設定・解除
-  - mentionUserの追加・削除・全削除
-- ✅ 型定義集約（`src/shared/database/types.ts`）
-  - GuildConfig, AfkConfig, BumpReminderConfig, VacConfig など
-  - IGuildConfigRepository インターフェース
+- ✅ 機能別 ConfigRepository 実装（`src/shared/database/repositories/`）
+  - `afkConfigRepository.ts` — GuildAfkConfig テーブル
+  - `bumpReminderConfigRepository.ts` — GuildBumpReminderConfig テーブル
+  - `memberLogConfigRepository.ts` — GuildMemberLogConfig テーブル
+  - `vacConfigRepository.ts` — GuildVacConfig テーブル
+  - `vcRecruitConfigRepository.ts` — GuildVcRecruitConfig テーブル
+- ✅ 型定義分割（`src/shared/database/types/`）
+  - `entities.ts` — ドメインエンティティ型
+  - `repositories.ts` — リポジトリインターフェース
+  - `bumpReminderTypes.ts` / `vcRecruitTypes.ts` / `stickyMessageTypes.ts` — 機能別型
+  - `index.ts` — 再エクスポート
 
 #### スケジューラー
 
@@ -149,21 +149,20 @@
 #### ユーティリティ
 
 - ✅ 共有ヘルパー（helpers.ts）
-  - formatTimestamp
-  - sleep
-  - isProduction
+  - formatTimestamp / sleep / isProduction
 - ✅ Interactionヘルパー（interaction.ts）
-  - safeReply
-  - safeFollowUp
-  - safeUpdate
-  - safeDeferReply
+  - safeReply / safeFollowUp / safeUpdate / safeDeferReply
 - ✅ Prismaヘルパー（prisma.ts）
-  - getPrismaClient / requirePrismaClient
-  - `setPrismaClient()`（モジュールレベルでPrisma Clientを登録。global変数不使用）
+  - getPrismaClient / requirePrismaClient / setPrismaClient()
 - ✅ メッセージレスポンス（messageResponse.ts）
   - createSuccessEmbed / createInfoEmbed / createWarningEmbed / createErrorEmbed
-  - カラーコード・絵文字の自動付与
-  - タイムスタンプ・フィールド対応
+- ✅ jsonUtils（`src/shared/utils/jsonUtils.ts`）
+  - JSON シリアライズ・デシリアライズヘルパー
+- ✅ serviceFactory（`src/shared/utils/serviceFactory.ts`）
+  - サービスインスタンス生成ファクトリ
+- ✅ bot/shared（`src/bot/shared/`）
+  - `i18nKeys.ts` — ローカライズキー定数
+  - `permissionGuards.ts` — 権限チェック共通ガード
 
 #### 定数管理
 
@@ -252,7 +251,7 @@
 
 - `src/bot/commands/afk.ts`
 - `src/bot/commands/afk-config.ts`
-- `src/shared/database/repositories/guildConfigRepository.ts`
+- `src/shared/database/repositories/afkConfigRepository.ts`
 
 **テスト**:
 
@@ -305,7 +304,7 @@
 
 ---
 
-### 🎤 VC自動作成機能（VAC）（100%完了）
+### 🎤 VC自動作成機能（100%完了）
 
 **状態**: ✅ 完全実装・テスト済み
 
@@ -377,7 +376,7 @@
 - `src/bot/features/vc-panel/` （vc-panel 共通モジュール）
 - `src/bot/events/messageDelete.ts`
 - `src/shared/features/vc-recruit/vcRecruitConfigService.ts`
-- `src/shared/database/stores/guildVcRecruitConfigStore.ts`
+- `src/shared/database/repositories/vcRecruitConfigRepository.ts`
 - `src/bot/utils/categoryAutocomplete.ts`
 
 **テスト**:
@@ -399,8 +398,7 @@
 - アカウント年齢計算（`date-fns` 利用 / `accountAge.ts`）
 - カスタムメッセージ（`{user}` / `{username}` / `{count}` プレースホルダー対応）
 - `/member-log-config` コマンド（set-channel / enable / disable / set-join-message / set-leave-message / view）
-- `GuildConfig.memberLogConfig`（JSON）への設定永続化
-- `botMemberLogDependencyResolver.ts` による DI 解決
+- `GuildMemberLogConfig` テーブルへの設定永続化（機能別専用テーブル）
 
 **関連ファイル**:
 
@@ -419,41 +417,47 @@
 
 ---
 
-### 🗑️ メッセージ削除機能（100%完了）
+### 🗑️ メッセージ削除機能（100%完了 / V2新仕様）
 
-**状態**: ✅ 完全実装・テスト済み
+**状態**: ✅ 完全実装・テスト済み（2026-03-13 新仕様移行完了）
 
 **仕様書**: [docs/specs/MESSAGE_DELETE_SPEC.md](../specs/MESSAGE_DELETE_SPEC.md)
 
 **実装内容**:
 
 - `/message-delete [count] [user] [bot] [keyword] [days] [after] [before] [channel]` コマンド
-  - `count`: 削除件数（デフォルト10件）
-  - `user`: 特定ユーザーのメッセージのみ対象
+  - `count`: 削除件数（全チャンネル合計の上限）
+  - `user`: 特定ユーザー/Bot/Webhookのメッセージのみ対象
   - `bot`: Botメッセージのみ対象
-  - `keyword`: キーワードを含むメッセージのみ対象
-  - `days`/`after`/`before`: 相対・絶対日時による絞り込み
-  - `channel`: 指定チャンネルのみ対象（省略時は現在チャンネル）
-- 確認ダイアログ（削除前のプレビュー表示）
-- Embed形式の削除結果表示（`messageDeleteEmbedBuilder.ts`）
+  - `keyword`: キーワードを含むメッセージのみ対象（大文字小文字不問）
+  - `days`/`after`/`before`: 相対・絶対日時による絞り込み（排他）
+  - `channel`: 指定チャンネルのみ対象（省略時は全チャンネル横断）
+- **Phase 1 スキャン**: リアルタイム進捗表示（スキャン済み件数・一致件数）
+- **Phase 2 プレビューダイアログ**: 5件/ページページネーション付き一覧
+- **Phase 3 最終確認ダイアログ**: `⚠️ この操作は取り消せません` 表示
+- **Phase 4 削除実行**: リアルタイム削除進捗表示（チャンネルごとの件数）
+- 完了メッセージのみ表示（詳細ページネーション廃止）
+- 処理中ロック（サーバー単位で重複実行防止）
 - 権限チェック（MANAGE_MESSAGES）
-- `/message-delete-config confirm:<boolean>` コマンド（確認ダイアログスキップ機能）
-- `MessageDeleteUserSettingRepository` / `MessageDeleteUserSettingService`（設定永続化）
+- フィルター条件未指定時は実行拒否（安全性確保）
 
 **関連ファイル**:
 
 - `src/bot/commands/message-delete.ts`
-- `src/bot/commands/message-delete-config.ts`
 - `src/bot/features/message-delete/commands/messageDeleteCommand.execute.ts`
-- `src/bot/features/message-delete/commands/messageDeleteConfigCommand.execute.ts`
 - `src/bot/features/message-delete/commands/messageDeleteEmbedBuilder.ts`
+- `src/bot/features/message-delete/commands/usecases/validateOptions.ts`
+- `src/bot/features/message-delete/commands/usecases/buildTargetChannels.ts`
+- `src/bot/features/message-delete/commands/usecases/runScanPhase.ts`
+- `src/bot/features/message-delete/commands/usecases/runPreviewDialog.ts`
+- `src/bot/features/message-delete/commands/usecases/runFinalConfirmDialog.ts`
+- `src/bot/features/message-delete/commands/usecases/runDeleteExecution.ts`
+- `src/bot/features/message-delete/commands/usecases/dialogUtils.ts`
 - `src/bot/features/message-delete/services/messageDeleteService.ts`
-- `src/bot/features/message-delete/repositories/messageDeleteUserSettingRepository.ts`
-- `src/shared/features/message-delete/messageDeleteUserSettingService.ts`
 
 **テスト**:
 
-- ✅ 9テストファイル ・ statements/functions/lines 100% ・ branches 100%
+- ✅ usecases 7ファイル含む複数テストファイル ・ statements/functions/lines 100% ・ branches 100%
 
 ---
 
@@ -510,8 +514,7 @@
 | `/sticky-message update` | スティッキーメッセージ更新                                 | ✅   | 完全実装 |
 | `/sticky-message view`   | スティッキーメッセージ一覧表示（SelectMenu）               | ✅   | 完全実装 |
 | `/member-log-config`     | メンバーログ機能設定                                       | ✅   | 完全実装 |
-| `/message-delete`        | メッセージ一括削除                                         | ✅   | 完全実装 |
-| `/message-delete-config` | メッセージ削除内容設定                                     | ✅   | 完全実装 |
+| `/message-delete`        | メッセージ一括削除（V2: 2段階確認フロー）                  | ✅   | 完全実装 |
 | `/vc-recruit-config`     | VC募集機能設定（setup/teardown/view/add-role/remove-role） | ✅   | 完全実装 |
 
 **関連ファイル**:
@@ -525,7 +528,6 @@
 - `src/bot/commands/sticky-message.ts`
 - `src/bot/commands/member-log-config.ts`
 - `src/bot/commands/message-delete.ts`
-- `src/bot/commands/message-delete-config.ts`
 - `src/bot/commands/vc-recruit-config.ts`
 - `src/bot/utils/commandLoader.ts` ← `commands/` ディレクトリを自動スキャンして動的ロード
 - `src/shared/utils/messageResponse.ts`
@@ -590,22 +592,17 @@
 
 ### 🗄️ データベーススキーマ
 
-#### 実装済みテーブル
+#### 実装済みテーブル（2026-03-13 機能別テーブルに再設計）
 
-**GuildConfig**
+> `GuildConfig` の JSON カラム（`afkConfig` / `vacConfig` / `bumpReminderConfig` / `memberLogConfig`）は廃止済み。機能別専用テーブルに分割。
+
+**GuildConfig**（ロケールのみ保持）
 
 ```prisma
 model GuildConfig {
   id        String   @id @default(cuid())
   guildId   String   @unique
   locale    String   @default("ja")
-
-  // 詳細設定（JSON形式で保存）
-  afkConfig              String? // JSON: AfkConfig
-  vacConfig              String? // JSON: VacConfig
-  bumpReminderConfig     String? // JSON: BumpReminderConfig
-  stickMessages          String? // JSON: StickMessage[]
-  memberLogConfig        String? // JSON: MemberLogConfig
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -614,22 +611,69 @@ model GuildConfig {
 }
 ```
 
-**StickyMessage**
+**GuildAfkConfig**（新規）
 
 ```prisma
-model StickyMessage {
-  id            String   @id @default(cuid())
-  guildId       String
-  channelId     String   @unique
-  content       String
-  embedData     String?  // JSON: StickyEmbedData
-  lastMessageId String?
+model GuildAfkConfig {
+  guildId   String  @id @map("guild_id")
+  enabled   Boolean @default(false)
+  channelId String? @map("channel_id")
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  @@map("guild_afk_configs")
+}
+```
 
-  @@index([guildId])
-  @@map("sticky_messages")
+**GuildBumpReminderConfig**（新規）
+
+```prisma
+model GuildBumpReminderConfig {
+  guildId        String  @id @map("guild_id")
+  enabled        Boolean @default(false)
+  channelId      String? @map("channel_id")
+  mentionRoleId  String? @map("mention_role_id")
+  mentionUserIds String  @default("[]") @map("mention_user_ids") // JSON: string[]
+
+  @@map("guild_bump_reminder_configs")
+}
+```
+
+**GuildVacConfig**（新規）
+
+```prisma
+model GuildVacConfig {
+  guildId           String  @id @map("guild_id")
+  enabled           Boolean @default(false)
+  triggerChannelIds String  @default("[]") @map("trigger_channel_ids") // JSON: string[]
+  createdChannels   String  @default("[]") @map("created_channels")    // JSON: VacChannelPair[]
+
+  @@map("guild_vac_configs")
+}
+```
+
+**GuildMemberLogConfig**（新規）
+
+```prisma
+model GuildMemberLogConfig {
+  guildId      String  @id @map("guild_id")
+  enabled      Boolean @default(false)
+  channelId    String? @map("channel_id")
+  joinMessage  String? @map("join_message")
+  leaveMessage String? @map("leave_message")
+
+  @@map("guild_member_log_configs")
+}
+```
+
+**GuildVcRecruitConfig**（再設計）
+
+```prisma
+model GuildVcRecruitConfig {
+  guildId        String  @id @map("guild_id")
+  enabled        Boolean @default(false)
+  mentionRoleIds String  @default("[]") @map("mention_role_ids") // JSON: string[]
+  setups         String  @default("[]")                          // JSON: VcRecruitSetup[]
+
+  @@map("guild_vc_recruit_configs")
 }
 ```
 
@@ -655,24 +699,22 @@ model BumpReminder {
 }
 ```
 
-**GuildVcRecruitConfig**
+**StickyMessage**
 
 ```prisma
-model GuildVcRecruitConfig {
+model StickyMessage {
   id            String   @id @default(cuid())
-  guildId       String
-  panelChannelId  String
-  postChannelId   String
-  categoryId      String?
-  allowedRoleIds  String   @default("[]") // JSON: string[]
-  setupMessageId  String?
-  createdChannelIds String @default("[]") // JSON: string[] 作成済みVCのID一覧
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  guildId       String   @map("guild_id")
+  channelId     String   @unique @map("channel_id")
+  content       String
+  embedData     String?  @map("embed_data") // JSON文字列
+  updatedBy     String?  @map("updated_by") // 最終設定・更新者の Discord ユーザーID
+  lastMessageId String?  @map("last_message_id")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
 
   @@index([guildId])
-  @@map("guild_vc_recruit_configs")
+  @@map("sticky_messages")
 }
 ```
 
@@ -729,11 +771,11 @@ model GuildVcRecruitConfig {
 
 | コンポーネント | 実装済み | 未実装 | 合計 |
 | -------------- | -------- | ------ | ---- |
-| コマンド       | 12       | 4      | 16   |
+| コマンド       | 10       | 4      | 14   |
 | イベント       | 8        | 0      | 8    |
 | サービス       | 8        | 0      | 8    |
-| リポジトリ     | 5        | 2      | 7    |
-| ユーティリティ | 10       | 1      | 11   |
+| リポジトリ     | 7        | 0      | 7    |
+| ユーティリティ | 12       | 1      | 13   |
 
 ---
 

@@ -8,6 +8,7 @@ import {
   SlashCommandBuilder,
 } from "discord.js";
 import { getCommandLocalizations } from "../../shared/locale/commandLocalizations";
+import { handleCommandError } from "../errors/interactionErrorHandler";
 import { autocompleteVacConfigCommand } from "../features/vac/commands/vacConfigCommand.autocomplete";
 import { VAC_CONFIG_COMMAND } from "../features/vac/commands/vacConfigCommand.constants";
 import { executeVacConfigCommand } from "../features/vac/commands/vacConfigCommand.execute";
@@ -81,7 +82,11 @@ export const vacConfigCommand: Command = {
    * @returns 実行完了を示す Promise
    */
   async execute(interaction: ChatInputCommandInteraction) {
-    await executeVacConfigCommand(interaction);
+    try {
+      await executeVacConfigCommand(interaction);
+    } catch (error) {
+      await handleCommandError(interaction, error);
+    }
   },
 
   /**

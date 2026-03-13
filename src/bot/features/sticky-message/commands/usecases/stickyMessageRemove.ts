@@ -8,7 +8,7 @@ import {
   type TextChannel,
 } from "discord.js";
 import { tGuild } from "../../../../../shared/locale/localeManager";
-import { getBotStickyMessageConfigService } from "../../../../services/botStickyMessageDependencyResolver";
+import { getBotStickyMessageConfigService } from "../../../../services/botCompositionRoot";
 import {
   createInfoEmbed,
   createSuccessEmbed,

@@ -3,7 +3,7 @@ import { handleVacChannelDelete } from "@/bot/features/vac/handlers/vacChannelDe
 
 const handleChannelDeleteMock = vi.fn();
 
-vi.mock("@/bot/services/botVacDependencyResolver", () => ({
+vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotVacService: vi.fn(() => ({
     handleChannelDelete: (...args: unknown[]) =>
       handleChannelDeleteMock(...args),

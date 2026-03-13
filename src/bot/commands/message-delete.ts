@@ -3,7 +3,9 @@
 
 import { PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 import { getCommandLocalizations } from "../../shared/locale/commandLocalizations";
+import { handleCommandError } from "../errors/interactionErrorHandler";
 import { executeMessageDeleteCommand } from "../features/message-delete/commands/messageDeleteCommand.execute";
+import { MSG_DEL_COMMAND } from "../features/message-delete/constants/messageDeleteConstants";
 import type { Command } from "../types/discord";
 
 /**
@@ -17,7 +19,6 @@ export const messageDeleteCommand: Command = {
       "message-delete.count.description",
     );
     const userDesc = getCommandLocalizations("message-delete.user.description");
-    const botDesc = getCommandLocalizations("message-delete.bot.description");
     const keywordDesc = getCommandLocalizations(
       "message-delete.keyword.description",
     );
@@ -33,64 +34,59 @@ export const messageDeleteCommand: Command = {
     );
 
     return new SlashCommandBuilder()
-      .setName("message-delete")
+      .setName(MSG_DEL_COMMAND.NAME)
       .setDescription(desc.ja)
       .setDescriptionLocalizations(desc.localizations)
       .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages)
       .addIntegerOption((opt) =>
         opt
-          .setName("count")
+          .setName(MSG_DEL_COMMAND.OPTION.COUNT)
           .setDescription(countDesc.ja)
           .setDescriptionLocalizations(countDesc.localizations)
           .setRequired(false)
-          .setMinValue(1),
+          .setMinValue(1)
+          .setMaxValue(1000),
       )
       .addStringOption((opt) =>
         opt
-          .setName("user")
+          .setName(MSG_DEL_COMMAND.OPTION.USER)
           .setDescription(userDesc.ja)
           .setDescriptionLocalizations(userDesc.localizations)
           .setRequired(false),
       )
-      .addBooleanOption((opt) =>
-        opt
-          .setName("bot")
-          .setDescription(botDesc.ja)
-          .setDescriptionLocalizations(botDesc.localizations)
-          .setRequired(false),
-      )
       .addStringOption((opt) =>
         opt
-          .setName("keyword")
+          .setName(MSG_DEL_COMMAND.OPTION.KEYWORD)
           .setDescription(keywordDesc.ja)
           .setDescriptionLocalizations(keywordDesc.localizations)
           .setRequired(false),
       )
       .addIntegerOption((opt) =>
         opt
-          .setName("days")
+          .setName(MSG_DEL_COMMAND.OPTION.DAYS)
           .setDescription(daysDesc.ja)
           .setDescriptionLocalizations(daysDesc.localizations)
           .setRequired(false)
-          .setMinValue(1),
+          .setMinValue(1)
+          .setMaxValue(366),
       )
       .addStringOption((opt) =>
         opt
-          .setName("after")
+          .setName(MSG_DEL_COMMAND.OPTION.AFTER)
           .setDescription(afterDesc.ja)
           .setDescriptionLocalizations(afterDesc.localizations)
           .setRequired(false),
       )
       .addStringOption((opt) =>
         opt
-          .setName("before")
+          .setName(MSG_DEL_COMMAND.OPTION.BEFORE)
           .setDescription(beforeDesc.ja)
           .setDescriptionLocalizations(beforeDesc.localizations)
           .setRequired(false),
       )
       .addChannelOption((opt) =>
         opt
-          .setName("channel")
+          .setName(MSG_DEL_COMMAND.OPTION.CHANNEL)
           .setDescription(channelDesc.ja)
           .setDescriptionLocalizations(channelDesc.localizations)
           .setRequired(false),
@@ -98,7 +94,11 @@ export const messageDeleteCommand: Command = {
   })(),
 
   async execute(interaction) {
-    await executeMessageDeleteCommand(interaction);
+    try {
+      await executeMessageDeleteCommand(interaction);
+    } catch (error) {
+      await handleCommandError(interaction, error);
+    }
   },
 
   cooldown: 5,

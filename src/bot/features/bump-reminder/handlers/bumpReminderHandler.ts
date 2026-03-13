@@ -4,7 +4,7 @@
 import type { Client } from "discord.js";
 import { tDefault } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
-import { getBotBumpReminderConfigService } from "../../../services/botBumpReminderDependencyResolver";
+import { getBotBumpReminderConfigService } from "../../../services/botCompositionRoot";
 import {
   getReminderDelayMinutes,
   type BumpServiceName,

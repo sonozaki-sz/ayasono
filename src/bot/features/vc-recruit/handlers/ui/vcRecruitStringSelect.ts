@@ -10,7 +10,7 @@ import {
 } from "discord.js";
 import { tGuild } from "../../../../../shared/locale/localeManager";
 import type { StringSelectHandler } from "../../../../handlers/interactionCreate/ui/types";
-import { getBotVcRecruitRepository } from "../../../../services/botVcRecruitDependencyResolver";
+import { getBotVcRecruitRepository } from "../../../../services/botCompositionRoot";
 import {
   VC_RECRUIT_PANEL_CUSTOM_ID,
   VC_RECRUIT_TEARDOWN_CUSTOM_ID,

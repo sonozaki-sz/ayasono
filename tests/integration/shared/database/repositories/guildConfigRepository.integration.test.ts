@@ -34,6 +34,27 @@ const mockPrismaClient = {
     delete: vi.fn(),
     count: vi.fn(),
   },
+  guildAfkConfig: {
+    findUnique: vi.fn(),
+    upsert: vi.fn(),
+  },
+  guildBumpReminderConfig: {
+    findUnique: vi.fn(),
+    upsert: vi.fn(),
+    update: vi.fn(),
+  },
+  guildVacConfig: {
+    findUnique: vi.fn(),
+    upsert: vi.fn(),
+  },
+  guildMemberLogConfig: {
+    findUnique: vi.fn(),
+    upsert: vi.fn(),
+  },
+  guildVcRecruitConfig: {
+    findUnique: vi.fn(),
+    upsert: vi.fn(),
+  },
 };
 
 describe("PrismaGuildConfigRepository", () => {
@@ -248,197 +269,114 @@ describe("PrismaGuildConfigRepository", () => {
   });
 
   describe("setAfkChannel()", () => {
-    it("should create AFK config when not configured", async () => {
-      // AFK設定未作成時は初期化してから保存
-      mockPrismaClient.guildConfig.findUnique
-        .mockResolvedValueOnce(null)
-        .mockResolvedValueOnce({
-          afkConfig: JSON.stringify({
-            enabled: true,
-            channelId: "vc-1",
-          }),
-        });
-      mockPrismaClient.guildConfig.upsert.mockResolvedValue({});
+    it("should upsert AFK config with new channel", async () => {
+      mockPrismaClient.guildAfkConfig.upsert.mockResolvedValue({});
 
       await repository.setAfkChannel("123456789", "vc-1");
 
-      expect(mockPrismaClient.guildConfig.upsert).toHaveBeenCalled();
-    });
-
-    it("should update AFK config with CAS when configured", async () => {
-      // 既存値一致を条件に CAS で更新する
-      const currentConfig = {
-        enabled: true,
-        channelId: "vc-1",
-      };
-
-      mockPrismaClient.guildConfig.findUnique.mockResolvedValue({
-        afkConfig: JSON.stringify(currentConfig),
-      });
-      mockPrismaClient.guildConfig.updateMany.mockResolvedValue({ count: 1 });
-
-      await repository.setAfkChannel("123456789", "new-vc");
-
-      expect(mockPrismaClient.guildConfig.updateMany).toHaveBeenCalledWith({
-        where: {
-          guildId: "123456789",
-          afkConfig: JSON.stringify(currentConfig),
-        },
-        data: {
-          afkConfig: JSON.stringify({
-            enabled: true,
-            channelId: "new-vc",
-          }),
-        },
+      expect(mockPrismaClient.guildAfkConfig.upsert).toHaveBeenCalledWith({
+        where: { guildId: "123456789" },
+        create: { guildId: "123456789", enabled: true, channelId: "vc-1" },
+        update: { enabled: true, channelId: "vc-1" },
       });
     });
   });
 
   describe("updateAfkConfig()", () => {
-    it("should merge update with existing AFK config via CAS", async () => {
-      const currentConfig = {
-        enabled: true,
-        channelId: "old-vc",
-      };
-
-      mockPrismaClient.guildConfig.findUnique.mockResolvedValue({
-        afkConfig: JSON.stringify(currentConfig),
-      });
-      mockPrismaClient.guildConfig.updateMany.mockResolvedValue({ count: 1 });
+    it("should upsert AFK config", async () => {
+      mockPrismaClient.guildAfkConfig.upsert.mockResolvedValue({});
 
       await repository.updateAfkConfig("123456789", {
         enabled: false,
+        channelId: "ch-x",
       });
 
-      expect(mockPrismaClient.guildConfig.updateMany).toHaveBeenCalledWith({
-        where: {
+      expect(mockPrismaClient.guildAfkConfig.upsert).toHaveBeenCalledWith({
+        where: { guildId: "123456789" },
+        create: {
           guildId: "123456789",
-          afkConfig: JSON.stringify(currentConfig),
+          enabled: false,
+          channelId: "ch-x",
         },
-        data: {
-          afkConfig: JSON.stringify({
-            enabled: false,
-            channelId: "old-vc",
-          }),
+        update: {
+          enabled: false,
+          channelId: "ch-x",
         },
       });
     });
   });
 
   describe("getBumpReminderConfig()", () => {
-    it("should return default enabled config when not configured", async () => {
-      // bump設定が無い場合は既定値（enabled: true）を返す
-      mockPrismaClient.guildConfig.findUnique.mockResolvedValue(null);
+    it("should return null when not configured", async () => {
+      mockPrismaClient.guildBumpReminderConfig.findUnique.mockResolvedValue(
+        null,
+      );
+
+      const config = await repository.getBumpReminderConfig("123456789");
+
+      expect(config).toBeNull();
+    });
+
+    it("should return stored config when configured", async () => {
+      mockPrismaClient.guildBumpReminderConfig.findUnique.mockResolvedValue({
+        enabled: false,
+        channelId: "999999999",
+        mentionRoleId: "888888888",
+        mentionUserIds: '["111111111","222222222"]',
+      });
 
       const config = await repository.getBumpReminderConfig("123456789");
 
       expect(config).toEqual({
-        enabled: true,
-        mentionRoleId: undefined,
-        mentionUserIds: [],
-      });
-    });
-
-    it("should return stored config when configured", async () => {
-      const mockBumpConfig = {
         enabled: false,
         channelId: "999999999",
         mentionRoleId: "888888888",
         mentionUserIds: ["111111111", "222222222"],
-      };
-
-      mockPrismaClient.guildConfig.findUnique.mockResolvedValue({
-        guildId: "123456789",
-        locale: "ja",
-        bumpReminderConfig: JSON.stringify(mockBumpConfig),
-        afkConfig: null,
-        vacConfig: null,
-        memberLogConfig: null,
-        stickMessages: null,
-        createdAt: atOffsetMs(0),
-        updatedAt: atOffsetMs(0),
-      });
-
-      const config = await repository.getBumpReminderConfig("123456789");
-
-      expect(config).toEqual(mockBumpConfig);
-    });
-
-    it("should return default enabled config when bumpReminderConfig is null", async () => {
-      mockPrismaClient.guildConfig.findUnique.mockResolvedValue({
-        guildId: "123456789",
-        locale: "ja",
-        bumpReminderConfig: null,
-        afkConfig: null,
-        vacConfig: null,
-        memberLogConfig: null,
-        stickMessages: null,
-        createdAt: atOffsetMs(0),
-        updatedAt: atOffsetMs(0),
-      });
-
-      const config = await repository.getBumpReminderConfig("123456789");
-
-      expect(config).toEqual({
-        enabled: true,
-        mentionRoleId: undefined,
-        mentionUserIds: [],
       });
     });
   });
 
   describe("setBumpReminderEnabled()", () => {
-    it("should create bump config when not configured", async () => {
-      mockPrismaClient.guildConfig.findUnique
-        .mockResolvedValueOnce(null)
-        .mockResolvedValueOnce({
-          bumpReminderConfig: JSON.stringify({
-            enabled: true,
-            channelId: "ch-1",
-            mentionRoleId: undefined,
-            mentionUserIds: [],
-          }),
-        });
-      mockPrismaClient.guildConfig.upsert.mockResolvedValue({});
+    it("should upsert bump config with enabled flag", async () => {
+      mockPrismaClient.guildBumpReminderConfig.upsert.mockResolvedValue({});
 
       await repository.setBumpReminderEnabled("123456789", true, "ch-1");
 
-      expect(mockPrismaClient.guildConfig.upsert).toHaveBeenCalled();
+      expect(mockPrismaClient.guildBumpReminderConfig.upsert).toHaveBeenCalledWith({
+        where: { guildId: "123456789" },
+        create: {
+          guildId: "123456789",
+          enabled: true,
+          channelId: "ch-1",
+          mentionUserIds: "[]",
+        },
+        update: {
+          enabled: true,
+          channelId: "ch-1",
+        },
+      });
     });
 
-    it("should update existing bump config while preserving mentions", async () => {
-      const currentConfig = {
-        enabled: true,
-        channelId: "ch-1",
-        mentionUserIds: [],
-      };
-
-      mockPrismaClient.guildConfig.findUnique.mockResolvedValue({
-        bumpReminderConfig: JSON.stringify(currentConfig),
-      });
-      mockPrismaClient.guildConfig.updateMany.mockResolvedValue({ count: 1 });
+    it("should upsert without channelId when not provided", async () => {
+      mockPrismaClient.guildBumpReminderConfig.upsert.mockResolvedValue({});
 
       await repository.setBumpReminderEnabled("123456789", false);
 
-      expect(mockPrismaClient.guildConfig.updateMany).toHaveBeenCalledWith({
-        where: {
+      expect(mockPrismaClient.guildBumpReminderConfig.upsert).toHaveBeenCalledWith({
+        where: { guildId: "123456789" },
+        create: {
           guildId: "123456789",
-          bumpReminderConfig: JSON.stringify(currentConfig),
+          enabled: false,
+          channelId: null,
+          mentionUserIds: "[]",
         },
-        data: {
-          bumpReminderConfig: JSON.stringify({
-            ...currentConfig,
-            enabled: false,
-            channelId: "ch-1",
-            mentionUserIds: [],
-          }),
-        },
+        update: { enabled: false },
       });
     });
   });
 
   describe("updateBumpReminderConfig()", () => {
-    it("should initialize bump config when null", async () => {
+    it("should upsert full bump config", async () => {
       const nextConfig = {
         enabled: true,
         channelId: "ch-1",
@@ -446,110 +384,48 @@ describe("PrismaGuildConfigRepository", () => {
         mentionUserIds: ["user-1"],
       };
 
-      mockPrismaClient.guildConfig.findUnique.mockResolvedValue({
-        bumpReminderConfig: null,
-      });
-      mockPrismaClient.guildConfig.updateMany.mockResolvedValue({ count: 1 });
+      mockPrismaClient.guildBumpReminderConfig.upsert.mockResolvedValue({});
 
       await repository.updateBumpReminderConfig("123456789", nextConfig);
 
-      expect(mockPrismaClient.guildConfig.updateMany).toHaveBeenCalledWith({
-        where: {
+      expect(mockPrismaClient.guildBumpReminderConfig.upsert).toHaveBeenCalledWith({
+        where: { guildId: "123456789" },
+        create: {
           guildId: "123456789",
-          bumpReminderConfig: null,
+          enabled: true,
+          channelId: "ch-1",
+          mentionRoleId: "role-1",
+          mentionUserIds: '["user-1"]',
         },
-        data: {
-          bumpReminderConfig: JSON.stringify(nextConfig),
-        },
-      });
-    });
-
-    it("should CAS-update existing bump config", async () => {
-      const currentConfig = {
-        enabled: false,
-        channelId: "old",
-        mentionRoleId: undefined,
-        mentionUserIds: [],
-      };
-      const nextConfig = {
-        enabled: true,
-        channelId: "new",
-        mentionRoleId: "role-1",
-        mentionUserIds: ["user-1"],
-      };
-
-      mockPrismaClient.guildConfig.findUnique.mockResolvedValue({
-        bumpReminderConfig: JSON.stringify(currentConfig),
-      });
-      mockPrismaClient.guildConfig.updateMany.mockResolvedValue({ count: 1 });
-
-      await repository.updateBumpReminderConfig("123456789", nextConfig);
-
-      expect(mockPrismaClient.guildConfig.updateMany).toHaveBeenCalledWith({
-        where: {
-          guildId: "123456789",
-          bumpReminderConfig: JSON.stringify(currentConfig),
-        },
-        data: {
-          bumpReminderConfig: JSON.stringify(nextConfig),
+        update: {
+          enabled: true,
+          channelId: "ch-1",
+          mentionRoleId: "role-1",
+          mentionUserIds: '["user-1"]',
         },
       });
     });
   });
 
   describe("addBumpReminderMentionUser()", () => {
-    it("should initialize default config and add user when not configured", async () => {
-      // 未設定時は初期化後にユーザーIDを追加
-      mockPrismaClient.guildConfig.findUnique
-        .mockResolvedValueOnce(null)
-        .mockResolvedValueOnce({
-          bumpReminderConfig: JSON.stringify({
-            enabled: true,
-            mentionRoleId: undefined,
-            mentionUserIds: [],
-          }),
-        });
-      mockPrismaClient.guildConfig.upsert.mockResolvedValue({});
-      mockPrismaClient.guildConfig.updateMany.mockResolvedValue({ count: 1 });
+    it("should return not-configured when record does not exist", async () => {
+      mockPrismaClient.guildBumpReminderConfig.findUnique.mockResolvedValue(
+        null,
+      );
 
       const result = await repository.addBumpReminderMentionUser(
         "123456789",
         "user-a",
       );
 
-      expect(result).toBe("added");
-      expect(mockPrismaClient.guildConfig.upsert).toHaveBeenCalled();
-      expect(mockPrismaClient.guildConfig.updateMany).toHaveBeenCalledWith({
-        where: {
-          guildId: "123456789",
-          bumpReminderConfig: JSON.stringify({
-            enabled: true,
-            mentionRoleId: undefined,
-            mentionUserIds: [],
-          }),
-        },
-        data: {
-          bumpReminderConfig: JSON.stringify({
-            enabled: true,
-            mentionRoleId: undefined,
-            mentionUserIds: ["user-a"],
-          }),
-        },
-      });
+      expect(result).toBe("not-configured");
     });
 
     it("should add user when not in mention list", async () => {
-      const currentConfig = {
-        enabled: true,
-        channelId: "111",
-        mentionRoleId: "222",
-        mentionUserIds: ["user-a"],
-      };
-
-      mockPrismaClient.guildConfig.findUnique.mockResolvedValue({
-        bumpReminderConfig: JSON.stringify(currentConfig),
+      mockPrismaClient.guildBumpReminderConfig.findUnique.mockResolvedValue({
+        mentionUserIds: '["user-a"]',
       });
-      mockPrismaClient.guildConfig.updateMany.mockResolvedValue({ count: 1 });
+      mockPrismaClient.guildBumpReminderConfig.update.mockResolvedValue({});
 
       const result = await repository.addBumpReminderMentionUser(
         "123456789",
@@ -557,27 +433,15 @@ describe("PrismaGuildConfigRepository", () => {
       );
 
       expect(result).toBe("added");
-      expect(mockPrismaClient.guildConfig.updateMany).toHaveBeenCalledWith({
-        where: {
-          guildId: "123456789",
-          bumpReminderConfig: JSON.stringify(currentConfig),
-        },
-        data: {
-          bumpReminderConfig: JSON.stringify({
-            ...currentConfig,
-            mentionUserIds: ["user-a", "user-b"],
-          }),
-        },
+      expect(mockPrismaClient.guildBumpReminderConfig.update).toHaveBeenCalledWith({
+        where: { guildId: "123456789" },
+        data: { mentionUserIds: '["user-a","user-b"]' },
       });
     });
 
     it("should return already-exists when user is already in list", async () => {
-      // 既存ユーザーは重複追加せず結果コードを返す
-      mockPrismaClient.guildConfig.findUnique.mockResolvedValue({
-        bumpReminderConfig: JSON.stringify({
-          enabled: true,
-          mentionUserIds: ["user-a"],
-        }),
+      mockPrismaClient.guildBumpReminderConfig.findUnique.mockResolvedValue({
+        mentionUserIds: '["user-a"]',
       });
 
       const result = await repository.addBumpReminderMentionUser(
@@ -586,23 +450,30 @@ describe("PrismaGuildConfigRepository", () => {
       );
 
       expect(result).toBe("already-exists");
-      expect(mockPrismaClient.guildConfig.updateMany).not.toHaveBeenCalled();
+      expect(mockPrismaClient.guildBumpReminderConfig.update).not.toHaveBeenCalled();
     });
   });
 
   describe("setBumpReminderMentionRole()", () => {
-    it("should set mention role", async () => {
-      const currentConfig = {
-        enabled: true,
-        channelId: "111",
-        mentionRoleId: "old-role",
-        mentionUserIds: ["user-a"],
-      };
+    it("should return not-configured when record does not exist", async () => {
+      mockPrismaClient.guildBumpReminderConfig.findUnique.mockResolvedValue(
+        null,
+      );
 
-      mockPrismaClient.guildConfig.findUnique.mockResolvedValue({
-        bumpReminderConfig: JSON.stringify(currentConfig),
+      const result = await repository.setBumpReminderMentionRole(
+        "123456789",
+        "new-role",
+      );
+
+      expect(result).toBe("not-configured");
+    });
+
+    it("should set mention role", async () => {
+      mockPrismaClient.guildBumpReminderConfig.findUnique.mockResolvedValue({
+        mentionRoleId: "old-role",
+        mentionUserIds: '["user-a"]',
       });
-      mockPrismaClient.guildConfig.updateMany.mockResolvedValue({ count: 1 });
+      mockPrismaClient.guildBumpReminderConfig.update.mockResolvedValue({});
 
       const result = await repository.setBumpReminderMentionRole(
         "123456789",
@@ -610,35 +481,32 @@ describe("PrismaGuildConfigRepository", () => {
       );
 
       expect(result).toBe("updated");
-      expect(mockPrismaClient.guildConfig.updateMany).toHaveBeenCalledWith({
-        where: {
-          guildId: "123456789",
-          bumpReminderConfig: JSON.stringify(currentConfig),
-        },
-        data: {
-          bumpReminderConfig: JSON.stringify({
-            ...currentConfig,
-            mentionRoleId: "new-role",
-            mentionUserIds: ["user-a"],
-          }),
-        },
+      expect(mockPrismaClient.guildBumpReminderConfig.update).toHaveBeenCalledWith({
+        where: { guildId: "123456789" },
+        data: { mentionRoleId: "new-role" },
       });
     });
   });
 
   describe("removeBumpReminderMentionUser()", () => {
-    it("should remove user when in mention list", async () => {
-      const currentConfig = {
-        enabled: true,
-        channelId: "111",
-        mentionRoleId: "222",
-        mentionUserIds: ["user-a", "user-b"],
-      };
+    it("should return not-configured when record does not exist", async () => {
+      mockPrismaClient.guildBumpReminderConfig.findUnique.mockResolvedValue(
+        null,
+      );
 
-      mockPrismaClient.guildConfig.findUnique.mockResolvedValue({
-        bumpReminderConfig: JSON.stringify(currentConfig),
+      const result = await repository.removeBumpReminderMentionUser(
+        "123456789",
+        "user-b",
+      );
+
+      expect(result).toBe("not-configured");
+    });
+
+    it("should remove user when in mention list", async () => {
+      mockPrismaClient.guildBumpReminderConfig.findUnique.mockResolvedValue({
+        mentionUserIds: '["user-a","user-b"]',
       });
-      mockPrismaClient.guildConfig.updateMany.mockResolvedValue({ count: 1 });
+      mockPrismaClient.guildBumpReminderConfig.update.mockResolvedValue({});
 
       const result = await repository.removeBumpReminderMentionUser(
         "123456789",
@@ -646,26 +514,15 @@ describe("PrismaGuildConfigRepository", () => {
       );
 
       expect(result).toBe("removed");
-      expect(mockPrismaClient.guildConfig.updateMany).toHaveBeenCalledWith({
-        where: {
-          guildId: "123456789",
-          bumpReminderConfig: JSON.stringify(currentConfig),
-        },
-        data: {
-          bumpReminderConfig: JSON.stringify({
-            ...currentConfig,
-            mentionUserIds: ["user-a"],
-          }),
-        },
+      expect(mockPrismaClient.guildBumpReminderConfig.update).toHaveBeenCalledWith({
+        where: { guildId: "123456789" },
+        data: { mentionUserIds: '["user-a"]' },
       });
     });
 
     it("should return not-found when user is not in list", async () => {
-      mockPrismaClient.guildConfig.findUnique.mockResolvedValue({
-        bumpReminderConfig: JSON.stringify({
-          enabled: true,
-          mentionUserIds: ["user-a"],
-        }),
+      mockPrismaClient.guildBumpReminderConfig.findUnique.mockResolvedValue({
+        mentionUserIds: '["user-a"]',
       });
 
       const result = await repository.removeBumpReminderMentionUser(
@@ -674,74 +531,85 @@ describe("PrismaGuildConfigRepository", () => {
       );
 
       expect(result).toBe("not-found");
-      expect(mockPrismaClient.guildConfig.updateMany).not.toHaveBeenCalled();
+      expect(mockPrismaClient.guildBumpReminderConfig.update).not.toHaveBeenCalled();
     });
   });
 
   describe("clearBumpReminderMentionUsers()", () => {
+    it("should return not-configured when record does not exist", async () => {
+      mockPrismaClient.guildBumpReminderConfig.findUnique.mockResolvedValue(
+        null,
+      );
+
+      const result = await repository.clearBumpReminderMentionUsers("123456789");
+
+      expect(result).toBe("not-configured");
+    });
+
     it("should clear all mention users", async () => {
-      const currentConfig = {
-        enabled: true,
-        channelId: "111",
-        mentionRoleId: "role-a",
-        mentionUserIds: ["user-a", "user-b"],
-      };
-
-      mockPrismaClient.guildConfig.findUnique.mockResolvedValue({
-        bumpReminderConfig: JSON.stringify(currentConfig),
+      mockPrismaClient.guildBumpReminderConfig.findUnique.mockResolvedValue({
+        mentionUserIds: '["user-a","user-b"]',
       });
-      mockPrismaClient.guildConfig.updateMany.mockResolvedValue({ count: 1 });
+      mockPrismaClient.guildBumpReminderConfig.update.mockResolvedValue({});
 
-      const result =
-        await repository.clearBumpReminderMentionUsers("123456789");
+      const result = await repository.clearBumpReminderMentionUsers("123456789");
 
       expect(result).toBe("cleared");
-      expect(mockPrismaClient.guildConfig.updateMany).toHaveBeenCalledWith({
-        where: {
-          guildId: "123456789",
-          bumpReminderConfig: JSON.stringify(currentConfig),
-        },
-        data: {
-          bumpReminderConfig: JSON.stringify({
-            ...currentConfig,
-            mentionUserIds: [],
-          }),
-        },
+      expect(mockPrismaClient.guildBumpReminderConfig.update).toHaveBeenCalledWith({
+        where: { guildId: "123456789" },
+        data: { mentionUserIds: "[]" },
       });
+    });
+
+    it("should return already-empty when list is already empty", async () => {
+      mockPrismaClient.guildBumpReminderConfig.findUnique.mockResolvedValue({
+        mentionUserIds: "[]",
+      });
+
+      const result = await repository.clearBumpReminderMentionUsers("123456789");
+
+      expect(result).toBe("already-empty");
+      expect(mockPrismaClient.guildBumpReminderConfig.update).not.toHaveBeenCalled();
     });
   });
 
   describe("clearBumpReminderMentions()", () => {
-    it("should clear role and users", async () => {
-      // ロールIDとユーザー一覧の両方を同時にクリア
-      const currentConfig = {
-        enabled: true,
-        channelId: "111",
-        mentionRoleId: "role-a",
-        mentionUserIds: ["user-a", "user-b"],
-      };
+    it("should return not-configured when record does not exist", async () => {
+      mockPrismaClient.guildBumpReminderConfig.findUnique.mockResolvedValue(
+        null,
+      );
 
-      mockPrismaClient.guildConfig.findUnique.mockResolvedValue({
-        bumpReminderConfig: JSON.stringify(currentConfig),
+      const result = await repository.clearBumpReminderMentions("123456789");
+
+      expect(result).toBe("not-configured");
+    });
+
+    it("should clear role and users", async () => {
+      mockPrismaClient.guildBumpReminderConfig.findUnique.mockResolvedValue({
+        mentionRoleId: "role-a",
+        mentionUserIds: '["user-a","user-b"]',
       });
-      mockPrismaClient.guildConfig.updateMany.mockResolvedValue({ count: 1 });
+      mockPrismaClient.guildBumpReminderConfig.update.mockResolvedValue({});
 
       const result = await repository.clearBumpReminderMentions("123456789");
 
       expect(result).toBe("cleared");
-      expect(mockPrismaClient.guildConfig.updateMany).toHaveBeenCalledWith({
-        where: {
-          guildId: "123456789",
-          bumpReminderConfig: JSON.stringify(currentConfig),
-        },
-        data: {
-          bumpReminderConfig: JSON.stringify({
-            ...currentConfig,
-            mentionRoleId: undefined,
-            mentionUserIds: [],
-          }),
-        },
+      expect(mockPrismaClient.guildBumpReminderConfig.update).toHaveBeenCalledWith({
+        where: { guildId: "123456789" },
+        data: { mentionRoleId: null, mentionUserIds: "[]" },
       });
+    });
+
+    it("should return already-cleared when nothing to clear", async () => {
+      mockPrismaClient.guildBumpReminderConfig.findUnique.mockResolvedValue({
+        mentionRoleId: null,
+        mentionUserIds: "[]",
+      });
+
+      const result = await repository.clearBumpReminderMentions("123456789");
+
+      expect(result).toBe("already-cleared");
+      expect(mockPrismaClient.guildBumpReminderConfig.update).not.toHaveBeenCalled();
     });
   });
 });

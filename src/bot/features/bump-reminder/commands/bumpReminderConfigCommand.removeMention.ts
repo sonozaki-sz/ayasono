@@ -18,7 +18,7 @@ import {
 } from "../../../../shared/features/bump-reminder/bumpReminderConfigService";
 import { tDefault, tGuild } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
-import { getBotBumpReminderConfigService } from "../../../services/botBumpReminderDependencyResolver";
+import { getBotBumpReminderConfigService } from "../../../services/botCompositionRoot";
 import {
   createErrorEmbed,
   createSuccessEmbed,
@@ -201,7 +201,7 @@ async function handleUserSelectionUI(
         .fetch(userId)
         .catch(() => null);
       const displayName =
-        member?.displayName ?? member?.user.username ?? userId;
+        member?.displayName ?? member?.user.displayName ?? userId;
       return {
         label: displayName.slice(0, 100),
         description: `ID: ${userId}`,

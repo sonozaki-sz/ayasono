@@ -18,6 +18,7 @@ import {
   createInfoEmbed,
   createSuccessEmbed,
 } from "../../../utils/messageResponse";
+import { COMMON_I18N_KEYS } from "../../../shared/i18nKeys";
 
 const AFK_CONFIG_SUBCOMMAND = {
   SET_CHANNEL: "set-channel",
@@ -32,12 +33,12 @@ export async function executeAfkConfigCommand(
 ): Promise<void> {
   const guildId = interaction.guildId;
   if (!guildId) {
-    throw new ValidationError(tDefault("errors:validation.guild_only"));
+    throw new ValidationError(tDefault(COMMON_I18N_KEYS.GUILD_ONLY));
   }
 
   if (!interaction.memberPermissions?.has(PermissionFlagsBits.ManageGuild)) {
     throw new ValidationError(
-      await tGuild(guildId, "errors:permission.manage_guild_required"),
+      await tGuild(guildId, COMMON_I18N_KEYS.MANAGE_GUILD_REQUIRED),
     );
   }
 
@@ -51,9 +52,7 @@ export async function executeAfkConfigCommand(
       await handleViewSetting(interaction, guildId);
       break;
     default:
-      throw new ValidationError(
-        tDefault("errors:validation.invalid_subcommand"),
-      );
+      throw new ValidationError(tDefault(COMMON_I18N_KEYS.INVALID_SUBCOMMAND));
   }
 }
 

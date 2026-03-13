@@ -3,34 +3,23 @@
 
 import { getGuildConfigRepository } from "../../database/guildConfigRepositoryProvider";
 import type {
-  IMemberLogRepository,
+  IMemberLogConfigRepository,
   MemberLogConfig,
 } from "../../database/types";
+import { createServiceGetter } from "../../utils/serviceFactory";
+import {
+  DEFAULT_MEMBER_LOG_CONFIG,
+  createDefaultMemberLogConfig,
+} from "./memberLogConfigDefaults";
 
 export type { MemberLogConfig };
-
-/** メンバーログ設定の初期値 */
-export const DEFAULT_MEMBER_LOG_CONFIG: MemberLogConfig = {
-  enabled: false,
-};
-
-let memberLogConfigService: MemberLogConfigService | undefined;
-let cachedRepository: IMemberLogRepository | undefined;
-
-/**
- * メンバーログ設定の初期値を生成する
- * @returns デフォルト MemberLogConfig オブジェクト
- */
-function createDefaultMemberLogConfig(): MemberLogConfig {
-  // 既定値から新しい設定オブジェクトを都度生成して返す
-  return { ...DEFAULT_MEMBER_LOG_CONFIG };
-}
+export { DEFAULT_MEMBER_LOG_CONFIG };
 
 /**
  * メンバーログ設定の取得・更新を担当するサービス
  */
 export class MemberLogConfigService {
-  constructor(private readonly repository: IMemberLogRepository) {}
+  constructor(private readonly repository: IMemberLogConfigRepository) {}
 
   /**
    * メンバーログ設定を取得する
@@ -111,6 +100,20 @@ export class MemberLogConfigService {
       leaveMessage: message,
     });
   }
+
+  /**
+   * 通知チャンネルをクリアして機能を無効化する
+   * ログチャンネルが削除されたときに呼び出す
+   * @param guildId 設定対象のギルドID
+   */
+  async disableAndClearChannel(guildId: string): Promise<void> {
+    const current = await this.getMemberLogConfigOrDefault(guildId);
+    await this.repository.updateMemberLogConfig(guildId, {
+      ...current,
+      channelId: undefined,
+      enabled: false,
+    });
+  }
 }
 
 /**
@@ -119,7 +122,7 @@ export class MemberLogConfigService {
  * @returns MemberLogConfigService インスタンス
  */
 export function createMemberLogConfigService(
-  repository: IMemberLogRepository,
+  repository: IMemberLogConfigRepository,
 ): MemberLogConfigService {
   return new MemberLogConfigService(repository);
 }
@@ -129,14 +132,7 @@ export function createMemberLogConfigService(
  * @param repository 明示的に利用するリポジトリ（省略時は既定リポジトリ）
  * @returns MemberLogConfigService シングルトン
  */
-export function getMemberLogConfigService(
-  repository?: IMemberLogRepository,
-): MemberLogConfigService {
-  // 引数優先で repository を解決し、同一依存なら service を再利用
-  const resolvedRepository = repository ?? getGuildConfigRepository();
-  if (!memberLogConfigService || cachedRepository !== resolvedRepository) {
-    memberLogConfigService = createMemberLogConfigService(resolvedRepository);
-    cachedRepository = resolvedRepository;
-  }
-  return memberLogConfigService;
-}
+export const getMemberLogConfigService = createServiceGetter(
+  createMemberLogConfigService,
+  getGuildConfigRepository,
+);

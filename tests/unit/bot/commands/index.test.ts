@@ -36,7 +36,6 @@ const KNOWN_COMMAND_NAMES = [
   "bump-reminder-config",
   "member-log-config",
   "message-delete",
-  "message-delete-config",
   "sticky-message",
   "vac",
   "vac-config",

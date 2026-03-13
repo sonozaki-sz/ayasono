@@ -25,8 +25,7 @@ describe("shared/features/member-log/memberLogConfigService", () => {
 
   // getMemberLogConfig がリポジトリの値をそのまま返すことを確認
   describe("MemberLogConfigService", () => {
-    // getMemberLogConfig が repository へ委譲し、null を返せることを確認
-    it("getMemberLogConfig returns null when repository has no config", async () => {
+    it("repository に設定がない場合は getMemberLogConfig が null を返すこと", async () => {
       const { module } = await loadModule();
       const repository = createRepositoryMock();
       const service = new module.MemberLogConfigService(repository as never);
@@ -38,8 +37,7 @@ describe("shared/features/member-log/memberLogConfigService", () => {
       expect(repository.getMemberLogConfig).toHaveBeenCalledWith("guild-1");
     });
 
-    // getMemberLogConfig が repository の値を返すことを確認
-    it("getMemberLogConfig returns config from repository", async () => {
+    it("repository の値を getMemberLogConfig が返すこと", async () => {
       const { module } = await loadModule();
       const repository = createRepositoryMock();
       const service = new module.MemberLogConfigService(repository as never);
@@ -51,8 +49,7 @@ describe("shared/features/member-log/memberLogConfigService", () => {
       expect(result).toEqual(config);
     });
 
-    // getMemberLogConfigOrDefault が null 時にデフォルト値を返すことを確認
-    it("getMemberLogConfigOrDefault returns default when config is null", async () => {
+    it("設定が null の場合は getMemberLogConfigOrDefault がデフォルト値を返すこと", async () => {
       const { module } = await loadModule();
       const repository = createRepositoryMock();
       const service = new module.MemberLogConfigService(repository as never);
@@ -63,8 +60,7 @@ describe("shared/features/member-log/memberLogConfigService", () => {
       expect(result).toEqual({ enabled: false });
     });
 
-    // getMemberLogConfigOrDefault が毎回新しいオブジェクトを返すことを確認（参照共有なし）
-    it("getMemberLogConfigOrDefault returns a fresh object each time (not same reference)", async () => {
+    it("getMemberLogConfigOrDefault が呼び出しごとに別インスタンスを返すこと", async () => {
       const { module } = await loadModule();
       const repository = createRepositoryMock();
       const service = new module.MemberLogConfigService(repository as never);
@@ -77,8 +73,7 @@ describe("shared/features/member-log/memberLogConfigService", () => {
       expect(first).toEqual(second);
     });
 
-    // setChannelId が現在の設定を読み込んで channelId をマージして保存することを確認
-    it("setChannelId reads current config and saves merged result", async () => {
+    it("setChannelId が現在の設定を読み込んで channelId をマージして保存すること", async () => {
       const { module } = await loadModule();
       const repository = createRepositoryMock();
       const service = new module.MemberLogConfigService(repository as never);
@@ -94,8 +89,7 @@ describe("shared/features/member-log/memberLogConfigService", () => {
       });
     });
 
-    // setEnabled が現在の設定を読み込んで enabled をマージして保存することを確認
-    it("setEnabled reads current config and saves merged enabled flag", async () => {
+    it("setEnabled が現在の設定を読み込んで enabled フラグをマージして保存すること", async () => {
       const { module } = await loadModule();
       const repository = createRepositoryMock();
       const service = new module.MemberLogConfigService(repository as never);
@@ -113,8 +107,7 @@ describe("shared/features/member-log/memberLogConfigService", () => {
       });
     });
 
-    // setJoinMessage が joinMessage をマージして保存することを確認
-    it("setJoinMessage reads current config and saves with joinMessage", async () => {
+    it("setJoinMessage が現在の設定を読み込んで joinMessage をマージして保存すること", async () => {
       const { module } = await loadModule();
       const repository = createRepositoryMock();
       const service = new module.MemberLogConfigService(repository as never);
@@ -129,8 +122,7 @@ describe("shared/features/member-log/memberLogConfigService", () => {
       });
     });
 
-    // setLeaveMessage が leaveMessage をマージして保存することを確認
-    it("setLeaveMessage reads current config and saves with leaveMessage", async () => {
+    it("setLeaveMessage が現在の設定を読み込んで leaveMessage をマージして保存すること", async () => {
       const { module } = await loadModule();
       const repository = createRepositoryMock();
       const service = new module.MemberLogConfigService(repository as never);
@@ -148,8 +140,7 @@ describe("shared/features/member-log/memberLogConfigService", () => {
 
   // createMemberLogConfigService が新しいインスタンスを返すことを検証
   describe("createMemberLogConfigService", () => {
-    // createMemberLogConfigService が MemberLogConfigService の新しいインスタンスを生成することを確認
-    it("creates and returns a new MemberLogConfigService instance", async () => {
+    it("createMemberLogConfigService が新しい MemberLogConfigService インスタンスを生成すること", async () => {
       const { module } = await loadModule();
       const repository = createRepositoryMock();
 
@@ -161,8 +152,7 @@ describe("shared/features/member-log/memberLogConfigService", () => {
 
   // getMemberLogConfigService のシングルトン動作を検証
   describe("getMemberLogConfigService", () => {
-    // 同じ repository で 2 回呼ぶと同一インスタンスを返すことを確認
-    it("returns the same singleton when called with the same repository", async () => {
+    it("同じ repository で呼び出すと同一のシングルトンを返すこと", async () => {
       const { module, getGuildConfigRepositoryMock } = await loadModule();
       const repository = createRepositoryMock();
       getGuildConfigRepositoryMock.mockReturnValue(repository);
@@ -173,8 +163,7 @@ describe("shared/features/member-log/memberLogConfigService", () => {
       expect(first).toBe(second);
     });
 
-    // 異なる repository を渡すと新しいインスタンスを返すことを確認
-    it("creates a new instance when called with a different repository", async () => {
+    it("異なる repository で呼び出すと新しいインスタンスを生成すること", async () => {
       const { module } = await loadModule();
       const repo1 = createRepositoryMock();
       const repo2 = createRepositoryMock();
@@ -185,8 +174,7 @@ describe("shared/features/member-log/memberLogConfigService", () => {
       expect(first).not.toBe(second);
     });
 
-    // 引数なしで呼ぶと getGuildConfigRepository のリポジトリを使用することを確認
-    it("uses getGuildConfigRepository as default when no repository is provided", async () => {
+    it("repository が指定されない場合は getGuildConfigRepository をデフォルトとして使用すること", async () => {
       const { module, getGuildConfigRepositoryMock } = await loadModule();
       const repository = createRepositoryMock();
       getGuildConfigRepositoryMock.mockReturnValue(repository);

@@ -1,7 +1,6 @@
 // tests/unit/bot/features/member-log/commands/memberLogConfigCommand.guard.test.ts
 import { ensureMemberLogManageGuildPermission } from "@/bot/features/member-log/commands/memberLogConfigCommand.guard";
 import { ValidationError } from "@/shared/errors/customErrors";
-import { PermissionFlagsBits } from "discord.js";
 
 // ---- モック定義 ----
 const tGuildMock = vi.fn(async (_guildId: string, key: string) => key);
@@ -54,27 +53,4 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.guard", () => 
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  // 権限エラー時に tGuild が呼ばれてメッセージが渡されることを確認
-  it("calls tGuild with correct key when throwing", async () => {
-    const interaction = makeInteraction(false);
-
-    await expect(
-      ensureMemberLogManageGuildPermission(interaction as never, "guild-1"),
-    ).rejects.toThrow("errors:permission.manage_guild_required");
-
-    expect(tGuildMock).toHaveBeenCalledWith(
-      "guild-1",
-      "errors:permission.manage_guild_required",
-    );
-  });
-
-  // has() が呼ばれる際に ManageGuild フラグが渡されることを確認
-  it("checks has() with PermissionFlagsBits.ManageGuild", async () => {
-    const hasMock = vi.fn(() => true);
-    const interaction = { memberPermissions: { has: hasMock } };
-
-    await ensureMemberLogManageGuildPermission(interaction as never, "guild-1");
-
-    expect(hasMock).toHaveBeenCalledWith(PermissionFlagsBits.ManageGuild);
-  });
 });

@@ -4,7 +4,7 @@
 import { ChannelType, type VoiceState } from "discord.js";
 import { tDefault } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
-import type { IVacRepository } from "../../repositories/vacRepository";
+import type { VacConfigService } from "../../../../../shared/features/vac/vacConfigService";
 
 /**
  * 管理対象VACが空室になったときにチャンネルと管理情報を削除する
@@ -13,7 +13,7 @@ import type { IVacRepository } from "../../repositories/vacRepository";
  * @returns 実行完了
  */
 export async function handleVacDeleteUseCase(
-  vacRepository: IVacRepository,
+  vacRepository: VacConfigService,
   oldState: VoiceState,
 ): Promise<void> {
   const oldChannel = oldState.channel;

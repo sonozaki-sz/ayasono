@@ -9,7 +9,7 @@ const findSetupByPanelChannelIdMock = vi.fn();
 const findSetupByPostChannelIdMock = vi.fn();
 const removeSetupMock = vi.fn();
 
-vi.mock("@/bot/services/botVcRecruitDependencyResolver", () => ({
+vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotVcRecruitRepository: () => ({
     findSetupByPanelChannelId: (...args: unknown[]) =>
       findSetupByPanelChannelIdMock(...args),

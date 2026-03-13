@@ -6,7 +6,7 @@ import { handleVcRecruitMessageDelete } from "@/bot/features/vc-recruit/handlers
 const findSetupByPanelChannelIdMock = vi.fn();
 const updatePanelMessageIdMock = vi.fn();
 
-vi.mock("@/bot/services/botVcRecruitDependencyResolver", () => ({
+vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotVcRecruitRepository: () => ({
     findSetupByPanelChannelId: (...args: unknown[]) =>
       findSetupByPanelChannelIdMock(...args),

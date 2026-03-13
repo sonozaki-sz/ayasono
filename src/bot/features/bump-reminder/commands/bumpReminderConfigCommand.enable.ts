@@ -4,7 +4,7 @@
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
 import { tDefault, tGuild } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
-import { getBotBumpReminderConfigService } from "../../../services/botBumpReminderDependencyResolver";
+import { getBotBumpReminderConfigService } from "../../../services/botCompositionRoot";
 import { createSuccessEmbed } from "../../../utils/messageResponse";
 import { ensureManageGuildPermission } from "./bumpReminderConfigCommand.guard";
 

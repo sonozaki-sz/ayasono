@@ -14,7 +14,8 @@ import {
 } from "discord.js";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
 import { tDefault, tGuild } from "../../../../../shared/locale/localeManager";
-import { getBotVcRecruitRepository } from "../../../../services/botVcRecruitDependencyResolver";
+import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
+import { getBotVcRecruitRepository } from "../../../../services/botCompositionRoot";
 import {
   createInfoEmbed,
   createSuccessEmbed,
@@ -37,7 +38,7 @@ export async function handleVcRecruitConfigSetup(
 ): Promise<void> {
   const guild = interaction.guild;
   if (!guild) {
-    throw new ValidationError(tDefault("errors:validation.guild_only"));
+    throw new ValidationError(tDefault(COMMON_I18N_KEYS.GUILD_ONLY));
   }
 
   const categoryOption = interaction.options.getString(
@@ -86,9 +87,14 @@ export async function handleVcRecruitConfigSetup(
       .permissionsFor(guild.roles.everyone)
       ?.has(PermissionFlagsBits.ViewChannel) === true;
 
+  const botMember = guild.members.me;
+  if (!botMember) {
+    throw new Error("Bot member not found in guild cache");
+  }
+
   const panelPermissionOverwrites: OverwriteResolvable[] = [
     {
-      id: guild.members.me!.id,
+      id: botMember.id,
       allow: [
         PermissionFlagsBits.SendMessages,
         PermissionFlagsBits.ManageMessages,
@@ -105,7 +111,7 @@ export async function handleVcRecruitConfigSetup(
 
   const postPermissionOverwrites: OverwriteResolvable[] = [
     {
-      id: guild.members.me!.id,
+      id: botMember.id,
       allow: [
         PermissionFlagsBits.SendMessages,
         PermissionFlagsBits.ManageMessages,

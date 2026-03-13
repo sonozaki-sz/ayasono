@@ -7,7 +7,7 @@ import { logger } from "../../../../shared/utils/logger";
 import {
   getBotBumpReminderConfigService,
   getBotBumpReminderManager,
-} from "../../../services/botBumpReminderDependencyResolver";
+} from "../../../services/botCompositionRoot";
 import { createSuccessEmbed } from "../../../utils/messageResponse";
 import { ensureManageGuildPermission } from "./bumpReminderConfigCommand.guard";
 

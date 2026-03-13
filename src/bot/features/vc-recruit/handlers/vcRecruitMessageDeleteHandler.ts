@@ -10,7 +10,7 @@ import {
 } from "discord.js";
 import { tGuild } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
-import { getBotVcRecruitRepository } from "../../../services/botVcRecruitDependencyResolver";
+import { getBotVcRecruitRepository } from "../../../services/botCompositionRoot";
 import { createInfoEmbed } from "../../../utils/messageResponse";
 import { VC_RECRUIT_PANEL_CUSTOM_ID } from "../commands/vcRecruitConfigCommand.constants";
 

@@ -8,6 +8,7 @@ import {
   SlashCommandBuilder,
 } from "discord.js";
 import { getCommandLocalizations } from "../../shared/locale/commandLocalizations";
+import { handleCommandError } from "../errors/interactionErrorHandler";
 import { autocompleteVcRecruitConfigCommand } from "../features/vc-recruit/commands/vcRecruitConfigCommand.autocomplete";
 import { VC_RECRUIT_CONFIG_COMMAND } from "../features/vc-recruit/commands/vcRecruitConfigCommand.constants";
 import { executeVcRecruitConfigCommand } from "../features/vc-recruit/commands/vcRecruitConfigCommand.execute";
@@ -120,7 +121,11 @@ export const vcRecruitConfigCommand: Command = {
    * @param interaction コマンド実行インタラクション
    */
   async execute(interaction: ChatInputCommandInteraction) {
-    await executeVcRecruitConfigCommand(interaction);
+    try {
+      await executeVcRecruitConfigCommand(interaction);
+    } catch (error) {
+      await handleCommandError(interaction, error);
+    }
   },
 
   /**

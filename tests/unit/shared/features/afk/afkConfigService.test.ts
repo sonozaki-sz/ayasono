@@ -25,8 +25,7 @@ describe("shared/features/afk/afkConfigService", () => {
     };
   };
 
-  // リポジトリが null を返す場合と値を返す場合の両方を検証し、かつ正規化コピーであることを確認（参照が異なる）
-  it("returns null and normalized config from getAfkConfig", async () => {
+  it("リポジトリが null を返す場合は null、値がある場合は正規化コピーを返すこと", async () => {
     const { module } = await loadModule();
     const repository = createRepositoryMock();
     const service = new module.AfkConfigService(repository as never);
@@ -42,7 +41,7 @@ describe("shared/features/afk/afkConfigService", () => {
     expect(config).not.toBe(rawConfig);
   });
 
-  it("returns fresh default config when repository has no config", async () => {
+  it("設定が未登録の場合はデフォルト値を返し、呼び出しごとに別インスタンスになること", async () => {
     const { module } = await loadModule();
     const repository = createRepositoryMock();
     const service = new module.AfkConfigService(repository as never);
@@ -55,7 +54,7 @@ describe("shared/features/afk/afkConfigService", () => {
     expect(first).not.toBe(second);
   });
 
-  it("returns existing config in getAfkConfigOrDefault when present", async () => {
+  it("設定が存在する場合は getAfkConfigOrDefault がその値を返すこと", async () => {
     const { module } = await loadModule();
     const repository = createRepositoryMock();
     const service = new module.AfkConfigService(repository as never);
@@ -68,7 +67,7 @@ describe("shared/features/afk/afkConfigService", () => {
     );
   });
 
-  it("normalizes config before save and delegates repository operations", async () => {
+  it("保存時に正規化済みコピーが渡され、repository の各操作に委譲されること", async () => {
     const { module } = await loadModule();
     const repository = createRepositoryMock();
     const service = new module.AfkConfigService(repository as never);
@@ -96,8 +95,7 @@ describe("shared/features/afk/afkConfigService", () => {
     );
   });
 
-  // 同一リポジトリインスタンスならサービスを再生成せずキャッシュを返し、別インスタンスでは新規生成されることを確認
-  it("reuses singleton for same repository and recreates for different repository", async () => {
+  it("同一 repository ではシングルトンを返し、異なる repository では新しいインスタンスを生成すること", async () => {
     const { module } = await loadModule();
     const repositoryA = createRepositoryMock();
     const repositoryB = createRepositoryMock();
@@ -110,8 +108,7 @@ describe("shared/features/afk/afkConfigService", () => {
     expect(serviceA1).not.toBe(serviceB);
   });
 
-  // モジュールが公開するトップレベル関数がリポジトリファクトリ経由でシングルトンサービスに委譲することを検証
-  it("function APIs delegate to singleton service resolved from repository factory", async () => {
+  it("トップレベル関数 API がリポジトリファクトリ経由のシングルトンサービスに委譲すること", async () => {
     const { module, getGuildConfigRepositoryMock } = await loadModule();
     const repository = createRepositoryMock();
     getGuildConfigRepositoryMock.mockReturnValue(repository);

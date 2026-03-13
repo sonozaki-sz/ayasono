@@ -12,7 +12,7 @@ vi.mock("@/shared/locale/localeManager", () => ({
   tGuild: vi.fn(async () => "translated"),
 }));
 
-vi.mock("@/bot/services/botBumpReminderDependencyResolver", () => ({
+vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotBumpReminderConfigService: () => ({
     getBumpReminderConfig: (...args: unknown[]) =>
       getBumpReminderConfigMock(...args),

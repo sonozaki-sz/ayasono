@@ -1,6 +1,5 @@
 // tests/unit/shared/database/repositories/guildConfigRepository.test.ts
-import type { Mock } from "vitest";
-// PrismaGuildConfigRepository が core usecases・各機能 store へ正しく委譲し、エラー変換も行うことを検証
+// PrismaGuildConfigRepository が core usecases・各機能リポジトリへ正しく委譲し、エラー変換も行うことを検証
 describe("shared/database/repositories/guildConfigRepository", () => {
   // vi.resetModules() + vi.doMock() を使って各テストに新鮮なモジュールを提供し、
   // ESM キャッシュによるモック汚染を防ぐ
@@ -17,12 +16,12 @@ describe("shared/database/repositories/guildConfigRepository", () => {
       updateGuildLocaleUsecase: vi.fn(),
     };
 
-    const afkStore = {
+    const afkRepo = {
       getAfkConfig: vi.fn(),
       setAfkChannel: vi.fn(),
       updateAfkConfig: vi.fn(),
     };
-    const bumpStore = {
+    const bumpRepo = {
       getBumpReminderConfig: vi.fn(),
       setBumpReminderEnabled: vi.fn(),
       updateBumpReminderConfig: vi.fn(),
@@ -32,72 +31,75 @@ describe("shared/database/repositories/guildConfigRepository", () => {
       clearBumpReminderMentionUsers: vi.fn(),
       clearBumpReminderMentions: vi.fn(),
     };
-    const vacStore = {
+    const vacRepo = {
       getVacConfig: vi.fn(),
       updateVacConfig: vi.fn(),
     };
-    const stickStore = {
-      getStickMessages: vi.fn(),
-      updateStickMessages: vi.fn(),
-    };
-    const memberStore = {
+    const memberRepo = {
       getMemberLogConfig: vi.fn(),
       updateMemberLogConfig: vi.fn(),
     };
+    const vcRecruitRepo = {
+      getVcRecruitConfig: vi.fn(),
+      updateVcRecruitConfig: vi.fn(),
+    };
 
-    // function式を使うことでvi.resetModules()後もnewで呼び出せるコンストラクタとして機能する
-    const GuildAfkConfigStore = vi.fn(function (this: unknown) {
-      return afkStore;
+    const AfkConfigRepository = vi.fn(function (this: unknown) {
+      return afkRepo;
     });
-    const GuildBumpReminderConfigStore = vi.fn(function (this: unknown) {
-      return bumpStore;
+    const BumpReminderConfigRepository = vi.fn(function (this: unknown) {
+      return bumpRepo;
     });
-    const GuildVacConfigStore = vi.fn(function (this: unknown) {
-      return vacStore;
+    const VacConfigRepository = vi.fn(function (this: unknown) {
+      return vacRepo;
     });
-    const GuildStickMessageStore = vi.fn(function (this: unknown) {
-      return stickStore;
+    const MemberLogConfigRepository = vi.fn(function (this: unknown) {
+      return memberRepo;
     });
-    const GuildMemberLogConfigStore = vi.fn(function (this: unknown) {
-      return memberStore;
+    const VcRecruitConfigRepository = vi.fn(function (this: unknown) {
+      return vcRecruitRepo;
     });
 
     vi.doMock(
       "@/shared/database/repositories/usecases/guildConfigCoreUsecases",
       () => coreUsecases,
     );
-    vi.doMock("@/shared/database/stores/guildAfkConfigStore", () => ({
-      GuildAfkConfigStore,
+    vi.doMock("@/shared/database/repositories/afkConfigRepository", () => ({
+      AfkConfigRepository,
     }));
-    vi.doMock("@/shared/database/stores/guildBumpReminderConfigStore", () => ({
-      GuildBumpReminderConfigStore,
+    vi.doMock(
+      "@/shared/database/repositories/bumpReminderConfigRepository",
+      () => ({ BumpReminderConfigRepository }),
+    );
+    vi.doMock("@/shared/database/repositories/vacConfigRepository", () => ({
+      VacConfigRepository,
     }));
-    vi.doMock("@/shared/database/stores/guildVacConfigStore", () => ({
-      GuildVacConfigStore,
-    }));
-    vi.doMock("@/shared/database/stores/guildStickMessageStore", () => ({
-      GuildStickMessageStore,
-    }));
-    vi.doMock("@/shared/database/stores/guildMemberLogConfigStore", () => ({
-      GuildMemberLogConfigStore,
-    }));
+    vi.doMock(
+      "@/shared/database/repositories/memberLogConfigRepository",
+      () => ({ MemberLogConfigRepository }),
+    );
+    vi.doMock(
+      "@/shared/database/repositories/vcRecruitConfigRepository",
+      () => ({ VcRecruitConfigRepository }),
+    );
 
-    const module =
-      await import("@/shared/database/repositories/guildConfigRepository");
+    const module = await import(
+      "@/shared/database/repositories/guildConfigRepository"
+    );
     return {
       module,
       coreUsecases,
-      afkStore,
-      bumpStore,
-      vacStore,
-      stickStore,
-      memberStore,
+      afkRepo,
+      bumpRepo,
+      vacRepo,
+      memberRepo,
+      vcRecruitRepo,
       constructors: {
-        GuildAfkConfigStore,
-        GuildBumpReminderConfigStore,
-        GuildVacConfigStore,
-        GuildStickMessageStore,
-        GuildMemberLogConfigStore,
+        AfkConfigRepository,
+        BumpReminderConfigRepository,
+        VacConfigRepository,
+        MemberLogConfigRepository,
+        VcRecruitConfigRepository,
       },
     };
   };
@@ -137,7 +139,6 @@ describe("shared/database/repositories/guildConfigRepository", () => {
     expect(coreUsecases.updateGuildLocaleUsecase).toHaveBeenCalled();
   });
 
-  // 非 Error 型を渡したとき toDatabaseError ヘルパーが "unknown error" サフィックス付きの DatabaseError に変換することを検証
   it("converts unknown errors to DatabaseError via toDatabaseError helper", async () => {
     const { module, coreUsecases } = await loadModule();
     const prisma = { guildConfig: {} };
@@ -157,32 +158,29 @@ describe("shared/database/repositories/guildConfigRepository", () => {
     });
   });
 
-  // 各 Store コンストラクタが 1 度だけ生成され、それぞれのメソッドがリポジトリ経由で呼び出されること、
-  // また StickMessage/MemberLog Store には updateGuildConfig コールバックが正しく渡されることを検証
-  it("delegates feature-specific operations to each store", async () => {
+  it("delegates feature-specific operations to each repository", async () => {
     const {
       module,
-      coreUsecases,
-      afkStore,
-      bumpStore,
-      vacStore,
-      stickStore,
-      memberStore,
+      afkRepo,
+      bumpRepo,
+      vacRepo,
+      memberRepo,
+      vcRecruitRepo,
       constructors,
     } = await loadModule();
     const prisma = { guildConfig: {} };
     const repository = new module.PrismaGuildConfigRepository(prisma as never);
 
-    afkStore.getAfkConfig.mockResolvedValue({ enabled: true });
-    bumpStore.getBumpReminderConfig.mockResolvedValue({ enabled: false });
-    bumpStore.setBumpReminderMentionRole.mockResolvedValue("updated");
-    bumpStore.addBumpReminderMentionUser.mockResolvedValue("added");
-    bumpStore.removeBumpReminderMentionUser.mockResolvedValue("removed");
-    bumpStore.clearBumpReminderMentionUsers.mockResolvedValue("cleared");
-    bumpStore.clearBumpReminderMentions.mockResolvedValue("cleared");
-    vacStore.getVacConfig.mockResolvedValue({ enabled: true });
-    stickStore.getStickMessages.mockResolvedValue([]);
-    memberStore.getMemberLogConfig.mockResolvedValue({ channelId: "x" });
+    afkRepo.getAfkConfig.mockResolvedValue({ enabled: true });
+    bumpRepo.getBumpReminderConfig.mockResolvedValue({ enabled: false });
+    bumpRepo.setBumpReminderMentionRole.mockResolvedValue("updated");
+    bumpRepo.addBumpReminderMentionUser.mockResolvedValue("added");
+    bumpRepo.removeBumpReminderMentionUser.mockResolvedValue("removed");
+    bumpRepo.clearBumpReminderMentionUsers.mockResolvedValue("cleared");
+    bumpRepo.clearBumpReminderMentions.mockResolvedValue("cleared");
+    vacRepo.getVacConfig.mockResolvedValue({ enabled: true });
+    memberRepo.getMemberLogConfig.mockResolvedValue({ channelId: "x" });
+    vcRecruitRepo.getVcRecruitConfig.mockResolvedValue({ enabled: true });
 
     await repository.getAfkConfig("g1");
     await repository.setAfkChannel("g1", "ch1");
@@ -199,76 +197,31 @@ describe("shared/database/repositories/guildConfigRepository", () => {
 
     await repository.getVacConfig("g1");
     await repository.updateVacConfig("g1", { enabled: true } as never);
-    await repository.getStickMessages("g1");
-    await repository.updateStickMessages("g1", []);
     await repository.getMemberLogConfig("g1");
     await repository.updateMemberLogConfig("g1", {
       enabled: true,
       channelId: "x",
     });
+    await repository.getVcRecruitConfig("g1");
+    await repository.updateVcRecruitConfig("g1", { enabled: true } as never);
 
-    const stickStoreCtorArgs = (constructors.GuildStickMessageStore as Mock)
-      .mock.calls[0] as unknown[] | undefined;
-    const memberStoreCtorArgs = (constructors.GuildMemberLogConfigStore as Mock)
-      .mock.calls[0] as unknown[] | undefined;
-    expect(stickStoreCtorArgs).toBeDefined();
-    expect(memberStoreCtorArgs).toBeDefined();
+    expect(constructors.AfkConfigRepository).toHaveBeenCalledTimes(1);
+    expect(constructors.BumpReminderConfigRepository).toHaveBeenCalledTimes(1);
+    expect(constructors.VacConfigRepository).toHaveBeenCalledTimes(1);
+    expect(constructors.MemberLogConfigRepository).toHaveBeenCalledTimes(1);
+    expect(constructors.VcRecruitConfigRepository).toHaveBeenCalledTimes(1);
 
-    const stickUpdateGuildConfigCallback = stickStoreCtorArgs?.[2];
-    const memberUpdateGuildConfigCallback = memberStoreCtorArgs?.[2];
-    expect(stickUpdateGuildConfigCallback).toEqual(expect.any(Function));
-    expect(memberUpdateGuildConfigCallback).toEqual(expect.any(Function));
-
-    const stickUpdateGuildConfig =
-      stickUpdateGuildConfigCallback as unknown as (
-        guildId: string,
-        updates: unknown,
-      ) => Promise<void>;
-    const memberUpdateGuildConfig =
-      memberUpdateGuildConfigCallback as unknown as (
-        guildId: string,
-        updates: unknown,
-      ) => Promise<void>;
-
-    await stickUpdateGuildConfig("g1", { stickMessages: [] });
-    await memberUpdateGuildConfig("g1", { memberLogChannelId: "ch3" });
-
-    expect(constructors.GuildAfkConfigStore).toHaveBeenCalledTimes(1);
-    expect(constructors.GuildBumpReminderConfigStore).toHaveBeenCalledTimes(1);
-    expect(constructors.GuildVacConfigStore).toHaveBeenCalledTimes(1);
-    expect(constructors.GuildStickMessageStore).toHaveBeenCalledTimes(1);
-    expect(constructors.GuildMemberLogConfigStore).toHaveBeenCalledTimes(1);
-
-    expect(afkStore.getAfkConfig).toHaveBeenCalledWith("g1");
-    expect(afkStore.setAfkChannel).toHaveBeenCalledWith("g1", "ch1");
-    expect(afkStore.updateAfkConfig).toHaveBeenCalledWith("g1", {
+    expect(afkRepo.getAfkConfig).toHaveBeenCalledWith("g1");
+    expect(afkRepo.setAfkChannel).toHaveBeenCalledWith("g1", "ch1");
+    expect(afkRepo.updateAfkConfig).toHaveBeenCalledWith("g1", {
       enabled: true,
     });
-    expect(bumpStore.getBumpReminderConfig).toHaveBeenCalledWith("g1");
-    expect(vacStore.getVacConfig).toHaveBeenCalledWith("g1");
-    expect(stickStore.getStickMessages).toHaveBeenCalledWith("g1");
-    expect(memberStore.getMemberLogConfig).toHaveBeenCalledWith("g1");
-    expect(coreUsecases.updateGuildConfigUsecase).toHaveBeenCalledWith(
-      expect.objectContaining({
-        prisma,
-        defaultLocale: "ja",
-        toDatabaseError: expect.any(Function),
-      }),
-      "g1",
-      { stickMessages: [] },
-    );
-    expect(coreUsecases.updateGuildConfigUsecase).toHaveBeenCalledWith(
-      expect.objectContaining({
-        prisma,
-        defaultLocale: "ja",
-        toDatabaseError: expect.any(Function),
-      }),
-      "g1",
-      { memberLogChannelId: "ch3" },
-    );
+    expect(bumpRepo.getBumpReminderConfig).toHaveBeenCalledWith("g1");
+    expect(vacRepo.getVacConfig).toHaveBeenCalledWith("g1");
+    expect(memberRepo.getMemberLogConfig).toHaveBeenCalledWith("g1");
+    expect(vcRecruitRepo.getVcRecruitConfig).toHaveBeenCalledWith("g1");
   });
 
-  // ファクトリ関数が PrismaGuildConfigRepository のインスタンスを返すことを確認
   it("createGuildConfigRepository returns repository instance", async () => {
     const { module } = await loadModule();
     const prisma = { guildConfig: {} };

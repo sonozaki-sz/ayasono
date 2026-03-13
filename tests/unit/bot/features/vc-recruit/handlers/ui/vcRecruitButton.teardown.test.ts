@@ -24,7 +24,7 @@ vi.mock("@/bot/features/vc-recruit/handlers/ui/vcRecruitTeardownState", () => ({
   setTeardownConfirmSession: vi.fn(),
 }));
 
-vi.mock("@/bot/services/botVcRecruitDependencyResolver", () => ({
+vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotVcRecruitRepository: () => ({
     findSetupByPanelChannelId: (...args: unknown[]) =>
       findSetupByPanelChannelIdMock(...args),
@@ -33,10 +33,7 @@ vi.mock("@/bot/services/botVcRecruitDependencyResolver", () => ({
       .fn()
       .mockResolvedValue({ setups: [], mentionRoleIds: [] }),
   }),
-}));
-
-vi.mock("@/bot/services/botVacDependencyResolver", () => ({
-  getBotVacRepository: () => ({
+  getBotVacConfigService: () => ({
     getVacConfigOrDefault: vi.fn().mockResolvedValue({ triggerChannelIds: [] }),
   }),
 }));

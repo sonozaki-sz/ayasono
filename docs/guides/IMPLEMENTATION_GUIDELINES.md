@@ -2,7 +2,7 @@
 
 > Implementation Guidelines - 実装方針とコーディング規約
 
-最終更新: 2026年3月1日
+最終更新: 2026年3月14日
 
 ---
 
@@ -95,40 +95,55 @@
   - `repositories/`（永続化アクセス）
   - `constants/`（定数・型ガード・変換ヘルパー）
 
+### `src/bot/shared`
+
+- Bot 層内の複数機能で共用するユーティリティを配置する
+- 例: `i18nKeys.ts`（共通 i18n キー定数）、`permissionGuards.ts`（共通権限チェック関数）
+- `bot/features` 固有のロジックは置かない（feature 固有なら feature ディレクトリへ）
+
 ### `src/shared`
 
 - Bot/Web 両方で再利用する実装のみ配置
 - `shared` から `bot` / `web` へ逆依存しない
+- **`src/shared/database/repositories/`**: ギルド設定リポジトリの実装（`xxxConfigRepository.ts`）を配置する
+- **`src/shared/database/types/`**: エンティティインターフェース（`entities.ts`）とリポジトリインターフェース（`repositories.ts`）の唯一の定義場所
+- **`src/shared/features/xxx/`**: `xxxConfigService.ts`・`xxxConfigDefaults.ts` を配置する
+- **`src/shared/utils/`**: `serviceFactory.ts`（`createBotServiceAccessor` / `createServiceGetter`）・`jsonUtils.ts` 等の汎用ユーティリティ
 
 ### shared/features 経由の DB アクセス（2026-02-22 追加）
 
 Bot 層のハンドラー・ユースケースが DB へアクセスする際は、必ず `src/shared/features/<feature>/` の `configService` 経由で行う。
 リポジトリ実装を Bot 層のハンドラーから直接取得・呼び出すことを **禁止** する。
 
-**正しいアクセス経路:**
+**正しいアクセス経路（ギルド設定データ）:**
 
 ```
 src/bot/features/<feature>/handlers/**
-  └─ getBotXxxConfigService()       ← botXxxDependencyResolver
-       └─ XxxConfigService          ← src/shared/features/xxx/xxxConfigService.ts
-            └─ IXxxRepository       ← src/shared/database/types.ts（インターフェース定義）
-                 └─ XxxRepository   ← src/bot/features/xxx/repositories/xxxRepository.ts（実装）
+  └─ getBotXxxConfigService()            ← botCompositionRoot（サービスアクセサ）
+       └─ XxxConfigService               ← src/shared/features/xxx/xxxConfigService.ts
+            └─ IXxxRepository            ← src/shared/database/types/（インターフェース定義）
+                 └─ XxxConfigRepository  ← src/shared/database/repositories/xxxConfigRepository.ts（実装）
+                      └─ guildConfigRepository を経由して PrismaGuildConfigRepository に集約
 ```
 
-**新機能追加時の必須手順:**
+> 設定データ以外の **機能固有のランタイムデータ**（bump reminder 記録・sticky message 記録等）は
+> `src/bot/features/xxx/repositories/xxxRepository.ts` に置き、botCompositionRoot でサービスと別途組み合わせる。
 
-1. `src/shared/database/types.ts` に `XxxEntity` インターフェースと `IXxxRepository` インターフェースを定義
-2. `src/shared/features/xxx/xxxConfigService.ts` を新規作成し `XxxConfigService` クラスと `createXxxConfigService` / `setXxxConfigService` / `getXxxConfigService` をエクスポート
-3. `src/bot/features/xxx/repositories/xxxRepository.ts` で `IXxxRepository` を実装
-4. `src/bot/services/botXxxDependencyResolver.ts` に `setBotXxxConfigService` / `getBotXxxConfigService` を追加
-5. `src/bot/services/botCompositionRoot.ts` で `createXxxConfigService(repository)` を呼び出して登録
-6. ハンドラーは `getBotXxxConfigService()` 経由のみでサービスを取得する
+**新機能（ギルド設定付き）追加時の必須手順:**
+
+1. `prisma/schema.prisma` に `GuildXxxConfig` モデルを追加し、マイグレーションを作成する
+2. `src/shared/database/types/entities.ts` に `XxxConfig` インターフェースを追記し、`src/shared/database/types/repositories.ts` に `IXxxConfigRepository` インターフェースを追記して `IGuildConfigRepository` に組み込む
+3. `src/shared/database/repositories/xxxConfigRepository.ts` で `IXxxConfigRepository` を実装し、`src/shared/database/repositories/guildConfigRepository.ts` の `PrismaGuildConfigRepository` に追加する
+4. `src/shared/features/xxx/xxxConfigDefaults.ts` を新規作成し、デフォルト設定オブジェクトと正規化関数（配列の防御コピー等）を定義する
+5. `src/shared/features/xxx/xxxConfigService.ts` を新規作成し `XxxConfigService` クラスと `createXxxConfigService` / `getXxxConfigService` をエクスポートする
+6. `src/bot/services/botCompositionRoot.ts` に `createBotServiceAccessor<XxxConfigService>()` でアクセサを追加し、`initializeBotCompositionRoot` 内で初期化・登録する
+7. ハンドラーは `getBotXxxConfigService()` 経由のみでサービスを取得する
 
 **違反例（禁止）:**
 
 ```typescript
 // ❌ リポジトリを直接取得して操作
-import { getBotXxxRepository } from "@/bot/services/botXxxDependencyResolver";
+import { getBotXxxRepository } from "@/bot/features/xxx/repositories/xxxRepository";
 const repo = getBotXxxRepository();
 await repo.findByChannel(channelId);
 ```
@@ -137,7 +152,7 @@ await repo.findByChannel(channelId);
 
 ```typescript
 // ✅ configService 経由でアクセス
-import { getBotXxxConfigService } from "@/bot/services/botXxxDependencyResolver";
+import { getBotXxxConfigService } from "@/bot/services/botCompositionRoot";
 const service = getBotXxxConfigService();
 await service.findByChannel(channelId);
 ```
@@ -146,42 +161,42 @@ await service.findByChannel(channelId);
 
 ### feature ディレクトリ標準テンプレート
 
+**Bot 層（機能実装）:**
+
 ```text
 src/bot/features/<feature-name>/
 ├── commands/       # 例: `*.execute.ts`, `*.constants.ts`, `*.autocomplete.ts`
 ├── handlers/
 │   └── ui/
-├── services/
-├── repositories/
+├── services/       # 機能固有のビジネスロジック（BumpReminderManager 等）
+├── repositories/   # 機能固有のランタイムデータ（設定以外）のリポジトリ
 └── constants/
 ```
+
+**Shared 層（設定管理）:**
+
+```text
+src/shared/features/<feature-name>/
+├── xxxConfigService.ts      # 設定の取得・更新ロジック（ConfigService クラス）
+└── xxxConfigDefaults.ts     # デフォルト設定・正規化関数（normalizeFoo / createDefaultFoo）
+
+src/shared/database/repositories/
+└── xxxConfigRepository.ts   # ギルド設定テーブルの CRUD 実装（IXxxConfigRepository 実装）
+```
+
+> `repositories/` が bot 層にある場合はランタイムデータ（bump reminder 記録・sticky message 本文等）を扱う。
+> ギルド設定データ（有効/無効、チャンネル ID 等）のリポジトリは必ず `src/shared/database/repositories/` に置く。
 
 ### `index.ts`（バレル）禁止ルール
 
 - `src` 配下では `index.ts` を作成しない
 - import は常に実体モジュールを直接参照する
-  - 例: `../locale/localeManager`, `../utils/logger`, `../../database/types`
+  - 例: `../locale/localeManager`, `../utils/logger`
 - 入口ファイルは `index.ts` ではなく役割名ファイルを使う
   - 例: `apiRoutes.ts`, `handleInteractionCreate.ts`, `resources.ts`
   - `src/bot/commands/` と `src/bot/events/` は **バレル不要**。`commandLoader.ts` / `eventLoader.ts` がディレクトリを自動スキャンするため、ファイルを追加するだけで自動登録される
 - 参照先を変更した場合は、関連テストの `vi.mock()` / `import()` パスも実解決先へ追従する
-
-### import / モック追従ルール（2026-02-22 追加）
-
-- 実装で import 先を `index.ts` から直接モジュールへ変更した場合、関連テストの `vi.mock()` 対象も同じ実解決先へ更新する
-- `vi.mock()` / `import()` は常に実体モジュールパスへ合わせる
-- `src/bot/features/**` でも同方針を段階適用する
-  - `../../../../shared/locale` のような shared barrel import は使わず、`.../shared/locale/localeManager` など直接モジュールを参照する
-- `src/bot/features/**` では featureローカルの barrel import（`..`, `../..`, `../index` など）も禁止する
-  - feature内部の実装同士は `constants/*` や `services/*` を直接参照する
-- `src/bot/**` 全体でも shared barrel import（`../shared/locale`, `../../shared/utils` など）を禁止する
-  - 例: `shared/locale/localeManager`, `shared/locale/commandLocalizations`, `shared/utils/logger`, `shared/utils/prisma`, `shared/database/types` を直接参照する
-- 例外は設けず、テストコードでも `index.ts` 参照を使わない
-- 変更時は以下を最小セットで確認する
-  1.  `pnpm run typecheck`
-  2.  `pnpm run lint`
-  3.  影響テストの個別実行
-  4.  必要に応じて `pnpm test:coverage`
+- **例外: `src/shared/database/types/index.ts`** は型定義の集約ポイントとして唯一の例外とする。実行可能コードを持たない `import type` 専用バレルであり、`IGuildConfigRepository` 等を `../../shared/database/types` 経由でインポートする用途に限り許可する
 
 ---
 
@@ -278,6 +293,58 @@ new EmbedBuilder().setTitle(tDefault("commands:foo.embed.summary_title"));
 - すべてのディレクトリ名は **kebab-case** を使う
   - 例: `bump-reminder/`, `member-log/`, `sticky-message/`
 
+### discord.js 準拠の命名
+
+Discord API および discord.js の制約に従い、以下を遵守する。
+
+#### イベント名
+
+- `Events` enum（discord.js 提供）を使用し、文字列リテラルを直接書かない
+- イベントハンドラーのファイル名はイベント名に対応する camelCase にする
+
+```ts
+// ✅ Events enum を使う
+export const guildMemberAddEvent: BotEvent<typeof Events.GuildMemberAdd> = {
+  name: Events.GuildMemberAdd,
+  // ...
+};
+
+// ❌ 文字列リテラルは使わない
+name: "guildMemberAdd",
+```
+
+#### スラッシュコマンド・サブコマンド・オプション名
+
+Discord API の仕様により **すべて kebab-case（lowercase）** にする。
+
+```ts
+// ✅ kebab-case
+new SlashCommandBuilder().setName("bump-reminder-config")
+subcommand.setName("set-mention")
+option.setName("channel")
+
+// ❌ camelCase / snake_case は使わない
+setName("bumpReminderConfig")
+setName("set_mention")
+```
+
+#### Custom ID（ボタン・セレクト・モーダル）
+
+- フォーマット: `<feature>:<action>[:<id>]`（コロン区切り、すべて lowercase・kebab-case）
+- 動的パラメータは末尾に付加する
+- 定数は `src/bot/features/<feature>/constants/` の `*.constants.ts` に集約する
+
+```ts
+// ✅ コロン区切り・kebab-case
+"vc-recruit:create:{panelChannelId}"
+"sticky-message:set-modal:{channelId}"
+"sticky-message:view-select"
+
+// ❌ camelCase や不統一なセパレータは使わない
+"vcRecruit_create"
+"stickyMessage-setModal"
+```
+
 ---
 
 ## 📝 コメント規約
@@ -296,10 +363,12 @@ new EmbedBuilder().setTitle(tDefault("commands:foo.embed.summary_title"));
 
 ### 2. 関数コメント
 
-- 必須: 関数宣言（`function` / `export function` / `async function`）の先頭に「何をする関数か」を記載
-- 必須: 引数がある場合は `@param`、戻り値を持つ場合は `@returns` を記載
+- 必須: 関数宣言（`function` / `export function` / `async function`）の先頭に JSDoc を記載
+- 必須: `export const foo = ...` のようにモジュール公開されるアロー関数にも同等の JSDoc を付与する
 - **必須: クラスの public メソッドにも同等の JSDoc を付与する**（`private` は推奨）
-- アロー関数にも同等の意図コメントを付与することを推奨する
+- 内部専用のアロー関数（非エクスポート）への JSDoc 付与は推奨
+- 必須: 引数がある場合は `@param` を記載する
+- 必須: `void` / `Promise<void>` 以外の戻り値を持つ場合は `@returns` を記載する（`void` 系は省略可）
 - **説明文だけの JSDoc ブロックは不完全とみなす。`@param`/`@returns` を必ずセットで記載すること**
 
 ```ts
@@ -352,44 +421,6 @@ async function getGuildConfig(guildId: string): Promise<GuildConfig | null> { ..
    - `pnpm run typecheck`
    - 必要に応じて `pnpm test`
 
-### 0ベース再監査チェック結果（2026-02-21）
-
-- 責務分離の確認:
-  - `commands` 入口の肥大化は大幅に縮小
-  - 一部大型コマンド（例: bump-reminder remove-mention）は次回分割候補
-- ディレクトリ/設計パターンの確認:
-  - `bot|web -> shared` の依存方向を維持
-  - feature内の公開境界は明示export方針を維持
-- 命名の確認:
-  - `stick`/`sticky` 混在は互換移行中として管理
-- スリム化の確認:
-  - 300行超のファイルは限定的（3ファイル）
-- テスト容易性の確認:
-  - DI経路は確保済み、テストの主課題は import/モック追随
-
-### コメント規約の全量確認結果（2026-02-21）
-
-- 対象: `src/**/*.ts`（175ファイル）
-- ファイル先頭コメント不足: 0
-- 関数コメント不足（関数宣言ベース）: 0
-- コメント不足検出分は反映済みとして、以後は同手順で差分監査する
-- **注意: 「説明文のみの JSDoc(`@param`/`@returns` なし)」も不備としてカウントする（2026-02-28 ルール改訂により追記）**
-
-### src整備フェーズ運用順序
-
-src整備スプリントでは、次の順序を固定する。
-
-1. **再分析**
-   - `typecheck` / `lint` を通し、責務境界・依存方向・公開面の逸脱がないことを確認する
-2. **コメント規約反映**
-   - `src/` 全体へファイル先頭コメント・関数コメント・意図コメントを適用する
-3. **ドキュメント同期**
-   - `ARCHITECTURE.md` と `IMPLEMENTATION_GUIDELINES.md` を実装実態へ合わせる
-4. **TODO同期**
-   - 完了条件と次フェーズの順序を TODO へ反映する
-5. **テスト修正フェーズ移行**
-   - 上記 1〜4 の完了後にのみ `pnpm test` 系を再開する
-
 ---
 
 ## ✅ 実装チェックリスト
@@ -397,18 +428,20 @@ src整備スプリントでは、次の順序を固定する。
 - [ ] 変更責務は適切なレイヤに配置されている
 - [ ] `commands` に業務ロジックが残っていない
 - [ ] DB アクセスは `getBotXxxConfigService()` 経由（ハンドラーからリポジトリを直接呼ぶな）
-- [ ] 新機能の `ConfigService` / `IXxxRepository` が `src/shared/` に定義されている
+- [ ] 新機能の `ConfigService` が `src/shared/features/xxx/` に、`IXxxConfigRepository` が `src/shared/database/types/repositories.ts` に、リポジトリ実装が `src/shared/database/repositories/xxxConfigRepository.ts` に定義されている
+- [ ] 新機能のデフォルト設定・正規化関数が `src/shared/features/xxx/xxxConfigDefaults.ts` に定義されている
+- [ ] Prisma スキーマに `GuildXxxConfig` モデルを追加し、マイグレーションを作成している（新機能の場合）
 - [ ] ファイル名は命名規則に従っている（基本 camelCase / SlashCommand 系は kebab-case）
 - [ ] ディレクトリ名は kebab-case になっている
 - [ ] ファイル先頭コメントがある
-- [ ] 関数宣言に JSDoc がある（説明文のみは不可。`@param` / `@returns` をセットで記載）
+- [ ] 関数宣言・エクスポートされるアロー関数に JSDoc がある（説明文のみは不可。`@param` / `@returns` をセットで記載。`@returns` は `void`/`Promise<void>` の場合は省略可）
 - [ ] クラスの public メソッドにも JSDoc（`@param` / `@returns` 含む）がある
 - [ ] 共用定数に説明コメントがある
 - [ ] 処理ブロックの意図コメントがある
-- [ ] テストの全 `it()` ブロックの直前に `//` コメントがある
-- [ ] 新機能実装時は `bot/commands/`・`bot/events/`・`bot/services/*DependencyResolver.ts` のテストも作成している（[テストチェックリスト参照](TESTING_GUIDELINES.md#-新機能テスト実装チェックリスト)）
+- [ ] テストの `it()` 文字列に日本語で検証の観点・条件・前提を記載している
+- [ ] 新機能実装時は `bot/commands/`・`bot/events/` のテストも作成している（[テストチェックリスト参照](TESTING_GUIDELINES.md#-新機能テスト実装チェックリスト)）
   - `bot/commands/<name>.ts` と `bot/events/<name>.ts` は **バレルへの手動追加不要**。ファイルを置くだけで `commandLoader.ts` / `eventLoader.ts` が自動ロードする
-- [ ] `pnpm test:coverage` で Stmts/Funcs/Lines 100%・Branches 99%以上を確認した
+- [ ] `pnpm test:coverage` で **Stmts/Lines 95%以上・Funcs 88%以上・Branches 94%以上** を確認した
 - [ ] `typecheck` が通る
 - [ ] ユーザー向け応答文字列（`editReply` / `followUp` / `reply` の `content`・ボタンラベル・Embedタイトル/説明文等）に生文字列をハードコードしていない
 - [ ] エラー・警告・情報・成功のステータス通知を `create*Embed` ユーティリティ（`createErrorEmbed` 等）で返しており、`editReply(string)` のようなプレーンテキスト返しを使っていない

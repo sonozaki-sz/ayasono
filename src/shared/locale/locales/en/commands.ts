@@ -210,17 +210,15 @@ export const commands = {
   "message-delete.description":
     "Bulk delete messages (default: all channels in server)",
   "message-delete.count.description":
-    "Number of messages to delete (all if omitted)",
+    "Number of messages to delete (1–1000, defaults to 1000 if omitted)",
   "message-delete.user.description":
-    "Target user ID or mention (for bots/webhooks, paste the user ID directly)",
+    "Target user ID or mention (for webhooks, paste the user ID directly)",
   "message-delete.errors.user_invalid_format":
     "Invalid `user` format. Enter a user ID or mention (e.g. `<@123456789>`).",
-  "message-delete.bot.description":
-    "Delete bot/webhook messages only (set to true)",
   "message-delete.keyword.description":
     "Delete messages containing this keyword (case-insensitive partial match)",
   "message-delete.days.description":
-    "Delete only messages from the past N days (cannot combine with after/before)",
+    "Delete only messages from the past N days (1–366, cannot combine with after/before)",
   "message-delete.after.description":
     "Delete only messages after this date (YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS)",
   "message-delete.before.description":
@@ -228,26 +226,9 @@ export const commands = {
   "message-delete.channel.description":
     "Restrict deletion to a specific channel (default: entire server)",
 
-  // message-delete-config command
-  "message-delete-config.description":
-    "Configure /message-delete behavior settings",
-  "message-delete-config.confirm.description":
-    "Show confirmation dialog before deleting (true: enabled / false: skip)",
-  // message-delete-config result
-  "message-delete-config.result.confirm_on":
-    "Confirmation dialog: Enabled",
-  "message-delete-config.result.confirm_off":
-    "Confirmation dialog: Disabled",
-  "message-delete-config.result.updated":
-    "✅ Settings updated. Changes will apply from the next `/message-delete`.\n{{status}}",
-
   // message-delete validation errors
   "message-delete.errors.no_filter":
-    "No filter condition specified. Please provide at least one of: `count`, `user`, `bot`, `keyword`, `days`, `after`, `before`.",
-  "message-delete.errors.no_channel_no_count":
-    "When targeting the entire server, `count` (number of messages) is required.\nTo target a specific channel, please specify `channel`.",
-  "message-delete.confirm.condition_bot":
-    "  Bot/Webhook: targeted",
+    "No filter condition specified. Please provide at least one of: `count`, `user`, `keyword`, `days`, `after`, `before`.",
   "message-delete.errors.days_and_date_conflict":
     "`days` cannot be combined with `after`/`before`. Use one or the other.",
   "message-delete.errors.after_invalid_format":
@@ -266,66 +247,96 @@ export const commands = {
     "An error occurred while deleting messages.",
   "message-delete.errors.not_authorized":
     "You are not authorized to do this.",
+  "message-delete.errors.jump_invalid_page":
+    "Page number must be an integer from 1 to {{total}}",
   "message-delete.errors.days_invalid_value":
     "Please enter a positive integer for the number of days.",
-  // confirmation dialog
-  "message-delete.confirm.channel_all":
-    "Entire server",
-  "message-delete.confirm.target_channel":
-    "Target channel: {{channel}}",
-  "message-delete.confirm.conditions":
-    "Delete conditions:",
-  "message-delete.confirm.condition_user":
-    "  User     : <@{{userId}}>",
-  "message-delete.confirm.condition_keyword": '  Keyword  : "{{keyword}}"',
-  "message-delete.confirm.condition_days":
-    "  Period   : Past {{days}} days",
-  "message-delete.confirm.condition_after":
-    "  after    : {{after}}",
-  "message-delete.confirm.condition_before":
-    "  before   : {{before}}",
-  "message-delete.confirm.condition_count":
-    "  Limit    : {{count}} messages",
-  "message-delete.confirm.question":
-    "⚠️ **This action cannot be undone**\n\n{{conditions}}\n\nProceed?",
-  "message-delete.confirm.btn_yes":
-    "Delete",
+  "message-delete.errors.after_future":
+    "Please specify a past date/time for `after`. (Today's date is valid.)",
+  "message-delete.errors.before_future":
+    "Please specify a past date/time for `before`. (Today's date is valid.)",
+  "message-delete.errors.locked":
+    "A message-delete command is already running on this server. Please try again after it completes.",
+  "message-delete.errors.channel_no_access":
+    "Cannot access the specified channel. The bot requires ReadMessageHistory and ManageMessages permissions.",
+  // scanning
+  "message-delete.confirm.btn_scan_cancel":
+    "Preview Collected",
+  "message-delete.confirm.scan_progress":
+    "Scanning... {{totalScanned}} fetched\nSearching for targets... {{collected}} / {{limit}}",
+  "message-delete.confirm.delete_progress":
+    "Deleting... {{totalDeleted}} / {{total}}",
+  "message-delete.confirm.delete_progress_channel":
+    "<#{{channelId}}>: {{deleted}} / {{total}}",
+  // confirmation dialog (Stage 1 preview)
+  "message-delete.confirm.embed_title":
+    "📋 Messages to Delete ({{page}} / {{total}})",
+  "message-delete.confirm.btn_delete":
+    "Delete ({{count}})",
   "message-delete.confirm.btn_no":
     "Cancel",
-  "message-delete.confirm.btn_skip_toggle_off":
-    "Skip confirmation next time",
-  "message-delete.confirm.btn_skip_toggle_on":
-    "Skip confirmation next time",
+  "message-delete.confirm.exclude_placeholder":
+    "Select messages to exclude from this page",
+  "message-delete.confirm.exclude_no_messages":
+    "(no messages)",
+  "message-delete.confirm.zero_targets":
+    "No messages left to delete",
   "message-delete.confirm.cancelled":
     "Deletion cancelled.",
   "message-delete.confirm.timed_out":
-    "⌛ Timed out. Please run the command again.",
+    "Timed out. Please run the command again.",
+  "message-delete.confirm.scan_timed_out":
+    "Scan timed out. Showing preview with collected messages.",
+  "message-delete.confirm.scan_timed_out_empty":
+    "Scan timed out. No deletable messages were found.",
+  "message-delete.confirm.delete_timed_out":
+    "Deletion timed out. Messages deleted: {{count}}",
+  // final confirmation dialog (Stage 2)
+  "message-delete.final.embed_title":
+    "🗑️ Are you sure? ({{page}} / {{total}})",
+  "message-delete.final.embed_warning":
+    "⚠️ **This action cannot be undone**",
+  "message-delete.final.embed_desc":
+    "The following messages will be deleted (total: {{count}})",
+  "message-delete.final.btn_yes":
+    "Delete ({{count}})",
+  "message-delete.final.btn_back":
+    "Go back",
+  "message-delete.final.btn_no":
+    "Cancel",
   // result display
   "message-delete.result.empty_content":
     "*(no content)*",
-  // summary embed
+  "message-delete.result.attachments":
+    "📎 {{count}} attachment(s)",
+  "message-delete.result.embed_no_title":
+    "🔗 Embedded content",
+  "message-delete.result.jump_to_message":
+    "↗ Jump to message",
+  // deletion complete embed
   "message-delete.embed.summary_title":
     "✅ Deletion Complete",
   "message-delete.embed.total_deleted":
     "Total Deleted",
+  "message-delete.embed.total_deleted_value":
+    "{{count}}",
   "message-delete.embed.channel_breakdown":
     "By Channel",
   "message-delete.embed.channel_breakdown_item":
-    "#{{channel}}: {{count}}",
+    "<#{{channelId}}>: {{count}}",
   "message-delete.embed.breakdown_empty":
     "—",
-  // detail embed
-  "message-delete.embed.detail_title":
-    "📋 Deleted Messages  ({{page}} / {{total}})",
-  "message-delete.embed.filter_active":
-    " (filter active)",
-  "message-delete.embed.no_messages":
-    "No messages to display.",
-  // pagination
+  // filter buttons (Stage 1 preview dialog)
+  "message-delete.pagination.btn_first":
+    "First",
   "message-delete.pagination.btn_prev":
     "Prev",
   "message-delete.pagination.btn_next":
     "Next",
+  "message-delete.pagination.btn_last":
+    "Last",
+  "message-delete.pagination.btn_jump":
+    "Page {{page}}/{{total}}",
   "message-delete.pagination.btn_days_set":
     "Past {{days}} days",
   "message-delete.pagination.btn_days_empty":
@@ -340,6 +351,8 @@ export const commands = {
     "Enter before date",
   "message-delete.pagination.btn_keyword":
     "Search by content",
+  "message-delete.pagination.btn_keyword_set":
+    "{{keyword}}",
   "message-delete.pagination.btn_reset":
     "Reset",
   "message-delete.pagination.author_select_placeholder":
@@ -371,6 +384,32 @@ export const commands = {
     "End date/time",
   "message-delete.modal.before.placeholder":
     "e.g. 2026-02-28 or 2026-02-28T23:59:59",
+  "message-delete.modal.jump.title":
+    "Jump to Page",
+  "message-delete.modal.jump.label":
+    "Page number",
+  "message-delete.modal.jump.placeholder":
+    "Integer from 1 to {{total}}",
+  // command conditions embed
+  "message-delete.conditions.title":
+    "📋 Command Conditions",
+  "message-delete.conditions.count_limited":
+    "{{count}}",
+  "message-delete.conditions.count_unlimited":
+    "(no limit: {{count}})",
+  "message-delete.conditions.user_all":
+    "(all users)",
+  "message-delete.conditions.none":
+    "(none)",
+  "message-delete.conditions.channel_all":
+    "(entire server)",
+  "message-delete.conditions.days_value":
+    "Past {{days}} days",
+  "message-delete.conditions.after_value":
+    "After {{date}}",
+  "message-delete.conditions.before_value":
+    "Before {{date}}",
+
   // Member log config command (Discord UI labels)
   // Slash command and subcommand descriptions
   "member-log-config.description":

@@ -13,7 +13,9 @@ import { cleanupVacOnStartup } from "../features/vac/handlers/vacStartupCleanup"
  */
 export async function handleClientReady(client: BotClient): Promise<void> {
   // 起動直後の基本メトリクスをログ出力
-  logger.info(tDefault("system:ready.bot_ready", { tag: client.user?.tag }));
+  logger.info(
+    tDefault("system:ready.bot_ready", { tag: client.user?.username }),
+  );
   logger.info(
     tDefault("system:ready.servers", { count: client.guilds.cache.size }),
   );

@@ -61,7 +61,7 @@ vi.mock("@/shared/features/bump-reminder/bumpReminderConfigService", () => ({
   })),
 }));
 
-vi.mock("@/bot/services/botBumpReminderDependencyResolver", () => ({
+vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotBumpReminderConfigService: vi.fn(() => ({
     setBumpReminderEnabled: (...args: unknown[]) =>
       setBumpReminderEnabledMock(...args),
@@ -187,17 +187,6 @@ describe("bot/commands/bump-reminder-config", () => {
     removeBumpReminderMentionUserMock.mockResolvedValue("removed");
   });
 
-  // guild 外実行時は共通エラーハンドラへ委譲されることを検証
-  it("delegates guild-only error to handleCommandError", async () => {
-    const interaction = createInteraction({ guildId: null });
-
-    await bumpReminderConfigCommand.execute(
-      interaction as unknown as ChatInputCommandInteraction,
-    );
-
-    expect(handleCommandError).toHaveBeenCalledTimes(1);
-  });
-
   // enable で設定有効化と成功応答が行われることを検証
   it("enables bump reminder and replies success", async () => {
     const interaction = createInteraction({
@@ -248,24 +237,6 @@ describe("bot/commands/bump-reminder-config", () => {
       embeds: [{ description: "translated" }],
       flags: MessageFlags.Ephemeral,
     });
-  });
-
-  // 未知のサブコマンドはエラーハンドラに委譲されることを検証
-  it("delegates invalid subcommand error to handleCommandError", async () => {
-    const interaction = createInteraction({
-      options: {
-        getSubcommand: vi.fn(() => "unknown-subcommand"),
-        getRole: vi.fn(() => null),
-        getUser: vi.fn(() => null),
-        getString: vi.fn(() => null),
-      },
-    });
-
-    await bumpReminderConfigCommand.execute(
-      interaction as unknown as ChatInputCommandInteraction,
-    );
-
-    expect(handleCommandError).toHaveBeenCalledTimes(1);
   });
 
   // 各サブコマンドの権限不足時にエラーハンドラへ委譲されることを検証

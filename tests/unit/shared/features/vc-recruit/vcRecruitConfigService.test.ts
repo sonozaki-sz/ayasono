@@ -41,7 +41,7 @@ describe("shared/features/vc-recruit/vcRecruitConfigService", () => {
   // getVcRecruitConfigOrDefault
   // ──────────────────────────────────────────────────────────
 
-  it("returns default config when repository has no config", async () => {
+  it("設定が未登録の場合はデフォルト値を返し、呼び出しごとに別インスタンスになること", async () => {
     const repository = createRepositoryMock();
     repository.getVcRecruitConfig.mockResolvedValue(null);
     const service = new VcRecruitConfigService(repository);
@@ -54,7 +54,7 @@ describe("shared/features/vc-recruit/vcRecruitConfigService", () => {
     expect(first).not.toBe(second);
   });
 
-  it("returns normalized copy when config exists", async () => {
+  it("設定が存在する場合は内容が一致した正規化コピーを返し、配列は元と別参照であること", async () => {
     const repository = createRepositoryMock();
     const raw = makeConfig({
       mentionRoleIds: ["r1"],
@@ -75,7 +75,7 @@ describe("shared/features/vc-recruit/vcRecruitConfigService", () => {
   // saveVcRecruitConfig
   // ──────────────────────────────────────────────────────────
 
-  it("delegates normalized config to repository on save", async () => {
+  it("保存時に正規化済みコピーが repository へ渡され、入力オブジェクトとは別参照であること", async () => {
     const repository = createRepositoryMock();
     repository.getVcRecruitConfig.mockResolvedValue(null);
     repository.updateVcRecruitConfig.mockResolvedValue(undefined);
@@ -98,7 +98,7 @@ describe("shared/features/vc-recruit/vcRecruitConfigService", () => {
   // addSetup / removeSetup
   // ──────────────────────────────────────────────────────────
 
-  it("adds new setup and enables feature", async () => {
+  it("新規セットアップを追加すると一覧に含まれ、機能が有効化されること", async () => {
     const repository = createRepositoryMock();
     repository.getVcRecruitConfig.mockResolvedValue(
       makeConfig({ enabled: false }),
@@ -120,7 +120,7 @@ describe("shared/features/vc-recruit/vcRecruitConfigService", () => {
     expect(result.setups[0].createdVoiceChannelIds).toEqual([]);
   });
 
-  it("removes setup by panelChannelId", async () => {
+  it("panelChannelId を指定するとセットアップが削除されること", async () => {
     const setup1 = makeSetup("p1", "post1");
     const setup2 = makeSetup("p2", "post2");
     const repository = createRepositoryMock();
@@ -140,7 +140,7 @@ describe("shared/features/vc-recruit/vcRecruitConfigService", () => {
   // updatePanelMessageId
   // ──────────────────────────────────────────────────────────
 
-  it("updates panelMessageId only for matching setup", async () => {
+  it("一致するセットアップのみ panelMessageId が更新されること", async () => {
     const setup1 = makeSetup("p1", "post1", { panelMessageId: "old-msg" });
     const setup2 = makeSetup("p2", "post2", { panelMessageId: "other-msg" });
     const repository = createRepositoryMock();
@@ -162,7 +162,7 @@ describe("shared/features/vc-recruit/vcRecruitConfigService", () => {
   // findSetupBy*
   // ──────────────────────────────────────────────────────────
 
-  it("findSetupByCategoryId: returns null when not found", async () => {
+  it("findSetupByCategoryId: 一致するセットアップがない場合は null を返すこと", async () => {
     const repository = createRepositoryMock();
     repository.getVcRecruitConfig.mockResolvedValue(
       makeConfig({ setups: [makeSetup("p1", "post1")] }),
@@ -174,7 +174,7 @@ describe("shared/features/vc-recruit/vcRecruitConfigService", () => {
     ).resolves.toBeNull();
   });
 
-  it("findSetupByCategoryId: returns setup when found, including null categoryId", async () => {
+  it("findSetupByCategoryId: categoryId（null 含む）が一致するセットアップを返すこと", async () => {
     const setup = makeSetup("p1", "post1", { categoryId: null });
     const repository = createRepositoryMock();
     repository.getVcRecruitConfig.mockResolvedValue(
@@ -187,7 +187,7 @@ describe("shared/features/vc-recruit/vcRecruitConfigService", () => {
     );
   });
 
-  it("findSetupByPanelChannelId: returns null when not found", async () => {
+  it("findSetupByPanelChannelId: 一致するセットアップがない場合は null を返すこと", async () => {
     const repository = createRepositoryMock();
     repository.getVcRecruitConfig.mockResolvedValue(
       makeConfig({ setups: [makeSetup("p1", "post1")] }),
@@ -199,7 +199,7 @@ describe("shared/features/vc-recruit/vcRecruitConfigService", () => {
     ).resolves.toBeNull();
   });
 
-  it("findSetupByPanelChannelId: returns setup when found", async () => {
+  it("findSetupByPanelChannelId: panelChannelId が一致するセットアップを返すこと", async () => {
     const setup = makeSetup("p1", "post1");
     const repository = createRepositoryMock();
     repository.getVcRecruitConfig.mockResolvedValue(
@@ -212,7 +212,7 @@ describe("shared/features/vc-recruit/vcRecruitConfigService", () => {
     ).resolves.toEqual(setup);
   });
 
-  it("findSetupByPostChannelId: returns null when not found", async () => {
+  it("findSetupByPostChannelId: 一致するセットアップがない場合は null を返すこと", async () => {
     const repository = createRepositoryMock();
     repository.getVcRecruitConfig.mockResolvedValue(
       makeConfig({ setups: [makeSetup("p1", "post1")] }),
@@ -224,7 +224,7 @@ describe("shared/features/vc-recruit/vcRecruitConfigService", () => {
     ).resolves.toBeNull();
   });
 
-  it("findSetupByPostChannelId: returns setup when found", async () => {
+  it("findSetupByPostChannelId: postChannelId が一致するセットアップを返すこと", async () => {
     const setup = makeSetup("p1", "post1");
     const repository = createRepositoryMock();
     repository.getVcRecruitConfig.mockResolvedValue(
@@ -241,7 +241,7 @@ describe("shared/features/vc-recruit/vcRecruitConfigService", () => {
   // createdVoiceChannelIds 操作
   // ──────────────────────────────────────────────────────────
 
-  it("addCreatedVoiceChannelId: appends vcId to matching setup", async () => {
+  it("addCreatedVoiceChannelId: 一致するセットアップに vcId を追加すること", async () => {
     const setup = makeSetup("p1", "post1");
     const repository = createRepositoryMock();
     repository.getVcRecruitConfig.mockResolvedValue(
@@ -255,7 +255,7 @@ describe("shared/features/vc-recruit/vcRecruitConfigService", () => {
     expect(result.setups[0].createdVoiceChannelIds).toEqual(["vc-1"]);
   });
 
-  it("addCreatedVoiceChannelId: leaves non-matching setups unchanged", async () => {
+  it("addCreatedVoiceChannelId: 一致しないセットアップは変更されないこと", async () => {
     const setup1 = makeSetup("p1", "post1");
     const setup2 = makeSetup("p2", "post2");
     const repository = createRepositoryMock();
@@ -273,7 +273,7 @@ describe("shared/features/vc-recruit/vcRecruitConfigService", () => {
     expect(result.setups[1].createdVoiceChannelIds).toEqual([]);
   });
 
-  it("removeCreatedVoiceChannelId: removes vcId from matching setup", async () => {
+  it("removeCreatedVoiceChannelId: 一致するセットアップから vcId を削除すること", async () => {
     const setup = makeSetup("p1", "post1", {
       createdVoiceChannelIds: ["vc-1", "vc-2"],
     });
@@ -289,7 +289,7 @@ describe("shared/features/vc-recruit/vcRecruitConfigService", () => {
     expect(result.setups[0].createdVoiceChannelIds).toEqual(["vc-2"]);
   });
 
-  it("findSetupByCreatedVcId: returns null when vcId not tracked", async () => {
+  it("findSetupByCreatedVcId: 追跡対象外の vcId の場合は null を返すこと", async () => {
     const setup = makeSetup("p1", "post1", {
       createdVoiceChannelIds: ["vc-1"],
     });
@@ -304,7 +304,7 @@ describe("shared/features/vc-recruit/vcRecruitConfigService", () => {
     ).resolves.toBeNull();
   });
 
-  it("findSetupByCreatedVcId: returns setup containing the vcId", async () => {
+  it("findSetupByCreatedVcId: vcId を含むセットアップを返すこと", async () => {
     const setup = makeSetup("p1", "post1", {
       createdVoiceChannelIds: ["vc-1"],
     });
@@ -319,7 +319,7 @@ describe("shared/features/vc-recruit/vcRecruitConfigService", () => {
     );
   });
 
-  it("isCreatedVcRecruitChannel: returns true when VC is tracked", async () => {
+  it("isCreatedVcRecruitChannel: 追跡対象の VC の場合は true を返すこと", async () => {
     const setup = makeSetup("p1", "post1", {
       createdVoiceChannelIds: ["vc-1"],
     });
@@ -334,7 +334,7 @@ describe("shared/features/vc-recruit/vcRecruitConfigService", () => {
     );
   });
 
-  it("isCreatedVcRecruitChannel: returns false when VC is not tracked", async () => {
+  it("isCreatedVcRecruitChannel: 追跡対象外の VC の場合は false を返すこと", async () => {
     const repository = createRepositoryMock();
     repository.getVcRecruitConfig.mockResolvedValue(makeConfig());
     const service = new VcRecruitConfigService(repository);
@@ -348,7 +348,7 @@ describe("shared/features/vc-recruit/vcRecruitConfigService", () => {
   // addMentionRoleId / removeMentionRoleId（3分岐 / 2分岐）
   // ──────────────────────────────────────────────────────────
 
-  it("addMentionRoleId: returns added when new role", async () => {
+  it("addMentionRoleId: 新規ロールを追加すると \"added\" を返すこと", async () => {
     const repository = createRepositoryMock();
     repository.getVcRecruitConfig.mockResolvedValue(makeConfig());
     repository.updateVcRecruitConfig.mockResolvedValue(undefined);
@@ -359,7 +359,7 @@ describe("shared/features/vc-recruit/vcRecruitConfigService", () => {
     );
   });
 
-  it("addMentionRoleId: returns already_exists when role is duplicate", async () => {
+  it("addMentionRoleId: 重複するロールを追加すると \"already_exists\" を返すこと", async () => {
     const repository = createRepositoryMock();
     repository.getVcRecruitConfig.mockResolvedValue(
       makeConfig({ mentionRoleIds: ["role-1"] }),
@@ -371,7 +371,7 @@ describe("shared/features/vc-recruit/vcRecruitConfigService", () => {
     );
   });
 
-  it("addMentionRoleId: returns limit_exceeded when 25 roles already registered", async () => {
+  it("addMentionRoleId: 25 件登録済みの状態で追加すると \"limit_exceeded\" を返すこと", async () => {
     const roles = Array.from({ length: 25 }, (_, i) => `role-${i}`);
     const repository = createRepositoryMock();
     repository.getVcRecruitConfig.mockResolvedValue(
@@ -384,7 +384,7 @@ describe("shared/features/vc-recruit/vcRecruitConfigService", () => {
     );
   });
 
-  it("removeMentionRoleId: returns removed when role exists", async () => {
+  it("removeMentionRoleId: 登録済みロールを削除すると \"removed\" を返すこと", async () => {
     const repository = createRepositoryMock();
     repository.getVcRecruitConfig.mockResolvedValue(
       makeConfig({ mentionRoleIds: ["role-1"] }),
@@ -397,7 +397,7 @@ describe("shared/features/vc-recruit/vcRecruitConfigService", () => {
     );
   });
 
-  it("removeMentionRoleId: returns not_found when role is missing", async () => {
+  it("removeMentionRoleId: 未登録ロールを削除すると \"not_found\" を返すこと", async () => {
     const repository = createRepositoryMock();
     repository.getVcRecruitConfig.mockResolvedValue(makeConfig());
     const service = new VcRecruitConfigService(repository);
@@ -408,28 +408,19 @@ describe("shared/features/vc-recruit/vcRecruitConfigService", () => {
   });
 
   // ──────────────────────────────────────────────────────────
-  // シングルトン（getVcRecruitConfigService）
+  // createVcRecruitConfigService ファクトリ関数
   // ──────────────────────────────────────────────────────────
 
-  // モジュールレベルのシングルトン変数が各テストに持ち越されないよう再ロードする
-  const loadModule = async () => {
-    vi.resetModules();
-    const module =
-      await import("@/shared/features/vc-recruit/vcRecruitConfigService");
-    return module;
-  };
-
-  it("returns same singleton instance on subsequent calls", async () => {
-    const { getVcRecruitConfigService } = await loadModule();
-    const repositoryA = createRepositoryMock();
-    const repositoryB = createRepositoryMock();
-
-    const serviceA = getVcRecruitConfigService(repositoryA);
-    const serviceAgain = getVcRecruitConfigService(repositoryA);
-    // 一度キャッシュされたら別リポジトリを渡しても同じインスタンスを返す
-    const serviceB = getVcRecruitConfigService(repositoryB);
-
-    expect(serviceA).toBe(serviceAgain);
-    expect(serviceA).toBe(serviceB);
+  it("createVcRecruitConfigService は VcRecruitConfigService のインスタンスを返すこと", async () => {
+    const { createVcRecruitConfigService } = await import(
+      "@/shared/features/vc-recruit/vcRecruitConfigService"
+    );
+    const repository = createRepositoryMock();
+    const service = createVcRecruitConfigService(repository);
+    expect(service).toBeInstanceOf(
+      (
+        await import("@/shared/features/vc-recruit/vcRecruitConfigService")
+      ).VcRecruitConfigService,
+    );
   });
 });

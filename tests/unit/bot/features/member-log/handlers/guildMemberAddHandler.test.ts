@@ -22,8 +22,10 @@ const { EmbedBuilderMock } = vi.hoisted(() => {
 
 // ---- モック定義 ----
 const getMemberLogConfigMock = vi.fn();
+const disableAndClearChannelMock = vi.fn().mockResolvedValue(undefined);
 const getBotMemberLogConfigServiceMock = vi.fn(() => ({
   getMemberLogConfig: getMemberLogConfigMock,
+  disableAndClearChannel: disableAndClearChannelMock,
 }));
 
 const tDefaultMock = vi.fn(
@@ -45,7 +47,7 @@ const calcDurationMock = vi.fn((_ts: number) => ({
   days: 7,
 }));
 
-vi.mock("@/bot/services/botMemberLogDependencyResolver", () => ({
+vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotMemberLogConfigService: () => getBotMemberLogConfigServiceMock(),
 }));
 vi.mock("@/shared/locale/localeManager", () => ({
@@ -98,6 +100,7 @@ function makeGuildMember(overrides: Record<string, unknown> = {}) {
         fetch: vi.fn(async (id: string) => channelMap.get(id) ?? null),
         _map: channelMap,
       },
+      systemChannel: { send: vi.fn().mockResolvedValue(undefined) },
     },
     joinedTimestamp: new Date("2025-01-01").getTime(),
     _channel: defaultChannel,
@@ -156,8 +159,8 @@ describe("bot/features/member-log/handlers/guildMemberAddHandler", () => {
       expect(member._channel.send).not.toHaveBeenCalled();
     });
 
-    // チャンネルが fetch で見つからない場合に logger.warn が呼ばれ、 channel.send は呼ばれないことを確認
-    it("warns and returns early when channel is not in cache", async () => {
+    // チャンネルが fetch で見つからない場合に disableAndClearChannel が呼ばれ、 channel.send は呼ばれないことを確認
+    it("clears config and returns early when channel is not in cache", async () => {
       const { handleGuildMemberAdd } =
         await import("@/bot/features/member-log/handlers/guildMemberAddHandler");
       getMemberLogConfigMock.mockResolvedValue({
@@ -168,14 +171,15 @@ describe("bot/features/member-log/handlers/guildMemberAddHandler", () => {
 
       await handleGuildMemberAdd(member as never);
 
+      expect(disableAndClearChannelMock).toHaveBeenCalledWith("guild-1");
       expect(loggerMock.warn).toHaveBeenCalledWith(
-        "system:member-log.channel_not_found",
+        "system:member-log.channel_deleted_config_cleared",
       );
       expect(member._channel.send).not.toHaveBeenCalled();
     });
 
-    // チャンネルがテキストチャンネル以外の場合に logger.warn が呼ばれ channel.send は呼ばれないことを確認
-    it("warns and returns early when channel is not a text channel", async () => {
+    // チャンネルがテキストチャンネル以外の場合に disableAndClearChannel が呼ばれ channel.send は呼ばれないことを確認
+    it("clears config and returns early when channel is not a text channel", async () => {
       const { handleGuildMemberAdd } =
         await import("@/bot/features/member-log/handlers/guildMemberAddHandler");
       getMemberLogConfigMock.mockResolvedValue({
@@ -191,6 +195,7 @@ describe("bot/features/member-log/handlers/guildMemberAddHandler", () => {
 
       await handleGuildMemberAdd(member as never);
 
+      expect(disableAndClearChannelMock).toHaveBeenCalledWith("guild-1");
       expect(loggerMock.warn).toHaveBeenCalled();
       expect(voiceChannel.send).not.toHaveBeenCalled();
     });

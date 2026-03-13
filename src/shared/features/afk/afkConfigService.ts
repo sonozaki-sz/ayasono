@@ -2,48 +2,29 @@
 // AFK設定サービス実装（Repositoryパターン準拠）
 
 import { getGuildConfigRepository } from "../../database/guildConfigRepositoryProvider";
-import { type AfkConfig, type IAfkRepository } from "../../database/types";
+import {
+  type AfkConfig,
+  type IAfkConfigRepository,
+} from "../../database/types";
+import { createServiceGetter } from "../../utils/serviceFactory";
 import { tDefault } from "../../locale/localeManager";
 import { executeWithDatabaseError } from "../../utils/errorHandling";
 import { logger } from "../../utils/logger";
+import {
+  DEFAULT_AFK_CONFIG,
+  createDefaultAfkConfig,
+  normalizeAfkConfig,
+} from "./afkConfigDefaults";
 
 export type { AfkConfig };
-
-export const DEFAULT_AFK_CONFIG: AfkConfig = {
-  enabled: false,
-};
-
-// AFK設定サービスのシングルトンキャッシュ
-let afkConfigService: AfkConfigService | undefined;
-let cachedRepository: IAfkRepository | undefined;
-
-/**
- * AFK設定の初期値を生成する
- */
-function createDefaultAfkConfig(): AfkConfig {
-  // 既定値から新しい設定オブジェクトを都度生成して返す
-  return {
-    enabled: DEFAULT_AFK_CONFIG.enabled,
-  };
-}
-
-/**
- * AFK設定を正規化して返す
- */
-function normalizeAfkConfig(config: AfkConfig): AfkConfig {
-  // 呼び出し元との参照共有を防ぐためコピーを返す
-  return {
-    enabled: config.enabled,
-    channelId: config.channelId,
-  };
-}
+export { DEFAULT_AFK_CONFIG };
 
 /**
  * AFK設定の取得・更新を担当するサービス
- * DBアクセスは IAfkRepository 経由に統一する
+ * DBアクセスは IAfkConfigRepository 経由に統一する
  */
 export class AfkConfigService {
-  constructor(private readonly guildConfigRepository: IAfkRepository) {}
+  constructor(private readonly guildConfigRepository: IAfkConfigRepository) {}
 
   /**
    * AFK設定を取得する
@@ -112,7 +93,7 @@ export class AfkConfigService {
  * AFK設定サービスを依存注入で生成する
  */
 export function createAfkConfigService(
-  repository: IAfkRepository,
+  repository: IAfkConfigRepository,
 ): AfkConfigService {
   return new AfkConfigService(repository);
 }
@@ -120,17 +101,10 @@ export function createAfkConfigService(
 /**
  * AFK設定サービスのシングルトンを取得する
  */
-export function getAfkConfigService(
-  repository?: IAfkRepository,
-): AfkConfigService {
-  // 引数優先で repository を解決し、同一インスタンスなら既存 service を再利用
-  const resolvedRepository = repository ?? getGuildConfigRepository();
-  if (!afkConfigService || cachedRepository !== resolvedRepository) {
-    afkConfigService = createAfkConfigService(resolvedRepository);
-    cachedRepository = resolvedRepository;
-  }
-  return afkConfigService;
-}
+export const getAfkConfigService = createServiceGetter(
+  createAfkConfigService,
+  getGuildConfigRepository,
+);
 
 /**
  * AFK設定を取得する

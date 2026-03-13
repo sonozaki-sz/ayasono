@@ -5,7 +5,7 @@ import { ChannelType } from "discord.js";
 import { tDefault } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import type { BotClient } from "../../../../client";
-import type { IVacRepository } from "../../repositories/vacRepository";
+import type { VacConfigService } from "../../../../../shared/features/vac/vacConfigService";
 
 /**
  * 起動時に不整合なトリガー/作成済みVACチャンネル情報を掃除する
@@ -14,7 +14,7 @@ import type { IVacRepository } from "../../repositories/vacRepository";
  * @returns 実行完了
  */
 export async function cleanupVacOnStartupUseCase(
-  vacRepository: IVacRepository,
+  vacRepository: VacConfigService,
   client: BotClient,
 ): Promise<void> {
   let removedTriggers = 0;

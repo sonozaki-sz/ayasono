@@ -1,10 +1,10 @@
 // tests/unit/bot/features/vac/services/usecases/cleanupVacOnStartup.test.ts
-import type { IVacRepository } from "@/bot/features/vac/repositories/vacRepository";
+import type { VacConfigService } from "@/shared/features/vac/vacConfigService";
 import { cleanupVacOnStartupUseCase } from "@/bot/features/vac/services/usecases/cleanupVacOnStartup";
 import { ChannelType } from "discord.js";
 import type { Mocked } from "vitest";
 
-function createRepositoryMock(): Mocked<IVacRepository> {
+function createRepositoryMock(): Mocked<VacConfigService> {
   return {
     getVacConfigOrDefault: vi.fn(),
     saveVacConfig: vi.fn(),
@@ -13,7 +13,7 @@ function createRepositoryMock(): Mocked<IVacRepository> {
     addCreatedVacChannel: vi.fn(),
     removeCreatedVacChannel: vi.fn(),
     isManagedVacChannel: vi.fn(),
-  };
+  } as unknown as Mocked<VacConfigService>;
 }
 
 function createGuild(params: {

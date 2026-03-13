@@ -67,9 +67,13 @@ export const events = {
     "メンバー数",
   "member-log.leave.footer":
     "またね！",
+  "member-log.leave.footer_with_number":
+    "またね！ • Member #{{number}}",
   // 日・単位ラベル
   "member-log.days":
     "{{count}}日",
+  "member-log.member_count":
+    "{{count}}名",
   "member-log.unknown":
     "不明",
   // 経過期間フォーマット
@@ -81,6 +85,9 @@ export const events = {
     "{{count}}日",
   "member-log.age.separator":
     "",
+  // チャンネル削除時の再設定案内（システムチャンネルへ送信）
+  "member-log.channel_deleted_notice":
+    "⚠️ メンバーログの通知チャンネルが削除されました。\n設定をリセットしたので、`/member-log-config set-channel` で再設定してください。",
 } as const;
 
 export type EventsTranslations = typeof events;

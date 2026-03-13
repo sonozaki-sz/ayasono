@@ -5,32 +5,12 @@ import { ChannelType, EmbedBuilder, type GuildMember } from "discord.js";
 import { getGuildTranslator } from "../../../../shared/locale/helpers";
 import { tDefault } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
-import { getBotMemberLogConfigService } from "../../../services/botMemberLogDependencyResolver";
+import { getBotMemberLogConfigService } from "../../../services/botCompositionRoot";
 import { calcDuration } from "./accountAge";
+import { formatAccountAge, formatCustomMessage } from "./memberLogUtils";
 
 // 参加通知 Embed の色（ビリジアン）
 const JOIN_EMBED_COLOR = 0x008969;
-
-/**
- * カスタムメッセージのプレースホルダーを置換する
- * @param template プレースホルダー付きテンプレート文字列
- * @param user ユーザーメンション文字列
- * @param username ユーザー名
- * @param count メンバー数
- * @returns 置換済み文字列
- */
-function formatCustomMessage(
-  template: string,
-  user: string,
-  username: string,
-  count: number,
-): string {
-  // {user}, {username}, {count} プレースホルダーを実値へ置換
-  return template
-    .replace(/\{user\}/g, user)
-    .replace(/\{username\}/g, username)
-    .replace(/\{count\}/g, String(count));
-}
 
 /**
  * guildMemberAdd 時にメンバーログ通知を送信する
@@ -53,13 +33,18 @@ export async function handleGuildMemberAdd(member: GuildMember): Promise<void> {
     // 通知先チャンネルを取得（キャッシュ未登録の場合も API で取得）
     const channel = await member.guild.channels.fetch(config.channelId);
     if (!channel || channel.type !== ChannelType.GuildText) {
-      // チャンネルが見つからない場合はスキップ
+      // チャンネルが存在しない場合：設定をリセットしてシステムチャンネルへ通知
+      await getBotMemberLogConfigService().disableAndClearChannel(guildId);
       logger.warn(
-        tDefault("system:member-log.channel_not_found", {
+        tDefault("system:member-log.channel_deleted_config_cleared", {
           guildId,
           channelId: config.channelId,
         }),
       );
+      const t = await getGuildTranslator(guildId);
+      await member.guild.systemChannel
+        ?.send({ content: t("events:member-log.channel_deleted_notice") })
+        .catch(() => null);
       return;
     }
 
@@ -95,18 +80,7 @@ export async function handleGuildMemberAdd(member: GuildMember): Promise<void> {
         },
         {
           name: t("events:member-log.join.fields.accountCreated"),
-          value: `<t:${createdTimestamp}:f>(${(() => {
-            const parts: string[] = [];
-            if (ageYears > 0)
-              parts.push(t("events:member-log.age.years", { count: ageYears }));
-            if (ageMonths > 0)
-              parts.push(
-                t("events:member-log.age.months", { count: ageMonths }),
-              );
-            if (ageDays > 0 || parts.length === 0)
-              parts.push(t("events:member-log.age.days", { count: ageDays }));
-            return parts.join(t("events:member-log.age.separator"));
-          })()})`,
+          value: `<t:${createdTimestamp}:f>(${formatAccountAge(ageYears, ageMonths, ageDays, t)})`,
           inline: true,
         },
         ...(joinedTimestamp !== null
@@ -120,7 +94,7 @@ export async function handleGuildMemberAdd(member: GuildMember): Promise<void> {
           : []),
         {
           name: t("events:member-log.join.fields.memberCount"),
-          value: `${memberCount.toLocaleString()}名`,
+          value: t("events:member-log.member_count", { count: memberCount }),
           inline: true,
         },
       )

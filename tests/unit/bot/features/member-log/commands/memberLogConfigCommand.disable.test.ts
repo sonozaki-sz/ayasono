@@ -25,7 +25,7 @@ vi.mock(
   }),
 );
 
-vi.mock("@/bot/services/botMemberLogDependencyResolver", () => ({
+vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotMemberLogConfigService: () => ({
     setEnabled: (...args: unknown[]) => setEnabledMock(...args),
   }),

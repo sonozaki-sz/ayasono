@@ -4,9 +4,11 @@
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
 import { tDefault, tGuild } from "../../../../../shared/locale/localeManager";
-import { getBotVcRecruitRepository } from "../../../../services/botVcRecruitDependencyResolver";
+import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
+import { getBotVcRecruitRepository } from "../../../../services/botCompositionRoot";
 import { createSuccessEmbed } from "../../../../utils/messageResponse";
 import { VC_RECRUIT_CONFIG_COMMAND } from "../vcRecruitConfigCommand.constants";
+import { VC_RECRUIT_MENTION_ROLE_ADD_RESULT } from "../../../../../shared/database/types";
 
 /**
  * vc-recruit-config add-role を実行する
@@ -18,7 +20,7 @@ export async function handleVcRecruitConfigAddRole(
   guildId: string,
 ): Promise<void> {
   if (!interaction.guild) {
-    throw new ValidationError(tDefault("errors:validation.guild_only"));
+    throw new ValidationError(tDefault(COMMON_I18N_KEYS.GUILD_ONLY));
   }
 
   const role = interaction.options.getRole(
@@ -31,7 +33,7 @@ export async function handleVcRecruitConfigAddRole(
     role.id,
   );
 
-  if (result === "already_exists") {
+  if (result === VC_RECRUIT_MENTION_ROLE_ADD_RESULT.ALREADY_EXISTS) {
     throw new ValidationError(
       await tGuild(guildId, "errors:vcRecruit.role_already_added", {
         role: `<@&${role.id}>`,
@@ -39,7 +41,7 @@ export async function handleVcRecruitConfigAddRole(
     );
   }
 
-  if (result === "limit_exceeded") {
+  if (result === VC_RECRUIT_MENTION_ROLE_ADD_RESULT.LIMIT_EXCEEDED) {
     throw new ValidationError(
       await tGuild(guildId, "errors:vcRecruit.role_limit_exceeded"),
     );

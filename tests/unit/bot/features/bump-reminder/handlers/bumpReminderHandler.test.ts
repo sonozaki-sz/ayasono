@@ -28,7 +28,7 @@ const toScheduledAtMock = vi.fn(
   (_delayMinutes: number) => new Date("2026-02-20T01:00:00.000Z"),
 );
 
-vi.mock("@/bot/services/botBumpReminderDependencyResolver", () => ({
+vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotBumpReminderConfigService: () => getBotBumpReminderConfigServiceMock(),
 }));
 

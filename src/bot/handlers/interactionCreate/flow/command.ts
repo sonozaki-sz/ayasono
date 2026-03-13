@@ -67,7 +67,7 @@ export async function handleChatInputCommand(
     logger.debug(
       tDefault("system:interaction.command_executed", {
         commandName: command.data.name,
-        userTag: interaction.user.tag,
+        userId: interaction.user.id,
       }),
     );
   } catch (error) {

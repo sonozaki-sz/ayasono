@@ -3,7 +3,7 @@ import { cleanupVacOnStartup } from "@/bot/features/vac/handlers/vacStartupClean
 
 const cleanupOnStartupMock = vi.fn();
 
-vi.mock("@/bot/services/botVacDependencyResolver", () => ({
+vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotVacService: vi.fn(() => ({
     cleanupOnStartup: (...args: unknown[]) => cleanupOnStartupMock(...args),
   })),

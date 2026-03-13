@@ -2,7 +2,7 @@
 
 > Testing Guidelines - テスト設計とベストプラクティス
 
-最終更新: 2026年3月3日
+最終更新: 2026年3月14日
 
 ---
 
@@ -25,9 +25,9 @@
    - 統合テスト 25%
    - E2Eテスト 5%（次フェーズ）
 3. **カバレッジ目標**
-   - statements / lines: **90%以上**
-   - functions: **89%以上**
-   - branches: **88%以上**
+   - statements / lines: **95%以上**
+   - functions: **88%以上**
+   - branches: **94%以上**
    - ※ 除外対象ファイルを `coverage.exclude` に追加することで、ロジック層のみで閾値を維持する
 
 > 最新のテスト統計・カバレッジは [TEST_PROGRESS.md](../progress/TEST_PROGRESS.md) を参照
@@ -40,12 +40,10 @@
 | `bot/features/*/handlers/*.ts`                  | ✅ **必須**    | 早期リターン条件・エラー委譲・副作用制御のロジックを含む |
 | `bot/features/*/commands/*.ts`                  | ✅ **必須**    | サブコマンドルーティング・権限ガードの分岐を含む         |
 | `bot/commands/*.ts` / `bot/events/*.ts`         | ✅ **必須**    | コマンド名・イベント名・executeの委譲先を検証            |
-| `bot/services/*Resolver.ts`                     | ✅ **必須**    | 未初期化時の例外スロー（唯一のロジック）を検証           |
 | `bot/utils/commandLoader.ts` / `eventLoader.ts` | ✅             | ENOENT例外・重複検出の制御フローを検証                   |
 | `bot/features/*/repositories/*.ts`              | ❌ **不要**    | Prisma への純粋な委譲のみ、分岐なし                      |
-| `shared/database/repositories/*.ts`             | ❌ **不要**    | 同上                                                     |
-| `shared/database/stores/guild*Store.ts`         | ❌ **不要**    | DB store への委譲のみ                                    |
-| `bot/services/botCompositionRoot.ts`            | ❌ **不要**    | DIの配線のみ、ロジックなし                               |
+| `shared/database/repositories/*.ts`             | ⚠️ **要判断** | JSON 配列のパース・null→undefined 変換等の独自ロジックがある場合は必須。純粋な委譲のみなら不要 |
+| `bot/services/botCompositionRoot.ts`            | ❌ **不要**    | サービスアクセサの配線のみ、ロジックなし                 |
 | `bot/handlers/index.ts` / UI array barrels      | ❌ **不要**    | 配列エクスポートのみ、ロジックなし                       |
 
 **「意味のないテスト」の判断基準**：
@@ -56,39 +54,28 @@
 - 関数参照の同一性確認のみ（`expect(fn).toBe(fn)`）
 - 全てモックで「呼ばれたか」だけを確認するリポジトリ委譲テスト
 
-### カバレッジ除外対象（`vitest.config.ts` の `coverage.exclude`）
+**リポジトリのテスト要否の判断（`shared/database/repositories/`）**：
 
-```text
-# 実行可能コードなし（型定義・再エクスポートのみ）
-src/**/*.d.ts
-src/shared/database/stores/usecases/bumpReminderStoreContext.ts
-src/bot/handlers/interactionCreate/ui/types.ts
-src/shared/errors/errorHandler.ts
+`src/shared/database/repositories/xxxConfigRepository.ts` は以下のロジックを含む場合がある:
+- JSON 文字列 → 配列の `parseJsonArray()` 変換
+- `null` → `undefined` の変換（Prisma nullable → TypeScript optional）
+- upsert パターンの create/update 分岐
 
-# DB委譲のみ（独自ロジックなし）
-src/bot/features/**/repositories/*.ts
-src/shared/database/repositories/guildConfigRepository.ts
-# Repository usecases: 単一Prisma呼び出しのみ（分岐・変換なし）
-src/bot/features/bump-reminder/repositories/usecases/deleteBumpReminder.ts
-src/bot/features/bump-reminder/repositories/usecases/findBumpReminderById.ts
+これらは独自ロジックを含むため、ユニットテストが必要。純粋に Prisma を呼び出して戻すだけならテスト不要。
 
-# セッター/ファクトリ委譲のみ
-src/bot/services/bot*Resolver.ts
+### カバレッジ除外対象
 
-# DB store委譲のみ
-src/shared/database/stores/guild*Store.ts
+除外対象の正確なリストは `vitest.config.ts` の `coverage.exclude` が唯一の情報源とする（このドキュメントには複製しない）。
 
-# DIの配線のみ
-src/bot/services/botCompositionRoot.ts
+除外の判断基準：
 
-# 配列エクスポートのみ（UIハンドラーバレル）
-src/bot/handlers/index.ts
-src/bot/handlers/interactionCreate/ui/buttons.ts
-src/bot/handlers/interactionCreate/ui/modals.ts
-src/bot/handlers/interactionCreate/ui/selectMenus.ts
-```
+- 実行可能コードなし（型定義・`*.d.ts`・再エクスポート専用ファイル）
+- Prisma / 外部ライブラリへの純粋な委譲のみで独自ロジックなし
+- DIの配線のみ（サービスアクセサの登録）
+- 配列エクスポートのみ（UIハンドラーバレル）
+- Discord collector パターンなど UI フロー制御に強依存してユニットテストが困難
 
-新たに除外対象が生じた場合は `vitest.config.ts` の `coverage.exclude` と**このドキュメント**の両方を更新する。
+新たに除外対象が生じた場合は `vitest.config.ts` の `coverage.exclude` **のみ**を更新する（コメントで除外理由を記載する）。
 
 ### import方針とテスト追従
 
@@ -103,9 +90,8 @@ src/bot/handlers/interactionCreate/ui/selectMenus.ts
 
 - `index.ts` を撤廃することで、再エクスポート専用ファイル由来の `Functions` ノイズを削減できる
 - 実体モジュールのテストに集約し、公開面の検証も同じ実体パスで行う
-- **v8 async ブランチのアーティファクトに注意**: async 関数内の `|| null` / `??` 演算子を v8 がgeneratorに変換する際、実際には到達不可能な内部ブランチが生成される。テキストレポートでは "uncovered" と表示されるが LCOV では影響なし（実コードは実質カバー済み）。`thresholds.branches` を 88% に設定して吸収する
-- **型専用ファイルの除外**: 実行可能なコードを持たない型定義・再エクスポートのみのファイルは `coverage.exclude` に追加する（v8 による誤検知回避）
-- **ファイルフィルター条件の branches**: `commandLoader.ts` / `eventLoader.ts` の `.d.ts` / `.js.map` 除外フィルターは `&&` 連鎖により v8 が複数ブランチを生成する。実際には到達不可能なケースのため 87.5% 表示は許容する（overall の branches 88% 閾値は通過）
+- **型専用ファイルの除外**: 実行可能なコードを持たない型定義・再エクスポートのみのファイルは `coverage.exclude` に追加する（istanbul による誤検知回避）
+- **カバレッジプロバイダ**: `istanbul` を使用する（v8 から移行済み）
 
 ---
 
@@ -116,25 +102,26 @@ src/bot/handlers/interactionCreate/ui/selectMenus.ts
 
 ### 対象ファイルマップ（例: member-log 機能）
 
-| src/ ファイル                                     | テスト必須 | 備考                                   |
-| ------------------------------------------------- | ---------- | -------------------------------------- |
-| `bot/commands/xxx-config.ts`                      | ✅         | コマンド名・execute委譲を検証          |
-| `bot/events/xxxEvent.ts`                          | ✅         | イベント名・once・execute委譲を検証    |
-| `bot/services/botXxxDependencyResolver.ts`        | ✅         | set/get・未初期化例外を検証            |
-| `bot/features/xxx/commands/xxxCommand.execute.ts` | ✅         | サブコマンドルーティングを検証         |
-| `bot/features/xxx/commands/xxxCommand.guard.ts`   | ✅         | 権限チェック分岐を検証                 |
-| `bot/features/xxx/commands/xxxCommand.yyyy.ts`    | ✅         | 各サブコマンドの正常・エラーを検証     |
-| `bot/features/xxx/handlers/xxxHandler.ts`         | ✅         | 早期リターン・正常フロー・エラーを検証 |
-| `shared/features/xxx/xxxConfigService.ts`         | ✅         | DB操作の全分岐を検証                   |
+| src/ ファイル                                              | テスト必須 | 備考                                                       |
+| ---------------------------------------------------------- | ---------- | ---------------------------------------------------------- |
+| `bot/commands/xxx-config.ts`                               | ✅         | コマンド名・execute委譲を検証                              |
+| `bot/events/xxxEvent.ts`                                   | ✅         | イベント名・once・execute委譲を検証                        |
+| `bot/features/xxx/commands/xxxCommand.execute.ts`          | ✅         | サブコマンドルーティングを検証                             |
+| `bot/features/xxx/commands/xxxCommand.guard.ts`            | ✅         | 権限チェック分岐を検証                                     |
+| `bot/features/xxx/commands/xxxCommand.yyyy.ts`             | ✅         | 各サブコマンドの正常・エラーを検証                         |
+| `bot/features/xxx/handlers/xxxHandler.ts`                  | ✅         | 早期リターン・正常フロー・エラーを検証                     |
+| `shared/features/xxx/xxxConfigService.ts`                  | ✅         | DB操作の全分岐を検証                                       |
+| `shared/database/repositories/xxxConfigRepository.ts`      | ⚠️ 要判断 | JSON パース・null変換等の独自ロジックがある場合は必須      |
+
+> `bot/services/botCompositionRoot.ts` はサービスアクセサの配線のみでロジックがないため、テスト・カバレッジ対象外。
 
 ### チェックリスト
 
 - [ ] `bot/commands/` の定義ファイルにテストを作成した
 - [ ] `bot/events/` の定義ファイルにテストを作成した
-- [ ] `bot/services/*DependencyResolver.ts` に set/get/未初期化例外テストを作成した
 - [ ] ハンドラーの早期リターン分岐をすべて網羅した（config=null/enabled=false/channelId=null/チャンネル不在/型不一致）
 - [ ] ハンドラーの条件式（`if (x > 0)` の複数条件の組み合わせ）を網羅した
-- [ ] `pnpm test:coverage` で **Stmts/Funcs/Lines 100%、Branches 99%以上** を確認した
+- [ ] `pnpm test:coverage` で **Stmts/Lines 95%以上・Funcs 88%以上・Branches 94%以上** を確認した
 
 ### 条件式の分岐網羅について
 
@@ -265,9 +252,11 @@ tests/
 │   │   ├── features/
 │   │   ├── handlers/
 │   │   ├── services/
+│   │   ├── types/
 │   │   └── utils/
 │   ├── shared/
 │   │   ├── config/
+│   │   ├── database/
 │   │   ├── errors/
 │   │   ├── features/
 │   │   ├── locale/
@@ -293,38 +282,13 @@ tests/
 
 ---
 
-## 🧭 E2Eフェーズ計画（2026-02-21）
+## 🧭 E2Eテスト方針
 
-### 優先シナリオ（上から実装）
-
-1. **Bumpリマインダー基本フロー**
-
-- `/bump-reminder-config` 設定
-- 対象チャンネル投稿
-- 予定時刻で通知送信
-
-2. **AFK基本フロー**
-
-- `/afk` 設定
-- 対象イベントでAFK状態反映
-- 解除条件で状態復帰
-
-3. **VAC基本フロー**
-
-- パネル操作でVC作成
-- 退出後のクリーンアップ
-
-### Discordモック方針
-
-- Discord APIは E2E でもモックを使う
+- Discord API は E2E でもモックを使う
 - DB はテスト専用ストレージ（隔離済み）を使い、ケースごとに初期化する
 - 時刻依存は fake timers を使い、実時間待機を避ける
-
-### 実行手順（最小）
-
-1. `tests/e2e` に機能単位のシナリオファイルを追加
-2. 1シナリオずつ `pnpm test` で回帰確認
-3. 安定後に `pnpm test:coverage` でカバレッジ影響を確認
+- テストファイルは `tests/e2e/` に機能単位で配置する
+- **E2E シナリオは各機能の仕様書（`docs/specs/`）に記載する**
 
 ---
 
@@ -348,13 +312,14 @@ tests/
 
 ### `vitest.config.ts` の主な設定
 
-- プロバイダ: `v8`（カバレッジ）
+- プロバイダ: `istanbul`（カバレッジ）
 - テスト環境: `node`
 - グローバル API: `globals: true`（`describe` / `it` / `expect` / `vi` が import 不要）
 - セットアップファイル: `tests/setup.ts`
 - タイムアウト: 10秒（デフォルト）
+- モック自動リセット: `clearMocks: true`、`restoreMocks: true`
 - `@/` エイリアス: `src/` に解決
-- **カバレッジしきい値**: `{ branches: 99, functions: 100, lines: 100, statements: 100 }`
+- **カバレッジしきい値**: `{ branches: 94, functions: 88, lines: 95, statements: 95 }`
 
 ### モジュール解決エラー時の確認
 
@@ -411,23 +376,17 @@ afterEach(() => {
 });
 ```
 
-### 4. it ブロック前のコメント（必須）
+### 4. it ブロックの記述
 
-**必須**: `it` の直前に、そのテストが何を検証しているかを 1 行で記載する。
-`it` 文字列と重複していてもよいが、**テスト対象の条件・制約・前提**を補足する形が望ましい。
+`it` の文字列に**日本語で検証の観点・条件・前提**を直接記載する。別途コメントは不要。
 
 ```typescript
-// Discord の embed フィールドは 1024 文字上限のため切り詰めを確認
-it("truncates content over 1024 chars", () => { ... });
+it("embed フィールドが 1024 文字を超える場合に切り詰めることを確認", () => { ... });
 
-// panelMessageId が null の場合は finally での削除処理をスキップする
-it("skips panel deletion when panelMessageId is null", () => { ... });
+it("panelMessageId が null の場合は finally での削除処理をスキップする", () => { ... });
 
-// getUserSetting: DB にレコードが存在する場合はその値を返すことを検証
-it("returns saved value when record exists", () => { ... });
+it("DB にレコードが存在する場合はその値を返す", () => { ... });
 ```
-
-> **背景**: message-delete テスト追加時（2026-02-28）にコメントなしの `it()` ブロックが多数含まれており、一括修正が必要になった事例。再発防止のため全 `it()` でのコメントを必須にした。
 
 ### 5. 動的インポート / モジュールキャッシュ起因のセットアップ
 
@@ -446,10 +405,12 @@ async function loadModule() {
 
 | 場所                            | 必須/推奨 | 内容                                      |
 | ------------------------------- | --------- | ----------------------------------------- |
+| 場所                            | 必須/推奨 | 内容                                      |
+| ------------------------------- | --------- | ----------------------------------------- |
 | ファイル先頭                    | 必須      | `// tests/path/to/file.test.ts`           |
 | `describe` 直前                 | 必須      | 検証グループの目的（1行）                 |
 | `beforeEach` / `afterEach` 直前 | 必須      | セットアップ・後処理の理由（1行）         |
-| `it` 直前                       | **必須**  | 検証内容・条件・制約の補足（1行）         |
+| `it` 文字列                     | **必須**  | 日本語で検証内容・条件・制約を直接記載    |
 | 動的インポート関数              | 必須      | モジュールキャッシュリセットの理由（1行） |
 
 ---

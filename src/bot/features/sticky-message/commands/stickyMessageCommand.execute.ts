@@ -8,6 +8,7 @@ import {
 import { ValidationError } from "../../../../shared/errors/customErrors";
 import { tDefault, tGuild } from "../../../../shared/locale/localeManager";
 import { handleCommandError } from "../../../errors/interactionErrorHandler";
+import { COMMON_I18N_KEYS } from "../../../shared/i18nKeys";
 import { STICKY_MESSAGE_COMMAND } from "./stickyMessageCommand.constants";
 import { handleStickyMessageRemove } from "./usecases/stickyMessageRemove";
 import { handleStickyMessageSet } from "./usecases/stickyMessageSet";
@@ -26,7 +27,7 @@ export async function executeStickyMessageCommand(
     // ギルドIDを取得し、サーバー内コマンドであることを確認する
     const guildId = interaction.guildId;
     if (!guildId) {
-      throw new ValidationError(tDefault("errors:validation.guild_only"));
+      throw new ValidationError(tDefault(COMMON_I18N_KEYS.GUILD_ONLY));
     }
 
     // MANAGE_CHANNELS 権限チェック
@@ -58,7 +59,7 @@ export async function executeStickyMessageCommand(
         break;
       default:
         throw new ValidationError(
-          await tGuild(guildId, "errors:validation.invalid_subcommand"),
+          await tGuild(guildId, COMMON_I18N_KEYS.INVALID_SUBCOMMAND),
         );
     }
   } catch (error) {

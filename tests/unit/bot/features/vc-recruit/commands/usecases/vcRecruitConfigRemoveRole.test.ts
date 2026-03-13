@@ -1,5 +1,6 @@
 // tests/unit/bot/features/vc-recruit/commands/usecases/vcRecruitConfigRemoveRole.test.ts
 import { handleVcRecruitConfigRemoveRole } from "@/bot/features/vc-recruit/commands/usecases/vcRecruitConfigRemoveRole";
+import { VC_RECRUIT_MENTION_ROLE_REMOVE_RESULT } from "@/shared/database/types";
 import { ValidationError } from "@/shared/errors/customErrors";
 
 // ---- モック定義 ----
@@ -11,7 +12,7 @@ const tGuildMock = vi.fn(
 );
 const tDefaultMock = vi.fn((key: string) => key);
 
-vi.mock("@/bot/services/botVcRecruitDependencyResolver", () => ({
+vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotVcRecruitRepository: () => ({
     removeMentionRoleId: (...args: unknown[]) =>
       removeMentionRoleIdMock(...args),
@@ -55,7 +56,7 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigRemoveRole", 
 
   // ロールが見つからない場合は ValidationError を投げる
   it("throws ValidationError when role is not found", async () => {
-    removeMentionRoleIdMock.mockResolvedValue("not_found");
+    removeMentionRoleIdMock.mockResolvedValue(VC_RECRUIT_MENTION_ROLE_REMOVE_RESULT.NOT_FOUND);
     const interaction = makeInteraction();
     await expect(
       handleVcRecruitConfigRemoveRole(interaction as never, GUILD_ID),
@@ -64,7 +65,7 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigRemoveRole", 
 
   // 正常時は success embed でエフェメラル返信する
   it("replies with success embed on successful role removal", async () => {
-    removeMentionRoleIdMock.mockResolvedValue("removed");
+    removeMentionRoleIdMock.mockResolvedValue(VC_RECRUIT_MENTION_ROLE_REMOVE_RESULT.REMOVED);
     const interaction = makeInteraction();
     await handleVcRecruitConfigRemoveRole(interaction as never, GUILD_ID);
 

@@ -1,7 +1,7 @@
 // tests/unit/bot/features/vac/commands/usecases/vacConfigView.test.ts
 import { presentVacConfigView } from "@/bot/features/vac/commands/presenters/vacConfigViewPresenter";
 import { handleVacConfigView } from "@/bot/features/vac/commands/usecases/vacConfigView";
-import { getBotVacRepository } from "@/bot/services/botVacDependencyResolver";
+import { getBotVacConfigService } from "@/bot/services/botCompositionRoot";
 import { createInfoEmbed } from "@/bot/utils/messageResponse";
 import { ValidationError } from "@/shared/errors/customErrors";
 import { MessageFlags } from "discord.js";
@@ -11,8 +11,8 @@ vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: vi.fn((key: string) => key),
 }));
 
-vi.mock("@/bot/services/botVacDependencyResolver", () => ({
-  getBotVacRepository: vi.fn(),
+vi.mock("@/bot/services/botCompositionRoot", () => ({
+  getBotVacConfigService: vi.fn(),
 }));
 
 vi.mock(
@@ -52,7 +52,7 @@ describe("bot/features/vac/commands/usecases/vacConfigView", () => {
       triggerChannelIds: ["trigger-1"],
       createdChannels: [],
     });
-    (getBotVacRepository as Mock).mockReturnValue({
+    (getBotVacConfigService as Mock).mockReturnValue({
       getVacConfigOrDefault,
     });
 

@@ -1,1736 +1,441 @@
 // tests/unit/bot/features/message-delete/commands/messageDeleteCommand.execute.test.ts
+// executeMessageDeleteCommand の単体テスト
+// - エラー系: 全分岐カバー（権限・バリデーション・ロック）
+// - 正常系: スキャン → プレビュー確認 → 最終確認 → 削除完了 の1本道
 
-import {
-  MSG_DEL_CUSTOM_ID,
-  type DeletedMessageRecord,
-} from "@/bot/features/message-delete/constants/messageDeleteConstants";
-import { ChannelType, MessageFlags, PermissionFlagsBits } from "discord.js";
+import { executeMessageDeleteCommand } from "@/bot/features/message-delete/commands/messageDeleteCommand.execute";
+import { MSG_DEL_CUSTOM_ID } from "@/bot/features/message-delete/constants/messageDeleteConstants";
+import type { ScannedMessageWithChannel } from "@/bot/features/message-delete/constants/messageDeleteConstants";
 
-// ---- モック定義 ----
-const tDefaultMock = vi.fn((key: string, opts?: Record<string, unknown>) =>
-  opts ? `${key}:${JSON.stringify(opts)}` : key,
-);
-const loggerMock = {
-  debug: vi.fn(),
-  info: vi.fn(),
-  warn: vi.fn(),
-  error: vi.fn(),
-};
-const handleCommandErrorMock = vi.fn();
-const getUserSettingMock = vi.fn();
-const updateUserSettingMock = vi.fn();
-const getBotMessageDeleteUserSettingServiceMock = vi.fn(() => ({
-  getUserSetting: getUserSettingMock,
-  updateUserSetting: updateUserSettingMock,
-}));
-const createErrorEmbedMock = vi.fn((msg: string) => ({
-  type: "error",
-  message: msg,
-}));
-const createInfoEmbedMock = vi.fn((msg: string) => ({
-  type: "info",
-  message: msg,
-}));
-const createWarningEmbedMock = vi.fn((msg: string) => ({
-  type: "warning",
-  message: msg,
-}));
-const deleteMessagesMock = vi.fn();
+// ── モック関数 ──────────────────────────────────────────────────────────────
+
+const scanMessagesMock = vi.fn();
+const deleteScannedMessagesMock = vi.fn();
 const parseDateStrMock = vi.fn();
-const buildSummaryEmbedMock = vi.fn(() => ({
-  addFields: vi.fn().mockReturnThis(),
+
+const createErrorEmbedMock = vi.fn((d: string) => ({ _type: "error", description: d }));
+const createWarningEmbedMock = vi.fn((d: string) => ({ _type: "warning", description: d }));
+const createInfoEmbedMock = vi.fn((d: string) => ({ _type: "info", description: d }));
+
+vi.mock("@/bot/features/message-delete/services/messageDeleteService", () => ({
+  scanMessages: (...args: unknown[]) => scanMessagesMock(...args),
+  deleteScannedMessages: (...args: unknown[]) => deleteScannedMessagesMock(...args),
+  parseDateStr: (...args: unknown[]) => parseDateStrMock(...args),
 }));
-const buildFilteredRecordsMock = vi.fn(
-  (records: DeletedMessageRecord[]) => records,
-);
-const buildDetailEmbedMock = vi.fn(() => ({ type: "detail" }));
-const buildPaginationComponentsMock = vi.fn(() => []);
+
+vi.mock("@/bot/features/message-delete/commands/messageDeleteEmbedBuilder", () => ({
+  buildCommandConditionsEmbed: vi.fn(() => ({ _type: "conditions" })),
+  buildPreviewEmbed: vi.fn(() => ({ _type: "preview" })),
+  buildPreviewComponents: vi.fn(() => []),
+  buildFinalConfirmEmbed: vi.fn(() => ({ _type: "final" })),
+  buildFinalConfirmComponents: vi.fn(() => []),
+  buildCompletionEmbed: vi.fn(() => ({ _type: "completion" })),
+  buildFilteredMessages: vi.fn((msgs: unknown[]) => msgs),
+}));
+
+vi.mock("@/bot/utils/messageResponse", () => ({
+  createErrorEmbed: (d: string) => createErrorEmbedMock(d),
+  createWarningEmbed: (d: string) => createWarningEmbedMock(d),
+  createInfoEmbed: (d: string) => createInfoEmbedMock(d),
+}));
+
+vi.mock("@/bot/errors/interactionErrorHandler", () => ({
+  handleCommandError: vi.fn(),
+}));
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  tDefault: tDefaultMock,
+  tDefault: vi.fn((key: string) => `t:${key}`),
 }));
+
 vi.mock("@/shared/utils/logger", () => ({
-  logger: loggerMock,
+  logger: { info: vi.fn(), debug: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
-vi.mock("@/bot/errors/interactionErrorHandler", () => ({
-  handleCommandError: handleCommandErrorMock,
-}));
-vi.mock("@/bot/services/botMessageDeleteDependencyResolver", () => ({
-  getBotMessageDeleteUserSettingService:
-    getBotMessageDeleteUserSettingServiceMock,
-}));
-vi.mock("@/bot/utils/messageResponse", () => ({
-  createErrorEmbed: createErrorEmbedMock,
-  createInfoEmbed: createInfoEmbedMock,
-  createWarningEmbed: createWarningEmbedMock,
-}));
-vi.mock("@/bot/features/message-delete/services/messageDeleteService", () => ({
-  deleteMessages: deleteMessagesMock,
-  parseDateStr: parseDateStrMock,
-}));
-vi.mock(
-  "@/bot/features/message-delete/commands/messageDeleteEmbedBuilder",
-  () => ({
-    buildSummaryEmbed: buildSummaryEmbedMock,
-    buildFilteredRecords: buildFilteredRecordsMock,
-    buildDetailEmbed: buildDetailEmbedMock,
-    buildPaginationComponents: buildPaginationComponentsMock,
-  }),
-);
 
-// ---- ヘルパー ----
+vi.mock("@/shared/locale/helpers", () => ({
+  getTimezoneOffsetForLocale: vi.fn(() => "+00:00"),
+}));
 
-/** コレクタモック。テスト側から collect/end イベントを手動発火できる */
-function makeCollector() {
-  const handlers: Record<
-    string,
-    ((...args: unknown[]) => unknown) | undefined
-  > = {};
+// ── テスト用コレクターヘルパー ───────────────────────────────────────────────
+
+function makeMockCollector() {
+  const handlers: Record<string, ((...args: unknown[]) => void)[]> = {};
   return {
-    on: vi.fn((event: string, handler: (...args: unknown[]) => unknown) => {
-      handlers[event] = handler;
+    on: vi.fn((event: string, handler: (...args: unknown[]) => void) => {
+      (handlers[event] ??= []).push(handler);
     }),
-    stop: vi.fn().mockImplementation(async (reason?: string) => {
-      await handlers.end?.(new Map(), reason ?? "idle");
+    /** stop() を呼ぶと "end" ハンドラーを "user" 理由で発火 */
+    stop: vi.fn(() => {
+      handlers["end"]?.forEach((h) => h(new Map(), "user"));
     }),
-    triggerCollect: async (i: unknown) => {
-      await (handlers.collect as (i: unknown) => Promise<void>)?.(i);
-    },
-    triggerEnd: async (reason?: string) => {
-      await handlers.end?.(new Map(), reason ?? "time");
+    _trigger(event: string, ...args: unknown[]) {
+      handlers[event]?.forEach((h) => h(...args));
     },
   };
 }
 
-/** コレクタ付きレスポンスモック */
-function makeResponse(collector: ReturnType<typeof makeCollector>) {
-  return {
-    createMessageComponentCollector: vi.fn(() => collector),
-  };
-}
+// ── コンポーネントインタラクションヘルパー ────────────────────────────────────
 
-/** コレクションモック（filter + map が使える） */
-function makeCollection<T>(items: T[]) {
-  const obj = {
-    size: items.length,
-    filter: vi.fn().mockImplementation((fn: (item: T) => boolean) => {
-      const filtered = items.filter((item) => fn(item));
-      return makeCollection(filtered);
-    }),
-    map: vi
-      .fn()
-      .mockImplementation((fn: (item: T) => unknown) => items.map(fn)),
-  };
-  return obj;
-}
-
-/** ギルドチャンネルモック */
-function makeChannel(
-  opts: {
-    id?: string;
-    type?: ChannelType;
-    permissioned?: boolean;
-  } = {},
-) {
-  const {
-    id = "ch-text-1",
-    type = ChannelType.GuildText,
-    permissioned = true,
-  } = opts;
-  return {
-    id,
-    type,
-    isTextBased: vi.fn(() => true),
-    permissionsFor: vi.fn(() => ({
-      has: vi.fn(() => permissioned),
-    })),
-  };
-}
-
-/** ギルドモック */
-function makeGuild(
-  opts: {
-    channels?: ReturnType<typeof makeChannel>[];
-    me?: object | null;
-  } = {},
-) {
-  const channels = opts.channels ?? [makeChannel()];
-  const me = "me" in opts ? opts.me : { id: "bot-1" };
-  return {
-    channels: {
-      fetch: vi.fn().mockResolvedValue(makeCollection(channels)),
-    },
-    members: {
-      me,
-    },
-  };
-}
-
-/** ボタンインタラクションモック (コレクタ内 i) */
-function makeButtonI(
-  opts: {
-    userId?: string;
-    customId?: string;
-    isStringSelectMenu?: boolean;
-    values?: string[];
-    awaitModalSubmitResult?: object | null;
-  } = {},
-) {
-  const {
-    userId = "user-1",
-    customId = MSG_DEL_CUSTOM_ID.PREV,
-    isStringSelectMenu = false,
-    values = [],
-    awaitModalSubmitResult = null,
-  } = opts;
+function makeComponentInteraction(customId: string, userId: string) {
   return {
     user: { id: userId },
     customId,
+    locale: "en-US",
+    deferUpdate: vi.fn().mockResolvedValue(undefined),
+    editReply: vi.fn().mockResolvedValue(undefined) as ReturnType<typeof vi.fn>,
+    followUp: vi.fn().mockResolvedValue(undefined),
     reply: vi.fn().mockResolvedValue(undefined),
     update: vi.fn().mockResolvedValue(undefined),
-    isStringSelectMenu: vi.fn(() => isStringSelectMenu),
-    values,
-    showModal: vi.fn().mockResolvedValue(undefined),
-    deferUpdate: vi.fn().mockResolvedValue(undefined),
-    awaitModalSubmit: vi.fn().mockImplementation(async () => {
-      if (awaitModalSubmitResult === null) throw new Error("timed out");
-      return awaitModalSubmitResult;
-    }),
-    fields: {
-      getTextInputValue: vi.fn(() => ""),
-    },
   };
 }
 
-/** メインインタラクションモック */
-function createInteraction(
-  opts: {
-    guildId?: string | null;
-    countOption?: number | null;
-    userInput?: string | null;
-    botOption?: boolean | null;
-    keyword?: string | null;
-    daysOption?: number | null;
-    afterStr?: string | null;
-    beforeStr?: string | null;
-    channelOption?: { type: ChannelType; id: string } | null;
-    hasManageMessages?: boolean;
-    hasAdministrator?: boolean;
-    guild?: ReturnType<typeof makeGuild> | null;
-    userId?: string;
-    editReplyImpl?: (() => Promise<unknown>) | null;
-  } = {},
-) {
+// ── メインインタラクションファクトリ ────────────────────────────────────────
+
+interface InteractionOverrides {
+  guildId?: string | null;
+  userId?: string;
+  hasPermission?: boolean;
+  count?: number | null;
+  userInput?: string | null;
+  keyword?: string | null;
+  daysOption?: number | null;
+  afterStr?: string | null;
+  beforeStr?: string | null;
+  channelOption?: object | null;
+  editReplies?: ReturnType<typeof vi.fn>;
+}
+
+function createInteraction(overrides: InteractionOverrides = {}) {
   const {
     guildId = "guild-1",
-    countOption = 100,
+    userId = "user-1",
+    hasPermission = true,
+    count = null,
     userInput = null,
-    botOption = null,
     keyword = null,
-    daysOption = null,
+    daysOption = 7,
     afterStr = null,
     beforeStr = null,
-    channelOption = {
-      type: ChannelType.GuildText,
-      id: "ch-option-1",
-    },
-    hasManageMessages = true,
-    hasAdministrator = false,
-    guild = makeGuild(),
-    userId = "user-1",
-    editReplyImpl = null,
-  } = opts;
+    channelOption = null,
+    editReplies,
+  } = overrides;
 
-  const deferReplyMock = vi.fn().mockResolvedValue(undefined);
-  const editReplyMock = editReplyImpl
-    ? vi.fn().mockImplementation(editReplyImpl)
-    : vi.fn().mockResolvedValue(undefined);
-  const followUpMock = vi.fn().mockResolvedValue(undefined);
+  const me = {
+    displayName: "Bot",
+    permissionsFor: vi.fn(() => ({ has: vi.fn(() => true) })),
+  };
+
+  const mockChannel = {
+    id: "channel-1",
+    name: "general",
+    isTextBased: () => true,
+    permissionsFor: vi.fn(() => ({ has: vi.fn(() => true) })),
+    guildId: guildId ?? "guild-1",
+    guild: { members: { me } },
+    messages: { fetch: vi.fn().mockResolvedValue(new Map()) },
+  };
+
+  // デフォルト: どの editReply 呼び出しにもコレクター付きメッセージを返す
+  const defaultEditReply = vi
+    .fn()
+    .mockResolvedValue({
+      createMessageComponentCollector: vi.fn(() => makeMockCollector()),
+    });
 
   return {
     guildId,
-    guild,
-    user: { id: userId, tag: "user#1234" },
-    memberPermissions: {
-      has: vi.fn((flag: bigint) => {
-        if (flag === PermissionFlagsBits.ManageMessages)
-          return hasManageMessages;
-        if (flag === PermissionFlagsBits.Administrator) return hasAdministrator;
-        return false;
-      }),
-    },
-    deferReply: deferReplyMock,
-    editReply: editReplyMock,
-    followUp: followUpMock,
+    guild: guildId
+      ? {
+          id: guildId,
+          members: { me },
+          channels: {
+            fetch: vi.fn().mockResolvedValue({ size: 1, values: () => [mockChannel] }),
+          },
+        }
+      : null,
+    user: { id: userId },
+    locale: "en-US",
+    memberPermissions: { has: vi.fn(() => hasPermission) },
     options: {
-      getInteger: vi.fn().mockImplementation((name: string) => {
-        if (name === "count") return countOption;
+      getInteger: vi.fn((name: string) => {
+        if (name === "count") return count;
         if (name === "days") return daysOption;
         return null;
       }),
-      getString: vi.fn().mockImplementation((name: string) => {
+      getString: vi.fn((name: string) => {
         if (name === "user") return userInput;
         if (name === "keyword") return keyword;
         if (name === "after") return afterStr;
         if (name === "before") return beforeStr;
         return null;
       }),
-      getBoolean: vi.fn().mockImplementation((name: string) => {
-        if (name === "bot") return botOption;
-        return null;
-      }),
-      getChannel: vi.fn().mockImplementation((name: string) => {
-        if (name === "channel") return channelOption ?? null;
+      getChannel: vi.fn((name: string) => {
+        if (name === "channel") return channelOption;
         return null;
       }),
     },
+    deferReply: vi.fn().mockResolvedValue(undefined),
+    editReply: editReplies ?? defaultEditReply,
+    followUp: vi.fn().mockResolvedValue(undefined),
   };
 }
 
-/** 複数件削除結果のサンプル */
-function makeManyRecords(n = 3): DeletedMessageRecord[] {
-  return Array.from({ length: n }, (_, i) => ({
-    authorId: `author-${i}`,
-    authorTag: `user${i}#0000`,
-    channelId: "ch-1",
-    channelName: "general",
-    createdAt: new Date("2025-01-01T00:00:00Z"),
-    content: `msg ${i}`,
-  }));
-}
+// ── テストデータ ──────────────────────────────────────────────────────────────
 
-// ====================================================================
-describe("bot/features/message-delete/commands/messageDeleteCommand.execute", () => {
+const mockScannedMessages: ScannedMessageWithChannel[] = [
+  {
+    messageId: "msg-1",
+    guildId: "guild-1",
+    authorId: "user-1",
+    authorDisplayName: "User One",
+    channelId: "channel-1",
+    channelName: "general",
+    createdAt: new Date("2024-01-01T00:00:00Z"),
+    content: "Hello",
+    _channel: {} as never,
+  },
+];
+
+// ════════════════════════════════════════════════════════════════════════════
+// テストスイート
+// ════════════════════════════════════════════════════════════════════════════
+
+describe("executeMessageDeleteCommand", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    handleCommandErrorMock.mockResolvedValue(undefined);
-    getUserSettingMock.mockResolvedValue({ skipConfirm: true });
-    updateUserSettingMock.mockResolvedValue(undefined);
-    deleteMessagesMock.mockResolvedValue({
-      totalDeleted: 0,
-      channelBreakdown: {},
-      deletedRecords: [],
+    // デフォルト: scanMessages は即座に解決
+    scanMessagesMock.mockResolvedValue(mockScannedMessages);
+    deleteScannedMessagesMock.mockResolvedValue({
+      totalDeleted: 1,
+      channelBreakdown: { "channel-1": { name: "general", count: 1 } },
     });
-    parseDateStrMock.mockImplementation(() => new Date("2025-01-01T00:00:00Z"));
   });
 
-  // ---- 早期リターン: バリデーション ----
+  // ══════════════════════════════════════════════════════════════════════════
+  // エラー系
+  // ══════════════════════════════════════════════════════════════════════════
 
-  it("guildId がない場合は guild_only メッセージを返して終了する", async () => {
-    const { executeMessageDeleteCommand } =
-      await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
-    const interaction = createInteraction({ guildId: null });
+  describe("エラー系", () => {
+    it("guildId が null の場合はエラー Embed を返して終了する", async () => {
+      const interaction = createInteraction({ guildId: null });
 
-    await executeMessageDeleteCommand(interaction as never);
+      await executeMessageDeleteCommand(interaction as never);
 
-    expect(interaction.editReply).toHaveBeenCalledWith(
-      "errors:validation.guild_only",
-    );
-  });
-
-  // ユーザー入力が不正形式（mentions/ID 以外）の場合に user_invalid_format 警告が返ることを検証
-  it("ユーザー入力が不正形式の場合は user_invalid_format 警告を返す", async () => {
-    const { executeMessageDeleteCommand } =
-      await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
-    const interaction = createInteraction({ userInput: "invalid-user-format" });
-
-    await executeMessageDeleteCommand(interaction as never);
-
-    expect(createWarningEmbedMock).toHaveBeenCalledWith(
-      "commands:message-delete.errors.user_invalid_format",
-    );
-    expect(interaction.editReply).toHaveBeenCalledWith(
-      expect.objectContaining({ embeds: expect.any(Array) }),
-    );
-  });
-
-  // メンション形式のユーザー入力が正常に解析されバリデーションエラーにならないことを検証
-  it("メンション形式のユーザー入力は正常に解析する", async () => {
-    const { executeMessageDeleteCommand } =
-      await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
-    const interaction = createInteraction({
-      userInput: "<@123456789012345678>",
+      expect(createErrorEmbedMock).toHaveBeenCalledOnce();
+      expect(interaction.editReply).toHaveBeenCalledWith(
+        expect.objectContaining({ embeds: [expect.objectContaining({ _type: "error" })] }),
+      );
     });
 
-    await executeMessageDeleteCommand(interaction as never);
+    it("フィルター指定が何もない場合は警告 Embed を返して終了する", async () => {
+      // count / user / keyword / days / after / before がすべて未指定
+      const interaction = createInteraction({ daysOption: null });
 
-    // 解析が通るのでバリデーションエラーにならない
-    expect(createWarningEmbedMock).not.toHaveBeenCalledWith(
-      "commands:message-delete.errors.user_invalid_format",
-    );
-  });
+      await executeMessageDeleteCommand(interaction as never);
 
-  // 生 ID 形式のユーザー入力が正常に解析されバリデーションエラーにならないことを検証
-  it("生ID形式のユーザー入力は正常に解析する", async () => {
-    const { executeMessageDeleteCommand } =
-      await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
-    const interaction = createInteraction({
-      userInput: "123456789012345678",
+      expect(createWarningEmbedMock).toHaveBeenCalledOnce();
+      expect(interaction.editReply).toHaveBeenCalledWith(
+        expect.objectContaining({ embeds: [expect.objectContaining({ _type: "warning" })] }),
+      );
     });
 
-    await executeMessageDeleteCommand(interaction as never);
+    it("user オプションのフォーマットが不正な場合は警告 Embed を返して終了する", async () => {
+      const interaction = createInteraction({ userInput: "not-a-valid-id" });
 
-    expect(createWarningEmbedMock).not.toHaveBeenCalledWith(
-      "commands:message-delete.errors.user_invalid_format",
-    );
-  });
+      await executeMessageDeleteCommand(interaction as never);
 
-  // フィルタ条件が何もない組み合わせで no_filter 警告が返ることを検証
-  it("フィルタ条件が何もない場合は no_filter 警告を返す", async () => {
-    const { executeMessageDeleteCommand } =
-      await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
-    const interaction = createInteraction({
-      countOption: null,
-      userInput: null,
-      botOption: null,
-      keyword: null,
-      daysOption: null,
-      afterStr: null,
-      beforeStr: null,
+      expect(createWarningEmbedMock).toHaveBeenCalledOnce();
     });
 
-    await executeMessageDeleteCommand(interaction as never);
+    it("days と after/before が同時指定された場合は警告 Embed を返して終了する", async () => {
+      const interaction = createInteraction({ daysOption: 7, afterStr: "2024-01-01" });
 
-    expect(createWarningEmbedMock).toHaveBeenCalledWith(
-      "commands:message-delete.errors.no_filter",
-    );
-  });
+      await executeMessageDeleteCommand(interaction as never);
 
-  // days と after が同時指定された場合に days_and_date_conflict 警告が返ることを検証
-  it("days と after が同時に指定された場合は days_and_date_conflict 警告を返す", async () => {
-    const { executeMessageDeleteCommand } =
-      await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
-    const interaction = createInteraction({
-      daysOption: 7,
-      afterStr: "2025-01-01",
+      expect(createWarningEmbedMock).toHaveBeenCalledOnce();
     });
 
-    await executeMessageDeleteCommand(interaction as never);
+    it("after の日付フォーマットが不正な場合は警告 Embed を返して終了する", async () => {
+      parseDateStrMock.mockReturnValue(null);
+      const interaction = createInteraction({ daysOption: null, afterStr: "not-a-date" });
 
-    expect(createWarningEmbedMock).toHaveBeenCalledWith(
-      "commands:message-delete.errors.days_and_date_conflict",
-    );
-  });
+      await executeMessageDeleteCommand(interaction as never);
 
-  // days と before が同時指定された場合に days_and_date_conflict 警告が返ることを検証
-  it("days と before が同時に指定された場合は days_and_date_conflict 警告を返す", async () => {
-    const { executeMessageDeleteCommand } =
-      await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
-    const interaction = createInteraction({
-      daysOption: 7,
-      beforeStr: "2025-01-31",
+      expect(createWarningEmbedMock).toHaveBeenCalledOnce();
     });
 
-    await executeMessageDeleteCommand(interaction as never);
+    it("after が未来日時の場合は警告 Embed を返して終了する", async () => {
+      parseDateStrMock.mockReturnValue(new Date(Date.now() + 86_400_000));
+      const interaction = createInteraction({ daysOption: null, afterStr: "2030-01-01" });
 
-    expect(createWarningEmbedMock).toHaveBeenCalledWith(
-      "commands:message-delete.errors.days_and_date_conflict",
-    );
-  });
+      await executeMessageDeleteCommand(interaction as never);
 
-  // channelOption と count が両方未指定の場合に no_channel_no_count 警告が返ることを検証
-  it("チャンネル未指定かつ count 未指定の場合は no_channel_no_count 警告を返す", async () => {
-    const { executeMessageDeleteCommand } =
-      await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
-    const interaction = createInteraction({
-      channelOption: null,
-      countOption: null,
-      keyword: "test",
+      expect(createWarningEmbedMock).toHaveBeenCalledOnce();
     });
 
-    await executeMessageDeleteCommand(interaction as never);
+    it("before の日付フォーマットが不正な場合は警告 Embed を返して終了する", async () => {
+      parseDateStrMock.mockReturnValue(null);
+      const interaction = createInteraction({ daysOption: null, beforeStr: "not-a-date" });
 
-    expect(createWarningEmbedMock).toHaveBeenCalledWith(
-      "commands:message-delete.errors.no_channel_no_count",
-    );
-  });
+      await executeMessageDeleteCommand(interaction as never);
 
-  // after の日付形式が不正な場合に after_invalid_format 警告が返ることを検証
-  it("after の日付形式が不正の場合は after_invalid_format 警告を返す", async () => {
-    const { executeMessageDeleteCommand } =
-      await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
-    parseDateStrMock.mockReturnValueOnce(null);
-    const interaction = createInteraction({ afterStr: "invalid-date" });
-
-    await executeMessageDeleteCommand(interaction as never);
-
-    expect(createWarningEmbedMock).toHaveBeenCalledWith(
-      "commands:message-delete.errors.after_invalid_format",
-    );
-  });
-
-  // before の日付形式が不正な場合に before_invalid_format 警告が返ることを検証
-  it("before の日付形式が不正の場合は before_invalid_format 警告を返す", async () => {
-    const { executeMessageDeleteCommand } =
-      await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
-    parseDateStrMock.mockReturnValueOnce(new Date("2025-01-01"));
-    parseDateStrMock.mockReturnValueOnce(null);
-    const interaction = createInteraction({
-      afterStr: "2025-01-01",
-      beforeStr: "invalid-date",
+      expect(createWarningEmbedMock).toHaveBeenCalledOnce();
     });
 
-    await executeMessageDeleteCommand(interaction as never);
+    it("before が未来日時の場合は警告 Embed を返して終了する", async () => {
+      // YYYY-MM-DD 形式の場合: parseDateStr が2回呼ばれる（endOfDay=true / false）
+      parseDateStrMock.mockReturnValue(new Date("2030-01-01T00:00:00Z"));
+      const interaction = createInteraction({ daysOption: null, beforeStr: "2030-01-01" });
 
-    expect(createWarningEmbedMock).toHaveBeenCalledWith(
-      "commands:message-delete.errors.before_invalid_format",
-    );
-  });
+      await executeMessageDeleteCommand(interaction as never);
 
-  // after > before の場合に date_range_invalid 警告が返ることを検証
-  it("after > before の場合は date_range_invalid 警告を返す", async () => {
-    const { executeMessageDeleteCommand } =
-      await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
-    parseDateStrMock
-      .mockReturnValueOnce(new Date("2025-02-01"))
-      .mockReturnValueOnce(new Date("2025-01-01"));
-    const interaction = createInteraction({
-      afterStr: "2025-02-01",
-      beforeStr: "2025-01-01",
+      expect(createWarningEmbedMock).toHaveBeenCalledOnce();
     });
 
-    await executeMessageDeleteCommand(interaction as never);
-
-    expect(createWarningEmbedMock).toHaveBeenCalledWith(
-      "commands:message-delete.errors.date_range_invalid",
-    );
-  });
-
-  // ManageMessages 権限も Administrator 権限もない場合に no_permission エラーが返ることを検証
-  it("ManageMessages 権限がない場合は no_permission エラーを返す", async () => {
-    const { executeMessageDeleteCommand } =
-      await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
-    const interaction = createInteraction({
-      hasManageMessages: false,
-      hasAdministrator: false,
-    });
-
-    await executeMessageDeleteCommand(interaction as never);
-
-    expect(createErrorEmbedMock).toHaveBeenCalledWith(
-      "commands:message-delete.errors.no_permission",
-    );
-  });
-
-  // Administrator 権限がある場合は no_permission エラーを出さずに権限チェックを通過することを検証
-  it("Administrator 権限がある場合は権限チェックを通過する", async () => {
-    const { executeMessageDeleteCommand } =
-      await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
-    const interaction = createInteraction({
-      hasManageMessages: false,
-      hasAdministrator: true,
-    });
-
-    await executeMessageDeleteCommand(interaction as never);
-
-    expect(createErrorEmbedMock).not.toHaveBeenCalledWith(
-      "commands:message-delete.errors.no_permission",
-    );
-  });
-
-  // guild が null の場合は guild_only メッセージを返して終了することを検証
-  it("guild が null の場合は guild_only メッセージを返す", async () => {
-    const { executeMessageDeleteCommand } =
-      await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
-    const interaction = createInteraction({ guild: null });
-
-    await executeMessageDeleteCommand(interaction as never);
-
-    expect(interaction.editReply).toHaveBeenCalledWith(
-      "errors:validation.guild_only",
-    );
-  });
-
-  // テキスト以外のチャンネル（GuildCategory など）が指定された場合に text_channel_only 警告が返ることを検証
-  it("テキスト以外のチャンネルが指定された場合は text_channel_only 警告を返す", async () => {
-    const { executeMessageDeleteCommand } =
-      await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
-    const interaction = createInteraction({
-      channelOption: { type: ChannelType.GuildCategory, id: "ch-cat" },
-    });
-
-    await executeMessageDeleteCommand(interaction as never);
-
-    expect(createWarningEmbedMock).toHaveBeenCalledWith(
-      "commands:message-delete.errors.text_channel_only",
-    );
-  });
-
-  // ---- チャンネルタイプ：テキスト系はすべて通過する ----
-
-  it.each([
-    ["GuildText", ChannelType.GuildText],
-    ["GuildAnnouncement", ChannelType.GuildAnnouncement],
-    ["PublicThread", ChannelType.PublicThread],
-    ["PrivateThread", ChannelType.PrivateThread],
-    ["GuildVoice", ChannelType.GuildVoice],
-  ])(
-    "ChannelType.%s のチャンネルは text_channel_only 警告を出さない",
-    async (_label, type) => {
-      const { executeMessageDeleteCommand } =
-        await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
+    it("after >= before の場合は警告 Embed を返して終了する", async () => {
+      // after=Jan 10、before=Jan 1（逆転）
+      parseDateStrMock
+        .mockReturnValueOnce(new Date("2024-01-10T00:00:00Z")) // afterStr parse
+        .mockReturnValueOnce(new Date("2024-01-01T23:59:59Z")) // beforeStr parse (endOfDay=true)
+        .mockReturnValueOnce(new Date("2024-01-01T00:00:00Z")); // beforeStr check (endOfDay=false)
       const interaction = createInteraction({
-        channelOption: { type: type as ChannelType, id: "ch-1" },
+        daysOption: null,
+        afterStr: "2024-01-10",
+        beforeStr: "2024-01-01",
       });
 
       await executeMessageDeleteCommand(interaction as never);
 
-      expect(createWarningEmbedMock).not.toHaveBeenCalledWith(
-        "commands:message-delete.errors.text_channel_only",
-      );
-    },
-  );
-
-  // ---- 全チャンネルスキャン（channelOption=null + count 指定）----
-
-  it("channelOption なし + count 指定の場合はギルド内全チャンネルを取得する", async () => {
-    const { executeMessageDeleteCommand } =
-      await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
-    const guild = makeGuild();
-    const interaction = createInteraction({ channelOption: null, guild });
-
-    await executeMessageDeleteCommand(interaction as never);
-
-    expect(guild.channels.fetch).toHaveBeenCalled();
-  });
-
-  // allChannels に null を含む場合（Discord API が null チャンネルを返すケース）、
-  // ch !== null フィルタにより除外されて処理が継続することを確認する
-  it("null チャンネルを含む全チャンネルでも正常にフィルタして処理する", async () => {
-    const { executeMessageDeleteCommand } =
-      await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
-    // null チャンネルを含む collection を返す guild を使う
-    const guild = makeGuild({ channels: [null, makeChannel()] as never });
-    const interaction = createInteraction({ channelOption: null, guild });
-
-    await executeMessageDeleteCommand(interaction as never);
-
-    expect(guild.channels.fetch).toHaveBeenCalled();
-  });
-
-  // days オプション指定時に afterTs が現在時刻から計算されて deleteMessages に渡されることを検証
-  it("days オプションが指定された場合 after タイムスタンプが計算される", async () => {
-    const { executeMessageDeleteCommand } =
-      await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
-    const interaction = createInteraction({
-      daysOption: 7,
-      afterStr: null,
-      beforeStr: null,
+      expect(createWarningEmbedMock).toHaveBeenCalledOnce();
     });
 
-    await executeMessageDeleteCommand(interaction as never);
+    it("ManageMessages 権限がない場合はエラー Embed を返して終了する", async () => {
+      const interaction = createInteraction({ hasPermission: false });
 
-    expect(deleteMessagesMock).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        afterTs: expect.any(Number),
-        beforeTs: Infinity,
-      }),
-    );
-  });
+      await executeMessageDeleteCommand(interaction as never);
 
-  // ---- 削除結果: 0件 ----
-
-  it("削除対象が0件の場合は no_messages_found 情報メッセージを返す", async () => {
-    const { executeMessageDeleteCommand } =
-      await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
-    deleteMessagesMock.mockResolvedValue({
-      totalDeleted: 0,
-      channelBreakdown: {},
-      deletedRecords: [],
-    });
-    const interaction = createInteraction();
-
-    await executeMessageDeleteCommand(interaction as never);
-
-    expect(createInfoEmbedMock).toHaveBeenCalledWith(
-      "commands:message-delete.errors.no_messages_found",
-    );
-  });
-
-  // ---- 削除結果: 1件 ----
-
-  it("削除結果が1件の場合はボタンなしで summaryEmbed にフィールドを追加して返す", async () => {
-    const { executeMessageDeleteCommand } =
-      await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
-    const record: DeletedMessageRecord = {
-      authorId: "a1",
-      authorTag: "Alice#0001",
-      channelId: "ch-1",
-      channelName: "general",
-      createdAt: new Date("2025-01-01T00:00:00Z"),
-      content: "hello",
-    };
-    deleteMessagesMock.mockResolvedValue({
-      totalDeleted: 1,
-      channelBreakdown: { "ch-1": 1 },
-      deletedRecords: [record],
-    });
-    const summaryEmbedMock = { addFields: vi.fn().mockReturnThis() };
-    buildSummaryEmbedMock.mockReturnValue(summaryEmbedMock);
-    const interaction = createInteraction();
-
-    await executeMessageDeleteCommand(interaction as never);
-
-    expect(summaryEmbedMock.addFields).toHaveBeenCalled();
-    expect(interaction.editReply).toHaveBeenCalledWith(
-      expect.objectContaining({ components: [] }),
-    );
-  });
-
-  // 削除済みメッセージのコンテンツが空文字の場合に empty_content キーが使用されることを検証
-  it("削除結果が1件でコンテンツが空の場合は empty_content キーを使用する", async () => {
-    const { executeMessageDeleteCommand } =
-      await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
-    const record: DeletedMessageRecord = {
-      authorId: "a1",
-      authorTag: "Alice#0001",
-      channelId: "ch-1",
-      channelName: "general",
-      createdAt: new Date("2025-01-01T00:00:00Z"),
-      content: "",
-    };
-    deleteMessagesMock.mockResolvedValue({
-      totalDeleted: 1,
-      channelBreakdown: { "ch-1": 1 },
-      deletedRecords: [record],
-    });
-    const summaryEmbedMock = { addFields: vi.fn().mockReturnThis() };
-    buildSummaryEmbedMock.mockReturnValue(summaryEmbedMock);
-    const interaction = createInteraction();
-
-    await executeMessageDeleteCommand(interaction as never);
-
-    expect(tDefaultMock).toHaveBeenCalledWith(
-      "commands:message-delete.result.empty_content",
-    );
-  });
-
-  // ---- 削除エラー ----
-
-  it("deleteMessages が例外を投げた場合は delete_failed エラーを返す", async () => {
-    const { executeMessageDeleteCommand } =
-      await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
-    deleteMessagesMock.mockRejectedValue(new Error("bulk delete failed"));
-    const interaction = createInteraction();
-
-    await executeMessageDeleteCommand(interaction as never);
-
-    expect(createErrorEmbedMock).toHaveBeenCalledWith(
-      "commands:message-delete.errors.delete_failed",
-    );
-  });
-
-  // ---- 外側 catch ----
-
-  it("予期しない例外が発生した場合は handleCommandError を呼ぶ", async () => {
-    const { executeMessageDeleteCommand } =
-      await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
-    const error = new Error("unexpected");
-    // deferReply が throw する → 外側 catch に流れる
-    const interaction = createInteraction();
-    (interaction.deferReply as ReturnType<typeof vi.fn>).mockRejectedValue(
-      error,
-    );
-
-    await executeMessageDeleteCommand(interaction as never);
-
-    expect(handleCommandErrorMock).toHaveBeenCalledWith(interaction, error);
-  });
-
-  // ---- ページネイション（複数レコード）----
-
-  describe("sendPaginatedResult", () => {
-    async function runWithPagination(
-      extra?: Parameters<typeof createInteraction>[0],
-    ) {
-      const { executeMessageDeleteCommand } =
-        await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
-      const collector = makeCollector();
-      const response = makeResponse(collector);
-      const records = makeManyRecords(3);
-
-      deleteMessagesMock.mockResolvedValue({
-        totalDeleted: records.length,
-        channelBreakdown: { "ch-1": records.length },
-        deletedRecords: records,
-      });
-      buildFilteredRecordsMock.mockImplementation(
-        (rec: DeletedMessageRecord[]) => rec,
-      );
-
-      const interaction = createInteraction({
-        editReplyImpl: async () => response,
-        ...extra,
-      });
-
-      // sendPaginatedResult はコレクタ登録後に即 return するため promise を await すると登録済みになる
-      const promise = executeMessageDeleteCommand(interaction as never);
-      await promise;
-
-      return { interaction, collector, records, promise };
-    }
-
-    // ページネイション付きで結果の Embed とコレクタが正しく設定されることを検証
-    it("ページネイション付きで結果を表示する", async () => {
-      const { interaction } = await runWithPagination();
-      expect(interaction.editReply).toHaveBeenCalled();
-      expect(buildDetailEmbedMock).toHaveBeenCalled();
+      expect(createErrorEmbedMock).toHaveBeenCalledOnce();
     });
 
-    // 他ユーザーのボタン操作に対して not_authorized エラーが Ephemeral で応答されることを検証
-    it("他ユーザーのボタン操作は not_authorized エラーで応答する", async () => {
-      const { collector } = await runWithPagination();
-      const diffUserI = makeButtonI({
-        userId: "other-user",
-        customId: MSG_DEL_CUSTOM_ID.PREV,
-      });
-      await collector.triggerCollect(diffUserI);
-      expect(diffUserI.reply).toHaveBeenCalledWith(
-        expect.objectContaining({ flags: MessageFlags.Ephemeral }),
-      );
-    });
+    it("同一ギルドで既に処理中の場合は警告 Embed を返して終了する（ロック）", async () => {
+      const LOCK_GUILD = "guild-locked";
 
-    // PREV ボタン押下でページ番号が減り Embed が再構築されることを検証
-    it("PREV ボタンでページが減る", async () => {
-      const { collector } = await runWithPagination();
-      const i = makeButtonI({ customId: MSG_DEL_CUSTOM_ID.PREV });
-      await collector.triggerCollect(i);
-      expect(i.update).toHaveBeenCalled();
-    });
+      // 1回目: scanMessages を永遠にブロックしてロックを保持
+      scanMessagesMock.mockReturnValueOnce(new Promise<ScannedMessageWithChannel[]>(() => {}));
 
-    // NEXT ボタン押下でページ番号が増え Embed が再構築されることを検証
-    it("NEXT ボタンでページが増える", async () => {
-      const { collector } = await runWithPagination();
-      const i = makeButtonI({ customId: MSG_DEL_CUSTOM_ID.NEXT });
-      await collector.triggerCollect(i);
-      expect(i.update).toHaveBeenCalled();
-    });
+      const interaction1 = createInteraction({ guildId: LOCK_GUILD });
+      const interaction2 = createInteraction({ guildId: LOCK_GUILD });
 
-    // FILTER_AUTHOR セレクトメニューで有効な authorTag が選択されたときフィルターが設定されることを検証
-    it("FILTER_AUTHOR (SelectMenu 有効値) でフィルターが設定される", async () => {
-      const { collector, records } = await runWithPagination();
-      const i = makeButtonI({
-        customId: MSG_DEL_CUSTOM_ID.FILTER_AUTHOR,
-        isStringSelectMenu: true,
-        values: [records[0].authorTag],
-      });
-      await collector.triggerCollect(i);
-      expect(i.update).toHaveBeenCalled();
-    });
+      // 1回目を開始（await しない）
+      void executeMessageDeleteCommand(interaction1 as never);
 
-    // FILTER_AUTHOR セレクトメニューで空値が選択されたとき authorId が undefined になることを検証
-    it("FILTER_AUTHOR (SelectMenu 空値) で authorId が undefined になる", async () => {
-      const { collector } = await runWithPagination();
-      const i = makeButtonI({
-        customId: MSG_DEL_CUSTOM_ID.FILTER_AUTHOR,
-        isStringSelectMenu: true,
-        values: [],
-      });
-      await collector.triggerCollect(i);
-      expect(i.update).toHaveBeenCalled();
-    });
+      // deferReply + parseAndValidateOptions の2非同期境界を越えてロック取得を待機
+      await Promise.resolve();
+      await Promise.resolve();
+      await Promise.resolve();
 
-    // FILTER_AUTHOR のインタラクションが StringSelectMenu でない場合はフィルター更新をスキップすることを検証
-    it("FILTER_AUTHOR (isStringSelectMenu=false) では何も更新しない", async () => {
-      const { collector } = await runWithPagination();
-      const i = makeButtonI({
-        customId: MSG_DEL_CUSTOM_ID.FILTER_AUTHOR,
-        isStringSelectMenu: false,
-      });
-      await collector.triggerCollect(i);
-      expect(i.update).toHaveBeenCalled();
-    });
-
-    // FILTER_RESET でフィルターがすべてリセットされることを検証
-    it("FILTER_RESET でフィルターがリセットされる", async () => {
-      const { collector } = await runWithPagination();
-      const i = makeButtonI({ customId: MSG_DEL_CUSTOM_ID.FILTER_RESET });
-      await collector.triggerCollect(i);
-      expect(i.update).toHaveBeenCalled();
-    });
-
-    // collector の end イベント発火時にボタンコンポーネントが削除されることを検証
-    it("collector.on('end') でボタンが削除される", async () => {
-      const { collector, interaction, promise } = await runWithPagination();
-      await collector.triggerEnd("time");
-      await promise;
-      expect(interaction.editReply).toHaveBeenCalledWith({ components: [] });
-    });
-
-    // ---- モーダル：awaitModalSubmit が null の場合 ----
-
-    it.each([
-      MSG_DEL_CUSTOM_ID.FILTER_KEYWORD,
-      MSG_DEL_CUSTOM_ID.FILTER_DAYS,
-      MSG_DEL_CUSTOM_ID.FILTER_AFTER,
-      MSG_DEL_CUSTOM_ID.FILTER_BEFORE,
-    ])(
-      "モーダル(%s): awaitModalSubmit が null の場合は何もしない",
-      async (customId) => {
-        const { collector } = await runWithPagination();
-        const i = makeButtonI({
-          customId,
-          awaitModalSubmitResult: null,
-        });
-        await collector.triggerCollect(i);
-        // showModal は呼ばれるが interaction.editReply は更新されない（初回以外）
-        expect(i.showModal).toHaveBeenCalled();
-      },
-    );
-
-    // ---- FILTER_KEYWORD モーダル ----
-
-    it("FILTER_KEYWORD モーダル: 値を入力するとキーワードフィルターが更新される", async () => {
-      const { collector, interaction } = await runWithPagination();
-      const deferUpdateMock = vi.fn().mockResolvedValue(undefined);
-      const modalSubmit = {
-        deferUpdate: deferUpdateMock,
-        fields: { getTextInputValue: vi.fn().mockReturnValue("hello") },
-      };
-      const i = makeButtonI({
-        customId: MSG_DEL_CUSTOM_ID.FILTER_KEYWORD,
-        awaitModalSubmitResult: modalSubmit,
-      });
-      await collector.triggerCollect(i);
-      expect(deferUpdateMock).toHaveBeenCalled();
-      expect(interaction.editReply).toHaveBeenCalled();
-    });
-
-    // FILTER_KEYWORD モーダルで空値を入力するとキーワードフィルターが undefined になることを検証
-    it("FILTER_KEYWORD モーダル: 空値をクリアするとフィルターが undefined になる", async () => {
-      const { collector, interaction } = await runWithPagination();
-      const modalSubmit = {
-        deferUpdate: vi.fn().mockResolvedValue(undefined),
-        fields: { getTextInputValue: vi.fn().mockReturnValue("") },
-      };
-      const i = makeButtonI({
-        customId: MSG_DEL_CUSTOM_ID.FILTER_KEYWORD,
-        awaitModalSubmitResult: modalSubmit,
-      });
-      await collector.triggerCollect(i);
-      expect(interaction.editReply).toHaveBeenCalled();
-    });
-
-    // ---- FILTER_DAYS モーダル ----
-
-    it("FILTER_DAYS モーダル: 有効な日数を入力するとフィルターが更新される", async () => {
-      const { collector, interaction } = await runWithPagination();
-      const modalSubmit = {
-        deferUpdate: vi.fn().mockResolvedValue(undefined),
-        fields: { getTextInputValue: vi.fn().mockReturnValue("7") },
-      };
-      const i = makeButtonI({
-        customId: MSG_DEL_CUSTOM_ID.FILTER_DAYS,
-        awaitModalSubmitResult: modalSubmit,
-      });
-      await collector.triggerCollect(i);
-      expect(interaction.editReply).toHaveBeenCalled();
-    });
-
-    // FILTER_DAYS モーダルで空文字を入力すると days フィルターがクリアされることを検証
-    it("FILTER_DAYS モーダル: 空値を入力するとフィルターがクリアされる", async () => {
-      const { collector, interaction } = await runWithPagination();
-      const modalSubmit = {
-        deferUpdate: vi.fn().mockResolvedValue(undefined),
-        fields: { getTextInputValue: vi.fn().mockReturnValue("") },
-      };
-      const i = makeButtonI({
-        customId: MSG_DEL_CUSTOM_ID.FILTER_DAYS,
-        awaitModalSubmitResult: modalSubmit,
-      });
-      await collector.triggerCollect(i);
-      expect(interaction.editReply).toHaveBeenCalled();
-    });
-
-    // FILTER_DAYS モーダルで NaN になる値を入力すると days_invalid_value 警告が出るがリビルドが実行されることを検証
-    it("FILTER_DAYS モーダル: 不正値 (NaN) を入力すると days_invalid_value 警告が出るがリビルドする", async () => {
-      const { collector, interaction } = await runWithPagination();
-      const modalSubmit = {
-        deferUpdate: vi.fn().mockResolvedValue(undefined),
-        fields: { getTextInputValue: vi.fn().mockReturnValue("abc") },
-      };
-      const i = makeButtonI({
-        customId: MSG_DEL_CUSTOM_ID.FILTER_DAYS,
-        awaitModalSubmitResult: modalSubmit,
-      });
-      await collector.triggerCollect(i);
-      expect(interaction.followUp).toHaveBeenCalledWith(
-        expect.objectContaining({ flags: MessageFlags.Ephemeral }),
-      );
-    });
-
-    // FILTER_DAYS モーダルで 0 以下の値を入力すると days_invalid_value 警告が出ることを検証
-    it("FILTER_DAYS モーダル: 不正値 (0 以下) を入力すると days_invalid_value 警告が出る", async () => {
-      const { collector, interaction } = await runWithPagination();
-      const modalSubmit = {
-        deferUpdate: vi.fn().mockResolvedValue(undefined),
-        fields: { getTextInputValue: vi.fn().mockReturnValue("0") },
-      };
-      const i = makeButtonI({
-        customId: MSG_DEL_CUSTOM_ID.FILTER_DAYS,
-        awaitModalSubmitResult: modalSubmit,
-      });
-      await collector.triggerCollect(i);
-      expect(interaction.followUp).toHaveBeenCalledWith(
-        expect.objectContaining({ flags: MessageFlags.Ephemeral }),
-      );
-    });
-
-    // ---- FILTER_AFTER モーダル ----
-
-    it("FILTER_AFTER モーダル: 有効な日付を入力するとフィルターが更新される", async () => {
-      const { collector, interaction } = await runWithPagination();
-      parseDateStrMock.mockReturnValue(new Date("2025-01-01"));
-      const modalSubmit = {
-        deferUpdate: vi.fn().mockResolvedValue(undefined),
-        fields: { getTextInputValue: vi.fn().mockReturnValue("2025-01-01") },
-      };
-      const i = makeButtonI({
-        customId: MSG_DEL_CUSTOM_ID.FILTER_AFTER,
-        awaitModalSubmitResult: modalSubmit,
-      });
-      await collector.triggerCollect(i);
-      expect(interaction.editReply).toHaveBeenCalled();
-    });
-
-    // FILTER_AFTER モーダルで不正な日付形式を入力すると after_invalid_format 警告が出ることを検証
-    it("FILTER_AFTER モーダル: 不正な日付形式は after_invalid_format 警告を出す", async () => {
-      const { collector, interaction } = await runWithPagination();
-      parseDateStrMock.mockReturnValue(null);
-      const modalSubmit = {
-        deferUpdate: vi.fn().mockResolvedValue(undefined),
-        fields: { getTextInputValue: vi.fn().mockReturnValue("bad-date") },
-      };
-      const i = makeButtonI({
-        customId: MSG_DEL_CUSTOM_ID.FILTER_AFTER,
-        awaitModalSubmitResult: modalSubmit,
-      });
-      await collector.triggerCollect(i);
-      expect(interaction.followUp).toHaveBeenCalledWith(
-        expect.objectContaining({ flags: MessageFlags.Ephemeral }),
-      );
-    });
-
-    // FILTER_AFTER モーダルで after > 既存 before になる日付を入力すると date_range_invalid 警告が出ることを検証
-    it("FILTER_AFTER モーダル: after > 既存 before の場合は date_range_invalid 警告を出す", async () => {
-      const { collector, interaction } = await runWithPagination();
-      // 先に before フィルターをセット
-      const beforeDate = new Date("2025-01-01");
-      const afterDate = new Date("2025-02-01"); // after > before
-
-      // FILTER_BEFORE を先に設定
-      parseDateStrMock.mockReturnValueOnce(beforeDate);
-      const beforeModalSubmit = {
-        deferUpdate: vi.fn().mockResolvedValue(undefined),
-        fields: { getTextInputValue: vi.fn().mockReturnValue("2025-01-01") },
-      };
-      const beforeI = makeButtonI({
-        customId: MSG_DEL_CUSTOM_ID.FILTER_BEFORE,
-        awaitModalSubmitResult: beforeModalSubmit,
-      });
-      await collector.triggerCollect(beforeI);
-
-      // FILTER_AFTER を設定（after > before になる）
-      parseDateStrMock.mockReturnValueOnce(afterDate);
-      const afterModalSubmit = {
-        deferUpdate: vi.fn().mockResolvedValue(undefined),
-        fields: { getTextInputValue: vi.fn().mockReturnValue("2025-02-01") },
-      };
-      const afterI = makeButtonI({
-        customId: MSG_DEL_CUSTOM_ID.FILTER_AFTER,
-        awaitModalSubmitResult: afterModalSubmit,
-      });
-      await collector.triggerCollect(afterI);
-
-      expect(interaction.followUp).toHaveBeenCalledWith(
-        expect.objectContaining({ flags: MessageFlags.Ephemeral }),
-      );
-    });
-
-    // FILTER_AFTER モーダルで空値を入力すると after フィルターがクリアされることを検証
-    it("FILTER_AFTER モーダル: 空値を入力すると after フィルターがクリアされる", async () => {
-      const { collector, interaction } = await runWithPagination();
-      const modalSubmit = {
-        deferUpdate: vi.fn().mockResolvedValue(undefined),
-        fields: { getTextInputValue: vi.fn().mockReturnValue("") },
-      };
-      const i = makeButtonI({
-        customId: MSG_DEL_CUSTOM_ID.FILTER_AFTER,
-        awaitModalSubmitResult: modalSubmit,
-      });
-      await collector.triggerCollect(i);
-      expect(interaction.editReply).toHaveBeenCalled();
-    });
-
-    // ---- FILTER_BEFORE モーダル ----
-
-    it("FILTER_BEFORE モーダル: 有効な日付を入力するとフィルターが更新される", async () => {
-      const { collector, interaction } = await runWithPagination();
-      parseDateStrMock.mockReturnValue(new Date("2025-12-31"));
-      const modalSubmit = {
-        deferUpdate: vi.fn().mockResolvedValue(undefined),
-        fields: { getTextInputValue: vi.fn().mockReturnValue("2025-12-31") },
-      };
-      const i = makeButtonI({
-        customId: MSG_DEL_CUSTOM_ID.FILTER_BEFORE,
-        awaitModalSubmitResult: modalSubmit,
-      });
-      await collector.triggerCollect(i);
-      expect(interaction.editReply).toHaveBeenCalled();
-    });
-
-    // FILTER_BEFORE モーダルで不正な日付形式を入力すると before_invalid_format 警告が出ることを検証
-    it("FILTER_BEFORE モーダル: 不正な日付形式は before_invalid_format 警告を出す", async () => {
-      const { collector, interaction } = await runWithPagination();
-      parseDateStrMock.mockReturnValue(null);
-      const modalSubmit = {
-        deferUpdate: vi.fn().mockResolvedValue(undefined),
-        fields: { getTextInputValue: vi.fn().mockReturnValue("bad-date") },
-      };
-      const i = makeButtonI({
-        customId: MSG_DEL_CUSTOM_ID.FILTER_BEFORE,
-        awaitModalSubmitResult: modalSubmit,
-      });
-      await collector.triggerCollect(i);
-      expect(interaction.followUp).toHaveBeenCalledWith(
-        expect.objectContaining({ flags: MessageFlags.Ephemeral }),
-      );
-    });
-
-    // FILTER_BEFORE モーダルで既存 after > before になる日付を入力すると date_range_invalid 警告が出ることを検証
-    it("FILTER_BEFORE モーダル: 既存 after > before の場合は date_range_invalid 警告を出す", async () => {
-      const { collector, interaction } = await runWithPagination();
-      const afterDate = new Date("2025-02-01");
-      const beforeDate = new Date("2025-01-01"); // before < after
-
-      // FILTER_AFTER を先に設定
-      parseDateStrMock.mockReturnValueOnce(afterDate);
-      const afterModalSubmit = {
-        deferUpdate: vi.fn().mockResolvedValue(undefined),
-        fields: { getTextInputValue: vi.fn().mockReturnValue("2025-02-01") },
-      };
-      const afterI = makeButtonI({
-        customId: MSG_DEL_CUSTOM_ID.FILTER_AFTER,
-        awaitModalSubmitResult: afterModalSubmit,
-      });
-      await collector.triggerCollect(afterI);
-
-      // FILTER_BEFORE を設定（before < after になる）
-      parseDateStrMock.mockReturnValueOnce(beforeDate);
-      const beforeModalSubmit = {
-        deferUpdate: vi.fn().mockResolvedValue(undefined),
-        fields: { getTextInputValue: vi.fn().mockReturnValue("2025-01-01") },
-      };
-      const beforeI = makeButtonI({
-        customId: MSG_DEL_CUSTOM_ID.FILTER_BEFORE,
-        awaitModalSubmitResult: beforeModalSubmit,
-      });
-      await collector.triggerCollect(beforeI);
-
-      expect(interaction.followUp).toHaveBeenCalledWith(
-        expect.objectContaining({ flags: MessageFlags.Ephemeral }),
-      );
-    });
-
-    // FILTER_BEFORE モーダルで空値を入力すると before フィルターがクリアされることを検証
-    it("FILTER_BEFORE モーダル: 空値を入力すると before フィルターがクリアされる", async () => {
-      const { collector, interaction } = await runWithPagination();
-      const modalSubmit = {
-        deferUpdate: vi.fn().mockResolvedValue(undefined),
-        fields: { getTextInputValue: vi.fn().mockReturnValue("") },
-      };
-      const i = makeButtonI({
-        customId: MSG_DEL_CUSTOM_ID.FILTER_BEFORE,
-        awaitModalSubmitResult: modalSubmit,
-      });
-      await collector.triggerCollect(i);
-      expect(interaction.editReply).toHaveBeenCalled();
-    });
-
-    // ---- 不明なカスタムID（最後の else-if の false ブランチ） ----
-
-    it("不明なカスタムIDは通常の i.update を呼ぶ", async () => {
-      const { collector } = await runWithPagination();
-      const i = makeButtonI({ customId: "unknown_custom_id_xyz" });
-      await collector.triggerCollect(i);
-      expect(i.update).toHaveBeenCalled();
-    });
-
-    // ---- catch(() => {}) ハンドラーのカバレッジ ----
-
-    it("i.update が失敗しても無視する", async () => {
-      const { collector } = await runWithPagination();
-      const i = makeButtonI({ customId: MSG_DEL_CUSTOM_ID.PREV });
-      (i.update as ReturnType<typeof vi.fn>).mockRejectedValue(
-        new Error("interaction expired"),
-      );
-      // エラーがスローされないことを確認
-      await expect(collector.triggerCollect(i)).resolves.toBeUndefined();
-    });
-
-    // collector end 時に editReply が失敗しても例外がスローされずに無視されることを検証
-    it("collector end の editReply が失敗しても無視する", async () => {
-      const { collector, interaction } = await runWithPagination();
-      (interaction.editReply as ReturnType<typeof vi.fn>).mockRejectedValue(
-        new Error("interaction expired"),
-      );
-      await expect(collector.triggerEnd("time")).resolves.toBeUndefined();
-    });
-
-    // FILTER_DAYS 不正値のときフォローアップ送信が失敗しても例外がスローされないことを検証
-    it("FILTER_DAYS 不正値: followUp が失敗しても無視する", async () => {
-      const { collector, interaction } = await runWithPagination();
-      (interaction.followUp as ReturnType<typeof vi.fn>).mockRejectedValue(
-        new Error("expired"),
-      );
-      (interaction.editReply as ReturnType<typeof vi.fn>).mockRejectedValue(
-        new Error("expired"),
-      );
-      const modalSubmit = {
-        deferUpdate: vi.fn().mockResolvedValue(undefined),
-        fields: { getTextInputValue: vi.fn().mockReturnValue("bad") },
-      };
-      const i = makeButtonI({
-        customId: MSG_DEL_CUSTOM_ID.FILTER_DAYS,
-        awaitModalSubmitResult: modalSubmit,
-      });
-      await expect(collector.triggerCollect(i)).resolves.toBeUndefined();
-    });
-
-    // FILTER_AFTER 不正形式のときフォローアップ送信が失敗しても例外がスローされないことを検証
-    it("FILTER_AFTER 不正形式: followUp が失敗しても無視する", async () => {
-      const { collector, interaction } = await runWithPagination();
-      parseDateStrMock.mockReturnValue(null);
-      (interaction.followUp as ReturnType<typeof vi.fn>).mockRejectedValue(
-        new Error("expired"),
-      );
-      (interaction.editReply as ReturnType<typeof vi.fn>).mockRejectedValue(
-        new Error("expired"),
-      );
-      const modalSubmit = {
-        deferUpdate: vi.fn().mockResolvedValue(undefined),
-        fields: { getTextInputValue: vi.fn().mockReturnValue("bad-date") },
-      };
-      const i = makeButtonI({
-        customId: MSG_DEL_CUSTOM_ID.FILTER_AFTER,
-        awaitModalSubmitResult: modalSubmit,
-      });
-      await expect(collector.triggerCollect(i)).resolves.toBeUndefined();
-    });
-
-    // FILTER_AFTER > before 競合のときフォローアップ送信が失敗しても例外がスローされないことを検証
-    it("FILTER_AFTER > before 競合: followUp が失敗しても無視する", async () => {
-      const { collector, interaction } = await runWithPagination();
-      // まず valid な before フィルターをセット
-      parseDateStrMock.mockReturnValueOnce(new Date("2025-01-01"));
-      const beforeSubmit = {
-        deferUpdate: vi.fn().mockResolvedValue(undefined),
-        fields: { getTextInputValue: vi.fn().mockReturnValue("2025-01-01") },
-      };
-      await collector.triggerCollect(
-        makeButtonI({
-          customId: MSG_DEL_CUSTOM_ID.FILTER_BEFORE,
-          awaitModalSubmitResult: beforeSubmit,
-        }),
-      );
-
-      // after > before になる after フィルターを設定してエラーを発生させる
-      parseDateStrMock.mockReturnValueOnce(new Date("2025-06-01"));
-      (interaction.followUp as ReturnType<typeof vi.fn>).mockRejectedValue(
-        new Error("expired"),
-      );
-      (interaction.editReply as ReturnType<typeof vi.fn>).mockRejectedValue(
-        new Error("expired"),
-      );
-      const afterSubmit = {
-        deferUpdate: vi.fn().mockResolvedValue(undefined),
-        fields: { getTextInputValue: vi.fn().mockReturnValue("2025-06-01") },
-      };
-      const i = makeButtonI({
-        customId: MSG_DEL_CUSTOM_ID.FILTER_AFTER,
-        awaitModalSubmitResult: afterSubmit,
-      });
-      await expect(collector.triggerCollect(i)).resolves.toBeUndefined();
-    });
-
-    // FILTER_BEFORE 不正形式のときフォローアップ送信が失敗しても例外がスローされないことを検証
-    it("FILTER_BEFORE 不正形式: followUp が失敗しても無視する", async () => {
-      const { collector, interaction } = await runWithPagination();
-      parseDateStrMock.mockReturnValue(null);
-      (interaction.followUp as ReturnType<typeof vi.fn>).mockRejectedValue(
-        new Error("expired"),
-      );
-      (interaction.editReply as ReturnType<typeof vi.fn>).mockRejectedValue(
-        new Error("expired"),
-      );
-      const modalSubmit = {
-        deferUpdate: vi.fn().mockResolvedValue(undefined),
-        fields: { getTextInputValue: vi.fn().mockReturnValue("bad-date") },
-      };
-      const i = makeButtonI({
-        customId: MSG_DEL_CUSTOM_ID.FILTER_BEFORE,
-        awaitModalSubmitResult: modalSubmit,
-      });
-      await expect(collector.triggerCollect(i)).resolves.toBeUndefined();
-    });
-
-    // FILTER_BEFORE < after 競合のときフォローアップ送信が失敗しても例外がスローされないことを検証
-    it("FILTER_BEFORE < after 競合: followUp が失敗しても無視する", async () => {
-      const { collector, interaction } = await runWithPagination();
-      // まず valid な after フィルターをセット
-      parseDateStrMock.mockReturnValueOnce(new Date("2025-06-01"));
-      const afterSubmit = {
-        deferUpdate: vi.fn().mockResolvedValue(undefined),
-        fields: { getTextInputValue: vi.fn().mockReturnValue("2025-06-01") },
-      };
-      await collector.triggerCollect(
-        makeButtonI({
-          customId: MSG_DEL_CUSTOM_ID.FILTER_AFTER,
-          awaitModalSubmitResult: afterSubmit,
-        }),
-      );
-
-      // before < after になる before フィルターを設定してエラーを発生させる
-      parseDateStrMock.mockReturnValueOnce(new Date("2025-01-01"));
-      (interaction.followUp as ReturnType<typeof vi.fn>).mockRejectedValue(
-        new Error("expired"),
-      );
-      (interaction.editReply as ReturnType<typeof vi.fn>).mockRejectedValue(
-        new Error("expired"),
-      );
-      const beforeSubmit = {
-        deferUpdate: vi.fn().mockResolvedValue(undefined),
-        fields: { getTextInputValue: vi.fn().mockReturnValue("2025-01-01") },
-      };
-      const i = makeButtonI({
-        customId: MSG_DEL_CUSTOM_ID.FILTER_BEFORE,
-        awaitModalSubmitResult: beforeSubmit,
-      });
-      await expect(collector.triggerCollect(i)).resolves.toBeUndefined();
-    });
-
-    // モーダル値が有効なとき editReply が失敗しても例外がスローされないことを検証
-    it("有効なモーダル更新: editReply が失敗しても無視する", async () => {
-      const { collector, interaction } = await runWithPagination();
-      (interaction.editReply as ReturnType<typeof vi.fn>).mockRejectedValue(
-        new Error("expired"),
-      );
-      const modalSubmit = {
-        deferUpdate: vi.fn().mockResolvedValue(undefined),
-        fields: { getTextInputValue: vi.fn().mockReturnValue("hello") },
-      };
-      const i = makeButtonI({
-        customId: MSG_DEL_CUSTOM_ID.FILTER_KEYWORD,
-        awaitModalSubmitResult: modalSubmit,
-      });
-      await expect(collector.triggerCollect(i)).resolves.toBeUndefined();
-    });
-  });
-
-  // ---- showConfirmDialog (skipConfirm=false) ----
-
-  describe("showConfirmDialog", () => {
-    async function runWithConfirmDialog(
-      extra?: Parameters<typeof createInteraction>[0],
-    ) {
-      const { executeMessageDeleteCommand } =
-        await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
-      const confirmCollector = makeCollector();
-      const paginationCollector = makeCollector();
-      let editReplyCallCount = 0;
-
-      // 1回目: confirm dialog のレスポンス、2回目以降: pagination レスポンス
-      const editReplyImpl = async () => {
-        editReplyCallCount++;
-        if (editReplyCallCount === 1) {
-          return makeResponse(confirmCollector);
-        }
-        return makeResponse(paginationCollector);
-      };
-
-      const records = makeManyRecords(3);
-      deleteMessagesMock.mockResolvedValue({
-        totalDeleted: records.length,
-        channelBreakdown: { "ch-1": records.length },
-        deletedRecords: records,
-      });
-      getUserSettingMock.mockResolvedValue({ skipConfirm: false });
-
-      const interaction = createInteraction({
-        editReplyImpl,
-        ...extra,
-      });
-
-      // showConfirmDialog は new Promise で中断するため setImmediate でマイクロタスクを消化してからコレクタを使う
-      const promise = executeMessageDeleteCommand(interaction as never);
-      await new Promise<void>((resolve) => setImmediate(resolve));
-
-      return {
-        interaction,
-        confirmCollector,
-        paginationCollector,
-        records,
-        promise,
-      };
-    }
-
-    // skipConfirm=false のときユーザーに確認ダイアログが表示されることを検証
-    it("skipConfirm=false の場合は確認ダイアログを表示する", async () => {
-      const { interaction } = await runWithConfirmDialog();
-      expect(tDefaultMock).toHaveBeenCalledWith(
-        "commands:message-delete.confirm.question",
-        expect.anything(),
-      );
-      expect(interaction.editReply).toHaveBeenCalled();
-    });
-
-    // skipConfirm=false かつ channelOption なしのとき channel_all ラベルが表示されることを検証
-    it("skipConfirm=false かつ channelOption なし の場合 channel_all を表示する", async () => {
-      const { interaction } = await runWithConfirmDialog({
-        channelOption: null,
-      });
-      expect(tDefaultMock).toHaveBeenCalledWith(
-        "commands:message-delete.confirm.channel_all",
-      );
-      expect(interaction.editReply).toHaveBeenCalled();
-    });
-
-    // 確認ダイアログで他ユーザーがボタン操作した場合に not_authorized で応答されることを検証
-    it("他ユーザーのボタン操作は not_authorized で応答する", async () => {
-      const { confirmCollector } = await runWithConfirmDialog();
-      const i = makeButtonI({
-        userId: "other-user",
-        customId: MSG_DEL_CUSTOM_ID.CONFIRM_YES,
-      });
-      await confirmCollector.triggerCollect(i);
-      expect(i.reply).toHaveBeenCalledWith(
-        expect.objectContaining({ flags: MessageFlags.Ephemeral }),
-      );
-    });
-
-    // CONFIRM_SKIP_TOGGLE ボタンで skipNext フラグがトグルされることを検証
-    it("CONFIRM_SKIP_TOGGLE で skipNext がトグルされる", async () => {
-      const { confirmCollector } = await runWithConfirmDialog();
-      const i = makeButtonI({
-        customId: MSG_DEL_CUSTOM_ID.CONFIRM_SKIP_TOGGLE,
-      });
-      await confirmCollector.triggerCollect(i);
-      expect(i.update).toHaveBeenCalled();
-    });
-
-    // CONFIRM_YES (skipNext=false) で削除処理が実行されることを検証
-    it("CONFIRM_YES (skipNext=false) で削除処理が実行される", async () => {
-      const { confirmCollector, promise } = await runWithConfirmDialog();
-
-      // YES ボタンを押す
-      const yesI = makeButtonI({ customId: MSG_DEL_CUSTOM_ID.CONFIRM_YES });
-      await confirmCollector.triggerCollect(yesI);
-      // end イベントを CONFIRM_YES で発火
-      await confirmCollector.triggerEnd(MSG_DEL_CUSTOM_ID.CONFIRM_YES);
-      await promise;
-
-      expect(deleteMessagesMock).toHaveBeenCalled();
-      expect(updateUserSettingMock).not.toHaveBeenCalled();
-    });
-
-    // CONFIRM_YES (skipNext=true) で削除処理実行とともにユーザー設定が保存されることを検証
-    it("CONFIRM_YES (skipNext=true) でユーザー設定が保存される", async () => {
-      const { confirmCollector, promise } = await runWithConfirmDialog();
-
-      // まず SKIP_TOGGLE で skipNext=true にする
-      const toggleI = makeButtonI({
-        customId: MSG_DEL_CUSTOM_ID.CONFIRM_SKIP_TOGGLE,
-      });
-      await confirmCollector.triggerCollect(toggleI);
-
-      // YES ボタンを押す → end イベントで CONFIRM_YES
-      await confirmCollector.triggerEnd(MSG_DEL_CUSTOM_ID.CONFIRM_YES);
-      await promise;
-
-      expect(updateUserSettingMock).toHaveBeenCalledWith("user-1", "guild-1", {
-        skipConfirm: true,
-      });
-    });
-
-    // CONFIRM_YES (skipNext=true) で updateUserSetting が失敗しても削除処理が続行されることを検証
-    it("CONFIRM_YES (skipNext=true) で updateUserSetting が失敗しても処理が続く", async () => {
-      const { confirmCollector, promise } = await runWithConfirmDialog();
-
-      updateUserSettingMock.mockRejectedValue(new Error("db error"));
-
-      const toggleI = makeButtonI({
-        customId: MSG_DEL_CUSTOM_ID.CONFIRM_SKIP_TOGGLE,
-      });
-      await confirmCollector.triggerCollect(toggleI);
-
-      await confirmCollector.triggerEnd(MSG_DEL_CUSTOM_ID.CONFIRM_YES);
-      await promise;
-
-      expect(loggerMock.warn).toHaveBeenCalled();
-    });
-
-    // CONFIRM_NO でキャンセルメッセージが表示されて処理が終了することを検証
-    it("CONFIRM_NO でキャンセルメッセージを表示して終了する", async () => {
-      const { confirmCollector, promise } = await runWithConfirmDialog();
-
-      await confirmCollector.triggerEnd(MSG_DEL_CUSTOM_ID.CONFIRM_NO);
-      await promise;
-
-      expect(createInfoEmbedMock).toHaveBeenCalledWith(
-        "commands:message-delete.confirm.cancelled",
-      );
-      expect(deleteMessagesMock).not.toHaveBeenCalled();
-    });
-
-    // 確認ダイアログがタイムアウトした場合に timed_out 警告が表示されることを検証
-    it("タイムアウトの場合は timed_out 警告を表示して終了する", async () => {
-      const { confirmCollector, promise } = await runWithConfirmDialog();
-
-      await confirmCollector.triggerEnd("time");
-      await promise;
+      // 2回目: ロック済みのはずなので警告が返る
+      await executeMessageDeleteCommand(interaction2 as never);
 
       expect(createWarningEmbedMock).toHaveBeenCalledWith(
-        "commands:message-delete.confirm.timed_out",
-      );
-      expect(deleteMessagesMock).not.toHaveBeenCalled();
-    });
-
-    // bot/keyword/days オプションが指定されたときの確認ダイアログラベル生成を検証
-    it("confirm ダイアログで各条件ラベルが生成される (bot, keyword, days)", async () => {
-      await runWithConfirmDialog({
-        botOption: true,
-        keyword: "hello",
-        daysOption: 7,
-        afterStr: null,
-      });
-
-      expect(tDefaultMock).toHaveBeenCalledWith(
-        "commands:message-delete.confirm.condition_bot",
-      );
-      expect(tDefaultMock).toHaveBeenCalledWith(
-        "commands:message-delete.confirm.condition_keyword",
-        expect.anything(),
-      );
-      expect(tDefaultMock).toHaveBeenCalledWith(
-        "commands:message-delete.confirm.condition_days",
-        expect.anything(),
+        expect.stringContaining("t:commands:message-delete.errors.locked"),
       );
     });
 
-    // user/after/before オプションが指定されたときの確認ダイアログラベル生成を検証
-    it("confirm ダイアログで各条件ラベルが生成される (user, after, before)", async () => {
-      parseDateStrMock
-        .mockReturnValueOnce(new Date("2025-01-01"))
-        .mockReturnValueOnce(new Date("2025-12-31"));
-      await runWithConfirmDialog({
-        userInput: "123456789012345678",
-        afterStr: "2025-01-01",
-        beforeStr: "2025-12-31",
-        daysOption: null,
-      });
+    it("スキャン結果が 0 件の場合は情報 Embed を返して終了する", async () => {
+      scanMessagesMock.mockResolvedValue([]);
+      const interaction = createInteraction();
 
-      expect(tDefaultMock).toHaveBeenCalledWith(
-        "commands:message-delete.confirm.condition_user",
-        expect.anything(),
-      );
-      expect(tDefaultMock).toHaveBeenCalledWith(
-        "commands:message-delete.confirm.condition_after",
-        expect.anything(),
-      );
-      expect(tDefaultMock).toHaveBeenCalledWith(
-        "commands:message-delete.confirm.condition_before",
-        expect.anything(),
-      );
-    });
+      await executeMessageDeleteCommand(interaction as never);
 
-    // countOption が null のとき condition_count ラベルが追加されないことを検証
-    it("countOption が null の場合 condition_count は追加されない", async () => {
-      const { confirmCollector, promise } = await runWithConfirmDialog({
-        countOption: null,
-        keyword: "test",
-      });
-      // cancel して完了させる
-      await confirmCollector.triggerEnd(MSG_DEL_CUSTOM_ID.CONFIRM_NO);
-      await promise;
-      expect(tDefaultMock).not.toHaveBeenCalledWith(
-        "commands:message-delete.confirm.condition_count",
-        expect.anything(),
-      );
-    });
-
-    // ---- catch(() => {}) ハンドラーのカバレッジ ----
-
-    it("CONFIRM_NO: editReply が失敗しても無視する", async () => {
-      const { confirmCollector, interaction, promise } =
-        await runWithConfirmDialog();
-      (interaction.editReply as ReturnType<typeof vi.fn>).mockRejectedValue(
-        new Error("expired"),
-      );
-      await confirmCollector.triggerEnd(MSG_DEL_CUSTOM_ID.CONFIRM_NO);
-      await expect(promise).resolves.toBeUndefined();
-    });
-
-    // 確認ダイアログのタイムアウト時に editReply が失敗しても例外がスローされないことを検証
-    it("タイムアウト: editReply が失敗しても無視する", async () => {
-      const { confirmCollector, interaction, promise } =
-        await runWithConfirmDialog();
-      (interaction.editReply as ReturnType<typeof vi.fn>).mockRejectedValue(
-        new Error("expired"),
-      );
-      await confirmCollector.triggerEnd("time");
-      await expect(promise).resolves.toBeUndefined();
+      expect(createInfoEmbedMock).toHaveBeenCalledOnce();
     });
   });
 
-  // ---- countOption=null → count=Infinity ----
+  // ══════════════════════════════════════════════════════════════════════════
+  // 正常系: スキャン → プレビュー確認 → 最終確認 → 削除完了
+  // ══════════════════════════════════════════════════════════════════════════
 
-  it("countOption が null の場合 count は Infinity になる", async () => {
-    const { executeMessageDeleteCommand } =
-      await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
-    deleteMessagesMock.mockResolvedValue({
-      totalDeleted: 0,
-      channelBreakdown: {},
-      deletedRecords: [],
-    });
-    const interaction = createInteraction({
-      countOption: null,
-      channelOption: { type: ChannelType.GuildText, id: "ch-1" },
-      keyword: "test",
-    });
+  describe("正常系", () => {
+    it("スキャン → プレビュー確認 → 最終確認 → 削除完了 の一連のフローが正常に動作する", async () => {
+      // ── 各フェーズのクリックインタラクションを準備 ──
 
-    await executeMessageDeleteCommand(interaction as never);
-
-    expect(deleteMessagesMock).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({ count: Infinity }),
-    );
-  });
-
-  // ---- ログ記録（削除後のログメッセージ）----
-
-  describe("削除後のログ記録", () => {
-    // ページネイションを含む削除成功後にログが記録されることを検証
-    it("削除成功後にログを記録する（複数件ページネイション）", async () => {
-      const { executeMessageDeleteCommand } =
-        await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
-      const collector = makeCollector();
-      const response = makeResponse(collector);
-      const records = makeManyRecords(3);
-
-      deleteMessagesMock.mockResolvedValue({
-        totalDeleted: records.length,
-        channelBreakdown: { "ch-1": records.length },
-        deletedRecords: records,
-      });
-
-      const interaction = createInteraction({
-        editReplyImpl: async () => response,
-        botOption: true,
-        keyword: "test",
-        userInput: "123456789012345678",
-        daysOption: null,
-        afterStr: null,
-        beforeStr: null,
-      });
-
-      const promise = executeMessageDeleteCommand(interaction as never);
-      await promise;
-      await collector.triggerEnd("time");
-
-      expect(loggerMock.info).toHaveBeenCalledWith(
-        expect.stringContaining("deleted"),
+      // Phase 3: FINAL_YES クリック（deleteScannedMessages の interaction になる）
+      const finalClickInteraction = makeComponentInteraction(
+        MSG_DEL_CUSTOM_ID.FINAL_YES,
+        "user-1",
       );
-    });
 
-    // after/before 指定での削除成功後にログが記録されることを検証
-    it("削除成功後にログを記録する（after/before 指定）", async () => {
-      const { executeMessageDeleteCommand } =
-        await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
-      parseDateStrMock
-        .mockReturnValueOnce(new Date("2025-01-01"))
-        .mockReturnValueOnce(new Date("2025-12-31"));
-      const collector = makeCollector();
-      const response = makeResponse(collector);
-      const records = makeManyRecords(3);
+      // Phase 2: 最終確認ダイアログ（Stage 2）のコレクター
+      // createMessageComponentCollector が呼ばれたら次のマイクロタスクで FINAL_YES を発火
+      const finalConfirmCollector = makeMockCollector();
+      const finalReplyMsg = {
+        createMessageComponentCollector: vi.fn(() => {
+          queueMicrotask(() => finalConfirmCollector._trigger("collect", finalClickInteraction));
+          return finalConfirmCollector;
+        }),
+      };
+      finalClickInteraction.editReply = vi.fn().mockResolvedValue(undefined);
 
-      deleteMessagesMock.mockResolvedValue({
-        totalDeleted: records.length,
-        channelBreakdown: { "ch-1": records.length },
-        deletedRecords: records,
-      });
-
-      const interaction = createInteraction({
-        editReplyImpl: async () => response,
-        afterStr: "2025-01-01",
-        beforeStr: "2025-12-31",
-        daysOption: null,
-      });
-
-      const promise = executeMessageDeleteCommand(interaction as never);
-      await promise;
-      await collector.triggerEnd("time");
-
-      expect(loggerMock.info).toHaveBeenCalledWith(
-        expect.stringContaining("deleted"),
+      // Stage 2 の baseInteraction は CONFIRM_YES クリックの interaction になる
+      const confirmClickInteraction = makeComponentInteraction(
+        MSG_DEL_CUSTOM_ID.CONFIRM_YES,
+        "user-1",
       );
-    });
+      confirmClickInteraction.editReply = vi
+        .fn()
+        .mockResolvedValue(finalReplyMsg) as ReturnType<typeof vi.fn>;
 
-    // onProgress コールバックが削除処理中に呼ばれることを検証
-    it("onProgress コールバックが呼ばれる", async () => {
-      const { executeMessageDeleteCommand } =
-        await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
-      const collector = makeCollector();
-      const response = makeResponse(collector);
-      const records = makeManyRecords(3);
+      // Phase 2: プレビューダイアログ（Stage 1）のコレクター
+      // createMessageComponentCollector が呼ばれたら次のマイクロタスクで CONFIRM_YES を発火
+      const previewCollector = makeMockCollector();
+      const previewReplyMsg = {
+        createMessageComponentCollector: vi.fn(() => {
+          queueMicrotask(() => previewCollector._trigger("collect", confirmClickInteraction));
+          return previewCollector;
+        }),
+      };
 
-      deleteMessagesMock.mockImplementation(async (_channels, opts) => {
-        await opts.onProgress("進捗メッセージ");
-        return {
-          totalDeleted: records.length,
-          channelBreakdown: { "ch-1": records.length },
-          deletedRecords: records,
-        };
-      });
+      // Phase 1: スキャン進捗メッセージ（キャンセルボタン付き）
+      const cancelCollector = makeMockCollector();
+      const scanReplyMsg = {
+        createMessageComponentCollector: vi.fn(() => cancelCollector),
+      };
 
-      const interaction = createInteraction({
-        editReplyImpl: async () => response,
-      });
+      // editReply の呼び出し順:
+      //   1回目 → スキャン進捗 (scanReplyMsg)
+      //   2回目 → プレビュー  (previewReplyMsg)
+      //   以降  → undefined（不使用）
+      const editReply = vi
+        .fn()
+        .mockResolvedValueOnce(scanReplyMsg)
+        .mockResolvedValueOnce(previewReplyMsg)
+        .mockResolvedValue(undefined);
 
-      const promise = executeMessageDeleteCommand(interaction as never);
-      await promise;
-      await collector.triggerEnd("time");
+      const interaction = createInteraction({ editReplies: editReply });
 
-      expect(interaction.editReply).toHaveBeenCalledWith("進捗メッセージ");
-    });
+      // ── 実行 ──
+      await executeMessageDeleteCommand(interaction as never);
 
-    // daysOption 指定での削除成功後にログが記録されることを検証
-    it("削除成功後にログを記録する（daysOption 指定）", async () => {
-      const { executeMessageDeleteCommand } =
-        await import("@/bot/features/message-delete/commands/messageDeleteCommand.execute");
-      const collector = makeCollector();
-      const response = makeResponse(collector);
-      const records = makeManyRecords(3);
+      // ── アサーション ──
 
-      deleteMessagesMock.mockResolvedValue({
-        totalDeleted: records.length,
-        channelBreakdown: { "ch-1": records.length },
-        deletedRecords: records,
-      });
+      // scanMessages が呼ばれた
+      expect(scanMessagesMock).toHaveBeenCalledOnce();
 
-      const interaction = createInteraction({
-        editReplyImpl: async () => response,
-        daysOption: 7,
-        afterStr: null,
-        beforeStr: null,
-      });
+      // deleteScannedMessages が呼ばれた
+      expect(deleteScannedMessagesMock).toHaveBeenCalledOnce();
+      expect(deleteScannedMessagesMock).toHaveBeenCalledWith(
+        mockScannedMessages,
+        expect.any(Function), // onProgress コールバック
+        expect.any(AbortSignal),
+      );
 
-      const promise = executeMessageDeleteCommand(interaction as never);
-      await promise;
-      await collector.triggerEnd("time");
-
-      expect(loggerMock.info).toHaveBeenCalledWith(
-        expect.stringContaining("days=7"),
+      // 削除完了 Embed が返された（finalClickInteraction.editReply で呼ばれる）
+      expect(finalClickInteraction.editReply).toHaveBeenCalledWith(
+        expect.objectContaining({
+          embeds: [expect.objectContaining({ _type: "completion" })],
+          content: "",
+          components: [],
+        }),
       );
     });
   });

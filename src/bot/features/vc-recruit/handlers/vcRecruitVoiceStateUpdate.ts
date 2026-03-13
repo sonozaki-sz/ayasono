@@ -3,7 +3,7 @@
 
 import { ChannelType, type VoiceState } from "discord.js";
 import { logger } from "../../../../shared/utils/logger";
-import { getBotVcRecruitRepository } from "../../../services/botVcRecruitDependencyResolver";
+import { getBotVcRecruitRepository } from "../../../services/botCompositionRoot";
 
 /**
  * voiceStateUpdate から VC募集で作成したVCの空き検知と自動削除を行う

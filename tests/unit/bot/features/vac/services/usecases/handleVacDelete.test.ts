@@ -1,5 +1,5 @@
 // tests/unit/bot/features/vac/services/usecases/handleVacDelete.test.ts
-import type { IVacRepository } from "@/bot/features/vac/repositories/vacRepository";
+import type { VacConfigService } from "@/shared/features/vac/vacConfigService";
 import { handleVacDeleteUseCase } from "@/bot/features/vac/services/usecases/handleVacDelete";
 import { ChannelType } from "discord.js";
 import type { Mocked } from "vitest";
@@ -16,7 +16,7 @@ vi.mock("@/shared/utils/logger", () => ({
   },
 }));
 
-function createRepositoryMock(): Mocked<IVacRepository> {
+function createRepositoryMock(): Mocked<VacConfigService> {
   return {
     getVacConfigOrDefault: vi.fn(),
     saveVacConfig: vi.fn(),
@@ -25,7 +25,7 @@ function createRepositoryMock(): Mocked<IVacRepository> {
     addCreatedVacChannel: vi.fn(),
     removeCreatedVacChannel: vi.fn(),
     isManagedVacChannel: vi.fn(),
-  };
+  } as unknown as Mocked<VacConfigService>;
 }
 
 // VAC が管理するボイスチャンネルが空になった際に自動削除とDBレコード除去が行われるか、

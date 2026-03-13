@@ -10,32 +10,12 @@ import {
 import { getGuildTranslator } from "../../../../shared/locale/helpers";
 import { tDefault } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
-import { getBotMemberLogConfigService } from "../../../services/botMemberLogDependencyResolver";
+import { getBotMemberLogConfigService } from "../../../services/botCompositionRoot";
 import { calcDuration } from "./accountAge";
+import { formatAccountAge, formatCustomMessage } from "./memberLogUtils";
 
 // 退出通知 Embed の色（茜色）
 const LEAVE_EMBED_COLOR = 0xb7282d;
-
-/**
- * カスタムメッセージのプレースホルダーを置換する
- * @param template プレースホルダー付きテンプレート文字列
- * @param user ユーザーメンション文字列
- * @param username ユーザー名
- * @param count メンバー数
- * @returns 置換済み文字列
- */
-function formatCustomMessage(
-  template: string,
-  user: string,
-  username: string,
-  count: number,
-): string {
-  // {user}, {username}, {count} プレースホルダーを実値へ置換
-  return template
-    .replace(/\{user\}/g, user)
-    .replace(/\{username\}/g, username)
-    .replace(/\{count\}/g, String(count));
-}
 
 /**
  * guildMemberRemove 時にメンバーログ通知を送信する
@@ -60,13 +40,18 @@ export async function handleGuildMemberRemove(
     // 通知先チャンネルを取得（キャッシュ未登録の場合も API で取得）
     const channel = await member.guild.channels.fetch(config.channelId);
     if (!channel || channel.type !== ChannelType.GuildText) {
-      // チャンネルが見つからない場合はスキップ
+      // チャンネルが存在しない場合：設定をリセットしてシステムチャンネルへ通知
+      await getBotMemberLogConfigService().disableAndClearChannel(guildId);
       logger.warn(
-        tDefault("system:member-log.channel_not_found", {
+        tDefault("system:member-log.channel_deleted_config_cleared", {
           guildId,
           channelId: config.channelId,
         }),
       );
+      const t = await getGuildTranslator(guildId);
+      await member.guild.systemChannel
+        ?.send({ content: t("events:member-log.channel_deleted_notice") })
+        .catch(() => null);
       return;
     }
 
@@ -88,11 +73,14 @@ export async function handleGuildMemberRemove(
     const stayDays =
       member.joinedTimestamp !== null
         ? Math.floor(
-            (Date.now() - (member.joinedTimestamp ?? 0)) /
-              (1000 * 60 * 60 * 24),
+            (Date.now() - member.joinedTimestamp) / (1000 * 60 * 60 * 24),
           )
         : null;
     const memberCount = member.guild.memberCount;
+    // createdTimestamp が存在する場合のみアカウント年齢を算出（member.user の null 判定を集約）
+    const accountAge = member.user
+      ? calcDuration(member.user.createdTimestamp)
+      : null;
 
     // 退出通知 Embed を生成
     const embed = new EmbedBuilder()
@@ -104,29 +92,11 @@ export async function handleGuildMemberRemove(
           value: userMention,
           inline: true,
         },
-        ...(createdTimestamp !== null
+        ...(createdTimestamp !== null && accountAge !== null
           ? [
               {
                 name: t("events:member-log.leave.fields.accountCreated"),
-                value: `<t:${createdTimestamp}:f>(${(() => {
-                  const { years, months, days } = calcDuration(
-                    member.user!.createdTimestamp,
-                  );
-                  const parts: string[] = [];
-                  if (years > 0)
-                    parts.push(
-                      t("events:member-log.age.years", { count: years }),
-                    );
-                  if (months > 0)
-                    parts.push(
-                      t("events:member-log.age.months", { count: months }),
-                    );
-                  if (days > 0 || parts.length === 0)
-                    parts.push(
-                      t("events:member-log.age.days", { count: days }),
-                    );
-                  return parts.join(t("events:member-log.age.separator"));
-                })()})`,
+                value: `<t:${createdTimestamp}:f>(${formatAccountAge(accountAge.years, accountAge.months, accountAge.days, t)})`,
                 inline: true,
               },
             ]
@@ -155,12 +125,14 @@ export async function handleGuildMemberRemove(
         },
         {
           name: t("events:member-log.leave.fields.memberCount"),
-          value: `${memberCount.toLocaleString()}名`,
+          value: t("events:member-log.member_count", { count: memberCount }),
           inline: true,
         },
       )
       .setFooter({
-        text: `${t("events:member-log.leave.footer")} • Member #${memberCount + 1}`,
+        text: t("events:member-log.leave.footer_with_number", {
+          number: memberCount + 1,
+        }),
       })
       .setTimestamp();
 

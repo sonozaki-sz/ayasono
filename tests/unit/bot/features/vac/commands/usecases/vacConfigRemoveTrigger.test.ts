@@ -4,7 +4,7 @@ import {
   resolveTargetCategory,
 } from "@/bot/features/vac/commands/helpers/vacConfigTargetResolver";
 import { handleVacConfigRemoveTrigger } from "@/bot/features/vac/commands/usecases/vacConfigRemoveTrigger";
-import { getBotVacRepository } from "@/bot/services/botVacDependencyResolver";
+import { getBotVacConfigService } from "@/bot/services/botCompositionRoot";
 import { createSuccessEmbed } from "@/bot/utils/messageResponse";
 import { ValidationError } from "@/shared/errors/customErrors";
 import { ChannelType, MessageFlags } from "discord.js";
@@ -15,8 +15,8 @@ vi.mock("@/shared/locale/localeManager", () => ({
   tGuild: vi.fn(async (_guildId: string, key: string) => key),
 }));
 
-vi.mock("@/bot/services/botVacDependencyResolver", () => ({
-  getBotVacRepository: vi.fn(),
+vi.mock("@/bot/services/botCompositionRoot", () => ({
+  getBotVacConfigService: vi.fn(),
 }));
 
 vi.mock("@/bot/utils/messageResponse", () => ({
@@ -51,7 +51,7 @@ describe("bot/features/vac/commands/usecases/vacConfigRemoveTrigger", () => {
   });
 
   it("throws ValidationError when trigger channel is not found", async () => {
-    (getBotVacRepository as Mock).mockReturnValue({
+    (getBotVacConfigService as Mock).mockReturnValue({
       getVacConfigOrDefault: vi
         .fn()
         .mockResolvedValue({ triggerChannelIds: [] }),
@@ -73,7 +73,7 @@ describe("bot/features/vac/commands/usecases/vacConfigRemoveTrigger", () => {
 
   it("removes trigger from config, deletes channel, and replies ephemeral", async () => {
     const removeTriggerChannel = vi.fn().mockResolvedValue(undefined);
-    (getBotVacRepository as Mock).mockReturnValue({
+    (getBotVacConfigService as Mock).mockReturnValue({
       getVacConfigOrDefault: vi.fn().mockResolvedValue({
         triggerChannelIds: ["trigger-1"],
       }),

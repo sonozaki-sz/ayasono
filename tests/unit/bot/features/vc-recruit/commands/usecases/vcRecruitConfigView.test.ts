@@ -11,7 +11,7 @@ const tGuildMock = vi.fn(
 );
 const tDefaultMock = vi.fn((key: string) => key);
 
-vi.mock("@/bot/services/botVcRecruitDependencyResolver", () => ({
+vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotVcRecruitRepository: () => ({
     getVcRecruitConfigOrDefault: (...args: unknown[]) =>
       getVcRecruitConfigOrDefaultMock(...args),

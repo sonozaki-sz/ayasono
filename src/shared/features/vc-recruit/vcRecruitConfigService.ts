@@ -2,54 +2,31 @@
 // VC募集設定のサービス実装（Repositoryパターン準拠）
 
 import {
-  type IVcRecruitRepository,
+  type IVcRecruitConfigRepository,
   type VcRecruitConfig,
   type VcRecruitSetup,
+  VC_RECRUIT_MENTION_ROLE_ADD_RESULT,
+  type VcRecruitMentionRoleAddResult,
+  VC_RECRUIT_MENTION_ROLE_REMOVE_RESULT,
+  type VcRecruitMentionRoleRemoveResult,
 } from "../../database/types";
 import { executeWithDatabaseError } from "../../utils/errorHandling";
+import {
+  DEFAULT_VC_RECRUIT_CONFIG,
+  DEFAULT_THREAD_ARCHIVE_DURATION,
+  createDefaultVcRecruitConfig,
+  normalizeVcRecruitConfig,
+} from "./vcRecruitConfigDefaults";
 
-export const DEFAULT_VC_RECRUIT_CONFIG: VcRecruitConfig = {
-  enabled: true,
-  mentionRoleIds: [],
-  setups: [],
-};
-
-/** セットアップのデフォルトスレッドアーカイブ時間（24h） */
-const DEFAULT_THREAD_ARCHIVE_DURATION = 1440 as const;
-
-// VcRecruitConfigService のシングルトンキャッシュ
-let vcRecruitConfigService: VcRecruitConfigService | undefined;
-
-/**
- * VC募集設定の初期値を生成する
- */
-function createDefaultVcRecruitConfig(): VcRecruitConfig {
-  return {
-    enabled: DEFAULT_VC_RECRUIT_CONFIG.enabled,
-    mentionRoleIds: [],
-    setups: [],
-  };
-}
-
-/**
- * VC募集設定を正規化し、配列参照を分離する
- */
-function normalizeVcRecruitConfig(config: VcRecruitConfig): VcRecruitConfig {
-  return {
-    enabled: config.enabled,
-    mentionRoleIds: [...config.mentionRoleIds],
-    setups: config.setups.map((s) => ({
-      ...s,
-      createdVoiceChannelIds: [...s.createdVoiceChannelIds],
-    })),
-  };
-}
+export { DEFAULT_VC_RECRUIT_CONFIG };
 
 /**
  * VC募集設定の取得・更新を担当するサービス
  */
 export class VcRecruitConfigService {
-  constructor(private readonly vcRecruitRepository: IVcRecruitRepository) {}
+  constructor(
+    private readonly vcRecruitRepository: IVcRecruitConfigRepository,
+  ) {}
 
   /**
    * VC募集設定を取得（未設定時は初期値を返す）
@@ -258,17 +235,19 @@ export class VcRecruitConfigService {
   async addMentionRoleId(
     guildId: string,
     roleId: string,
-  ): Promise<"added" | "already_exists" | "limit_exceeded"> {
+  ): Promise<VcRecruitMentionRoleAddResult> {
     return executeWithDatabaseError(async () => {
       const config = await this.getVcRecruitConfigOrDefault(guildId);
-      if (config.mentionRoleIds.includes(roleId)) return "already_exists";
-      if (config.mentionRoleIds.length >= 25) return "limit_exceeded";
+      if (config.mentionRoleIds.includes(roleId))
+        return VC_RECRUIT_MENTION_ROLE_ADD_RESULT.ALREADY_EXISTS;
+      if (config.mentionRoleIds.length >= 25)
+        return VC_RECRUIT_MENTION_ROLE_ADD_RESULT.LIMIT_EXCEEDED;
       const updated: VcRecruitConfig = {
         ...config,
         mentionRoleIds: [...config.mentionRoleIds, roleId],
       };
       await this.saveVcRecruitConfig(guildId, updated);
-      return "added";
+      return VC_RECRUIT_MENTION_ROLE_ADD_RESULT.ADDED;
     }, "addMentionRoleId failed");
   }
 
@@ -278,16 +257,17 @@ export class VcRecruitConfigService {
   async removeMentionRoleId(
     guildId: string,
     roleId: string,
-  ): Promise<"removed" | "not_found"> {
+  ): Promise<VcRecruitMentionRoleRemoveResult> {
     return executeWithDatabaseError(async () => {
       const config = await this.getVcRecruitConfigOrDefault(guildId);
-      if (!config.mentionRoleIds.includes(roleId)) return "not_found";
+      if (!config.mentionRoleIds.includes(roleId))
+        return VC_RECRUIT_MENTION_ROLE_REMOVE_RESULT.NOT_FOUND;
       const updated: VcRecruitConfig = {
         ...config,
         mentionRoleIds: config.mentionRoleIds.filter((id) => id !== roleId),
       };
       await this.saveVcRecruitConfig(guildId, updated);
-      return "removed";
+      return VC_RECRUIT_MENTION_ROLE_REMOVE_RESULT.REMOVED;
     }, "removeMentionRoleId failed");
   }
 
@@ -300,19 +280,7 @@ export class VcRecruitConfigService {
  * VcRecruitConfigService インスタンスを生成する
  */
 export function createVcRecruitConfigService(
-  repository: IVcRecruitRepository,
+  repository: IVcRecruitConfigRepository,
 ): VcRecruitConfigService {
   return new VcRecruitConfigService(repository);
-}
-
-/**
- * キャッシュ済みサービスを取得する（未初期化時は新規作成）
- */
-export function getVcRecruitConfigService(
-  repository: IVcRecruitRepository,
-): VcRecruitConfigService {
-  if (!vcRecruitConfigService) {
-    vcRecruitConfigService = createVcRecruitConfigService(repository);
-  }
-  return vcRecruitConfigService;
 }

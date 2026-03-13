@@ -3,7 +3,7 @@
 
 import type { Channel } from "discord.js";
 import { logger } from "../../../../shared/utils/logger";
-import { getBotVcRecruitRepository } from "../../../services/botVcRecruitDependencyResolver";
+import { getBotVcRecruitRepository } from "../../../services/botCompositionRoot";
 
 /**
  * channelDelete 時にVC募集セットアップのチャンネルが削除された場合、

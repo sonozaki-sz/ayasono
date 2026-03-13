@@ -11,7 +11,7 @@ const resolveTargetCategoryMock = vi.fn();
 const tGuildMock = vi.fn(async (_guildId: string, key: string) => key);
 const tDefaultMock = vi.fn((key: string) => key);
 
-vi.mock("@/bot/services/botVcRecruitDependencyResolver", () => ({
+vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotVcRecruitRepository: () => ({
     findSetupByCategoryId: (...args: unknown[]) =>
       findSetupByCategoryIdMock(...args),

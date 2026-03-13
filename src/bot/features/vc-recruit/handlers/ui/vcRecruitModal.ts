@@ -12,7 +12,7 @@ import {
 } from "discord.js";
 import { tGuild } from "../../../../../shared/locale/localeManager";
 import type { ModalHandler } from "../../../../handlers/interactionCreate/ui/types";
-import { getBotVcRecruitRepository } from "../../../../services/botVcRecruitDependencyResolver";
+import { getBotVcRecruitRepository } from "../../../../services/botCompositionRoot";
 import { safeReply } from "../../../../utils/interaction";
 import {
   createErrorEmbed,
@@ -117,7 +117,7 @@ export const vcRecruitModalHandler: ModalHandler = {
       // 新規VC作成
       const channelName =
         vcName.trim() ||
-        `${member?.displayName ?? interaction.user.username}'s Room`;
+        `${member?.displayName ?? interaction.user.displayName}'s Room`;
 
       voiceChannel = (await guild.channels.create({
         name: channelName,
@@ -203,7 +203,7 @@ export const vcRecruitModalHandler: ModalHandler = {
       const threadName = await tGuild(
         guild.id,
         "commands:vcRecruit.thread_name",
-        { recruiter: member?.displayName ?? interaction.user.username },
+        { recruiter: member?.displayName ?? interaction.user.displayName },
       );
       await message
         .startThread({

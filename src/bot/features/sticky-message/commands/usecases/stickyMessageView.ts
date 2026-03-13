@@ -9,7 +9,7 @@ import {
   StringSelectMenuOptionBuilder,
 } from "discord.js";
 import { tGuild } from "../../../../../shared/locale/localeManager";
-import { getBotStickyMessageConfigService } from "../../../../services/botStickyMessageDependencyResolver";
+import { getBotStickyMessageConfigService } from "../../../../services/botCompositionRoot";
 import { createInfoEmbed } from "../../../../utils/messageResponse";
 import { STICKY_MESSAGE_COMMAND } from "../stickyMessageCommand.constants";
 

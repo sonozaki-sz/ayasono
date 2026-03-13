@@ -1,5 +1,6 @@
 // tests/unit/bot/features/vc-recruit/commands/usecases/vcRecruitConfigAddRole.test.ts
 import { handleVcRecruitConfigAddRole } from "@/bot/features/vc-recruit/commands/usecases/vcRecruitConfigAddRole";
+import { VC_RECRUIT_MENTION_ROLE_ADD_RESULT } from "@/shared/database/types";
 import { ValidationError } from "@/shared/errors/customErrors";
 
 // ---- モック定義 ----
@@ -11,7 +12,7 @@ const tGuildMock = vi.fn(
 );
 const tDefaultMock = vi.fn((key: string) => key);
 
-vi.mock("@/bot/services/botVcRecruitDependencyResolver", () => ({
+vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotVcRecruitRepository: () => ({
     addMentionRoleId: (...args: unknown[]) => addMentionRoleIdMock(...args),
   }),
@@ -54,7 +55,7 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigAddRole", () 
 
   // ロールが既に追加済みの場合は ValidationError を投げる
   it("throws ValidationError when role is already added", async () => {
-    addMentionRoleIdMock.mockResolvedValue("already_exists");
+    addMentionRoleIdMock.mockResolvedValue(VC_RECRUIT_MENTION_ROLE_ADD_RESULT.ALREADY_EXISTS);
     const interaction = makeInteraction();
     await expect(
       handleVcRecruitConfigAddRole(interaction as never, GUILD_ID),
@@ -63,7 +64,7 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigAddRole", () 
 
   // ロール数が上限超えの場合は ValidationError を投げる
   it("throws ValidationError when role limit is exceeded", async () => {
-    addMentionRoleIdMock.mockResolvedValue("limit_exceeded");
+    addMentionRoleIdMock.mockResolvedValue(VC_RECRUIT_MENTION_ROLE_ADD_RESULT.LIMIT_EXCEEDED);
     const interaction = makeInteraction();
     await expect(
       handleVcRecruitConfigAddRole(interaction as never, GUILD_ID),
@@ -72,7 +73,7 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigAddRole", () 
 
   // 正常時は success embed でエフェメラル返信する
   it("replies with success embed on successful role addition", async () => {
-    addMentionRoleIdMock.mockResolvedValue("added");
+    addMentionRoleIdMock.mockResolvedValue(VC_RECRUIT_MENTION_ROLE_ADD_RESULT.ADDED);
     const interaction = makeInteraction();
     await handleVcRecruitConfigAddRole(interaction as never, GUILD_ID);
 

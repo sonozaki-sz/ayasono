@@ -1,6 +1,6 @@
 // tests/unit/bot/features/bump-reminder/handlers/ui/bumpPanelButtonHandler.test.ts
 import { bumpPanelButtonHandler } from "@/bot/features/bump-reminder/handlers/ui/bumpPanelButtonHandler";
-import { getBotBumpReminderConfigService } from "@/bot/services/botBumpReminderDependencyResolver";
+import { getBotBumpReminderConfigService } from "@/bot/services/botCompositionRoot";
 import {
   createErrorEmbed,
   createSuccessEmbed,
@@ -29,7 +29,7 @@ vi.mock("@/shared/features/bump-reminder/bumpReminderConfigService", () => ({
   },
 }));
 
-vi.mock("@/bot/services/botBumpReminderDependencyResolver", () => ({
+vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotBumpReminderConfigService: vi.fn(() => ({
     addBumpReminderMentionUser: (...args: unknown[]) =>
       addMentionUserMock(...args),

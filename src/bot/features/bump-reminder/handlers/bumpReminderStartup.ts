@@ -7,7 +7,7 @@ import type { BotClient } from "../../../client";
 import {
   getBotBumpReminderConfigService,
   getBotBumpReminderManager,
-} from "../../../services/botBumpReminderDependencyResolver";
+} from "../../../services/botCompositionRoot";
 import { type BumpServiceName } from "../constants/bumpReminderConstants";
 import { type BumpReminderTaskFactory } from "../services/bumpReminderService";
 import { sendBumpReminder } from "./usecases/sendBumpReminder";
