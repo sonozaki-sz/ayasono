@@ -158,7 +158,9 @@ export async function showFinalConfirmDialog(
       // collect ハンドラで処理済みの場合（通常終了・キャンセル・戻る）はスキップ
       // "time" 以外（messageDelete / channelDelete 等）でも未処理なら Timeout として解決し
       // ロックを確実に解放する
-      logger.debug(`[MsgDel] Phase2/FinalConfirm collector ended: reason=${String(reason)}, handledByCollect=${handledByCollect}`);
+      logger.debug(
+        `[MsgDel] Phase2/FinalConfirm collector ended: reason=${String(reason)}, handledByCollect=${handledByCollect}`,
+      );
       if (handledByCollect) return;
       void reason;
       await baseInteraction

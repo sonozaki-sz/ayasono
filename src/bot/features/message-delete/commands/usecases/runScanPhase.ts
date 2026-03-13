@@ -90,7 +90,9 @@ export async function runScanPhase(
     cancelCollector.on("end", (_, reason) => {
       // "user" 以外（messageDelete / channelDelete 等）でメッセージが削除された場合は
       // スキャンを即座に中断する。"user" は finally の cancelCollector.stop() による通常停止。
-      logger.debug(`[MsgDel] Phase1 cancelCollector ended: reason=${String(reason)}`);
+      logger.debug(
+        `[MsgDel] Phase1 cancelCollector ended: reason=${String(reason)}`,
+      );
       if (reason !== "user") {
         logger.debug(`[MsgDel] Phase1 aborting scan due to non-user end`);
         controller.abort();
