@@ -5,10 +5,10 @@
             "name": "🤖 Bot: Debug (Dev)",
             "type": "node",
             "request": "launch",
-            "runtimeExecutable": "pnpm",
+            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/tsx",
             "runtimeArgs": [
-                "run",
-                "dev:bot"
+                "watch",
+                "src/bot/main.ts"
             ],
             "skipFiles": [
                 "<node_internals>/**"
@@ -18,18 +18,21 @@
             "env": {
                 "NODE_ENV": "development"
             },
-            "outFiles": [
-                "${workspaceFolder}/dist/**/*.js"
-            ]
+            "sourceMaps": true,
+            "resolveSourceMapLocations": [
+                "${workspaceFolder}/**",
+                "!**/node_modules/**"
+            ],
+            "autoAttachChildProcesses": true
         },
         {
             "name": "🌐 Web: Debug (Dev)",
             "type": "node",
             "request": "launch",
-            "runtimeExecutable": "pnpm",
+            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/tsx",
             "runtimeArgs": [
-                "run",
-                "dev:web"
+                "watch",
+                "src/web/server.ts"
             ],
             "skipFiles": [
                 "<node_internals>/**"
@@ -39,9 +42,12 @@
             "env": {
                 "NODE_ENV": "development"
             },
-            "outFiles": [
-                "${workspaceFolder}/dist/**/*.js"
-            ]
+            "sourceMaps": true,
+            "resolveSourceMapLocations": [
+                "${workspaceFolder}/**",
+                "!**/node_modules/**"
+            ],
+            "autoAttachChildProcesses": true
         },
         {
             "name": "🚀 All: Debug (Bot + Web)",
@@ -117,12 +123,14 @@
             "type": "node",
             "request": "attach",
             "port": 9229,
+            "restart": true,
             "skipFiles": [
                 "<node_internals>/**"
             ],
             "sourceMaps": true,
-            "outFiles": [
-                "${workspaceFolder}/dist/**/*.js"
+            "resolveSourceMapLocations": [
+                "${workspaceFolder}/**",
+                "!**/node_modules/**"
             ]
         },
         {
