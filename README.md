@@ -36,7 +36,7 @@ VCの非アクティブユーザーをAFKチャンネルに移動する機能で
 
 [📖 詳細仕様](docs/specs/AFK_SPEC.md)
 
-### 🎤 VC自動作成機能（VAC）
+### 🎤 VC自動作成機能
 
 トリガーVC参加時、専用ボイスチャンネルを自動作成・削除する機能です。
 
@@ -274,7 +274,7 @@ ayasono/
 │   │   └── public/
 │   └── shared/               # 共有コード
 │       ├── config/           # 環境変数定義
-│       ├── database/         # Repository・Store・型定義
+│       ├── database/         # リポジトリ・型定義
 │       ├── features/         # 機能モジュール（bot/web 横断で共有するサービス層）
 │       ├── locale/           # i18n（i18next）
 │       ├── scheduler/        # ジョブスケジューラ
@@ -408,9 +408,10 @@ chore: ビルド・補助ツール変更
 
 ## 📄 ライセンス
 
-Apache License 2.0 - 詳細は [LICENSE](LICENSE) を参照
+MIT License - 詳細は [LICENSE](LICENSE) を参照
 
 ---
 
 **開発開始**: 2026年2月
-**最終更新**: 2026年3月1日
+**最終更新**: 2026年3月13日
+**AI利用**: コードおよびドキュメントの作成に生成AIを使用しています。
