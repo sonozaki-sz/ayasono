@@ -229,7 +229,9 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
         },
       };
       const repository = {
-        getBumpReminderConfig: vi.fn().mockResolvedValue({ enabled: false }),
+        getBumpReminderConfigOrDefault: vi
+          .fn()
+          .mockResolvedValue({ enabled: false, mentionUserIds: [] }),
       };
 
       await sendBumpReminder(
@@ -263,7 +265,7 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
         },
       };
       const repository = {
-        getBumpReminderConfig: vi.fn().mockResolvedValue({
+        getBumpReminderConfigOrDefault: vi.fn().mockResolvedValue({
           enabled: true,
           mentionRoleId: "role-1",
           mentionUserIds: ["u-1", "u-2"],
@@ -303,7 +305,7 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
         },
       };
       const repository = {
-        getBumpReminderConfig: vi.fn().mockResolvedValue({
+        getBumpReminderConfigOrDefault: vi.fn().mockResolvedValue({
           enabled: true,
           mentionRoleId: null,
           mentionUserIds: [],
@@ -341,7 +343,7 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
         },
       };
       const repository = {
-        getBumpReminderConfig: vi.fn().mockResolvedValue({
+        getBumpReminderConfigOrDefault: vi.fn().mockResolvedValue({
           enabled: true,
           mentionRoleId: null,
           mentionUserIds: [],
@@ -382,7 +384,7 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
         },
       };
       const repository = {
-        getBumpReminderConfig: vi.fn().mockResolvedValue({
+        getBumpReminderConfigOrDefault: vi.fn().mockResolvedValue({
           enabled: true,
           mentionRoleId: null,
           mentionUserIds: [],
@@ -423,7 +425,7 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
         },
       };
       const repository = {
-        getBumpReminderConfig: vi.fn().mockResolvedValue({
+        getBumpReminderConfigOrDefault: vi.fn().mockResolvedValue({
           enabled: true,
           mentionRoleId: null,
           mentionUserIds: [],
@@ -489,7 +491,7 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
         },
       };
       const repository = {
-        getBumpReminderConfig: vi.fn().mockResolvedValue({
+        getBumpReminderConfigOrDefault: vi.fn().mockResolvedValue({
           enabled: true,
           mentionRoleId: null,
           mentionUserIds: [],
@@ -517,7 +519,9 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
   describe("handleBumpDetected", () => {
     it("returns early when bump reminder is disabled", async () => {
       getBotBumpReminderConfigServiceMock.mockReturnValue({
-        getBumpReminderConfig: vi.fn().mockResolvedValue({ enabled: false }),
+        getBumpReminderConfigOrDefault: vi
+          .fn()
+          .mockResolvedValue({ enabled: false, mentionUserIds: [] }),
       });
 
       await handleBumpDetected(
@@ -536,9 +540,10 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
 
     it("returns early when channel does not match configured channel", async () => {
       getBotBumpReminderConfigServiceMock.mockReturnValue({
-        getBumpReminderConfig: vi.fn().mockResolvedValue({
+        getBumpReminderConfigOrDefault: vi.fn().mockResolvedValue({
           enabled: true,
           channelId: "expected-ch",
+          mentionUserIds: [],
         }),
       });
 
@@ -558,7 +563,9 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
 
     it("schedules reminder and logs detected message on success", async () => {
       const configService = {
-        getBumpReminderConfig: vi.fn().mockResolvedValue({ enabled: true }),
+        getBumpReminderConfigOrDefault: vi
+          .fn()
+          .mockResolvedValue({ enabled: true, mentionUserIds: [] }),
       };
       getBotBumpReminderConfigServiceMock.mockReturnValue(configService);
       scheduleBumpReminderMock.mockResolvedValue(undefined);
@@ -600,7 +607,9 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
 
     it("passes undefined panel message id when panel is not sendable", async () => {
       const configService = {
-        getBumpReminderConfig: vi.fn().mockResolvedValue({ enabled: true }),
+        getBumpReminderConfigOrDefault: vi
+          .fn()
+          .mockResolvedValue({ enabled: true, mentionUserIds: [] }),
       };
       getBotBumpReminderConfigServiceMock.mockReturnValue(configService);
       scheduleBumpReminderMock.mockResolvedValue(undefined);
@@ -638,7 +647,9 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
     // scheduleBumpReminder が例外を投げた場合にエラーをそのまま浜に出さず、ログだけ戻る補償処理を検証
     it("logs detection failure when scheduling throws", async () => {
       getBotBumpReminderConfigServiceMock.mockReturnValue({
-        getBumpReminderConfig: vi.fn().mockResolvedValue({ enabled: true }),
+        getBumpReminderConfigOrDefault: vi
+          .fn()
+          .mockResolvedValue({ enabled: true, mentionUserIds: [] }),
       });
       scheduleBumpReminderMock.mockRejectedValue(new Error("set failed"));
 
