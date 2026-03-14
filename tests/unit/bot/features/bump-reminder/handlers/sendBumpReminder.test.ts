@@ -43,7 +43,7 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
         fetch: vi.fn().mockResolvedValue({ isTextBased: () => false }),
       },
     };
-    const configService = { getBumpReminderConfig: vi.fn() };
+    const configService = { getBumpReminderConfigOrDefault: vi.fn() };
 
     await sendBumpReminder(
       client as never,
@@ -70,7 +70,7 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
       },
     };
     const configService = {
-      getBumpReminderConfig: vi.fn().mockResolvedValue({ enabled: false }),
+      getBumpReminderConfigOrDefault: vi.fn().mockResolvedValue({ enabled: false }),
     };
 
     await sendBumpReminder(
@@ -102,7 +102,7 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
       },
     };
     const configService = {
-      getBumpReminderConfig: vi.fn().mockResolvedValue({
+      getBumpReminderConfigOrDefault: vi.fn().mockResolvedValue({
         enabled: true,
         mentionRoleId: "role-1",
         mentionUserIds: ["user-1"],

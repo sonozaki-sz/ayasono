@@ -53,7 +53,7 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
 
   function makeConfigService(config: unknown = { enabled: true }) {
     return {
-      getBumpReminderConfig: vi.fn().mockResolvedValue(config),
+      getBumpReminderConfigOrDefault: vi.fn().mockResolvedValue(config),
     };
   }
 
@@ -81,7 +81,7 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
     );
 
     expect(loggerMock.warn).toHaveBeenCalled();
-    expect(service.getBumpReminderConfig).not.toHaveBeenCalled();
+    expect(service.getBumpReminderConfigOrDefault).not.toHaveBeenCalled();
   });
 
   it("debugs and returns when config is disabled", async () => {
