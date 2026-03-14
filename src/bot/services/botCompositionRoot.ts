@@ -49,49 +49,87 @@ export interface BotServices {
 // Module-level singletons
 // ---------------------------------------------------------------------------
 
-export const [getBotGuildConfigRepository, setBotGuildConfigRepository] =
+const _guildConfigRepositoryAccessor =
   createBotServiceAccessor<IGuildConfigRepository>("GuildConfigRepository");
+export const getBotGuildConfigRepository: () => IGuildConfigRepository =
+  _guildConfigRepositoryAccessor[0];
+export const setBotGuildConfigRepository: (
+  value: IGuildConfigRepository,
+) => void = _guildConfigRepositoryAccessor[1];
 
-export const [
-  getBotBumpReminderConfigService,
-  setBotBumpReminderConfigService,
-] = createBotServiceAccessor<BumpReminderConfigService>(
-  "BumpReminderConfigService",
-);
+const _bumpReminderConfigServiceAccessor =
+  createBotServiceAccessor<BumpReminderConfigService>(
+    "BumpReminderConfigService",
+  );
+export const getBotBumpReminderConfigService: () => BumpReminderConfigService =
+  _bumpReminderConfigServiceAccessor[0];
+export const setBotBumpReminderConfigService: (
+  value: BumpReminderConfigService,
+) => void = _bumpReminderConfigServiceAccessor[1];
 
-export const [getBotBumpReminderRepository, setBotBumpReminderRepository] =
+const _bumpReminderRepositoryAccessor =
   createBotServiceAccessor<BumpReminderRepositoryType>(
     "BumpReminderRepository",
   );
+export const getBotBumpReminderRepository: () => BumpReminderRepositoryType =
+  _bumpReminderRepositoryAccessor[0];
+export const setBotBumpReminderRepository: (
+  value: BumpReminderRepositoryType,
+) => void = _bumpReminderRepositoryAccessor[1];
 
-export const [getBotBumpReminderManager, setBotBumpReminderManager] =
+const _bumpReminderManagerAccessor =
   createBotServiceAccessor<BumpReminderManager>("BumpReminderManager");
+export const getBotBumpReminderManager: () => BumpReminderManager =
+  _bumpReminderManagerAccessor[0];
+export const setBotBumpReminderManager: (value: BumpReminderManager) => void =
+  _bumpReminderManagerAccessor[1];
 
-export const [getBotVacConfigService, setBotVacConfigService] =
+const _vacConfigServiceAccessor =
   createBotServiceAccessor<VacConfigService>("VacConfigService");
+export const getBotVacConfigService: () => VacConfigService =
+  _vacConfigServiceAccessor[0];
+export const setBotVacConfigService: (value: VacConfigService) => void =
+  _vacConfigServiceAccessor[1];
 
-export const [getBotVacService, setBotVacService] =
-  createBotServiceAccessor<VacService>("VacService");
+const _vacServiceAccessor = createBotServiceAccessor<VacService>("VacService");
+export const getBotVacService: () => VacService = _vacServiceAccessor[0];
+export const setBotVacService: (value: VacService) => void =
+  _vacServiceAccessor[1];
 
-export const [
-  getBotStickyMessageConfigService,
-  setBotStickyMessageConfigService,
-] = createBotServiceAccessor<StickyMessageConfigService>(
-  "StickyMessageConfigService",
-);
+const _stickyMessageConfigServiceAccessor =
+  createBotServiceAccessor<StickyMessageConfigService>(
+    "StickyMessageConfigService",
+  );
+export const getBotStickyMessageConfigService: () => StickyMessageConfigService =
+  _stickyMessageConfigServiceAccessor[0];
+export const setBotStickyMessageConfigService: (
+  value: StickyMessageConfigService,
+) => void = _stickyMessageConfigServiceAccessor[1];
 
-export const [
-  getBotStickyMessageResendService,
-  setBotStickyMessageResendService,
-] = createBotServiceAccessor<StickyMessageResendService>(
-  "StickyMessageResendService",
-);
+const _stickyMessageResendServiceAccessor =
+  createBotServiceAccessor<StickyMessageResendService>(
+    "StickyMessageResendService",
+  );
+export const getBotStickyMessageResendService: () => StickyMessageResendService =
+  _stickyMessageResendServiceAccessor[0];
+export const setBotStickyMessageResendService: (
+  value: StickyMessageResendService,
+) => void = _stickyMessageResendServiceAccessor[1];
 
-export const [getBotMemberLogConfigService, setBotMemberLogConfigService] =
+const _memberLogConfigServiceAccessor =
   createBotServiceAccessor<MemberLogConfigService>("MemberLogConfigService");
+export const getBotMemberLogConfigService: () => MemberLogConfigService =
+  _memberLogConfigServiceAccessor[0];
+export const setBotMemberLogConfigService: (
+  value: MemberLogConfigService,
+) => void = _memberLogConfigServiceAccessor[1];
 
-export const [getBotVcRecruitRepository, setBotVcRecruitRepository] =
+const _vcRecruitRepositoryAccessor =
   createBotServiceAccessor<IVcRecruitRepository>("VcRecruitRepository");
+export const getBotVcRecruitRepository: () => IVcRecruitRepository =
+  _vcRecruitRepositoryAccessor[0];
+export const setBotVcRecruitRepository: (value: IVcRecruitRepository) => void =
+  _vcRecruitRepositoryAccessor[1];
 
 // ---------------------------------------------------------------------------
 // Composition Root initializer

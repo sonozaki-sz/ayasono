@@ -20,7 +20,10 @@ const RESEND_DELAY_MS = 5_000;
  * スティッキーメッセージ再送信サービス
  */
 export class StickyMessageResendService {
-  constructor(private readonly repository: IStickyMessageRepository) {}
+  private readonly repository: IStickyMessageRepository;
+  constructor(repository: IStickyMessageRepository) {
+    this.repository = repository;
+  }
 
   /**
    * メッセージ作成イベントでスティッキーメッセージを処理する

@@ -1,8 +1,8 @@
-// tests/unit/utils/messageResponse.test.ts
+// tests/unit/bot/utils/messageResponse.test.ts
 // メッセージレスポンスユーティリティのテスト
 
 import {
-  MessageStatus,
+  type MessageStatus,
   createErrorEmbed,
   createInfoEmbed,
   createStatusEmbed,

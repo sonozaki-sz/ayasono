@@ -1,7 +1,7 @@
 // src/shared/database/repositories/persistence/guildConfigReadPersistence.ts
 // guildConfig の read 系永続化ヘルパー
 
-import type { PrismaClient } from "@prisma/client";
+import type { GuildConfig, PrismaClient } from "@prisma/client";
 
 /**
  * guildConfig レコードを1件取得する
@@ -12,7 +12,7 @@ import type { PrismaClient } from "@prisma/client";
 export async function findGuildConfigRecord(
   prisma: PrismaClient,
   guildId: string,
-) {
+): Promise<GuildConfig | null> {
   return prisma.guildConfig.findUnique({
     where: { guildId },
   });

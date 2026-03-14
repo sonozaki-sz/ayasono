@@ -27,9 +27,11 @@ export type BumpReminderTaskFactory = (
  * Bumpリマインダー用のジョブマネージャー
  */
 export class BumpReminderManager {
-  constructor(private readonly repository: IBumpReminderRepository) {}
-
+  private readonly repository: IBumpReminderRepository;
   private reminders: Map<string, ScheduledReminderRef> = new Map();
+  constructor(repository: IBumpReminderRepository) {
+    this.repository = repository;
+  }
 
   /**
    * リマインダーを設定（DBに保存 + スケジュール登録）

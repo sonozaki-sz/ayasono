@@ -22,7 +22,10 @@ import {
  * guild_bump_reminder_configs テーブルを使用した Bumpリマインダー設定リポジトリ
  */
 export class BumpReminderConfigRepository implements IBumpReminderConfigRepository {
-  constructor(private readonly prisma: PrismaClient) {}
+  private readonly prisma: PrismaClient;
+  constructor(prisma: PrismaClient) {
+    this.prisma = prisma;
+  }
 
   async getBumpReminderConfig(
     guildId: string,

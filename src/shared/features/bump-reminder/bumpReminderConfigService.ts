@@ -16,6 +16,7 @@ import {
   type BumpReminderMentionUserRemoveResult,
   type BumpReminderMentionUsersClearResult,
   type IBumpReminderConfigRepository,
+  type IGuildConfigRepository,
 } from "../../database/types";
 import {
   DEFAULT_BUMP_REMINDER_CONFIG,
@@ -45,9 +46,10 @@ export type {
  * Bumpリマインダー設定の取得・更新を担当するサービス
  */
 export class BumpReminderConfigService {
-  constructor(
-    private readonly guildConfigRepository: IBumpReminderConfigRepository,
-  ) {}
+  private readonly guildConfigRepository: IBumpReminderConfigRepository;
+  constructor(guildConfigRepository: IBumpReminderConfigRepository) {
+    this.guildConfigRepository = guildConfigRepository;
+  }
 
   /**
    * Bumpリマインダー設定を取得する
@@ -180,7 +182,9 @@ export function createBumpReminderConfigService(
 /**
  * Bumpリマインダー設定サービスのシングルトンを取得する
  */
-export const getBumpReminderConfigService = createServiceGetter(
+export const getBumpReminderConfigService: (
+  repository?: IGuildConfigRepository,
+) => BumpReminderConfigService = createServiceGetter(
   createBumpReminderConfigService,
   getGuildConfigRepository,
 );

@@ -3,6 +3,7 @@
 
 import { getGuildConfigRepository } from "../../database/guildConfigRepositoryProvider";
 import type {
+  IGuildConfigRepository,
   IMemberLogConfigRepository,
   MemberLogConfig,
 } from "../../database/types";
@@ -19,7 +20,10 @@ export { DEFAULT_MEMBER_LOG_CONFIG };
  * メンバーログ設定の取得・更新を担当するサービス
  */
 export class MemberLogConfigService {
-  constructor(private readonly repository: IMemberLogConfigRepository) {}
+  private readonly repository: IMemberLogConfigRepository;
+  constructor(repository: IMemberLogConfigRepository) {
+    this.repository = repository;
+  }
 
   /**
    * メンバーログ設定を取得する
@@ -132,7 +136,9 @@ export function createMemberLogConfigService(
  * @param repository 明示的に利用するリポジトリ（省略時は既定リポジトリ）
  * @returns MemberLogConfigService シングルトン
  */
-export const getMemberLogConfigService = createServiceGetter(
+export const getMemberLogConfigService: (
+  repository?: IGuildConfigRepository,
+) => MemberLogConfigService = createServiceGetter(
   createMemberLogConfigService,
   getGuildConfigRepository,
 );

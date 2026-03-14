@@ -8,7 +8,10 @@ import type { AfkConfig, IAfkConfigRepository } from "../types";
  * guild_afk_configs テーブルを使用した AFK 設定リポジトリ
  */
 export class AfkConfigRepository implements IAfkConfigRepository {
-  constructor(private readonly prisma: PrismaClient) {}
+  private readonly prisma: PrismaClient;
+  constructor(prisma: PrismaClient) {
+    this.prisma = prisma;
+  }
 
   async getAfkConfig(guildId: string): Promise<AfkConfig | null> {
     const record = await this.prisma.guildAfkConfig.findUnique({

@@ -87,7 +87,7 @@ if (env.DISCORD_ERROR_WEBHOOK_URL) {
 }
 
 // アプリ全体で共有するロガーインスタンス
-export const logger = winston.createLogger({
+export const logger: winston.Logger = winston.createLogger({
   // ログレベルは環境変数優先、未設定時は info
   level: env.LOG_LEVEL || "info",
   transports,

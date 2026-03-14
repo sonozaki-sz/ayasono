@@ -24,9 +24,10 @@ export { DEFAULT_VC_RECRUIT_CONFIG };
  * VC募集設定の取得・更新を担当するサービス
  */
 export class VcRecruitConfigService {
-  constructor(
-    private readonly vcRecruitRepository: IVcRecruitConfigRepository,
-  ) {}
+  private readonly vcRecruitRepository: IVcRecruitConfigRepository;
+  constructor(vcRecruitRepository: IVcRecruitConfigRepository) {
+    this.vcRecruitRepository = vcRecruitRepository;
+  }
 
   /**
    * VC募集設定を取得（未設定時は初期値を返す）
@@ -272,7 +273,7 @@ export class VcRecruitConfigService {
   }
 
   /** デフォルトのスレッドアーカイブ時間 */
-  static readonly DEFAULT_THREAD_ARCHIVE_DURATION =
+  static readonly DEFAULT_THREAD_ARCHIVE_DURATION: typeof DEFAULT_THREAD_ARCHIVE_DURATION =
     DEFAULT_THREAD_ARCHIVE_DURATION;
 }
 

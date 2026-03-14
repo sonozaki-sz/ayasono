@@ -13,7 +13,10 @@ import { executeWithDatabaseError } from "../../../../shared/utils/errorHandling
  * Prisma 実装
  */
 export class StickyMessageRepository implements IStickyMessageRepository {
-  constructor(private prisma: PrismaClient) {}
+  private prisma: PrismaClient;
+  constructor(prisma: PrismaClient) {
+    this.prisma = prisma;
+  }
 
   async findByChannel(channelId: string): Promise<StickyMessage | null> {
     return executeWithDatabaseError(

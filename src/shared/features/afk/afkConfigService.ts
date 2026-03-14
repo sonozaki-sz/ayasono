@@ -5,6 +5,7 @@ import { getGuildConfigRepository } from "../../database/guildConfigRepositoryPr
 import {
   type AfkConfig,
   type IAfkConfigRepository,
+  type IGuildConfigRepository,
 } from "../../database/types";
 import { createServiceGetter } from "../../utils/serviceFactory";
 import { tDefault } from "../../locale/localeManager";
@@ -24,7 +25,10 @@ export { DEFAULT_AFK_CONFIG };
  * DBアクセスは IAfkConfigRepository 経由に統一する
  */
 export class AfkConfigService {
-  constructor(private readonly guildConfigRepository: IAfkConfigRepository) {}
+  private readonly guildConfigRepository: IAfkConfigRepository;
+  constructor(guildConfigRepository: IAfkConfigRepository) {
+    this.guildConfigRepository = guildConfigRepository;
+  }
 
   /**
    * AFK設定を取得する
@@ -101,7 +105,9 @@ export function createAfkConfigService(
 /**
  * AFK設定サービスのシングルトンを取得する
  */
-export const getAfkConfigService = createServiceGetter(
+export const getAfkConfigService: (
+  repository?: IGuildConfigRepository,
+) => AfkConfigService = createServiceGetter(
   createAfkConfigService,
   getGuildConfigRepository,
 );

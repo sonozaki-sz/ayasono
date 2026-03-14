@@ -49,9 +49,22 @@ export const BUMP_COMMANDS = {
 } as const;
 
 /**
+ * Bump検知対象のサービス名
+ */
+export type BumpServiceName =
+  (typeof BUMP_SERVICES)[keyof typeof BUMP_SERVICES];
+
+export type BumpReminderStatus =
+  (typeof BUMP_REMINDER_STATUS)[keyof typeof BUMP_REMINDER_STATUS];
+
+/**
  * Bot ID + コマンド名の検知ルール
  */
-export const BUMP_DETECTION_RULES = [
+export const BUMP_DETECTION_RULES: readonly {
+  readonly botId: string;
+  readonly commandName: string;
+  readonly serviceName: BumpServiceName;
+}[] = [
   {
     botId: BUMP_CONSTANTS.DISBOARD_BOT_ID,
     commandName: BUMP_COMMANDS.DISBOARD,
@@ -87,15 +100,6 @@ export function toScheduledAt(delayMinutes: number): Date {
   // 現在時刻に遅延分を加算して実行予定時刻を生成
   return new Date(Date.now() + delayMinutes * MS_PER_MINUTE);
 }
-
-/**
- * Bump検知対象のサービス名
- */
-export type BumpServiceName =
-  (typeof BUMP_SERVICES)[keyof typeof BUMP_SERVICES];
-
-export type BumpReminderStatus =
-  (typeof BUMP_REMINDER_STATUS)[keyof typeof BUMP_REMINDER_STATUS];
 
 /**
  * 任意文字列が BumpServiceName か判定
