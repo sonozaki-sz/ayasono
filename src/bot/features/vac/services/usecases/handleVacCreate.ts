@@ -100,7 +100,13 @@ export async function handleVacCreateUseCase(
     logger.error(tDefault("system:vac.panel_send_failed"), error);
   });
 
-  await member.voice.setChannel(voiceChannel);
+  try {
+    await member.voice.setChannel(voiceChannel);
+  } catch {
+    // ユーザーがチャンネル参加直後に切断した場合、移動不可能なため作成チャンネルを削除して終了
+    await voiceChannel.delete().catch(() => null);
+    return;
+  }
 
   await vacRepository.addCreatedVacChannel(member.guild.id, {
     voiceChannelId: voiceChannel.id,
