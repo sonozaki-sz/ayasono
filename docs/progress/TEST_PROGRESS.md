@@ -12,10 +12,10 @@
 
 ### 最新テスト実行結果（2026年3月14日）
 
-- ✅ **全テスト PASSED**: 1361/1361
-- ✅ **全スイート PASSED**: 189/189
+- ✅ **全テスト PASSED**: 1382/1382
+- ✅ **全スイート PASSED**: 183/183
 - ⏱️ **実行時間**: ~4秒
-- 📦 **カバレッジ（global）**: statements 98.92% / branches 97.89% / functions 95.63% / lines 99.07%
+- 📦 **カバレッジ（global）**: statements 96.34% / branches 94.93% / functions 88.19% / lines 96.73%
 - ✅ **カバレッジしきい値**: `{ branches: 94, functions: 88, lines: 95, statements: 95 }`（`vitest.config.ts` 設定済み / 全クリア）
 
 ### カバレッジ除外対象（vitest.config.ts）
@@ -195,7 +195,7 @@ GuildConfig JSON カラム廃止・機能別専用テーブル化に伴うリポ
 
 ### 短期目標（継続中）
 
-- **全体カバレッジ**: ✅ 全閾値クリア（statements 98.92% / branches 97.89% / functions 95.63% / lines 99.07%）
+- **全体カバレッジ**: ✅ 全閾値クリア（statements 96.34% / branches 94.93% / functions 88.19% / lines 96.73%）
 - **新機能**: 実装と同時にテスト作成（方針継続）
 
 ### 中長期目標

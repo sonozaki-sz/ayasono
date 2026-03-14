@@ -10,8 +10,8 @@
 
 ### 残タスク統計
 
-- 残タスク合計: **29件**
-- bot優先対象（1～3）: **13件**
+- 残タスク合計: **33件**
+- bot優先対象（1～3）: **17件**
 - デプロイ・運用（4）: **4件**
 - Web UI実装（5 / 凍結中）: **12件**
 
@@ -19,7 +19,7 @@
 
 | No. | 内容               | 残件 | 状態 |
 | --- | ------------------ | ---- | ---- |
-| 1   | 主要機能実装       | 4    | 🛠️   |
+| 1   | 主要機能実装       | 8    | 🛠️   |
 | 2   | 基本コマンド追加   | 3    | 📋   |
 | 3   | テスト・品質向上   | 6    | 🚧   |
 | 4   | デプロイ・運用     | 4    | 🚧   |
@@ -35,7 +35,7 @@
 
 > 運用方針（2026-02-21）: Web系（5系統）は一旦凍結し、bot層（1〜3）を優先。bot層が安定したら4（デプロイ・運用）へ進み、5（Web UI実装）を再開する。
 
-### 1. 主要機能実装 - 残4件
+### 1. 主要機能実装 - 残8件
 
 #### 1.1 VC自動作成機能 - ✅ 完了
 
@@ -96,7 +96,34 @@
 
 **仕様書**: [docs/specs/VC_RECRUIT_SPEC.md](docs/specs/VC_RECRUIT_SPEC.md)
 
-#### 1.6 ギルド設定機能 - 残4件
+#### 1.6 ロケール対応（interaction.locale 導入） - 残4件
+
+コマンド応答のロケールを `tGuild`（ギルド設定）から `interaction.locale`（ユーザーのDiscordクライアント言語）に切り替える。
+
+**方針**:
+
+- `interaction.locale` が `ja` → 日本語、それ以外 → 英語
+- ユーザーが直接操作するコマンド応答・エラー応答 → `interaction.locale` を使用
+- チャンネル全体向けの自動メッセージ（Bumpリマインダー通知、メンバーログ、VC募集パネル、スティッキーメッセージ再送信、VACパネル等） → `tGuild` を維持
+- システムログ → `tDefault` を維持
+
+**実装計画**:
+
+- [ ] `tInteraction` ヘルパー関数を `localeManager.ts` に追加（`interaction.locale` → `SupportedLocale` 変換 + `getFixedT` で翻訳）
+- [ ] 全コマンドハンドラの `tGuild` 呼び出しを `tInteraction` に置き換え（ping / afk / afk-config / bump-reminder-config / vac / vac-config / sticky-message / member-log-config / message-delete / vc-recruit-config）
+- [ ] UIハンドラ（ボタン・モーダル・セレクトメニュー）のうちユーザー応答部分を `tInteraction` に置き換え
+- [ ] テスト更新（`tGuild` → `tInteraction` の差し替えに伴うモック修正）
+
+**対象外（tGuild を維持）**:
+
+- `bumpReminderHandler.ts` / `sendBumpReminder.ts`（2時間後の自動通知）
+- `bumpMessageCreateHandler.ts`（Bump検知パネル）
+- `guildMemberAddHandler.ts` / `guildMemberRemoveHandler.ts`（参加・退出ログ）
+- `stickyMessageResendService.ts`（スティッキーメッセージ再送信）
+- VC募集の投稿・パネル送信
+- VACパネルのラベル
+
+#### 1.7 ギルド設定機能 - 残4件
 
 - [ ] `/guild-config set-locale` コマンド実装（ja / en 切り替え）
 - [ ] `/guild-config view` コマンド実装（概要 + 各機能詳細のページネーション・セレクトメニュー）
@@ -209,7 +236,7 @@
 
 ## 🎯 優先度別タスク
 
-1. **主要機能実装** - 5件
+1. **主要機能実装** - 8件
 2. **基本コマンド追加** - 3件
 3. **テスト・品質向上** - 6件
 4. **デプロイ・運用** - 4件
@@ -305,7 +332,8 @@
    - ~~メッセージ削除機能（`/message-delete`）~~ ✅ **完了**
    - ~~VAC E2E検証~~ ✅ **完了**（bot実装完了後にまとめて作成予定）
    - ~~VC募集機能実装~~ ✅ **完了**（feature/vc-recruit）
-   - **次: ギルド設定機能**（セクション 1.6）
+   - **次: ロケール対応（interaction.locale 導入）**（セクション 1.6）
+   - ギルド設定機能（セクション 1.7）
 
 4. **基本コマンド追加**（セクション 2）
    - `/help` / `/server-info` / `/user-info`
@@ -321,5 +349,5 @@
 
 ---
 
-**最終更新**: 2026年3月13日
-**次のマイルストーン**: ギルド設定機能実装 → E2E テスト着手
+**最終更新**: 2026年3月14日
+**次のマイルストーン**: ロケール対応（interaction.locale 導入） → ギルド設定機能実装 → E2E テスト着手
