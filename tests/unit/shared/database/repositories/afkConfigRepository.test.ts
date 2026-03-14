@@ -17,7 +17,7 @@ describe("shared/database/repositories/afkConfigRepository", () => {
   }
 
   describe("getAfkConfig", () => {
-    it("returns null when record not found", async () => {
+    it("レコードが存在しない場合は null を返すこと", async () => {
       const prisma = createPrismaMock();
       prisma.guildAfkConfig.findUnique.mockResolvedValue(null);
 
@@ -31,7 +31,7 @@ describe("shared/database/repositories/afkConfigRepository", () => {
       });
     });
 
-    it("returns AfkConfig when record found with channelId", async () => {
+    it("channelId を含むレコードが見つかった場合は AfkConfig を返すこと", async () => {
       const prisma = createPrismaMock();
       prisma.guildAfkConfig.findUnique.mockResolvedValue({
         guildId: "guild-1",
@@ -46,7 +46,7 @@ describe("shared/database/repositories/afkConfigRepository", () => {
       expect(result).toEqual({ enabled: true, channelId: "ch-1" });
     });
 
-    it("returns AfkConfig with undefined channelId when null in DB", async () => {
+    it("DB の channelId が null の場合は undefined として返すこと", async () => {
       const prisma = createPrismaMock();
       prisma.guildAfkConfig.findUnique.mockResolvedValue({
         guildId: "guild-1",
@@ -63,7 +63,7 @@ describe("shared/database/repositories/afkConfigRepository", () => {
   });
 
   describe("setAfkChannel", () => {
-    it("calls updateAfkConfig with enabled=true and given channelId", async () => {
+    it("enabled=true と指定 channelId で updateAfkConfig が呼ばれること", async () => {
       const prisma = createPrismaMock();
       prisma.guildAfkConfig.upsert.mockResolvedValue({});
 
@@ -88,7 +88,7 @@ describe("shared/database/repositories/afkConfigRepository", () => {
   });
 
   describe("updateAfkConfig", () => {
-    it("upserts record with given config values", async () => {
+    it("指定した設定値でレコードを upsert すること", async () => {
       const prisma = createPrismaMock();
       prisma.guildAfkConfig.upsert.mockResolvedValue({});
 
@@ -113,7 +113,7 @@ describe("shared/database/repositories/afkConfigRepository", () => {
       });
     });
 
-    it("uses null for undefined channelId in upsert", async () => {
+    it("channelId が undefined の場合は upsert で null を使用すること", async () => {
       const prisma = createPrismaMock();
       prisma.guildAfkConfig.upsert.mockResolvedValue({});
 

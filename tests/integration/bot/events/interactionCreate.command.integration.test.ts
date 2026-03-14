@@ -96,8 +96,7 @@ describe("integration: interactionCreate + pingCommand", () => {
     vi.clearAllMocks();
   });
 
-  // interactionCreate から pingCommand までの実行経路を統合的に確認する
-  it("dispatches chat command through event and returns latency embed", async () => {
+  it("interactionCreate から pingCommand までの実行経路を統合的に確認する", async () => {
     const interaction = createInteraction();
 
     await interactionCreateEvent.execute(

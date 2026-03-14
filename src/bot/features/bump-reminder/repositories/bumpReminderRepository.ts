@@ -25,7 +25,10 @@ import {
  * Prisma実装
  */
 export class BumpReminderRepository implements IBumpReminderRepository {
-  constructor(private prisma: PrismaClient) {}
+  private prisma: PrismaClient;
+  constructor(prisma: PrismaClient) {
+    this.prisma = prisma;
+  }
 
   /**
    * 新しいリマインダーを作成

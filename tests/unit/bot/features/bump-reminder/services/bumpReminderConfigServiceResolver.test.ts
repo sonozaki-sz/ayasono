@@ -17,7 +17,7 @@ describe("bot/features/bump-reminder/services/bumpReminderConfigServiceResolver"
     vi.clearAllMocks();
   });
 
-  it("creates feature config service from injected repository", async () => {
+  it("注入されたリポジトリから feature config サービスを生成する", async () => {
     const service = { getBumpReminderConfig: vi.fn() };
     createBumpReminderConfigServiceMock.mockReturnValue(service);
 
@@ -35,7 +35,7 @@ describe("bot/features/bump-reminder/services/bumpReminderConfigServiceResolver"
     );
   });
 
-  it("returns shared singleton when repository is omitted", async () => {
+  it("リポジトリ未指定の場合は共有シングルトンを返す", async () => {
     const shared = { getBumpReminderConfig: vi.fn() };
     getBumpReminderConfigServiceMock.mockReturnValue(shared);
 
@@ -48,7 +48,7 @@ describe("bot/features/bump-reminder/services/bumpReminderConfigServiceResolver"
     expect(getBumpReminderConfigServiceMock).toHaveBeenCalledTimes(1);
   });
 
-  it("caches service per repository instance", async () => {
+  it("リポジトリインスタンスごとにサービスをキャッシュする", async () => {
     const serviceA = { id: "service-a" };
     const serviceB = { id: "service-b" };
     createBumpReminderConfigServiceMock

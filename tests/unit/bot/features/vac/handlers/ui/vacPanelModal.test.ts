@@ -91,13 +91,13 @@ describe("bot/features/vac/handlers/ui/vacPanelModal", () => {
     isVcPanelManagedChannelMock.mockResolvedValue(true);
   });
 
-  it("matches only supported modal customId prefixes", () => {
+  it("サポートされているモーダルのcustomIdプレフィックスのみにマッチする", () => {
     expect(vcPanelModalHandler.matches("vac:rename-modal:voice-1")).toBe(true);
     expect(vcPanelModalHandler.matches("vac:limit-modal:voice-1")).toBe(true);
     expect(vcPanelModalHandler.matches("other:voice-1")).toBe(false);
   });
 
-  it("replies error when target channel is not managed by VAC", async () => {
+  it("対象チャンネルがVACに管理されていない場合はエラーを返答する", async () => {
     isVcPanelManagedChannelMock.mockResolvedValueOnce(false);
     const interaction = createBaseInteraction();
 
@@ -109,8 +109,7 @@ describe("bot/features/vac/handlers/ui/vacPanelModal", () => {
     });
   });
 
-  // 入力値の前後空白をトリムして channel.edit に渡し、成功メッセージを返すことを検証
-  it("renames voice channel and replies success", async () => {
+  it("入力値の前後空白をトリムして channel.edit に渡し、成功メッセージを返すことを検証", async () => {
     const editMock = vi.fn().mockResolvedValue(undefined);
     const interaction = createBaseInteraction({
       customId: "vac:rename-modal:voice-1",
@@ -127,8 +126,7 @@ describe("bot/features/vac/handlers/ui/vacPanelModal", () => {
     });
   });
 
-  // 数値に変換できない入力（"abc"）ではチャンネル編集を行わずバリデーションエラーを返すことを検証
-  it("replies range error when limit input is invalid", async () => {
+  it("数値に変換できない入力（\"abc\"）ではチャンネル編集を行わずバリデーションエラーを返すことを検証", async () => {
     const editMock = vi.fn().mockResolvedValue(undefined);
     const interaction = createBaseInteraction({
       customId: "vac:limit-modal:voice-1",

@@ -18,7 +18,7 @@ describe("bot/features/bump-reminder/services/usecases/clearAllBumpRemindersUsec
     vi.clearAllMocks();
   });
 
-  it("calls cancelByKey for all tracked reminder keys", async () => {
+  it("追跡中のすべてのリマインダーキーに対して cancelByKey を呼ぶ", async () => {
     const cancelByKey = vi.fn().mockResolvedValue(true);
     const reminders = new Map([
       ["g1", { jobId: "job-1", reminderId: "r1" }],
@@ -31,7 +31,7 @@ describe("bot/features/bump-reminder/services/usecases/clearAllBumpRemindersUsec
     expect(cancelByKey).toHaveBeenCalledWith("g2");
   });
 
-  it("logs when one cancellation promise is rejected", async () => {
+  it("キャンセル処理のひとつが reject された場合はエラーログを記録する", async () => {
     const cancelByKey = vi
       .fn()
       .mockResolvedValueOnce(true)

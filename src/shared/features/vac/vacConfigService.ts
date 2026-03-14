@@ -4,6 +4,7 @@
 import { getGuildConfigRepository } from "../../database/guildConfigRepositoryProvider";
 import { createServiceGetter } from "../../utils/serviceFactory";
 import {
+  type IGuildConfigRepository,
   type IVacConfigRepository,
   type VacChannelPair,
   type VacConfig,
@@ -34,7 +35,10 @@ function hasCreatedChannel(config: VacConfig, voiceChannelId: string): boolean {
  * DBアクセスは IVacConfigRepository 経由に統一する
  */
 export class VacConfigService {
-  constructor(private readonly guildConfigRepository: IVacConfigRepository) {}
+  private readonly guildConfigRepository: IVacConfigRepository;
+  constructor(guildConfigRepository: IVacConfigRepository) {
+    this.guildConfigRepository = guildConfigRepository;
+  }
 
   /**
    * VAC設定を取得（未設定時は初期値を返す）
@@ -247,7 +251,9 @@ export function createVacConfigService(
 /**
  * VAC設定サービスのシングルトンを取得する
  */
-export const getVacConfigService = createServiceGetter(
+export const getVacConfigService: (
+  repository?: IGuildConfigRepository,
+) => VacConfigService = createServiceGetter(
   createVacConfigService,
   getGuildConfigRepository,
 );

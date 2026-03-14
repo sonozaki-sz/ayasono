@@ -74,8 +74,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.setChannel", (
     setChannelIdMock.mockResolvedValue(undefined);
   });
 
-  // ガードが ValidationError を投げた場合にそれが伝播することを確認
-  it("propagates error when guard throws", async () => {
+  it("ガードが ValidationError を投げた場合にそれが伝播することを確認", async () => {
     ensurePermissionMock.mockRejectedValue(new ValidationError("no-perm"));
     const interaction = makeInteraction();
 
@@ -84,8 +83,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.setChannel", (
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  // テキストチャンネル以外を選択した場合に ValidationError を投げることを確認
-  it("throws ValidationError when selected channel is not a text channel", async () => {
+  it("テキストチャンネル以外を選択した場合に ValidationError を投げることを確認", async () => {
     ensurePermissionMock.mockResolvedValue(undefined);
     const interaction = makeInteraction(ChannelType.GuildVoice);
 
@@ -94,8 +92,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.setChannel", (
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  // テキストチャンネルが選択された場合に setChannelId が呼ばれることを確認
-  it("calls service.setChannelId with correct arguments on success", async () => {
+  it("テキストチャンネルが選択された場合に service.setChannelId が正しい引数で呼ばれることを確認", async () => {
     ensurePermissionMock.mockResolvedValue(undefined);
     const interaction = makeInteraction();
 
@@ -104,8 +101,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.setChannel", (
     expect(setChannelIdMock).toHaveBeenCalledWith("guild-1", "ch-123");
   });
 
-  // 成功時に interaction.reply が呼ばれることを確認
-  it("replies with success embed on success", async () => {
+  it("成功時に success embed で interaction.reply が呼ばれることを確認", async () => {
     ensurePermissionMock.mockResolvedValue(undefined);
     const interaction = makeInteraction();
 
@@ -116,8 +112,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.setChannel", (
     );
   });
 
-  // 成功時に logger.info が呼ばれることを確認
-  it("logs info on success", async () => {
+  it("成功時に logger.info が呼ばれることを確認", async () => {
     ensurePermissionMock.mockResolvedValue(undefined);
     const interaction = makeInteraction();
 
@@ -128,8 +123,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.setChannel", (
     );
   });
 
-  // getChannel が MEMBER_LOG_CONFIG_COMMAND.OPTION.CHANNEL を引数に呼ばれることを確認
-  it("requests channel option with correct option name", async () => {
+  it("getChannel が MEMBER_LOG_CONFIG_COMMAND.OPTION.CHANNEL を引数に呼ばれることを確認", async () => {
     ensurePermissionMock.mockResolvedValue(undefined);
     const interaction = makeInteraction();
 

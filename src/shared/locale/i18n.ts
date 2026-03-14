@@ -87,6 +87,6 @@ export const changeLanguage = async (
 /**
  * 翻訳関数のエクスポート
  */
-export const t = i18next.t.bind(i18next);
+export const t: typeof i18next.t = i18next.t.bind(i18next);
 
 export default i18next;

@@ -10,7 +10,7 @@ vi.mock("@/shared/locale/localeManager", () => ({
 
 describe("bot/features/vac/commands/helpers/vacVoiceChannelResolver", () => {
   // 編集対象VCの解決条件とエラー分岐を検証する
-  it("returns guild voice channel when target channel is valid", async () => {
+  it("対象チャンネルが有効なギルドボイスチャンネルの場合にそれを返す", async () => {
     const voiceChannel = {
       id: "voice-1",
       type: ChannelType.GuildVoice,
@@ -32,7 +32,7 @@ describe("bot/features/vac/commands/helpers/vacVoiceChannelResolver", () => {
     expect(result).toBe(voiceChannel);
   });
 
-  it("throws ValidationError when channel is missing", async () => {
+  it("チャンネルが存在しない場合にValidationErrorをスローする", async () => {
     const interaction = {
       guild: {
         channels: {
@@ -51,7 +51,7 @@ describe("bot/features/vac/commands/helpers/vacVoiceChannelResolver", () => {
     );
   });
 
-  it("throws ValidationError when channel is not voice", async () => {
+  it("チャンネルがボイスチャンネルでない場合にValidationErrorをスローする", async () => {
     const interaction = {
       guild: {
         channels: {

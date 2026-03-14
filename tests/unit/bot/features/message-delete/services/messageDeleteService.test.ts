@@ -38,21 +38,21 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
   // ─────────────────────────────────────────────────────────────
 
   describe("parseDateStr", () => {
-    it("parses YYYY-MM-DD format with endOfDay=false", async () => {
+    it("endOfDay=false で YYYY-MM-DD 形式をパースする", async () => {
       const { parseDateStr } = await loadModule();
       const result = parseDateStr("2024-01-15", false, "+00:00");
       expect(result).toBeInstanceOf(Date);
       expect(result?.toISOString()).toBe("2024-01-15T00:00:00.000Z");
     });
 
-    it("parses YYYY-MM-DD format with endOfDay=true", async () => {
+    it("endOfDay=true で YYYY-MM-DD 形式をパースする", async () => {
       const { parseDateStr } = await loadModule();
       const result = parseDateStr("2024-01-15", true, "+00:00");
       expect(result).toBeInstanceOf(Date);
       expect(result?.toISOString()).toBe("2024-01-15T23:59:59.000Z");
     });
 
-    it("applies timezone offset to YYYY-MM-DD format", async () => {
+    it("YYYY-MM-DD 形式にタイムゾーンオフセットを適用する", async () => {
       const { parseDateStr } = await loadModule();
       const result = parseDateStr("2024-01-15", false, "+09:00");
       expect(result).toBeInstanceOf(Date);
@@ -60,35 +60,35 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
       expect(result?.toISOString()).toBe("2024-01-14T15:00:00.000Z");
     });
 
-    it("parses YYYY-MM-DDTHH:MM:SS format without offset", async () => {
+    it("オフセットなしの YYYY-MM-DDTHH:MM:SS 形式をパースする", async () => {
       const { parseDateStr } = await loadModule();
       const result = parseDateStr("2024-01-15T12:30:45", false, "+00:00");
       expect(result).toBeInstanceOf(Date);
       expect(result?.toISOString()).toBe("2024-01-15T12:30:45.000Z");
     });
 
-    it("parses YYYY-MM-DDTHH:MM:SS+offset format", async () => {
+    it("YYYY-MM-DDTHH:MM:SS+offset 形式をパースする", async () => {
       const { parseDateStr } = await loadModule();
       const result = parseDateStr("2024-01-15T12:30:45+09:00", false, "+00:00");
       expect(result).toBeInstanceOf(Date);
       expect(result?.toISOString()).toBe("2024-01-15T03:30:45.000Z");
     });
 
-    it("parses YYYY-MM-DDTHH:MM:SSZ format", async () => {
+    it("YYYY-MM-DDTHH:MM:SSZ 形式をパースする", async () => {
       const { parseDateStr } = await loadModule();
       const result = parseDateStr("2024-01-15T12:30:45Z", false, "+00:00");
       expect(result).toBeInstanceOf(Date);
       expect(result?.toISOString()).toBe("2024-01-15T12:30:45.000Z");
     });
 
-    it("returns null for invalid format", async () => {
+    it("無効な形式の場合は null を返す", async () => {
       const { parseDateStr } = await loadModule();
       expect(parseDateStr("not-a-date", false, "+00:00")).toBeNull();
       expect(parseDateStr("2024/01/15", false, "+00:00")).toBeNull();
       expect(parseDateStr("15-01-2024", false, "+00:00")).toBeNull();
     });
 
-    it("returns null when date is NaN", async () => {
+    it("日付が NaN の場合は null を返す", async () => {
       const { parseDateStr } = await loadModule();
       // A format that passes regex but produces NaN date
       // e.g. month 99
@@ -150,7 +150,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
       };
     }
 
-    it("returns empty array when channels have no permissions", async () => {
+    it("チャンネルへの権限がない場合は空の配列を返す", async () => {
       const { scanMessages } = await loadModule();
       const channel = makeChannel("ch-1", { hasPermission: false });
       const result = await scanMessages([channel as never], {
@@ -161,7 +161,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
       expect(result).toEqual([]);
     });
 
-    it("scans messages from a channel", async () => {
+    it("チャンネルからメッセージをスキャンする", async () => {
       const { scanMessages } = await loadModule();
 
       const now = Date.now();
@@ -182,7 +182,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
       expect(result).toHaveLength(2);
     });
 
-    it("filters by targetUserId", async () => {
+    it("targetUserId でフィルタリングする", async () => {
       const { scanMessages } = await loadModule();
 
       const now = Date.now();
@@ -205,7 +205,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
       expect(result[0].authorId).toBe("user-1");
     });
 
-    it("filters by keyword", async () => {
+    it("keyword でフィルタリングする", async () => {
       const { scanMessages } = await loadModule();
 
       const now = Date.now();
@@ -227,7 +227,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
       expect(result).toHaveLength(1);
     });
 
-    it("stops scanning when count limit is reached", async () => {
+    it("count の上限に達した場合にスキャンを停止する", async () => {
       const { scanMessages } = await loadModule();
 
       const now = Date.now();
@@ -249,7 +249,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
       expect(result).toHaveLength(3);
     });
 
-    it("respects abort signal when already aborted", async () => {
+    it("既に中断済みの abort signal を尊重する", async () => {
       const { scanMessages } = await loadModule();
 
       const controller = new AbortController();
@@ -268,7 +268,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
       expect(result).toEqual([]);
     });
 
-    it("builds display content with attachments", async () => {
+    it("添付ファイルがある場合の表示コンテンツを構築する", async () => {
       const { scanMessages } = await loadModule();
 
       const now = Date.now();
@@ -290,7 +290,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
       expect(result).toHaveLength(1);
     });
 
-    it("builds display content with embeds (with title and without)", async () => {
+    it("embed（タイトルあり・なし）がある場合の表示コンテンツを構築する", async () => {
       const { scanMessages } = await loadModule();
 
       const now = Date.now();
@@ -312,7 +312,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
       expect(result).toHaveLength(1);
     });
 
-    it("calls onProgress callback", async () => {
+    it("onProgress コールバックを呼び出す", async () => {
       const { scanMessages } = await loadModule();
 
       const onProgress = vi.fn().mockResolvedValue(undefined);
@@ -329,7 +329,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
       expect(onProgress).toHaveBeenCalled();
     });
 
-    it("handles channels without me member (no permission check)", async () => {
+    it("me メンバーがいないチャンネル（権限チェックなし）を処理する", async () => {
       const { scanMessages } = await loadModule();
 
       const now = Date.now();
@@ -349,7 +349,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
       expect(result).toHaveLength(1);
     });
 
-    it("truncates long content to max length", async () => {
+    it("長いコンテンツを最大文字数に切り詰める", async () => {
       const { scanMessages } = await loadModule();
 
       const now = Date.now();
@@ -407,7 +407,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
       };
     }
 
-    it("bulk deletes recent messages (< 14 days)", async () => {
+    it("最近のメッセージ（14 日未満）を一括削除する", async () => {
       const { deleteScannedMessages } = await loadModule();
 
       const msg = makeScannedMessage("msg-1", "ch-1", 1000);
@@ -421,7 +421,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
       expect(msg._channel.bulkDelete).toHaveBeenCalled();
     });
 
-    it("individually deletes old messages (> 14 days)", async () => {
+    it("古いメッセージ（14 日超）を個別に削除する", async () => {
       const { deleteScannedMessages } = await loadModule();
 
       const twoWeeksMs = 14 * 24 * 60 * 60 * 1000 + 1000;
@@ -434,7 +434,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
       ).toHaveBeenCalledWith("msg-1");
     });
 
-    it("uses individual delete for channels without bulkDelete", async () => {
+    it("bulkDelete を持たないチャンネルでは個別削除を使用する", async () => {
       const { deleteScannedMessages } = await loadModule();
 
       const msg = makeScannedMessage("msg-1", "ch-1", 1000, false);
@@ -446,7 +446,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
       ).toHaveBeenCalledWith("msg-1");
     });
 
-    it("handles delete errors gracefully", async () => {
+    it("削除エラーを適切に処理する", async () => {
       const { deleteScannedMessages } = await loadModule();
 
       const twoWeeksMs = 14 * 24 * 60 * 60 * 1000 + 1000;
@@ -460,7 +460,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
       expect(result.totalDeleted).toBe(0);
     });
 
-    it("respects abort signal", async () => {
+    it("abort signal を尊重する", async () => {
       const { deleteScannedMessages } = await loadModule();
 
       const controller = new AbortController();
@@ -476,14 +476,14 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
       expect(result.totalDeleted).toBe(0);
     });
 
-    it("returns empty breakdown for empty messages array", async () => {
+    it("メッセージ配列が空の場合は空の内訳を返す", async () => {
       const { deleteScannedMessages } = await loadModule();
       const result = await deleteScannedMessages([]);
       expect(result.totalDeleted).toBe(0);
       expect(result.channelBreakdown).toEqual({});
     });
 
-    it("calls onProgress callback", async () => {
+    it("onProgress コールバックを呼び出す", async () => {
       const { deleteScannedMessages } = await loadModule();
 
       const onProgress = vi.fn().mockResolvedValue(undefined);
@@ -493,7 +493,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
       expect(onProgress).toHaveBeenCalled();
     });
 
-    it("handles multiple messages in same channel", async () => {
+    it("同じチャンネルの複数メッセージを処理する", async () => {
       const { deleteScannedMessages } = await loadModule();
 
       const channel: Record<string, unknown> = {

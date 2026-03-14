@@ -48,8 +48,8 @@ export async function sendBumpReminder(
 
     // 送信直前に最新設定を再取得し、無効化されていたら中止
     const currentConfig =
-      await bumpReminderConfigService.getBumpReminderConfig(guildId);
-    if (!currentConfig?.enabled) {
+      await bumpReminderConfigService.getBumpReminderConfigOrDefault(guildId);
+    if (!currentConfig.enabled) {
       // 予約後に無効化されていた場合は送信を抑止
       logger.debug(
         tDefault("system:scheduler.bump_reminder_disabled", {

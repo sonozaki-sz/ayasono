@@ -52,8 +52,7 @@ describe("bot/features/vac/commands/vacCommand.execute", () => {
     });
   });
 
-  // guildIdがnull（DM等）の場合はガード・サブコマンド処理を一切呼ばずエラーハンドラへ委譲することを確認
-  it("delegates guild-only validation error to handleCommandError", async () => {
+  it("guildIdがnull（DM等）の場合はガード・サブコマンド処理を一切呼ばずエラーハンドラへ委譲することを確認", async () => {
     const interaction = createInteraction({ guildId: null });
 
     await executeVacCommand(interaction as never);
@@ -62,7 +61,7 @@ describe("bot/features/vac/commands/vacCommand.execute", () => {
     expect(handleCommandError).toHaveBeenCalledTimes(1);
   });
 
-  it("delegates vc-rename subcommand to executeVacRename", async () => {
+  it("vc-renameサブコマンドをexecuteVacRenameへ委譲する", async () => {
     const interaction = createInteraction({
       subcommand: VAC_COMMAND.SUBCOMMAND.VC_RENAME,
     });
@@ -81,7 +80,7 @@ describe("bot/features/vac/commands/vacCommand.execute", () => {
     expect(executeVacLimit).not.toHaveBeenCalled();
   });
 
-  it("delegates vc-limit subcommand to executeVacLimit", async () => {
+  it("vc-limitサブコマンドをexecuteVacLimitへ委譲する", async () => {
     const interaction = createInteraction({
       subcommand: VAC_COMMAND.SUBCOMMAND.VC_LIMIT,
     });
@@ -100,8 +99,7 @@ describe("bot/features/vac/commands/vacCommand.execute", () => {
     expect(executeVacRename).not.toHaveBeenCalled();
   });
 
-  // 定義外のサブコマンド名が渡された場合はフォールスルーしてエラーハンドラへ委譲することを確認
-  it("delegates invalid subcommand error to handleCommandError", async () => {
+  it("定義外のサブコマンド名が渡された場合はフォールスルーしてエラーハンドラへ委譲することを確認", async () => {
     const interaction = createInteraction({ subcommand: "invalid-subcommand" });
 
     await executeVacCommand(interaction as never);
@@ -111,8 +109,7 @@ describe("bot/features/vac/commands/vacCommand.execute", () => {
     expect(executeVacRename).not.toHaveBeenCalled();
   });
 
-  // ボイスチャンネルガードが例外を投げた場合、サブコマンド処理を呼ばずエラーハンドラへ委譲することを確認
-  it("delegates guard failure to handleCommandError", async () => {
+  it("ボイスチャンネルガードが例外を投げた場合、サブコマンド処理を呼ばずエラーハンドラへ委譲することを確認", async () => {
     (getManagedVacVoiceChannel as Mock).mockRejectedValueOnce(
       new Error("not managed"),
     );

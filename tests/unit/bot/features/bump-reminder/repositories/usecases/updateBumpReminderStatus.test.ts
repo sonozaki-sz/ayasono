@@ -7,7 +7,7 @@ import {
 } from "@/bot/features/bump-reminder/repositories/usecases/updateBumpReminderStatus";
 
 describe("bot/features/bump-reminder/repositories/usecases/updateBumpReminderStatus", () => {
-  it("updates reminder status by id", async () => {
+  it("ID でリマインダーのステータスを更新する", async () => {
     const update = vi.fn().mockResolvedValue(undefined);
     const prisma = { bumpReminder: { update } };
 
@@ -23,7 +23,7 @@ describe("bot/features/bump-reminder/repositories/usecases/updateBumpReminderSta
     });
   });
 
-  it("cancels pending reminders by guild", async () => {
+  it("ギルド単位で pending リマインダーをキャンセルする", async () => {
     const updateMany = vi.fn().mockResolvedValue({ count: 2 });
     const prisma = { bumpReminder: { updateMany } };
 
@@ -35,7 +35,7 @@ describe("bot/features/bump-reminder/repositories/usecases/updateBumpReminderSta
     });
   });
 
-  it("cancels pending reminders by guild and channel", async () => {
+  it("ギルドとチャンネル単位で pending リマインダーをキャンセルする", async () => {
     const updateMany = vi.fn().mockResolvedValue({ count: 1 });
     const prisma = { bumpReminder: { updateMany } };
 

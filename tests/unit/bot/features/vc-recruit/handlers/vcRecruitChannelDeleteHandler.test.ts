@@ -70,8 +70,7 @@ describe("bot/features/vc-recruit/handlers/vcRecruitChannelDeleteHandler", () =>
     removeSetupMock.mockResolvedValue(undefined);
   });
 
-  // DM チャンネルは対象外（リポジトリを呼ばない）
-  it("skips DM-based channels", async () => {
+  it("DM チャンネルは対象外でリポジトリを呼ばない", async () => {
     const channel = makeDMChannel();
     await handleVcRecruitChannelDelete(channel as never);
 
@@ -79,16 +78,14 @@ describe("bot/features/vc-recruit/handlers/vcRecruitChannelDeleteHandler", () =>
     expect(findSetupByPostChannelIdMock).not.toHaveBeenCalled();
   });
 
-  // 登録外のチャンネル（パネルでも投稿でもない）は何もしない
-  it("does nothing when channel is not a setup channel", async () => {
+  it("登録外のチャンネル（パネルでも投稿でもない）は何もしない", async () => {
     const channel = makeGuildChannel("unknown-ch");
     await handleVcRecruitChannelDelete(channel as never);
 
     expect(removeSetupMock).not.toHaveBeenCalled();
   });
 
-  // パネルチャンネルが削除 → 投稿チャンネルを削除して DB も消す
-  it("when panel channel deleted: deletes post channel and removes setup from DB", async () => {
+  it("パネルチャンネルが削除されたとき、投稿チャンネルを削除して DB からも削除する", async () => {
     const setup = {
       panelChannelId: "panel-ch-1",
       postChannelId: "post-ch-1",
@@ -113,8 +110,7 @@ describe("bot/features/vc-recruit/handlers/vcRecruitChannelDeleteHandler", () =>
     expect(findSetupByPostChannelIdMock).not.toHaveBeenCalled();
   });
 
-  // 投稿チャンネルが削除 → パネルチャンネルを削除して DB も消す
-  it("when post channel deleted: deletes panel channel and removes setup from DB", async () => {
+  it("投稿チャンネルが削除されたとき、パネルチャンネルを削除して DB からも削除する", async () => {
     const setup = {
       panelChannelId: "panel-ch-2",
       postChannelId: "post-ch-2",
@@ -141,8 +137,7 @@ describe("bot/features/vc-recruit/handlers/vcRecruitChannelDeleteHandler", () =>
     expect(removeSetupMock).toHaveBeenCalledWith(GUILD_ID, "panel-ch-2");
   });
 
-  // ペアのチャンネルが既に消えていても（fetch null）エラーにならない
-  it("gracefully handles missing paired channel on panel delete", async () => {
+  it("パネル削除時にペアのチャンネルが既に消えていても（fetch null）エラーにならない", async () => {
     const setup = {
       panelChannelId: "panel-ch-3",
       postChannelId: "post-ch-3",
@@ -158,8 +153,7 @@ describe("bot/features/vc-recruit/handlers/vcRecruitChannelDeleteHandler", () =>
     expect(removeSetupMock).toHaveBeenCalledWith(GUILD_ID, "panel-ch-3");
   });
 
-  // ペアのチャンネルが既に消えていても（fetch null）エラーにならない（投稿側）
-  it("gracefully handles missing paired channel on post delete", async () => {
+  it("投稿削除時にペアのチャンネルが既に消えていても（fetch null）エラーにならない", async () => {
     const setup = {
       panelChannelId: "panel-ch-4",
       postChannelId: "post-ch-4",
@@ -175,8 +169,7 @@ describe("bot/features/vc-recruit/handlers/vcRecruitChannelDeleteHandler", () =>
     expect(removeSetupMock).toHaveBeenCalledWith(GUILD_ID, "panel-ch-4");
   });
 
-  // ペアのチャンネルが fetch できても delete() が throw した場合に logger.error を出力する（パネル側）
-  it("succeeds gracefully when post channel delete() throws on panel delete", async () => {
+  it("パネル削除時に投稿チャンネルの delete() が throw しても成功し logger.error を出力する", async () => {
     const setup = {
       panelChannelId: "panel-ch-5",
       postChannelId: "post-ch-5",
@@ -201,8 +194,7 @@ describe("bot/features/vc-recruit/handlers/vcRecruitChannelDeleteHandler", () =>
     );
   });
 
-  // ペアのチャンネルが fetch できても delete() が throw した場合に logger.error を出力する（投稿側）
-  it("succeeds gracefully when panel channel delete() throws on post delete", async () => {
+  it("投稿削除時にパネルチャンネルの delete() が throw しても成功し logger.error を出力する", async () => {
     const setup = {
       panelChannelId: "panel-ch-6",
       postChannelId: "post-ch-6",

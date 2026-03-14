@@ -4,9 +4,12 @@
 import { en } from "./en/resources";
 import { ja } from "./ja/resources";
 
-export const resources = {
+export const resources: {
+  ja: typeof ja;
+  en: typeof en;
+} = {
   ja,
   en,
-} as const;
+};
 
 export type TranslationResources = typeof resources;

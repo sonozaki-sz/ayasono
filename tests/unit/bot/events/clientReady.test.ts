@@ -13,12 +13,12 @@ describe("bot/events/clientReady", () => {
     vi.clearAllMocks();
   });
 
-  it("has expected event metadata", () => {
+  it("イベントメタデータが正しいことを確認", () => {
     expect(clientReadyEvent.name).toBe(Events.ClientReady);
     expect(clientReadyEvent.once).toBe(true);
   });
 
-  it("delegates client to client-ready handler", async () => {
+  it("クライアントが handleClientReady へ委譲されることを確認", async () => {
     const client = { user: { tag: "bot#0001" } };
 
     await clientReadyEvent.execute(client as never);

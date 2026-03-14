@@ -18,7 +18,10 @@ import { handleVacDeleteUseCase } from "./usecases/handleVacDelete";
  * VAC機能のユースケースを担当するサービス
  */
 export class VacService {
-  constructor(private readonly vacRepository: VacConfigService) {}
+  private readonly vacRepository: VacConfigService;
+  constructor(vacRepository: VacConfigService) {
+    this.vacRepository = vacRepository;
+  }
 
   /**
    * voiceStateUpdate を受け、VAC 作成/削除ユースケースを実行する

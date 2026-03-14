@@ -55,8 +55,7 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.removeMe
     });
   });
 
-  // サービスが NOT_CONFIGURED を返した場合（削除対象のロールが存在しない）は ValidationError を投げることを確認
-  it("throws ValidationError when role target is not configured", async () => {
+  it("サービスが NOT_CONFIGURED を返した場合（削除対象のロールが存在しない）は ValidationError を投げることを確認", async () => {
     setMentionRoleMock.mockResolvedValue(
       BUMP_REMINDER_MENTION_ROLE_RESULT.NOT_CONFIGURED,
     );
@@ -73,7 +72,7 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.removeMe
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  it("replies success when role target is removed", async () => {
+  it("ロールが正常に削除された場合は成功応答を返す", async () => {
     setMentionRoleMock.mockResolvedValue(
       BUMP_REMINDER_MENTION_ROLE_RESULT.UPDATED,
     );

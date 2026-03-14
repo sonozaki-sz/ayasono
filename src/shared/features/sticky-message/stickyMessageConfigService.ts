@@ -12,7 +12,10 @@ export type { StickyMessage };
  * スティッキーメッセージの永続化アクセスを担当するサービス
  */
 export class StickyMessageConfigService {
-  constructor(private readonly repository: IStickyMessageRepository) {}
+  private readonly repository: IStickyMessageRepository;
+  constructor(repository: IStickyMessageRepository) {
+    this.repository = repository;
+  }
 
   /**
    * チャンネル ID でスティッキーメッセージ設定を取得する

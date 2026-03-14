@@ -9,7 +9,7 @@ vi.mock("@/bot/utils/categoryAutocomplete", () => ({
 }));
 
 describe("bot/features/vac/commands/vacConfigCommand.autocomplete", () => {
-  it("delegates to respondCategoryAutocomplete with correct options", async () => {
+  it("正しいオプションでrespondCategoryAutocompleteへ委譲する", async () => {
     const interaction = { commandName: VAC_CONFIG_COMMAND.NAME } as never;
 
     await autocompleteVacConfigCommand(interaction);

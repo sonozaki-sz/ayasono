@@ -19,7 +19,7 @@ import {
 describe("CustomErrors", () => {
   // 各エラークラスのプロパティ・継承・運用フラグの挙動を検証
   describe("BaseError", () => {
-    it("should create error with correct properties", () => {
+    it("正しいプロパティを持つエラーが生成されること", () => {
       const error = new BaseError("TestError", "Test message", true, 500);
 
       expect(error).toBeInstanceOf(Error);
@@ -30,17 +30,17 @@ describe("CustomErrors", () => {
       expect(error.stack).toBeDefined();
     });
 
-    it("should default isOperational to true", () => {
+    it("isOperational のデフォルト値が true であること", () => {
       const error = new BaseError("TestError", "Test message");
       expect(error.isOperational).toBe(true);
     });
 
-    it("should allow non-operational errors", () => {
+    it("非運用エラーとして生成できること", () => {
       const error = new BaseError("TestError", "Test message", false);
       expect(error.isOperational).toBe(false);
     });
 
-    it("should capture stack trace", () => {
+    it("生成時にスタックトレースが保持されること", () => {
       // 生成時にスタック情報が保持されることを確認
       const error = new BaseError("TestError", "Test message");
       expect(error.stack).toBeDefined();
@@ -50,7 +50,7 @@ describe("CustomErrors", () => {
 
   describe("ValidationError", () => {
     // 入力エラー用クラスの既定値と継承関係を検証
-    it("should create validation error", () => {
+    it("バリデーションエラーが正しい既定値で生成されること", () => {
       const error = new ValidationError("Invalid input");
 
       expect(error).toBeInstanceOf(BaseError);
@@ -61,7 +61,7 @@ describe("CustomErrors", () => {
       expect(error.statusCode).toBe(400);
     });
 
-    it("should be catchable as BaseError", () => {
+    it("BaseError としてキャッチできること", () => {
       try {
         throw new ValidationError("Test");
       } catch (error) {
@@ -72,7 +72,7 @@ describe("CustomErrors", () => {
 
   describe("ConfigurationError", () => {
     // 設定エラーの基本属性を検証
-    it("should create configuration error", () => {
+    it("設定エラーが正しい基本属性で生成されること", () => {
       const error = new ConfigurationError("Missing config");
 
       expect(error).toBeInstanceOf(BaseError);
@@ -84,7 +84,7 @@ describe("CustomErrors", () => {
 
   describe("DatabaseError", () => {
     // DBエラーの運用可否フラグ挙動を検証
-    it("should create database error", () => {
+    it("データベースエラーが正しい属性で生成されること", () => {
       const error = new DatabaseError("Connection failed");
 
       expect(error).toBeInstanceOf(BaseError);
@@ -94,7 +94,7 @@ describe("CustomErrors", () => {
       expect(error.isOperational).toBe(true);
     });
 
-    it("should allow non-operational database error", () => {
+    it("非運用の DatabaseError を生成できること", () => {
       const error = new DatabaseError("Critical DB error", false);
       expect(error.isOperational).toBe(false);
     });
@@ -102,7 +102,7 @@ describe("CustomErrors", () => {
 
   describe("DiscordApiError", () => {
     // Discord APIエラーのステータスコード挙動を検証
-    it("should create Discord API error with default status", () => {
+    it("デフォルトステータスで DiscordApiError が生成されること", () => {
       const error = new DiscordApiError("API rate limited");
 
       expect(error).toBeInstanceOf(BaseError);
@@ -111,7 +111,7 @@ describe("CustomErrors", () => {
       expect(error.statusCode).toBe(500);
     });
 
-    it("should create Discord API error with custom status", () => {
+    it("カスタムステータスで DiscordApiError が生成されること", () => {
       const error = new DiscordApiError("Unauthorized", 401);
       expect(error.statusCode).toBe(401);
     });
@@ -119,7 +119,7 @@ describe("CustomErrors", () => {
 
   describe("PermissionError", () => {
     // 権限エラーのHTTPステータスを検証
-    it("should create permission error", () => {
+    it("PermissionError が正しい HTTP ステータスで生成されること", () => {
       const error = new PermissionError("Access denied");
 
       expect(error).toBeInstanceOf(BaseError);
@@ -131,7 +131,7 @@ describe("CustomErrors", () => {
 
   describe("NotFoundError", () => {
     // not found メッセージの組み立てを検証
-    it("should create not found error with resource name", () => {
+    it("リソース名を含む NotFoundError が生成されること", () => {
       const error = new NotFoundError("Guild");
 
       expect(error).toBeInstanceOf(BaseError);
@@ -140,7 +140,7 @@ describe("CustomErrors", () => {
       expect(error.statusCode).toBe(404);
     });
 
-    it("should handle different resource types", () => {
+    it("異なるリソース種別でメッセージが正しく組み立てられること", () => {
       const userError = new NotFoundError("User");
       const channelError = new NotFoundError("Channel");
 
@@ -151,7 +151,7 @@ describe("CustomErrors", () => {
 
   describe("TimeoutError", () => {
     // タイムアウトエラーの基本属性を検証
-    it("should create timeout error", () => {
+    it("TimeoutError が正しい基本属性で生成されること", () => {
       const error = new TimeoutError("Request timed out");
 
       expect(error).toBeInstanceOf(BaseError);
@@ -163,7 +163,7 @@ describe("CustomErrors", () => {
 
   describe("RateLimitError", () => {
     // レート制限エラーの基本属性を検証
-    it("should create rate limit error", () => {
+    it("RateLimitError が正しい基本属性で生成されること", () => {
       const error = new RateLimitError("Too many requests");
 
       expect(error).toBeInstanceOf(BaseError);
@@ -174,7 +174,7 @@ describe("CustomErrors", () => {
   });
 
   describe("Error Handling Scenarios", () => {
-    it("should preserve error information when rethrowing", () => {
+    it("再送出しても主要なエラー情報が保持されること", () => {
       // 再送出/再捕捉しても主要情報が失われないこと
       try {
         throw new ValidationError("Original error");
@@ -187,7 +187,7 @@ describe("CustomErrors", () => {
       }
     });
 
-    it("should allow instanceof checks", () => {
+    it("instanceof チェックが正しく機能すること", () => {
       // 継承関係が期待どおりに機能することを確認
       const validationErr = new ValidationError("test");
       const dbErr = new DatabaseError("test");
@@ -202,7 +202,7 @@ describe("CustomErrors", () => {
       expect(dbErr instanceof BaseError).toBe(true);
     });
 
-    it("should differentiate operational from programming errors", () => {
+    it("isOperational フラグで運用エラーとプログラミングエラーを区別できること", () => {
       // 運用エラーとプログラミングエラーをフラグで区別できること
       const operationalError = new DatabaseError("Connection lost", true);
       const programmingError = new DatabaseError("Invalid SQL", false);

@@ -62,8 +62,7 @@ describe("bot/features/bump-reminder/services/usecases/setBumpReminderUsecase", 
     );
   });
 
-  // 既存リマインダーが存在しない通常フローで DB 作成とインメモリスケジュールが呼ばれることを確認
-  it("creates and schedules reminder", async () => {
+  it("既存リマインダーが存在しない通常フローで DB 作成とインメモリスケジュールが呼ばれることを確認", async () => {
     const repository = {
       create: vi.fn().mockResolvedValue({ id: "r1" }),
     };
@@ -90,8 +89,7 @@ describe("bot/features/bump-reminder/services/usecases/setBumpReminderUsecase", 
     expect(loggerInfoMock).toHaveBeenCalled();
   });
 
-  // 同一ギルドにすでにリマインダーが登録されている場合、新規スケジュール前に既存ジョブをキャンセルする必要がある
-  it("cancels existing reminder before scheduling replacement", async () => {
+  it("同一ギルドにすでにリマインダーが登録されている場合、新規スケジュール前に既存ジョブをキャンセルする", async () => {
     const repository = {
       create: vi.fn().mockResolvedValue({ id: "r1" }),
     };

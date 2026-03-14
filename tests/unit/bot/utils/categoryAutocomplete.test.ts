@@ -27,7 +27,7 @@ function createCache(items: CategoryLike[]) {
 }
 
 describe("bot/utils/categoryAutocomplete", () => {
-  it("responds empty when command name does not match", async () => {
+  it("コマンド名が一致しない場合は空の配列で respond が呼ばれることを確認", async () => {
     const respond = vi.fn();
     const interaction = {
       commandName: "other-command",
@@ -44,7 +44,7 @@ describe("bot/utils/categoryAutocomplete", () => {
     expect(respond).toHaveBeenCalledWith([]);
   });
 
-  it("responds empty when subcommand is not in the allowed list", async () => {
+  it("サブコマンドが許可リストに存在しない場合は空の配列で respond が呼ばれることを確認", async () => {
     const respond = vi.fn();
     const interaction = {
       commandName: COMMAND,
@@ -61,7 +61,7 @@ describe("bot/utils/categoryAutocomplete", () => {
     expect(respond).toHaveBeenCalledWith([]);
   });
 
-  it("responds empty when guild context is missing", async () => {
+  it("ギルドコンテキストがない場合は空の配列で respond が呼ばれることを確認", async () => {
     const respond = vi.fn();
     const interaction = {
       commandName: COMMAND,
@@ -78,7 +78,7 @@ describe("bot/utils/categoryAutocomplete", () => {
     expect(respond).toHaveBeenCalledWith([]);
   });
 
-  it("returns TOP and matching categories with case-insensitive filtering", async () => {
+  it("大文字小文字を区別しないフィルタリングで一致するカテゴリが返されることを確認", async () => {
     const respond = vi.fn();
     const interaction = {
       commandName: COMMAND,
@@ -103,7 +103,7 @@ describe("bot/utils/categoryAutocomplete", () => {
     expect(respond).toHaveBeenCalledWith([{ name: "Game", value: "cat-1" }]);
   });
 
-  it("includes TOP choice when focused text matches topLabel", async () => {
+  it("入力テキストが topLabel に一致する場合は TOP 選択肢が含まれることを確認", async () => {
     const respond = vi.fn();
     const interaction = {
       commandName: COMMAND,
@@ -130,7 +130,7 @@ describe("bot/utils/categoryAutocomplete", () => {
     expect(choices).toContainEqual({ name: "TOP", value: "TOP" });
   });
 
-  it("limits autocomplete choices to 25", async () => {
+  it("オートコンプリートの選択肢が 25 件に制限されることを確認", async () => {
     const respond = vi.fn();
     const categories = Array.from({ length: 30 }, (_, i) => ({
       id: `cat-${i}`,

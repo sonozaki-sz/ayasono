@@ -17,7 +17,7 @@ describe("web/routes/health", () => {
     vi.clearAllMocks();
   });
 
-  it("GET /health returns status payload", async () => {
+  it("GET /health がステータスペイロードを返すこと", async () => {
     // ルート登録済みの Fastify インスタンスを作成
     const app = Fastify();
     await app.register(healthRoute);
@@ -34,7 +34,7 @@ describe("web/routes/health", () => {
     await app.close();
   });
 
-  it("GET /ready returns 503 when prisma is not initialized", async () => {
+  it("GET /ready が Prisma 未初期化の場合は 503 を返すこと", async () => {
     // Prisma 未初期化の分岐
     getPrismaClientMock.mockReturnValueOnce(null);
 
@@ -52,7 +52,7 @@ describe("web/routes/health", () => {
     await app.close();
   });
 
-  it("GET /ready returns ready true when query succeeds", async () => {
+  it("GET /ready が疎通クエリ成功時に ready: true を返すこと", async () => {
     // 疎通クエリ成功時の分岐
     const queryRaw = vi.fn().mockResolvedValueOnce([{ value: 1 }]);
     getPrismaClientMock.mockReturnValueOnce({
@@ -71,7 +71,7 @@ describe("web/routes/health", () => {
     await app.close();
   });
 
-  it("GET /ready returns 503 when query fails", async () => {
+  it("GET /ready が疎通クエリ失敗時は 503 を返すこと", async () => {
     // 疎通クエリ失敗時の分岐
     const queryRaw = vi.fn().mockRejectedValueOnce(new Error("db down"));
     getPrismaClientMock.mockReturnValueOnce({

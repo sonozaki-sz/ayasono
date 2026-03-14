@@ -66,7 +66,7 @@ describe("bot/features/message-delete/commands/usecases/runDeleteExecution", () 
     );
   }
 
-  it("executes delete and shows completion embed on success", async () => {
+  it("削除を実行して成功時に完了 embed を表示する", async () => {
     const { executeDelete } = await loadModule();
 
     deleteScannedMessagesMock.mockResolvedValue({
@@ -90,7 +90,7 @@ describe("bot/features/message-delete/commands/usecases/runDeleteExecution", () 
     );
   });
 
-  it("logs with countSpecified=true", async () => {
+  it("countSpecified=true の場合にログ出力する", async () => {
     const { executeDelete } = await loadModule();
 
     deleteScannedMessagesMock.mockResolvedValue({
@@ -110,7 +110,7 @@ describe("bot/features/message-delete/commands/usecases/runDeleteExecution", () 
     expect(interaction.editReply).toHaveBeenCalled();
   });
 
-  it("logs with afterStr/beforeStr when no daysOption", async () => {
+  it("daysOption なしで afterStr/beforeStr がある場合にログ出力する", async () => {
     const { executeDelete } = await loadModule();
 
     deleteScannedMessagesMock.mockResolvedValue({
@@ -128,7 +128,7 @@ describe("bot/features/message-delete/commands/usecases/runDeleteExecution", () 
     expect(interaction.editReply).toHaveBeenCalled();
   });
 
-  it("shows error embed when deleteScannedMessages throws", async () => {
+  it("deleteScannedMessages が例外をスローした場合はエラー embed を表示する", async () => {
     const { executeDelete } = await loadModule();
 
     deleteScannedMessagesMock.mockRejectedValue(new Error("delete failed"));
@@ -139,7 +139,7 @@ describe("bot/features/message-delete/commands/usecases/runDeleteExecution", () 
     expect(createErrorEmbedMock).toHaveBeenCalled();
   });
 
-  it("calls onProgress callback during deletion", async () => {
+  it("削除中に onProgress コールバックを呼び出す", async () => {
     const { executeDelete } = await loadModule();
 
     deleteScannedMessagesMock.mockImplementation(

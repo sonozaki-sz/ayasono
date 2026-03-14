@@ -8,8 +8,7 @@ describe("bot/features/vc-panel/vcPanelOwnershipRegistry", () => {
     vi.resetModules();
   });
 
-  // チェッカーが未登録の場合は false を返す
-  it("returns false when no checkers are registered", async () => {
+  it("チェッカーが未登録の場合は false を返す", async () => {
     const { isVcPanelManagedChannel } =
       await import("@/bot/features/vc-panel/vcPanelOwnershipRegistry");
     await expect(isVcPanelManagedChannel("guild-1", "ch-1")).resolves.toBe(
@@ -17,8 +16,7 @@ describe("bot/features/vc-panel/vcPanelOwnershipRegistry", () => {
     );
   });
 
-  // 登録済みチェッカーが true を返す場合は true を返す
-  it("returns true when a registered checker returns true", async () => {
+  it("登録済みチェッカーが true を返す場合は true を返す", async () => {
     const { registerVcPanelOwnershipChecker, isVcPanelManagedChannel } =
       await import("@/bot/features/vc-panel/vcPanelOwnershipRegistry");
 
@@ -31,8 +29,7 @@ describe("bot/features/vc-panel/vcPanelOwnershipRegistry", () => {
     );
   });
 
-  // 登録済みチェッカーが全て false を返す場合は false を返す
-  it("returns false when all registered checkers return false", async () => {
+  it("登録済みチェッカーが全て false を返す場合は false を返す", async () => {
     const { registerVcPanelOwnershipChecker, isVcPanelManagedChannel } =
       await import("@/bot/features/vc-panel/vcPanelOwnershipRegistry");
 
@@ -48,8 +45,7 @@ describe("bot/features/vc-panel/vcPanelOwnershipRegistry", () => {
     );
   });
 
-  // 複数チェッカーのうち1つでも true を返したら即 true（短絡評価）
-  it("returns true as soon as the first checker returns true", async () => {
+  it("複数チェッカーのうち1つでも true を返したら即 true（短絡評価）", async () => {
     const { registerVcPanelOwnershipChecker, isVcPanelManagedChannel } =
       await import("@/bot/features/vc-panel/vcPanelOwnershipRegistry");
 
@@ -70,8 +66,7 @@ describe("bot/features/vc-panel/vcPanelOwnershipRegistry", () => {
     expect(secondChecker.isManagedVcPanelChannel).not.toHaveBeenCalled();
   });
 
-  // guildId と channelId が正しくチェッカーに渡される
-  it("passes guildId and channelId to checkers", async () => {
+  it("guildId と channelId が正しくチェッカーに渡される", async () => {
     const { registerVcPanelOwnershipChecker, isVcPanelManagedChannel } =
       await import("@/bot/features/vc-panel/vcPanelOwnershipRegistry");
 

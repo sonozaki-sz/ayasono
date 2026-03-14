@@ -39,7 +39,7 @@ describe("bot/handlers/interactionCreate/flow/command", () => {
     vi.clearAllMocks();
   });
 
-  it("returns when command is not registered", async () => {
+  it("未登録のコマンドが指定された場合に警告ログを出して返ることを確認", async () => {
     const interaction = { commandName: "unknown" };
     const client = {
       commands: new Map(),
@@ -51,8 +51,7 @@ describe("bot/handlers/interactionCreate/flow/command", () => {
     expect(loggerWarnMock).toHaveBeenCalledTimes(1);
   });
 
-  // cooldownManager.check が正の値を返した場合、コマンドは実行せずクールダウンメッセージを ephemeral で返す
-  it("replies cooldown message when user is in cooldown", async () => {
+  it("cooldownManager.check が正の値を返した場合はコマンドを実行せずクールダウンメッセージを ephemeral で返すことを確認", async () => {
     const interaction = {
       commandName: "ping",
       guildId: "guild-1",
@@ -77,8 +76,7 @@ describe("bot/handlers/interactionCreate/flow/command", () => {
     expect(command.execute).not.toHaveBeenCalled();
   });
 
-  // コマンドの execute が例外を投げた場合、handleCommandError に委譲し自前でエラーを握りつぶさないことを確認
-  it("delegates execution error to handleCommandError", async () => {
+  it("コマンドの execute が例外を投げた場合に handleCommandError へ委譲することを確認", async () => {
     const error = new Error("execute failed");
     const interaction = {
       commandName: "ping",
@@ -101,7 +99,7 @@ describe("bot/handlers/interactionCreate/flow/command", () => {
     expect(loggerErrorMock).toHaveBeenCalledTimes(1);
   });
 
-  it("runs autocomplete when command supports it", async () => {
+  it("オートコンプリート対応コマンドがある場合に autocomplete が実行されることを確認", async () => {
     const interaction = { commandName: "ping" };
     const autocomplete = vi.fn().mockResolvedValue(undefined);
     const client = {

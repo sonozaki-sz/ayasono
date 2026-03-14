@@ -47,7 +47,7 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.setMenti
     });
   });
 
-  it("throws ValidationError when both role and user are missing", async () => {
+  it("ロールもユーザーも指定されていない場合は ValidationError をスローする", async () => {
     const interaction = {
       options: {
         getRole: vi.fn(() => null),

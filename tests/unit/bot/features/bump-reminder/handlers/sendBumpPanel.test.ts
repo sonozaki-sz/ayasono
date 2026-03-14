@@ -63,8 +63,7 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpPanel", () => {
     });
   });
 
-  // テキストベースでないチャンネル（VCなど）にはパネルを送らず undefined を返すことを確認
-  it("returns undefined when target channel is not text-based", async () => {
+  it("テキストベースでないチャンネル（VCなど）にはパネルを送らず undefined を返すことを確認", async () => {
     const client = {
       channels: {
         fetch: vi.fn().mockResolvedValue({ isTextBased: () => false }),
@@ -82,7 +81,7 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpPanel", () => {
     expect(result).toBeUndefined();
   });
 
-  it("sends panel and returns message id", async () => {
+  it("パネルを送信してメッセージ ID を返す", async () => {
     const send = vi.fn().mockResolvedValue({ id: "panel-1" });
     const client = {
       channels: {
@@ -112,8 +111,7 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpPanel", () => {
     );
   });
 
-  // チャンネルフェッチ自体が失敗した場合にエラーをログして undefined を返し、例外を上位に伝播させないことを確認
-  it("logs and returns undefined when fetch fails", async () => {
+  it("チャンネルフェッチ自体が失敗した場合にエラーをログして undefined を返し、例外を上位に伝播させないことを確認", async () => {
     const error = new Error("fetch failed");
     const client = {
       channels: {

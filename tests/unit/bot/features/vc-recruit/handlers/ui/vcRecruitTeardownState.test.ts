@@ -25,27 +25,23 @@ describe("bot/features/vc-recruit/handlers/ui/vcRecruitTeardownState", () => {
     vi.useRealTimers();
   });
 
-  // セッションを保存して取得できることを確認
-  it("stores and retrieves a session", () => {
+  it("セッションを保存して取得できる", () => {
     const session = makeSession();
     setTeardownConfirmSession("sel-id-1", session);
     expect(getTeardownConfirmSession("sel-id-1")).toEqual(session);
   });
 
-  // 存在しないキーを取得すると null を返す
-  it("returns null for unknown key", () => {
+  it("存在しないキーを取得すると null を返す", () => {
     expect(getTeardownConfirmSession("nonexistent")).toBeNull();
   });
 
-  // deleteTeardownConfirmSession でセッションを削除できる
-  it("deletes a session", () => {
+  it("deleteTeardownConfirmSession でセッションを削除できる", () => {
     setTeardownConfirmSession("sel-id-2", makeSession());
     deleteTeardownConfirmSession("sel-id-2");
     expect(getTeardownConfirmSession("sel-id-2")).toBeNull();
   });
 
-  // 60秒後にセッションが自動的に削除される
-  it("auto-expires session after 60 seconds", () => {
+  it("60秒後にセッションが自動的に削除される", () => {
     setTeardownConfirmSession("sel-id-3", makeSession());
     expect(getTeardownConfirmSession("sel-id-3")).not.toBeNull();
 

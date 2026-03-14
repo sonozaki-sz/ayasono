@@ -6,6 +6,7 @@ import { tDefault } from "../../shared/locale/localeManager";
 import { logger } from "../../shared/utils/logger";
 import type { BotClient } from "../client";
 import { restoreBumpRemindersOnStartup } from "../features/bump-reminder/handlers/bumpReminderStartup";
+import { initGuildInviteCache } from "../features/member-log/handlers/inviteTracker";
 import { cleanupVacOnStartup } from "../features/vac/handlers/vacStartupCleanup";
 
 /**
@@ -42,6 +43,11 @@ export async function handleClientReady(client: BotClient): Promise<void> {
     ],
     status: PresenceUpdateStatus.Online,
   });
+
+  // 全サーバーの招待リンクをキャッシュ（メンバーログの招待追跡に使用）
+  await Promise.all(
+    client.guilds.cache.map((guild) => initGuildInviteCache(guild)),
+  );
 
   // 起動時復元・クリーンアップを順に実行
   await restoreBumpRemindersOnStartup(client);

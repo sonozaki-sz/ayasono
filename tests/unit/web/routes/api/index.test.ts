@@ -7,7 +7,7 @@ vi.mock("@/web/middleware/auth", () => ({
 }));
 
 describe("web/routes/api/index", () => {
-  it("registers auth plugin and API root route", async () => {
+  it("auth プラグインと API ルートルートを登録すること", async () => {
     let registeredRootHandler: (() => Promise<unknown>) | undefined;
     const fastifyMock = {
       register: vi.fn().mockResolvedValue(undefined),

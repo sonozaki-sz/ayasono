@@ -74,7 +74,7 @@ describe("PrismaGuildConfigRepository", () => {
   });
 
   describe("getConfig()", () => {
-    it("should return guild config when found", async () => {
+    it("guildId でギルド設定を取得できること", async () => {
       // DBレコード(JSON文字列)がドメイン型へ復元されること
       const mockRecord = {
         guildId: "123456789",
@@ -97,7 +97,7 @@ describe("PrismaGuildConfigRepository", () => {
       expect(config?.locale).toBe("ja");
     });
 
-    it("should return null when config not found", async () => {
+    it("設定が存在しない場合は null を返すこと", async () => {
       mockPrismaClient.guildConfig.findUnique.mockResolvedValue(null);
 
       const config = await repository.getConfig("nonexistent");
@@ -105,7 +105,7 @@ describe("PrismaGuildConfigRepository", () => {
       expect(config).toBeNull();
     });
 
-    it("should throw DatabaseError on failure", async () => {
+    it("getConfig 失敗時に DatabaseError をスローすること", async () => {
       mockPrismaClient.guildConfig.findUnique.mockRejectedValue(
         new Error("DB connection failed"),
       );
@@ -117,7 +117,7 @@ describe("PrismaGuildConfigRepository", () => {
   });
 
   describe("saveConfig()", () => {
-    it("should create new guild config", async () => {
+    it("新規ギルド設定を作成できること", async () => {
       const newConfig: GuildConfig = {
         guildId: "123456789",
         locale: "ja",
@@ -142,7 +142,7 @@ describe("PrismaGuildConfigRepository", () => {
       expect(mockPrismaClient.guildConfig.create).toHaveBeenCalled();
     });
 
-    it("should throw DatabaseError on save failure", async () => {
+    it("saveConfig 失敗時に DatabaseError をスローすること", async () => {
       const newConfig: GuildConfig = {
         guildId: "123456789",
         locale: "ja",
@@ -161,7 +161,7 @@ describe("PrismaGuildConfigRepository", () => {
   });
 
   describe("updateConfig()", () => {
-    it("should update existing config", async () => {
+    it("既存の設定を更新できること", async () => {
       mockPrismaClient.guildConfig.upsert.mockResolvedValue({
         guildId: "123456789",
         locale: "en",
@@ -179,7 +179,7 @@ describe("PrismaGuildConfigRepository", () => {
       expect(mockPrismaClient.guildConfig.upsert).toHaveBeenCalled();
     });
 
-    it("should create config if not exists (upsert)", async () => {
+    it("upsert により未作成ギルドでも更新 API で作成できること", async () => {
       // upsert により未作成ギルドでも更新APIで作成できること
       mockPrismaClient.guildConfig.upsert.mockResolvedValue({
         guildId: "123456789",
@@ -200,7 +200,7 @@ describe("PrismaGuildConfigRepository", () => {
   });
 
   describe("deleteConfig()", () => {
-    it("should delete guild config", async () => {
+    it("ギルド設定を削除できること", async () => {
       mockPrismaClient.guildConfig.delete.mockResolvedValue({
         guildId: "123456789",
         locale: "ja",
@@ -220,7 +220,7 @@ describe("PrismaGuildConfigRepository", () => {
   });
 
   describe("exists()", () => {
-    it("should return true when config exists", async () => {
+    it("設定が存在する場合は true を返すこと", async () => {
       mockPrismaClient.guildConfig.findUnique.mockResolvedValue({
         id: "some-id",
       });
@@ -230,7 +230,7 @@ describe("PrismaGuildConfigRepository", () => {
       expect(exists).toBe(true);
     });
 
-    it("should return false when config does not exist", async () => {
+    it("設定が存在しない場合は false を返すこと", async () => {
       mockPrismaClient.guildConfig.findUnique.mockResolvedValue(null);
 
       const exists = await repository.exists("nonexistent");
@@ -240,7 +240,7 @@ describe("PrismaGuildConfigRepository", () => {
   });
 
   describe("getLocale()", () => {
-    it("should return guild locale", async () => {
+    it("ギルドのロケールを取得できること", async () => {
       mockPrismaClient.guildConfig.findUnique.mockResolvedValue({
         guildId: "123456789",
         locale: "en",
@@ -258,7 +258,7 @@ describe("PrismaGuildConfigRepository", () => {
       expect(locale).toBe("en");
     });
 
-    it("should return default locale when config not found", async () => {
+    it("未設定ギルドは既定ロケールを返すこと", async () => {
       // 未設定ギルドは既定ロケールを返す
       mockPrismaClient.guildConfig.findUnique.mockResolvedValue(null);
 
@@ -269,7 +269,7 @@ describe("PrismaGuildConfigRepository", () => {
   });
 
   describe("setAfkChannel()", () => {
-    it("should upsert AFK config with new channel", async () => {
+    it("新しいチャンネルで AFK 設定を upsert できること", async () => {
       mockPrismaClient.guildAfkConfig.upsert.mockResolvedValue({});
 
       await repository.setAfkChannel("123456789", "vc-1");
@@ -283,7 +283,7 @@ describe("PrismaGuildConfigRepository", () => {
   });
 
   describe("updateAfkConfig()", () => {
-    it("should upsert AFK config", async () => {
+    it("AFK 設定を upsert できること", async () => {
       mockPrismaClient.guildAfkConfig.upsert.mockResolvedValue({});
 
       await repository.updateAfkConfig("123456789", {
@@ -307,7 +307,7 @@ describe("PrismaGuildConfigRepository", () => {
   });
 
   describe("getBumpReminderConfig()", () => {
-    it("should return null when not configured", async () => {
+    it("未設定の場合は null を返すこと", async () => {
       mockPrismaClient.guildBumpReminderConfig.findUnique.mockResolvedValue(
         null,
       );
@@ -317,7 +317,7 @@ describe("PrismaGuildConfigRepository", () => {
       expect(config).toBeNull();
     });
 
-    it("should return stored config when configured", async () => {
+    it("設定済みの場合はバンプリマインダー設定を返すこと", async () => {
       mockPrismaClient.guildBumpReminderConfig.findUnique.mockResolvedValue({
         enabled: false,
         channelId: "999999999",
@@ -337,7 +337,7 @@ describe("PrismaGuildConfigRepository", () => {
   });
 
   describe("setBumpReminderEnabled()", () => {
-    it("should upsert bump config with enabled flag", async () => {
+    it("enabled フラグ付きでバンプ設定を upsert できること", async () => {
       mockPrismaClient.guildBumpReminderConfig.upsert.mockResolvedValue({});
 
       await repository.setBumpReminderEnabled("123456789", true, "ch-1");
@@ -357,7 +357,7 @@ describe("PrismaGuildConfigRepository", () => {
       });
     });
 
-    it("should upsert without channelId when not provided", async () => {
+    it("channelId 未指定でバンプ設定を upsert できること", async () => {
       mockPrismaClient.guildBumpReminderConfig.upsert.mockResolvedValue({});
 
       await repository.setBumpReminderEnabled("123456789", false);
@@ -376,7 +376,7 @@ describe("PrismaGuildConfigRepository", () => {
   });
 
   describe("updateBumpReminderConfig()", () => {
-    it("should upsert full bump config", async () => {
+    it("バンプリマインダー設定を全フィールドで upsert できること", async () => {
       const nextConfig = {
         enabled: true,
         channelId: "ch-1",
@@ -408,7 +408,7 @@ describe("PrismaGuildConfigRepository", () => {
   });
 
   describe("addBumpReminderMentionUser()", () => {
-    it("should return not-configured when record does not exist", async () => {
+    it("レコードが存在しない場合は not-configured を返すこと（addBumpReminderMentionUser）", async () => {
       mockPrismaClient.guildBumpReminderConfig.findUnique.mockResolvedValue(
         null,
       );
@@ -421,7 +421,7 @@ describe("PrismaGuildConfigRepository", () => {
       expect(result).toBe("not-configured");
     });
 
-    it("should add user when not in mention list", async () => {
+    it("メンションリストに未登録のユーザーを追加できること", async () => {
       mockPrismaClient.guildBumpReminderConfig.findUnique.mockResolvedValue({
         mentionUserIds: '["user-a"]',
       });
@@ -439,7 +439,7 @@ describe("PrismaGuildConfigRepository", () => {
       });
     });
 
-    it("should return already-exists when user is already in list", async () => {
+    it("ユーザーが既にリストに存在する場合は already-exists を返すこと", async () => {
       mockPrismaClient.guildBumpReminderConfig.findUnique.mockResolvedValue({
         mentionUserIds: '["user-a"]',
       });
@@ -455,7 +455,7 @@ describe("PrismaGuildConfigRepository", () => {
   });
 
   describe("setBumpReminderMentionRole()", () => {
-    it("should return not-configured when record does not exist", async () => {
+    it("レコードが存在しない場合は not-configured を返すこと（setBumpReminderMentionRole）", async () => {
       mockPrismaClient.guildBumpReminderConfig.findUnique.mockResolvedValue(
         null,
       );
@@ -468,7 +468,7 @@ describe("PrismaGuildConfigRepository", () => {
       expect(result).toBe("not-configured");
     });
 
-    it("should set mention role", async () => {
+    it("メンションロールを設定できること", async () => {
       mockPrismaClient.guildBumpReminderConfig.findUnique.mockResolvedValue({
         mentionRoleId: "old-role",
         mentionUserIds: '["user-a"]',
@@ -489,7 +489,7 @@ describe("PrismaGuildConfigRepository", () => {
   });
 
   describe("removeBumpReminderMentionUser()", () => {
-    it("should return not-configured when record does not exist", async () => {
+    it("レコードが存在しない場合は not-configured を返すこと（removeBumpReminderMentionUser）", async () => {
       mockPrismaClient.guildBumpReminderConfig.findUnique.mockResolvedValue(
         null,
       );
@@ -502,7 +502,7 @@ describe("PrismaGuildConfigRepository", () => {
       expect(result).toBe("not-configured");
     });
 
-    it("should remove user when in mention list", async () => {
+    it("メンションリストのユーザーを削除できること", async () => {
       mockPrismaClient.guildBumpReminderConfig.findUnique.mockResolvedValue({
         mentionUserIds: '["user-a","user-b"]',
       });
@@ -520,7 +520,7 @@ describe("PrismaGuildConfigRepository", () => {
       });
     });
 
-    it("should return not-found when user is not in list", async () => {
+    it("ユーザーがリストに存在しない場合は not-found を返すこと", async () => {
       mockPrismaClient.guildBumpReminderConfig.findUnique.mockResolvedValue({
         mentionUserIds: '["user-a"]',
       });
@@ -536,7 +536,7 @@ describe("PrismaGuildConfigRepository", () => {
   });
 
   describe("clearBumpReminderMentionUsers()", () => {
-    it("should return not-configured when record does not exist", async () => {
+    it("レコードが存在しない場合は not-configured を返すこと（clearBumpReminderMentionUsers）", async () => {
       mockPrismaClient.guildBumpReminderConfig.findUnique.mockResolvedValue(
         null,
       );
@@ -546,7 +546,7 @@ describe("PrismaGuildConfigRepository", () => {
       expect(result).toBe("not-configured");
     });
 
-    it("should clear all mention users", async () => {
+    it("全メンションユーザーをクリアできること", async () => {
       mockPrismaClient.guildBumpReminderConfig.findUnique.mockResolvedValue({
         mentionUserIds: '["user-a","user-b"]',
       });
@@ -561,7 +561,7 @@ describe("PrismaGuildConfigRepository", () => {
       });
     });
 
-    it("should return already-empty when list is already empty", async () => {
+    it("リストがすでに空の場合は already-empty を返すこと", async () => {
       mockPrismaClient.guildBumpReminderConfig.findUnique.mockResolvedValue({
         mentionUserIds: "[]",
       });
@@ -574,7 +574,7 @@ describe("PrismaGuildConfigRepository", () => {
   });
 
   describe("clearBumpReminderMentions()", () => {
-    it("should return not-configured when record does not exist", async () => {
+    it("レコードが存在しない場合は not-configured を返すこと（clearBumpReminderMentions）", async () => {
       mockPrismaClient.guildBumpReminderConfig.findUnique.mockResolvedValue(
         null,
       );
@@ -584,7 +584,7 @@ describe("PrismaGuildConfigRepository", () => {
       expect(result).toBe("not-configured");
     });
 
-    it("should clear role and users", async () => {
+    it("ロールとメンションユーザーをクリアできること", async () => {
       mockPrismaClient.guildBumpReminderConfig.findUnique.mockResolvedValue({
         mentionRoleId: "role-a",
         mentionUserIds: '["user-a","user-b"]',
@@ -600,7 +600,7 @@ describe("PrismaGuildConfigRepository", () => {
       });
     });
 
-    it("should return already-cleared when nothing to clear", async () => {
+    it("クリア対象がない場合は already-cleared を返すこと", async () => {
       mockPrismaClient.guildBumpReminderConfig.findUnique.mockResolvedValue({
         mentionRoleId: null,
         mentionUserIds: "[]",

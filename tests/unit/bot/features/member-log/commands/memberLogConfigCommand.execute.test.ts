@@ -91,8 +91,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.execute", () =
 
   // Guild 外実行・不明サブコマンドの検証分岐を確認
   describe("validation", () => {
-    // guildId が null の場合に ValidationError が handleCommandError へ伝わることを確認
-    it("calls handleCommandError with ValidationError when guildId is null", async () => {
+    it("guildId が null の場合に ValidationError が handleCommandError へ伝わることを確認", async () => {
       const interaction = makeInteraction({ guildId: null });
 
       await executeMemberLogConfigCommand(interaction as never);
@@ -103,8 +102,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.execute", () =
       );
     });
 
-    // 未定義のサブコマンドを受け取った場合に ValidationError が handleCommandError へ伝わることを確認
-    it("calls handleCommandError with ValidationError for unknown subcommand", async () => {
+    it("未定義のサブコマンドを受け取った場合に ValidationError が handleCommandError へ伝わることを確認", async () => {
       const interaction = makeInteraction({ subcommand: "unknown-sub" });
 
       await executeMemberLogConfigCommand(interaction as never);
@@ -118,8 +116,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.execute", () =
 
   // 各サブコマンドが対応するハンドラへ委譲されることを確認
   describe("routing", () => {
-    // set-channel サブコマンドが setChannel ハンドラへ委譲されることを確認
-    it("delegates set-channel to handleMemberLogConfigSetChannel", async () => {
+    it("set-channel サブコマンドが handleMemberLogConfigSetChannel へ委譲されることを確認", async () => {
       const interaction = makeInteraction({
         subcommand: MEMBER_LOG_CONFIG_COMMAND.SUBCOMMAND.SET_CHANNEL,
       });
@@ -129,8 +126,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.execute", () =
       expect(setChannelMock).toHaveBeenCalledWith(interaction, "guild-1");
     });
 
-    // enable サブコマンドが enable ハンドラへ委譲されることを確認
-    it("delegates enable to handleMemberLogConfigEnable", async () => {
+    it("enable サブコマンドが handleMemberLogConfigEnable へ委譲されることを確認", async () => {
       const interaction = makeInteraction({
         subcommand: MEMBER_LOG_CONFIG_COMMAND.SUBCOMMAND.ENABLE,
       });
@@ -140,8 +136,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.execute", () =
       expect(enableMock).toHaveBeenCalledWith(interaction, "guild-1");
     });
 
-    // disable サブコマンドが disable ハンドラへ委譲されることを確認
-    it("delegates disable to handleMemberLogConfigDisable", async () => {
+    it("disable サブコマンドが handleMemberLogConfigDisable へ委譲されることを確認", async () => {
       const interaction = makeInteraction({
         subcommand: MEMBER_LOG_CONFIG_COMMAND.SUBCOMMAND.DISABLE,
       });
@@ -151,8 +146,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.execute", () =
       expect(disableMock).toHaveBeenCalledWith(interaction, "guild-1");
     });
 
-    // set-join-message サブコマンドが setJoinMessage ハンドラへ委譲されることを確認
-    it("delegates set-join-message to handleMemberLogConfigSetJoinMessage", async () => {
+    it("set-join-message サブコマンドが handleMemberLogConfigSetJoinMessage へ委譲されることを確認", async () => {
       const interaction = makeInteraction({
         subcommand: MEMBER_LOG_CONFIG_COMMAND.SUBCOMMAND.SET_JOIN_MESSAGE,
       });
@@ -162,8 +156,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.execute", () =
       expect(setJoinMessageMock).toHaveBeenCalledWith(interaction, "guild-1");
     });
 
-    // set-leave-message サブコマンドが setLeaveMessage ハンドラへ委譲されることを確認
-    it("delegates set-leave-message to handleMemberLogConfigSetLeaveMessage", async () => {
+    it("set-leave-message サブコマンドが handleMemberLogConfigSetLeaveMessage へ委譲されることを確認", async () => {
       const interaction = makeInteraction({
         subcommand: MEMBER_LOG_CONFIG_COMMAND.SUBCOMMAND.SET_LEAVE_MESSAGE,
       });
@@ -173,8 +166,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.execute", () =
       expect(setLeaveMessageMock).toHaveBeenCalledWith(interaction, "guild-1");
     });
 
-    // view サブコマンドが view ハンドラへ委譲されることを確認
-    it("delegates view to handleMemberLogConfigView", async () => {
+    it("view サブコマンドが handleMemberLogConfigView へ委譲されることを確認", async () => {
       const interaction = makeInteraction({
         subcommand: MEMBER_LOG_CONFIG_COMMAND.SUBCOMMAND.VIEW,
       });
@@ -187,8 +179,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.execute", () =
 
   // サブハンドラが例外を投げた場合も handleCommandError へ委譲されることを確認
   describe("error propagation", () => {
-    // サブハンドラが例外を投げた場合に handleCommandError が呼ばれることを確認
-    it("calls handleCommandError when sub-handler throws", async () => {
+    it("サブハンドラが例外を投げた場合に handleCommandError が呼ばれることを確認", async () => {
       const error = new Error("sub-handler error");
       enableMock.mockRejectedValue(error);
       const interaction = makeInteraction({

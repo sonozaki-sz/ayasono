@@ -103,8 +103,7 @@ describe("integration: interactionCreate handler routing", () => {
     vi.clearAllMocks();
   });
 
-  // modal submit は modalHandlers へルーティングされることを確認する
-  it("routes modal submit to modal handler registry", async () => {
+  it("modal submit が modalHandlers へルーティングされること", async () => {
     const modalModule = await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/modals",
     ) as {
@@ -125,8 +124,7 @@ describe("integration: interactionCreate handler routing", () => {
     );
   });
 
-  // button interaction は buttonHandlers を経由して処理されることを確認する
-  it("routes button interaction to button handler registry", async () => {
+  it("button interaction が buttonHandlers を経由して処理されること", async () => {
     const buttonModule = await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/buttons",
     ) as {
@@ -147,8 +145,7 @@ describe("integration: interactionCreate handler routing", () => {
     );
   });
 
-  // user select の例外は interaction 用エラーハンドラへ委譲されることを確認する
-  it("delegates user-select handler failure to interaction error handler", async () => {
+  it("user select ハンドラの例外が interaction 用エラーハンドラへ委譲されること", async () => {
     const selectModule = await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/selectMenus",
     ) as {

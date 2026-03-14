@@ -25,8 +25,7 @@ describe("shared/features/bump-reminder/constants", () => {
     vi.useRealTimers();
   });
 
-  // 定数値が仕様どおり固定されていることを検証
-  it("exports stable bump constants", async () => {
+  it("定数値が仕様どおり固定されていることを検証", async () => {
     const mod = await loadModule(false);
 
     expect(mod.BUMP_CONSTANTS.DISBOARD_BOT_ID).toBe("302050872383242240");
@@ -40,8 +39,7 @@ describe("shared/features/bump-reminder/constants", () => {
     expect(mod.BUMP_CONSTANTS.JOB_ID_PREFIX).toBe("bump-reminder-");
   });
 
-  // 検知ルールが Bot ID / command / service の対応表と一致することを検証
-  it("exports detection rules consistent with command/service constants", async () => {
+  it("検知ルールが Bot ID / command / service の対応表と一致することを検証", async () => {
     const mod = await loadModule(false);
 
     expect(mod.BUMP_DETECTION_RULES).toEqual([
@@ -58,22 +56,19 @@ describe("shared/features/bump-reminder/constants", () => {
     ]);
   });
 
-  // テストモード時は短縮遅延（1分）を返すことを検証
-  it("returns test-mode reminder delay when TEST_MODE=true", async () => {
+  it("テストモード時は短縮遅延（1分）を返すことを検証", async () => {
     const mod = await loadModule(true);
 
     expect(mod.getReminderDelayMinutes()).toBe(1);
   });
 
-  // 通常モード時は本番遅延（120分）を返すことを検証
-  it("returns production reminder delay when TEST_MODE=false", async () => {
+  it("通常モード時は本番遅延（120分）を返すことを検証", async () => {
     const mod = await loadModule(false);
 
     expect(mod.getReminderDelayMinutes()).toBe(120);
   });
 
-  // 現在時刻基準で分遅延を予定時刻へ変換できることを検証
-  it("converts delay minutes to scheduled date from current time", async () => {
+  it("現在時刻基準で分遅延を予定時刻へ変換できることを検証", async () => {
     const mod = await loadModule(false);
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-02-20T00:00:00.000Z"));
@@ -83,8 +78,7 @@ describe("shared/features/bump-reminder/constants", () => {
     expect(scheduledAt.toISOString()).toBe("2026-02-20T00:30:00.000Z");
   });
 
-  // サービス名判定が大小文字や未知値を正しく弾くことを検証
-  it("validates bump service names", async () => {
+  it("サービス名判定が大小文字や未知値を正しく弾くことを検証", async () => {
     const mod = await loadModule(false);
 
     expect(mod.isBumpServiceName("Disboard")).toBe(true);
@@ -93,8 +87,7 @@ describe("shared/features/bump-reminder/constants", () => {
     expect(mod.isBumpServiceName("unknown")).toBe(false);
   });
 
-  // Bot ID とコマンド名の組で正しいサービス名を解決できることを検証
-  it("resolves bump service from bot id and command pair", async () => {
+  it("Bot ID とコマンド名の組で正しいサービス名を解決できることを検証", async () => {
     const mod = await loadModule(false);
 
     expect(
@@ -112,8 +105,7 @@ describe("shared/features/bump-reminder/constants", () => {
     ).toBe(mod.BUMP_SERVICES.DISSOKU);
   });
 
-  // ルール未一致時は undefined を返すことを検証
-  it("returns undefined for unmatched bump detection rule", async () => {
+  it("ルール未一致時は undefined を返すことを検証", async () => {
     const mod = await loadModule(false);
 
     expect(
@@ -124,8 +116,7 @@ describe("shared/features/bump-reminder/constants", () => {
     ).toBeUndefined();
   });
 
-  // ジョブID接頭辞と guildId の結合フォーマットを検証
-  it("builds bump reminder job id with expected prefix", async () => {
+  it("ジョブID接頭辞と guildId の結合フォーマットを検証", async () => {
     const mod = await loadModule(false);
 
     expect(mod.toBumpReminderJobId("guild-123")).toBe(
@@ -133,8 +124,7 @@ describe("shared/features/bump-reminder/constants", () => {
     );
   });
 
-  // serviceName 付きでジョブID を組み立てられることを検証
-  it("builds bump reminder job id with serviceName appended", async () => {
+  it("serviceName 付きでジョブID を組み立てられることを検証", async () => {
     const mod = await loadModule(false);
 
     expect(

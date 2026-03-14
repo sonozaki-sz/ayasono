@@ -241,8 +241,7 @@ describe("bot/main", () => {
     vi.restoreAllMocks();
   });
 
-  // ギルドコマンド登録とイベント登録、ログイン、graceful shutdown の主経路を検証
-  it("registers guild commands and events then logs in", async () => {
+  it("ギルドコマンド登録とイベント登録を行ってログインすることを確認", async () => {
     const boot = await bootMain({ guildId: "guild-1" });
 
     expect(boot.setupGlobalErrorHandlers).toHaveBeenCalledTimes(1);
@@ -269,8 +268,7 @@ describe("bot/main", () => {
     expect(boot.prisma.$disconnect).toHaveBeenCalled();
   });
 
-  // DISCORD_GUILD_ID 未設定時にグローバルコマンド経路へ分岐することを検証
-  it("registers global commands when DISCORD_GUILD_ID is undefined", async () => {
+  it("DISCORD_GUILD_ID が未設定の場合はグローバルコマンドが登録されることを確認", async () => {
     const boot = await bootMain();
 
     expect(boot.routes.applicationCommands).toHaveBeenCalledWith("123456");
@@ -280,8 +278,7 @@ describe("bot/main", () => {
     expect(boot.processExitSpy).not.toHaveBeenCalled();
   });
 
-  // 起動 try ブロック内の失敗でエラーログと終了コードが設定されることを検証
-  it("handles startup error in try block and exits", async () => {
+  it("起動 try ブロック内で失敗した場合はエラーログを出力して終了することを確認", async () => {
     const boot = await bootMain({ guildId: "guild-1", restPutReject: true });
 
     expect(boot.logger.error).toHaveBeenCalledWith(
@@ -292,8 +289,7 @@ describe("bot/main", () => {
     expect(boot.processExitSpy).toHaveBeenCalledWith(1);
   });
 
-  // 起動前段（接続処理）失敗で outer catch が処理することを検証
-  it("handles startup failure before try block and exits", async () => {
+  it("起動前段の接続処理が失敗した場合は outer catch でエラーログを出力して終了することを確認", async () => {
     const boot = await bootMain({ connectReject: true });
 
     expect(boot.logger.error).toHaveBeenCalledWith(

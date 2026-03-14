@@ -3,7 +3,7 @@ import { BUMP_REMINDER_STATUS } from "@/bot/features/bump-reminder/constants/bum
 import { createBumpReminderUseCase } from "@/bot/features/bump-reminder/repositories/usecases/createBumpReminder";
 
 describe("bot/features/bump-reminder/repositories/usecases/createBumpReminder", () => {
-  it("cancels existing pending and creates new reminder in transaction", async () => {
+  it("既存の pending リマインダーをキャンセルしてトランザクション内で新規リマインダーを作成する", async () => {
     const updateMany = vi.fn().mockResolvedValue({ count: 1 });
     const create = vi.fn().mockResolvedValue({ id: "r1" });
     const tx = { bumpReminder: { updateMany, create } };

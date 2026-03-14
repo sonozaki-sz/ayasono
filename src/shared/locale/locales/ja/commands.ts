@@ -421,12 +421,12 @@ export const commands = {
     "メンバーログ機能を無効化",
   "member-log-config.set-join-message.description":
     "カスタム参加メッセージを設定",
-  "member-log-config.set-join-message.message.description":
-    "参加メッセージ（{user}, {username}, {count} を使用可）",
   "member-log-config.set-leave-message.description":
     "カスタム退出メッセージを設定",
-  "member-log-config.set-leave-message.message.description":
-    "退出メッセージ（{user}, {username}, {count} を使用可）",
+  "member-log-config.clear-join-message.description":
+    "カスタム参加メッセージを削除",
+  "member-log-config.clear-leave-message.description":
+    "カスタム退出メッセージを削除",
   "member-log-config.view.description":
     "現在の設定を表示",
   // メンバーログ設定コマンド レスポンス
@@ -448,6 +448,10 @@ export const commands = {
     "参加メッセージを設定しました。",
   "member-log-config.embed.set_leave_message_success":
     "退出メッセージを設定しました。",
+  "member-log-config.embed.clear_join_message_success":
+    "参加メッセージを削除しました。",
+  "member-log-config.embed.clear_leave_message_success":
+    "退出メッセージを削除しました。",
   "member-log-config.embed.field.status":
     "状態",
   "member-log-config.embed.field.channel":
@@ -456,6 +460,19 @@ export const commands = {
     "参加メッセージ",
   "member-log-config.embed.field.leave_message":
     "退出メッセージ",
+  // モーダル
+  "member-log-config.modal.set_join_message.title":
+    "参加メッセージを設定",
+  "member-log-config.modal.set_join_message.label":
+    "参加メッセージ",
+  "member-log-config.modal.set_join_message.placeholder":
+    "{userMention}, {userName}, {count} を使用可（最大500文字）",
+  "member-log-config.modal.set_leave_message.title":
+    "退出メッセージを設定",
+  "member-log-config.modal.set_leave_message.label":
+    "退出メッセージ",
+  "member-log-config.modal.set_leave_message.placeholder":
+    "{userMention}, {userName}, {count} を使用可（最大500文字）",
   // エラー
   "member-log-config.errors.text_channel_only":
     "テキストチャンネルを指定してください。",

@@ -134,16 +134,14 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigSetup", () =>
     resolveTargetCategoryMock.mockResolvedValue(null);
   });
 
-  // guild が null の場合は ValidationError を投げる
-  it("throws ValidationError when interaction has no guild", async () => {
+  it("guild が null の場合は ValidationError を投げる", async () => {
     const interaction = makeInteraction({ hasGuild: false });
     await expect(
       handleVcRecruitConfigSetup(interaction as never, GUILD_ID),
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  // 既にセットアップ済みの場合は ValidationError を投げる
-  it("throws ValidationError when same category is already set up", async () => {
+  it("既にセットアップ済みの場合は ValidationError を投げる", async () => {
     findSetupByCategoryIdMock.mockResolvedValue({
       panelChannelId: "old-panel",
     });
@@ -155,8 +153,7 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigSetup", () =>
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  // カテゴリーが満杯（50チャンネル）の場合は ValidationError を投げる
-  it("throws ValidationError when category has reached channel limit", async () => {
+  it("カテゴリーが満杯（50チャンネル）の場合は ValidationError を投げる", async () => {
     const category = {
       id: "cat-full",
       children: { cache: { size: 50 } },
@@ -171,8 +168,7 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigSetup", () =>
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  // カテゴリーなし（TOP）で正常にセットアップできる
-  it("creates panel/post channels and saves setup to DB for TOP category", async () => {
+  it("カテゴリーなし（TOP）で正常にセットアップでき、パネル/投稿チャンネルを作成して DB に保存する", async () => {
     const guild = makeGuild();
     const interaction = makeInteraction({ guildObj: guild });
     await handleVcRecruitConfigSetup(interaction as never, GUILD_ID);
@@ -200,8 +196,7 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigSetup", () =>
     );
   });
 
-  // カテゴリーあり（49チャンネル）で正常にセットアップできる
-  it("creates channels under a specific category", async () => {
+  it("カテゴリーあり（49チャンネル）で正常にセットアップでき、指定カテゴリー下にチャンネルを作成する", async () => {
     const category = {
       id: "cat-1",
       name: "ゲームカテゴリー",
@@ -220,8 +215,7 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigSetup", () =>
     );
   });
 
-  // threadArchiveOption が指定されている場合は正しい分数に変換される
-  it("uses specified thread archive duration", async () => {
+  it("threadArchiveOption が指定されている場合は正しい分数に変換される", async () => {
     const guild = makeGuild();
     const interaction = makeInteraction({
       guildObj: guild,
@@ -235,9 +229,7 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigSetup", () =>
     );
   });
 
-  // @everyone が ViewChannel を持たないカテゴリーでは everyoneViewAllowed=false となり
-  // パーミッションオーバーライドに @everyone への deny が追加されない
-  it("creates channels without everyone-view overwrites when everyone cannot view category", async () => {
+  it("@everyone が ViewChannel を持たないカテゴリーでは everyoneViewAllowed=false となり、チャンネルが正常に作成される", async () => {
     const category = {
       id: "cat-restricted",
       name: "制限カテゴリー",

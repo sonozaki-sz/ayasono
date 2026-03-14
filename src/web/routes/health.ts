@@ -1,7 +1,7 @@
 // src/web/routes/health.ts
 // ヘルスチェックエンドポイント
 
-import { FastifyPluginAsync } from "fastify";
+import { type FastifyPluginAsync } from "fastify";
 import { getPrismaClient } from "../../shared/utils/prisma";
 
 export const healthRoute: FastifyPluginAsync = async (fastify) => {

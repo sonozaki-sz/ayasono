@@ -27,7 +27,7 @@ describe("shared/database/repositories/bumpReminderConfigRepository", () => {
   }
 
   describe("getBumpReminderConfig", () => {
-    it("returns null when record not found", async () => {
+    it("レコードが存在しない場合は null を返すこと", async () => {
       const prisma = createPrismaMock();
       prisma.guildBumpReminderConfig.findUnique.mockResolvedValue(null);
 
@@ -38,7 +38,7 @@ describe("shared/database/repositories/bumpReminderConfigRepository", () => {
       expect(result).toBeNull();
     });
 
-    it("returns config with all fields when record found", async () => {
+    it("レコードが見つかった場合は全フィールドを含む設定を返すこと", async () => {
       const prisma = createPrismaMock();
       prisma.guildBumpReminderConfig.findUnique.mockResolvedValue({
         guildId: "guild-1",
@@ -60,7 +60,7 @@ describe("shared/database/repositories/bumpReminderConfigRepository", () => {
       });
     });
 
-    it("returns undefined for null optional fields", async () => {
+    it("null の任意フィールドは undefined として返すこと", async () => {
       const prisma = createPrismaMock();
       prisma.guildBumpReminderConfig.findUnique.mockResolvedValue({
         guildId: "guild-1",
@@ -82,7 +82,7 @@ describe("shared/database/repositories/bumpReminderConfigRepository", () => {
       });
     });
 
-    it("returns empty array for invalid mentionUserIds JSON", async () => {
+    it("mentionUserIds が無効な JSON の場合は空配列を返すこと", async () => {
       const prisma = createPrismaMock();
       prisma.guildBumpReminderConfig.findUnique.mockResolvedValue({
         guildId: "guild-1",
@@ -101,7 +101,7 @@ describe("shared/database/repositories/bumpReminderConfigRepository", () => {
   });
 
   describe("setBumpReminderEnabled", () => {
-    it("upserts with enabled=true and channelId when provided", async () => {
+    it("channelId が指定された場合に enabled=true で upsert すること", async () => {
       const prisma = createPrismaMock();
       prisma.guildBumpReminderConfig.upsert.mockResolvedValue({});
 
@@ -125,7 +125,7 @@ describe("shared/database/repositories/bumpReminderConfigRepository", () => {
       );
     });
 
-    it("upserts without channelId in update when not provided", async () => {
+    it("channelId が未指定の場合は update に channelId を含めないこと", async () => {
       const prisma = createPrismaMock();
       prisma.guildBumpReminderConfig.upsert.mockResolvedValue({});
 
@@ -139,7 +139,7 @@ describe("shared/database/repositories/bumpReminderConfigRepository", () => {
   });
 
   describe("updateBumpReminderConfig", () => {
-    it("upserts record with JSON-stringified mentionUserIds", async () => {
+    it("mentionUserIds を JSON 文字列化して upsert すること", async () => {
       const prisma = createPrismaMock();
       prisma.guildBumpReminderConfig.upsert.mockResolvedValue({});
 
@@ -172,7 +172,7 @@ describe("shared/database/repositories/bumpReminderConfigRepository", () => {
   });
 
   describe("setBumpReminderMentionRole", () => {
-    it("returns NOT_CONFIGURED when record not found", async () => {
+    it("レコードが存在しない場合は NOT_CONFIGURED を返すこと", async () => {
       const prisma = createPrismaMock();
       prisma.guildBumpReminderConfig.findUnique.mockResolvedValue(null);
 
@@ -183,7 +183,7 @@ describe("shared/database/repositories/bumpReminderConfigRepository", () => {
       expect(result).toBe(BUMP_REMINDER_MENTION_ROLE_RESULT.NOT_CONFIGURED);
     });
 
-    it("updates mentionRoleId and returns UPDATED when record found", async () => {
+    it("レコードが見つかった場合は mentionRoleId を更新して UPDATED を返すこと", async () => {
       const prisma = createPrismaMock();
       prisma.guildBumpReminderConfig.findUnique.mockResolvedValue({
         guildId: "guild-1",
@@ -201,7 +201,7 @@ describe("shared/database/repositories/bumpReminderConfigRepository", () => {
       });
     });
 
-    it("sets mentionRoleId to null when undefined is passed", async () => {
+    it("undefined が渡された場合は mentionRoleId を null に設定すること", async () => {
       const prisma = createPrismaMock();
       prisma.guildBumpReminderConfig.findUnique.mockResolvedValue({
         guildId: "guild-1",
@@ -220,7 +220,7 @@ describe("shared/database/repositories/bumpReminderConfigRepository", () => {
   });
 
   describe("addBumpReminderMentionUser", () => {
-    it("returns NOT_CONFIGURED when record not found", async () => {
+    it("レコードが存在しない場合は NOT_CONFIGURED を返すこと", async () => {
       const prisma = createPrismaMock();
       prisma.guildBumpReminderConfig.findUnique.mockResolvedValue(null);
 
@@ -231,7 +231,7 @@ describe("shared/database/repositories/bumpReminderConfigRepository", () => {
       expect(result).toBe(BUMP_REMINDER_MENTION_USER_ADD_RESULT.NOT_CONFIGURED);
     });
 
-    it("returns ALREADY_EXISTS when user is already in list", async () => {
+    it("ユーザーがすでにリストにいる場合は ALREADY_EXISTS を返すこと", async () => {
       const prisma = createPrismaMock();
       prisma.guildBumpReminderConfig.findUnique.mockResolvedValue({
         guildId: "guild-1",
@@ -245,7 +245,7 @@ describe("shared/database/repositories/bumpReminderConfigRepository", () => {
       expect(result).toBe(BUMP_REMINDER_MENTION_USER_ADD_RESULT.ALREADY_EXISTS);
     });
 
-    it("adds user and returns ADDED", async () => {
+    it("ユーザーを追加して ADDED を返すこと", async () => {
       const prisma = createPrismaMock();
       prisma.guildBumpReminderConfig.findUnique.mockResolvedValue({
         guildId: "guild-1",
@@ -266,7 +266,7 @@ describe("shared/database/repositories/bumpReminderConfigRepository", () => {
   });
 
   describe("removeBumpReminderMentionUser", () => {
-    it("returns NOT_CONFIGURED when record not found", async () => {
+    it("レコードが存在しない場合は NOT_CONFIGURED を返すこと", async () => {
       const prisma = createPrismaMock();
       prisma.guildBumpReminderConfig.findUnique.mockResolvedValue(null);
 
@@ -282,7 +282,7 @@ describe("shared/database/repositories/bumpReminderConfigRepository", () => {
       );
     });
 
-    it("returns NOT_FOUND when user not in list", async () => {
+    it("ユーザーがリストにいない場合は NOT_FOUND を返すこと", async () => {
       const prisma = createPrismaMock();
       prisma.guildBumpReminderConfig.findUnique.mockResolvedValue({
         guildId: "guild-1",
@@ -299,7 +299,7 @@ describe("shared/database/repositories/bumpReminderConfigRepository", () => {
       expect(result).toBe(BUMP_REMINDER_MENTION_USER_REMOVE_RESULT.NOT_FOUND);
     });
 
-    it("removes user and returns REMOVED", async () => {
+    it("ユーザーを削除して REMOVED を返すこと", async () => {
       const prisma = createPrismaMock();
       prisma.guildBumpReminderConfig.findUnique.mockResolvedValue({
         guildId: "guild-1",
@@ -323,7 +323,7 @@ describe("shared/database/repositories/bumpReminderConfigRepository", () => {
   });
 
   describe("clearBumpReminderMentionUsers", () => {
-    it("returns NOT_CONFIGURED when record not found", async () => {
+    it("レコードが存在しない場合は NOT_CONFIGURED を返すこと", async () => {
       const prisma = createPrismaMock();
       prisma.guildBumpReminderConfig.findUnique.mockResolvedValue(null);
 
@@ -336,7 +336,7 @@ describe("shared/database/repositories/bumpReminderConfigRepository", () => {
       );
     });
 
-    it("returns ALREADY_EMPTY when list is empty", async () => {
+    it("リストが空の場合は ALREADY_EMPTY を返すこと", async () => {
       const prisma = createPrismaMock();
       prisma.guildBumpReminderConfig.findUnique.mockResolvedValue({
         guildId: "guild-1",
@@ -352,7 +352,7 @@ describe("shared/database/repositories/bumpReminderConfigRepository", () => {
       );
     });
 
-    it("clears list and returns CLEARED", async () => {
+    it("リストをクリアして CLEARED を返すこと", async () => {
       const prisma = createPrismaMock();
       prisma.guildBumpReminderConfig.findUnique.mockResolvedValue({
         guildId: "guild-1",
@@ -373,7 +373,7 @@ describe("shared/database/repositories/bumpReminderConfigRepository", () => {
   });
 
   describe("clearBumpReminderMentions", () => {
-    it("returns NOT_CONFIGURED when record not found", async () => {
+    it("レコードが存在しない場合は NOT_CONFIGURED を返すこと", async () => {
       const prisma = createPrismaMock();
       prisma.guildBumpReminderConfig.findUnique.mockResolvedValue(null);
 
@@ -384,7 +384,7 @@ describe("shared/database/repositories/bumpReminderConfigRepository", () => {
       expect(result).toBe(BUMP_REMINDER_MENTION_CLEAR_RESULT.NOT_CONFIGURED);
     });
 
-    it("returns ALREADY_CLEARED when no role and empty users", async () => {
+    it("ロールもユーザーもない場合は ALREADY_CLEARED を返すこと", async () => {
       const prisma = createPrismaMock();
       prisma.guildBumpReminderConfig.findUnique.mockResolvedValue({
         guildId: "guild-1",
@@ -399,7 +399,7 @@ describe("shared/database/repositories/bumpReminderConfigRepository", () => {
       expect(result).toBe(BUMP_REMINDER_MENTION_CLEAR_RESULT.ALREADY_CLEARED);
     });
 
-    it("clears mentions and returns CLEARED when role is set", async () => {
+    it("ロールが設定されている場合はメンションをクリアして CLEARED を返すこと", async () => {
       const prisma = createPrismaMock();
       prisma.guildBumpReminderConfig.findUnique.mockResolvedValue({
         guildId: "guild-1",
@@ -419,7 +419,7 @@ describe("shared/database/repositories/bumpReminderConfigRepository", () => {
       });
     });
 
-    it("clears mentions and returns CLEARED when users are set", async () => {
+    it("ユーザーが設定されている場合はメンションをクリアして CLEARED を返すこと", async () => {
       const prisma = createPrismaMock();
       prisma.guildBumpReminderConfig.findUnique.mockResolvedValue({
         guildId: "guild-1",

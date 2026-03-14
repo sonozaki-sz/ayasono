@@ -43,7 +43,7 @@ describe("bot/features/vac/services/usecases/cleanupVacOnStartup", () => {
     vi.clearAllMocks();
   });
 
-  it("keeps valid trigger and non-empty managed voice channel", async () => {
+  it("有効なトリガーと空でない管理済みボイスチャンネルはそのまま保持する", async () => {
     const repository = createRepositoryMock();
     repository.getVacConfigOrDefault.mockResolvedValue({
       enabled: true,
@@ -86,8 +86,7 @@ describe("bot/features/vac/services/usecases/cleanupVacOnStartup", () => {
     expect(repository.removeCreatedVacChannel).not.toHaveBeenCalled();
   });
 
-  // 存在しないチャンネルやボイス以外（テキスト）のチャンネルは、トリガー・管理済みチャンネル両方からレコードが削除されることを検証
-  it("removes invalid trigger and invalid managed channel records", async () => {
+  it("存在しないチャンネルやボイス以外（テキスト）のチャンネルは、トリガー・管理済みチャンネル両方からレコードが削除されることを検証", async () => {
     const repository = createRepositoryMock();
     repository.getVacConfigOrDefault.mockResolvedValue({
       enabled: true,
@@ -148,8 +147,7 @@ describe("bot/features/vac/services/usecases/cleanupVacOnStartup", () => {
     );
   });
 
-  // 空の管理済みボイスチャンネルは Discord 上でも削除を試み、削除 API が失敗しても DB レコードは除去されることを検証
-  it("deletes empty managed voice channel and still removes record on delete failure", async () => {
+  it("空の管理済みボイスチャンネルは Discord 上でも削除を試み、削除 API が失敗しても DB レコードは除去されることを検証", async () => {
     const repository = createRepositoryMock();
     repository.getVacConfigOrDefault.mockResolvedValue({
       enabled: true,
@@ -210,8 +208,7 @@ describe("bot/features/vac/services/usecases/cleanupVacOnStartup", () => {
     );
   });
 
-  // channels.fetch が例外をスローした場合もチャンネル不在と同様に扱い、古くなったレコードを削除することを検証
-  it("treats fetch errors as missing channels and removes stale records", async () => {
+  it("channels.fetch が例外をスローした場合もチャンネル不在と同様に扱い、古くなったレコードを削除することを検証", async () => {
     const repository = createRepositoryMock();
     repository.getVacConfigOrDefault.mockResolvedValue({
       enabled: true,

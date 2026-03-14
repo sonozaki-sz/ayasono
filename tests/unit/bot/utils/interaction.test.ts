@@ -32,7 +32,7 @@ function createDiscordApiError(code: number): DiscordAPIError {
 
 describe("shared/utils/interaction safeReply", () => {
   // 応答状態ごとの reply/followUp 分岐と例外ハンドリングを検証
-  it("uses reply when interaction has not been acknowledged", async () => {
+  it("interaction が未応答の場合は reply が使われることを確認", async () => {
     const interaction = createInteraction();
 
     await safeReply(interaction as never, { content: "hello" });
@@ -41,7 +41,7 @@ describe("shared/utils/interaction safeReply", () => {
     expect(interaction.followUp).not.toHaveBeenCalled();
   });
 
-  it("uses followUp when interaction is already replied", async () => {
+  it("interaction が応答済みの場合は followUp が使われることを確認", async () => {
     const interaction = createInteraction({ replied: true });
 
     await safeReply(interaction as never, { content: "hello" });
@@ -50,7 +50,7 @@ describe("shared/utils/interaction safeReply", () => {
     expect(interaction.reply).not.toHaveBeenCalled();
   });
 
-  it("uses followUp when interaction is deferred", async () => {
+  it("interaction が defer 済みの場合は followUp が使われることを確認", async () => {
     const interaction = createInteraction({ deferred: true });
 
     await safeReply(interaction as never, { content: "hello" });
@@ -59,7 +59,7 @@ describe("shared/utils/interaction safeReply", () => {
     expect(interaction.reply).not.toHaveBeenCalled();
   });
 
-  it("ignores UnknownInteraction Discord API error", async () => {
+  it("UnknownInteraction の Discord API エラーが無視されることを確認", async () => {
     // 期限切れInteractionは安全に無視されること
     const interaction = createInteraction({
       reply: vi
@@ -74,7 +74,7 @@ describe("shared/utils/interaction safeReply", () => {
     ).resolves.toBeUndefined();
   });
 
-  it("ignores InteractionHasAlreadyBeenAcknowledged Discord API error", async () => {
+  it("InteractionHasAlreadyBeenAcknowledged の Discord API エラーが無視されることを確認", async () => {
     // 応答済みエラーは再送処理で握りつぶすこと
     const interaction = createInteraction({
       reply: vi
@@ -91,7 +91,7 @@ describe("shared/utils/interaction safeReply", () => {
     ).resolves.toBeUndefined();
   });
 
-  it("rethrows non-ignored Discord API error", async () => {
+  it("無視対象外の Discord API エラーが再送出されることを確認", async () => {
     // 無視対象以外の Discord API エラーは呼び出し元へ送出すること
     const interaction = createInteraction({
       reply: vi
@@ -106,7 +106,7 @@ describe("shared/utils/interaction safeReply", () => {
     ).rejects.toBeInstanceOf(DiscordAPIError);
   });
 
-  it("rethrows non-Discord error", async () => {
+  it("Discord 以外のエラーが再送出されることを確認", async () => {
     // DiscordAPIError 以外の例外も握りつぶさず再送出すること
     const interaction = createInteraction({
       reply: vi

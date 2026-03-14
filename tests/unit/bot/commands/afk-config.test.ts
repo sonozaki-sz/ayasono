@@ -96,8 +96,7 @@ describe("bot/commands/afk-config", () => {
     getAfkConfigMock.mockResolvedValue({ enabled: false, channelId: null });
   });
 
-  // set-channel 正常系として保存と Ephemeral 返信を検証
-  it("sets AFK channel on set-channel subcommand", async () => {
+  it("set-channel サブコマンドで AFK チャンネルが保存されて Ephemeral で返信することを確認", async () => {
     const interaction = createInteraction({
       options: {
         getSubcommand: vi.fn(() => "set-channel"),
@@ -122,8 +121,7 @@ describe("bot/commands/afk-config", () => {
     });
   });
 
-  // set-channel でVC以外を指定した場合は操作が実行されないことを検証
-  it("does not set AFK channel when channel type is invalid", async () => {
+  it("set-channel でチャンネル種別が無効の場合は AFK チャンネルが設定されないことを確認", async () => {
     const interaction = createInteraction({
       options: {
         getSubcommand: vi.fn(() => "set-channel"),
@@ -142,8 +140,7 @@ describe("bot/commands/afk-config", () => {
     expect(setAfkChannelMock).not.toHaveBeenCalled();
   });
 
-  // view 未設定時は情報 Embed を返すことを検証
-  it("shows not-configured state on view subcommand", async () => {
+  it("view サブコマンドで未設定の場合は情報 Embed が返されることを確認", async () => {
     getAfkConfigMock.mockResolvedValueOnce(null);
     const interaction = createInteraction({
       options: {
@@ -168,7 +165,7 @@ describe("bot/commands/afk-config", () => {
   it.each([
     { enabled: false, channelId: "afk-channel" },
     { enabled: true, channelId: null },
-  ])("shows not-configured when config is invalid: %j", async (config) => {
+  ])("設定が不正な場合は未設定状態を表示することを確認: %j", async (config) => {
     getAfkConfigMock.mockResolvedValueOnce(config);
     const interaction = createInteraction({
       options: {
@@ -186,8 +183,7 @@ describe("bot/commands/afk-config", () => {
     });
   });
 
-  // view で設定済みの場合にチャンネル情報を返すことを検証
-  it("shows configured AFK channel on view subcommand", async () => {
+  it("view サブコマンドで設定済みの場合は AFK チャンネル情報が表示されることを確認", async () => {
     getAfkConfigMock.mockResolvedValueOnce({
       enabled: true,
       channelId: "afk-channel",

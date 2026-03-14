@@ -206,8 +206,7 @@ describe("bot/commands/vac-config", () => {
     });
   });
 
-  // ManageGuild 権限がない場合に権限チェックが正しく実行されることを検証
-  it("delegates permission error when ManageGuild is missing", async () => {
+  it("ManageGuild 権限がない場合に権限チェックエラーが handleCommandError へ委譲されることを確認", async () => {
     const interaction = createCommandInteraction({
       memberPermissions: { has: vi.fn(() => false) },
     });
@@ -222,8 +221,7 @@ describe("bot/commands/vac-config", () => {
     expect(handleCommandError).toHaveBeenCalledTimes(1);
   });
 
-  // create-trigger-vc 正常系で作成・保存・応答されることを検証
-  it("creates trigger voice channel on create-trigger-vc", async () => {
+  it("create-trigger-vc でトリガーボイスチャンネルが作成・保存・応答されることを確認", async () => {
     const interaction = createCommandInteraction();
 
     await vacConfigCommand.execute(
@@ -245,7 +243,7 @@ describe("bot/commands/vac-config", () => {
     });
   });
 
-  it("creates trigger under category resolved from current channel parent", async () => {
+  it("現在チャンネルの親カテゴリを解決してトリガーが作成されることを確認", async () => {
     const category = {
       id: "cat-parent",
       type: ChannelType.GuildCategory,
@@ -275,8 +273,7 @@ describe("bot/commands/vac-config", () => {
     });
   });
 
-  // 現在チャンネルの取得に失敗した場合、カテゴリなし（トップレベル）でVCを作成することを検証
-  it("creates trigger at top when current channel fetch fails", async () => {
+  it("現在チャンネルの取得に失敗した場合はカテゴリなし（トップレベル）でVCが作成されることを確認", async () => {
     const interaction = createCommandInteraction({
       guild: createGuildWithChannels({
         byId: {},
@@ -298,7 +295,7 @@ describe("bot/commands/vac-config", () => {
     });
   });
 
-  it("creates trigger when category option is TOP", async () => {
+  it("カテゴリオプションが TOP の場合はトップレベルでトリガーが作成されることを確認", async () => {
     const interaction = createCommandInteraction({
       options: {
         getSubcommand: vi.fn(() => "create-trigger-vc"),
@@ -317,7 +314,7 @@ describe("bot/commands/vac-config", () => {
     });
   });
 
-  it("creates trigger with category option resolved by id", async () => {
+  it("カテゴリオプションが ID で解決された場合にトリガーが作成されることを確認", async () => {
     const category = {
       id: "cat-by-id",
       name: "ById",
@@ -343,7 +340,7 @@ describe("bot/commands/vac-config", () => {
     });
   });
 
-  it("creates trigger with category option resolved by name", async () => {
+  it("カテゴリオプションが名前で解決された場合にトリガーが作成されることを確認", async () => {
     const category = {
       id: "cat-by-name",
       name: "TargetCategory",
@@ -372,7 +369,7 @@ describe("bot/commands/vac-config", () => {
     });
   });
 
-  it("creates trigger at top when category option does not resolve", async () => {
+  it("カテゴリオプションが解決できない場合はトップレベルでトリガーが作成されることを確認", async () => {
     const interaction = createCommandInteraction({
       options: {
         getSubcommand: vi.fn(() => "create-trigger-vc"),
@@ -400,7 +397,7 @@ describe("bot/commands/vac-config", () => {
     });
   });
 
-  it("creates trigger when category fetch throws and name fallback misses", async () => {
+  it("カテゴリ fetch が失敗して名前フォールバックも見つからない場合はトップレベルでトリガーが作成されることを確認", async () => {
     const interaction = createCommandInteraction({
       options: {
         getSubcommand: vi.fn(() => "create-trigger-vc"),
@@ -427,8 +424,7 @@ describe("bot/commands/vac-config", () => {
     });
   });
 
-  // 既に同カテゴリにトリガーVCが存在する場合、重複作成を防いでエラーハンドラへ委譲することを検証
-  it("delegates error when trigger already exists in target category", async () => {
+  it("同カテゴリにトリガーVCが既に存在する場合は重複作成を防いで handleCommandError へ委譲されることを確認", async () => {
     getVacConfigOrDefaultMock.mockResolvedValue({
       enabled: true,
       triggerChannelIds: ["tr-existing"],
@@ -468,8 +464,7 @@ describe("bot/commands/vac-config", () => {
     expect(addTriggerChannelMock).not.toHaveBeenCalled();
   });
 
-  // トリガーVCの親がカテゴリ以外（テキストチャンネル等）の場合、TOPレベル指定と同居とみなし重複エラーになることを検証
-  it("treats trigger with non-category parent as top-level existing trigger", async () => {
+  it("トリガーVCの親がカテゴリ以外の場合はトップレベルの既存トリガーとみなして重複エラーになることを確認", async () => {
     getVacConfigOrDefaultMock.mockResolvedValue({
       enabled: true,
       triggerChannelIds: ["tr-top"],
@@ -501,8 +496,7 @@ describe("bot/commands/vac-config", () => {
     expect(interaction.guild?.channels.create).not.toHaveBeenCalled();
   });
 
-  // Discord カテゴリの上限 50 チャンネルに達している場合は作成せずエラーハンドラへ委譲することを検証
-  it("delegates error when target category is full", async () => {
+  it("対象カテゴリが 50 チャンネル上限に達している場合は作成せず handleCommandError へ委譲されることを確認", async () => {
     const category = {
       id: "cat-full",
       name: "Full",
@@ -525,7 +519,7 @@ describe("bot/commands/vac-config", () => {
     expect(interaction.guild?.channels.create).not.toHaveBeenCalled();
   });
 
-  it("delegates error when create-trigger guild is unexpectedly missing", async () => {
+  it("create-trigger-vc でギルドが予期せず欠如している場合は handleCommandError へ委譲されることを確認", async () => {
     const interaction = createCommandInteraction({
       guild: null,
       options: {
@@ -541,7 +535,7 @@ describe("bot/commands/vac-config", () => {
     expect(handleCommandError).toHaveBeenCalledTimes(1);
   });
 
-  it("removes trigger channel and deletes voice channel on remove-trigger-vc", async () => {
+  it("remove-trigger-vc でトリガーチャンネルが削除されてボイスチャンネルも削除されることを確認", async () => {
     getVacConfigOrDefaultMock.mockResolvedValue({
       enabled: true,
       triggerChannelIds: ["tr-1"],
@@ -586,8 +580,7 @@ describe("bot/commands/vac-config", () => {
     });
   });
 
-  // 2回目の fetch で音声チャンネル以外が返っても設定削除は実行される（実際の山の削除はスキップ）ことを検証
-  it("removes trigger setting even when fetched channel is not voice", async () => {
+  it("2回目の fetch でボイスチャンネル以外が返ってもトリガー設定が削除されることを確認", async () => {
     getVacConfigOrDefaultMock.mockResolvedValue({
       enabled: true,
       triggerChannelIds: ["tr-2"],
@@ -651,7 +644,7 @@ describe("bot/commands/vac-config", () => {
     expect(interaction.reply).toHaveBeenCalledTimes(1);
   });
 
-  it("delegates remove error when trigger is not found", async () => {
+  it("トリガーが見つからない場合は remove エラーが handleCommandError へ委譲されることを確認", async () => {
     getVacConfigOrDefaultMock.mockResolvedValue({
       enabled: true,
       triggerChannelIds: [],
@@ -672,7 +665,7 @@ describe("bot/commands/vac-config", () => {
     expect(handleCommandError).toHaveBeenCalledTimes(1);
   });
 
-  it("delegates remove error when trigger ids exist but channels are invalid", async () => {
+  it("トリガー ID は存在するがチャンネルが無効な場合は remove エラーが委譲されることを確認", async () => {
     getVacConfigOrDefaultMock.mockResolvedValue({
       enabled: true,
       triggerChannelIds: ["invalid-1", "invalid-2"],
@@ -701,8 +694,7 @@ describe("bot/commands/vac-config", () => {
     expect(removeTriggerChannelMock).not.toHaveBeenCalled();
   });
 
-  // トリガーVCが別カテゴリに属する場合、指定カテゴリに対応するトリガーが見つからずエラーになることを検証
-  it("delegates remove error when trigger channels exist but category does not match", async () => {
+  it("トリガーVCが別カテゴリに属する場合は指定カテゴリに対応するトリガーが見つからずエラーが委譲されることを確認", async () => {
     getVacConfigOrDefaultMock.mockResolvedValue({
       enabled: true,
       triggerChannelIds: ["tr-mismatch"],
@@ -748,7 +740,7 @@ describe("bot/commands/vac-config", () => {
     expect(removeTriggerChannelMock).not.toHaveBeenCalled();
   });
 
-  it("delegates remove error when trigger fetch throws during search", async () => {
+  it("トリガー検索中の fetch が失敗した場合は remove エラーが委譲されることを確認", async () => {
     getVacConfigOrDefaultMock.mockResolvedValue({
       enabled: true,
       triggerChannelIds: ["tr-throw"],
@@ -784,7 +776,7 @@ describe("bot/commands/vac-config", () => {
     expect(handleCommandError).toHaveBeenCalledTimes(1);
   });
 
-  it("removes trigger setting when deleting actual channel fetch fails", async () => {
+  it("実際のチャンネル削除時の fetch が失敗してもトリガー設定が削除されることを確認", async () => {
     getVacConfigOrDefaultMock.mockResolvedValue({
       enabled: true,
       triggerChannelIds: ["tr-err"],
@@ -843,7 +835,7 @@ describe("bot/commands/vac-config", () => {
     expect(interaction.reply).toHaveBeenCalledTimes(1);
   });
 
-  it("delegates remove error when guild is unexpectedly missing", async () => {
+  it("remove-trigger-vc でギルドが予期せず欠如している場合は handleCommandError へ委譲されることを確認", async () => {
     const interaction = createCommandInteraction({
       guild: null,
       options: {
@@ -859,7 +851,7 @@ describe("bot/commands/vac-config", () => {
     expect(handleCommandError).toHaveBeenCalledTimes(1);
   });
 
-  it("shows configured trigger channels and created channels", async () => {
+  it("設定済みのトリガーチャンネルと作成済みチャンネルが表示されることを確認", async () => {
     getVacConfigOrDefaultMock.mockResolvedValue({
       enabled: true,
       triggerChannelIds: ["tr-1", "tr-2"],
@@ -907,8 +899,7 @@ describe("bot/commands/vac-config", () => {
     });
   });
 
-  // view サブコマンドでトリガーチャンネルの fetch が失敗した場合、カテゴリ名の代わりにチャンネルメンションのみを表示することを検証
-  it("shows top label for trigger channel when trigger fetch throws", async () => {
+  it("view でトリガーチャンネルの fetch が失敗した場合はチャンネルメンションのみが表示されることを確認", async () => {
     getVacConfigOrDefaultMock.mockResolvedValue({
       enabled: true,
       triggerChannelIds: ["tr-fail"],
@@ -941,7 +932,7 @@ describe("bot/commands/vac-config", () => {
     expect(options.fields[0].value).toContain("<#tr-fail>");
   });
 
-  it("shows fallback labels when no channels are configured", async () => {
+  it("チャンネルが未設定の場合はフォールバックラベルが表示されることを確認", async () => {
     getVacConfigOrDefaultMock.mockResolvedValue({
       enabled: true,
       triggerChannelIds: [],
@@ -969,7 +960,7 @@ describe("bot/commands/vac-config", () => {
     expect(options.fields.length).toBe(2);
   });
 
-  it("delegates view error when guild is unexpectedly missing", async () => {
+  it("view でギルドが予期せず欠如している場合は handleCommandError へ委譲されることを確認", async () => {
     const interaction = createCommandInteraction({
       guild: null,
       options: {
@@ -985,8 +976,7 @@ describe("bot/commands/vac-config", () => {
     expect(handleCommandError).toHaveBeenCalledTimes(1);
   });
 
-  // オートコンプリートで TOP とカテゴリ候補を返すことを検証
-  it("responds autocomplete choices with TOP and matching categories", async () => {
+  it("オートコンプリートで TOP と一致するカテゴリ候補が返されることを確認", async () => {
     const interaction = createAutocompleteInteraction();
 
     await vacConfigCommand.autocomplete!(
@@ -1002,7 +992,7 @@ describe("bot/commands/vac-config", () => {
     expect(choices.some((choice) => choice.value === "cat-1")).toBe(true);
   });
 
-  it("responds empty choices when command name does not match", async () => {
+  it("コマンド名が一致しない場合は空の選択肢が返されることを確認", async () => {
     const interaction = createAutocompleteInteraction({ commandName: "other" });
 
     await vacConfigCommand.autocomplete!(
@@ -1012,7 +1002,7 @@ describe("bot/commands/vac-config", () => {
     expect(interaction.respond).toHaveBeenCalledWith([]);
   });
 
-  it("responds empty choices when subcommand is unsupported", async () => {
+  it("サブコマンドが非対応の場合は空の選択肢が返されることを確認", async () => {
     const interaction = createAutocompleteInteraction({
       options: {
         getSubcommand: vi.fn(() => "view"),
@@ -1027,7 +1017,7 @@ describe("bot/commands/vac-config", () => {
     expect(interaction.respond).toHaveBeenCalledWith([]);
   });
 
-  it("responds empty choices when guild is missing in autocomplete", async () => {
+  it("オートコンプリートでギルドが欠如している場合は空の選択肢が返されることを確認", async () => {
     const interaction = createAutocompleteInteraction({ guild: null });
 
     await vacConfigCommand.autocomplete!(
@@ -1037,7 +1027,7 @@ describe("bot/commands/vac-config", () => {
     expect(interaction.respond).toHaveBeenCalledWith([]);
   });
 
-  it("supports remove-trigger-vc autocomplete as valid path", async () => {
+  it("remove-trigger-vc のオートコンプリートが有効パスとして機能することを確認", async () => {
     const interaction = createAutocompleteInteraction({
       options: {
         getSubcommand: vi.fn(() => "remove-trigger-vc"),

@@ -53,18 +53,18 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
 
   function makeConfigService(config: unknown = { enabled: true }) {
     return {
-      getBumpReminderConfig: vi.fn().mockResolvedValue(config),
+      getBumpReminderConfigOrDefault: vi.fn().mockResolvedValue(config),
     };
   }
 
-  it("exports sendBumpReminder function", async () => {
+  it("sendBumpReminder 関数がエクスポートされていることを確認する", async () => {
     const module =
       await import("@/bot/features/bump-reminder/handlers/usecases/sendBumpReminder");
 
     expect(typeof module.sendBumpReminder).toBe("function");
   });
 
-  it("warns and returns when channel is not text-based", async () => {
+  it("チャンネルがテキストベースでない場合は警告ログを出して返す", async () => {
     const channel = makeChannel({ isTextBased: false });
     const client = makeClient(channel);
     const service = makeConfigService();
@@ -81,10 +81,10 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
     );
 
     expect(loggerMock.warn).toHaveBeenCalled();
-    expect(service.getBumpReminderConfig).not.toHaveBeenCalled();
+    expect(service.getBumpReminderConfigOrDefault).not.toHaveBeenCalled();
   });
 
-  it("debugs and returns when config is disabled", async () => {
+  it("設定が無効の場合はデバッグログを出して返す", async () => {
     const channel = makeChannel();
     const client = makeClient(channel);
     const service = makeConfigService({ enabled: false });
@@ -104,8 +104,7 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
     expect(channel.send).not.toHaveBeenCalled();
   });
 
-  // Disboard は bump 元メッセージへのリプライ形式で通知する必要があるため reply フィールドが含まれているか確認
-  it("sends message with reply when messageId is provided (Disboard)", async () => {
+  it("Disboard は bump 元メッセージへのリプライ形式で通知するため messageId が提供された場合に reply フィールドが含まれることを確認", async () => {
     const channel = makeChannel();
     const client = makeClient(channel);
     const service = makeConfigService({
@@ -131,7 +130,7 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
     expect(loggerMock.info).toHaveBeenCalled();
   });
 
-  it("sends plain message without reply when no messageId (Dissoku)", async () => {
+  it("Dissoku は messageId なしでリプライなしのプレーンメッセージを送信する", async () => {
     const channel = makeChannel();
     const client = makeClient(channel);
     const service = makeConfigService({
@@ -155,7 +154,7 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
     expect(loggerMock.info).toHaveBeenCalled();
   });
 
-  it("sends message with generic reminder when serviceName is undefined", async () => {
+  it("serviceName が undefined の場合は汎用リマインダーメッセージを送信する", async () => {
     const channel = makeChannel();
     const client = makeClient(channel);
     const service = makeConfigService({
@@ -178,8 +177,7 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
     expect(channel.send).toHaveBeenCalled();
   });
 
-  // ロールメンションと複数ユーザーメンションが Discord の書式(<@&...>, <@...>)で本文に含まれることを確認
-  it("includes mention role and user ids in message content", async () => {
+  it("ロールメンションと複数ユーザーメンションが Discord の書式（<@&...>, <@...>）で本文に含まれることを確認", async () => {
     const channel = makeChannel();
     const client = makeClient(channel);
     const service = makeConfigService({
@@ -205,7 +203,7 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
     expect(sentContent).toContain("<@user-2>");
   });
 
-  it("cleans up panelMessageId when channel is already text-based", async () => {
+  it("チャンネルがテキストベースの場合に finally で panelMessageId をクリーンアップする", async () => {
     const panelMsgDeleteMock = vi.fn().mockResolvedValue(undefined);
     const fetchMsgMock = vi
       .fn()
@@ -235,9 +233,7 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
     expect(loggerMock.debug).toHaveBeenCalled();
   });
 
-  // 最初の fetch でテキストベース外チャンネルが返った場合でも、finally 節でパネルメッセージ削除用に
-  // 再 fetch が行われる分岐を検証(fetchMock が 2 回呼ばれることで確認)
-  it("re-fetches channel for panel cleanup when channel is not text-based in finally", async () => {
+  it("最初の fetch でテキストベース外チャンネルが返った場合でも finally でパネル削除用に再 fetch されることを検証", async () => {
     const panelMsgDeleteMock = vi.fn().mockResolvedValue(undefined);
     const textChannelForPanel = makeChannel({
       messagesFetch: vi.fn().mockResolvedValue({ delete: panelMsgDeleteMock }),
@@ -266,7 +262,7 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
-  it("logs debug when panel message deletion fails", async () => {
+  it("パネルメッセージの削除に失敗した場合はデバッグログを記録する", async () => {
     const fetchMsgMock = vi.fn().mockRejectedValue(new Error("Not found"));
     const channel = makeChannel({ messagesFetch: fetchMsgMock });
     const client = makeClient(channel);
@@ -296,9 +292,7 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
     );
   });
 
-  // finally で再フェッチしたチャンネルが null（取得失敗）の場合、
-  // ch?.isTextBased() が falsy になりパネルクリーンアップをスキップすることを確認する
-  it("skips panel cleanup when re-fetched channel is null in finally", async () => {
+  it("finally での再フェッチが null を返した場合はパネルクリーンアップをスキップする", async () => {
     // 1回目フェッチ: テキスト以外 → try ブロックで warn して return
     // 2回目フェッチ: null（取得失敗） → ch?.isTextBased() が falsy → クリーンアップスキップ
     const fetchMock = vi

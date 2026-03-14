@@ -13,7 +13,10 @@ import { parseJsonArray } from "../../utils/jsonUtils";
  * guild_vc_recruit_configs テーブルを使用した VC募集設定リポジトリ
  */
 export class VcRecruitConfigRepository implements IVcRecruitConfigRepository {
-  constructor(private readonly prisma: PrismaClient) {}
+  private readonly prisma: PrismaClient;
+  constructor(prisma: PrismaClient) {
+    this.prisma = prisma;
+  }
 
   async getVcRecruitConfig(guildId: string): Promise<VcRecruitConfig | null> {
     const record = await this.prisma.guildVcRecruitConfig.findUnique({

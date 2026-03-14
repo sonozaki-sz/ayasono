@@ -33,7 +33,18 @@ export function getCommandLocalizations(
  * .setName("ping")
  * ...withLocalization("ping.description")
  */
-export function withLocalization(key: keyof typeof resources.ja.commands) {
+export function withLocalization(key: keyof typeof resources.ja.commands): {
+  description: string;
+  descriptionLocalizations: CommandLocalizationMap;
+  apply: <
+    T extends {
+      setDescription: (desc: string) => T;
+      setDescriptionLocalizations: (loc: CommandLocalizationMap) => T;
+    },
+  >(
+    builder: T,
+  ) => T;
+} {
   // キーに対応する説明文をまとめて取得して再利用
   const { ja, localizations } = getCommandLocalizations(key);
   return {

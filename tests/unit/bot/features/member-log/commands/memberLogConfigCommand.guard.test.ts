@@ -26,8 +26,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.guard", () => 
     vi.clearAllMocks();
   });
 
-  // ManageGuild 権限がある場合は正常終了することを確認
-  it("resolves without throwing when member has ManageGuild permission", async () => {
+  it("ManageGuild 権限がある場合は正常終了することを確認", async () => {
     const interaction = makeInteraction(true);
 
     await expect(
@@ -35,8 +34,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.guard", () => 
     ).resolves.toBeUndefined();
   });
 
-  // ManageGuild 権限がない場合に ValidationError を投げることを確認
-  it("throws ValidationError when member lacks ManageGuild permission", async () => {
+  it("ManageGuild 権限がない場合に ValidationError を投げることを確認", async () => {
     const interaction = makeInteraction(false);
 
     await expect(
@@ -44,8 +42,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.guard", () => 
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  // memberPermissions が null の場合に ValidationError を投げることを確認
-  it("throws ValidationError when memberPermissions is null", async () => {
+  it("memberPermissions が null の場合に ValidationError を投げることを確認", async () => {
     const interaction = makeInteraction(null);
 
     await expect(

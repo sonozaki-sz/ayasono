@@ -39,7 +39,7 @@ describe("bot/features/sticky-message/handlers/stickyMessageCreateHandler", () =
     vi.clearAllMocks();
   });
 
-  it("calls resend service for guild text channel messages", async () => {
+  it("ギルドテキストチャンネルのメッセージに対して再送サービスを呼び出す", async () => {
     const { handleStickyMessageCreate } = await import(
       "@/bot/features/sticky-message/handlers/stickyMessageCreate" + "Handler"
     );
@@ -53,7 +53,7 @@ describe("bot/features/sticky-message/handlers/stickyMessageCreateHandler", () =
     );
   });
 
-  it("ignores bot messages", async () => {
+  it("Bot からのメッセージは無視する", async () => {
     const { handleStickyMessageCreate } =
       await import("@/bot/features/sticky-message/handlers/stickyMessageCreateHandler");
     const message = createMessageMock({ author: { bot: true } });
@@ -63,8 +63,7 @@ describe("bot/features/sticky-message/handlers/stickyMessageCreateHandler", () =
     expect(handleMessageCreateMock).not.toHaveBeenCalled();
   });
 
-  // DM（guildId が null）はギルドスコープの機能対象外のため無視されることを確認
-  it("ignores messages without guildId (DMs)", async () => {
+  it("DM（guildId が null）はギルドスコープの機能対象外のため無視される", async () => {
     const { handleStickyMessageCreate } =
       await import("@/bot/features/sticky-message/handlers/stickyMessageCreateHandler");
     const message = createMessageMock({ guildId: null });
@@ -74,7 +73,7 @@ describe("bot/features/sticky-message/handlers/stickyMessageCreateHandler", () =
     expect(handleMessageCreateMock).not.toHaveBeenCalled();
   });
 
-  it("ignores non-text channels", async () => {
+  it("テキスト以外のチャンネルのメッセージは無視する", async () => {
     const { handleStickyMessageCreate } =
       await import("@/bot/features/sticky-message/handlers/stickyMessageCreateHandler");
     const message = createMessageMock({
@@ -86,8 +85,7 @@ describe("bot/features/sticky-message/handlers/stickyMessageCreateHandler", () =
     expect(handleMessageCreateMock).not.toHaveBeenCalled();
   });
 
-  // 再送サービスが例外を投げても呼び出し元に伝播させずエラーログのみ記録することを確認
-  it("logs error when resend service throws", async () => {
+  it("再送サービスが例外を投げても呼び出し元に伝播させずエラーログのみ記録する", async () => {
     const { handleStickyMessageCreate } =
       await import("@/bot/features/sticky-message/handlers/stickyMessageCreateHandler");
     handleMessageCreateMock.mockRejectedValueOnce(new Error("resend error"));

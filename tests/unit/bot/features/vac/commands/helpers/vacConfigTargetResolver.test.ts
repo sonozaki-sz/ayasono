@@ -8,7 +8,7 @@ import { ChannelType } from "discord.js";
 describe("bot/features/vac/commands/helpers/vacConfigTargetResolver", () => {
   // カテゴリ解決とトリガー探索の分岐を安定して検証する
   describe("resolveTargetCategory", () => {
-    it("returns parent category when option is omitted", async () => {
+    it("オプション未指定時に親カテゴリを返す", async () => {
       const category = {
         id: "cat-1",
         name: "General",
@@ -32,7 +32,7 @@ describe("bot/features/vac/commands/helpers/vacConfigTargetResolver", () => {
       expect(result).toEqual(category);
     });
 
-    it("returns null when TOP is specified", async () => {
+    it("TOPが指定された場合はnullを返す", async () => {
       const fetch = vi.fn();
       const guild = {
         channels: {
@@ -51,7 +51,7 @@ describe("bot/features/vac/commands/helpers/vacConfigTargetResolver", () => {
       expect(fetch).not.toHaveBeenCalled();
     });
 
-    it("resolves category by id first, then falls back to name", async () => {
+    it("まずIDでカテゴリを解決し、見つからなければ名前でフォールバックする", async () => {
       const categoryByName = {
         id: "cat-2",
         name: "TargetCategory",
@@ -83,7 +83,7 @@ describe("bot/features/vac/commands/helpers/vacConfigTargetResolver", () => {
   });
 
   describe("findTriggerChannelByCategory", () => {
-    it("returns first voice trigger channel matching category", async () => {
+    it("指定カテゴリに一致する最初のボイストリガーチャンネルを返す", async () => {
       const guild = {
         channels: {
           fetch: vi
@@ -114,7 +114,7 @@ describe("bot/features/vac/commands/helpers/vacConfigTargetResolver", () => {
       expect(result?.id).toBe("voice-2");
     });
 
-    it("returns null when no trigger matches category", async () => {
+    it("カテゴリに一致するトリガーが存在しない場合はnullを返す", async () => {
       const guild = {
         channels: {
           fetch: vi

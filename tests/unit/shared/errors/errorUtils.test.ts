@@ -43,7 +43,7 @@ describe("shared/errors/errorUtils", () => {
   };
 
   // Error・BaseError はそのまま返し、数値など Error 以外の型は message 文字列化した Error に変換することを確認
-  it("toError returns Error/BaseError as-is and converts unknown values", async () => {
+  it("toError が Error/BaseError をそのまま返し、未知の値を変換すること", async () => {
     const { errorUtils, BaseError } = await loadModule("test");
     const base = new BaseError("ValidationError", "invalid", true);
     const normal = new Error("boom");
@@ -57,7 +57,7 @@ describe("shared/errors/errorUtils", () => {
   });
 
   // operational フラグが true の BaseError は warn、それ以外は error レベルでログ出力されることを確認
-  it("logError writes warn for operational BaseError and error otherwise", async () => {
+  it("logError が運用エラーは warn、それ以外は error レベルで出力すること", async () => {
     const { errorUtils, BaseError } = await loadModule("test");
     const operational = new BaseError("ValidationError", "invalid", true, 400);
     const nonOperational = new BaseError(
@@ -87,7 +87,7 @@ describe("shared/errors/errorUtils", () => {
   });
 
   // operational エラーはメッセージをそのまま返し、非 operational は本番では汎用文言・開発環境では詳細付きの文言を返す
-  it("getUserFriendlyMessage returns operational message and env-specific fallback", async () => {
+  it("getUserFriendlyMessage が運用エラーのメッセージを返し、環境ごとのフォールバックを適用すること", async () => {
     const testModule = await loadModule("test");
     const op = new testModule.BaseError(
       "ValidationError",

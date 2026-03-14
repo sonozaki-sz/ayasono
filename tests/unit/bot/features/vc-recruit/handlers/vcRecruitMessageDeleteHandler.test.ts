@@ -79,24 +79,21 @@ describe("bot/features/vc-recruit/handlers/vcRecruitMessageDeleteHandler", () =>
     updatePanelMessageIdMock.mockResolvedValue(undefined);
   });
 
-  // guildId がない（DM）はスキップ
-  it("skips messages without guildId", async () => {
+  it("guildId がない（DM）メッセージはスキップする", async () => {
     const msg = makeMessage({ guildId: null });
     await handleVcRecruitMessageDelete(msg as never);
 
     expect(findSetupByPanelChannelIdMock).not.toHaveBeenCalled();
   });
 
-  // channelId がない場合はスキップ
-  it("skips messages without channelId", async () => {
+  it("channelId がない場合はスキップする", async () => {
     const msg = makeMessage({ channelId: null });
     await handleVcRecruitMessageDelete(msg as never);
 
     expect(findSetupByPanelChannelIdMock).not.toHaveBeenCalled();
   });
 
-  // guild が null の PartialMessage はスキップ（キャッシュなし）
-  it("skips when guild is null (partial message not in cache)", async () => {
+  it("guild が null の PartialMessage はスキップする（キャッシュなし）", async () => {
     findSetupByPanelChannelIdMock.mockResolvedValue(makeSetup());
     const msg = makeMessage({ guild: null });
 
@@ -105,8 +102,7 @@ describe("bot/features/vc-recruit/handlers/vcRecruitMessageDeleteHandler", () =>
     expect(updatePanelMessageIdMock).not.toHaveBeenCalled();
   });
 
-  // パネルチャンネル登録外のチャンネルのメッセージは何もしない
-  it("does nothing when channel is not a panel channel", async () => {
+  it("パネルチャンネルとして登録されていないチャンネルのメッセージは何もしない", async () => {
     const msg = makeMessage();
     // findSetupByPanelChannelId が null を返す（デフォルト）
 
@@ -115,8 +111,7 @@ describe("bot/features/vc-recruit/handlers/vcRecruitMessageDeleteHandler", () =>
     expect(updatePanelMessageIdMock).not.toHaveBeenCalled();
   });
 
-  // パネルチャンネルのメッセージだが panelMessageId と一致しない（別メッセージ削除）
-  it("does nothing when deleted message is not the stored panelMessageId", async () => {
+  it("パネルチャンネルのメッセージだが panelMessageId と一致しない場合は何もしない", async () => {
     findSetupByPanelChannelIdMock.mockResolvedValue(makeSetup());
     const msg = makeMessage({ id: "other-msg-99" });
 
@@ -125,8 +120,7 @@ describe("bot/features/vc-recruit/handlers/vcRecruitMessageDeleteHandler", () =>
     expect(updatePanelMessageIdMock).not.toHaveBeenCalled();
   });
 
-  // パネルメッセージが削除された → 再送信して DB 更新
-  it("resends panel message and updates DB when panelMessageId is deleted", async () => {
+  it("panelMessageId のメッセージが削除されたとき、パネルを再送信して DB を更新する", async () => {
     findSetupByPanelChannelIdMock.mockResolvedValue(makeSetup());
     const panelChannel = makeSendablePanelChannel();
     const msg = makeMessage({
@@ -147,8 +141,7 @@ describe("bot/features/vc-recruit/handlers/vcRecruitMessageDeleteHandler", () =>
     );
   });
 
-  // チャンネル fetch 失敗（削除済みなど）でもエラーにならない
-  it("gracefully handles fetch failure for panel channel", async () => {
+  it("パネルチャンネルの fetch が失敗しても（削除済みなど）エラーにならない", async () => {
     findSetupByPanelChannelIdMock.mockResolvedValue(makeSetup());
     const msg = makeMessage({
       guild: {
@@ -165,8 +158,7 @@ describe("bot/features/vc-recruit/handlers/vcRecruitMessageDeleteHandler", () =>
     expect(updatePanelMessageIdMock).not.toHaveBeenCalled();
   });
 
-  // send 失敗でもエラーにならない
-  it("gracefully handles send failure", async () => {
+  it("send が失敗してもエラーにならない", async () => {
     findSetupByPanelChannelIdMock.mockResolvedValue(makeSetup());
     const panelChannel = {
       ...makeSendablePanelChannel(),

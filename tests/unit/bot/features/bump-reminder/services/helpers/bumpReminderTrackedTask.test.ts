@@ -19,7 +19,7 @@ describe("bot/features/bump-reminder/services/helpers/bumpReminderTrackedTask", 
     vi.clearAllMocks();
   });
 
-  it("marks reminder as sent when task succeeds", async () => {
+  it("タスク成功時にリマインダーを sent としてマークする", async () => {
     const repository = { updateStatus: vi.fn().mockResolvedValue(undefined) };
     const task = vi.fn().mockResolvedValue(undefined);
 
@@ -32,7 +32,7 @@ describe("bot/features/bump-reminder/services/helpers/bumpReminderTrackedTask", 
     expect(loggerErrorMock).not.toHaveBeenCalled();
   });
 
-  it("marks reminder cancelled when task fails", async () => {
+  it("タスク失敗時にリマインダーを cancelled としてマークする", async () => {
     const repository = { updateStatus: vi.fn().mockResolvedValue(undefined) };
     const task = vi.fn().mockRejectedValue(new Error("task failed"));
 

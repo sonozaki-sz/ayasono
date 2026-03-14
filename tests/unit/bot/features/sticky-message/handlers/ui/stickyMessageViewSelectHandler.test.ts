@@ -64,7 +64,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler
     infoEmbedInstance.setTimestamp.mockReturnThis();
   });
 
-  it("matches VIEW_SELECT_CUSTOM_ID exactly", async () => {
+  it("VIEW_SELECT_CUSTOM_ID に完全一致する customId を正しく識別する", async () => {
     const { stickyMessageViewSelectHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler");
     expect(
@@ -77,8 +77,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler
     ).toBe(false);
   });
 
-  // values が空配列の場合（チャンネル未選択）はチャンネル ID を取得できず、コンポーネントのみクリアして早期リターンすることを検証
-  it("calls update with empty components when no channelId", async () => {
+  it("values が空配列の場合（チャンネル未選択）はコンポーネントのみクリアして早期リターンする", async () => {
     const { stickyMessageViewSelectHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler");
     const updateMock = vi.fn().mockResolvedValue(undefined);
@@ -93,7 +92,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler
     expect(findByChannelMock).not.toHaveBeenCalled();
   });
 
-  it("updates with warning when sticky not found", async () => {
+  it("スティッキーメッセージが見つからない場合に警告で更新する", async () => {
     const { stickyMessageViewSelectHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler");
     findByChannelMock.mockResolvedValue(null);
@@ -108,8 +107,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler
     );
   });
 
-  // embedData が null の場合はプレーンテキスト表示パスに分岐し、setColor が呼ばれないことを検証
-  it("shows plain format for sticky without embedData", async () => {
+  it("embedData が null の場合はプレーンテキスト表示パスに分岐し、setColor が呼ばれない", async () => {
     const { stickyMessageViewSelectHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler");
     findByChannelMock.mockResolvedValue({
@@ -136,7 +134,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler
     );
   });
 
-  it("shows embed format, title, and color fields for sticky with embedData", async () => {
+  it("embedData がある場合は embed 形式・タイトル・カラーフィールドを表示する", async () => {
     const { stickyMessageViewSelectHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler");
     const embedData = JSON.stringify({
@@ -163,7 +161,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler
     );
   });
 
-  it("shows updatedBy field when updatedBy is set", async () => {
+  it("updatedBy が設定されている場合に updatedBy フィールドを表示する", async () => {
     const { stickyMessageViewSelectHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler");
     findByChannelMock.mockResolvedValue({
@@ -185,8 +183,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler
     );
   });
 
-  // Discord の embed フィールド文字数上限（1024）を超えるコンテンツが "..." で切り詰められることを検証
-  it("truncates content longer than 1024 chars", async () => {
+  it("Discord の embed フィールド文字数上限（1024）を超えるコンテンツが '...' で切り詰められる", async () => {
     const { stickyMessageViewSelectHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler");
     const longContent = "a".repeat(1100);
@@ -211,7 +208,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler
     expect(contentField).toBeDefined();
   });
 
-  it("does not truncate content equal to 1024 chars", async () => {
+  it("コンテンツがちょうど 1024 文字の場合は切り詰めない", async () => {
     const { stickyMessageViewSelectHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler");
     const exactContent = "a".repeat(1024);
@@ -237,8 +234,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler
     expect(contentField?.value).not.toContain("...");
   });
 
-  // embedData が不正な JSON 文字列でも例外を投げず、更新処理が正常完了することを検証
-  it("ignores JSON parse errors in embedData", async () => {
+  it("embedData が不正な JSON 文字列でも例外を投げず、更新処理が正常完了する", async () => {
     const { stickyMessageViewSelectHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler");
     findByChannelMock.mockResolvedValue({
@@ -258,8 +254,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler
     expect(updateMock).toHaveBeenCalled();
   });
 
-  // embedData に title も color もない場合はどちらの if ブロックもスキップする
-  it("does not add title/color fields when embedData has neither title nor color", async () => {
+  it("embedData に title も color もない場合はどちらのフィールドも追加しない", async () => {
     const { stickyMessageViewSelectHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler");
     // title も color もない embedData
@@ -288,8 +283,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler
     expect(updateMock).toHaveBeenCalled();
   });
 
-  // guildId が null の場合に null 合体演算子で undefined にフォールバックし、クラッシュせず更新できることを検証
-  it("treats guildId as undefined when null (null-coalescing fallback)", async () => {
+  it("guildId が null の場合に null 合体演算子で undefined にフォールバックし、クラッシュせず更新できる", async () => {
     const { stickyMessageViewSelectHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler");
     findByChannelMock.mockResolvedValue({

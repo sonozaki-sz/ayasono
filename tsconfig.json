@@ -1,10 +1,14 @@
 {
   "compilerOptions": {
     // === コンパイルターゲット ===
-    "target": "ES2024", // Node.js 24完全サポート、最新かつ安全
+    "target": "ES2024", // Node.js 24完全サポート（VS Codeスキーマ上限）
     "module": "ESNext", // 最新モジュール機能
     "moduleResolution": "bundler", // 最新の解決方式、拡張子不要
-    "lib": ["ES2024"], // 最新の標準化済みAPI
+    "lib": ["ES2024"], // 最新の標準化済みAPI（VS Codeスキーマ上限）
+    "verbatimModuleSyntax": true, // import type を強制（TS 7 推奨）
+    "noUncheckedSideEffectImports": true, // 副作用インポートの存在チェック
+    "erasableSyntaxOnly": true, // TS 7 対応：型消去可能な構文のみ許可
+    "isolatedDeclarations": true, // TS 7 対応：高速並列型チェック
 
     // === 出力設定 ===
     "outDir": "./dist",

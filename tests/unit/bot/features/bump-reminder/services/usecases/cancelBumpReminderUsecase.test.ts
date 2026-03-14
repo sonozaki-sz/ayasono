@@ -30,7 +30,7 @@ describe("bot/features/bump-reminder/services/usecases/cancelBumpReminderUsecase
     vi.clearAllMocks();
   });
 
-  it("returns false when no scheduled reminder exists", async () => {
+  it("スケジュールされたリマインダーが存在しない場合は false を返す", async () => {
     cancelScheduledReminderMock.mockReturnValue(undefined);
     const repository = { updateStatus: vi.fn() };
 
@@ -44,7 +44,7 @@ describe("bot/features/bump-reminder/services/usecases/cancelBumpReminderUsecase
     expect(repository.updateStatus).not.toHaveBeenCalled();
   });
 
-  it("updates status to cancelled when reminder exists", async () => {
+  it("リマインダーが存在する場合はステータスを cancelled に更新する", async () => {
     cancelScheduledReminderMock.mockReturnValue({
       jobId: "job-1",
       reminderId: "r1",

@@ -6,7 +6,7 @@ import {
 import { resources } from "@/shared/locale/locales/resources";
 
 describe("shared/locale/commandLocalizations", () => {
-  it("returns ja default and English localization map", () => {
+  it("日本語のデフォルトと英語のローカライゼーションマップを返すこと", () => {
     const key = "ping.description";
     const localizations = getCommandLocalizations(key);
 
@@ -17,7 +17,7 @@ describe("shared/locale/commandLocalizations", () => {
     });
   });
 
-  it("creates helper object and applies localization to builder chain", () => {
+  it("ヘルパーオブジェクトを生成してビルダーチェーンにローカライゼーションを適用すること", () => {
     const key = "afk.description";
     const calls: Array<{ method: string; value: unknown }> = [];
 

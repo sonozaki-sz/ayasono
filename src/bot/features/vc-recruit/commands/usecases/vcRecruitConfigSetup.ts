@@ -7,7 +7,7 @@ import {
   ButtonStyle,
   ChannelType,
   MessageFlags,
-  OverwriteResolvable,
+  type OverwriteResolvable,
   PermissionFlagsBits,
   type ChatInputCommandInteraction,
   type TextChannel,

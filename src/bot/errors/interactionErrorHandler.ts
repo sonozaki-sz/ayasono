@@ -4,7 +4,7 @@
 import {
   ChatInputCommandInteraction,
   MessageFlags,
-  RepliableInteraction,
+  type RepliableInteraction,
 } from "discord.js";
 import { BaseError, ValidationError } from "../../shared/errors/customErrors";
 import {

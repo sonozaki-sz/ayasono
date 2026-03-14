@@ -63,8 +63,7 @@ describe("bot/features/vc-recruit/handlers/vcRecruitVoiceStateUpdate", () => {
     removeCreatedVoiceChannelIdMock.mockResolvedValue(undefined);
   });
 
-  // oldState.channel が null の場合は何もしない
-  it("does nothing when oldState has no channel", async () => {
+  it("oldState.channel が null の場合は何もしない", async () => {
     const old = makeVoiceState({ channelId: null });
     const newState = makeVoiceState({ channelId: "vc-2" });
     await handleVcRecruitVoiceStateUpdate(old as never, newState as never);
@@ -72,8 +71,7 @@ describe("bot/features/vc-recruit/handlers/vcRecruitVoiceStateUpdate", () => {
     expect(findSetupByCreatedVcIdMock).not.toHaveBeenCalled();
   });
 
-  // channel.type が GuildVoice でない場合は何もしない
-  it("does nothing when channel type is not GuildVoice", async () => {
+  it("channel.type が GuildVoice でない場合は何もしない", async () => {
     const old = makeVoiceState({ channelType: ChannelType.GuildText });
     const newState = makeVoiceState({ channelId: "vc-2" });
     await handleVcRecruitVoiceStateUpdate(old as never, newState as never);
@@ -81,8 +79,7 @@ describe("bot/features/vc-recruit/handlers/vcRecruitVoiceStateUpdate", () => {
     expect(findSetupByCreatedVcIdMock).not.toHaveBeenCalled();
   });
 
-  // 同一チャンネルへの移動（リージョン変更など）は無視する
-  it("does nothing when user stays in the same channel", async () => {
+  it("同一チャンネルへの移動（リージョン変更など）は無視する", async () => {
     const old = makeVoiceState({ channelId: CHANNEL_ID });
     const newState = makeVoiceState({ channelId: CHANNEL_ID });
     await handleVcRecruitVoiceStateUpdate(old as never, newState as never);
@@ -90,8 +87,7 @@ describe("bot/features/vc-recruit/handlers/vcRecruitVoiceStateUpdate", () => {
     expect(findSetupByCreatedVcIdMock).not.toHaveBeenCalled();
   });
 
-  // VC募集で作成したVCでない場合は何もしない
-  it("does nothing when channel is not a vc-recruit managed channel", async () => {
+  it("VC募集で作成した VC でない場合は何もしない", async () => {
     findSetupByCreatedVcIdMock.mockResolvedValue(null);
 
     const old = makeVoiceState({ channelId: CHANNEL_ID });
@@ -101,8 +97,7 @@ describe("bot/features/vc-recruit/handlers/vcRecruitVoiceStateUpdate", () => {
     expect(removeCreatedVoiceChannelIdMock).not.toHaveBeenCalled();
   });
 
-  // メンバーが残っている場合はチャンネルを削除しない
-  it("does not delete channel when members remain", async () => {
+  it("メンバーが残っている場合はチャンネルを削除しない", async () => {
     findSetupByCreatedVcIdMock.mockResolvedValue({ panelChannelId: "panel-1" });
     const deleteFn = vi.fn().mockResolvedValue(undefined);
     const old = makeVoiceState({
@@ -117,8 +112,7 @@ describe("bot/features/vc-recruit/handlers/vcRecruitVoiceStateUpdate", () => {
     expect(removeCreatedVoiceChannelIdMock).not.toHaveBeenCalled();
   });
 
-  // 空VCになったらチャンネルを削除してDBから追跡リストを更新する
-  it("deletes empty VC and updates DB", async () => {
+  it("空 VC になったらチャンネルを削除して DB から追跡リストを更新する", async () => {
     findSetupByCreatedVcIdMock.mockResolvedValue({ panelChannelId: "panel-1" });
     const deleteFn = vi.fn().mockResolvedValue(undefined);
     const old = makeVoiceState({
@@ -136,8 +130,7 @@ describe("bot/features/vc-recruit/handlers/vcRecruitVoiceStateUpdate", () => {
     );
   });
 
-  // エラーが发生してもクラッシュしない（エラーをログに記録して処理を継続）
-  it("does not throw when repository throws an error", async () => {
+  it("リポジトリがエラーを throw してもクラッシュせずにエラーをログに記録して処理を継続する", async () => {
     findSetupByCreatedVcIdMock.mockRejectedValue(new Error("DB エラー"));
 
     const old = makeVoiceState({ channelId: CHANNEL_ID, memberSize: 0 });

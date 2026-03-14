@@ -223,7 +223,7 @@ export class LocaleManager {
 }
 
 // シングルトンインスタンス
-export const localeManager = new LocaleManager();
+export const localeManager: LocaleManager = new LocaleManager();
 
 /**
  * ヘルパー関数：Guild別翻訳

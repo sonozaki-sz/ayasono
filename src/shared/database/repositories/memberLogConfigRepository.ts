@@ -8,7 +8,10 @@ import type { IMemberLogConfigRepository, MemberLogConfig } from "../types";
  * guild_member_log_configs テーブルを使用したメンバーログ設定リポジトリ
  */
 export class MemberLogConfigRepository implements IMemberLogConfigRepository {
-  constructor(private readonly prisma: PrismaClient) {}
+  private readonly prisma: PrismaClient;
+  constructor(prisma: PrismaClient) {
+    this.prisma = prisma;
+  }
 
   async getMemberLogConfig(guildId: string): Promise<MemberLogConfig | null> {
     const record = await this.prisma.guildMemberLogConfig.findUnique({

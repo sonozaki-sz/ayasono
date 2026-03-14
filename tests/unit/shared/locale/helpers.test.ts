@@ -24,7 +24,7 @@ describe("shared/locale/helpers", () => {
   });
 
   // guild translator 取得時に localeManager.getGuildT を透過利用することを検証
-  it("returns guild translator from locale manager", async () => {
+  it("localeManager 経由でギルドトランスレーターを返すこと", async () => {
     const fixedT = vi.fn((key: string) => `translated:${key}`);
     getGuildTMock.mockResolvedValue(fixedT);
 
@@ -37,7 +37,7 @@ describe("shared/locale/helpers", () => {
   });
 
   // 追加パラメータなしで guild translator を解決できることを検証
-  it("resolves translator without repository parameter", async () => {
+  it("repository パラメータなしでトランスレーターを解決できること", async () => {
     const fixedT = vi.fn((key: string) => key);
     getGuildTMock.mockResolvedValue(fixedT);
 
@@ -47,7 +47,7 @@ describe("shared/locale/helpers", () => {
   });
 
   // 明示的なキャッシュ無効化が対象 guildId に対して実行されることを検証
-  it("invalidates locale cache for target guild", async () => {
+  it("指定 guildId のロケールキャッシュを無効化すること", async () => {
     await invalidateGuildLocaleCache("guild-3");
 
     expect(invalidateLocaleCacheMock).toHaveBeenCalledWith("guild-3");

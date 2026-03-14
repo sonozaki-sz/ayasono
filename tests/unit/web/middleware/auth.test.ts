@@ -58,7 +58,7 @@ describe("web/middleware/auth apiAuthPlugin", () => {
     };
   }
 
-  it("skips auth when JWT_SECRET is not configured", async () => {
+  it("JWT_SECRET が未設定の場合は認証をスキップすること", async () => {
     jwtSecretValue = undefined;
     const onRequest = await setupHook();
     const reply = createReply();
@@ -69,7 +69,7 @@ describe("web/middleware/auth apiAuthPlugin", () => {
     expect(reply.send).not.toHaveBeenCalled();
   });
 
-  it("returns 401 when Authorization header is missing", async () => {
+  it("Authorization ヘッダーが欠落している場合は 401 を返すこと", async () => {
     // 認証ヘッダー欠落時は 401 を返す
     jwtSecretValue = "secret-token";
     const onRequest = await setupHook();
@@ -91,7 +91,7 @@ describe("web/middleware/auth apiAuthPlugin", () => {
     ).toBe(true);
   });
 
-  it("returns 401 when Authorization header is not Bearer", async () => {
+  it("Authorization ヘッダーが Bearer 形式でない場合は 401 を返すこと", async () => {
     // Bearer 形式でないヘッダーは 401 扱い
     jwtSecretValue = "secret-token";
     const onRequest = await setupHook();
@@ -110,7 +110,7 @@ describe("web/middleware/auth apiAuthPlugin", () => {
     expect(reply.send).toHaveBeenCalled();
   });
 
-  it("returns 403 when Bearer token is invalid", async () => {
+  it("Bearer トークンが不正な場合は 403 を返すこと", async () => {
     // Bearer 形式でもトークン不一致なら 403 を返す
     jwtSecretValue = "secret-token";
     const onRequest = await setupHook();
@@ -139,7 +139,7 @@ describe("web/middleware/auth apiAuthPlugin", () => {
     ).toBe(true);
   });
 
-  it("allows request when Bearer token is valid", async () => {
+  it("正しい Bearer トークンの場合はリクエストを通過させること", async () => {
     // 正しいトークン時はミドルウェアが応答を返さず通過させる
     jwtSecretValue = "secret-token";
     const onRequest = await setupHook();

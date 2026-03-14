@@ -43,7 +43,7 @@ describe("bot/features/bump-reminder/handlers/bumpReminderStartup", () => {
     });
   });
 
-  it("creates task factory and delegates restore", async () => {
+  it("タスクファクトリーを構築して restorePendingReminders に委譲する", async () => {
     const client = { id: "client" };
 
     await restoreBumpRemindersOnStartup(client as never);
@@ -79,8 +79,7 @@ describe("bot/features/bump-reminder/handlers/bumpReminderStartup", () => {
     );
   });
 
-  // 復元処理が失敗しても Bot 起動を止めないよう例外をキャッチしてエラーログのみ残すことを確認
-  it("logs and swallows restore error", async () => {
+  it("復元処理が失敗しても Bot 起動を止めないよう例外をキャッチしてエラーログのみ残すことを確認", async () => {
     restorePendingRemindersMock.mockRejectedValueOnce(
       new Error("restore failed"),
     );

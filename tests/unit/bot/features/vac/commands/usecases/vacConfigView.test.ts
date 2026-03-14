@@ -35,7 +35,7 @@ describe("bot/features/vac/commands/usecases/vacConfigView", () => {
     vi.clearAllMocks();
   });
 
-  it("throws ValidationError when guild context is missing", async () => {
+  it("ギルドコンテキストが存在しない場合にValidationErrorをスローする", async () => {
     const interaction = {
       guild: null,
       reply: vi.fn(),
@@ -46,7 +46,7 @@ describe("bot/features/vac/commands/usecases/vacConfigView", () => {
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  it("builds info embed and replies ephemeral when guild exists", async () => {
+  it("ギルドが存在する場合にinfoエンベッドを構築してエフェメラルで返答する", async () => {
     const getVacConfigOrDefault = vi.fn().mockResolvedValue({
       enabled: true,
       triggerChannelIds: ["trigger-1"],

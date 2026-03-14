@@ -182,7 +182,7 @@ describe("bot/features/message-delete/commands/usecases/runPreviewDialog", () =>
 
   // ─── 終端アクション ───────────────────────────────────────────────────────
 
-  it("resolves with Confirm when CONFIRM_YES is clicked", async () => {
+  it("CONFIRM_YES クリック時に Confirm として解決する", async () => {
     const { showPreviewDialog } = await loadModule();
     const collector = makeMockCollector();
     const baseInteraction = makeBaseInteraction(collector);
@@ -206,7 +206,7 @@ describe("bot/features/message-delete/commands/usecases/runPreviewDialog", () =>
     expect(result.type).toBe("confirm");
   });
 
-  it("resolves with Cancel when CONFIRM_NO is clicked", async () => {
+  it("CONFIRM_NO クリック時に Cancel として解決する", async () => {
     const { showPreviewDialog } = await loadModule();
     const collector = makeMockCollector();
     const baseInteraction = makeBaseInteraction(collector);
@@ -232,7 +232,7 @@ describe("bot/features/message-delete/commands/usecases/runPreviewDialog", () =>
 
   // ─── タイムアウト・ロック解放 ──────────────────────────────────────────────
 
-  it("resolves with Timeout on time end", async () => {
+  it("タイム終了時に Timeout として解決する", async () => {
     const { showPreviewDialog } = await loadModule();
     const collector = makeMockCollector();
     const baseInteraction = makeBaseInteraction(collector);
@@ -254,7 +254,7 @@ describe("bot/features/message-delete/commands/usecases/runPreviewDialog", () =>
     expect(baseInteraction.editReply).toHaveBeenCalledTimes(2); // initial + timeout message
   });
 
-  it("non-time end reason resolves as timeout when no terminal button was clicked", async () => {
+  it("終端ボタン未押下で非タイム理由（messageDelete 等）の end イベントが来た場合も Timeout として解決する", async () => {
     // Bug fix: messageDelete / channelDelete 等で collector が終了した場合も
     // ロックを確実に解放するため Timeout として解決する
     const { showPreviewDialog } = await loadModule();
@@ -278,7 +278,7 @@ describe("bot/features/message-delete/commands/usecases/runPreviewDialog", () =>
     expect(baseInteraction.editReply).toHaveBeenCalledTimes(2); // initial + timeout message
   });
 
-  it("idle end reason resolves as timeout (ephemeral dismissed)", async () => {
+  it("idle タイムアウト（エフェメラル非表示）で Timeout として解決する", async () => {
     // Bug fix: エフェメラルメッセージを非表示にしても MESSAGE_DELETE は発火しないため
     // idle タイムアウトでロックを解放する
     const { showPreviewDialog } = await loadModule();
@@ -302,7 +302,7 @@ describe("bot/features/message-delete/commands/usecases/runPreviewDialog", () =>
     expect(baseInteraction.editReply).toHaveBeenCalledTimes(2); // initial + timeout message
   });
 
-  it("end event after terminal button click does not override the result", async () => {
+  it("終端ボタン押下後の end イベントは結果を上書きしない", async () => {
     // handledByCollect フラグにより、ボタン押下後の end イベントはスキップされること
     const { showPreviewDialog } = await loadModule();
     const collector = makeMockCollector();
@@ -331,7 +331,7 @@ describe("bot/features/message-delete/commands/usecases/runPreviewDialog", () =>
 
   // ─── 権限チェック ─────────────────────────────────────────────────────────
 
-  it("replies ephemeral warning when wrong user clicks", async () => {
+  it("別のユーザーがクリックした場合に Ephemeral 警告を返信する", async () => {
     const { showPreviewDialog } = await loadModule();
     const collector = makeMockCollector();
     const baseInteraction = makeBaseInteraction(collector);
@@ -363,7 +363,7 @@ describe("bot/features/message-delete/commands/usecases/runPreviewDialog", () =>
 
   // ─── ページネーション ─────────────────────────────────────────────────────
 
-  it("handles FIRST page navigation", async () => {
+  it("FIRST ページナビゲーションを処理する", async () => {
     const { showPreviewDialog } = await loadModule();
     const collector = makeMockCollector();
     const baseInteraction = makeBaseInteraction(collector);
@@ -389,7 +389,7 @@ describe("bot/features/message-delete/commands/usecases/runPreviewDialog", () =>
     await promise;
   });
 
-  it("handles PREV page navigation", async () => {
+  it("PREV ページナビゲーションを処理する", async () => {
     const { showPreviewDialog } = await loadModule();
     const collector = makeMockCollector();
     const baseInteraction = makeBaseInteraction(collector);
@@ -415,7 +415,7 @@ describe("bot/features/message-delete/commands/usecases/runPreviewDialog", () =>
     await promise;
   });
 
-  it("handles NEXT page navigation", async () => {
+  it("NEXT ページナビゲーションを処理する", async () => {
     const { showPreviewDialog } = await loadModule();
     const collector = makeMockCollector();
     const baseInteraction = makeBaseInteraction(collector);
@@ -441,7 +441,7 @@ describe("bot/features/message-delete/commands/usecases/runPreviewDialog", () =>
     await promise;
   });
 
-  it("handles LAST page navigation", async () => {
+  it("LAST ページナビゲーションを処理する", async () => {
     const { showPreviewDialog } = await loadModule();
     const collector = makeMockCollector();
     const baseInteraction = makeBaseInteraction(collector);
@@ -469,7 +469,7 @@ describe("bot/features/message-delete/commands/usecases/runPreviewDialog", () =>
 
   // ─── ページジャンプ ───────────────────────────────────────────────────────
 
-  it("handles JUMP with valid page number", async () => {
+  it("有効なページ番号での JUMP を処理する", async () => {
     const { showPreviewDialog } = await loadModule();
     showJumpModalMock.mockResolvedValue("2");
 
@@ -502,7 +502,7 @@ describe("bot/features/message-delete/commands/usecases/runPreviewDialog", () =>
     await promise;
   });
 
-  it("handles JUMP with null (modal closed)", async () => {
+  it("JUMP でモーダルが閉じられた場合（null）の処理をする", async () => {
     const { showPreviewDialog } = await loadModule();
     showJumpModalMock.mockResolvedValue(null);
 
@@ -533,7 +533,7 @@ describe("bot/features/message-delete/commands/usecases/runPreviewDialog", () =>
     await promise;
   });
 
-  it("handles JUMP with invalid page number", async () => {
+  it("無効なページ番号での JUMP を処理する", async () => {
     const { showPreviewDialog } = await loadModule();
     showJumpModalMock.mockResolvedValue("not-a-number");
 
@@ -565,7 +565,7 @@ describe("bot/features/message-delete/commands/usecases/runPreviewDialog", () =>
 
   // ─── 除外セレクト ─────────────────────────────────────────────────────────
 
-  it("adds message to excludedIds when exclude select is used", async () => {
+  it("除外セレクトを使用した場合にメッセージが excludedIds に追加される", async () => {
     const { showPreviewDialog } = await loadModule();
     const collector = makeMockCollector();
     const baseInteraction = makeBaseInteraction(collector);
@@ -606,7 +606,7 @@ describe("bot/features/message-delete/commands/usecases/runPreviewDialog", () =>
     }
   });
 
-  it("removes message from excludedIds when deselected in exclude select", async () => {
+  it("除外セレクトで選択解除した場合に excludedIds からメッセージが削除される", async () => {
     const { showPreviewDialog } = await loadModule();
     const collector = makeMockCollector();
     const baseInteraction = makeBaseInteraction(collector);
@@ -648,7 +648,7 @@ describe("bot/features/message-delete/commands/usecases/runPreviewDialog", () =>
 
   // ─── 投稿者フィルター ─────────────────────────────────────────────────────
 
-  it("applies author filter when specific author is selected", async () => {
+  it("特定の投稿者が選択された場合に投稿者フィルターを適用する", async () => {
     const { showPreviewDialog } = await loadModule();
     const collector = makeMockCollector();
     const baseInteraction = makeBaseInteraction(collector);
@@ -683,7 +683,7 @@ describe("bot/features/message-delete/commands/usecases/runPreviewDialog", () =>
     }
   });
 
-  it("clears author filter when __all__ is selected", async () => {
+  it("__all__ が選択された場合に投稿者フィルターをクリアする", async () => {
     const { showPreviewDialog } = await loadModule();
     const collector = makeMockCollector();
     const baseInteraction = makeBaseInteraction(collector);
@@ -720,7 +720,7 @@ describe("bot/features/message-delete/commands/usecases/runPreviewDialog", () =>
 
   // ─── フィルターリセット ───────────────────────────────────────────────────
 
-  it("resets filter when FILTER_RESET is clicked", async () => {
+  it("FILTER_RESET クリック時にフィルターをリセットする", async () => {
     const { showPreviewDialog } = await loadModule();
     const collector = makeMockCollector();
     const baseInteraction = makeBaseInteraction(collector);
@@ -755,7 +755,7 @@ describe("bot/features/message-delete/commands/usecases/runPreviewDialog", () =>
 
   // ─── モーダルフィルター ───────────────────────────────────────────────────
 
-  it("applies modal filter when value is entered successfully", async () => {
+  it("モーダルフィルターの値が正常に入力された場合にフィルターを適用する", async () => {
     const { showPreviewDialog } = await loadModule();
     showFilterModalMock.mockResolvedValue("7");
     applyModalFilterValueMock.mockReturnValue({
@@ -793,7 +793,7 @@ describe("bot/features/message-delete/commands/usecases/runPreviewDialog", () =>
     }
   });
 
-  it("does not apply modal filter when modal is closed (null)", async () => {
+  it("モーダルが閉じられた場合（null）はフィルターを適用しない", async () => {
     const { showPreviewDialog } = await loadModule();
     showFilterModalMock.mockResolvedValue(null);
 
@@ -830,7 +830,7 @@ describe("bot/features/message-delete/commands/usecases/runPreviewDialog", () =>
     }
   });
 
-  it("shows error and does not update filter when modal filter value has errorKey", async () => {
+  it("モーダルフィルター値に errorKey がある場合はエラーを表示してフィルターを更新しない", async () => {
     const { showPreviewDialog } = await loadModule();
     showFilterModalMock.mockResolvedValue("invalid-value");
     applyModalFilterValueMock.mockReturnValue({

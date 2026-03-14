@@ -47,7 +47,7 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.disable"
     setEnabledMock.mockResolvedValue(undefined);
   });
 
-  it("cancels pending reminder, disables config, and replies success", async () => {
+  it("リマインダーをキャンセルし、設定を無効化して成功応答を返す", async () => {
     const interaction = {
       reply: vi.fn().mockResolvedValue(undefined),
     };

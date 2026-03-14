@@ -74,7 +74,7 @@ export const MSG_DEL_BULK_WAIT_MS = 1000;
 export const MSG_DEL_INDIVIDUAL_WAIT_MS = 500;
 
 /** Discord の bulkDelete 対象となる最大メッセージ年齢（14日） */
-export const MSG_DEL_BULK_MAX_AGE_MS = 14 * 24 * 60 * 60 * 1000;
+export const MSG_DEL_BULK_MAX_AGE_MS: number = 14 * 24 * 60 * 60 * 1000;
 
 /** 削除結果メッセージの本文最大文字数 */
 export const MSG_DEL_CONTENT_MAX_LENGTH = 200;
@@ -86,7 +86,7 @@ export const MSG_DEL_DEFAULT_COUNT = 1000;
 export const DISCORD_EPOCH = 1420070400000n;
 
 /** 1日あたりのミリ秒数 */
-export const MS_PER_DAY = 24 * 60 * 60 * 1000;
+export const MS_PER_DAY: number = 24 * 60 * 60 * 1000;
 
 /** コマンド名定数 */
 export const MSG_DEL_COMMAND = {

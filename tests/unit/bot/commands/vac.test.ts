@@ -37,8 +37,7 @@ describe("bot/commands/vac", () => {
     isManagedVacChannelMock.mockResolvedValue(true);
   });
 
-  // vc-rename 正常系の応答を検証
-  it("renames managed voice channel and replies success embed", async () => {
+  it("管理対象のボイスチャンネルをリネームして success embed で返信することを確認", async () => {
     const editMock = vi.fn().mockResolvedValue(undefined);
     const interaction = {
       guildId: "guild-1",
@@ -77,8 +76,7 @@ describe("bot/commands/vac", () => {
     });
   });
 
-  // vc-limit 正常系（制限あり）を検証
-  it("sets user limit on managed voice channel and replies success", async () => {
+  it("管理対象のボイスチャンネルにユーザー上限を設定して success embed で返信することを確認", async () => {
     const editMock = vi.fn().mockResolvedValue(undefined);
     const interaction = {
       guildId: "guild-1",
@@ -116,8 +114,7 @@ describe("bot/commands/vac", () => {
     });
   });
 
-  // vc-limit 0 は unlimited 表示で成功することを検証
-  it("uses unlimited label when vc-limit is zero", async () => {
+  it("vc-limit が 0 の場合は unlimited ラベルで成功することを確認", async () => {
     const editMock = vi.fn().mockResolvedValue(undefined);
     const interaction = {
       guildId: "guild-1",

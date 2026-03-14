@@ -33,7 +33,7 @@ describe("Environment Configuration", () => {
   });
 
   describe("Required Fields", () => {
-    it("should parse valid environment variables", async () => {
+    it("有効な環境変数を正しくパースできること", async () => {
       process.env.DISCORD_TOKEN = "a".repeat(50);
       process.env.DISCORD_APP_ID = "1234567890";
       process.env.NODE_ENV = "production";
@@ -46,7 +46,7 @@ describe("Environment Configuration", () => {
       expect(env.NODE_ENV).toBe("production");
     });
 
-    it("should use default values for optional fields", async () => {
+    it("任意項目を未設定にした場合にデフォルト値が適用されること", async () => {
       // 任意項目を未設定にし、デフォルト値の適用を確認
       process.env.DISCORD_TOKEN = "a".repeat(50);
       process.env.DISCORD_APP_ID = "1234567890";
@@ -67,7 +67,7 @@ describe("Environment Configuration", () => {
   });
 
   describe("Type Coercion", () => {
-    it("should coerce WEB_PORT to number", async () => {
+    it("WEB_PORT が数値に型変換されること", async () => {
       process.env.DISCORD_TOKEN = "a".repeat(50);
       process.env.DISCORD_APP_ID = "1234567890";
       process.env.WEB_PORT = "8080";
@@ -80,7 +80,7 @@ describe("Environment Configuration", () => {
   });
 
   describe("Enum Validation", () => {
-    it("should accept valid NODE_ENV values", async () => {
+    it("有効な NODE_ENV 値がすべて受け入れられること", async () => {
       const validEnvs = ["development", "production", "test"];
 
       // 有効な NODE_ENV 値を順番に検証
@@ -100,7 +100,7 @@ describe("Environment Configuration", () => {
       }
     });
 
-    it("should accept valid LOG_LEVEL values", async () => {
+    it("有効な LOG_LEVEL 値がすべて受け入れられること", async () => {
       const validLevels = [
         "error",
         "warn",
@@ -126,7 +126,7 @@ describe("Environment Configuration", () => {
   });
 
   describe("Optional Fields", () => {
-    it("should handle optional DISCORD_GUILD_ID", async () => {
+    it("任意フィールド DISCORD_GUILD_ID が設定されたとき値を返すこと", async () => {
       process.env.DISCORD_TOKEN = "a".repeat(50);
       process.env.DISCORD_APP_ID = "1234567890";
       process.env.DISCORD_GUILD_ID = "9876543210";
@@ -136,7 +136,7 @@ describe("Environment Configuration", () => {
       expect(env.DISCORD_GUILD_ID).toBe("9876543210");
     });
 
-    it("should handle optional JWT_SECRET", async () => {
+    it("任意フィールド JWT_SECRET が設定されたとき値を返すこと", async () => {
       process.env.DISCORD_TOKEN = "a".repeat(50);
       process.env.DISCORD_APP_ID = "1234567890";
       process.env.JWT_SECRET = "my-secret-key";
@@ -148,7 +148,7 @@ describe("Environment Configuration", () => {
   });
 
   describe("Database Configuration", () => {
-    it("should use DATABASE_URL from setup", async () => {
+    it("setup.ts で注入されるテスト用 DATABASE_URL が使用されること", async () => {
       // setup.ts で注入されるテスト用 DATABASE_URL を利用すること
       process.env.DISCORD_TOKEN = "a".repeat(50);
       process.env.DISCORD_APP_ID = "1234567890";
@@ -159,7 +159,7 @@ describe("Environment Configuration", () => {
       expect(env.DATABASE_URL).toBe("file::memory:?cache=shared");
     });
 
-    it("should accept custom DATABASE_URL", async () => {
+    it("カスタムの DATABASE_URL を受け入れてそのまま返すこと", async () => {
       process.env.DISCORD_TOKEN = "a".repeat(50);
       process.env.DISCORD_APP_ID = "1234567890";
       process.env.DATABASE_URL = "file:./custom/path/db.sqlite";
@@ -171,7 +171,7 @@ describe("Environment Configuration", () => {
   });
 
   describe("Web Server Configuration", () => {
-    it("should handle custom WEB_PORT and WEB_HOST", async () => {
+    it("カスタムの WEB_PORT と WEB_HOST が正しく設定されること", async () => {
       process.env.DISCORD_TOKEN = "a".repeat(50);
       process.env.DISCORD_APP_ID = "1234567890";
       process.env.WEB_PORT = "5000";
@@ -185,7 +185,7 @@ describe("Environment Configuration", () => {
   });
 
   describe("Locale Configuration", () => {
-    it("should accept custom locale", async () => {
+    it("カスタムの LOCALE 値が受け入れられること", async () => {
       process.env.DISCORD_TOKEN = "a".repeat(50);
       process.env.DISCORD_APP_ID = "1234567890";
       process.env.LOCALE = "en";
@@ -197,7 +197,7 @@ describe("Environment Configuration", () => {
   });
 
   describe("Warning and Failure Paths", () => {
-    it("should warn when JWT_SECRET is missing in any environment", async () => {
+    it("JWT_SECRET が未設定の場合に警告が出力されること", async () => {
       process.env.DISCORD_TOKEN = "a".repeat(50);
       process.env.DISCORD_APP_ID = "1234567890";
       process.env.NODE_ENV = "test";
@@ -213,7 +213,7 @@ describe("Environment Configuration", () => {
       );
     });
 
-    it("should warn (not exit) when production JWT_SECRET is missing", async () => {
+    it("本番環境で JWT_SECRET が未設定の場合は警告のみで exit しないこと", async () => {
       // JWT_SECRET の必須チェックは server.ts に委譲されたため、env.ts 単体では exit しない
       process.env.DISCORD_TOKEN = "a".repeat(50);
       process.env.DISCORD_APP_ID = "1234567890";
@@ -235,7 +235,7 @@ describe("Environment Configuration", () => {
       expect(exitSpy).not.toHaveBeenCalled();
     });
 
-    it("should exit on non-Zod error during env parsing", async () => {
+    it("環境変数パース時に非 ZodError が発生した場合は exit すること", async () => {
       process.env.DISCORD_TOKEN = "a".repeat(50);
       process.env.DISCORD_APP_ID = "1234567890";
       process.env.NODE_ENV = "test";
@@ -257,7 +257,7 @@ describe("Environment Configuration", () => {
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    it("should log validation errors and exit on ZodError during env parsing", async () => {
+    it("ZodError 発生時にバリデーションエラーをログに記録して exit すること", async () => {
       // 必須の DISCORD_TOKEN / DISCORD_APP_ID を削除して ZodError を発生させる
       delete process.env.DISCORD_TOKEN;
       delete process.env.DISCORD_APP_ID;

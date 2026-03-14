@@ -53,7 +53,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageUpdate", ()
     showModalMock.mockResolvedValue(undefined);
   });
 
-  it("replies with warning when channel is not GuildText", async () => {
+  it("チャンネルが GuildText でない場合に警告を Ephemeral 返信する", async () => {
     const { handleStickyMessageUpdate } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageUpdate");
     const interaction = createInteractionMock({
@@ -68,7 +68,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageUpdate", ()
     expect(findByChannelMock).not.toHaveBeenCalled();
   });
 
-  it("replies with info when no sticky message found", async () => {
+  it("スティッキーメッセージが見つからない場合に情報を Ephemeral 返信する", async () => {
     const { handleStickyMessageUpdate } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageUpdate");
     findByChannelMock.mockResolvedValue(null);
@@ -82,8 +82,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageUpdate", ()
     expect(showModalMock).not.toHaveBeenCalled();
   });
 
-  // embed オプションが false のとき、テキスト編集用モーダル(update-modal)の custom_id が使われることを確認
-  it("shows plain text update modal when embed is false", async () => {
+  it("embed オプションが false のとき、テキスト編集用モーダル（update-modal）を表示する", async () => {
     const { handleStickyMessageUpdate } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageUpdate");
     findByChannelMock.mockResolvedValue({
@@ -100,8 +99,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageUpdate", ()
     expect(modal.data.custom_id).toContain("sticky-message:update-modal:");
   });
 
-  // embedData が存在し useEmbed=true の場合、埋め込み編集専用モーダル(update-embed-modal)が呼ばれることを確認
-  it("shows embed update modal when embed is true", async () => {
+  it("embedData が存在し useEmbed=true の場合、埋め込み編集専用モーダル（update-embed-modal）を表示する", async () => {
     const { handleStickyMessageUpdate } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageUpdate");
     findByChannelMock.mockResolvedValue({
@@ -124,8 +122,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageUpdate", ()
     );
   });
 
-  // embedData が null でも embed=true が指定された場合、空の初期値でモーダルが表示されることを確認
-  it("shows embed modal with empty prev data when embedData is null but embed=true", async () => {
+  it("embedData が null でも embed=true が指定された場合、空の初期値でモーダルが表示される", async () => {
     const { handleStickyMessageUpdate } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageUpdate");
     findByChannelMock.mockResolvedValue({
@@ -140,8 +137,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageUpdate", ()
     expect(showModalMock).toHaveBeenCalled();
   });
 
-  // getString が null を返す場合（style 未指定）にデフォルトで text スタイルとなり、プレーンテキストモーダルが開かれることを検証
-  it("shows plain text update modal when getString returns null (defaults to text style)", async () => {
+  it("getString が null を返す場合（style 未指定）にデフォルトで text スタイルとなり、プレーンテキストモーダルが開かれる", async () => {
     const { handleStickyMessageUpdate } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageUpdate");
     findByChannelMock.mockResolvedValue({
@@ -166,7 +162,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageUpdate", ()
     expect(modal.data.custom_id).toContain("sticky-message:update-modal:");
   });
 
-  it("replies with warning for non-text channel option", async () => {
+  it("テキスト以外のチャンネルオプションが指定された場合に警告を返信する", async () => {
     const { handleStickyMessageUpdate } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageUpdate");
     const interaction = createInteractionMock({

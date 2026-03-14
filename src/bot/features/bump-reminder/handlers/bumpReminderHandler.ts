@@ -33,8 +33,8 @@ export async function handleBumpDetected(
     const bumpReminderConfigService = getBotBumpReminderConfigService();
 
     const config =
-      await bumpReminderConfigService.getBumpReminderConfig(guildId);
-    if (!config?.enabled) {
+      await bumpReminderConfigService.getBumpReminderConfigOrDefault(guildId);
+    if (!config.enabled) {
       // 機能無効ギルドでは検知のみ行い何もしない
       logger.debug(
         tDefault("system:scheduler.bump_reminder_disabled", { guildId }),

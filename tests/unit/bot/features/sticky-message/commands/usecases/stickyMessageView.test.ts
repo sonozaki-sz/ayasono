@@ -32,7 +32,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageView", () =
     vi.clearAllMocks();
   });
 
-  it("replies with info when no sticky messages found", async () => {
+  it("スティッキーメッセージが 0 件の場合に情報を Ephemeral 返信する", async () => {
     const { handleStickyMessageView } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageView");
     findAllByGuildMock.mockResolvedValue([]);
@@ -45,7 +45,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageView", () =
     );
   });
 
-  it("shows select menu when sticky messages exist", async () => {
+  it("スティッキーメッセージが存在する場合にセレクトメニューを表示する", async () => {
     const { handleStickyMessageView } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageView");
     const stickies = [
@@ -66,8 +66,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageView", () =
     );
   });
 
-  // チャンネルがキャッシュに存在しない場合はチャンネル名の代わりに ID をラベル表示することを確認
-  it("uses channel ID as label when channel is not in cache", async () => {
+  it("チャンネルがキャッシュに存在しない場合はチャンネル名の代わりに ID をラベル表示する", async () => {
     const { handleStickyMessageView } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageView");
     const stickies = [{ id: "s1", channelId: "unknown-ch", content: "Hi" }];
@@ -79,8 +78,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageView", () =
     expect(interaction.reply).toHaveBeenCalled();
   });
 
-  // Discord のセレクトメニューは最大 25 項目のため、30件あっても 25件に切り捨てられることを確認
-  it("limits to 25 options even if more stickies exist", async () => {
+  it("Discord のセレクトメニューは最大 25 項目のため、30件あっても 25件に切り捨てられる", async () => {
     const { handleStickyMessageView } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageView");
     const stickies = Array.from({ length: 30 }, (_, i) => ({

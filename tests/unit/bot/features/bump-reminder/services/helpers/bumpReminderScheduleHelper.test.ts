@@ -19,7 +19,7 @@ describe("bot/features/bump-reminder/services/helpers/bumpReminderScheduleHelper
     vi.clearAllMocks();
   });
 
-  it("schedules one-time job and tracks reminder in map", async () => {
+  it("ワンタイムジョブをスケジュールしてリマインダーをマップで追跡する", async () => {
     const reminders = new Map<string, { jobId: string; reminderId: string }>();
     const task = vi.fn().mockResolvedValue(undefined);
 
@@ -41,7 +41,7 @@ describe("bot/features/bump-reminder/services/helpers/bumpReminderScheduleHelper
     expect(reminders.has("g1")).toBe(false);
   });
 
-  it("cancels tracked reminder and removes scheduler job", () => {
+  it("追跡中のリマインダーをキャンセルしてスケジューラーのジョブを削除する", () => {
     const reminders = new Map<string, { jobId: string; reminderId: string }>();
     reminders.set("g1", { jobId: "job-1", reminderId: "rem-1" });
 

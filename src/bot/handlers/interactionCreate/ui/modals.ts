@@ -1,6 +1,8 @@
 // src/bot/handlers/interactionCreate/ui/modals.ts
 // モーダルハンドラーレジストリ
 
+import { memberLogSetJoinMessageModalHandler } from "../../../features/member-log/handlers/ui/memberLogSetJoinMessageModalHandler";
+import { memberLogSetLeaveMessageModalHandler } from "../../../features/member-log/handlers/ui/memberLogSetLeaveMessageModalHandler";
 import { stickyMessageSetEmbedModalHandler } from "../../../features/sticky-message/handlers/ui/stickyMessageSetEmbedModalHandler";
 import { stickyMessageSetModalHandler } from "../../../features/sticky-message/handlers/ui/stickyMessageSetModalHandler";
 import { stickyMessageUpdateEmbedModalHandler } from "../../../features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler";
@@ -22,4 +24,8 @@ export const modalHandlers: ModalHandler[] = [
   stickyMessageUpdateModalHandler,
   // sticky-message update Embed モーダルを処理
   stickyMessageUpdateEmbedModalHandler,
+  // member-log-config set-join-message モーダルを処理
+  memberLogSetJoinMessageModalHandler,
+  // member-log-config set-leave-message モーダルを処理
+  memberLogSetLeaveMessageModalHandler,
 ];

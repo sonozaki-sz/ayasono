@@ -14,7 +14,7 @@ describe("bot/features/vac/handlers/vacStartupCleanup", () => {
     vi.clearAllMocks();
   });
 
-  it("delegates startup client to vac service", async () => {
+  it("起動時のclientをvacサービスへ委譲する", async () => {
     const client = { guilds: { cache: new Map() } };
 
     await cleanupVacOnStartup(client as never);
@@ -22,7 +22,7 @@ describe("bot/features/vac/handlers/vacStartupCleanup", () => {
     expect(cleanupOnStartupMock).toHaveBeenCalledWith(client);
   });
 
-  it("propagates service failure", async () => {
+  it("サービスの失敗を呼び出し元に伝播する", async () => {
     cleanupOnStartupMock.mockRejectedValueOnce(new Error("service failed"));
 
     await expect(cleanupVacOnStartup({} as never)).rejects.toThrow(

@@ -71,8 +71,7 @@ describe("bot/features/sticky-message/commands/stickyMessageCommand.execute", ()
     handleCommandErrorMock.mockResolvedValue(undefined);
   });
 
-  // DM など guildId が null のインタラクションはギルド外として早期検証エラーになることを確認
-  it("throws ValidationError when no guildId", async () => {
+  it("DM など guildId が null のインタラクションはギルド外として早期検証エラーになる", async () => {
     const { executeStickyMessageCommand } =
       await import("@/bot/features/sticky-message/commands/stickyMessageCommand.execute");
     const interaction = createInteractionMock({ guildId: null });
@@ -82,7 +81,7 @@ describe("bot/features/sticky-message/commands/stickyMessageCommand.execute", ()
     expect(handleCommandErrorMock).toHaveBeenCalled();
   });
 
-  it("throws ValidationError when no permission", async () => {
+  it("ManageChannels 権限がない場合は ValidationError として処理される", async () => {
     const { executeStickyMessageCommand } =
       await import("@/bot/features/sticky-message/commands/stickyMessageCommand.execute");
     const interaction = createInteractionMock({ hasPermission: false });
@@ -92,7 +91,7 @@ describe("bot/features/sticky-message/commands/stickyMessageCommand.execute", ()
     expect(handleCommandErrorMock).toHaveBeenCalled();
   });
 
-  it("calls handleStickyMessageSet for set subcommand", async () => {
+  it("set サブコマンドで handleStickyMessageSet が呼ばれる", async () => {
     const { executeStickyMessageCommand } =
       await import("@/bot/features/sticky-message/commands/stickyMessageCommand.execute");
     const interaction = createInteractionMock({ subcommand: "set" });
@@ -105,7 +104,7 @@ describe("bot/features/sticky-message/commands/stickyMessageCommand.execute", ()
     );
   });
 
-  it("calls handleStickyMessageRemove for remove subcommand", async () => {
+  it("remove サブコマンドで handleStickyMessageRemove が呼ばれる", async () => {
     const { executeStickyMessageCommand } =
       await import("@/bot/features/sticky-message/commands/stickyMessageCommand.execute");
     const interaction = createInteractionMock({ subcommand: "remove" });
@@ -118,7 +117,7 @@ describe("bot/features/sticky-message/commands/stickyMessageCommand.execute", ()
     );
   });
 
-  it("calls handleStickyMessageView for view subcommand", async () => {
+  it("view サブコマンドで handleStickyMessageView が呼ばれる", async () => {
     const { executeStickyMessageCommand } =
       await import("@/bot/features/sticky-message/commands/stickyMessageCommand.execute");
     const interaction = createInteractionMock({ subcommand: "view" });
@@ -131,7 +130,7 @@ describe("bot/features/sticky-message/commands/stickyMessageCommand.execute", ()
     );
   });
 
-  it("calls handleStickyMessageUpdate for update subcommand", async () => {
+  it("update サブコマンドで handleStickyMessageUpdate が呼ばれる", async () => {
     const { executeStickyMessageCommand } =
       await import("@/bot/features/sticky-message/commands/stickyMessageCommand.execute");
     const interaction = createInteractionMock({ subcommand: "update" });
@@ -144,8 +143,7 @@ describe("bot/features/sticky-message/commands/stickyMessageCommand.execute", ()
     );
   });
 
-  // 定義外のサブコマンド名が渡された場合は網羅外として ValidationError 扱いになることを確認
-  it("throws ValidationError for unknown subcommand", async () => {
+  it("定義外のサブコマンド名が渡された場合は網羅外として ValidationError 扱いになる", async () => {
     const { executeStickyMessageCommand } =
       await import("@/bot/features/sticky-message/commands/stickyMessageCommand.execute");
     const interaction = createInteractionMock({ subcommand: "unknown" });
@@ -155,8 +153,7 @@ describe("bot/features/sticky-message/commands/stickyMessageCommand.execute", ()
     expect(handleCommandErrorMock).toHaveBeenCalled();
   });
 
-  // ユースケース内で予期せぬ例外が発生した場合、handleCommandError へ委譲されて握りつぶされないことを確認
-  it("calls handleCommandError when an error is thrown", async () => {
+  it("ユースケース内で予期せぬ例外が発生した場合、handleCommandError へ委譲されて握りつぶされない", async () => {
     const { executeStickyMessageCommand } =
       await import("@/bot/features/sticky-message/commands/stickyMessageCommand.execute");
     const err = new Error("something failed");

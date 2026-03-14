@@ -2,7 +2,7 @@
 
 > Member Log - メンバー参加・脱退時のログ機能
 
-最終更新: 2026年3月1日
+最終更新: 2026年3月14日（招待リンク追跡機能を追加・カスタムメッセージをモーダル入力に変更）
 
 ---
 
@@ -18,6 +18,7 @@
 2. **メンバー管理**: 参加・退出を記録し、メンバー数の変動を追跡
 3. **セキュリティ対策**: 大量参加・退出など異常な動きを監視
 4. **統計情報**: アカウント作成日時・経過年齢・滞在期間などの情報を自動表示
+5. **招待経路の把握**: 参加時に使用された招待リンク・招待者（サービス）を表示
 
 ### 特徴
 
@@ -25,6 +26,7 @@
 - **詳細なメンバー情報**: アカウント作成日時・経過年齢・滞在期間などを自動表示
 - **Embed形式の通知**: 視認性の高いEmbedメッセージで通知
 - **柔軟な設定**: チャンネル指定、有効/無効の切り替えが可能
+- **招待経路の表示**: 参加時に使用された招待リンクと招待者（またはサービス名）を1つのフィールドにまとめて表示
 
 ---
 
@@ -44,8 +46,9 @@
   | ユーザー | メンションリンク（`<@userId>`）|
   | アカウント作成日時 | `2020年12月23日 21:36(5年3ヶ月7日)` 形式。日時は Discord の `:f` フォーマット、括弧内は `date-fns` で計算した経過年齢 |
   | サーバー参加日時 | Discord の `:f` フォーマット（取得可能な場合のみ表示）|
+  | 招待元 | `discord.gg/XXXXX（<@userId>）`（ユーザー）/ `discord.gg/XXXXX（サービス名）`（Bot）形式。特定できない場合は `不明` |
   | メンバー数 | 参加後の現在メンバー数 |
-- **フッター**: `ようこそ！ • Member #<メンバー番号>` + タイムスタンプ
+- **フッター**: なし（タイムスタンプのみ）
 
 ### 2. メンバー退出通知
 
@@ -64,8 +67,7 @@
   | サーバー退出日時 | Discord の `:f` フォーマット |
   | 滞在期間 | `x日` 形式（参加日時取得不可の場合は「不明」）|
   | メンバー数 | 退出後の現在メンバー数 |
-- **フッター**: `またね！ • Member #<退出したメンバー番号>` + タイムスタンプ
-  - メンバー番号は `guild.memberCount + 1`（退出後のカウントに +1）
+- **フッター**: なし（タイムスタンプのみ）
 
 > **注意**: `guildMemberRemove` 発火時点では Discord から `PartialGuildMember` が渡される場合があり、ユーザー情報（アイコン・アカウント作成日時など）が `null` になることがある。その場合は該当フィールドを省略する。
 
@@ -106,20 +108,58 @@
 **4. `set-join-message` - カスタム参加メッセージ設定**
 
 ```
-/member-log-config set-join-message message:ようこそ {user}さん！
+/member-log-config set-join-message
 ```
 
-- `{user}`: ユーザーメンション
-- `{username}`: ユーザー名
+コマンド実行後にモーダルが表示され、複数行のテキストを入力できる（最大500文字）。
+
+**モーダルイメージ:**
+
+<table border="1" cellpadding="8" width="420">
+<tr><th align="left">参加メッセージ</th></tr>
+<tr><td><i>ようこそ {userMention}さん！<br>メンバー数: {count}人になりました！</i><br><br><br></td></tr>
+<tr><td align="center"><kbd>　送信する　</kbd></td></tr>
+</table>
+
+使用可能なプレースホルダー:
+
+- `{userMention}`: ユーザーメンション（`<@userId>` 形式）
+- `{userName}`: ユーザー名
 - `{count}`: メンバー数
 
 **5. `set-leave-message` - カスタム退出メッセージ設定**
 
 ```
-/member-log-config set-leave-message message:{user}さんが退出しました
+/member-log-config set-leave-message
 ```
 
-**6. `view` - 現在の設定表示**
+コマンド実行後にモーダルが表示される（最大500文字）。プレースホルダーは参加メッセージと同じ。
+
+**モーダルイメージ:**
+
+<table border="1" cellpadding="8" width="420">
+<tr><th align="left">退出メッセージ</th></tr>
+<tr><td><i>{userMention}さんが退出しました。</i><br><br><br></td></tr>
+<tr><td align="center"><kbd>　送信する　</kbd></td></tr>
+</table>
+
+**6. `clear-join-message` - カスタム参加メッセージ削除**
+
+```
+/member-log-config clear-join-message
+```
+
+- 設定済みのカスタム参加メッセージを削除し、メッセージなし状態に戻す
+
+**7. `clear-leave-message` - カスタム退出メッセージ削除**
+
+```
+/member-log-config clear-leave-message
+```
+
+- 設定済みのカスタム退出メッセージを削除し、メッセージなし状態に戻す
+
+**8. `view` - 現在の設定表示**
 
 ```
 /member-log-config view
@@ -139,22 +179,17 @@
 
 ## 💾 データベーススキーマ
 
-### GuildConfig
+### GuildMemberLogConfig テーブル
 
-```prisma
-model GuildConfig {
-  // ...
-  memberLogConfig String? // JSON: MemberLogConfig
-}
-```
+メンバーログ設定はギルドごとに1レコード保存されます。
 
-### MemberLogConfig 型定義
-
-```typescript
-interface MemberLogConfig {
-  channelId?: string; // 通知チャンネルID
-}
-```
+| フィールド     | 型      | 説明                                                                 |
+| -------------- | ------- | -------------------------------------------------------------------- |
+| `guildId`      | String  | ギルドID（主キー）                                                   |
+| `enabled`      | Boolean | 機能の有効/無効（デフォルト: false）                                 |
+| `channelId`    | String? | 通知チャンネルID（未設定時は null）                                  |
+| `joinMessage`  | String? | カスタム参加メッセージ（`{userMention}` / `{userName}` / `{count}` 置換可） |
+| `leaveMessage` | String? | カスタム退出メッセージ（`{userMention}` / `{userName}` / `{count}` 置換可） |
 
 ---
 
@@ -162,49 +197,37 @@ interface MemberLogConfig {
 
 ### 参加通知フロー
 
-```
 1. guildMemberAddイベント発火
    ↓
 2. 機能が有効かチェック
    ↓
 3. 通知チャンネルを取得
    ↓
-4. メンバー情報を収集
-   - ユーザー名・ID
-   - アイコン画像（`member.user.displayAvatarURL({ size: 256 })` で取得）
-   - アカウント作成日
-   - 現在のメンバー数
+4. メンバー情報を収集（ユーザー名・ID・アイコン・アカウント作成日・現在のメンバー数）
    ↓
-5. Embedを生成
+5. 招待情報を取得（招待リンク・招待者）
    ↓
-6. 通知チャンネルに送信
+6. Embedを生成
    ↓
-7. ログに記録
-```
+7. 通知チャンネルに送信
+   ↓
+8. ログに記録
 
 ### 退出通知フロー
 
-```
 1. guildMemberRemoveイベント発火
    ↓
 2. 機能が有効かチェック
    ↓
 3. 通知チャンネルを取得
    ↓
-4. メンバー情報を収集
-   - ユーザー名・ID
-   - アイコン画像（`member.user.displayAvatarURL({ size: 256 })` で取得）
-   - アカウント作成日
-   - サーバー参加日（取得可能な場合）
-   - 滞在期間計算
-   - 現在のメンバー数
+4. メンバー情報を収集（ユーザー名・ID・アイコン・アカウント作成日・サーバー参加日・滞在期間・現在のメンバー数）
    ↓
 5. Embedを生成
    ↓
 6. 通知チャンネルに送信
    ↓
 7. ログに記録
-```
 
 ---
 
@@ -220,17 +243,14 @@ interface MemberLogConfig {
 
 - 日時部分: Discord タイムスタンプ `:f`（曜日なし日時形式）
 - 括弧内: 経過年齢（0の単位は省略、例: `3ヶ月5日`）
-- 経過期間計算ロジック: `src/bot/features/member-log/handlers/accountAge.ts` の `calcDuration()`
 
 ### 滞在期間の表示形式
 
 退出時のみ表示。参加日時が取得できない場合は「不明」と表示する。
 
-```
-72日
-```
+表示例: `72日`
 
-- `Math.floor((Date.now() - joinedTimestamp) / (1000 * 60 * 60 * 24))` で計算
+- 参加日時から退出日時までの経過日数を整数で算出
 
 ---
 
@@ -252,7 +272,11 @@ interface MemberLogConfig {
    - 基本情報のみで通知
    - エラーログ記録
 
-4. **レート制限**
+4. **招待情報取得失敗**（権限不足・API エラー）
+   - 招待元フィールドを「不明」として表示し、通知自体は継続
+   - エラーログは記録しない（権限なしは正常ケース扱い）
+
+5. **レート制限**
    - 大量の参加/退出が発生した場合
    - キュー処理で順次送信
 
@@ -280,35 +304,69 @@ interface MemberLogConfig {
 
 ## 🌐 多言語対応（i18next）
 
-### ローカライゼーションキー（`events` ネームスペース）
+### メッセージ一覧（`events` ネームスペース）
 
-```typescript
-// 参加通知フィールド
-"member-log.join.title"; // 👋 新しいメンバーが参加しました！
-"member-log.join.fields.username"; // ユーザー
-"member-log.join.fields.accountCreated"; // アカウント作成日時
-"member-log.join.fields.serverJoined"; // サーバー参加日時
-"member-log.join.fields.memberCount"; // メンバー数
-"member-log.join.footer"; // ようこそ！
+**参加通知:**
 
-// 退出通知フィールド
-"member-log.leave.title"; // 👋 メンバーが退出しました
-"member-log.leave.fields.username"; // ユーザー
-"member-log.leave.fields.accountCreated"; // アカウント作成日時
-"member-log.leave.fields.serverJoined"; // サーバー参加日時
-"member-log.leave.fields.serverLeft"; // サーバー退出日時
-"member-log.leave.fields.stayDuration"; // 滞在期間
-"member-log.leave.fields.memberCount"; // メンバー数
-"member-log.leave.footer"; // またね！
+| 項目               | 内容                              |
+| ------------------ | --------------------------------- |
+| タイトル           | 👋 新しいメンバーが参加しました！ |
+| ユーザーフィールド | ユーザー                          |
+| アカウント作成日時 | アカウント作成日時                |
+| サーバー参加日時   | サーバー参加日時                  |
+| 招待元             | 招待元                            |
+| メンバー数         | メンバー数                        |
 
-// 共通
-"member-log.days"; // {{count}}日
-"member-log.unknown"; // 不明
-"member-log.age.years"; // {{count}}年
-"member-log.age.months"; // {{count}}ヶ月
-"member-log.age.days"; // {{count}}日
-"member-log.age.separator"; // ""（ja） / " "（en）
+**退出通知:**
+
+| 項目               | 内容                      |
+| ------------------ | ------------------------- |
+| タイトル           | 👋 メンバーが退出しました |
+| ユーザーフィールド | ユーザー                  |
+| アカウント作成日時 | アカウント作成日時        |
+| サーバー参加日時   | サーバー参加日時          |
+| サーバー退出日時   | サーバー退出日時          |
+| 滞在期間           | 滞在期間                  |
+| メンバー数         | メンバー数                |
+
+**共通:**
+
+- 日数表示: `{{count}}日`
+- 不明表示: `不明`
+- 経過年齢: `{{count}}年` / `{{count}}ヶ月` / `{{count}}日`（0の単位は省略）
+
+---
+
+## 🔗 招待リンク追跡の仕組み
+
+### 差分比較によるリンク特定
+
+Discord API では「どの招待リンクで参加したか」を直接取得できないため、**キャッシュとの差分比較**で特定します。
+
 ```
+Bot起動時
+  └─ 各サーバーの招待一覧（コード → 使用回数）をメモリにキャッシュ
+
+guildMemberAdd 発火時
+  └─ 招待一覧を再取得
+  └─ キャッシュと比較して使用回数が増えたリンクを特定
+  └─ キャッシュを更新
+```
+
+### 招待元フィールドの表示形式
+
+| ケース               | 表示例                          |
+| -------------------- | ------------------------------- |
+| 招待者がユーザー     | `discord.gg/XXXXX（<@userId>）`  |
+| 招待者がサービス Bot | `discord.gg/XXXXX（Disboard）`   |
+| 特定できない         | `不明`                          |
+
+### 制限事項
+
+- Bot に `Manage Guild` 権限が必要（なければ「不明」表示）
+- バニティURL（サーバーカスタムURL）経由の参加は検出不可
+- Bot再起動直後はキャッシュが空のため、最初の参加者は特定できない場合がある
+- 招待キャッシュはインメモリで保持されるため、Bot再起動時にリセットされる
 
 ---
 

@@ -77,7 +77,7 @@ describe("bot/features/vac/services/vacService", () => {
     );
   });
 
-  it("delegates create/delete usecases when voice state changed", async () => {
+  it("ボイス状態変化時にcreate/deleteユースケースへ委譲する", async () => {
     const repository = createRepositoryMock();
     const service = new VacService(repository);
 
@@ -91,8 +91,7 @@ describe("bot/features/vac/services/vacService", () => {
     expect(handleVacDeleteUseCase).toHaveBeenCalledWith(repository, oldState);
   });
 
-  // guild が null の場合と、同じチャンネルに留まった場合の 2 つのガード条件を一洿で検証
-  it("skips voice-state usecases when guild missing or channel unchanged", async () => {
+  it("guild が null の場合と、同じチャンネルに留まった場合の 2 つのガード条件を一度で検証", async () => {
     const repository = createRepositoryMock();
     const service = new VacService(repository);
 
@@ -110,9 +109,7 @@ describe("bot/features/vac/services/vacService", () => {
     expect(handleVacDeleteUseCase).not.toHaveBeenCalled();
   });
 
-  // トリガーチャンネルにも作成チャンネルにも登録されているボイスチャンネルが削除された際に
-  // 両方のレコードが同時に確実に削除されることを検証
-  it("syncs trigger and created-channel records on managed voice delete", async () => {
+  it("トリガーチャンネルにも作成チャンネルにも登録されているボイスチャンネルが削除された際に両方のレコードが同時に確実に削除されることを検証", async () => {
     const repository = createRepositoryMock();
     repository.getVacConfigOrDefault.mockResolvedValue({
       enabled: true,
@@ -148,7 +145,7 @@ describe("bot/features/vac/services/vacService", () => {
     expect(loggerInfoMock).toHaveBeenCalledTimes(1);
   });
 
-  it("does not remove records when deleted voice channel is not tracked", async () => {
+  it("削除されたボイスチャンネルが追跡対象でない場合はレコードを削除しない", async () => {
     const repository = createRepositoryMock();
     repository.getVacConfigOrDefault.mockResolvedValue({
       enabled: true,
@@ -176,7 +173,7 @@ describe("bot/features/vac/services/vacService", () => {
     expect(repository.removeCreatedVacChannel).not.toHaveBeenCalled();
   });
 
-  it("ignores channel delete for DM-based and non-voice channels", async () => {
+  it("DMベースのチャンネルおよびボイス以外のチャンネル削除を無視する", async () => {
     const repository = createRepositoryMock();
     const service = new VacService(repository);
 
@@ -194,7 +191,7 @@ describe("bot/features/vac/services/vacService", () => {
     expect(repository.removeCreatedVacChannel).not.toHaveBeenCalled();
   });
 
-  it("delegates startup cleanup usecase", async () => {
+  it("起動時クリーンアップユースケースへ委譲する", async () => {
     const repository = createRepositoryMock();
     const service = new VacService(repository);
     const client = { guilds: { cache: new Map() } };
@@ -204,7 +201,7 @@ describe("bot/features/vac/services/vacService", () => {
     expect(cleanupVacOnStartupUseCase).toHaveBeenCalledWith(repository, client);
   });
 
-  it("creates service instance from factory", () => {
+  it("ファクトリ関数からサービスインスタンスを生成する", () => {
     const repository = createRepositoryMock();
 
     const service = createVacService(repository);
@@ -212,8 +209,7 @@ describe("bot/features/vac/services/vacService", () => {
     expect(service).toBeInstanceOf(VacService);
   });
 
-  // 同じリポジトリ定例は同一インスタンスを返し、別のリポジトリを渡すと新たなインスタンスが生成されることを検証
-  it("returns singleton and recreates when repository changes", () => {
+  it("同じリポジトリは同一インスタンスを返し、別のリポジトリを渡すと新たなインスタンスが生成されることを検証", () => {
     const repositoryA = createRepositoryMock();
     const repositoryB = createRepositoryMock();
 

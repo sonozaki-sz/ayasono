@@ -19,7 +19,7 @@ describe("bot/features/vac/commands/usecases/vacVoiceChannelGuard", () => {
     vi.clearAllMocks();
   });
 
-  it("throws ValidationError when member is not in a voice channel", async () => {
+  it("メンバーがボイスチャンネルに在籍していない場合にValidationErrorをスローする", async () => {
     const interaction = {
       user: { id: "user-1" },
       guild: {
@@ -36,7 +36,7 @@ describe("bot/features/vac/commands/usecases/vacVoiceChannelGuard", () => {
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  it("throws ValidationError when current voice channel is not managed VAC", async () => {
+  it("在籍中のボイスチャンネルがVAC管理対象でない場合にValidationErrorをスローする", async () => {
     (getBotVacConfigService as Mock).mockReturnValue({
       isManagedVacChannel: vi.fn().mockResolvedValue(false),
     });
@@ -59,7 +59,7 @@ describe("bot/features/vac/commands/usecases/vacVoiceChannelGuard", () => {
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  it("returns voice channel id when user is in managed VAC channel", async () => {
+  it("ユーザーがVAC管理チャンネルに在籍している場合にボイスチャンネルIDを返す", async () => {
     const isManagedVacChannel = vi.fn().mockResolvedValue(true);
     (getBotVacConfigService as Mock).mockReturnValue({
       isManagedVacChannel,

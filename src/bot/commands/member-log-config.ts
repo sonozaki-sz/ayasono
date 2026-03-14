@@ -35,14 +35,14 @@ export const memberLogConfigCommand: Command = {
     const setJoinMessageDesc = getCommandLocalizations(
       "member-log-config.set-join-message.description",
     );
-    const setJoinMessageMsgDesc = getCommandLocalizations(
-      "member-log-config.set-join-message.message.description",
-    );
     const setLeaveMessageDesc = getCommandLocalizations(
       "member-log-config.set-leave-message.description",
     );
-    const setLeaveMessageMsgDesc = getCommandLocalizations(
-      "member-log-config.set-leave-message.message.description",
+    const clearJoinMessageDesc = getCommandLocalizations(
+      "member-log-config.clear-join-message.description",
+    );
+    const clearLeaveMessageDesc = getCommandLocalizations(
+      "member-log-config.clear-leave-message.description",
     );
     const viewDesc = getCommandLocalizations(
       "member-log-config.view.description",
@@ -88,38 +88,32 @@ export const memberLogConfigCommand: Command = {
             .setDescriptionLocalizations(disableDesc.localizations),
         )
         .addSubcommand((subcommand) =>
-          // カスタム参加メッセージ設定
+          // カスタム参加メッセージ設定（モーダル起動）
           subcommand
             .setName(MEMBER_LOG_CONFIG_COMMAND.SUBCOMMAND.SET_JOIN_MESSAGE)
             .setDescription(setJoinMessageDesc.ja)
-            .setDescriptionLocalizations(setJoinMessageDesc.localizations)
-            .addStringOption((option) =>
-              option
-                .setName(MEMBER_LOG_CONFIG_COMMAND.OPTION.MESSAGE)
-                .setDescription(setJoinMessageMsgDesc.ja)
-                .setDescriptionLocalizations(
-                  setJoinMessageMsgDesc.localizations,
-                )
-                .setRequired(true)
-                .setMaxLength(500),
-            ),
+            .setDescriptionLocalizations(setJoinMessageDesc.localizations),
         )
         .addSubcommand((subcommand) =>
-          // カスタム退出メッセージ設定
+          // カスタム退出メッセージ設定（モーダル起動）
           subcommand
             .setName(MEMBER_LOG_CONFIG_COMMAND.SUBCOMMAND.SET_LEAVE_MESSAGE)
             .setDescription(setLeaveMessageDesc.ja)
-            .setDescriptionLocalizations(setLeaveMessageDesc.localizations)
-            .addStringOption((option) =>
-              option
-                .setName(MEMBER_LOG_CONFIG_COMMAND.OPTION.MESSAGE)
-                .setDescription(setLeaveMessageMsgDesc.ja)
-                .setDescriptionLocalizations(
-                  setLeaveMessageMsgDesc.localizations,
-                )
-                .setRequired(true)
-                .setMaxLength(500),
-            ),
+            .setDescriptionLocalizations(setLeaveMessageDesc.localizations),
+        )
+        .addSubcommand((subcommand) =>
+          // カスタム参加メッセージ削除
+          subcommand
+            .setName(MEMBER_LOG_CONFIG_COMMAND.SUBCOMMAND.CLEAR_JOIN_MESSAGE)
+            .setDescription(clearJoinMessageDesc.ja)
+            .setDescriptionLocalizations(clearJoinMessageDesc.localizations),
+        )
+        .addSubcommand((subcommand) =>
+          // カスタム退出メッセージ削除
+          subcommand
+            .setName(MEMBER_LOG_CONFIG_COMMAND.SUBCOMMAND.CLEAR_LEAVE_MESSAGE)
+            .setDescription(clearLeaveMessageDesc.ja)
+            .setDescriptionLocalizations(clearLeaveMessageDesc.localizations),
         )
         .addSubcommand((subcommand) =>
           // 設定表示

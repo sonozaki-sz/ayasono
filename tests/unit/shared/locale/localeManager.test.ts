@@ -42,7 +42,7 @@ describe("shared/locale/localeManager", () => {
 
   // Promise.all で同時呼び出ししても i18next.init が 1 回しか実行されないことを検証
   // (競合条件に対する冪等性のガード)
-  it("initializes i18next only once for concurrent calls", async () => {
+  it("同時呼び出しでも i18next を一度だけ初期化すること", async () => {
     const { LocaleManager } = await import("@/shared/locale/localeManager");
     const manager = new LocaleManager("ja");
 
@@ -52,7 +52,7 @@ describe("shared/locale/localeManager", () => {
     expect(loggerMock.info).toHaveBeenCalledTimes(1);
   });
 
-  it("returns immediately when initialize is called after already initialized", async () => {
+  it("初期化済みの場合は initialize を呼び出しても即座に返ること", async () => {
     const { LocaleManager } = await import("@/shared/locale/localeManager");
     const manager = new LocaleManager("ja");
 
@@ -63,7 +63,7 @@ describe("shared/locale/localeManager", () => {
   });
 
   // 初化失敗後にペンディング Promise がクリアされ、再呼び出しで正常に初期化できるリトライ動作を検証
-  it("resets pending init promise after failure and allows retry", async () => {
+  it("初期化失敗後にペンディング Promise をリセットしてリトライできること", async () => {
     const initializeError = new Error("init failed");
     initMock
       .mockRejectedValueOnce(initializeError)
@@ -77,7 +77,7 @@ describe("shared/locale/localeManager", () => {
     expect(initMock).toHaveBeenCalledTimes(2);
   });
 
-  it("translates with cached guild locale and avoids duplicate repository queries", async () => {
+  it("ギルドロケールをキャッシュして重複するリポジトリクエリを避けながら翻訳すること", async () => {
     const { LocaleManager } = await import("@/shared/locale/localeManager");
     const manager = new LocaleManager("ja");
     const repository = {
@@ -102,7 +102,7 @@ describe("shared/locale/localeManager", () => {
 
   // サポート外ロケール(例: fr)や guildId なしケースでデフォルトロケール(ja)に
   // フォールバックすることと、追加オプション(value)が訳文呼び出しに引き継がれることを検証
-  it("falls back to default locale when guild locale is unsupported or guildId is undefined", async () => {
+  it("ギルドロケールが未サポートまたは guildId が未定義の場合はデフォルトロケールにフォールバックすること", async () => {
     const { LocaleManager } = await import("@/shared/locale/localeManager");
     const manager = new LocaleManager("ja");
     const repository = {
@@ -123,7 +123,7 @@ describe("shared/locale/localeManager", () => {
     );
   });
 
-  it("uses default locale from cache path when repository is not set", async () => {
+  it("repository が未設定の場合はデフォルトロケールを使用すること", async () => {
     const { LocaleManager } = await import("@/shared/locale/localeManager");
     const manager = new LocaleManager("ja");
 
@@ -132,7 +132,7 @@ describe("shared/locale/localeManager", () => {
     ).resolves.toBe("ja:ping.description");
   });
 
-  it("returns key and logs error when translation fails", async () => {
+  it("翻訳失敗時はキーを返してエラーをログに記録すること", async () => {
     translateMock.mockImplementation(() => {
       throw new Error("translation-failed");
     });
@@ -149,7 +149,7 @@ describe("shared/locale/localeManager", () => {
     );
   });
 
-  it("gets fixed translators, invalidates cache, and exposes locale metadata", async () => {
+  it("固定トランスレーターの取得・キャッシュ無効化・ロケールメタデータの公開が正しく機能すること", async () => {
     const { LocaleManager } = await import("@/shared/locale/localeManager");
     const { SUPPORTED_LOCALES } = await import("@/shared/locale/i18n");
     const manager = new LocaleManager("ja");
@@ -174,7 +174,7 @@ describe("shared/locale/localeManager", () => {
     expect(manager.isSupported("xx")).toBe(false);
   });
 
-  it("getGuildT uses default locale when guildId is undefined", async () => {
+  it("getGuildT が guildId 未定義の場合はデフォルトロケールを使用すること", async () => {
     const { LocaleManager } = await import("@/shared/locale/localeManager");
     const manager = new LocaleManager("ja");
     const repository = {
@@ -189,7 +189,7 @@ describe("shared/locale/localeManager", () => {
     expect(repository.getLocale).not.toHaveBeenCalled();
   });
 
-  it("tGuild and tDefault delegate to singleton manager/i18next", async () => {
+  it("tGuild と tDefault がシングルトンマネージャー/i18next へ委譲すること", async () => {
     const module = await import("@/shared/locale/localeManager");
 
     const translateSpy = vi

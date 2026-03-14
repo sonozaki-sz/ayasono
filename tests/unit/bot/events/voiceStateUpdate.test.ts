@@ -14,12 +14,12 @@ describe("bot/events/voiceStateUpdate", () => {
     vi.clearAllMocks();
   });
 
-  it("has expected event metadata", () => {
+  it("イベントメタデータが正しいことを確認", () => {
     expect(voiceStateUpdateEvent.name).toBe(Events.VoiceStateUpdate);
     expect(voiceStateUpdateEvent.once).toBe(false);
   });
 
-  it("delegates old/new state to VAC voice-state handler", async () => {
+  it("旧・新ボイス状態が handleVacVoiceStateUpdate へ委譲されることを確認", async () => {
     const oldState = { channelId: "old" };
     const newState = { channelId: "new" };
 

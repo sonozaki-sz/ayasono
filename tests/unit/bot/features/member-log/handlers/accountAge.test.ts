@@ -10,8 +10,7 @@ describe("bot/features/member-log/handlers/accountAge", () => {
 
   // calcDuration：年・月・日が正しく算出されること・境界値・ゼロ経過を検証
   describe("calcDuration", () => {
-    // 5年3ヶ月7日が経過した場合に正しい年・月・日を返すことを確認
-    it("returns correct years, months and days for a typical duration", () => {
+    it("5年3ヶ月7日が経過した場合に正しい年・月・日を返すことを確認", () => {
       vi.useFakeTimers();
       // 2020-11-24 + 5y3m7d = 2026-03-03
       vi.setSystemTime(new Date("2026-03-03T00:00:00.000Z"));
@@ -24,8 +23,7 @@ describe("bot/features/member-log/handlers/accountAge", () => {
       expect(result.days).toBe(7);
     });
 
-    // 経過ゼロ（現在時刻と同じタイムスタンプ）の場合にすべて 0 を返すことを確認
-    it("returns zeros when start timestamp equals current time", () => {
+    it("経過ゼロ（現在時刻と同じタイムスタンプ）の場合にすべて 0 を返すことを確認", () => {
       vi.useFakeTimers();
       const now = new Date("2026-03-01T00:00:00.000Z");
       vi.setSystemTime(now);
@@ -35,8 +33,7 @@ describe("bot/features/member-log/handlers/accountAge", () => {
       expect(result).toEqual({ years: 0, months: 0, days: 0 });
     });
 
-    // ちょうど 1 年経過した場合に years:1 / months:0 / days:0 を返すことを確認
-    it("returns years:1 months:0 days:0 when exactly one year has passed", () => {
+    it("ちょうど 1 年経過した場合に years:1 / months:0 / days:0 を返すことを確認", () => {
       vi.useFakeTimers();
       vi.setSystemTime(new Date("2026-03-01T00:00:00.000Z"));
       const oneYearAgo = new Date("2025-03-01T00:00:00.000Z").getTime();
@@ -46,8 +43,7 @@ describe("bot/features/member-log/handlers/accountAge", () => {
       expect(result).toEqual({ years: 1, months: 0, days: 0 });
     });
 
-    // 1 ヶ月未満（数日のみ）の場合に years:0 / months:0 / days のみ返すことを確認
-    it("returns only days when less than one month has passed", () => {
+    it("1 ヶ月未満（数日のみ）の場合に years:0 / months:0 / days のみ返すことを確認", () => {
       vi.useFakeTimers();
       vi.setSystemTime(new Date("2026-03-01T00:00:00.000Z"));
       const fiveDaysAgo = new Date("2026-02-24T00:00:00.000Z").getTime();
@@ -57,9 +53,8 @@ describe("bot/features/member-log/handlers/accountAge", () => {
       expect(result).toEqual({ years: 0, months: 0, days: 5 });
     });
 
-    // うるう年（2024-02-29）を含む期間でも正しく計算されることを確認
     // date-fns: 2024-02-29 → 2025-03-01 は 1y0m1d（閏日なし年の換算で +1 日）
-    it("handles leap year correctly", () => {
+    it("うるう年（2024-02-29）を含む期間でも正しく計算されることを確認", () => {
       vi.useFakeTimers();
       vi.setSystemTime(new Date("2025-03-01T00:00:00.000Z"));
       const start = new Date("2024-02-29T00:00:00.000Z").getTime();

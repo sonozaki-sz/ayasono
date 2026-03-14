@@ -39,8 +39,7 @@ describe("bot/handlers/interactionCreate/flow/modal", () => {
     vi.clearAllMocks();
   });
 
-  // 未登録の customId を持つモーダルが送信された場合は警告ログを出してハンドラーを呼び出さないことを確認
-  it("warns and returns when no modal handler matches", async () => {
+  it("未登録の customId を持つモーダルが送信された場合は警告ログを出してハンドラーを呼び出さないことを確認", async () => {
     const interaction = { customId: "unknown", user: { tag: "user#0001" } };
     const uiModule = await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/modals",
@@ -54,7 +53,7 @@ describe("bot/handlers/interactionCreate/flow/modal", () => {
     expect(uiModule.modalHandlers[0].execute).not.toHaveBeenCalled();
   });
 
-  it("executes matching modal handler", async () => {
+  it("customId に一致するモーダルハンドラーが実行されることを確認", async () => {
     const interaction = { customId: "vac:rename", user: { tag: "user#0001" } };
     const uiModule = await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/modals",
@@ -68,8 +67,7 @@ describe("bot/handlers/interactionCreate/flow/modal", () => {
     expect(loggerDebugMock).toHaveBeenCalledTimes(1);
   });
 
-  // モーダルハンドラーが例外を投げた場合は handleInteractionError に委譲してエラーログを記録することを確認
-  it("delegates modal handler errors", async () => {
+  it("モーダルハンドラーが例外を投げた場合は handleInteractionError に委譲してエラーログを記録することを確認", async () => {
     const error = new Error("modal failed");
     const uiModule = await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/modals",

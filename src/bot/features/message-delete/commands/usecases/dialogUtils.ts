@@ -83,7 +83,10 @@ export type FinalResult =
 
 // ===== モーダルフィルター設定マップ =====
 
-export const MODAL_FILTER_CONFIG = new Map<string, ModalFilterConfig>([
+export const MODAL_FILTER_CONFIG: Map<string, ModalFilterConfig> = new Map<
+  string,
+  ModalFilterConfig
+>([
   [
     MSG_DEL_CUSTOM_ID.FILTER_KEYWORD,
     {

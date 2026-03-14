@@ -61,7 +61,7 @@ describe("bot/features/bump-reminder/helpers", () => {
       updatedAt: new Date("2026-02-20T00:00:00.000Z"),
     });
 
-    it("keeps latest pending reminder per guild and collects stale ones", () => {
+    it("ギルドごとに最新の pending リマインダーを保持し古いものを収集する", () => {
       const reminders = [
         buildReminder("old-a", "g-a", "2026-02-20T00:10:00.000Z"),
         buildReminder("new-a", "g-a", "2026-02-20T00:20:00.000Z"),
@@ -76,7 +76,7 @@ describe("bot/features/bump-reminder/helpers", () => {
       expect(plan.staleReminders.map((item) => item.id)).toEqual(["old-a"]);
     });
 
-    it("marks later-processed older reminder as stale", () => {
+    it("後から処理された古いリマインダーを stale としてマークする", () => {
       const reminders = [
         buildReminder("new-a", "g-a", "2026-02-20T00:20:00.000Z"),
         buildReminder("old-a", "g-a", "2026-02-20T00:10:00.000Z"),
@@ -91,7 +91,7 @@ describe("bot/features/bump-reminder/helpers", () => {
 
   // メモリ上スケジュールの登録と解除が整合することを検証
   describe("schedule helper", () => {
-    it("schedules one-time task and clears reminder map after task execution", async () => {
+    it("ワンタイムタスクをスケジュールし、タスク実行後にリマインダーマップをクリアする", async () => {
       const reminders = new Map<string, ScheduledReminderRef>();
       const task = vi.fn().mockResolvedValue(undefined);
 
@@ -115,7 +115,7 @@ describe("bot/features/bump-reminder/helpers", () => {
       expect(reminders.has("g-1")).toBe(false);
     });
 
-    it("cancels existing reminder from scheduler and memory map", () => {
+    it("スケジューラーとメモリマップから既存のリマインダーをキャンセルする", () => {
       const reminders = new Map<string, ScheduledReminderRef>();
       reminders.set("g-1", { jobId: "job-1", reminderId: "rem-1" });
 
@@ -126,7 +126,7 @@ describe("bot/features/bump-reminder/helpers", () => {
       expect(reminders.has("g-1")).toBe(false);
     });
 
-    it("returns undefined when no scheduled reminder exists", () => {
+    it("スケジュールされたリマインダーが存在しない場合は undefined を返す", () => {
       const reminders = new Map<string, ScheduledReminderRef>();
 
       const removed = cancelScheduledReminder(reminders, "missing-guild");
@@ -138,7 +138,7 @@ describe("bot/features/bump-reminder/helpers", () => {
 
   // タスク結果に応じた DB ステータス更新と失敗時補償を検証
   describe("createTrackedReminderTask", () => {
-    it("updates status to sent when task succeeds", async () => {
+    it("タスク成功時にステータスを sent に更新する", async () => {
       const repository = {
         updateStatus: vi.fn().mockResolvedValue(undefined),
       };
@@ -161,7 +161,7 @@ describe("bot/features/bump-reminder/helpers", () => {
       expect(logger.error).not.toHaveBeenCalled();
     });
 
-    it("updates status to cancelled when task fails", async () => {
+    it("タスク失敗時にステータスを cancelled に更新する", async () => {
       const repository = {
         updateStatus: vi.fn().mockResolvedValue(undefined),
       };
@@ -183,7 +183,7 @@ describe("bot/features/bump-reminder/helpers", () => {
       expect(logger.error).toHaveBeenCalledTimes(1);
     });
 
-    it("logs twice when both task and status update fail", async () => {
+    it("タスクとステータス更新の両方が失敗した場合は 2 回ログを記録する", async () => {
       const repository = {
         updateStatus: vi.fn().mockRejectedValue(new Error("db failed")),
       };

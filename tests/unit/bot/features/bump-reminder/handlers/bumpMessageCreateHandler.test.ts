@@ -49,7 +49,7 @@ describe("bot/features/bump-reminder/handlers/bumpMessageCreateHandler", () => {
     vi.clearAllMocks();
   });
 
-  it("ignores messages without guild", async () => {
+  it("guild のないメッセージは無視する", async () => {
     const message = createMessage({ guild: null });
 
     await handleBumpMessageCreate(message as never);
@@ -57,8 +57,7 @@ describe("bot/features/bump-reminder/handlers/bumpMessageCreateHandler", () => {
     expect(handleBumpDetectedMock).not.toHaveBeenCalled();
   });
 
-  // テストモードで "test /bump" プレフィックスを含むメッセージが Disboard バンプとして検出されることを検証
-  it("detects test disboard command in test mode", async () => {
+  it("テストモードで \"test /bump\" プレフィックスを含むメッセージが Disboard バンプとして検出されることを検証", async () => {
     const message = createMessage({
       author: { id: "user-1", bot: false },
       content: "test /bump",
@@ -75,7 +74,7 @@ describe("bot/features/bump-reminder/handlers/bumpMessageCreateHandler", () => {
     );
   });
 
-  it("detects test dissoku command in test mode", async () => {
+  it("テストモードで \"test /dissoku up\" プレフィックスを含むメッセージが Dissoku バンプとして検出されることを検証", async () => {
     const message = createMessage({
       author: { id: "user-1", bot: false },
       content: "test /dissoku up",
@@ -92,8 +91,7 @@ describe("bot/features/bump-reminder/handlers/bumpMessageCreateHandler", () => {
     );
   });
 
-  // テストコマンドプレフィックスを持たない一般ユーザーメッセージがすべてのガードを通過せず無視されることを検証
-  it("ignores non-bot normal messages outside test command flow", async () => {
+  it("テストコマンドプレフィックスを持たない一般ユーザーメッセージがすべてのガードを通過せず無視されることを検証", async () => {
     const message = createMessage({
       author: { id: "user-1", bot: false },
       content: "hello",
@@ -105,7 +103,7 @@ describe("bot/features/bump-reminder/handlers/bumpMessageCreateHandler", () => {
     expect(resolveBumpServiceMock).not.toHaveBeenCalled();
   });
 
-  it("ignores bot message without interaction commandName", async () => {
+  it("interaction の commandName がないボットメッセージは無視する", async () => {
     const message = createMessage({ interaction: null });
 
     await handleBumpMessageCreate(message as never);
@@ -114,7 +112,7 @@ describe("bot/features/bump-reminder/handlers/bumpMessageCreateHandler", () => {
     expect(resolveBumpServiceMock).not.toHaveBeenCalled();
   });
 
-  it("ignores when resolver cannot map service", async () => {
+  it("リゾルバーがサービスを解決できない場合は無視する", async () => {
     resolveBumpServiceMock.mockReturnValueOnce(undefined);
     const message = createMessage({ interaction: { commandName: "unknown" } });
 
@@ -124,8 +122,7 @@ describe("bot/features/bump-reminder/handlers/bumpMessageCreateHandler", () => {
     expect(handleBumpDetectedMock).not.toHaveBeenCalled();
   });
 
-  // 本番環境でボットがinteraction付きメッセージを送信した場合にリゾルバーでサービスを解決し検出されることを検証
-  it("detects production bot interaction message via resolver", async () => {
+  it("本番環境でボットがinteraction付きメッセージを送信した場合にリゾルバーでサービスを解決し検出されることを検証", async () => {
     resolveBumpServiceMock.mockReturnValueOnce("dissoku");
     const message = createMessage({
       interaction: { commandName: "dissoku" },

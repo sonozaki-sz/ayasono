@@ -55,16 +55,14 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigView", () => 
     vi.clearAllMocks();
   });
 
-  // guild が null の場合は ValidationError を投げる
-  it("throws ValidationError when interaction has no guild", async () => {
+  it("guild が null の場合は ValidationError を投げる", async () => {
     const interaction = makeInteraction({ hasGuild: false });
     await expect(
       handleVcRecruitConfigView(interaction as never, GUILD_ID),
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  // セットアップ・ロールが空の場合もエラーなく返信する
-  it("replies with info embed when config is empty", async () => {
+  it("セットアップ・ロールが空の場合もエラーなく info embed で返信する", async () => {
     getVcRecruitConfigOrDefaultMock.mockResolvedValue({
       setups: [],
       mentionRoleIds: [],
@@ -80,8 +78,7 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigView", () => 
     );
   });
 
-  // セットアップがある場合はカテゴリー名を表示する（カテゴリーあり）
-  it("shows category name in reply when setups exist with known category", async () => {
+  it("セットアップがある場合はカテゴリー名を含む返信をする（既知カテゴリーあり）", async () => {
     getVcRecruitConfigOrDefaultMock.mockResolvedValue({
       setups: [
         {
@@ -101,8 +98,7 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigView", () => 
     expect(getVcRecruitConfigOrDefaultMock).toHaveBeenCalledWith(GUILD_ID);
   });
 
-  // categoryId が null のセットアップは "TOP" キーで表示する
-  it("uses TOP key for setup with null categoryId", async () => {
+  it("categoryId が null のセットアップは TOP キーで表示する", async () => {
     getVcRecruitConfigOrDefaultMock.mockResolvedValue({
       setups: [
         {
@@ -123,8 +119,7 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigView", () => 
     );
   });
 
-  // categoryId があるがキャッシュに存在しないセットアップは categoryId をフォールバックラベルとして使用する
-  it("falls back to categoryId string when category channel is not in guild cache", async () => {
+  it("categoryId があるがキャッシュに存在しないセットアップは categoryId 文字列をフォールバックラベルとして使用する", async () => {
     getVcRecruitConfigOrDefaultMock.mockResolvedValue({
       setups: [
         {
@@ -148,8 +143,7 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigView", () => 
     );
   });
 
-  // ロールがある場合はロール一覧を含む embed で返信する
-  it("replies with role mentions when mentionRoleIds exist", async () => {
+  it("ロールがある場合はロール一覧を含む embed で返信する", async () => {
     getVcRecruitConfigOrDefaultMock.mockResolvedValue({
       setups: [],
       mentionRoleIds: ["role-1", "role-2"],

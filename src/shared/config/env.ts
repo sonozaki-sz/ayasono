@@ -6,16 +6,39 @@ import { z } from "zod";
 
 export const NODE_ENV_VALUES = ["development", "production", "test"] as const;
 
-export const NODE_ENV = {
-  DEVELOPMENT: NODE_ENV_VALUES[0],
-  PRODUCTION: NODE_ENV_VALUES[1],
-  TEST: NODE_ENV_VALUES[2],
+export const NODE_ENV: {
+  DEVELOPMENT: "development";
+  PRODUCTION: "production";
+  TEST: "test";
+} = {
+  DEVELOPMENT: "development",
+  PRODUCTION: "production",
+  TEST: "test",
 } as const;
 
 export type NodeEnv = (typeof NODE_ENV_VALUES)[number];
 
+/**
+ * 検証済み環境変数の型
+ */
+export type Env = {
+  NODE_ENV: NodeEnv;
+  DISCORD_TOKEN: string;
+  DISCORD_APP_ID: string;
+  DISCORD_GUILD_ID?: string | undefined;
+  DISCORD_ERROR_WEBHOOK_URL?: string | undefined;
+  LOCALE: string;
+  DATABASE_URL: string;
+  WEB_PORT: number;
+  WEB_HOST: string;
+  JWT_SECRET?: string | undefined;
+  CORS_ORIGIN?: string | undefined;
+  LOG_LEVEL: "error" | "warn" | "info" | "http" | "verbose" | "debug" | "silly";
+  TEST_MODE: boolean;
+};
+
 // 環境変数スキーマ定義（起動時バリデーション用）
-const envSchema = z.object({
+export const envSchema: z.ZodType<Env> = z.object({
   NODE_ENV: z.enum(NODE_ENV_VALUES).default(NODE_ENV.DEVELOPMENT),
 
   // Discord
@@ -84,5 +107,4 @@ const parseEnv = () => {
   }
 };
 
-export const env = parseEnv();
-export type Env = z.infer<typeof envSchema>;
+export const env: Env = parseEnv();

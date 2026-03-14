@@ -429,6 +429,10 @@ export const system = {
     "[メンバーログ機能] 参加メッセージ設定 GuildId: {{guildId}}",
   "member-log.config_leave_message_set":
     "[メンバーログ機能] 退出メッセージ設定 GuildId: {{guildId}}",
+  "member-log.config_join_message_cleared":
+    "[メンバーログ機能] 参加メッセージ削除 GuildId: {{guildId}}",
+  "member-log.config_leave_message_cleared":
+    "[メンバーログ機能] 退出メッセージ削除 GuildId: {{guildId}}",
 
   // VC募集機能ログ
   "vc-recruit.voice_state_update_failed":

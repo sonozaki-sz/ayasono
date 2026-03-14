@@ -15,7 +15,7 @@ describe("bot/features/vac/handlers/vacChannelDelete", () => {
     vi.clearAllMocks();
   });
 
-  it("delegates deleted channel to vac service", async () => {
+  it("削除されたチャンネルをvacサービスへ委譲する", async () => {
     const channel = { id: "voice-1" };
 
     await handleVacChannelDelete(channel as never);
@@ -23,7 +23,7 @@ describe("bot/features/vac/handlers/vacChannelDelete", () => {
     expect(handleChannelDeleteMock).toHaveBeenCalledWith(channel);
   });
 
-  it("propagates service failure", async () => {
+  it("サービスの失敗を呼び出し元に伝播する", async () => {
     handleChannelDeleteMock.mockRejectedValueOnce(new Error("service failed"));
 
     await expect(handleVacChannelDelete({} as never)).rejects.toThrow(

@@ -10,6 +10,8 @@ import { MEMBER_LOG_CONFIG_COMMAND } from "./memberLogConfigCommand.constants";
 import { handleMemberLogConfigDisable } from "./memberLogConfigCommand.disable";
 import { handleMemberLogConfigEnable } from "./memberLogConfigCommand.enable";
 import { handleMemberLogConfigSetChannel } from "./memberLogConfigCommand.setChannel";
+import { handleMemberLogConfigClearJoinMessage } from "./memberLogConfigCommand.clearJoinMessage";
+import { handleMemberLogConfigClearLeaveMessage } from "./memberLogConfigCommand.clearLeaveMessage";
 import { handleMemberLogConfigSetJoinMessage } from "./memberLogConfigCommand.setJoinMessage";
 import { handleMemberLogConfigSetLeaveMessage } from "./memberLogConfigCommand.setLeaveMessage";
 import { handleMemberLogConfigView } from "./memberLogConfigCommand.view";
@@ -52,6 +54,14 @@ export async function executeMemberLogConfigCommand(
 
       case MEMBER_LOG_CONFIG_COMMAND.SUBCOMMAND.SET_LEAVE_MESSAGE:
         await handleMemberLogConfigSetLeaveMessage(interaction, guildId);
+        break;
+
+      case MEMBER_LOG_CONFIG_COMMAND.SUBCOMMAND.CLEAR_JOIN_MESSAGE:
+        await handleMemberLogConfigClearJoinMessage(interaction, guildId);
+        break;
+
+      case MEMBER_LOG_CONFIG_COMMAND.SUBCOMMAND.CLEAR_LEAVE_MESSAGE:
+        await handleMemberLogConfigClearLeaveMessage(interaction, guildId);
         break;
 
       case MEMBER_LOG_CONFIG_COMMAND.SUBCOMMAND.VIEW:

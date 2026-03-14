@@ -9,7 +9,10 @@ import { parseJsonArray } from "../../utils/jsonUtils";
  * guild_vac_configs テーブルを使用した VAC設定リポジトリ
  */
 export class VacConfigRepository implements IVacConfigRepository {
-  constructor(private readonly prisma: PrismaClient) {}
+  private readonly prisma: PrismaClient;
+  constructor(prisma: PrismaClient) {
+    this.prisma = prisma;
+  }
 
   async getVacConfig(guildId: string): Promise<VacConfig | null> {
     const record = await this.prisma.guildVacConfig.findUnique({

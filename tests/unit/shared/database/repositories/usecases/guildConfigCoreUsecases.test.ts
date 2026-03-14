@@ -102,7 +102,7 @@ describe("shared/database/repositories/usecases/guildConfigCoreUsecases", () => 
     vi.clearAllMocks();
   });
 
-  it("getGuildConfigUsecase returns mapped config or null", async () => {
+  it("getGuildConfigUsecase が変換済み設定または null を返すこと", async () => {
     findGuildConfigRecordMock.mockResolvedValueOnce({ guildId: "g1" } as never);
     toGuildConfigMock.mockReturnValueOnce({
       guildId: "g1",
@@ -120,7 +120,7 @@ describe("shared/database/repositories/usecases/guildConfigCoreUsecases", () => 
   });
 
   // DBエラーが toDatabaseError でラップされ、適切なプレフィックス付きメッセージで再スローされることを確認
-  it("getGuildConfigUsecase wraps errors with toDatabaseError", async () => {
+  it("getGuildConfigUsecase がエラーを toDatabaseError でラップすること", async () => {
     findGuildConfigRecordMock.mockRejectedValueOnce(new Error("db down"));
 
     await expect(getGuildConfigUsecase(deps, "g1")).rejects.toThrow(
@@ -129,7 +129,7 @@ describe("shared/database/repositories/usecases/guildConfigCoreUsecases", () => 
     expect(deps.toDatabaseError).toHaveBeenCalled();
   });
 
-  it("saveGuildConfigUsecase serializes and persists create data", async () => {
+  it("saveGuildConfigUsecase が作成データをシリアライズして永続化すること", async () => {
     const config = { guildId: "g1", locale: "ja" } as never;
     const createData = { guildId: "g1", locale: "ja" } as never;
     toCreateDataMock.mockReturnValueOnce(createData);
@@ -143,7 +143,7 @@ describe("shared/database/repositories/usecases/guildConfigCoreUsecases", () => 
   });
 
   // upsertペイロードが(updateData + createFallback)として正しく構築され、失敗時はエラーがラップされることを検証
-  it("updateGuildConfigUsecase builds upsert payload and wraps failures", async () => {
+  it("updateGuildConfigUsecase が upsert ペイロードを構築し、失敗時はエラーをラップすること", async () => {
     toUpdateDataMock.mockReturnValueOnce({ afkConfig: "{}" });
 
     await updateGuildConfigUsecase(deps, "g1", { locale: "en" } as never);
@@ -160,7 +160,7 @@ describe("shared/database/repositories/usecases/guildConfigCoreUsecases", () => 
     ).rejects.toThrow("Failed to update guild config:conflict");
   });
 
-  it("delete/exists usecases delegate and wrap failures", async () => {
+  it("delete/exists ユースケースが処理を委譲し、失敗時にエラーをラップすること", async () => {
     await deleteGuildConfigUsecase(deps, "g1");
     expect(deleteGuildConfigRecordMock).toHaveBeenCalledWith(deps.prisma, "g1");
 
@@ -179,7 +179,7 @@ describe("shared/database/repositories/usecases/guildConfigCoreUsecases", () => 
   });
 
   // ロケールが見つからない(null)場合とDBエラー発生時の両方でデフォルトロケールにフォールバックすることを確認
-  it("getGuildLocaleUsecase returns locale, fallback, and fallback-on-error", async () => {
+  it("getGuildLocaleUsecase がロケール・null 時フォールバック・エラー時フォールバックを正しく返すこと", async () => {
     findGuildLocaleMock.mockResolvedValueOnce("en");
     await expect(getGuildLocaleUsecase(deps, "g1")).resolves.toBe("en");
 
@@ -190,7 +190,7 @@ describe("shared/database/repositories/usecases/guildConfigCoreUsecases", () => 
     await expect(getGuildLocaleUsecase(deps, "g1")).resolves.toBe("ja");
   });
 
-  it("updateGuildLocaleUsecase delegates through updateGuildConfigUsecase", async () => {
+  it("updateGuildLocaleUsecase が updateGuildConfigUsecase を経由して処理を委譲すること", async () => {
     toUpdateDataMock.mockReturnValueOnce({ locale: "en" });
     await updateGuildLocaleUsecase(deps, "g1", "en");
 

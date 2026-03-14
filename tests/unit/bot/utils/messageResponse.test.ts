@@ -1,8 +1,8 @@
-// tests/unit/utils/messageResponse.test.ts
+// tests/unit/bot/utils/messageResponse.test.ts
 // メッセージレスポンスユーティリティのテスト
 
 import {
-  MessageStatus,
+  type MessageStatus,
   createErrorEmbed,
   createInfoEmbed,
   createStatusEmbed,
@@ -26,7 +26,7 @@ describe("messageResponse", () => {
       ["warning", 0xfee75c, "⚠️"],
       ["error", 0xed4245, "❌"],
     ])(
-      "should create embed with correct color and emoji for %s status",
+      "%s ステータスの embed に正しい色と絵文字が設定されることを確認",
       (status, expectedColor, expectedEmoji) => {
         const title = "Test Title";
         const description = "Test Description";
@@ -40,7 +40,7 @@ describe("messageResponse", () => {
       },
     );
 
-    it("should add timestamp when timestamp option is true", () => {
+    it("timestamp オプションが true の場合に embed にタイムスタンプが付与されることを確認", () => {
       // timestamp オプション有効時は埋め込みに時刻が付与される
       const embed = createStatusEmbed("info", "Title", "Description", {
         timestamp: true,
@@ -49,7 +49,7 @@ describe("messageResponse", () => {
       expect(embed.data.timestamp).toBeDefined();
     });
 
-    it("should not add timestamp when timestamp option is false or undefined", () => {
+    it("timestamp オプションが false または未指定の場合はタイムスタンプが付与されないことを確認", () => {
       // false/未指定時は timestamp を付与しない
       const embed1 = createStatusEmbed("info", "Title", "Description", {
         timestamp: false,
@@ -60,13 +60,13 @@ describe("messageResponse", () => {
       expect(embed2.data.timestamp).toBeUndefined();
     });
 
-    it("should omit description when empty string is provided", () => {
+    it("空文字列が渡された場合は description が省略されることを確認", () => {
       const embed = createStatusEmbed("info", "Title", "");
 
       expect(embed.data.description).toBeUndefined();
     });
 
-    it("should add fields when fields option is provided", () => {
+    it("fields オプションが指定された場合に embed にフィールドが追加されることを確認", () => {
       // fields オプションで任意フィールドが反映されること
       const fields = [
         { name: "Field 1", value: "Value 1", inline: true },
@@ -90,7 +90,7 @@ describe("messageResponse", () => {
       });
     });
 
-    it("should truncate title if it exceeds 256 characters", () => {
+    it("タイトルが 256 文字を超える場合は切り詰められることを確認", () => {
       const longTitle = "a".repeat(260);
       const embed = createStatusEmbed("info", longTitle, "Description");
 
@@ -100,7 +100,7 @@ describe("messageResponse", () => {
   });
 
   describe("createSuccessEmbed", () => {
-    it("should create success embed with correct color and locale title", () => {
+    it("正しい色とロケールタイトルで success embed が生成されることを確認", () => {
       const embed = createSuccessEmbed("Operation completed");
 
       expect(embed.data.color).toBe(0x57f287);
@@ -109,7 +109,7 @@ describe("messageResponse", () => {
       expect(embed.data.description).toBe("Operation completed");
     });
 
-    it("should support options", () => {
+    it("オプションが反映されることを確認", () => {
       const embed = createSuccessEmbed("Description", {
         timestamp: true,
       });
@@ -119,7 +119,7 @@ describe("messageResponse", () => {
   });
 
   describe("createInfoEmbed", () => {
-    it("should create info embed with default title", () => {
+    it("デフォルトタイトルで info embed が生成されることを確認", () => {
       const embed = createInfoEmbed("Information message");
 
       expect(embed.data.color).toBe(0x3498db);
@@ -127,13 +127,13 @@ describe("messageResponse", () => {
       expect(embed.data.description).toBe("Information message");
     });
 
-    it("should use custom title when provided via options", () => {
+    it("options でカスタムタイトルが指定された場合に反映されることを確認", () => {
       const embed = createInfoEmbed("Information message", { title: "Custom" });
 
       expect(embed.data.title).toBe("ℹ️ Custom");
     });
 
-    it("should support options with fields", () => {
+    it("fields オプションが反映されることを確認", () => {
       // ラッパー関数経由でも fields 指定が維持されること
       const fields = [{ name: "Status", value: "Active", inline: true }];
       const embed = createInfoEmbed("Description", { fields });
@@ -144,7 +144,7 @@ describe("messageResponse", () => {
   });
 
   describe("createWarningEmbed", () => {
-    it("should create warning embed with default title", () => {
+    it("デフォルトタイトルで warning embed が生成されることを確認", () => {
       const embed = createWarningEmbed("Please be careful");
 
       expect(embed.data.color).toBe(0xfee75c);
@@ -152,7 +152,7 @@ describe("messageResponse", () => {
       expect(embed.data.description).toBe("Please be careful");
     });
 
-    it("should use custom title when provided via options", () => {
+    it("options でカスタムタイトルが指定された場合に反映されることを確認", () => {
       const embed = createWarningEmbed("Please be careful", {
         title: "Custom Warning",
       });
@@ -162,7 +162,7 @@ describe("messageResponse", () => {
   });
 
   describe("createErrorEmbed", () => {
-    it("should create error embed with default title", () => {
+    it("デフォルトタイトルで error embed が生成されることを確認", () => {
       const embed = createErrorEmbed("An error occurred");
 
       expect(embed.data.color).toBe(0xed4245);
@@ -170,7 +170,7 @@ describe("messageResponse", () => {
       expect(embed.data.description).toBe("An error occurred");
     });
 
-    it("should use custom title when provided via options", () => {
+    it("options でカスタムタイトルが指定された場合に反映されることを確認", () => {
       const embed = createErrorEmbed("An error occurred", {
         title: "Permission Error",
       });

@@ -61,8 +61,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.disable", () =
     setEnabledMock.mockResolvedValue(undefined);
   });
 
-  // ガードが ValidationError を投げた場合にそれが伝播することを確認
-  it("propagates error when guard throws", async () => {
+  it("ガードが ValidationError を投げた場合にそれが伝播することを確認", async () => {
     ensurePermissionMock.mockRejectedValue(new ValidationError("no-perm"));
 
     await expect(
@@ -70,8 +69,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.disable", () =
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  // setEnabled(false) が正しい引数で呼ばれることを確認
-  it("calls service.setEnabled(false) with correct guildId", async () => {
+  it("service.setEnabled(false) が正しい guildId を引数に呼ばれることを確認", async () => {
     ensurePermissionMock.mockResolvedValue(undefined);
     const interaction = makeInteraction();
 
@@ -80,8 +78,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.disable", () =
     expect(setEnabledMock).toHaveBeenCalledWith("guild-1", false);
   });
 
-  // 成功時に success embed で reply が呼ばれることを確認
-  it("replies with success embed on success", async () => {
+  it("成功時に success embed で reply が呼ばれることを確認", async () => {
     ensurePermissionMock.mockResolvedValue(undefined);
     const interaction = makeInteraction();
 
@@ -93,8 +90,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.disable", () =
     expect(createSuccessEmbedMock).toHaveBeenCalled();
   });
 
-  // 成功時に logger.info が呼ばれることを確認
-  it("logs info on success", async () => {
+  it("成功時に logger.info が呼ばれることを確認", async () => {
     ensurePermissionMock.mockResolvedValue(undefined);
 
     await handleMemberLogConfigDisable(makeInteraction() as never, "guild-1");

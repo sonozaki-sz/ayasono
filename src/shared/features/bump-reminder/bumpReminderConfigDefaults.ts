@@ -5,7 +5,7 @@ import type { BumpReminderConfig } from "../../database/types";
 
 /** Bumpリマインダー設定の初期値 */
 export const DEFAULT_BUMP_REMINDER_CONFIG: BumpReminderConfig = {
-  enabled: false,
+  enabled: true,
   mentionUserIds: [],
 };
 

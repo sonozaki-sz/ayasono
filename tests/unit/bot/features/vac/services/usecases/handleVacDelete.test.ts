@@ -36,7 +36,7 @@ describe("bot/features/vac/services/usecases/handleVacDelete", () => {
     vi.clearAllMocks();
   });
 
-  it("returns when oldState has no channel", async () => {
+  it("oldStateにチャンネルが存在しない場合は早期リターンする", async () => {
     const repository = createRepositoryMock();
 
     await handleVacDeleteUseCase(repository, { channel: null } as never);
@@ -44,7 +44,7 @@ describe("bot/features/vac/services/usecases/handleVacDelete", () => {
     expect(repository.getVacConfigOrDefault).not.toHaveBeenCalled();
   });
 
-  it("returns when old channel is not a voice channel", async () => {
+  it("退出チャンネルがボイスチャンネルでない場合は早期リターンする", async () => {
     const repository = createRepositoryMock();
 
     await handleVacDeleteUseCase(repository, {
@@ -54,8 +54,7 @@ describe("bot/features/vac/services/usecases/handleVacDelete", () => {
     expect(repository.getVacConfigOrDefault).not.toHaveBeenCalled();
   });
 
-  // createdChannels に ID が含まれない管理外チャンネルでは削除処理もレコード除去も行われないことを確認
-  it("returns when old channel is not managed by VAC", async () => {
+  it("createdChannels に ID が含まれない管理外チャンネルでは削除処理もレコード除去も行われないことを確認", async () => {
     const repository = createRepositoryMock();
     repository.getVacConfigOrDefault.mockResolvedValue({
       enabled: true,
@@ -79,8 +78,7 @@ describe("bot/features/vac/services/usecases/handleVacDelete", () => {
     expect(loggerInfoMock).not.toHaveBeenCalled();
   });
 
-  // VAC 管理チャンネルであっても members.size > 0 の場合は削除しないことを確認（早期リターン）
-  it("returns when managed channel still has members", async () => {
+  it("VAC 管理チャンネルであっても members.size > 0 の場合は削除しないことを確認（早期リターン）", async () => {
     const repository = createRepositoryMock();
     repository.getVacConfigOrDefault.mockResolvedValue({
       enabled: true,
@@ -110,7 +108,7 @@ describe("bot/features/vac/services/usecases/handleVacDelete", () => {
     expect(loggerInfoMock).not.toHaveBeenCalled();
   });
 
-  it("deletes managed empty channel and removes record", async () => {
+  it("管理済みの空チャンネルを削除してDBレコードを除去する", async () => {
     const repository = createRepositoryMock();
     repository.getVacConfigOrDefault.mockResolvedValue({
       enabled: true,
@@ -143,9 +141,7 @@ describe("bot/features/vac/services/usecases/handleVacDelete", () => {
     expect(loggerInfoMock).toHaveBeenCalledTimes(1);
   });
 
-  // Discord API の channel.delete() が失敗しても removeCreatedVacChannel が呼ばれ、
-  // エラーを握りつぶしてクリーンアップを継続する耐障害性を検証する
-  it("continues cleanup even when channel delete fails", async () => {
+  it("Discord API の channel.delete() が失敗しても removeCreatedVacChannel が呼ばれ、エラーを握りつぶしてクリーンアップを継続する耐障害性を検証する", async () => {
     const repository = createRepositoryMock();
     repository.getVacConfigOrDefault.mockResolvedValue({
       enabled: true,

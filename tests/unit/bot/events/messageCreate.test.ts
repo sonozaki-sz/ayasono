@@ -26,12 +26,12 @@ describe("bot/events/messageCreate", () => {
     vi.clearAllMocks();
   });
 
-  it("has expected event metadata", () => {
+  it("イベントメタデータが正しいことを確認", () => {
     expect(messageCreateEvent.name).toBe(Events.MessageCreate);
     expect(messageCreateEvent.once).toBe(false);
   });
 
-  it("delegates message to bump message handler", async () => {
+  it("メッセージが handleBumpMessageCreate へ委譲されることを確認", async () => {
     const message = { content: "bump" };
 
     await messageCreateEvent.execute(message as never);
@@ -39,7 +39,7 @@ describe("bot/events/messageCreate", () => {
     expect(handleBumpMessageCreateMock).toHaveBeenCalledWith(message);
   });
 
-  it("delegates message to sticky message handler", async () => {
+  it("メッセージが handleStickyMessageCreate へ委譲されることを確認", async () => {
     const message = { content: "hello" };
 
     await messageCreateEvent.execute(message as never);

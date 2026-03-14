@@ -15,7 +15,7 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.guard", 
     vi.clearAllMocks();
   });
 
-  it("passes when interaction has manage-guild permission", async () => {
+  it("ManageGuild 権限がある場合は正常に通過する", async () => {
     const interaction = {
       memberPermissions: {
         has: vi.fn(() => true),
@@ -30,7 +30,7 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.guard", 
     );
   });
 
-  it("throws ValidationError when permission is missing", async () => {
+  it("権限がない場合は ValidationError をスローする", async () => {
     const interaction = {
       memberPermissions: {
         has: vi.fn(() => false),

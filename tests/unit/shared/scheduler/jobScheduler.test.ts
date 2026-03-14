@@ -43,7 +43,7 @@ describe("shared/scheduler/jobScheduler", () => {
   });
 
   // cronジョブを登録すると start され、管理対象に入ることを検証
-  it("adds cron job and starts scheduled task", () => {
+  it("cron ジョブを登録すると start されて管理対象に追加されること", () => {
     const start = vi.fn();
     const stop = vi.fn();
     cronScheduleMock.mockReturnValueOnce({ start, stop });
@@ -64,7 +64,7 @@ describe("shared/scheduler/jobScheduler", () => {
   });
 
   // 同一IDの再登録時に既存ジョブを停止して置き換えることを検証
-  it("replaces existing cron job when same id is added", () => {
+  it("同一 ID の cron ジョブを再登録すると既存ジョブを停止して置き換えること", () => {
     const first = { start: vi.fn(), stop: vi.fn() };
     const second = { start: vi.fn(), stop: vi.fn() };
     cronScheduleMock.mockReturnValueOnce(first).mockReturnValueOnce(second);
@@ -87,7 +87,7 @@ describe("shared/scheduler/jobScheduler", () => {
   });
 
   // cron登録処理が例外を投げた場合はログ出力して再送出することを検証
-  it("throws when cron schedule registration fails", () => {
+  it("cron スケジュール登録が失敗した場合にエラーをログ出力して再スローすること", () => {
     cronScheduleMock.mockImplementationOnce(() => {
       throw new Error("schedule failed");
     });
@@ -107,7 +107,7 @@ describe("shared/scheduler/jobScheduler", () => {
   });
 
   // cronコールバック内の正常完了と例外ログを検証
-  it("executes cron callback and logs task errors safely", async () => {
+  it("cron コールバックを実行してタスクエラーを安全にログ記録すること", async () => {
     cronScheduleMock.mockReturnValueOnce({
       start: vi.fn(),
       stop: vi.fn(),
@@ -150,7 +150,7 @@ describe("shared/scheduler/jobScheduler", () => {
   });
 
   // one-timeジョブは0未満遅延を0に補正し、実行後に自動削除されることを検証
-  it("runs one-time job with clamped delay and removes it after execution", async () => {
+  it("ワンタイムジョブが遅延を 0 にクランプして実行後に自動削除されること", async () => {
     const task = vi.fn().mockResolvedValue(undefined);
 
     scheduler.addOneTimeJob("once-1", -100, task);
@@ -166,7 +166,7 @@ describe("shared/scheduler/jobScheduler", () => {
   });
 
   // one-timeタスク例外時は落とさずログ出力することを検証
-  it("logs one-time job task error", async () => {
+  it("ワンタイムジョブのタスクエラーをログに記録すること", async () => {
     const task = vi.fn().mockRejectedValue(new Error("once failed"));
 
     scheduler.addOneTimeJob("once-error", 0, task);
@@ -182,7 +182,7 @@ describe("shared/scheduler/jobScheduler", () => {
   });
 
   // one-time を同一IDで再登録したとき、既存を削除して新規のみ実行することを検証
-  it("replaces existing one-time job when same id is added", async () => {
+  it("同一 ID のワンタイムジョブを再登録すると既存を削除して新規のみ実行すること", async () => {
     const oldTask = vi.fn().mockResolvedValue(undefined);
     const newTask = vi.fn().mockResolvedValue(undefined);
 
@@ -200,7 +200,7 @@ describe("shared/scheduler/jobScheduler", () => {
   });
 
   // removeJob は cron/one-time の両方を削除でき、未登録は false を返すことを検証
-  it("removes cron and one-time jobs and returns false when missing", () => {
+  it("cron とワンタイムジョブを削除でき、未登録の場合は false を返すこと", () => {
     const cronTask = { start: vi.fn(), stop: vi.fn() };
     cronScheduleMock.mockReturnValueOnce(cronTask);
 
@@ -220,7 +220,7 @@ describe("shared/scheduler/jobScheduler", () => {
   });
 
   // stopAll で全ジョブ停止・クリアされ、統計が0になることを検証
-  it("stops and clears all jobs", () => {
+  it("stopAll で全ジョブを停止・クリアして統計が 0 になること", () => {
     const cronA = { start: vi.fn(), stop: vi.fn() };
     const cronB = { start: vi.fn(), stop: vi.fn() };
     cronScheduleMock.mockReturnValueOnce(cronA).mockReturnValueOnce(cronB);

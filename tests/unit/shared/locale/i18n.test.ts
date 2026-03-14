@@ -32,7 +32,7 @@ describe("shared/locale/i18n", () => {
     return { module, i18nextMock };
   };
 
-  it("exports supported/default locale constants", async () => {
+  it("サポート済みロケール定数とデフォルトロケール定数をエクスポートすること", async () => {
     const { module } = await loadModule("test");
 
     expect(module.SUPPORTED_LOCALES).toEqual(["ja", "en"]);
@@ -44,7 +44,7 @@ describe("shared/locale/i18n", () => {
     ["development" as const, true],
     ["production" as const, false],
     ["test" as const, false],
-  ])("sets debug=%s in %s environment", async (nodeEnv, expectedDebug) => {
+  ])("%s 環境では debug=%s が設定されること", async (nodeEnv, expectedDebug) => {
     const { module, i18nextMock } = await loadModule(nodeEnv);
     await module.initI18n();
 
@@ -54,7 +54,7 @@ describe("shared/locale/i18n", () => {
   });
 
   // addResources が merge フラグ付きで addResourceBundle を呼び出し、changeLanguage が委譲されることを確認
-  it("delegates addResources and changeLanguage to i18next", async () => {
+  it("addResources と changeLanguage が i18next へ委譲されること", async () => {
     const { module, i18nextMock } = await loadModule("test");
 
     module.addResources("ja", "commands", { "ping.description": "ピング" });
@@ -70,7 +70,7 @@ describe("shared/locale/i18n", () => {
     expect(i18nextMock.changeLanguage).toHaveBeenCalledWith("en");
   });
 
-  it("exports bound translator function", async () => {
+  it("バインドされたトランスレーター関数をエクスポートすること", async () => {
     const { module, i18nextMock } = await loadModule("test");
 
     expect(module.t("ping.description" as never)).toBe(

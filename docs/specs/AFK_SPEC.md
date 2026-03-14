@@ -2,7 +2,7 @@
 
 > ボイスチャンネルの非アクティブユーザーを手動でAFKチャンネルに移動する機能
 
-最終更新: 2026年2月19日
+最終更新: 2026年3月14日
 
 ---
 
@@ -132,36 +132,17 @@ AFKチャンネルを設定します。
 
 ## 💾 データベース設計
 
-### GuildConfig.afkConfig
+### GuildAfkConfig テーブル
 
-AFK設定は`GuildConfig`テーブルの`afkConfig`フィールドにJSON形式で保存されます。
+AFK設定は`guild_afk_configs`テーブルに保存されます。
 
-**型定義:**
+**フィールド:**
 
-```typescript
-interface AfkConfig {
-  enabled: boolean; // 機能の有効/無効
-  channelId: string; // AFKチャンネルのID
-}
-```
-
-**保存例:**
-
-```json
-{
-  "enabled": true,
-  "channelId": "123456789012345678"
-}
-```
-
-**初期値:**
-
-```json
-{
-  "enabled": false,
-  "channelId": null
-}
-```
+| フィールド  | 型      | 説明                                |
+| ----------- | ------- | ----------------------------------- |
+| `guildId`   | String  | ギルドID（主キー）                  |
+| `enabled`   | Boolean | 機能の有効/無効（デフォルト: false） |
+| `channelId` | String? | AFKチャンネルID（未設定時は null）  |
 
 ---
 
@@ -175,31 +156,27 @@ interface AfkConfig {
 
 **処理フロー:**
 
-```typescript
 1. Guild IDの取得・検証
    ↓
 2. AFK設定の確認
-   - enabled が true か
-   - channelId が設定されているか
+   - 機能が有効か
+   - チャンネルが設定済みか
    ↓
 3. 対象ユーザーの取得
    - user引数が指定されていればそのユーザー
    - 未指定なら実行者自身
    ↓
 4. ボイスチャンネル参加状態の確認
-   - member.voice.channel の存在確認
    ↓
 5. AFKチャンネルの取得・検証
    - チャンネルが存在するか
    - ボイスチャンネルタイプか
    ↓
 6. ユーザーを移動
-   - member.voice.setChannel(afkChannel)
    ↓
 7. 成功メッセージを送信
    ↓
 8. ログ記録
-```
 
 **エラーケース:**
 
@@ -221,26 +198,20 @@ interface AfkConfig {
 
 **サブコマンド: `set-channel`**
 
-```typescript
 1. サーバー管理権限の確認
    ↓
 2. 指定されたチャンネルの取得
    ↓
 3. ボイスチャンネルタイプの確認
-   - ChannelType.GuildVoice であることを確認
    ↓
-4. Repositoryを通じてafkConfigを更新
-   - enabled: true
-   - channelId: channel.id
+4. AFK設定を更新（有効化＋チャンネルIDを保存）
    ↓
-5. 成功メッセージを送信（MessageFlags.Ephemeral）
+5. 成功メッセージを送信（本人のみ表示）
    ↓
 6. ログ記録
-```
 
 **サブコマンド: `view`**
 
-```typescript
 1. サーバー管理権限の確認
    ↓
 2. 現在のAFK設定を取得
@@ -248,8 +219,7 @@ interface AfkConfig {
 3. 設定が存在すればチャンネル情報を表示
    設定がなければ未設定メッセージを表示
    ↓
-4. MessageFlags.Ephemeralで応答
-```
+4. 本人のみ表示で応答
 
 ---
 
@@ -257,109 +227,40 @@ interface AfkConfig {
 
 ### バリデーションエラー
 
-**ValidationError** を使用して、ユーザーフレンドリーなエラーメッセージを返します。
+各操作のエラー条件に対してユーザーフレンドリーなメッセージを返します。
 
 **共通エラー:**
 
-```typescript
-// Guild外での実行
-throw new ValidationError(tDefault("errors:validation.guild_only"));
-
-// 権限不足
-throw new ValidationError(
-  await tGuild(guildId, "errors:permission.manage_guild_required"),
-);
-```
+- Guild外での実行
+- 権限不足
 
 **AFK固有エラー:**
 
-```typescript
-// AFK機能未設定
-throw new ValidationError(await tGuild(guildId, "errors:afk.not_configured"));
-
-// 対象ユーザーがボイスチャンネル未参加
-throw new ValidationError(
-  await tGuild(guildId, "errors:afk.user_not_in_voice"),
-);
-
-// AFKチャンネルが見つからない
-throw new ValidationError(
-  await tGuild(guildId, "errors:afk.channel_not_found"),
-);
-
-// 無効なチャンネルタイプ
-throw new ValidationError(
-  await tGuild(guildId, "errors:afk.invalid_channel_type"),
-);
-```
+- AFK機能未設定
+- 対象ユーザーがボイスチャンネル未参加
+- AFKチャンネルが見つからない
+- 無効なチャンネルタイプ（ボイスチャンネル以外を指定）
 
 ### エラーレスポンス
 
-全てのエラーは `handleCommandError()` で統一的に処理され、適切なメッセージがユーザーに返されます。
+全てのエラーは共通のエラーハンドラーで処理され、適切なメッセージがユーザーに返されます。
 
 ---
 
 ## 🌐 多言語対応（i18next）
 
-### 翻訳キー
+### メッセージ一覧
 
-#### コマンド説明
-
-```json
-{
-  "afk": {
-    "description": "ユーザーをAFKチャンネルに移動",
-    "user": {
-      "description": "移動するユーザー（省略時は自分）"
-    }
-  },
-  "afk-config": {
-    "description": "AFK機能の設定",
-    "set-channel": {
-      "description": "AFKチャンネルを設定",
-      "channel": {
-        "description": "AFKチャンネル"
-      }
-    },
-    "view": {
-      "description": "現在のAFK設定を表示"
-    }
-  }
-}
-```
-
-#### コマンド応答
-
-```json
-{
-  "commands": {
-    "afk": {
-      "moved": "{{user}} を {{channel}} に移動しました",
-      "configured": "AFKチャンネルを {{channel}} に設定しました",
-      "not_configured": "AFK機能が設定されていません",
-      "settings_title": "【AFK設定】",
-      "moved_log": "User {{userId}} moved to AFK channel {{channelId}} in guild {{guildId}}",
-      "configured_log": "AFK channel configured to {{channelId}} in guild {{guildId}}"
-    }
-  }
-}
-```
-
-#### エラーメッセージ
-
-```json
-{
-  "errors": {
-    "afk": {
-      "not_configured": "AFK機能が設定されていません。管理者に連絡してください。",
-      "member_not_found": "指定されたメンバーが見つかりません",
-      "user_not_in_voice": "対象ユーザーはボイスチャンネルに参加していません",
-      "channel_not_found": "AFKチャンネルが見つかりません。設定を確認してください。",
-      "invalid_channel_type": "ボイスチャンネルを指定してください"
-    }
-  }
-}
-```
+| 種別                 | 内容                                                       |
+| -------------------- | ---------------------------------------------------------- |
+| 移動成功             | `{{user}} を {{channel}} に移動しました`                   |
+| チャンネル設定成功   | `AFKチャンネルを {{channel}} に設定しました`               |
+| 設定タイトル         | `【AFK設定】`                                              |
+| 未設定エラー         | `AFK機能が設定されていません。管理者に連絡してください。`   |
+| メンバー不在エラー   | `指定されたメンバーが見つかりません`                       |
+| VC未参加エラー       | `対象ユーザーはボイスチャンネルに参加していません`         |
+| チャンネル不在エラー | `AFKチャンネルが見つかりません。設定を確認してください。`   |
+| チャンネル種別エラー | `ボイスチャンネルを指定してください`                       |
 
 ---
 

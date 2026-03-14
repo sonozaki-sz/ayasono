@@ -1,7 +1,7 @@
 // src/shared/scheduler/jobScheduler.ts
 // タイマー処理（node-cron + setTimeout）
 
-import cron, { ScheduledTask } from "node-cron";
+import cron, { type ScheduledTask } from "node-cron";
 import { tDefault } from "../locale/localeManager";
 import { logger } from "../utils/logger";
 
@@ -182,4 +182,4 @@ export class JobScheduler {
 }
 
 // シングルトンインスタンス
-export const jobScheduler = new JobScheduler();
+export const jobScheduler: JobScheduler = new JobScheduler();
