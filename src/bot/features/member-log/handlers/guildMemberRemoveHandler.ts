@@ -129,11 +129,6 @@ export async function handleGuildMemberRemove(
           inline: true,
         },
       )
-      .setFooter({
-        text: t("events:member-log.leave.footer_with_number", {
-          number: memberCount + 1,
-        }),
-      })
       .setTimestamp();
 
     // アバター画像がある場合はサムネイルとして設定

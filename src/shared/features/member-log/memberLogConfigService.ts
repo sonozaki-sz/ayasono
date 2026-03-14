@@ -106,6 +106,30 @@ export class MemberLogConfigService {
   }
 
   /**
+   * カスタム参加メッセージを削除する
+   * @param guildId 設定対象のギルドID
+   */
+  async clearJoinMessage(guildId: string): Promise<void> {
+    const current = await this.getMemberLogConfigOrDefault(guildId);
+    await this.repository.updateMemberLogConfig(guildId, {
+      ...current,
+      joinMessage: undefined,
+    });
+  }
+
+  /**
+   * カスタム退出メッセージを削除する
+   * @param guildId 設定対象のギルドID
+   */
+  async clearLeaveMessage(guildId: string): Promise<void> {
+    const current = await this.getMemberLogConfigOrDefault(guildId);
+    await this.repository.updateMemberLogConfig(guildId, {
+      ...current,
+      leaveMessage: undefined,
+    });
+  }
+
+  /**
    * 通知チャンネルをクリアして機能を無効化する
    * ログチャンネルが削除されたときに呼び出す
    * @param guildId 設定対象のギルドID

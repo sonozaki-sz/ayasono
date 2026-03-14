@@ -43,8 +43,8 @@ export interface MemberLogConfig {
   enabled: boolean;
   // 参加/退出ログ送信先
   channelId?: string;
-  // カスタム参加メッセージ（{user}/{username}/{count} 置換可）
+  // カスタム参加メッセージ（{userMention}/{userName}/{count} 置換可）
   joinMessage?: string;
-  // カスタム退出メッセージ（{user}/{username}/{count} 置換可）
+  // カスタム退出メッセージ（{userMention}/{userName}/{count} 置換可）
   leaveMessage?: string;
 }

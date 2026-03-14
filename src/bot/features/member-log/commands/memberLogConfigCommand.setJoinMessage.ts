@@ -1,16 +1,19 @@
 // src/bot/features/member-log/commands/memberLogConfigCommand.setJoinMessage.ts
 // member-log-config set-join-message 実行処理
 
-import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
-import { tDefault, tGuild } from "../../../../shared/locale/localeManager";
-import { logger } from "../../../../shared/utils/logger";
-import { getBotMemberLogConfigService } from "../../../services/botCompositionRoot";
-import { createSuccessEmbed } from "../../../utils/messageResponse";
+import {
+  ActionRowBuilder,
+  type ChatInputCommandInteraction,
+  ModalBuilder,
+  TextInputBuilder,
+  TextInputStyle,
+} from "discord.js";
+import { tDefault } from "../../../../shared/locale/localeManager";
 import { MEMBER_LOG_CONFIG_COMMAND } from "./memberLogConfigCommand.constants";
 import { ensureMemberLogManageGuildPermission } from "./memberLogConfigCommand.guard";
 
 /**
- * カスタム参加メッセージを設定する
+ * カスタム参加メッセージ設定モーダルを表示する
  * @param interaction コマンド実行インタラクション
  * @param guildId 設定更新対象のギルドID
  * @returns 実行完了を示す Promise
@@ -22,31 +25,27 @@ export async function handleMemberLogConfigSetJoinMessage(
   // 実行時にも管理権限を確認
   await ensureMemberLogManageGuildPermission(interaction, guildId);
 
-  // メッセージオプションを取得
-  const message = interaction.options.getString(
-    MEMBER_LOG_CONFIG_COMMAND.OPTION.MESSAGE,
-    true,
+  const modal = new ModalBuilder()
+    .setCustomId(MEMBER_LOG_CONFIG_COMMAND.SET_JOIN_MESSAGE_MODAL_ID)
+    .setTitle(
+      tDefault("commands:member-log-config.modal.set_join_message.title"),
+    );
+
+  const messageInput = new TextInputBuilder()
+    .setCustomId(MEMBER_LOG_CONFIG_COMMAND.MODAL_INPUT_MESSAGE)
+    .setLabel(
+      tDefault("commands:member-log-config.modal.set_join_message.label"),
+    )
+    .setPlaceholder(
+      tDefault("commands:member-log-config.modal.set_join_message.placeholder"),
+    )
+    .setStyle(TextInputStyle.Paragraph)
+    .setRequired(true)
+    .setMaxLength(500);
+
+  modal.addComponents(
+    new ActionRowBuilder<TextInputBuilder>().addComponents(messageInput),
   );
 
-  // 参加メッセージを保存
-  await getBotMemberLogConfigService().setJoinMessage(guildId, message);
-
-  const description = await tGuild(
-    guildId,
-    "commands:member-log-config.embed.set_join_message_success",
-  );
-  const successTitle = await tGuild(
-    guildId,
-    "commands:member-log-config.embed.success_title",
-  );
-  const embed = createSuccessEmbed(description, { title: successTitle });
-  await interaction.reply({
-    embeds: [embed],
-    flags: MessageFlags.Ephemeral,
-  });
-
-  // 監査用ログ
-  logger.info(
-    tDefault("system:member-log.config_join_message_set", { guildId }),
-  );
+  await interaction.showModal(modal);
 }

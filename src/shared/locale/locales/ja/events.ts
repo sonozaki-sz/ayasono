@@ -48,9 +48,9 @@ export const events = {
     "サーバー参加日時",
   "member-log.join.fields.memberCount":
     "メンバー数",
-  "member-log.join.footer":
-    "ようこそ！",
-  // 退出通知Embedのフィールドラベル・フッター
+  "member-log.join.fields.invitedBy":
+    "招待元",
+  // 退出通知Embedのフィールドラベル
   "member-log.leave.title":
     "👋 メンバーが退出しました。",
   "member-log.leave.fields.username":
@@ -65,10 +65,6 @@ export const events = {
     "滞在期間",
   "member-log.leave.fields.memberCount":
     "メンバー数",
-  "member-log.leave.footer":
-    "またね！",
-  "member-log.leave.footer_with_number":
-    "またね！ • Member #{{number}}",
   // 日・単位ラベル
   "member-log.days":
     "{{count}}日",

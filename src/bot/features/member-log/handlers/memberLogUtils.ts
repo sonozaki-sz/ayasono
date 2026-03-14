@@ -17,10 +17,10 @@ export function formatCustomMessage(
   username: string,
   count: number,
 ): string {
-  // {user}, {username}, {count} プレースホルダーを実値へ置換
+  // {userMention}, {userName}, {count} プレースホルダーを実値へ置換
   return template
-    .replace(/\{user\}/g, user)
-    .replace(/\{username\}/g, username)
+    .replace(/\{userMention\}/g, user)
+    .replace(/\{userName\}/g, username)
     .replace(/\{count\}/g, String(count));
 }
 

@@ -7,6 +7,7 @@ import { tDefault } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import { getBotMemberLogConfigService } from "../../../services/botCompositionRoot";
 import { calcDuration } from "./accountAge";
+import { findUsedInvite } from "./inviteTracker";
 import { formatAccountAge, formatCustomMessage } from "./memberLogUtils";
 
 // 参加通知 Embed の色（ビリジアン）
@@ -67,6 +68,19 @@ export async function handleGuildMemberAdd(member: GuildMember): Promise<void> {
       days: ageDays,
     } = calcDuration(member.user.createdTimestamp);
 
+    // 使用された招待リンクを取得（権限不足時は null）
+    const usedInvite = await findUsedInvite(member.guild);
+    const inviteFieldValue = (() => {
+      if (!usedInvite) return t("events:member-log.unknown");
+      // Botは表示名で、ユーザーはメンション形式で表示する
+      const inviterLabel = usedInvite.inviter
+        ? usedInvite.inviter.bot
+          ? usedInvite.inviter.displayName
+          : `<@${usedInvite.inviter.id}>`
+        : t("events:member-log.unknown");
+      return `discord.gg/${usedInvite.code}（${inviterLabel}）`;
+    })();
+
     // 参加通知 Embed を生成
     const embed = new EmbedBuilder()
       .setColor(JOIN_EMBED_COLOR)
@@ -93,14 +107,16 @@ export async function handleGuildMemberAdd(member: GuildMember): Promise<void> {
             ]
           : []),
         {
+          name: t("events:member-log.join.fields.invitedBy"),
+          value: inviteFieldValue,
+          inline: true,
+        },
+        {
           name: t("events:member-log.join.fields.memberCount"),
           value: t("events:member-log.member_count", { count: memberCount }),
           inline: true,
         },
       )
-      .setFooter({
-        text: `${t("events:member-log.join.footer")} • Member #${memberCount}`,
-      })
       .setTimestamp();
 
     // カスタム参加メッセージが設定されている場合は content として追加

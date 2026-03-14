@@ -48,9 +48,9 @@ export const events = {
     "Joined Server At",
   "member-log.join.fields.memberCount":
     "Member Count",
-  "member-log.join.footer":
-    "Welcome!",
-  // Leave notification embed field labels and footer
+  "member-log.join.fields.invitedBy":
+    "Invite Source",
+  // Leave notification embed field labels
   "member-log.leave.title":
     "👋 A member has left",
   "member-log.leave.fields.username":
@@ -65,10 +65,6 @@ export const events = {
     "Stay Duration",
   "member-log.leave.fields.memberCount":
     "Member Count",
-  "member-log.leave.footer":
-    "See you!",
-  "member-log.leave.footer_with_number":
-    "See you! • Member #{{number}}",
   // Days unit label
   "member-log.days":
     "{{count}} days",

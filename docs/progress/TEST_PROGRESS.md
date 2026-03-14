@@ -84,7 +84,7 @@ GuildConfig JSON カラム廃止・機能別専用テーブル化に伴うリポ
 | `runDeleteExecution.test.ts` | Phase 4 削除実行 |
 | `dialogUtils.test.ts` | ダイアログユーティリティ |
 
-### メンバーログ機能（2026-03-01）
+### メンバーログ機能（2026-03-14 更新）
 
 | ファイル | 対象 |
 | --- | --- |
@@ -95,10 +95,16 @@ GuildConfig JSON カラム廃止・機能別専用テーブル化に伴うリポ
 | `memberLogConfigCommand.setChannel.test.ts` | set-channel ハンドラ |
 | `memberLogConfigCommand.setJoinMessage.test.ts` | set-join-message ハンドラ |
 | `memberLogConfigCommand.setLeaveMessage.test.ts` | set-leave-message ハンドラ |
+| `memberLogConfigCommand.clearJoinMessage.test.ts` | clear-join-message ハンドラ |
+| `memberLogConfigCommand.clearLeaveMessage.test.ts` | clear-leave-message ハンドラ |
 | `memberLogConfigCommand.view.test.ts` | view ハンドラ |
 | `memberLogConfigCommand.guard.test.ts` | 権限ガード |
 | `guildMemberAddHandler.test.ts` | 参加イベントハンドラ |
 | `guildMemberRemoveHandler.test.ts` | 退出イベントハンドラ |
+| `inviteTracker.test.ts` | 招待リンク追跡 |
+| `memberLogUtils.test.ts` | カスタムメッセージ共通処理 |
+| `memberLogSetJoinMessageModalHandler.test.ts` | 参加メッセージモーダルハンドラ |
+| `memberLogSetLeaveMessageModalHandler.test.ts` | 退出メッセージモーダルハンドラ |
 | `accountAge.test.ts` | 年齢計算ユーティリティ |
 | `memberLogConfigService.test.ts` (shared) | 設定サービス |
 

@@ -433,6 +433,10 @@ export const system = {
     "[MemberLog] join message set GuildId: {{guildId}}",
   "member-log.config_leave_message_set":
     "[MemberLog] leave message set GuildId: {{guildId}}",
+  "member-log.config_join_message_cleared":
+    "[MemberLog] join message cleared GuildId: {{guildId}}",
+  "member-log.config_leave_message_cleared":
+    "[MemberLog] leave message cleared GuildId: {{guildId}}",
 
   // VC Recruit feature logs
   "vc-recruit.voice_state_update_failed":

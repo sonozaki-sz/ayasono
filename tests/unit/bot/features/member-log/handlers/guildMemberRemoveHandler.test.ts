@@ -292,7 +292,7 @@ describe("bot/features/member-log/handlers/guildMemberRemoveHandler", () => {
       getMemberLogConfigMock.mockResolvedValue({
         enabled: true,
         channelId: "ch-1",
-        leaveMessage: "さようなら {user}！",
+        leaveMessage: "さようなら {userMention}！",
       });
       const member = makeGuildMember();
 

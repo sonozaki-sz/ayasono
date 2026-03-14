@@ -2,7 +2,7 @@
 
 > 機能実装の詳細な進捗状況
 
-最終更新: 2026年3月13日（DBアーキテクチャ刷新・メッセージ削除機能 V2 完了）
+最終更新: 2026年3月14日（メンバーログ機能拡張：招待追跡・カスタムメッセージモーダル・clear コマンド追加）
 
 ---
 
@@ -394,10 +394,13 @@
 **実装内容**:
 
 - `guildMemberAdd` / `guildMemberRemove` イベントハンドラ
-- Embed形式の参加・退出通知（ビリジアン・茶色カラー）
-- アカウント年齢計算（`date-fns` 利用 / `accountAge.ts`）
-- カスタムメッセージ（`{user}` / `{username}` / `{count}` プレースホルダー対応）
-- `/member-log-config` コマンド（set-channel / enable / disable / set-join-message / set-leave-message / view）
+- Embed形式の参加・退出通知（ビリジアン・茜色カラー）
+- アカウント年齢計算（`date-fns` `intervalToDuration` 利用 / `accountAge.ts`）
+- カスタムメッセージ（`{userMention}` / `{userName}` / `{count}` プレースホルダー対応、モーダル入力・最大500文字）
+- `/member-log-config` コマンド（set-channel / enable / disable / set-join-message / set-leave-message / clear-join-message / clear-leave-message / view）
+- 招待リンク追跡（`inviteTracker.ts`：インメモリキャッシュによる差分検出方式）
+- モーダルUIハンドラ（`memberLogSetJoinMessageModalHandler.ts` / `memberLogSetLeaveMessageModalHandler.ts`）
+- カスタムメッセージ共通処理（`memberLogUtils.ts`：`formatCustomMessage()`）
 - `GuildMemberLogConfig` テーブルへの設定永続化（機能別専用テーブル）
 
 **関連ファイル**:
@@ -408,12 +411,18 @@
 - `src/bot/features/member-log/handlers/guildMemberAddHandler.ts`
 - `src/bot/features/member-log/handlers/guildMemberRemoveHandler.ts`
 - `src/bot/features/member-log/handlers/accountAge.ts`
+- `src/bot/features/member-log/handlers/inviteTracker.ts`
+- `src/bot/features/member-log/handlers/memberLogUtils.ts`
+- `src/bot/features/member-log/handlers/ui/memberLogSetJoinMessageModalHandler.ts`
+- `src/bot/features/member-log/handlers/ui/memberLogSetLeaveMessageModalHandler.ts`
 - `src/bot/features/member-log/commands/memberLogConfigCommand.execute.ts`
+- `src/bot/features/member-log/commands/memberLogConfigCommand.clearJoinMessage.ts`
+- `src/bot/features/member-log/commands/memberLogConfigCommand.clearLeaveMessage.ts`
 - `src/shared/features/member-log/memberLogConfigService.ts`
 
 **テスト**:
 
-- ✅ 13テストファイル ・ statements/functions/lines 100% ・ branches 100%
+- ✅ 17テストファイル ・ statements/functions/lines 100% ・ branches 100%
 
 ---
 

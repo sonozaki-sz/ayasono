@@ -47,6 +47,8 @@ const calcDurationMock = vi.fn((_ts: number) => ({
   days: 7,
 }));
 
+const findUsedInviteMock = vi.fn();
+
 vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotMemberLogConfigService: () => getBotMemberLogConfigServiceMock(),
 }));
@@ -62,6 +64,9 @@ vi.mock("@/shared/utils/logger", () => ({
 }));
 vi.mock("@/bot/features/member-log/handlers/accountAge", () => ({
   calcDuration: (ts: number) => calcDurationMock(ts),
+}));
+vi.mock("@/bot/features/member-log/handlers/inviteTracker", () => ({
+  findUsedInvite: (...args: unknown[]) => findUsedInviteMock(...args),
 }));
 vi.mock("discord.js", async () => {
   const actual = await vi.importActual("discord.js");
@@ -113,6 +118,8 @@ describe("bot/features/member-log/handlers/guildMemberAddHandler", () => {
   // 各ケースでモック呼び出し記録をリセットし、テスト間の副作用を排除する
   beforeEach(() => {
     vi.clearAllMocks();
+    // デフォルトは招待情報なし（権限不足等）
+    findUsedInviteMock.mockResolvedValue(null);
   });
 
   // 設定取得系の早期リターン分岐を検証
@@ -228,7 +235,7 @@ describe("bot/features/member-log/handlers/guildMemberAddHandler", () => {
       getMemberLogConfigMock.mockResolvedValue({
         enabled: true,
         channelId: "ch-1",
-        joinMessage: "ようこそ {user}さん！",
+        joinMessage: "ようこそ {userMention}さん！",
       });
       const member = makeGuildMember();
 
@@ -305,6 +312,91 @@ describe("bot/features/member-log/handlers/guildMemberAddHandler", () => {
       await handleGuildMemberAdd(member as never);
 
       expect(member._channel.send).toHaveBeenCalled();
+    });
+
+    // 招待者がDiscordユーザー（bot=false）の場合に <@userId> メンション形式で Embed が送信されることを確認
+    it("sends embed with user mention when inviter is a human user", async () => {
+      const { handleGuildMemberAdd } =
+        await import("@/bot/features/member-log/handlers/guildMemberAddHandler");
+      getMemberLogConfigMock.mockResolvedValue({
+        enabled: true,
+        channelId: "ch-1",
+        joinMessage: null,
+      });
+      findUsedInviteMock.mockResolvedValue({
+        code: "abc123",
+        inviter: { id: "inviter-user-id", displayName: "InviterUser", bot: false },
+      });
+      const member = makeGuildMember();
+
+      await handleGuildMemberAdd(member as never);
+
+      expect(member._channel.send).toHaveBeenCalledWith(
+        expect.objectContaining({ embeds: expect.any(Array) }),
+      );
+    });
+
+    // 招待者がサービスBot（bot=true）の場合に displayName で Embed が送信されることを確認
+    it("sends embed with service name when inviter is a bot", async () => {
+      const { handleGuildMemberAdd } =
+        await import("@/bot/features/member-log/handlers/guildMemberAddHandler");
+      getMemberLogConfigMock.mockResolvedValue({
+        enabled: true,
+        channelId: "ch-1",
+        joinMessage: null,
+      });
+      findUsedInviteMock.mockResolvedValue({
+        code: "abc123",
+        inviter: { id: "disboard-bot-id", displayName: "Disboard", bot: true },
+      });
+      const member = makeGuildMember();
+
+      await handleGuildMemberAdd(member as never);
+
+      expect(member._channel.send).toHaveBeenCalledWith(
+        expect.objectContaining({ embeds: expect.any(Array) }),
+      );
+    });
+
+    // 招待リンクが特定できない場合（findUsedInvite が null）でも Embed が送信されることを確認
+    it("sends embed with unknown invite when invite is not found", async () => {
+      const { handleGuildMemberAdd } =
+        await import("@/bot/features/member-log/handlers/guildMemberAddHandler");
+      getMemberLogConfigMock.mockResolvedValue({
+        enabled: true,
+        channelId: "ch-1",
+        joinMessage: null,
+      });
+      findUsedInviteMock.mockResolvedValue(null);
+      const member = makeGuildMember();
+
+      await handleGuildMemberAdd(member as never);
+
+      expect(member._channel.send).toHaveBeenCalledWith(
+        expect.objectContaining({ embeds: expect.any(Array) }),
+      );
+    });
+
+    // 招待リンクは特定できたが inviter が null の場合でも Embed が送信されることを確認
+    it("sends embed when invite is found but inviter is null", async () => {
+      const { handleGuildMemberAdd } =
+        await import("@/bot/features/member-log/handlers/guildMemberAddHandler");
+      getMemberLogConfigMock.mockResolvedValue({
+        enabled: true,
+        channelId: "ch-1",
+        joinMessage: null,
+      });
+      findUsedInviteMock.mockResolvedValue({
+        code: "xyz789",
+        inviter: null,
+      });
+      const member = makeGuildMember();
+
+      await handleGuildMemberAdd(member as never);
+
+      expect(member._channel.send).toHaveBeenCalledWith(
+        expect.objectContaining({ embeds: expect.any(Array) }),
+      );
     });
 
     // 送信成功後に logger.debug が呼ばれることを確認

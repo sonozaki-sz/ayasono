@@ -2,7 +2,7 @@
 
 > プロジェクト全体のタスク管理と残件リスト
 
-最終更新: 2026年3月13日
+最終更新: 2026年3月14日
 
 ---
 
@@ -25,7 +25,7 @@
 | 4   | デプロイ・運用     | 4    | 🚧   |
 | 5   | Web UI実装（凍結） | 12   | ⏸️   |
 
-> 2026-03-13 更新: DBアーキテクチャ大規模リファクタリング完了（GuildConfig JSON カラム廃止・機能別専用テーブル化）、メッセージ削除機能 V2 新仕様移行完了
+> 2026-03-14 更新: メンバーログ機能拡張（招待追跡・カスタムメッセージモーダル・clear コマンド追加）
 
 **凡例**: 🛠️ 着手中 | 🚧 進行中 | 📋 未着手 | ⏸️ 凍結中
 
@@ -59,9 +59,11 @@
 
 - [x] guildMemberAdd、guildMemberRemoveイベントハンドラ作成
 - [x] Embed形式の通知メッセージ実装
-- [x] `/member-log-config` コマンド実装（set-channel、enable、disable、set-join-message、set-leave-message、show）
-- [x] Prisma Schema更新（memberLogConfig JSONフィールド）
-- [x] テスト実装
+- [x] `/member-log-config` コマンド実装（set-channel / enable / disable / set-join-message / set-leave-message / clear-join-message / clear-leave-message / view）
+- [x] 招待リンク追跡（インメモリキャッシュによる差分検出方式）
+- [x] カスタムメッセージのモーダル入力対応（最大500文字）
+- [x] Prisma Schema更新（GuildMemberLogConfig 専用テーブル）
+- [x] テスト実装（17テストファイル）
 
 **仕様書**: [docs/specs/MEMBER_LOG_SPEC.md](docs/specs/MEMBER_LOG_SPEC.md)
 
