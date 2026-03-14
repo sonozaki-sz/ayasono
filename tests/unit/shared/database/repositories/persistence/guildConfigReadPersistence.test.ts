@@ -18,7 +18,7 @@ describe("shared/database/repositories/persistence/guildConfigReadPersistence", 
     vi.clearAllMocks();
   });
 
-  it("findGuildConfigRecord returns full record by guildId", async () => {
+  it("findGuildConfigRecord が guildId でフルレコードを返すこと", async () => {
     const prisma = createPrisma();
     const record = { guildId: "guild-1", locale: "ja" };
     prisma.guildConfig.findUnique.mockResolvedValue(record);
@@ -33,7 +33,7 @@ describe("shared/database/repositories/persistence/guildConfigReadPersistence", 
 
   // レコードが存在する場合は true、null が返った場合は false になることを
   // 同一テスト内でモックの返却値を切り替えて両方の分岐を確認する
-  it("existsGuildConfigRecord returns true/false based on selected id", async () => {
+  it("existsGuildConfigRecord がレコードの有無に応じて true/false を返すこと", async () => {
     const prisma = createPrisma();
     prisma.guildConfig.findUnique.mockResolvedValueOnce({ id: 1 });
     await expect(
@@ -51,7 +51,7 @@ describe("shared/database/repositories/persistence/guildConfigReadPersistence", 
   });
 
   // select: { locale } で取得したフィールドを返し、レコードがない場合は null を返すことを確認
-  it("findGuildLocale returns locale or null", async () => {
+  it("findGuildLocale がロケールまたは null を返すこと", async () => {
     const prisma = createPrisma();
     prisma.guildConfig.findUnique.mockResolvedValueOnce({ locale: "en" });
     await expect(findGuildLocale(prisma as never, "guild-1")).resolves.toBe(

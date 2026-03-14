@@ -25,7 +25,7 @@ describe("bot/services/botEventRegistration", () => {
     vi.clearAllMocks();
   });
 
-  it("registers all events and logs progress", () => {
+  it("全イベントが登録されて進捗がログ出力されることを確認", () => {
     const client = {};
     const events = [
       { name: "ready", execute: vi.fn() },

@@ -26,7 +26,7 @@ describe("bot/features/vc-panel/vcControlPanel", () => {
     vi.clearAllMocks();
   });
 
-  it("extracts channel id from custom id with expected prefix", () => {
+  it("期待するプレフィックスを持つcustomIdからチャンネルIDを抽出する", () => {
     expect(
       getVacPanelChannelId(
         "vac:rename:voice-1",
@@ -35,7 +35,7 @@ describe("bot/features/vc-panel/vcControlPanel", () => {
     ).toBe("voice-1");
   });
 
-  it("returns empty string when custom id does not match prefix", () => {
+  it("customIdがプレフィックスに一致しない場合は空文字を返す", () => {
     expect(
       getVacPanelChannelId(
         "vac:limit:voice-1",
@@ -44,7 +44,7 @@ describe("bot/features/vc-panel/vcControlPanel", () => {
     ).toBe("");
   });
 
-  it("returns early when voice channel is not text based", async () => {
+  it("ボイスチャンネルがテキストベースでない場合は早期リターンする", async () => {
     const send = vi.fn();
     const voiceChannel = {
       id: "voice-1",
@@ -60,7 +60,7 @@ describe("bot/features/vc-panel/vcControlPanel", () => {
     expect(send).not.toHaveBeenCalled();
   });
 
-  it("returns early when voice channel is not sendable", async () => {
+  it("ボイスチャンネルが送信可能でない場合は早期リターンする", async () => {
     const send = vi.fn();
     const voiceChannel = {
       id: "voice-1",
@@ -75,7 +75,7 @@ describe("bot/features/vc-panel/vcControlPanel", () => {
     expect(send).not.toHaveBeenCalled();
   });
 
-  it("sends VC control panel with four button rows", async () => {
+  it("VCコントロールパネルを4つのボタン行で送信する", async () => {
     const send = vi.fn().mockResolvedValue(undefined);
     const voiceChannel = {
       id: "voice-1",

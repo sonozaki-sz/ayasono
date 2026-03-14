@@ -4,7 +4,7 @@ describe("shared/database/guildConfigRepositoryProvider", () => {
     vi.resetModules();
   });
 
-  it("throws when repository is not initialized and no prisma is provided", async () => {
+  it("リポジトリ未初期化かつ prisma 未指定の場合に例外をスローすること", async () => {
     const createGuildConfigRepositoryMock = vi.fn();
     vi.doMock("@/shared/database/repositories/guildConfigRepository", () => ({
       createGuildConfigRepository: createGuildConfigRepositoryMock,
@@ -16,7 +16,7 @@ describe("shared/database/guildConfigRepositoryProvider", () => {
     );
   });
 
-  it("creates repository once per prisma instance and reuses cache", async () => {
+  it("同一 prisma インスタンスに対してリポジトリを一度だけ生成してキャッシュを再利用すること", async () => {
     const repoA = { id: "repoA" };
     const repoB = { id: "repoB" };
     const prismaA = { id: "prismaA" };
@@ -43,7 +43,7 @@ describe("shared/database/guildConfigRepositoryProvider", () => {
     expect(createGuildConfigRepositoryMock).toHaveBeenNthCalledWith(2, prismaB);
   });
 
-  it("stores default repository from prisma path and supports explicit default override", async () => {
+  it("prisma 経由で生成したリポジトリをデフォルトとして保存し、明示的な上書きも反映されること", async () => {
     const repoFromPrisma = { id: "repoFromPrisma" };
     const explicitDefault = { id: "explicitDefault" };
     const prisma = { id: "prisma" };
@@ -62,7 +62,7 @@ describe("shared/database/guildConfigRepositoryProvider", () => {
     expect(module.getGuildConfigRepository()).toBe(explicitDefault);
   });
 
-  it("clears cached and default repositories on reset", async () => {
+  it("リセット時にキャッシュとデフォルトリポジトリがクリアされること", async () => {
     const repoFromPrisma = { id: "repoFromPrisma" };
     const prisma = { id: "prisma" };
     const createGuildConfigRepositoryMock = vi.fn(() => repoFromPrisma);
@@ -81,7 +81,7 @@ describe("shared/database/guildConfigRepositoryProvider", () => {
     );
   });
 
-  it("exports provider/repository/types modules", async () => {
+  it("provider/repository/types モジュールをエクスポートしていること", async () => {
     const providerModule = await import(
       "@/shared/database/guildConfigRepositoryProvider"
     );

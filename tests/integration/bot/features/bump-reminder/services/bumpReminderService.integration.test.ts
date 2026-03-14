@@ -72,7 +72,7 @@ describe("BumpReminderManager Integration", () => {
   });
 
   describe("setReminder()", () => {
-    it("should create a reminder in database and schedule job", async () => {
+    it("DB にリマインダーを保存してジョブをスケジュールできること", async () => {
       // DB保存とジョブ登録が1セットで行われること
       const scheduledAt = new Date(Date.now() + 2 * 60 * 60 * 1000);
       const mockReminder = {
@@ -113,7 +113,7 @@ describe("BumpReminderManager Integration", () => {
       expect(jobScheduler.hasJob("bump-reminder-guild-123")).toBe(true);
     });
 
-    it("should create reminder without messageId", async () => {
+    it("messageId 未指定でリマインダーを作成できること", async () => {
       // messageId 未指定（null相当）パターン
       const scheduledAt = new Date(Date.now() + 2 * 60 * 60 * 1000);
       const mockReminder = {
@@ -151,7 +151,7 @@ describe("BumpReminderManager Integration", () => {
   });
 
   describe("cancelReminder()", () => {
-    it("should cancel existing reminder", async () => {
+    it("登録済みのリマインダーをキャンセルできること", async () => {
       // 先に登録してからキャンセル動作を確認
       const scheduledAt = new Date(Date.now() + 2 * 60 * 60 * 1000);
       const mockReminder = {
@@ -193,14 +193,14 @@ describe("BumpReminderManager Integration", () => {
       expect(jobScheduler.hasJob("bump-reminder-guild-123")).toBe(false);
     });
 
-    it("should return false when no reminder exists", async () => {
+    it("リマインダーが存在しない場合は false を返すこと", async () => {
       const result = await manager.cancelReminder("nonexistent-guild");
       expect(result).toBe(false);
     });
   });
 
   describe("hasReminder()", () => {
-    it("should return true when reminder exists", async () => {
+    it("リマインダーが存在する場合は true を返すこと", async () => {
       const scheduledAt = new Date(Date.now() + 2 * 60 * 60 * 1000);
       const mockReminder = {
         id: "reminder-1",
@@ -228,13 +228,13 @@ describe("BumpReminderManager Integration", () => {
       expect(manager.hasReminder("guild-123")).toBe(true);
     });
 
-    it("should return false when no reminder exists", () => {
+    it("リマインダーが未登録の場合は hasReminder が false を返すこと", () => {
       expect(manager.hasReminder("nonexistent-guild")).toBe(false);
     });
   });
 
   describe("restorePendingReminders()", () => {
-    it("should restore future reminders from database", async () => {
+    it("DB の未来時刻 pending リマインダーをジョブとして復元できること", async () => {
       // 未来時刻の pending はジョブとして再登録される
       const futureDate = new Date(Date.now() + 30 * 60 * 1000); // 30分後
       const mockReminders = [
@@ -267,7 +267,7 @@ describe("BumpReminderManager Integration", () => {
       );
     });
 
-    it("should execute overdue reminders immediately", async () => {
+    it("期限超過の pending リマインダーを復元時に即時実行すること", async () => {
       // 期限超過分は復元時に即時実行される
       const pastDate = new Date(Date.now() - 10 * 60 * 1000); // 10分前
       const mockReminders = [
@@ -299,7 +299,7 @@ describe("BumpReminderManager Integration", () => {
       );
     });
 
-    it("should handle empty pending reminders", async () => {
+    it("pending リマインダーが空の場合は0を返すこと", async () => {
       mockRepository.findAllPending.mockResolvedValue([]);
 
       const taskFactory = vi.fn();
@@ -311,7 +311,7 @@ describe("BumpReminderManager Integration", () => {
   });
 
   describe("clearAll()", () => {
-    it("should clear all reminders", async () => {
+    it("全リマインダーを一括でクリアできること", async () => {
       // 複数ギルド分のジョブが一括でクリアされること
       const scheduledAt = new Date(Date.now() + 2 * 60 * 60 * 1000);
       const mockReminder1 = {

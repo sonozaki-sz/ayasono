@@ -37,7 +37,7 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.view", (
     ensureManageGuildPermissionMock.mockResolvedValue(undefined);
   });
 
-  it("replies not-configured embed when config is null", async () => {
+  it("設定が null の場合は未設定状態を示す embed を返す", async () => {
     getBumpReminderConfigMock.mockResolvedValueOnce(null);
     const interaction = { reply: vi.fn().mockResolvedValue(undefined) };
 
@@ -49,7 +49,7 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.view", (
     });
   });
 
-  it("replies configured embed when config exists", async () => {
+  it("設定が存在する場合は設定済み内容を示す embed を返す", async () => {
     getBumpReminderConfigMock.mockResolvedValueOnce({
       enabled: true,
       mentionRoleId: "role-1",

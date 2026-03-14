@@ -82,7 +82,7 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.execute"
     ensureManageGuildPermissionMock.mockResolvedValue(undefined);
   });
 
-  it("routes enable subcommand", async () => {
+  it("enable サブコマンドを対応するハンドラーへルーティングする", async () => {
     const interaction = createInteraction(
       BUMP_REMINDER_CONFIG_COMMAND.SUBCOMMAND.ENABLE,
     );
@@ -92,7 +92,7 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.execute"
     expect(enableMock).toHaveBeenCalledWith(interaction, "guild-1");
   });
 
-  it("routes view subcommand", async () => {
+  it("view サブコマンドを対応するハンドラーへルーティングする", async () => {
     const interaction = createInteraction(
       BUMP_REMINDER_CONFIG_COMMAND.SUBCOMMAND.VIEW,
     );
@@ -102,8 +102,7 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.execute"
     expect(showMock).toHaveBeenCalledWith(interaction, "guild-1");
   });
 
-  // 未定義のサブコマンドが渡された場合は handleCommandError に委譲し、サイレントに無視しないことを保証
-  it("delegates invalid subcommand error to command error handler", async () => {
+  it("未定義のサブコマンドが渡された場合は handleCommandError に委譲し、サイレントに無視しないことを保証", async () => {
     const interaction = createInteraction("unknown");
 
     await executeBumpReminderConfigCommand(interaction as never);

@@ -77,7 +77,7 @@ describe("bot/features/message-delete/commands/usecases/runScanPhase", () => {
     );
   }
 
-  it("returns scanned messages on successful scan", async () => {
+  it("スキャン成功時にスキャン済みメッセージを返す", async () => {
     const { runScanPhase } = await loadModule();
     const messages = [{ messageId: "msg-1" }];
     scanMessagesMock.mockResolvedValue(messages);
@@ -92,7 +92,7 @@ describe("bot/features/message-delete/commands/usecases/runScanPhase", () => {
     expect(result).toBe(messages);
   });
 
-  it("returns null and shows error embed when scan throws", async () => {
+  it("スキャンが例外をスローした場合は null を返してエラー embed を表示する", async () => {
     const { runScanPhase } = await loadModule();
     scanMessagesMock.mockRejectedValue(new Error("scan failed"));
 
@@ -107,7 +107,7 @@ describe("bot/features/message-delete/commands/usecases/runScanPhase", () => {
     expect(createErrorEmbedMock).toHaveBeenCalled();
   });
 
-  it("returns null when scan is aborted with 0 results (user cancel)", async () => {
+  it("スキャンが中断されて結果が 0 件の場合（ユーザーキャンセル）は null を返す", async () => {
     const { runScanPhase } = await loadModule();
 
     // Create an aborted signal
@@ -183,7 +183,7 @@ describe("bot/features/message-delete/commands/usecases/runScanPhase", () => {
     expect(result).toBeNull();
   });
 
-  it("calls editReply with progress content during scan", async () => {
+  it("スキャン中に進捗コンテンツで editReply を呼び出す", async () => {
     const { runScanPhase } = await loadModule();
 
     let progressCallback: ((data: object) => Promise<void>) | undefined;

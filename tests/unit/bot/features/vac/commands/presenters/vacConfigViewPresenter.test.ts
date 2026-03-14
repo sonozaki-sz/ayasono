@@ -19,7 +19,7 @@ vi.mock("@/shared/locale/localeManager", () => ({
 
 describe("bot/features/vac/commands/presenters/vacConfigViewPresenter", () => {
   // view 表示用の文言整形と空状態フォールバックを検証する
-  it("formats trigger channels and created vc details", async () => {
+  it("トリガーチャンネルと作成済みVCの詳細を整形して返す", async () => {
     const guild = {
       channels: {
         fetch: vi
@@ -61,7 +61,7 @@ describe("bot/features/vac/commands/presenters/vacConfigViewPresenter", () => {
     expect(result.createdVcDetails).toBe("<#voice-1>(<@user-1>)");
   });
 
-  it("uses fallback labels when config has no channels", async () => {
+  it("チャンネルが未設定の場合にフォールバックラベルを使用する", async () => {
     const guild = {
       channels: {
         fetch: vi.fn(),

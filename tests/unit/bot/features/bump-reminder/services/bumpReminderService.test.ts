@@ -60,8 +60,7 @@ describe("shared/features/bump-reminder/manager", () => {
     vi.useRealTimers();
   });
 
-  // setReminder が one-time 登録し、実行後に sent 更新することを検証
-  it("schedules reminder and marks sent when task succeeds", async () => {
+  it("setReminder が one-time 登録し、実行後に sent 更新することを検証", async () => {
     repositoryMock.create.mockResolvedValueOnce({
       id: "rem-1",
       guildId: "g-1",
@@ -93,8 +92,7 @@ describe("shared/features/bump-reminder/manager", () => {
     expect(manager.hasReminder("g-1")).toBe(false);
   });
 
-  // task 失敗時は cancelled 更新し、更新失敗時もログして握りつぶすことを検証
-  it("marks cancelled on task failure and logs secondary status update error", async () => {
+  it("task 失敗時は cancelled 更新し、更新失敗時もログして握りつぶすことを検証", async () => {
     repositoryMock.create.mockResolvedValueOnce({
       id: "rem-2",
       guildId: "g-2",
@@ -131,8 +129,7 @@ describe("shared/features/bump-reminder/manager", () => {
     );
   });
 
-  // 既存リマインダーがある場合は先にキャンセルしてから再設定することを検証
-  it("cancels existing reminder before replacing with new one", async () => {
+  it("既存リマインダーがある場合は先にキャンセルしてから再設定することを検証", async () => {
     repositoryMock.create
       .mockResolvedValueOnce({
         id: "old-rem",
@@ -185,8 +182,7 @@ describe("shared/features/bump-reminder/manager", () => {
     );
   });
 
-  // cancelReminder は DB更新失敗時でも true を返し、メモリ状態を解放することを検証
-  it("keeps cancellation successful even if status update fails", async () => {
+  it("cancelReminder は DB更新失敗時でも true を返し、メモリ状態を解放することを検証", async () => {
     repositoryMock.create.mockResolvedValueOnce({
       id: "rem-4",
       guildId: "g-4",
@@ -218,13 +214,11 @@ describe("shared/features/bump-reminder/manager", () => {
     expect(manager.hasReminder("g-4")).toBe(false);
   });
 
-  // 未登録ギルドの cancelReminder は false を返すことを検証
-  it("returns false when cancelling non-existent reminder", async () => {
+  it("未登録ギルドの cancelReminder は false を返すことを検証", async () => {
     await expect(manager.cancelReminder("missing-guild")).resolves.toBe(false);
   });
 
-  // restorePendingReminders は重複pendingを古い順にキャンセルし、最新のみ復元することを検証
-  it("restores only latest pending per guild and cancels duplicates", async () => {
+  it("restorePendingReminders は重複pendingを古い順にキャンセルし、最新のみ復元することを検証", async () => {
     const now = new Date("2026-02-20T00:00:00.000Z");
     repositoryMock.findAllPending.mockResolvedValueOnce([
       {
@@ -295,8 +289,7 @@ describe("shared/features/bump-reminder/manager", () => {
     expect(repositoryMock.updateStatus).toHaveBeenCalledWith("past-b", "sent");
   });
 
-  // 重複判定の else 分岐（既存より古いレコード）で toCancel へ積まれることを検証
-  it("cancels older duplicate via else branch when newer reminder appears first", async () => {
+  it("重複判定の else 分岐（既存より古いレコード）で toCancel へ積まれることを検証", async () => {
     repositoryMock.findAllPending.mockResolvedValueOnce([
       {
         id: "new-first",
@@ -331,8 +324,7 @@ describe("shared/features/bump-reminder/manager", () => {
     );
   });
 
-  // clearAll の allSettled で reject が混ざる場合にエラーログすることを検証
-  it("logs rejection from clearAll cancellation batch", async () => {
+  it("clearAll の allSettled で reject が混ざる場合にエラーログすることを検証", async () => {
     (
       manager as unknown as {
         reminders: Map<string, { jobId: string; reminderId: string }>;
@@ -352,8 +344,7 @@ describe("shared/features/bump-reminder/manager", () => {
     );
   });
 
-  // 重複なし復元時は duplicate-cancel ログを出さず、serviceName 未指定で taskFactory を呼ぶことを検証
-  it("restores pending reminder without duplicate cancellation when list is unique", async () => {
+  it("重複なし復元時は duplicate-cancel ログを出さず、serviceName 未指定で taskFactory を呼ぶことを検証", async () => {
     repositoryMock.findAllPending.mockResolvedValueOnce([
       {
         id: "uniq-1",
@@ -386,8 +377,7 @@ describe("shared/features/bump-reminder/manager", () => {
     );
   });
 
-  // clearAll ですべて成功した場合は reject ログを出さないことを検証
-  it("does not log error in clearAll when all cancellations succeed", async () => {
+  it("clearAll ですべて成功した場合は reject ログを出さないことを検証", async () => {
     (
       manager as unknown as {
         reminders: Map<string, { jobId: string; reminderId: string }>;
@@ -407,15 +397,13 @@ describe("shared/features/bump-reminder/manager", () => {
     );
   });
 
-  // 初期化前に repository なしで取得すると例外になることを検証
-  it("throws when getBumpReminderManager is called before initialization", () => {
+  it("初期化前に repository なしで getBumpReminderManager を呼ぶと例外になることを検証", () => {
     expect(() => getBumpReminderManager()).toThrow(
       "BumpReminderManager is not initialized. Initialize in composition root first.",
     );
   });
 
-  // getBumpReminderManager は同一インスタンスを返すことを検証
-  it("returns singleton instance from getBumpReminderManager", () => {
+  it("getBumpReminderManager は同一インスタンスを返すことを検証", () => {
     const first = getBumpReminderManager(repositoryMock as never);
     const second = getBumpReminderManager();
 

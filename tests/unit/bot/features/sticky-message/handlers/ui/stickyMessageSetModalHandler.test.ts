@@ -83,7 +83,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageSetModalHandler",
     updateLastMessageIdMock.mockResolvedValue(undefined);
   });
 
-  it("matches SET_MODAL_ID_PREFIX", async () => {
+  it("SET_MODAL_ID_PREFIX にマッチする customId を正しく識別する", async () => {
     const { stickyMessageSetModalHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageSetModalHandler");
     expect(
@@ -97,7 +97,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageSetModalHandler",
     expect(stickyMessageSetModalHandler.matches("other-custom-id")).toBe(false);
   });
 
-  it("returns early when no guild", async () => {
+  it("guild が null の場合に早期リターンする", async () => {
     const { stickyMessageSetModalHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageSetModalHandler");
     const interaction = createInteractionMock({ guild: false });
@@ -107,7 +107,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageSetModalHandler",
     expect(interaction._replyMock).not.toHaveBeenCalled();
   });
 
-  it("replies with warning when content is empty", async () => {
+  it("コンテンツが空の場合に警告を Ephemeral 返信する", async () => {
     const { stickyMessageSetModalHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageSetModalHandler");
     const interaction = createInteractionMock({ contentValue: "   " });
@@ -120,8 +120,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageSetModalHandler",
     expect(createMock).not.toHaveBeenCalled();
   });
 
-  // モーダル提出と同時に別のリクエストがスティッキーを作成していた場合（レースコンディション）に警告を返すことを確認する
-  it("replies with warning when sticky already exists (race condition)", async () => {
+  it("モーダル提出と同時に別のリクエストがスティッキーを作成していた場合（レースコンディション）に警告を返す", async () => {
     const { stickyMessageSetModalHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageSetModalHandler");
     findByChannelMock.mockResolvedValue({ id: "existing" });
@@ -135,8 +134,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageSetModalHandler",
     expect(createMock).not.toHaveBeenCalled();
   });
 
-  // チャンネルキャッシュに存在しないチャンネルIDがcustomIdに含まれている場合、処理を続行せずに例外を投げることを確認する
-  it("throws ValidationError when channel not found in cache", async () => {
+  it("チャンネルキャッシュに存在しないチャンネルIDがcustomIdに含まれている場合、処理を続行せずに例外を投げる", async () => {
     const { stickyMessageSetModalHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageSetModalHandler");
     findByChannelMock.mockResolvedValue(null);
@@ -147,7 +145,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageSetModalHandler",
     ).rejects.toThrow();
   });
 
-  it("creates sticky message and replies with success", async () => {
+  it("スティッキーメッセージを作成して成功返信する", async () => {
     const { stickyMessageSetModalHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageSetModalHandler");
     findByChannelMock.mockResolvedValue(null);
@@ -172,8 +170,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageSetModalHandler",
     );
   });
 
-  // DB作成処理が失敗した場合にエラーが呼び出し元へ再スローされ、かつエラーログが記録されることを確認する
-  it("rethrows error when create fails", async () => {
+  it("DB作成処理が失敗した場合にエラーが呼び出し元へ再スローされ、かつエラーログが記録される", async () => {
     const { stickyMessageSetModalHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageSetModalHandler");
     findByChannelMock.mockResolvedValue(null);

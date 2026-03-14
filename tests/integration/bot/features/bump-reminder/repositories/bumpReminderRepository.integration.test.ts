@@ -62,7 +62,7 @@ describe("BumpReminderRepository", () => {
   });
 
   describe("create()", () => {
-    it("should create a new bump reminder", async () => {
+    it("新規バンプリマインダーを作成できること", async () => {
       // 新規作成前に既存 pending を cancelled へ更新してから作成する
       const scheduledAt = atOffsetMs(2 * 60 * 60 * 1000);
       const mockReminder = {
@@ -108,7 +108,7 @@ describe("BumpReminderRepository", () => {
       });
     });
 
-    it("should create reminder without messageId", async () => {
+    it("messageId 未指定でもリマインダーを作成できること", async () => {
       // messageId が未指定でも作成できること
       const scheduledAt = atOffsetMs(2 * 60 * 60 * 1000);
       const mockReminder = {
@@ -136,7 +136,7 @@ describe("BumpReminderRepository", () => {
       expect(result.messageId).toBeNull();
     });
 
-    it("should throw DatabaseError on failure", async () => {
+    it("作成失敗時に DatabaseError をスローすること", async () => {
       const scheduledAt = atOffsetMs(0);
       mockPrismaClient.bumpReminder.updateMany.mockResolvedValue({
         count: 0,
@@ -152,7 +152,7 @@ describe("BumpReminderRepository", () => {
   });
 
   describe("findById()", () => {
-    it("should return reminder when found", async () => {
+    it("ID でリマインダーを取得できること", async () => {
       const mockReminder = {
         id: "reminder-1",
         guildId: "guild-123",
@@ -174,7 +174,7 @@ describe("BumpReminderRepository", () => {
       });
     });
 
-    it("should return null when not found", async () => {
+    it("存在しない ID の場合は null を返すこと", async () => {
       // 未存在IDの場合は null を返す
       mockPrismaClient.bumpReminder.findUnique.mockResolvedValue(null);
 
@@ -183,7 +183,7 @@ describe("BumpReminderRepository", () => {
       expect(result).toBeNull();
     });
 
-    it("should throw DatabaseError on failure", async () => {
+    it("取得失敗時に DatabaseError をスローすること", async () => {
       mockPrismaClient.bumpReminder.findUnique.mockRejectedValue(
         new Error("DB error"),
       );
@@ -195,7 +195,7 @@ describe("BumpReminderRepository", () => {
   });
 
   describe("findPendingByGuild()", () => {
-    it("should return pending reminder for guild", async () => {
+    it("ギルドの pending リマインダーを返すこと", async () => {
       const mockReminder = {
         id: "reminder-1",
         guildId: "guild-123",
@@ -218,7 +218,7 @@ describe("BumpReminderRepository", () => {
       });
     });
 
-    it("should return null when no pending reminder", async () => {
+    it("pending リマインダーがない場合は null を返すこと", async () => {
       mockPrismaClient.bumpReminder.findFirst.mockResolvedValue(null);
 
       const result = await repository.findPendingByGuild("guild-123");
@@ -226,7 +226,7 @@ describe("BumpReminderRepository", () => {
       expect(result).toBeNull();
     });
 
-    it("should throw DatabaseError on failure", async () => {
+    it("findPendingByGuild 失敗時に DatabaseError をスローすること", async () => {
       mockPrismaClient.bumpReminder.findFirst.mockRejectedValue(
         new Error("DB error"),
       );
@@ -238,7 +238,7 @@ describe("BumpReminderRepository", () => {
   });
 
   describe("findAllPending()", () => {
-    it("should return all pending reminders", async () => {
+    it("全 pending リマインダーを返すこと", async () => {
       const mockReminders = [
         {
           id: "reminder-1",
@@ -274,7 +274,7 @@ describe("BumpReminderRepository", () => {
       });
     });
 
-    it("should return empty array when no pending reminders", async () => {
+    it("pending が0件の場合は空配列を返すこと", async () => {
       // pending が0件なら空配列
       mockPrismaClient.bumpReminder.findMany.mockResolvedValue([]);
 
@@ -283,7 +283,7 @@ describe("BumpReminderRepository", () => {
       expect(result).toEqual([]);
     });
 
-    it("should throw DatabaseError on failure", async () => {
+    it("findAllPending 失敗時に DatabaseError をスローすること", async () => {
       mockPrismaClient.bumpReminder.findMany.mockRejectedValue(
         new Error("DB error"),
       );
@@ -293,7 +293,7 @@ describe("BumpReminderRepository", () => {
   });
 
   describe("updateStatus()", () => {
-    it("should update reminder status to sent", async () => {
+    it("リマインダーのステータスを sent に更新できること", async () => {
       mockPrismaClient.bumpReminder.update.mockResolvedValue({
         id: "reminder-1",
         status: "sent",
@@ -307,7 +307,7 @@ describe("BumpReminderRepository", () => {
       });
     });
 
-    it("should update reminder status to cancelled", async () => {
+    it("リマインダーのステータスを cancelled に更新できること", async () => {
       mockPrismaClient.bumpReminder.update.mockResolvedValue({
         id: "reminder-1",
         status: "cancelled",
@@ -321,7 +321,7 @@ describe("BumpReminderRepository", () => {
       });
     });
 
-    it("should throw DatabaseError on failure", async () => {
+    it("updateStatus 失敗時に DatabaseError をスローすること", async () => {
       mockPrismaClient.bumpReminder.update.mockRejectedValue(
         new Error("DB error"),
       );
@@ -333,7 +333,7 @@ describe("BumpReminderRepository", () => {
   });
 
   describe("delete()", () => {
-    it("should delete reminder", async () => {
+    it("リマインダーを削除できること", async () => {
       mockPrismaClient.bumpReminder.delete.mockResolvedValue({
         id: "reminder-1",
       });
@@ -345,7 +345,7 @@ describe("BumpReminderRepository", () => {
       });
     });
 
-    it("should throw DatabaseError on failure", async () => {
+    it("delete 失敗時に DatabaseError をスローすること", async () => {
       mockPrismaClient.bumpReminder.delete.mockRejectedValue(
         new Error("DB error"),
       );
@@ -357,7 +357,7 @@ describe("BumpReminderRepository", () => {
   });
 
   describe("cancelByGuild()", () => {
-    it("should cancel all pending reminders for guild", async () => {
+    it("ギルドの全 pending リマインダーをキャンセルできること", async () => {
       mockPrismaClient.bumpReminder.updateMany.mockResolvedValue({ count: 2 });
 
       await repository.cancelByGuild("guild-123");
@@ -368,7 +368,7 @@ describe("BumpReminderRepository", () => {
       });
     });
 
-    it("should throw DatabaseError on failure", async () => {
+    it("cancelByGuild 失敗時に DatabaseError をスローすること", async () => {
       mockPrismaClient.bumpReminder.updateMany.mockRejectedValue(
         new Error("DB error"),
       );
@@ -380,7 +380,7 @@ describe("BumpReminderRepository", () => {
   });
 
   describe("cancelByGuildAndChannel()", () => {
-    it("should cancel all pending reminders for guild and channel", async () => {
+    it("ギルドとチャンネルの全 pending リマインダーをキャンセルできること", async () => {
       mockPrismaClient.bumpReminder.updateMany.mockResolvedValue({ count: 1 });
 
       await repository.cancelByGuildAndChannel("guild-123", "channel-456");
@@ -395,7 +395,7 @@ describe("BumpReminderRepository", () => {
       });
     });
 
-    it("should throw DatabaseError on failure", async () => {
+    it("cancelByGuildAndChannel 失敗時に DatabaseError をスローすること", async () => {
       mockPrismaClient.bumpReminder.updateMany.mockRejectedValue(
         new Error("DB error"),
       );
@@ -407,7 +407,7 @@ describe("BumpReminderRepository", () => {
   });
 
   describe("cleanupOld()", () => {
-    it("should delete old sent/cancelled reminders", async () => {
+    it("古い sent/cancelled リマインダーを削除できること", async () => {
       // 古い sent/cancelled レコードのみを削除対象にする
       mockPrismaClient.bumpReminder.deleteMany.mockResolvedValue({ count: 5 });
 
@@ -420,7 +420,7 @@ describe("BumpReminderRepository", () => {
       expect(callArgs.where.status.in).toEqual(["sent", "cancelled"]);
     });
 
-    it("should use default 7 days when no parameter provided", async () => {
+    it("引数未指定時は既定の7日間を使用すること", async () => {
       // 引数未指定時は既定の保持日数を使用
       mockPrismaClient.bumpReminder.deleteMany.mockResolvedValue({ count: 3 });
 
@@ -429,7 +429,7 @@ describe("BumpReminderRepository", () => {
       expect(result).toBe(3);
     });
 
-    it("should throw DatabaseError on failure", async () => {
+    it("cleanupOld 失敗時に DatabaseError をスローすること", async () => {
       mockPrismaClient.bumpReminder.deleteMany.mockRejectedValue(
         new Error("DB error"),
       );
@@ -439,14 +439,14 @@ describe("BumpReminderRepository", () => {
   });
 
   describe("getBumpReminderRepository()", () => {
-    it("should return same instance for same prisma client", () => {
+    it("同じ prisma クライアントに対して同一インスタンスを返すこと", () => {
       const first = getBumpReminderRepository(mockPrismaClient as never);
       const second = getBumpReminderRepository(mockPrismaClient as never);
 
       expect(second).toBe(first);
     });
 
-    it("should create new instance when prisma client changes", () => {
+    it("prisma クライアントが変わった場合は新規インスタンスを生成すること", () => {
       const first = getBumpReminderRepository(mockPrismaClient as never);
       const anotherPrisma = {
         ...mockPrismaClient,

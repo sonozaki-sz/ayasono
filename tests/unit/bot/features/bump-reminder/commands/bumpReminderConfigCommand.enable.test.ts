@@ -42,7 +42,7 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.enable",
     setEnabledMock.mockResolvedValue(undefined);
   });
 
-  it("enables bump reminder in current channel and replies success", async () => {
+  it("バンプリマインダーを現在のチャンネルで有効化し成功応答を返す", async () => {
     const interaction = {
       channelId: "channel-1",
       reply: vi.fn().mockResolvedValue(undefined),

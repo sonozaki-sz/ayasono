@@ -111,7 +111,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalH
     updateLastMessageIdMock.mockResolvedValue(undefined);
   });
 
-  it("matches UPDATE_EMBED_MODAL_ID_PREFIX", async () => {
+  it("UPDATE_EMBED_MODAL_ID_PREFIX にマッチする customId を正しく識別する", async () => {
     const { stickyMessageUpdateEmbedModalHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler");
     expect(
@@ -126,7 +126,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalH
     ).toBe(false);
   });
 
-  it("returns early when no guild", async () => {
+  it("guild が null の場合に早期リターンする", async () => {
     const { stickyMessageUpdateEmbedModalHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler");
     const interaction = createInteractionMock({ guild: false });
@@ -136,8 +136,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalH
     expect(interaction._replyMock).not.toHaveBeenCalled();
   });
 
-  // バリデーション異常系: タイトルと説明が両方空の場合は DB 更新を行わず警告を Ephemeral 返信すること
-  it("replies with warning when both title and description are empty", async () => {
+  it("タイトルと説明が両方空の場合は DB 更新を行わず警告を Ephemeral 返信する", async () => {
     const { stickyMessageUpdateEmbedModalHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler");
     const interaction = createInteractionMock({
@@ -153,7 +152,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalH
     expect(updateContentMock).not.toHaveBeenCalled();
   });
 
-  it("replies with info when sticky not found", async () => {
+  it("スティッキーメッセージが見つからない場合に情報を Ephemeral 返信する", async () => {
     const { stickyMessageUpdateEmbedModalHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler");
     findByChannelMock.mockResolvedValue(null);
@@ -167,8 +166,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalH
     expect(updateContentMock).not.toHaveBeenCalled();
   });
 
-  // 正常系: コンテンツ更新・旧メッセージ削除・新規送信・lastMessageId 更新が一連の順序で実行されること
-  it("updates embed content and resends sticky message", async () => {
+  it("コンテンツ更新・旧メッセージ削除・新規送信・lastMessageId 更新が一連の順序で実行される", async () => {
     const { stickyMessageUpdateEmbedModalHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler");
     findByChannelMock.mockResolvedValue({
@@ -197,7 +195,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalH
     );
   });
 
-  it("proceeds with only title when description is empty", async () => {
+  it("説明が空の場合はタイトルのみで更新処理を続行する", async () => {
     const { stickyMessageUpdateEmbedModalHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler");
     findByChannelMock.mockResolvedValue({
@@ -212,8 +210,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalH
     expect(interaction._replyMock).toHaveBeenCalled();
   });
 
-  // 準正常系: 旧メッセージの取得・削除に失敗しても例外を伝播させず処理を続行すること
-  it("ignores error when deleting old message fails", async () => {
+  it("旧メッセージの取得・削除に失敗しても例外を伝播させず処理を続行する", async () => {
     const { stickyMessageUpdateEmbedModalHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler");
     findByChannelMock.mockResolvedValue({
@@ -228,7 +225,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalH
     expect(interaction._replyMock).toHaveBeenCalled();
   });
 
-  it("logs error when resend fails after update", async () => {
+  it("更新後の再送信が失敗した場合にエラーをログに記録する", async () => {
     const { stickyMessageUpdateEmbedModalHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler");
     findByChannelMock.mockResolvedValue({
@@ -247,7 +244,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalH
     expect(interaction._replyMock).toHaveBeenCalled();
   });
 
-  it("skips resend when no channel in cache", async () => {
+  it("キャッシュにチャンネルがない場合は再送信をスキップする", async () => {
     const { stickyMessageUpdateEmbedModalHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler");
     findByChannelMock.mockResolvedValue({
@@ -261,8 +258,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalH
     expect(interaction._replyMock).toHaveBeenCalled();
   });
 
-  // 異常系: DB 書き込み失敗時はエラーをロギングしたうえで呼び出し元に再スローすること
-  it("rethrows error when updateContent fails", async () => {
+  it("DB 書き込み失敗時はエラーをロギングしたうえで呼び出し元に再スローする", async () => {
     const { stickyMessageUpdateEmbedModalHandler } =
       await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler");
     findByChannelMock.mockResolvedValue({

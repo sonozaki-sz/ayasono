@@ -33,7 +33,7 @@ describe("bot/features/vac/commands/usecases/vacRename", () => {
     vi.clearAllMocks();
   });
 
-  it("renames channel and replies ephemeral success", async () => {
+  it("チャンネルをリネームしてエフェメラルで成功応答する", async () => {
     const edit = vi.fn().mockResolvedValue(undefined);
     (resolveVacVoiceChannelForEdit as Mock).mockResolvedValue({ edit });
 
@@ -53,7 +53,7 @@ describe("bot/features/vac/commands/usecases/vacRename", () => {
     });
   });
 
-  it("propagates resolver failure", async () => {
+  it("resolverの失敗を呼び出し元に伝播する", async () => {
     (resolveVacVoiceChannelForEdit as Mock).mockRejectedValue(
       new Error("not vac channel"),
     );

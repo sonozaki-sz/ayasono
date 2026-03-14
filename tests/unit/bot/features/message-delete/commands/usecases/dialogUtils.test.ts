@@ -55,7 +55,7 @@ describe("bot/features/message-delete/commands/usecases/dialogUtils", () => {
   // ─────────────────────────────────────────────────────────────
 
   describe("applyModalFilterValue", () => {
-    it("returns current filter unchanged for unknown customId", async () => {
+    it("不明な customId の場合は現在のフィルターを変更せずに返す", async () => {
       const { applyModalFilterValue } = await loadModule();
       const currentFilter = { keyword: "existing" };
       const result = applyModalFilterValue(
@@ -68,7 +68,7 @@ describe("bot/features/message-delete/commands/usecases/dialogUtils", () => {
       expect(result.errorKey).toBeUndefined();
     });
 
-    it("applies FILTER_KEYWORD to set keyword", async () => {
+    it("FILTER_KEYWORD で keyword を設定する", async () => {
       const { applyModalFilterValue } = await loadModule();
       const { MSG_DEL_CUSTOM_ID } = await import(
         "@/bot/features/message-delete/constants/messageDeleteConstants"
@@ -82,7 +82,7 @@ describe("bot/features/message-delete/commands/usecases/dialogUtils", () => {
       expect(result.filter.keyword).toBe("search-term");
     });
 
-    it("applies FILTER_KEYWORD with empty value clears keyword", async () => {
+    it("FILTER_KEYWORD に空値を指定すると keyword をクリアする", async () => {
       const { applyModalFilterValue } = await loadModule();
       const { MSG_DEL_CUSTOM_ID } = await import(
         "@/bot/features/message-delete/constants/messageDeleteConstants"
@@ -96,7 +96,7 @@ describe("bot/features/message-delete/commands/usecases/dialogUtils", () => {
       expect(result.filter.keyword).toBeUndefined();
     });
 
-    it("applies FILTER_DAYS with valid number", async () => {
+    it("FILTER_DAYS に有効な数値を指定すると days を設定する", async () => {
       const { applyModalFilterValue } = await loadModule();
       const { MSG_DEL_CUSTOM_ID } = await import(
         "@/bot/features/message-delete/constants/messageDeleteConstants"
@@ -112,7 +112,7 @@ describe("bot/features/message-delete/commands/usecases/dialogUtils", () => {
       expect(result.filter.before).toBeUndefined();
     });
 
-    it("applies FILTER_DAYS with empty value clears days", async () => {
+    it("FILTER_DAYS に空値を指定すると days をクリアする", async () => {
       const { applyModalFilterValue } = await loadModule();
       const { MSG_DEL_CUSTOM_ID } = await import(
         "@/bot/features/message-delete/constants/messageDeleteConstants"
@@ -126,7 +126,7 @@ describe("bot/features/message-delete/commands/usecases/dialogUtils", () => {
       expect(result.filter.days).toBeUndefined();
     });
 
-    it("returns error key for invalid FILTER_DAYS value", async () => {
+    it("FILTER_DAYS に無効な値を指定するとエラーキーを返す", async () => {
       const { applyModalFilterValue } = await loadModule();
       const { MSG_DEL_CUSTOM_ID } = await import(
         "@/bot/features/message-delete/constants/messageDeleteConstants"
@@ -142,7 +142,7 @@ describe("bot/features/message-delete/commands/usecases/dialogUtils", () => {
       );
     });
 
-    it("returns error key for FILTER_DAYS with zero or negative", async () => {
+    it("FILTER_DAYS にゼロまたは負の値を指定するとエラーキーを返す", async () => {
       const { applyModalFilterValue } = await loadModule();
       const { MSG_DEL_CUSTOM_ID } = await import(
         "@/bot/features/message-delete/constants/messageDeleteConstants"
@@ -156,7 +156,7 @@ describe("bot/features/message-delete/commands/usecases/dialogUtils", () => {
       expect(result.errorKey).toBeDefined();
     });
 
-    it("applies FILTER_AFTER with valid date", async () => {
+    it("FILTER_AFTER に有効な日付を指定すると after を設定する", async () => {
       const { applyModalFilterValue } = await loadModule();
       const { MSG_DEL_CUSTOM_ID } = await import(
         "@/bot/features/message-delete/constants/messageDeleteConstants"
@@ -175,7 +175,7 @@ describe("bot/features/message-delete/commands/usecases/dialogUtils", () => {
       expect(result.filter.days).toBeUndefined();
     });
 
-    it("applies FILTER_AFTER with empty value clears after", async () => {
+    it("FILTER_AFTER に空値を指定すると after をクリアする", async () => {
       const { applyModalFilterValue } = await loadModule();
       const { MSG_DEL_CUSTOM_ID } = await import(
         "@/bot/features/message-delete/constants/messageDeleteConstants"
@@ -189,7 +189,7 @@ describe("bot/features/message-delete/commands/usecases/dialogUtils", () => {
       expect(result.filter.after).toBeUndefined();
     });
 
-    it("returns error key for FILTER_AFTER with invalid date", async () => {
+    it("FILTER_AFTER に無効な日付を指定するとエラーキーを返す", async () => {
       const { applyModalFilterValue } = await loadModule();
       const { MSG_DEL_CUSTOM_ID } = await import(
         "@/bot/features/message-delete/constants/messageDeleteConstants"
@@ -207,7 +207,7 @@ describe("bot/features/message-delete/commands/usecases/dialogUtils", () => {
       );
     });
 
-    it("returns error key for FILTER_AFTER when after >= before", async () => {
+    it("FILTER_AFTER で after >= before となる場合にエラーキーを返す", async () => {
       const { applyModalFilterValue } = await loadModule();
       const { MSG_DEL_CUSTOM_ID } = await import(
         "@/bot/features/message-delete/constants/messageDeleteConstants"
@@ -227,7 +227,7 @@ describe("bot/features/message-delete/commands/usecases/dialogUtils", () => {
       );
     });
 
-    it("applies FILTER_BEFORE with valid date", async () => {
+    it("FILTER_BEFORE に有効な日付を指定すると before を設定する", async () => {
       const { applyModalFilterValue } = await loadModule();
       const { MSG_DEL_CUSTOM_ID } = await import(
         "@/bot/features/message-delete/constants/messageDeleteConstants"
@@ -246,7 +246,7 @@ describe("bot/features/message-delete/commands/usecases/dialogUtils", () => {
       expect(result.filter.days).toBeUndefined();
     });
 
-    it("applies FILTER_BEFORE with empty value clears before", async () => {
+    it("FILTER_BEFORE に空値を指定すると before をクリアする", async () => {
       const { applyModalFilterValue } = await loadModule();
       const { MSG_DEL_CUSTOM_ID } = await import(
         "@/bot/features/message-delete/constants/messageDeleteConstants"
@@ -260,7 +260,7 @@ describe("bot/features/message-delete/commands/usecases/dialogUtils", () => {
       expect(result.filter.before).toBeUndefined();
     });
 
-    it("returns error key for FILTER_BEFORE with invalid date", async () => {
+    it("FILTER_BEFORE に無効な日付を指定するとエラーキーを返す", async () => {
       const { applyModalFilterValue } = await loadModule();
       const { MSG_DEL_CUSTOM_ID } = await import(
         "@/bot/features/message-delete/constants/messageDeleteConstants"
@@ -278,7 +278,7 @@ describe("bot/features/message-delete/commands/usecases/dialogUtils", () => {
       );
     });
 
-    it("returns error key for FILTER_BEFORE when after >= before", async () => {
+    it("FILTER_BEFORE で after >= before となる場合にエラーキーを返す", async () => {
       const { applyModalFilterValue } = await loadModule();
       const { MSG_DEL_CUSTOM_ID } = await import(
         "@/bot/features/message-delete/constants/messageDeleteConstants"
@@ -304,7 +304,7 @@ describe("bot/features/message-delete/commands/usecases/dialogUtils", () => {
   // ─────────────────────────────────────────────────────────────
 
   describe("DIALOG_TYPE", () => {
-    it("has expected values", async () => {
+    it("期待する値を持つ", async () => {
       const { DIALOG_TYPE } = await loadModule();
       expect(DIALOG_TYPE.Confirm).toBe("confirm");
       expect(DIALOG_TYPE.Cancel).toBe("cancel");

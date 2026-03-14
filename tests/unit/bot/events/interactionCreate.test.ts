@@ -119,14 +119,12 @@ describe("bot/events/interactionCreate", () => {
     vi.clearAllMocks();
   });
 
-  // イベントメタ情報が正しいことをまず担保する
-  it("has expected event metadata", () => {
+  it("イベントメタデータが正しいことを確認", () => {
     expect(interactionCreateEvent.name).toBe(Events.InteractionCreate);
     expect(interactionCreateEvent.once).toBe(false);
   });
 
-  // クールダウン中はコマンド実行せず Ephemeral 返信することを検証する
-  it("replies cooldown message when command is in cooldown", async () => {
+  it("クールダウン中はコマンドを実行せず Ephemeral でクールダウンメッセージを返すことを確認", async () => {
     const command = {
       data: { name: "ping" },
       cooldown: 5,
@@ -150,8 +148,7 @@ describe("bot/events/interactionCreate", () => {
     expect(command.execute).not.toHaveBeenCalled();
   });
 
-  // モーダルは registry の prefix match を優先して実行されることを確認する
-  it("routes modal submit to registry handler first", async () => {
+  it("モーダル送信が registry ハンドラーを優先して実行されることを確認", async () => {
     const mockedModalModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/modals",
     )) as {
@@ -175,8 +172,7 @@ describe("bot/events/interactionCreate", () => {
     );
   });
 
-  // modal registry 実行失敗時は interaction error ハンドラへ委譲されることを検証
-  it("delegates modal registry handler error to interaction error handler", async () => {
+  it("modal registry ハンドラー実行失敗時は handleInteractionError へ委譲されることを確認", async () => {
     const mockedModalModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/modals",
     )) as {
@@ -203,8 +199,7 @@ describe("bot/events/interactionCreate", () => {
     );
   });
 
-  // ボタン実行失敗時は handleInteractionError にフォールバックすることを検証する
-  it("delegates button handler error to interaction error handler", async () => {
+  it("ボタンハンドラー実行失敗時は handleInteractionError へ委譲されることを確認", async () => {
     const mockedButtonModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/buttons",
     )) as {
@@ -228,8 +223,7 @@ describe("bot/events/interactionCreate", () => {
     expect(handleInteractionError).toHaveBeenCalledWith(interaction, error);
   });
 
-  // コマンド実行失敗時は handleCommandError に委譲されることを検証する
-  it("delegates command error to handleCommandError", async () => {
+  it("コマンド実行失敗時は handleCommandError へ委譲されることを確認", async () => {
     const error = new Error("command failed");
     const command = {
       data: { name: "ping" },
@@ -247,8 +241,7 @@ describe("bot/events/interactionCreate", () => {
     expect(handleCommandError).toHaveBeenCalledWith(interaction, error);
   });
 
-  // 未登録コマンド名は警告ログのみで終了することを検証
-  it("warns and returns when command is not found", async () => {
+  it("未登録コマンド名の場合は警告ログのみで終了することを確認", async () => {
     const interaction = createInteraction({
       isChatInputCommand: vi.fn(() => true),
       commandName: "unknown",
@@ -262,8 +255,7 @@ describe("bot/events/interactionCreate", () => {
     expect(interaction.reply).not.toHaveBeenCalled();
   });
 
-  // ギルド外では tDefault のクールダウン文言を使うことを検証
-  it("uses default cooldown message outside guild", async () => {
+  it("ギルド外では tDefault のクールダウンメッセージを使うことを確認", async () => {
     const command = {
       data: { name: "ping" },
       cooldown: undefined,
@@ -285,8 +277,7 @@ describe("bot/events/interactionCreate", () => {
     });
   });
 
-  // クールダウン対象外ではコマンドが成功実行されることを検証
-  it("executes command and logs debug when not in cooldown", async () => {
+  it("クールダウン対象外の場合にコマンドが実行され logger.debug が呼ばれることを確認", async () => {
     const command = {
       data: { name: "ping" },
       cooldown: 3,
@@ -306,8 +297,7 @@ describe("bot/events/interactionCreate", () => {
     );
   });
 
-  // autocomplete 対応コマンドがある場合に実行されることを検証
-  it("executes autocomplete handler when available", async () => {
+  it("オートコンプリート対応コマンドがある場合に autocomplete ハンドラーが実行されることを確認", async () => {
     const autocomplete = vi.fn().mockResolvedValue(undefined);
     const command = {
       data: { name: "ping" },
@@ -324,8 +314,7 @@ describe("bot/events/interactionCreate", () => {
     expect(autocomplete).toHaveBeenCalledWith(interaction);
   });
 
-  // autocomplete 非対応または未登録は何もせず終了することを検証
-  it("returns on autocomplete when command is missing or no autocomplete", async () => {
+  it("autocomplete 非対応または未登録の場合は何もせず終了することを確認", async () => {
     const interaction = createInteraction({
       isAutocomplete: vi.fn(() => true),
     });
@@ -345,8 +334,7 @@ describe("bot/events/interactionCreate", () => {
     );
   });
 
-  // autocomplete 失敗時はエラーログのみ行うことを検証
-  it("logs error when autocomplete throws", async () => {
+  it("autocomplete 失敗時はエラーログのみ行うことを確認", async () => {
     const autocompleteError = new Error("autocomplete failed");
     const command = {
       data: { name: "ping" },
@@ -366,8 +354,7 @@ describe("bot/events/interactionCreate", () => {
     );
   });
 
-  // modal registry 非一致時は client.modals を使わず警告して終了することを検証
-  it("does not use client modal collection when registry has no match", async () => {
+  it("modal registry 非一致時は client.modals を使わず警告して終了することを確認", async () => {
     const mockedModalModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/modals",
     )) as {
@@ -392,8 +379,7 @@ describe("bot/events/interactionCreate", () => {
     );
   });
 
-  // modal fallback でも見つからない場合は警告して終了することを検証
-  it("warns when modal is unknown in both registry and collection", async () => {
+  it("modal が registry にも collection にも存在しない場合は警告して終了することを確認", async () => {
     const mockedModalModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/modals",
     )) as {
@@ -415,8 +401,7 @@ describe("bot/events/interactionCreate", () => {
     );
   });
 
-  // registry 非一致時は fallback モーダルの失敗も発生せず interaction error へ委譲しない
-  it("does not delegate modal collection errors when registry has no match", async () => {
+  it("registry 非一致時は fallback モーダルの失敗も発生せず interaction error へ委譲しないことを確認", async () => {
     const mockedModalModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/modals",
     )) as {
@@ -440,8 +425,7 @@ describe("bot/events/interactionCreate", () => {
     expect(handleInteractionError).not.toHaveBeenCalled();
   });
 
-  // user select ハンドラ成功時に execute が呼ばれることを検証
-  it("routes user select menu to handler", async () => {
+  it("user select ハンドラーが一致した場合に execute が呼ばれることを確認", async () => {
     const mockedSelectModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/selectMenus",
     )) as {
@@ -464,8 +448,7 @@ describe("bot/events/interactionCreate", () => {
     ).toHaveBeenCalledWith(interaction);
   });
 
-  // user select ハンドラ失敗時は interaction error ハンドラへ委譲することを検証
-  it("delegates user select handler error to interaction error handler", async () => {
+  it("user select ハンドラー失敗時は handleInteractionError へ委譲されることを確認", async () => {
     const mockedSelectModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/selectMenus",
     )) as {
@@ -493,8 +476,7 @@ describe("bot/events/interactionCreate", () => {
     );
   });
 
-  // ボタンハンドラ未一致時は何も実行しないことを検証
-  it("does nothing when no button handler matches", async () => {
+  it("ボタンハンドラーが一致しない場合は何も実行しないことを確認", async () => {
     const mockedButtonModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/buttons",
     )) as {
@@ -518,8 +500,7 @@ describe("bot/events/interactionCreate", () => {
     expect(handleInteractionError).not.toHaveBeenCalled();
   });
 
-  // ユーザーセレクトハンドラ未一致時は何も実行しないことを検証
-  it("does nothing when no user select handler matches", async () => {
+  it("ユーザーセレクトハンドラーが一致しない場合は何も実行しないことを確認", async () => {
     const mockedSelectModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/selectMenus",
     )) as {
@@ -543,8 +524,7 @@ describe("bot/events/interactionCreate", () => {
     expect(handleInteractionError).not.toHaveBeenCalled();
   });
 
-  // どのinteraction種別にも該当しない場合は何もしないことを検証
-  it("does nothing for unsupported interaction type", async () => {
+  it("どの interaction 種別にも該当しない場合は何もしないことを確認", async () => {
     const interaction = createInteraction();
 
     await interactionCreateEvent.execute(interaction as never);

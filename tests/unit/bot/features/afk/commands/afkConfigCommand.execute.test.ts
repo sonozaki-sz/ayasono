@@ -69,8 +69,7 @@ describe("bot/features/afk/commands/afkConfigCommand.execute", () => {
     });
   });
 
-  // ManageGuild 権限を持たないメンバーがコマンドを実行した場合に適切に弾かれるかを確認
-  it("throws ValidationError when member lacks manage-guild permission", async () => {
+  it("ManageGuild 権限を持たないメンバーがコマンドを実行した場合は ValidationError を投げる", async () => {
     const interaction = createInteraction("set-channel");
     interaction.memberPermissions.has.mockReturnValue(false);
 
@@ -82,7 +81,7 @@ describe("bot/features/afk/commands/afkConfigCommand.execute", () => {
     );
   });
 
-  it("sets AFK channel and replies success on set-channel", async () => {
+  it("set-channel サブコマンドで AFK チャンネルを設定し成功返信する", async () => {
     const interaction = createInteraction("set-channel");
 
     await executeAfkConfigCommand(interaction as never);
@@ -94,7 +93,7 @@ describe("bot/features/afk/commands/afkConfigCommand.execute", () => {
     });
   });
 
-  it("shows current config on view", async () => {
+  it("view サブコマンドで現在の設定を表示する", async () => {
     const interaction = createInteraction("view");
 
     await executeAfkConfigCommand(interaction as never);

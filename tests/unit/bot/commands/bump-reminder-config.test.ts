@@ -187,8 +187,7 @@ describe("bot/commands/bump-reminder-config", () => {
     removeBumpReminderMentionUserMock.mockResolvedValue("removed");
   });
 
-  // enable で設定有効化と成功応答が行われることを検証
-  it("enables bump reminder and replies success", async () => {
+  it("enable でバンプリマインダーが有効化されて success 応答が返されることを確認", async () => {
     const interaction = createInteraction({
       options: {
         getSubcommand: vi.fn(() => "enable"),
@@ -216,8 +215,7 @@ describe("bot/commands/bump-reminder-config", () => {
     });
   });
 
-  // disable でタイマー停止と設定無効化が行われることを検証
-  it("disables bump reminder and cancels active reminder", async () => {
+  it("disable でアクティブなリマインダーが停止されてバンプリマインダーが無効化されることを確認", async () => {
     const interaction = createInteraction({
       options: {
         getSubcommand: vi.fn(() => "disable"),
@@ -241,7 +239,7 @@ describe("bot/commands/bump-reminder-config", () => {
 
   // 各サブコマンドの権限不足時にエラーハンドラへ委譲されることを検証
   it.each(["enable", "disable", "set-mention", "remove-mention", "view"])(
-    "delegates permission error when subcommand is %s",
+    "%s サブコマンドで権限不足の場合は handleCommandError へ委譲されることを確認",
     async (subcommand) => {
       const interaction = createInteraction({
         memberPermissions: { has: vi.fn(() => false) },
@@ -261,8 +259,7 @@ describe("bot/commands/bump-reminder-config", () => {
     },
   );
 
-  // set-mention で role/user 未指定の場合にエラー委譲されることを検証
-  it("delegates validation error when set-mention has no role and user", async () => {
+  it("set-mention で role/user が未指定の場合はバリデーションエラーが委譲されることを確認", async () => {
     const interaction = createInteraction({
       options: {
         getSubcommand: vi.fn(() => "set-mention"),
@@ -279,8 +276,7 @@ describe("bot/commands/bump-reminder-config", () => {
     expect(handleCommandError).toHaveBeenCalledTimes(1);
   });
 
-  // set-mention user(追加) が成功することを検証
-  it("adds mention user on set-mention user path", async () => {
+  it("set-mention でユーザーメンションが追加されることを確認", async () => {
     addBumpReminderMentionUserMock.mockResolvedValueOnce("added");
     getBumpReminderConfigMock
       .mockResolvedValueOnce({
@@ -314,8 +310,7 @@ describe("bot/commands/bump-reminder-config", () => {
     });
   });
 
-  // set-mention role 単独指定の成功経路を検証
-  it("sets mention role only on set-mention success", async () => {
+  it("set-mention で role のみ指定した場合に成功することを確認", async () => {
     setBumpReminderMentionRoleMock.mockResolvedValueOnce("updated");
     getBumpReminderConfigMock
       .mockResolvedValueOnce({
@@ -350,8 +345,7 @@ describe("bot/commands/bump-reminder-config", () => {
     });
   });
 
-  // set-mention user(既存) がトグル削除されることを検証
-  it("toggles mention user off when set-mention user already exists", async () => {
+  it("set-mention で既に登録済みのユーザーを指定した場合はトグルで削除されることを確認", async () => {
     addBumpReminderMentionUserMock.mockResolvedValueOnce("already_exists");
     removeBumpReminderMentionUserMock.mockResolvedValueOnce("removed");
     getBumpReminderConfigMock
@@ -391,8 +385,7 @@ describe("bot/commands/bump-reminder-config", () => {
     });
   });
 
-  // set-mention user add が失敗した場合のエラー委譲を検証
-  it("delegates error when set-mention user add result is not configured", async () => {
+  it("set-mention でユーザー追加結果が not_configured の場合はエラーが委譲されることを確認", async () => {
     addBumpReminderMentionUserMock.mockResolvedValueOnce("not_configured");
     const interaction = createInteraction({
       options: {
@@ -410,8 +403,7 @@ describe("bot/commands/bump-reminder-config", () => {
     expect(handleCommandError).toHaveBeenCalledTimes(1);
   });
 
-  // set-mention user remove が未設定を返した場合のエラー委譲を検証
-  it("delegates error when toggling existing user but remove returns not configured", async () => {
+  it("既存ユーザーのトグル削除結果が not_configured の場合はエラーが委譲されることを確認", async () => {
     addBumpReminderMentionUserMock.mockResolvedValueOnce("already_exists");
     removeBumpReminderMentionUserMock.mockResolvedValueOnce("not_configured");
     const interaction = createInteraction({
@@ -430,8 +422,7 @@ describe("bot/commands/bump-reminder-config", () => {
     expect(handleCommandError).toHaveBeenCalledTimes(1);
   });
 
-  // set-mention role が未設定を返した場合のエラー委譲を検証
-  it("delegates error when set-mention role result is not configured", async () => {
+  it("set-mention で role 設定結果が not_configured の場合はエラーが委譲されることを確認", async () => {
     setBumpReminderMentionRoleMock.mockResolvedValueOnce("not_configured");
     const interaction = createInteraction({
       options: {
@@ -449,8 +440,7 @@ describe("bot/commands/bump-reminder-config", () => {
     expect(handleCommandError).toHaveBeenCalledTimes(1);
   });
 
-  // set-mention role + user 同時指定の成功経路を検証
-  it("sets both mention role and user on set-mention success", async () => {
+  it("set-mention で role と user を同時指定した場合に両方が設定されることを確認", async () => {
     addBumpReminderMentionUserMock.mockResolvedValueOnce("added");
     setBumpReminderMentionRoleMock.mockResolvedValueOnce("updated");
     getBumpReminderConfigMock
@@ -500,8 +490,7 @@ describe("bot/commands/bump-reminder-config", () => {
     });
   });
 
-  // view で設定未登録時に info 応答することを検証
-  it("replies not-configured info on view when config is absent", async () => {
+  it("view で設定が未登録の場合は info 応答が返されることを確認", async () => {
     getBumpReminderConfigMock.mockResolvedValueOnce(null);
     const interaction = createInteraction({
       options: {
@@ -522,8 +511,7 @@ describe("bot/commands/bump-reminder-config", () => {
     });
   });
 
-  // view で設定内容（enabled/role/users）を表示することを検証
-  it("replies configured info on view with role and users", async () => {
+  it("view で role と users が設定済みの場合に info 応答が返されることを確認", async () => {
     getBumpReminderConfigMock.mockResolvedValueOnce({
       enabled: false,
       channelId: "channel-1",
@@ -553,8 +541,7 @@ describe("bot/commands/bump-reminder-config", () => {
     });
   });
 
-  // view で role/users未設定かつ enabled=true の表示分岐を検証
-  it("replies configured info on view with no role and no users", async () => {
+  it("view で role/users が未設定かつ enabled=true の場合に info 応答が返されることを確認", async () => {
     getBumpReminderConfigMock.mockResolvedValueOnce({
       enabled: true,
       channelId: "channel-1",
@@ -584,8 +571,7 @@ describe("bot/commands/bump-reminder-config", () => {
     });
   });
 
-  // remove-mention role でロールメンション解除されることを検証
-  it("removes role mention on remove-mention target=role", async () => {
+  it("remove-mention target=role でロールメンションが解除されることを確認", async () => {
     const interaction = createInteraction({
       options: {
         getSubcommand: vi.fn(() => "remove-mention"),
@@ -609,8 +595,7 @@ describe("bot/commands/bump-reminder-config", () => {
     });
   });
 
-  // remove-mention role で未設定の場合は共通エラーハンドラへ委譲されることを検証
-  it("delegates not-configured error when remove-mention target=role", async () => {
+  it("remove-mention target=role が未設定の場合は not_configured エラーが委譲されることを確認", async () => {
     setBumpReminderMentionRoleMock.mockResolvedValueOnce("not_configured");
     const interaction = createInteraction({
       options: {
@@ -632,8 +617,7 @@ describe("bot/commands/bump-reminder-config", () => {
     expect(handleCommandError).toHaveBeenCalledTimes(1);
   });
 
-  // remove-mention users で全ユーザーメンション解除されることを検証
-  it("clears all user mentions on remove-mention target=users", async () => {
+  it("remove-mention target=users で全ユーザーメンションが解除されることを確認", async () => {
     const interaction = createInteraction({
       options: {
         getSubcommand: vi.fn(() => "remove-mention"),
@@ -654,8 +638,7 @@ describe("bot/commands/bump-reminder-config", () => {
     });
   });
 
-  // remove-mention users で未設定の場合は共通エラーハンドラへ委譲されることを検証
-  it("delegates not-configured error when remove-mention target=users", async () => {
+  it("remove-mention target=users が未設定の場合は not_configured エラーが委譲されることを確認", async () => {
     clearBumpReminderMentionUsersMock.mockResolvedValueOnce("not_configured");
     const interaction = createInteraction({
       options: {
@@ -674,8 +657,7 @@ describe("bot/commands/bump-reminder-config", () => {
     expect(handleCommandError).toHaveBeenCalledTimes(1);
   });
 
-  // remove-mention all でロール＋ユーザーをまとめて解除することを検証
-  it("clears all mentions on remove-mention target=all", async () => {
+  it("remove-mention target=all でロールとユーザーのメンションがまとめて解除されることを確認", async () => {
     const interaction = createInteraction({
       options: {
         getSubcommand: vi.fn(() => "remove-mention"),
@@ -696,8 +678,7 @@ describe("bot/commands/bump-reminder-config", () => {
     });
   });
 
-  // remove-mention all で未設定の場合は共通エラーハンドラへ委譲されることを検証
-  it("delegates not-configured error when remove-mention target=all", async () => {
+  it("remove-mention target=all が未設定の場合は not_configured エラーが委譲されることを確認", async () => {
     clearBumpReminderMentionsMock.mockResolvedValueOnce("not_configured");
     const interaction = createInteraction({
       options: {
@@ -716,8 +697,7 @@ describe("bot/commands/bump-reminder-config", () => {
     expect(handleCommandError).toHaveBeenCalledTimes(1);
   });
 
-  // remove-mention user で登録ユーザーが空のときエラー応答になることを検証
-  it("replies error when remove-mention target=user has no registered users", async () => {
+  it("remove-mention target=user で登録ユーザーが空の場合はエラー応答が返されることを確認", async () => {
     getBumpReminderConfigMock.mockResolvedValueOnce({
       enabled: true,
       channelId: "channel-1",
@@ -743,8 +723,7 @@ describe("bot/commands/bump-reminder-config", () => {
     });
   });
 
-  // remove-mention user で currentConfig が null の場合も空扱いでエラー応答することを検証
-  it("replies error when remove-mention target=user and config is null", async () => {
+  it("remove-mention target=user で config が null の場合も空扱いでエラー応答が返されることを確認", async () => {
     getBumpReminderConfigMock.mockResolvedValueOnce(null);
     const interaction = createInteraction({
       options: {
@@ -765,8 +744,7 @@ describe("bot/commands/bump-reminder-config", () => {
     });
   });
 
-  // remove-mention user でUI待機がタイムアウトした場合に editReply されることを検証
-  it("edits reply with timeout message when user-selection collector times out", async () => {
+  it("remove-mention target=user でコレクターがタイムアウトした場合は editReply でタイムアウトメッセージが表示されることを確認", async () => {
     getBumpReminderConfigMock.mockResolvedValueOnce({
       enabled: true,
       channelId: "channel-1",
@@ -800,8 +778,7 @@ describe("bot/commands/bump-reminder-config", () => {
     });
   });
 
-  // remove-mention user で選択したユーザーを削除して update 応答することを検証
-  it("removes selected users and updates interaction on remove-mention target=user success", async () => {
+  it("remove-mention target=user で選択したユーザーが削除されて interaction が update されることを確認", async () => {
     getBumpReminderConfigMock.mockResolvedValueOnce({
       enabled: true,
       channelId: "channel-1",
@@ -882,8 +859,7 @@ describe("bot/commands/bump-reminder-config", () => {
     });
   });
 
-  // remove-mention user でDiscord APIエラーが発生した場合に上位へ委譲されることを検証
-  it("delegates DiscordAPIError from user-selection collector", async () => {
+  it("remove-mention target=user でコレクターから DiscordAPIError が発生した場合は handleCommandError へ委譲されることを確認", async () => {
     getBumpReminderConfigMock.mockResolvedValueOnce({
       enabled: true,
       channelId: "channel-1",
@@ -914,8 +890,7 @@ describe("bot/commands/bump-reminder-config", () => {
     expect(handleCommandError).toHaveBeenCalledTimes(1);
   });
 
-  // remove-mention user で予期しないエラーが発生した場合に上位へ委譲されることを検証
-  it("delegates unexpected collector error on remove-mention target=user", async () => {
+  it("remove-mention target=user で予期しないコレクターエラーが発生した場合は handleCommandError へ委譲されることを確認", async () => {
     getBumpReminderConfigMock.mockResolvedValueOnce({
       enabled: true,
       channelId: "channel-1",

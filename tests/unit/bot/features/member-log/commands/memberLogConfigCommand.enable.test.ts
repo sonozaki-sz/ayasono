@@ -65,8 +65,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.enable", () =>
     setEnabledMock.mockResolvedValue(undefined);
   });
 
-  // ガードが ValidationError を投げた場合にそれが伝播することを確認
-  it("propagates error when guard throws", async () => {
+  it("ガードが ValidationError を投げた場合にそれが伝播することを確認", async () => {
     ensurePermissionMock.mockRejectedValue(new ValidationError("no-perm"));
 
     await expect(
@@ -74,8 +73,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.enable", () =>
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  // channelId が未設定の場合に warning embed が返され setEnabled が呼ばれないことを確認
-  it("replies with warning and does not enable when channelId is missing", async () => {
+  it("channelId が未設定の場合に warning embed が返され setEnabled が呼ばれないことを確認", async () => {
     ensurePermissionMock.mockResolvedValue(undefined);
     getMemberLogConfigMock.mockResolvedValue({
       enabled: false,
@@ -94,8 +92,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.enable", () =>
     expect(createWarningEmbedMock).toHaveBeenCalled();
   });
 
-  // config が null の場合も warning embed が返されることを確認
-  it("replies with warning when config is null", async () => {
+  it("config が null の場合も warning embed が返されることを確認", async () => {
     ensurePermissionMock.mockResolvedValue(undefined);
     getMemberLogConfigMock.mockResolvedValue(null);
     const interaction = makeInteraction();
@@ -106,8 +103,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.enable", () =>
     expect(createWarningEmbedMock).toHaveBeenCalled();
   });
 
-  // channelId が設定済みの場合に setEnabled(true) が呼ばれることを確認
-  it("calls service.setEnabled(true) when channelId is set", async () => {
+  it("channelId が設定済みの場合に service.setEnabled(true) が呼ばれることを確認", async () => {
     ensurePermissionMock.mockResolvedValue(undefined);
     getMemberLogConfigMock.mockResolvedValue({
       enabled: false,
@@ -120,8 +116,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.enable", () =>
     expect(setEnabledMock).toHaveBeenCalledWith("guild-1", true);
   });
 
-  // 成功時に success embed で reply が呼ばれることを確認
-  it("replies with success embed when enabled successfully", async () => {
+  it("有効化に成功した場合に success embed で reply が呼ばれることを確認", async () => {
     ensurePermissionMock.mockResolvedValue(undefined);
     getMemberLogConfigMock.mockResolvedValue({
       enabled: false,
@@ -137,8 +132,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.enable", () =>
     expect(createSuccessEmbedMock).toHaveBeenCalled();
   });
 
-  // 成功時に logger.info が呼ばれることを確認
-  it("logs info on success", async () => {
+  it("成功時に logger.info が呼ばれることを確認", async () => {
     ensurePermissionMock.mockResolvedValue(undefined);
     getMemberLogConfigMock.mockResolvedValue({
       enabled: false,

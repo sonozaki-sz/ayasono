@@ -9,7 +9,7 @@ vi.mock("@/bot/utils/categoryAutocomplete", () => ({
 }));
 
 describe("bot/features/vc-recruit/commands/vcRecruitConfigCommand.autocomplete", () => {
-  it("delegates to respondCategoryAutocomplete with correct options", async () => {
+  it("正しいオプションで respondCategoryAutocomplete に処理を委譲する", async () => {
     const interaction = {
       commandName: VC_RECRUIT_CONFIG_COMMAND.NAME,
     } as never;

@@ -15,7 +15,7 @@ describe("shared/database/repositories/serializers/guildConfigSerializer", () =>
     updatedAt: new Date("2026-01-02T00:00:00.000Z"),
   };
 
-  it("toGuildConfig maps record to GuildConfig domain object", () => {
+  it("toGuildConfig がレコードを GuildConfig ドメインオブジェクトへ変換すること", () => {
     expect(toGuildConfig(baseRecord)).toEqual({
       guildId: "guild-1",
       locale: "ja",
@@ -25,7 +25,7 @@ describe("shared/database/repositories/serializers/guildConfigSerializer", () =>
   });
 
   // localeが空の場合はデフォルト値で補完されることを確認
-  it("toGuildConfigCreateData serializes values and applies default locale", () => {
+  it("toGuildConfigCreateData が値をシリアライズしてデフォルトロケールを適用すること", () => {
     const data = toGuildConfigCreateData(
       {
         guildId: "guild-3",
@@ -42,7 +42,7 @@ describe("shared/database/repositories/serializers/guildConfigSerializer", () =>
     });
   });
 
-  it("toGuildConfigCreateData preserves provided locale", () => {
+  it("toGuildConfigCreateData が指定された locale をそのまま保持すること", () => {
     const data = toGuildConfigCreateData(
       {
         guildId: "guild-4",
@@ -56,12 +56,12 @@ describe("shared/database/repositories/serializers/guildConfigSerializer", () =>
     expect(data).toEqual({ guildId: "guild-4", locale: "en" });
   });
 
-  it("toGuildConfigUpdateData includes only locale when provided", () => {
+  it("toGuildConfigUpdateData が locale のみを含むオブジェクトを返すこと", () => {
     expect(toGuildConfigUpdateData({ locale: "en" })).toEqual({ locale: "en" });
   });
 
   // フィールドを一切渡さない場合は空オブジェクトが返ることを確認
-  it("toGuildConfigUpdateData returns empty object when no fields are provided", () => {
+  it("toGuildConfigUpdateData がフィールド未指定の場合に空オブジェクトを返すこと", () => {
     expect(toGuildConfigUpdateData({})).toEqual({});
   });
 });

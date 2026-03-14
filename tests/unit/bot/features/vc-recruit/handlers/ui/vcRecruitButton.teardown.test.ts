@@ -159,8 +159,7 @@ describe("vcRecruitButtonHandler / teardown confirm", () => {
     removeSetupMock.mockResolvedValue(undefined);
   });
 
-  // セッションが失効していた場合はエフェメラルエラーを返す
-  it("replies with error when session is expired", async () => {
+  it("セッションが失効していた場合はエフェメラルエラーを返す", async () => {
     const { safeReply } = await import("@/bot/utils/interaction");
     getTeardownConfirmSessionMock.mockReturnValue(null);
 
@@ -174,8 +173,7 @@ describe("vcRecruitButtonHandler / teardown confirm", () => {
     expect(removeSetupMock).not.toHaveBeenCalled();
   });
 
-  // DB にレコードがない場合はそのエントリをスキップする
-  it("skips entry when setup is not found in DB", async () => {
+  it("DB にレコードがない場合はそのエントリをスキップする", async () => {
     getTeardownConfirmSessionMock.mockReturnValue({
       guildId: GUILD_ID,
       selectedSetups: [
@@ -190,8 +188,7 @@ describe("vcRecruitButtonHandler / teardown confirm", () => {
     expect(removeSetupMock).not.toHaveBeenCalled();
   });
 
-  // removeSetup が channel.delete より先に呼ばれる（DB 削除が最初）
-  it("calls removeSetup BEFORE channel.delete (DB-first ordering)", async () => {
+  it("removeSetup が channel.delete より先に呼ばれる（DB 削除優先）", async () => {
     getTeardownConfirmSessionMock.mockReturnValue({
       guildId: GUILD_ID,
       selectedSetups: [
@@ -247,8 +244,7 @@ describe("vcRecruitButtonHandler / teardown confirm", () => {
     );
   });
 
-  // チャンネルが既に削除されている場合もエラーにならず成功する
-  it("succeeds gracefully when channels are already deleted", async () => {
+  it("チャンネルが既に削除されている場合もエラーにならず成功する", async () => {
     getTeardownConfirmSessionMock.mockReturnValue({
       guildId: GUILD_ID,
       selectedSetups: [
@@ -276,8 +272,7 @@ describe("vcRecruitButtonHandler / teardown confirm", () => {
     expect(interaction.editReply).toHaveBeenCalled();
   });
 
-  // UnknownChannel DiscordAPIError は吸収されて成功扱いになる（冪等性）
-  it("absorbs UnknownChannel DiscordAPIError and treats as success", async () => {
+  it("UnknownChannel DiscordAPIError は吸収されて成功扱いになる（冪等性）", async () => {
     getTeardownConfirmSessionMock.mockReturnValue({
       guildId: GUILD_ID,
       selectedSetups: [
@@ -316,8 +311,7 @@ describe("vcRecruitButtonHandler / teardown confirm", () => {
     expect(editArg.embeds[0].success).not.toContain("teardown_partial_error");
   });
 
-  // UnknownChannel 以外のエラー（Missing Permissions 等）は再 throw され errorLines に入る
-  it("reports to errorLines when non-UnknownChannel error thrown from delete()", async () => {
+  it("UnknownChannel 以外のエラー（Missing Permissions 等）は errorLines に記録される", async () => {
     getTeardownConfirmSessionMock.mockReturnValue({
       guildId: GUILD_ID,
       selectedSetups: [
@@ -359,8 +353,7 @@ describe("vcRecruitButtonHandler / teardown confirm", () => {
     expect(editArg.embeds[0].success).toContain("Missing Permissions");
   });
 
-  // 複数セットアップの一部が失敗しても残りは処理されエラー報告される
-  it("processes all entries even when one fails, and reports partial errors", async () => {
+  it("複数セットアップの一部が失敗しても残りは処理されエラーが報告される", async () => {
     getTeardownConfirmSessionMock.mockReturnValue({
       guildId: GUILD_ID,
       selectedSetups: [
@@ -402,8 +395,7 @@ describe("vcRecruitButtonHandler / teardown confirm", () => {
     expect(interaction.editReply).toHaveBeenCalled();
   });
 
-  // postChannel 削除時に UnknownChannel 以外のエラーが throw され errorLines に入る
-  it("reports to errorLines when non-UnknownChannel error thrown from postChannel delete()", async () => {
+  it("postChannel 削除時に UnknownChannel 以外のエラーが throw されると errorLines に記録される", async () => {
     getTeardownConfirmSessionMock.mockReturnValue({
       guildId: GUILD_ID,
       selectedSetups: [
@@ -455,8 +447,7 @@ describe("vcRecruitButtonHandler / teardown cancel", () => {
     vi.clearAllMocks();
   });
 
-  // CANCEL ボタン → セッション削除してキャンセル成功 embed を表示する
-  it("deletes session and updates with success embed", async () => {
+  it("CANCEL ボタンでセッションを削除してキャンセル成功 embed を表示する", async () => {
     const interaction = {
       customId: `vc-recruit-teardown-cancel:${SELECT_INTERACTION_ID}`,
       guild: { id: GUILD_ID },
@@ -475,8 +466,7 @@ describe("vcRecruitButtonHandler / teardown cancel", () => {
     );
   });
 
-  // guild が null の場合は早期リターン
-  it("does nothing when guild is null", async () => {
+  it("guild が null の場合は早期リターンして何もしない", async () => {
     const interaction = {
       customId: `vc-recruit-teardown-cancel:${SELECT_INTERACTION_ID}`,
       guild: null,
@@ -494,8 +484,7 @@ describe("vcRecruitButtonHandler / teardown redo", () => {
     vi.clearAllMocks();
   });
 
-  // REDO ボタン → セッション削除して teardown セレクトメニューを再表示する
-  it("deletes session and re-shows teardown select menu", async () => {
+  it("REDO ボタンでセッションを削除して teardown セレクトメニューを再表示する", async () => {
     const interaction = {
       customId: `vc-recruit-teardown-redo:${SELECT_INTERACTION_ID}`,
       guild: { id: GUILD_ID },
@@ -515,8 +504,7 @@ describe("vcRecruitButtonHandler / teardown redo", () => {
     );
   });
 
-  // REDO 60秒後にセレクトメニューが無効化される（setTimeout + editReply）
-  it("disables select menu after 60 seconds", async () => {
+  it("REDO の 60秒後にセレクトメニューが無効化される", async () => {
     vi.useFakeTimers();
     const interaction = {
       customId: `vc-recruit-teardown-redo:${SELECT_INTERACTION_ID}`,
@@ -534,8 +522,7 @@ describe("vcRecruitButtonHandler / teardown redo", () => {
     vi.useRealTimers();
   });
 
-  // editReply が throw しても（トークン失効）エラーにならない
-  it("does not throw when editReply fails after timeout", async () => {
+  it("タイムアウト後に editReply が throw しても（トークン失効）エラーにならない", async () => {
     vi.useFakeTimers();
     const interaction = {
       customId: `vc-recruit-teardown-redo:${SELECT_INTERACTION_ID}`,

@@ -99,15 +99,13 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
     removeMentionUserMock.mockResolvedValue("removed");
   });
 
-  // customId prefix 判定が有効であることを検証
-  it("matches mention on/off custom IDs", () => {
+  it("customId prefix 判定が有効であることを検証", () => {
     expect(bumpPanelButtonHandler.matches("bump:on:guild-1")).toBe(true);
     expect(bumpPanelButtonHandler.matches("bump:off:guild-1")).toBe(true);
     expect(bumpPanelButtonHandler.matches("other:guild-1")).toBe(false);
   });
 
-  // ギルド不一致時にエラー応答して終了することを検証
-  it("replies error when guild does not match customId guild", async () => {
+  it("ギルド不一致時にエラー応答して終了することを検証", async () => {
     const interaction = createInteraction({
       customId: "bump:on:guild-1",
       guild: { id: "guild-x" },
@@ -121,7 +119,7 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
     });
   });
 
-  it("replies error when guild is missing", async () => {
+  it("guild が存在しない場合はエラー応答する", async () => {
     const interaction = createInteraction({ guild: null });
 
     await bumpPanelButtonHandler.execute(interaction as never);
@@ -132,7 +130,7 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
     });
   });
 
-  it("replies not-configured error on add path", async () => {
+  it("追加パスで NOT_CONFIGURED エラーが返った場合はエラー応答する", async () => {
     addMentionUserMock.mockResolvedValueOnce("not_configured");
     const interaction = createInteraction({ customId: "bump:on:guild-1" });
 
@@ -145,7 +143,7 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
     });
   });
 
-  it("replies warning when add target already exists", async () => {
+  it("追加対象がすでに存在する場合は警告応答を返す", async () => {
     addMentionUserMock.mockResolvedValueOnce("already_exists");
     const interaction = createInteraction({ customId: "bump:on:guild-1" });
 
@@ -160,7 +158,7 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
     });
   });
 
-  it("replies success and logs debug on add success", async () => {
+  it("メンション追加成功時に成功応答を返してデバッグログを記録する", async () => {
     const interaction = createInteraction({ customId: "bump:on:guild-1" });
 
     await bumpPanelButtonHandler.execute(interaction as never);
@@ -178,7 +176,7 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
     expect(logger.debug).toHaveBeenCalled();
   });
 
-  it("replies not-configured error on remove path", async () => {
+  it("削除パスで NOT_CONFIGURED エラーが返った場合はエラー応答する", async () => {
     removeMentionUserMock.mockResolvedValueOnce("not_configured");
     const interaction = createInteraction({ customId: "bump:off:guild-1" });
 
@@ -191,7 +189,7 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
     });
   });
 
-  it("replies warning when remove target is not found", async () => {
+  it("削除対象が見つからない場合は警告応答を返す", async () => {
     removeMentionUserMock.mockResolvedValueOnce("not_found");
     const interaction = createInteraction({ customId: "bump:off:guild-1" });
 
@@ -206,7 +204,7 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
     });
   });
 
-  it("replies success and logs debug on remove success", async () => {
+  it("メンション削除成功時に成功応答を返してデバッグログを記録する", async () => {
     const interaction = createInteraction({ customId: "bump:off:guild-1" });
 
     await bumpPanelButtonHandler.execute(interaction as never);
@@ -222,7 +220,7 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
     expect(logger.debug).toHaveBeenCalled();
   });
 
-  it("handles execution error and sends fallback error embed", async () => {
+  it("実行エラー発生時にフォールバックのエラー embed を送信する", async () => {
     addMentionUserMock.mockRejectedValueOnce(new Error("db failed"));
     const interaction = createInteraction({ customId: "bump:on:guild-1" });
 
@@ -243,7 +241,7 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
     });
   });
 
-  it("logs secondary error when fallback reply also fails", async () => {
+  it("フォールバック返答も失敗した場合は二次エラーをログに記録する", async () => {
     addMentionUserMock.mockRejectedValueOnce(new Error("db failed"));
     safeReplyMock.mockRejectedValueOnce(new Error("reply failed"));
     const interaction = createInteraction({ customId: "bump:on:guild-1" });

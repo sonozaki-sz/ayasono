@@ -17,7 +17,7 @@ describe("shared/database/repositories/memberLogConfigRepository", () => {
   }
 
   describe("getMemberLogConfig", () => {
-    it("returns null when record not found", async () => {
+    it("レコードが存在しない場合は null を返すこと", async () => {
       const prisma = createPrismaMock();
       prisma.guildMemberLogConfig.findUnique.mockResolvedValue(null);
 
@@ -31,7 +31,7 @@ describe("shared/database/repositories/memberLogConfigRepository", () => {
       });
     });
 
-    it("returns MemberLogConfig with all fields from record", async () => {
+    it("レコードが見つかった場合は全フィールドを含む MemberLogConfig を返すこと", async () => {
       const prisma = createPrismaMock();
       prisma.guildMemberLogConfig.findUnique.mockResolvedValue({
         guildId: "guild-1",
@@ -53,7 +53,7 @@ describe("shared/database/repositories/memberLogConfigRepository", () => {
       });
     });
 
-    it("returns undefined for null optional fields", async () => {
+    it("null の任意フィールドは undefined として返すこと", async () => {
       const prisma = createPrismaMock();
       prisma.guildMemberLogConfig.findUnique.mockResolvedValue({
         guildId: "guild-1",
@@ -77,7 +77,7 @@ describe("shared/database/repositories/memberLogConfigRepository", () => {
   });
 
   describe("updateMemberLogConfig", () => {
-    it("upserts record with all provided values", async () => {
+    it("指定した全フィールドでレコードを upsert すること", async () => {
       const prisma = createPrismaMock();
       prisma.guildMemberLogConfig.upsert.mockResolvedValue({});
 
@@ -108,7 +108,7 @@ describe("shared/database/repositories/memberLogConfigRepository", () => {
       });
     });
 
-    it("uses null for undefined optional fields", async () => {
+    it("未指定の任意フィールドには null を使用すること", async () => {
       const prisma = createPrismaMock();
       prisma.guildMemberLogConfig.upsert.mockResolvedValue({});
 

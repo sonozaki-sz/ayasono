@@ -56,7 +56,7 @@ describe("ErrorHandler", () => {
   });
 
   describe("logError()", () => {
-    it("should log operational BaseError as warning", () => {
+    it("operational な BaseError は warning としてログ出力されることを確認", () => {
       const error = new ValidationError("Invalid input");
 
       logError(error);
@@ -69,7 +69,7 @@ describe("ErrorHandler", () => {
       );
     });
 
-    it("should log non-operational BaseError as error", () => {
+    it("non-operational な BaseError は error としてログ出力されることを確認", () => {
       const error = new DatabaseError("Critical DB error", false);
 
       logError(error);
@@ -82,7 +82,7 @@ describe("ErrorHandler", () => {
       );
     });
 
-    it("should log regular Error as unhandled error", () => {
+    it("通常の Error は unhandled error としてログ出力されることを確認", () => {
       const error = new Error("Generic error");
 
       logError(error);
@@ -95,7 +95,7 @@ describe("ErrorHandler", () => {
       );
     });
 
-    it("should include stack trace in logs", () => {
+    it("ログにスタックトレースが含まれることを確認", () => {
       const error = new ValidationError("Test error");
 
       logError(error);
@@ -117,7 +117,7 @@ describe("ErrorHandler", () => {
       env.NODE_ENV = originalEnv;
     });
 
-    it("should return operational error message", () => {
+    it("operational エラーのメッセージがそのまま返されることを確認", () => {
       const error = new ValidationError("フィールドが必須です");
 
       const message = getUserFriendlyMessage(error);
@@ -125,7 +125,7 @@ describe("ErrorHandler", () => {
       expect(message).toBe("フィールドが必須です");
     });
 
-    it("should return generic message in production for non-operational errors", () => {
+    it("本番環境では non-operational エラーに汎用メッセージを返すことを確認", () => {
       // 本番環境では内部詳細を出さず汎用メッセージにする
       env.NODE_ENV = NODE_ENV.PRODUCTION;
       const error = new Error("Internal server error");
@@ -135,7 +135,7 @@ describe("ErrorHandler", () => {
       expect(message).toBe("予期しないエラーが発生しました。");
     });
 
-    it("should return detailed message in development", () => {
+    it("開発環境では詳細メッセージを返すことを確認", () => {
       // 開発環境ではデバッグ容易性のため詳細メッセージを返す
       env.NODE_ENV = NODE_ENV.DEVELOPMENT;
       const error = new Error("Detailed error message");
@@ -145,7 +145,7 @@ describe("ErrorHandler", () => {
       expect(message).toContain("Detailed error message");
     });
 
-    it("should handle BaseError with isOperational=true", () => {
+    it("isOperational=true の BaseError のメッセージがそのまま返されることを確認", () => {
       const error = new BaseError("CustomError", "User-friendly message", true);
 
       const message = getUserFriendlyMessage(error);
@@ -167,7 +167,7 @@ describe("ErrorHandler", () => {
       } as unknown as Mocked<ChatInputCommandInteraction>;
     });
 
-    it("should reply with error message when not replied", async () => {
+    it("未応答の場合はエラーメッセージで reply が呼ばれることを確認", async () => {
       const error = new ValidationError("Invalid command");
 
       await handleCommandError(mockInteraction, error);
@@ -187,7 +187,7 @@ describe("ErrorHandler", () => {
       );
     });
 
-    it("should edit reply when already replied", async () => {
+    it("応答済みの場合は editReply が呼ばれることを確認", async () => {
       // 応答済みの場合は editReply へフォールバック
       mockInteraction.replied = true;
       const error = new ValidationError("Invalid command");
@@ -208,7 +208,7 @@ describe("ErrorHandler", () => {
       );
     });
 
-    it("should edit reply when deferred", async () => {
+    it("defer 済みの場合も editReply が呼ばれることを確認", async () => {
       // defer 済みの場合も editReply で更新
       mockInteraction.deferred = true;
       const error = new DatabaseError("Connection failed");
@@ -229,7 +229,7 @@ describe("ErrorHandler", () => {
       );
     });
 
-    it("should log error before replying", async () => {
+    it("reply の前にエラーログが出力されることを確認", async () => {
       const error = new ValidationError("Test error");
 
       await handleCommandError(mockInteraction, error);
@@ -237,7 +237,7 @@ describe("ErrorHandler", () => {
       expect(logger.warn).toHaveBeenCalled();
     });
 
-    it("should handle reply failure gracefully", async () => {
+    it("返信処理が失敗した場合も例外を投げずエラーログに記録することを確認", async () => {
       // 返信処理自体が失敗しても例外で落とさずログへ記録
       mockInteraction.reply.mockRejectedValue(new Error("Reply failed"));
       const error = new ValidationError("Test error");
@@ -252,7 +252,7 @@ describe("ErrorHandler", () => {
   });
 
   describe("handleInteractionError()", () => {
-    it("should use guild validation title when guildId exists", async () => {
+    it("guildId がある場合はギルド検証タイトルが使われることを確認", async () => {
       const interaction: any = {
         replied: false,
         deferred: false,
@@ -271,7 +271,7 @@ describe("ErrorHandler", () => {
       expect(embed.data?.title ?? embed.title).toMatch(/^❌/);
     });
 
-    it("should prioritize BaseError.embedTitle over default title", async () => {
+    it("BaseError.embedTitle がデフォルトタイトルより優先されることを確認", async () => {
       const interaction: any = {
         replied: false,
         deferred: false,
@@ -300,7 +300,7 @@ describe("ErrorHandler", () => {
       expect(embed.data?.title ?? embed.title).toMatch(/^❌/);
     });
 
-    it("should use general fallback title for regular Error", async () => {
+    it("通常の Error にはフォールバックの汎用タイトルが使われることを確認", async () => {
       const interaction: any = {
         replied: false,
         deferred: false,
@@ -321,7 +321,7 @@ describe("ErrorHandler", () => {
   });
 
   describe("Error Message Formatting", () => {
-    it("should prefix error messages title with ❌", async () => {
+    it("エラーメッセージのタイトルに ❌ プレフィックスが付くことを確認", async () => {
       // テストごとに独立した Interaction モックを用意
       const mockInteraction = {
         replied: false,

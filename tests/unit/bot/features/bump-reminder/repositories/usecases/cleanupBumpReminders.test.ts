@@ -3,7 +3,7 @@ import { BUMP_REMINDER_STATUS } from "@/bot/features/bump-reminder/constants/bum
 import { cleanupOldBumpRemindersUseCase } from "@/bot/features/bump-reminder/repositories/usecases/cleanupBumpReminders";
 
 describe("bot/features/bump-reminder/repositories/usecases/cleanupBumpReminders", () => {
-  it("deletes old sent/cancelled reminders and returns count", async () => {
+  it("古い sent/cancelled リマインダーを削除して件数を返す", async () => {
     const deleteMany = vi.fn().mockResolvedValue({ count: 2 });
     const prisma = { bumpReminder: { deleteMany } };
 

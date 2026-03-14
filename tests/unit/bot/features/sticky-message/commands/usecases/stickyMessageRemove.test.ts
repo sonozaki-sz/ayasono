@@ -88,7 +88,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageRemove", ()
     deleteMock.mockResolvedValue(undefined);
   });
 
-  it("replies with warning when channel is not a GuildText", async () => {
+  it("チャンネルが GuildText でない場合に警告を Ephemeral 返信する", async () => {
     const { handleStickyMessageRemove } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageRemove");
     const interaction = createInteractionMock({
@@ -103,7 +103,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageRemove", ()
     expect(findByChannelMock).not.toHaveBeenCalled();
   });
 
-  it("replies with info when no sticky message found", async () => {
+  it("スティッキーメッセージが見つからない場合に情報を Ephemeral 返信する", async () => {
     const { handleStickyMessageRemove } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageRemove");
     findByChannelMock.mockResolvedValue(null);
@@ -117,8 +117,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageRemove", ()
     expect(deleteMock).not.toHaveBeenCalled();
   });
 
-  // DBレコード削除とDiscordの投稿削除が両方呼ばれ、成功返信が送られる正常系フロー全体を確認する
-  it("deletes existing sticky message and replies with success", async () => {
+  it("DBレコード削除とDiscordの投稿削除が両方呼ばれ、成功返信が送られる正常系フロー全体を確認する", async () => {
     const { handleStickyMessageRemove } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageRemove");
     findByChannelMock.mockResolvedValue({
@@ -137,7 +136,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageRemove", ()
     );
   });
 
-  it("skips message deletion when no lastMessageId", async () => {
+  it("lastMessageId がない場合はメッセージ削除をスキップする", async () => {
     const { handleStickyMessageRemove } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageRemove");
     findByChannelMock.mockResolvedValue({
@@ -152,8 +151,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageRemove", ()
     expect(interaction._replyMock).toHaveBeenCalled();
   });
 
-  // Discordのメッセージが既に削除済み等で取得・削除に失敗しても、DBレコード削除は続行されエラーが上位に伝播しないことを確認する
-  it("ignores error when fetching/deleting previous message fails", async () => {
+  it("Discordのメッセージが既に削除済み等で取得・削除に失敗しても、DBレコード削除は続行されエラーが上位に伝播しない", async () => {
     const { handleStickyMessageRemove } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageRemove");
     findByChannelMock.mockResolvedValue({
@@ -171,8 +169,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageRemove", ()
     expect(deleteMock).toHaveBeenCalledWith("sticky-1");
   });
 
-  // guildチャンネルキャッシュに対象チャンネルがない場合でも、DBのスティッキー設定は正常に削除されることを確認する
-  it("skips delete when guild channels cache has no channel", async () => {
+  it("guildチャンネルキャッシュに対象チャンネルがない場合でも、DBのスティッキー設定は正常に削除される", async () => {
     const { handleStickyMessageRemove } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageRemove");
     findByChannelMock.mockResolvedValue({

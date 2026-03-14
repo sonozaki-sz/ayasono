@@ -37,7 +37,7 @@ describe("bot/features/vac/commands/usecases/vacConfigRemoveTrigger", () => {
     (resolveTargetCategory as Mock).mockResolvedValue(null);
   });
 
-  it("throws ValidationError when guild context is missing", async () => {
+  it("ギルドコンテキストが存在しない場合にValidationErrorをスローする", async () => {
     const interaction = {
       guild: null,
       channelId: "ch-1",
@@ -50,7 +50,7 @@ describe("bot/features/vac/commands/usecases/vacConfigRemoveTrigger", () => {
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  it("throws ValidationError when trigger channel is not found", async () => {
+  it("トリガーチャンネルが見つからない場合にValidationErrorをスローする", async () => {
     (getBotVacConfigService as Mock).mockReturnValue({
       getVacConfigOrDefault: vi
         .fn()
@@ -71,7 +71,7 @@ describe("bot/features/vac/commands/usecases/vacConfigRemoveTrigger", () => {
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  it("removes trigger from config, deletes channel, and replies ephemeral", async () => {
+  it("トリガーをconfigから削除してチャンネルを廃棄し、エフェメラルで成功応答する", async () => {
     const removeTriggerChannel = vi.fn().mockResolvedValue(undefined);
     (getBotVacConfigService as Mock).mockReturnValue({
       getVacConfigOrDefault: vi.fn().mockResolvedValue({

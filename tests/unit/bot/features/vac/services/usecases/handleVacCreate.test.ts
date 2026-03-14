@@ -121,7 +121,7 @@ describe("bot/features/vac/services/usecases/handleVacCreate", () => {
     vi.restoreAllMocks();
   });
 
-  it("returns when member or channel is missing, or channel is not voice", async () => {
+  it("memberかchannelが存在しない、またはchannelがボイスでない場合は早期リターンする", async () => {
     const repository = createRepositoryMock();
 
     await handleVacCreateUseCase(repository, { member: null } as never);
@@ -137,7 +137,7 @@ describe("bot/features/vac/services/usecases/handleVacCreate", () => {
     expect(repository.getVacConfigOrDefault).not.toHaveBeenCalled();
   });
 
-  it("returns when VAC is disabled or joined channel is not trigger", async () => {
+  it("VACが無効または参加チャンネルがトリガーでない場合は早期リターンする", async () => {
     const repository = createRepositoryMock();
     const { newState } = createVoiceStateInput({
       triggerChannelId: "trigger-1",
@@ -160,8 +160,7 @@ describe("bot/features/vac/services/usecases/handleVacCreate", () => {
     expect(repository.addCreatedVacChannel).not.toHaveBeenCalled();
   });
 
-  // ユーザー所有の管理チャンネルが既存する場合は新規作成をスキップしてそちらへ移動すること
-  it("moves user to existing owned managed channel and skips creation", async () => {
+  it("ユーザー所有の管理チャンネルが既存する場合は新規作成をスキップしてそちらへ移動すること", async () => {
     const repository = createRepositoryMock();
     const { newState, fetchMock, createMock, setChannelMock } =
       createVoiceStateInput();
@@ -188,7 +187,7 @@ describe("bot/features/vac/services/usecases/handleVacCreate", () => {
     expect(repository.removeCreatedVacChannel).not.toHaveBeenCalled();
   });
 
-  it("removes stale owned channel record when existing owned channel is unavailable", async () => {
+  it("既存の所有チャンネルが利用不可の場合に古いレコードを削除する", async () => {
     const repository = createRepositoryMock();
     const { newState, fetchMock } = createVoiceStateInput();
 
@@ -213,7 +212,7 @@ describe("bot/features/vac/services/usecases/handleVacCreate", () => {
     );
   });
 
-  it("returns when parent category reached channel limit", async () => {
+  it("親カテゴリがチャンネル上限に達している場合は早期リターンする", async () => {
     const repository = createRepositoryMock();
     const { newState, createMock } = createVoiceStateInput({
       parentCategoryChildrenCount: 50,
@@ -231,8 +230,7 @@ describe("bot/features/vac/services/usecases/handleVacCreate", () => {
     expect(loggerWarnMock).toHaveBeenCalledTimes(1);
   });
 
-  // 正常系: VACチャンネル作成からコントロールパネル送信・ユーザー移動・レコード保存まで一連する処理が正しく実行されること
-  it("creates managed voice channel, sends panel, moves user, and stores record", async () => {
+  it("VACチャンネル作成からコントロールパネル送信・ユーザー移動・レコード保存まで一連する処理が正しく実行されること", async () => {
     const repository = createRepositoryMock();
     const { newState, createMock, setChannelMock } = createVoiceStateInput({
       displayName: "Alice",
@@ -272,7 +270,7 @@ describe("bot/features/vac/services/usecases/handleVacCreate", () => {
     expect(loggerInfoMock).toHaveBeenCalledTimes(1);
   });
 
-  it("returns early when created channel is not a voice channel", async () => {
+  it("作成されたチャンネルがボイスチャンネルでない場合は早期リターンする", async () => {
     const repository = createRepositoryMock();
     const { newState, createMock, setChannelMock } = createVoiceStateInput({
       createdChannel: {
@@ -295,8 +293,7 @@ describe("bot/features/vac/services/usecases/handleVacCreate", () => {
     expect(repository.addCreatedVacChannel).not.toHaveBeenCalled();
   });
 
-  // コントロールパネル送信が失敗してもユーザー移動とチャンネル保存は続行されること (静默したエラーヘルパー)
-  it("logs panel send failure and still continues move + save", async () => {
+  it("コントロールパネル送信が失敗してもユーザー移動とチャンネル保存は続行されること", async () => {
     const repository = createRepositoryMock();
     const { newState, setChannelMock } = createVoiceStateInput();
     repository.getVacConfigOrDefault.mockResolvedValue({

@@ -61,8 +61,7 @@ describe("Logger", () => {
     };
   };
 
-  // development 環境では Console + DailyRotateFile×2 の計3トランスポートと debug レベルが設定されることを確認
-  it("configures development logger with debug-level console and two rotate files", async () => {
+  it("development 環境では Console + DailyRotateFile×2 の計3トランスポートと debug レベルが設定されること", async () => {
     const { module, createLoggerMock, consoleTransportMock, dailyRotateMock } =
       await loadLoggerModule("development", "debug");
 
@@ -79,7 +78,7 @@ describe("Logger", () => {
     expect(createLoggerArgs.transports).toHaveLength(3);
   });
 
-  it("configures non-development logger with info-level console and defaults", async () => {
+  it("非 development 環境では info レベルのコンソールトランスポートとデフォルト設定が適用されること", async () => {
     const { createLoggerMock, consoleTransportMock, dailyRotateMock } =
       await loadLoggerModule("production", undefined);
 
@@ -96,7 +95,7 @@ describe("Logger", () => {
 
   // コンソール用 printf が stack の有無でフォーマットを切り替えること、
   // stack がある場合は改行で続けて出力されることを検証する
-  it("formats console output with and without stack in development", async () => {
+  it("development 環境でコンソール出力が stack の有無でフォーマットを切り替えること", async () => {
     const { winstonMock } = await loadLoggerModule("development", "debug");
 
     const printfCalls = winstonMock.format.printf.mock.calls;
@@ -129,7 +128,7 @@ describe("Logger", () => {
 
   // ファイル用 printf が余剰メタフィールドを JSON 文字列として末尾に付加し、
   // stack は改行区切りで最後に出力されることを確認する
-  it("formats file output with meta and optional stack", async () => {
+  it("ファイル出力がメタフィールドと stack を正しくフォーマットすること", async () => {
     const { winstonMock } = await loadLoggerModule("development", "debug");
 
     const printfCalls = winstonMock.format.printf.mock.calls;
@@ -161,8 +160,7 @@ describe("Logger", () => {
     ).toBe('2026-02-21 00:00:00 [ERROR]: boom{"guildId":"g1"}\nSTACK_TRACE');
   });
 
-  // LOG_LEVEL が未設定の開発環境ではデフォルト値として debug が適用されることを確認
-  it("uses debug default level when LOG_LEVEL is missing in development", async () => {
+  it("LOG_LEVEL が未設定の開発環境ではデフォルト値として debug が適用されること", async () => {
     const { consoleTransportMock } = await loadLoggerModule(
       "development",
       undefined,
@@ -173,8 +171,7 @@ describe("Logger", () => {
     );
   });
 
-  // DISCORD_ERROR_WEBHOOK_URL が設定されている場合に DiscordWebhookTransport が追加され4トランスポートになることを確認する
-  it("adds DiscordWebhookTransport when DISCORD_ERROR_WEBHOOK_URL is set", async () => {
+  it("DISCORD_ERROR_WEBHOOK_URL が設定されている場合に DiscordWebhookTransport が追加されて4トランスポートになること", async () => {
     const { createLoggerMock, discordWebhookTransportMock } =
       await loadLoggerModule(
         "production",
@@ -190,8 +187,7 @@ describe("Logger", () => {
     expect(createLoggerArgs.transports).toHaveLength(4);
   });
 
-  // DISCORD_ERROR_WEBHOOK_URL が未設定の場合は DiscordWebhookTransport が追加されないことを確認する
-  it("does not add DiscordWebhookTransport when DISCORD_ERROR_WEBHOOK_URL is not set", async () => {
+  it("DISCORD_ERROR_WEBHOOK_URL が未設定の場合は DiscordWebhookTransport が追加されないこと", async () => {
     const { createLoggerMock, discordWebhookTransportMock } =
       await loadLoggerModule("production", undefined);
 

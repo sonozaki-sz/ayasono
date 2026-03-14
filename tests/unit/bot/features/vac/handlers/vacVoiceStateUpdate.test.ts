@@ -15,7 +15,7 @@ describe("bot/features/vac/handlers/vacVoiceStateUpdate", () => {
     vi.clearAllMocks();
   });
 
-  it("delegates voice state pair to vac service", async () => {
+  it("ボイス状態ペアをvacサービスへ委譲する", async () => {
     const oldState = { channelId: "old-1" };
     const newState = { channelId: "new-1" };
 
@@ -24,7 +24,7 @@ describe("bot/features/vac/handlers/vacVoiceStateUpdate", () => {
     expect(handleVoiceStateUpdateMock).toHaveBeenCalledWith(oldState, newState);
   });
 
-  it("propagates service failure", async () => {
+  it("サービスの失敗を呼び出し元に伝播する", async () => {
     handleVoiceStateUpdateMock.mockRejectedValueOnce(
       new Error("service failed"),
     );

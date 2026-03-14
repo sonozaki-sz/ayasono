@@ -73,8 +73,7 @@ describe("bot/features/afk/commands/afkCommand.execute", () => {
     tGuildMock.mockResolvedValue("translated");
   });
 
-  // guildId が null（DM などギルド外）の場合はコマンド実行前に弾かれることを確認
-  it("throws ValidationError when guildId is missing", async () => {
+  it("guildId が null（DM などギルド外）の場合は ValidationError を投げる", async () => {
     const interaction = createInteraction();
     interaction.guildId = null as never;
 
@@ -83,7 +82,7 @@ describe("bot/features/afk/commands/afkCommand.execute", () => {
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  it("moves target user and replies success embed", async () => {
+  it("対象ユーザーを AFK チャンネルへ移動して成功 embed で返信する", async () => {
     const interaction = createInteraction();
 
     await executeAfkCommand(interaction as never);
@@ -99,7 +98,7 @@ describe("bot/features/afk/commands/afkCommand.execute", () => {
     expect(loggerInfoMock).toHaveBeenCalledTimes(1);
   });
 
-  it("throws ValidationError when config is null", async () => {
+  it("config が null の場合は ValidationError を投げる", async () => {
     getAfkConfigMock.mockResolvedValue(null);
     const interaction = createInteraction();
 
@@ -108,7 +107,7 @@ describe("bot/features/afk/commands/afkCommand.execute", () => {
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  it("throws ValidationError when config.enabled is false", async () => {
+  it("config.enabled が false の場合は ValidationError を投げる", async () => {
     getAfkConfigMock.mockResolvedValue({ enabled: false, channelId: "afk-channel" });
     const interaction = createInteraction();
 
@@ -117,7 +116,7 @@ describe("bot/features/afk/commands/afkCommand.execute", () => {
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  it("throws ValidationError when config.channelId is missing", async () => {
+  it("config.channelId が未設定の場合は ValidationError を投げる", async () => {
     getAfkConfigMock.mockResolvedValue({ enabled: true, channelId: undefined });
     const interaction = createInteraction();
 
@@ -126,7 +125,7 @@ describe("bot/features/afk/commands/afkCommand.execute", () => {
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  it("throws ValidationError when member is not found", async () => {
+  it("メンバーが見つからない場合は ValidationError を投げる", async () => {
     const interaction = createInteraction();
     interaction.guild.members.fetch = vi.fn().mockResolvedValue(null);
 
@@ -135,7 +134,7 @@ describe("bot/features/afk/commands/afkCommand.execute", () => {
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  it("throws ValidationError when member is not in a voice channel", async () => {
+  it("メンバーがボイスチャンネルにいない場合は ValidationError を投げる", async () => {
     const interaction = createInteraction();
     interaction.guild.members.fetch = vi.fn().mockResolvedValue({
       voice: { channel: null },
@@ -146,7 +145,7 @@ describe("bot/features/afk/commands/afkCommand.execute", () => {
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  it("throws ValidationError when afk channel is not found", async () => {
+  it("AFK チャンネルが見つからない場合は ValidationError を投げる", async () => {
     const interaction = createInteraction();
     interaction.guild.channels.fetch = vi.fn().mockResolvedValue(null);
 
@@ -155,7 +154,7 @@ describe("bot/features/afk/commands/afkCommand.execute", () => {
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  it("throws ValidationError when afk channel is not a GuildVoice channel", async () => {
+  it("AFK チャンネルが GuildVoice チャンネルでない場合は ValidationError を投げる", async () => {
     const interaction = createInteraction();
     // ChannelType.GuildText = 0
     interaction.guild.channels.fetch = vi.fn().mockResolvedValue({
@@ -168,7 +167,7 @@ describe("bot/features/afk/commands/afkCommand.execute", () => {
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  it("uses explicit user option if provided", async () => {
+  it("user オプションが指定されている場合はそのユーザーを対象にする", async () => {
     const interaction = createInteraction();
     const explicitUser = { id: "user-2" };
     interaction.options.getUser = vi.fn().mockReturnValue(explicitUser);

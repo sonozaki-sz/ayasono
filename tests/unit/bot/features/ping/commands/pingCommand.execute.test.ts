@@ -28,7 +28,7 @@ describe("bot/features/ping/commands/pingCommand.execute", () => {
     vi.clearAllMocks();
   });
 
-  it("replies measuring then edits with latency embed", async () => {
+  it("計測中メッセージを返信し、レイテンシ embed で編集する", async () => {
     const interaction = createInteraction();
 
     (tGuild as Mock)
@@ -45,7 +45,7 @@ describe("bot/features/ping/commands/pingCommand.execute", () => {
     });
   });
 
-  it("passes undefined guildId to translation when interaction guildId is null", async () => {
+  it("interaction の guildId が null の場合は翻訳に undefined を渡す", async () => {
     const interaction = createInteraction();
     interaction.guildId = null as never;
 

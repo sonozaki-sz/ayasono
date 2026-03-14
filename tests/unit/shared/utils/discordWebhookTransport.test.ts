@@ -34,13 +34,13 @@ describe("shared/utils/discordWebhookTransport", () => {
     vi.unstubAllGlobals();
   });
 
-  it("has level 'error' (only fires on error-level logs)", () => {
+  it("level が 'error' であること（error レベルのログのみで発火する）", () => {
     const transport = new DiscordWebhookTransport(TEST_WEBHOOK_URL);
     expect(transport.level).toBe("error");
   });
 
   // コールバックが同期的に呼ばれることで後続のトランスポート処理をブロックしないことを確認する
-  it("invokes callback synchronously", () => {
+  it("コールバックが同期的に呼ばれること", () => {
     const transport = new DiscordWebhookTransport(TEST_WEBHOOK_URL);
     const callback = vi.fn();
 
@@ -49,7 +49,7 @@ describe("shared/utils/discordWebhookTransport", () => {
     expect(callback).toHaveBeenCalledTimes(1);
   });
 
-  it("calls fetch with the correct webhook URL and method", () => {
+  it("正しい Webhook URL と メソッドで fetch が呼ばれること", () => {
     const transport = new DiscordWebhookTransport(TEST_WEBHOOK_URL);
     const callback = vi.fn();
 
@@ -62,7 +62,7 @@ describe("shared/utils/discordWebhookTransport", () => {
     );
   });
 
-  it("sends correct embed payload with title, color, and timestamp", () => {
+  it("タイトル・カラー・タイムスタンプを含む正しい Embed ペイロードを送信すること", () => {
     const transport = new DiscordWebhookTransport(TEST_WEBHOOK_URL);
     const callback = vi.fn();
 
@@ -79,7 +79,7 @@ describe("shared/utils/discordWebhookTransport", () => {
   });
 
   // description に message が含まれることを確認（エラー内容の可視性保証）
-  it("includes message in embed description", () => {
+  it("Embed の description に message が含まれること", () => {
     const transport = new DiscordWebhookTransport(TEST_WEBHOOK_URL);
     const callback = vi.fn();
 
@@ -93,7 +93,7 @@ describe("shared/utils/discordWebhookTransport", () => {
   });
 
   // stack が存在する場合は コードブロック形式でdescription に付記されることを確認する
-  it("includes stack in description when present", () => {
+  it("stack が存在する場合は description にコードブロック形式で付記されること", () => {
     const transport = new DiscordWebhookTransport(TEST_WEBHOOK_URL);
     const callback = vi.fn();
 
@@ -110,7 +110,7 @@ describe("shared/utils/discordWebhookTransport", () => {
     expect(body.embeds[0]?.description).toContain("Error\n  at foo (bar.ts:1)");
   });
 
-  it("does not include code block when stack is absent", () => {
+  it("stack が存在しない場合は description にコードブロックを含めないこと", () => {
     const transport = new DiscordWebhookTransport(TEST_WEBHOOK_URL);
     const callback = vi.fn();
 
@@ -124,7 +124,7 @@ describe("shared/utils/discordWebhookTransport", () => {
   });
 
   // 4096文字を超えるdescriptionが "..." に切り詰められ、Discord文字数上限を守ることを確認する
-  it("truncates description exceeding 4096 chars", () => {
+  it("4096 文字を超える description が '...' に切り詰められること", () => {
     const transport = new DiscordWebhookTransport(TEST_WEBHOOK_URL);
     const callback = vi.fn();
     const longMessage = "a".repeat(MAX_DESC_LENGTH + 100);
@@ -141,7 +141,7 @@ describe("shared/utils/discordWebhookTransport", () => {
   });
 
   // 4096文字ちょうどの場合は切り詰めが発生しないことを境界値テストで確認する
-  it("does not truncate description at exactly 4096 chars", () => {
+  it("description がちょうど 4096 文字の場合は切り詰めが発生しないこと", () => {
     const transport = new DiscordWebhookTransport(TEST_WEBHOOK_URL);
     const callback = vi.fn();
     // "**" + message + "**" が 4096文字になるようメッセージ長を調整する
@@ -159,7 +159,7 @@ describe("shared/utils/discordWebhookTransport", () => {
   });
 
   // fetch 失敗時はアプリをクラッシュさせず、stderrにのみ記録することを確認する
-  it("handles fetch error gracefully without throwing", async () => {
+  it("fetch エラーをスローせずに安全に処理すること", async () => {
     fetchMock.mockRejectedValue(new Error("Network error"));
     const stderrSpy = vi
       .spyOn(process.stderr, "write")
@@ -188,7 +188,7 @@ describe("shared/utils/discordWebhookTransport", () => {
   });
 
   // "logged" イベントが非同期で発行されることを確認する（Winston の規約準拠）
-  it("emits 'logged' event after log", async () => {
+  it("ログ後に 'logged' イベントが発行されること", async () => {
     const transport = new DiscordWebhookTransport(TEST_WEBHOOK_URL);
     const callback = vi.fn();
     const loggedHandler = vi.fn();
@@ -203,8 +203,7 @@ describe("shared/utils/discordWebhookTransport", () => {
     expect(loggedHandler).toHaveBeenCalledWith(info);
   });
 
-  // message が文字列以外（数値）の場合に String() で変換されることを確認する（type guard の false ブランチ）
-  it("converts non-string message to string in description", () => {
+  it("message が文字列以外（数値）の場合に String() で変換されることを確認する（type guard の false ブランチ）", () => {
     const transport = new DiscordWebhookTransport(TEST_WEBHOOK_URL);
     const callback = vi.fn();
 
@@ -218,8 +217,7 @@ describe("shared/utils/discordWebhookTransport", () => {
     expect(body.embeds[0]?.description).toContain("42");
   });
 
-  // message が undefined の場合に空文字列へフォールバックすることを確認する（nullish coalescing の右辺ブランチ）
-  it("falls back to empty string when message is undefined", () => {
+  it("message が undefined の場合に空文字列へフォールバックすることを確認する（nullish coalescing の右辺ブランチ）", () => {
     const transport = new DiscordWebhookTransport(TEST_WEBHOOK_URL);
     const callback = vi.fn();
 

@@ -59,8 +59,7 @@ describe("bot/handlers/interactionCreate/flow/components", () => {
     vi.clearAllMocks();
   });
 
-  // handlers 配列の先頭マッチが実行されるべきで、後続ハンドラは呼ばれないことを確認
-  it("executes first matching button handler only", async () => {
+  it("handlers 配列の先頭マッチが実行され後続ハンドラは呼ばれないことを確認", async () => {
     const interaction = { customId: "target" };
     const uiModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/buttons",
@@ -74,8 +73,7 @@ describe("bot/handlers/interactionCreate/flow/components", () => {
     expect(uiModule.buttonHandlers[1].execute).not.toHaveBeenCalled();
   });
 
-  // ハンドラ内で例外が起きた場合、呼び出し元に伝播させず handleInteractionError に委譲することを検証
-  it("delegates button handler error to interaction error handler", async () => {
+  it("ボタンハンドラが例外を投げた場合に handleInteractionError へ委譲することを確認", async () => {
     const error = new Error("button failed");
     const uiModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/buttons",
@@ -89,7 +87,7 @@ describe("bot/handlers/interactionCreate/flow/components", () => {
     expect(loggerErrorMock).toHaveBeenCalledTimes(1);
   });
 
-  it("executes matching user-select handler", async () => {
+  it("customId に一致するユーザーセレクトハンドラーが実行されることを確認", async () => {
     const interaction = { customId: "target" };
     const uiModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/selectMenus",
@@ -102,7 +100,7 @@ describe("bot/handlers/interactionCreate/flow/components", () => {
     );
   });
 
-  it("executes matching string-select handler", async () => {
+  it("customId に一致するストリングセレクトハンドラーが実行されることを確認", async () => {
     const interaction = { customId: "target" };
     const uiModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/selectMenus",
@@ -115,8 +113,7 @@ describe("bot/handlers/interactionCreate/flow/components", () => {
     );
   });
 
-  // customId が一致しないハンドラは execute が呼ばれないことを確認（フィルタ漏れがないか）
-  it("skips non-matching string-select handler", async () => {
+  it("customId が一致しないストリングセレクトハンドラーは execute が呼ばれないことを確認", async () => {
     const interaction = { customId: "no-match" };
     const uiModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/selectMenus",
@@ -127,8 +124,7 @@ describe("bot/handlers/interactionCreate/flow/components", () => {
     expect(uiModule.stringSelectHandlers[0].execute).not.toHaveBeenCalled();
   });
 
-  // ストリングセレクトハンドラのエラーも同様に handleInteractionError へ委譲されることを確認
-  it("delegates string-select handler error to interaction error handler", async () => {
+  it("ストリングセレクトハンドラーが例外を投げた場合に handleInteractionError へ委譲されることを確認", async () => {
     const error = new Error("select failed");
     const uiModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/selectMenus",

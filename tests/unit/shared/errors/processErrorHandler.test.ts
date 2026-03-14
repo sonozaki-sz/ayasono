@@ -32,7 +32,7 @@ describe("shared/errors/processErrorHandler", () => {
     vi.restoreAllMocks();
   });
 
-  it("registers global handlers only once", async () => {
+  it("グローバルハンドラーを一度だけ登録すること", async () => {
     const onSpy = vi
       .spyOn(process, "on")
       .mockImplementation((() => process) as typeof process.on);
@@ -48,7 +48,7 @@ describe("shared/errors/processErrorHandler", () => {
     );
   });
 
-  it("logs unhandled rejection and forwards Error reason", async () => {
+  it("unhandledRejection をログに記録し、Error 型の reason を転送すること", async () => {
     const handlers = new Map<string, (...args: unknown[]) => void>();
     vi.spyOn(process, "on").mockImplementation(((
       event: string,
@@ -83,7 +83,7 @@ describe("shared/errors/processErrorHandler", () => {
   });
 
   // non-operational （回復不可能なエラー）の場合はプロセス終了すること・ operational なら終了しないことを検証
-  it("exits on non-operational BaseError from uncaughtException", async () => {
+  it("uncaughtException で非運用 BaseError が発生した場合にプロセスを終了すること", async () => {
     const handlers = new Map<string, (...args: unknown[]) => void>();
     vi.spyOn(process, "on").mockImplementation(((
       event: string,
@@ -115,7 +115,7 @@ describe("shared/errors/processErrorHandler", () => {
     expect(exitSpy).toHaveBeenCalledWith(1);
   });
 
-  it("does not exit on operational BaseError from uncaughtException", async () => {
+  it("uncaughtException で運用 BaseError が発生した場合はプロセスを終了しないこと", async () => {
     const handlers = new Map<string, (...args: unknown[]) => void>();
     vi.spyOn(process, "on").mockImplementation(((
       event: string,
@@ -141,7 +141,7 @@ describe("shared/errors/processErrorHandler", () => {
     expect(exitSpy).not.toHaveBeenCalled();
   });
 
-  it("logs node warning details from warning event", async () => {
+  it("warning イベントから Node.js 警告の詳細をログに記録すること", async () => {
     const handlers = new Map<string, (...args: unknown[]) => void>();
     vi.spyOn(process, "on").mockImplementation(((
       event: string,
@@ -172,7 +172,7 @@ describe("shared/errors/processErrorHandler", () => {
     );
   });
 
-  it("logs DEP0040 DeprecationWarning (no longer in ignore list)", async () => {
+  it("DEP0040 の DeprecationWarning を無視リスト外としてログに記録すること", async () => {
     const handlers = new Map<string, (...args: unknown[]) => void>();
     vi.spyOn(process, "on").mockImplementation(((
       event: string,
@@ -209,7 +209,7 @@ describe("shared/errors/processErrorHandler", () => {
     );
   });
 
-  it("logs DeprecationWarning when code is not in the ignore list", async () => {
+  it("無視リストにないコードの DeprecationWarning をログに記録すること", async () => {
     const handlers = new Map<string, (...args: unknown[]) => void>();
     vi.spyOn(process, "on").mockImplementation(((
       event: string,
@@ -245,7 +245,7 @@ describe("shared/errors/processErrorHandler", () => {
     );
   });
 
-  it("logs DeprecationWarning when code is undefined (null-coalescing fallback)", async () => {
+  it("code が undefined の場合の null 合体フォールバックで DeprecationWarning をログに記録すること", async () => {
     const handlers = new Map<string, (...args: unknown[]) => void>();
     vi.spyOn(process, "on").mockImplementation(((
       event: string,
@@ -280,7 +280,7 @@ describe("shared/errors/processErrorHandler", () => {
   });
 
   // グレースフルシャットダウンのクリーンアップ成功・失敗後の exit コードとログ、および二重登録防止を一つの IT で網羅的に検証
-  it("registers graceful shutdown once and handles cleanup outcomes", async () => {
+  it("グレースフルシャットダウンを一度だけ登録しクリーンアップ結果を正しく処理すること", async () => {
     const onceHandlers = new Map<string, () => void>();
     vi.spyOn(process, "once").mockImplementation(((
       event: string,
@@ -360,7 +360,7 @@ describe("shared/errors/processErrorHandler", () => {
   });
 
   // シャットダウン中に同じシグナルが再度山るケース: 二重処理を防いで warn だけ出すことを検証
-  it("logs already-shutting-down warning when signal arrives again", async () => {
+  it("シャットダウン中に同じシグナルが届いた場合は二重処理を防いで警告のみ出すこと", async () => {
     const onceHandlers = new Map<string, () => void>();
     vi.spyOn(process, "once").mockImplementation(((
       event: string,
@@ -400,7 +400,7 @@ describe("shared/errors/processErrorHandler", () => {
     await Promise.resolve();
   });
 
-  it("exits successfully even when cleanup is not provided", async () => {
+  it("クリーンアップ関数が未指定でも正常に終了すること", async () => {
     const onceHandlers = new Map<string, () => void>();
     vi.spyOn(process, "once").mockImplementation(((
       event: string,

@@ -6,7 +6,7 @@ import {
 } from "@/bot/features/bump-reminder/repositories/usecases/findPendingReminders";
 
 describe("bot/features/bump-reminder/repositories/usecases/findPendingReminders", () => {
-  it("finds next pending reminder for guild", async () => {
+  it("ギルドの次の pending リマインダーを取得する", async () => {
     const findFirst = vi.fn().mockResolvedValue({ id: "r1" });
     const prisma = { bumpReminder: { findFirst } };
 
@@ -19,7 +19,7 @@ describe("bot/features/bump-reminder/repositories/usecases/findPendingReminders"
     });
   });
 
-  it("finds all pending reminders ordered by schedule", async () => {
+  it("すべての pending リマインダーをスケジュール順で取得する", async () => {
     const findMany = vi.fn().mockResolvedValue([{ id: "r1" }, { id: "r2" }]);
     const prisma = { bumpReminder: { findMany } };
 

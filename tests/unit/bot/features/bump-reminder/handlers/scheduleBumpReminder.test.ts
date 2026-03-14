@@ -48,7 +48,7 @@ describe("bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder", ()
     });
   });
 
-  it("registers reminder with delay and service", async () => {
+  it("遅延時間とサービス情報を指定してリマインダーを登録する", async () => {
     const client = { channels: { fetch: vi.fn() } };
     const configService = { getBumpReminderConfig: vi.fn() };
 
@@ -68,8 +68,7 @@ describe("bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder", ()
     expect(setReminderMock.mock.calls[0][6]).toBe("Disboard");
   });
 
-  // リマインダー登録失敗時に孤立パネルメッセージをチャンネルから削除したうえでエラーを再スローする正常系クリーンアップを検証
-  it("deletes orphan panel and rethrows on registration error", async () => {
+  it("リマインダー登録失敗時に孤立パネルメッセージをチャンネルから削除したうえでエラーを再スローする正常系クリーンアップを検証", async () => {
     const panelDelete = vi.fn().mockResolvedValue(undefined);
     const fetchMessage = vi.fn().mockResolvedValue({ delete: panelDelete });
     const fetchChannel = vi.fn().mockResolvedValue({
@@ -99,7 +98,7 @@ describe("bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder", ()
     expect(panelDelete).toHaveBeenCalled();
   });
 
-  it("executes registered task with sendBumpReminder", async () => {
+  it("登録されたタスクが sendBumpReminder を実行することを確認する", async () => {
     const client = { channels: { fetch: vi.fn() } };
     const configService = { getBumpReminderConfig: vi.fn() };
 
@@ -127,8 +126,7 @@ describe("bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder", ()
     );
   });
 
-  // パネル削除自体も失敗した場合、クリーンアップエラーを握りつぶしてデバッグログに記録し元エラーを再スローすることを確認
-  it("logs debug when orphan panel deletion fails", async () => {
+  it("パネル削除自体も失敗した場合、クリーンアップエラーを握りつぶしてデバッグログに記録し元エラーを再スローすることを確認", async () => {
     const fetchMessage = vi.fn().mockRejectedValue(new Error("fetch failed"));
     const fetchChannel = vi.fn().mockResolvedValue({
       isTextBased: () => true,
@@ -157,8 +155,7 @@ describe("bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder", ()
     );
   });
 
-  // panelMessageId が未定義の場合はチャンネルフェッチを行わず元エラーをそのまま再スローする(不要なIO回避)
-  it("rethrows without orphan cleanup when panelMessageId is undefined", async () => {
+  it("panelMessageId が未定義の場合はチャンネルフェッチを行わず元エラーをそのまま再スローする", async () => {
     const fetchChannel = vi.fn();
     const client = { channels: { fetch: fetchChannel } };
     const configService = { getBumpReminderConfig: vi.fn() };
@@ -179,8 +176,7 @@ describe("bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder", ()
     expect(fetchChannel).not.toHaveBeenCalled();
   });
 
-  // 取得したチャンネルがテキストチャンネルでない場合はメッセージ削除をスキップし元エラーだけを再スローすることを確認
-  it("skips panel deletion when fetched channel is not text based", async () => {
+  it("取得したチャンネルがテキストチャンネルでない場合はメッセージ削除をスキップし元エラーだけを再スローすることを確認", async () => {
     const fetchChannel = vi.fn().mockResolvedValue({
       isTextBased: () => false,
       messages: { fetch: vi.fn() },

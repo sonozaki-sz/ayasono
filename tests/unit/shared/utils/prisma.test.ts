@@ -17,12 +17,12 @@ describe("shared/utils/prisma", () => {
     }));
   });
 
-  it("returns null before client is initialized", async () => {
+  it("初期化前は getPrismaClient が null を返すこと", async () => {
     const { getPrismaClient } = await import("@/shared/utils/prisma");
     expect(getPrismaClient()).toBeNull();
   });
 
-  it("stores and returns initialized prisma client", async () => {
+  it("setPrismaClient で設定した prisma クライアントを getPrismaClient で取得できること", async () => {
     const { getPrismaClient, setPrismaClient } =
       await import("@/shared/utils/prisma");
     const client = { $disconnect: vi.fn() };
@@ -32,7 +32,7 @@ describe("shared/utils/prisma", () => {
     expect(getPrismaClient()).toBe(client);
   });
 
-  it("returns initialized client via requirePrismaClient", async () => {
+  it("初期化済みの場合は requirePrismaClient でクライアントを取得できること", async () => {
     const { requirePrismaClient, setPrismaClient } =
       await import("@/shared/utils/prisma");
     const client = { $connect: vi.fn() };
@@ -41,7 +41,7 @@ describe("shared/utils/prisma", () => {
     expect(requirePrismaClient()).toBe(client);
   });
 
-  it("throws and logs when requirePrismaClient is called before initialization", async () => {
+  it("未初期化状態で requirePrismaClient を呼ぶと例外をスローしてログ出力すること", async () => {
     const { requirePrismaClient } = await import("@/shared/utils/prisma");
 
     expect(() => requirePrismaClient()).toThrow("system:database.prisma_not_available");

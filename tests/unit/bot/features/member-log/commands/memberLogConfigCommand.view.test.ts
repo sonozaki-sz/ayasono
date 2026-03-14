@@ -53,8 +53,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.view", () => {
     vi.clearAllMocks();
   });
 
-  // ガードが ValidationError を投げた場合にそれが伝播することを確認
-  it("propagates error when guard throws", async () => {
+  it("ガードが ValidationError を投げた場合にそれが伝播することを確認", async () => {
     ensurePermissionMock.mockRejectedValue(new ValidationError("no-perm"));
 
     await expect(
@@ -62,8 +61,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.view", () => {
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  // config が null の場合に "not_configured" メッセージで reply が呼ばれることを確認
-  it("replies with not_configured info embed when config is null", async () => {
+  it("config が null の場合に not_configured メッセージで reply が呼ばれることを確認", async () => {
     ensurePermissionMock.mockResolvedValue(undefined);
     getMemberLogConfigMock.mockResolvedValue(null);
     tGuildMock.mockImplementation(async (_guildId: string, key: string) => key);
@@ -82,8 +80,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.view", () => {
     );
   });
 
-  // config が存在する場合に fields を含む info embed が表示されることを確認
-  it("replies with config fields when config exists", async () => {
+  it("config が存在する場合に fields を含む info embed が表示されることを確認", async () => {
     ensurePermissionMock.mockResolvedValue(undefined);
     getMemberLogConfigMock.mockResolvedValue({
       enabled: true,
@@ -117,8 +114,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.view", () => {
     );
   });
 
-  // config.enabled が true の場合に labelEnabled が使用されることを確認
-  it("uses labelEnabled when config.enabled is true", async () => {
+  it("config.enabled が true の場合に labelEnabled が使用されることを確認", async () => {
     ensurePermissionMock.mockResolvedValue(undefined);
     getMemberLogConfigMock.mockResolvedValue({
       enabled: true,
@@ -138,8 +134,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.view", () => {
     expect(statusField?.value).toBe("common:enabled");
   });
 
-  // config.enabled が false の場合に labelDisabled が使用されることを確認
-  it("uses labelDisabled when config.enabled is false", async () => {
+  it("config.enabled が false の場合に labelDisabled が使用されることを確認", async () => {
     ensurePermissionMock.mockResolvedValue(undefined);
     getMemberLogConfigMock.mockResolvedValue({
       enabled: false,
@@ -159,8 +154,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.view", () => {
     expect(statusField?.value).toBe("common:disabled");
   });
 
-  // channelId が設定されている場合にチャンネルメンションが表示されることを確認
-  it("shows channel mention when channelId is set", async () => {
+  it("channelId が設定されている場合にチャンネルメンションが表示されることを確認", async () => {
     ensurePermissionMock.mockResolvedValue(undefined);
     getMemberLogConfigMock.mockResolvedValue({
       enabled: true,
@@ -180,8 +174,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.view", () => {
     expect(channelField?.value).toBe("<#ch-99>");
   });
 
-  // joinMessage が null の場合に labelNone が表示されることを確認
-  it("shows labelNone when joinMessage is null", async () => {
+  it("joinMessage が null の場合に labelNone が表示されることを確認", async () => {
     ensurePermissionMock.mockResolvedValue(undefined);
     getMemberLogConfigMock.mockResolvedValue({
       enabled: false,

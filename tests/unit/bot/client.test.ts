@@ -18,7 +18,7 @@ describe("bot/client", () => {
     vi.clearAllMocks();
   });
 
-  it("creates BotClient with expected collections and intents", () => {
+  it("BotClient が期待される collections と intents で生成されることを確認", () => {
     const client = new BotClient();
 
     expect(client.commands).toBeInstanceOf(Collection);
@@ -38,14 +38,14 @@ describe("bot/client", () => {
     );
   });
 
-  it("createBotClient logs initialized message", () => {
+  it("createBotClient が初期化完了ログを出力することを確認", () => {
     const client = createBotClient();
 
     expect(client).toBeInstanceOf(BotClient);
     expect(logger.info).toHaveBeenCalledWith("system:bot.client.initialized");
   });
 
-  it("shutdown destroys cooldown manager and client with logs", async () => {
+  it("shutdown が cooldown manager とクライアントを破棄してログを出力することを確認", async () => {
     const client = new BotClient();
     const destroyCooldownSpy = vi
       .spyOn(client.cooldownManager, "destroy")

@@ -27,7 +27,7 @@ describe("bot/features/sticky-message/handlers/stickyMessageChannelDeleteHandler
     vi.clearAllMocks();
   });
 
-  it("cancels timer and deletes DB record for GuildText channel", async () => {
+  it("GuildText チャンネル削除時にタイマーをキャンセルし DB レコードを削除する", async () => {
     deleteByChannelMock.mockResolvedValue(0);
     const channel = { id: "ch-1", type: ChannelType.GuildText };
 
@@ -37,7 +37,7 @@ describe("bot/features/sticky-message/handlers/stickyMessageChannelDeleteHandler
     expect(deleteByChannelMock).toHaveBeenCalledWith("ch-1");
   });
 
-  it("logs debug when a record was actually deleted", async () => {
+  it("レコードが実際に削除された場合に debug ログを出力する", async () => {
     deleteByChannelMock.mockResolvedValue(1);
     const channel = { id: "ch-1", type: ChannelType.GuildText };
 
@@ -46,7 +46,7 @@ describe("bot/features/sticky-message/handlers/stickyMessageChannelDeleteHandler
     expect(debugMock).toHaveBeenCalledTimes(1);
   });
 
-  it("does not log when no record was deleted", async () => {
+  it("レコードが削除されなかった場合はログを出力しない", async () => {
     deleteByChannelMock.mockResolvedValue(0);
     const channel = { id: "ch-1", type: ChannelType.GuildText };
 
@@ -55,7 +55,7 @@ describe("bot/features/sticky-message/handlers/stickyMessageChannelDeleteHandler
     expect(debugMock).not.toHaveBeenCalled();
   });
 
-  it("skips non-text channels (e.g. GuildVoice)", async () => {
+  it("テキスト以外のチャンネル（例: GuildVoice）はスキップする", async () => {
     const channel = { id: "vc-1", type: ChannelType.GuildVoice };
 
     await handleStickyMessageChannelDelete(channel as never);
@@ -64,7 +64,7 @@ describe("bot/features/sticky-message/handlers/stickyMessageChannelDeleteHandler
     expect(deleteByChannelMock).not.toHaveBeenCalled();
   });
 
-  it("swallows DB errors without rethrowing", async () => {
+  it("DB エラーが発生しても外部に再スローしない", async () => {
     deleteByChannelMock.mockRejectedValueOnce(new Error("db error"));
     const channel = { id: "ch-2", type: ChannelType.GuildText };
 

@@ -45,16 +45,14 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigAddRole", () 
     vi.clearAllMocks();
   });
 
-  // guild が null の場合は ValidationError を投げる
-  it("throws ValidationError when interaction has no guild", async () => {
+  it("guild が null の場合は ValidationError を投げる", async () => {
     const interaction = makeInteraction({ hasGuild: false });
     await expect(
       handleVcRecruitConfigAddRole(interaction as never, GUILD_ID),
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  // ロールが既に追加済みの場合は ValidationError を投げる
-  it("throws ValidationError when role is already added", async () => {
+  it("ロールが既に追加済みの場合は ValidationError を投げる", async () => {
     addMentionRoleIdMock.mockResolvedValue(VC_RECRUIT_MENTION_ROLE_ADD_RESULT.ALREADY_EXISTS);
     const interaction = makeInteraction();
     await expect(
@@ -62,8 +60,7 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigAddRole", () 
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  // ロール数が上限超えの場合は ValidationError を投げる
-  it("throws ValidationError when role limit is exceeded", async () => {
+  it("ロール数が上限超えの場合は ValidationError を投げる", async () => {
     addMentionRoleIdMock.mockResolvedValue(VC_RECRUIT_MENTION_ROLE_ADD_RESULT.LIMIT_EXCEEDED);
     const interaction = makeInteraction();
     await expect(
@@ -71,8 +68,7 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigAddRole", () 
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  // 正常時は success embed でエフェメラル返信する
-  it("replies with success embed on successful role addition", async () => {
+  it("ロール追加成功時は success embed でエフェメラル返信する", async () => {
     addMentionRoleIdMock.mockResolvedValue(VC_RECRUIT_MENTION_ROLE_ADD_RESULT.ADDED);
     const interaction = makeInteraction();
     await handleVcRecruitConfigAddRole(interaction as never, GUILD_ID);

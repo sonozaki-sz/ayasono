@@ -17,7 +17,7 @@ describe("shared/database/repositories/vcRecruitConfigRepository", () => {
   }
 
   describe("getVcRecruitConfig", () => {
-    it("returns null when record not found", async () => {
+    it("レコードが存在しない場合は null を返すこと", async () => {
       const prisma = createPrismaMock();
       prisma.guildVcRecruitConfig.findUnique.mockResolvedValue(null);
 
@@ -31,7 +31,7 @@ describe("shared/database/repositories/vcRecruitConfigRepository", () => {
       });
     });
 
-    it("returns VcRecruitConfig with parsed arrays", async () => {
+    it("レコードが見つかった場合は配列をパースした VcRecruitConfig を返すこと", async () => {
       const prisma = createPrismaMock();
       prisma.guildVcRecruitConfig.findUnique.mockResolvedValue({
         guildId: "guild-1",
@@ -51,7 +51,7 @@ describe("shared/database/repositories/vcRecruitConfigRepository", () => {
       });
     });
 
-    it("returns empty arrays for invalid JSON", async () => {
+    it("無効な JSON の場合は空配列を返すこと", async () => {
       const prisma = createPrismaMock();
       prisma.guildVcRecruitConfig.findUnique.mockResolvedValue({
         guildId: "guild-1",
@@ -71,7 +71,7 @@ describe("shared/database/repositories/vcRecruitConfigRepository", () => {
       });
     });
 
-    it("returns empty arrays for non-array JSON values", async () => {
+    it("配列でない JSON 値の場合は空配列を返すこと", async () => {
       const prisma = createPrismaMock();
       prisma.guildVcRecruitConfig.findUnique.mockResolvedValue({
         guildId: "guild-1",
@@ -93,7 +93,7 @@ describe("shared/database/repositories/vcRecruitConfigRepository", () => {
   });
 
   describe("updateVcRecruitConfig", () => {
-    it("upserts record with JSON-stringified arrays", async () => {
+    it("配列を JSON 文字列化してレコードを upsert すること", async () => {
       const prisma = createPrismaMock();
       prisma.guildVcRecruitConfig.upsert.mockResolvedValue({});
 

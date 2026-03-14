@@ -104,7 +104,7 @@ describe("shared/database/repositories/guildConfigRepository", () => {
     };
   };
 
-  it("delegates core operations to core usecases with deps", async () => {
+  it("コア操作が deps 付きでコアユースケースへ委譲されること", async () => {
     const { module, coreUsecases } = await loadModule();
     const prisma = { guildConfig: {} };
     const repository = new module.PrismaGuildConfigRepository(prisma as never);
@@ -139,7 +139,7 @@ describe("shared/database/repositories/guildConfigRepository", () => {
     expect(coreUsecases.updateGuildLocaleUsecase).toHaveBeenCalled();
   });
 
-  it("converts unknown errors to DatabaseError via toDatabaseError helper", async () => {
+  it("不明なエラーが toDatabaseError ヘルパーで DatabaseError に変換されること", async () => {
     const { module, coreUsecases } = await loadModule();
     const prisma = { guildConfig: {} };
     const repository = new module.PrismaGuildConfigRepository(prisma as never);
@@ -158,7 +158,7 @@ describe("shared/database/repositories/guildConfigRepository", () => {
     });
   });
 
-  it("delegates feature-specific operations to each repository", async () => {
+  it("機能別操作がそれぞれのリポジトリへ委譲されること", async () => {
     const {
       module,
       afkRepo,
@@ -222,7 +222,7 @@ describe("shared/database/repositories/guildConfigRepository", () => {
     expect(vcRecruitRepo.getVcRecruitConfig).toHaveBeenCalledWith("g1");
   });
 
-  it("createGuildConfigRepository returns repository instance", async () => {
+  it("createGuildConfigRepository がリポジトリインスタンスを返すこと", async () => {
     const { module } = await loadModule();
     const prisma = { guildConfig: {} };
 

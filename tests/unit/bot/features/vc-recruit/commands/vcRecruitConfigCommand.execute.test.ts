@@ -98,8 +98,7 @@ describe("bot/features/vc-recruit/commands/vcRecruitConfigCommand.execute", () =
     vi.clearAllMocks();
   });
 
-  // guildId が null の場合は ValidationError が handleCommandError に渡される
-  it("calls handleCommandError with ValidationError when not in guild", async () => {
+  it("guildId が null の場合は ValidationError が handleCommandError に渡される", async () => {
     const interaction = makeInteraction({ guildId: null });
     await executeVcRecruitConfigCommand(interaction as never);
 
@@ -109,8 +108,7 @@ describe("bot/features/vc-recruit/commands/vcRecruitConfigCommand.execute", () =
     );
   });
 
-  // ManageGuild 権限がない場合は ValidationError が handleCommandError に渡される
-  it("calls handleCommandError with ValidationError when missing ManageGuild permission", async () => {
+  it("ManageGuild 権限がない場合は ValidationError が handleCommandError に渡される", async () => {
     const interaction = makeInteraction({ hasManageGuild: false });
     await executeVcRecruitConfigCommand(interaction as never);
 
@@ -120,8 +118,7 @@ describe("bot/features/vc-recruit/commands/vcRecruitConfigCommand.execute", () =
     );
   });
 
-  // setup サブコマンドが handleVcRecruitConfigSetup にルーティングされる
-  it("routes setup subcommand to handleVcRecruitConfigSetup", async () => {
+  it("setup サブコマンドが handleVcRecruitConfigSetup にルーティングされる", async () => {
     const interaction = makeInteraction({ subcommand: "setup" });
     await executeVcRecruitConfigCommand(interaction as never);
 
@@ -132,8 +129,7 @@ describe("bot/features/vc-recruit/commands/vcRecruitConfigCommand.execute", () =
     expect(handleCommandErrorMock).not.toHaveBeenCalled();
   });
 
-  // teardown サブコマンドが handleVcRecruitConfigTeardown にルーティングされる
-  it("routes teardown subcommand to handleVcRecruitConfigTeardown", async () => {
+  it("teardown サブコマンドが handleVcRecruitConfigTeardown にルーティングされる", async () => {
     const interaction = makeInteraction({ subcommand: "teardown" });
     await executeVcRecruitConfigCommand(interaction as never);
 
@@ -144,8 +140,7 @@ describe("bot/features/vc-recruit/commands/vcRecruitConfigCommand.execute", () =
     expect(handleCommandErrorMock).not.toHaveBeenCalled();
   });
 
-  // add-role サブコマンドが handleVcRecruitConfigAddRole にルーティングされる
-  it("routes add-role subcommand to handleVcRecruitConfigAddRole", async () => {
+  it("add-role サブコマンドが handleVcRecruitConfigAddRole にルーティングされる", async () => {
     const interaction = makeInteraction({ subcommand: "add-role" });
     await executeVcRecruitConfigCommand(interaction as never);
 
@@ -156,8 +151,7 @@ describe("bot/features/vc-recruit/commands/vcRecruitConfigCommand.execute", () =
     expect(handleCommandErrorMock).not.toHaveBeenCalled();
   });
 
-  // remove-role サブコマンドが handleVcRecruitConfigRemoveRole にルーティングされる
-  it("routes remove-role subcommand to handleVcRecruitConfigRemoveRole", async () => {
+  it("remove-role サブコマンドが handleVcRecruitConfigRemoveRole にルーティングされる", async () => {
     const interaction = makeInteraction({ subcommand: "remove-role" });
     await executeVcRecruitConfigCommand(interaction as never);
 
@@ -168,8 +162,7 @@ describe("bot/features/vc-recruit/commands/vcRecruitConfigCommand.execute", () =
     expect(handleCommandErrorMock).not.toHaveBeenCalled();
   });
 
-  // view サブコマンドが handleVcRecruitConfigView にルーティングされる
-  it("routes view subcommand to handleVcRecruitConfigView", async () => {
+  it("view サブコマンドが handleVcRecruitConfigView にルーティングされる", async () => {
     const interaction = makeInteraction({ subcommand: "view" });
     await executeVcRecruitConfigCommand(interaction as never);
 
@@ -180,8 +173,7 @@ describe("bot/features/vc-recruit/commands/vcRecruitConfigCommand.execute", () =
     expect(handleCommandErrorMock).not.toHaveBeenCalled();
   });
 
-  // 不明なサブコマンドは ValidationError が handleCommandError に渡される
-  it("calls handleCommandError with ValidationError for unknown subcommand", async () => {
+  it("不明なサブコマンドは ValidationError が handleCommandError に渡される", async () => {
     const interaction = makeInteraction({ subcommand: "unknown" });
     await executeVcRecruitConfigCommand(interaction as never);
 
@@ -191,8 +183,7 @@ describe("bot/features/vc-recruit/commands/vcRecruitConfigCommand.execute", () =
     );
   });
 
-  // ユースケースがエラーを throw した場合は handleCommandError に委譲する
-  it("delegates thrown errors to handleCommandError", async () => {
+  it("ユースケースがエラーを throw した場合は handleCommandError に委譲する", async () => {
     const error = new Error("ユースケースエラー");
     handleVcRecruitConfigViewMock.mockRejectedValueOnce(error);
 

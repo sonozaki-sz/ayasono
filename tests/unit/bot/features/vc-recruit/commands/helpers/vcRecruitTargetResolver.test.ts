@@ -37,8 +37,7 @@ describe("bot/features/vc-recruit/commands/helpers/vcRecruitTargetResolver", () 
     vi.clearAllMocks();
   });
 
-  // categoryOption が null のとき → 現在チャンネルの親カテゴリーを返す
-  it("returns parent category of current channel when categoryOption is null", async () => {
+  it("categoryOption が null のとき、現在チャンネルの親カテゴリーを返す", async () => {
     const parentCategory = makeCategoryChannel("cat-1", "ゲームカテゴリー");
     const currentChannel = {
       id: "text-ch-1",
@@ -55,8 +54,7 @@ describe("bot/features/vc-recruit/commands/helpers/vcRecruitTargetResolver", () 
     expect(result).toEqual(parentCategory);
   });
 
-  // categoryOption が null で現在チャンネルに親カテゴリーがない → null を返す
-  it("returns null when current channel has no parent category", async () => {
+  it("categoryOption が null で現在チャンネルに親カテゴリーがない場合、null を返す", async () => {
     const currentChannel = {
       id: "text-ch-1",
       type: GUILD_TEXT,
@@ -72,8 +70,7 @@ describe("bot/features/vc-recruit/commands/helpers/vcRecruitTargetResolver", () 
     expect(result).toBeNull();
   });
 
-  // categoryOption が null で fetch に失敗した場合 → null を返す
-  it("returns null when channel fetch fails for null option", async () => {
+  it("categoryOption が null で fetch に失敗した場合、null を返す", async () => {
     const guild = makeGuild({ fetchChannelResult: null });
 
     const result = await resolveTargetCategory(
@@ -84,8 +81,7 @@ describe("bot/features/vc-recruit/commands/helpers/vcRecruitTargetResolver", () 
     expect(result).toBeNull();
   });
 
-  // categoryOption が "TOP"（大文字）→ null を返す（トップカテゴリー指定）
-  it("returns null when categoryOption is TOP", async () => {
+  it("categoryOption が \"TOP\"（大文字）のとき、null を返す（トップカテゴリー指定）", async () => {
     const guild = makeGuild({});
     const result = await resolveTargetCategory(
       guild as never,
@@ -95,8 +91,7 @@ describe("bot/features/vc-recruit/commands/helpers/vcRecruitTargetResolver", () 
     expect(result).toBeNull();
   });
 
-  // categoryOption が "top"（小文字）→ null を返す（大文字小文字無視）
-  it("returns null when categoryOption is top (lowercase)", async () => {
+  it("categoryOption が \"top\"（小文字）のとき、null を返す（大文字小文字無視）", async () => {
     const guild = makeGuild({});
     const result = await resolveTargetCategory(
       guild as never,
@@ -106,8 +101,7 @@ describe("bot/features/vc-recruit/commands/helpers/vcRecruitTargetResolver", () 
     expect(result).toBeNull();
   });
 
-  // categoryOption がカテゴリーID → ID で fetch した結果を返す
-  it("returns category fetched by ID", async () => {
+  it("categoryOption がカテゴリーID のとき、ID で fetch した結果を返す", async () => {
     const category = makeCategoryChannel("cat-42", "ゲームカテゴリー");
     const guild = makeGuild({ fetchChannelResult: category });
 
@@ -119,8 +113,7 @@ describe("bot/features/vc-recruit/commands/helpers/vcRecruitTargetResolver", () 
     expect(result).toEqual(category);
   });
 
-  // categoryOption がチャンネルIDだが GuildCategory ではない → 名前検索にフォールバック
-  it("returns null when fetched channel is not a GuildCategory and not found by name", async () => {
+  it("fetch したチャンネルが GuildCategory でなく名前でも見つからない場合、null を返す", async () => {
     const textChannel = { id: "text-ch-99", type: GUILD_TEXT };
     const guild = makeGuild({
       fetchChannelResult: textChannel,
@@ -135,8 +128,7 @@ describe("bot/features/vc-recruit/commands/helpers/vcRecruitTargetResolver", () 
     expect(result).toBeNull();
   });
 
-  // categoryOption がカテゴリー名 → 名前検索で返す（大文字小文字無視）
-  it("returns category found by name (case-insensitive)", async () => {
+  it("categoryOption がカテゴリー名のとき、名前検索で該当カテゴリーを返す（大文字小文字無視）", async () => {
     const category = makeCategoryChannel("cat-1", "ゲームカテゴリー");
     const guild = makeGuild({
       fetchChannelResult: null,
@@ -151,8 +143,7 @@ describe("bot/features/vc-recruit/commands/helpers/vcRecruitTargetResolver", () 
     expect(result).toEqual(category);
   });
 
-  // 名前検索は大文字小文字を無視する
-  it("matches category name case-insensitively", async () => {
+  it("カテゴリー名の大文字小文字を無視して一致するカテゴリーを返す", async () => {
     const category = makeCategoryChannel("cat-1", "GameCategory");
     const guild = makeGuild({
       fetchChannelResult: null,
@@ -167,8 +158,7 @@ describe("bot/features/vc-recruit/commands/helpers/vcRecruitTargetResolver", () 
     expect(result).toEqual(category);
   });
 
-  // 何も見つからない場合 → null を返す
-  it("returns null when nothing is found", async () => {
+  it("何も見つからない場合、null を返す", async () => {
     const guild = makeGuild({
       fetchChannelResult: null,
       cacheChannels: [],

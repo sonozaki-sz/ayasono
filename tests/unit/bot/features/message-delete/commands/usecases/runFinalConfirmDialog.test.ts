@@ -115,7 +115,7 @@ describe("bot/features/message-delete/commands/usecases/runFinalConfirmDialog", 
     };
   }
 
-  it("resolves with Confirm when FINAL_YES is clicked", async () => {
+  it("FINAL_YES クリック時に Confirm として解決する", async () => {
     const { showFinalConfirmDialog } = await loadModule();
 
     const collector = makeMockCollector();
@@ -133,7 +133,7 @@ describe("bot/features/message-delete/commands/usecases/runFinalConfirmDialog", 
     expect(result.type).toBe("confirm");
   });
 
-  it("resolves with Cancel when FINAL_NO is clicked", async () => {
+  it("FINAL_NO クリック時に Cancel として解決する", async () => {
     const { showFinalConfirmDialog } = await loadModule();
 
     const collector = makeMockCollector();
@@ -149,7 +149,7 @@ describe("bot/features/message-delete/commands/usecases/runFinalConfirmDialog", 
     expect(result.type).toBe("cancel");
   });
 
-  it("resolves with Back when FINAL_BACK is clicked", async () => {
+  it("FINAL_BACK クリック時に Back として解決する", async () => {
     const { showFinalConfirmDialog } = await loadModule();
 
     const collector = makeMockCollector();
@@ -165,7 +165,7 @@ describe("bot/features/message-delete/commands/usecases/runFinalConfirmDialog", 
     expect(result.type).toBe("back");
   });
 
-  it("resolves with Timeout on time end", async () => {
+  it("タイム終了時に Timeout として解決する", async () => {
     const { showFinalConfirmDialog } = await loadModule();
 
     const collector = makeMockCollector();
@@ -181,7 +181,7 @@ describe("bot/features/message-delete/commands/usecases/runFinalConfirmDialog", 
     expect(result.type).toBe("timeout");
   });
 
-  it("non-time end reason resolves as timeout when no terminal button was clicked", async () => {
+  it("終端ボタン未押下で非タイム理由（messageDelete 等）の end イベントが来た場合も Timeout として解決する", async () => {
     // Bug fix: messageDelete / channelDelete 等で collector が終了した場合も
     // ロックを確実に解放するため Timeout として解決する
     const { showFinalConfirmDialog } = await loadModule();
@@ -201,7 +201,7 @@ describe("bot/features/message-delete/commands/usecases/runFinalConfirmDialog", 
     expect(baseInteraction.editReply).toHaveBeenCalledTimes(2); // initial + timeout message
   });
 
-  it("idle end reason resolves as timeout (ephemeral dismissed)", async () => {
+  it("idle タイムアウト（エフェメラル非表示）で Timeout として解決する", async () => {
     // Bug fix: エフェメラルメッセージを非表示にしても MESSAGE_DELETE は発火しないため
     // idle タイムアウトでロックを解放する
     const { showFinalConfirmDialog } = await loadModule();
@@ -219,7 +219,7 @@ describe("bot/features/message-delete/commands/usecases/runFinalConfirmDialog", 
     expect(baseInteraction.editReply).toHaveBeenCalledTimes(2); // initial + timeout message
   });
 
-  it("end event after terminal button click does not override the result", async () => {
+  it("終端ボタン押下後の end イベントは結果を上書きしない", async () => {
     // handledByCollect フラグにより、ボタン押下後の end イベントはスキップされること
     const { showFinalConfirmDialog } = await loadModule();
 
@@ -241,7 +241,7 @@ describe("bot/features/message-delete/commands/usecases/runFinalConfirmDialog", 
     expect(result.type).toBe("confirm");
   });
 
-  it("replies ephemeral warning when wrong user clicks", async () => {
+  it("別のユーザーがクリックした場合に Ephemeral 警告を返信する", async () => {
     const { showFinalConfirmDialog } = await loadModule();
 
     const collector = makeMockCollector();
@@ -261,7 +261,7 @@ describe("bot/features/message-delete/commands/usecases/runFinalConfirmDialog", 
     await promise;
   });
 
-  it("handles FIRST page navigation", async () => {
+  it("FIRST ページナビゲーションを処理する", async () => {
     const { showFinalConfirmDialog } = await loadModule();
 
     const collector = makeMockCollector();
@@ -279,7 +279,7 @@ describe("bot/features/message-delete/commands/usecases/runFinalConfirmDialog", 
     await promise;
   });
 
-  it("handles PREV page navigation", async () => {
+  it("PREV ページナビゲーションを処理する", async () => {
     const { showFinalConfirmDialog } = await loadModule();
 
     const collector = makeMockCollector();
@@ -295,7 +295,7 @@ describe("bot/features/message-delete/commands/usecases/runFinalConfirmDialog", 
     await promise;
   });
 
-  it("handles NEXT page navigation", async () => {
+  it("NEXT ページナビゲーションを処理する", async () => {
     const { showFinalConfirmDialog } = await loadModule();
 
     const collector = makeMockCollector();
@@ -311,7 +311,7 @@ describe("bot/features/message-delete/commands/usecases/runFinalConfirmDialog", 
     await promise;
   });
 
-  it("handles LAST page navigation", async () => {
+  it("LAST ページナビゲーションを処理する", async () => {
     const { showFinalConfirmDialog } = await loadModule();
 
     const collector = makeMockCollector();
@@ -327,7 +327,7 @@ describe("bot/features/message-delete/commands/usecases/runFinalConfirmDialog", 
     await promise;
   });
 
-  it("handles JUMP with valid page number", async () => {
+  it("有効なページ番号での JUMP を処理する", async () => {
     const { showFinalConfirmDialog } = await loadModule();
 
     showJumpModalMock.mockResolvedValue("2");
@@ -351,7 +351,7 @@ describe("bot/features/message-delete/commands/usecases/runFinalConfirmDialog", 
     await promise;
   });
 
-  it("handles JUMP with null (modal closed)", async () => {
+  it("JUMP でモーダルが閉じられた場合（null）の処理をする", async () => {
     const { showFinalConfirmDialog } = await loadModule();
 
     showJumpModalMock.mockResolvedValue(null);
@@ -372,7 +372,7 @@ describe("bot/features/message-delete/commands/usecases/runFinalConfirmDialog", 
     await promise;
   });
 
-  it("handles JUMP with invalid page number", async () => {
+  it("無効なページ番号での JUMP を処理する", async () => {
     const { showFinalConfirmDialog } = await loadModule();
 
     showJumpModalMock.mockResolvedValue("not-a-number");

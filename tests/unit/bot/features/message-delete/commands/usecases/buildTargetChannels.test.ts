@@ -83,14 +83,14 @@ describe("bot/features/message-delete/commands/usecases/buildTargetChannels", ()
     );
   }
 
-  it("returns null when guild is null", async () => {
+  it("guild が null の場合は null を返す", async () => {
     const { buildTargetChannels } = await loadModule();
     const interaction = makeInteraction({ guildId: null });
     const result = await buildTargetChannels(interaction as never);
     expect(result).toBeNull();
   });
 
-  it("returns null and sends warning for non-text channel option", async () => {
+  it("テキスト以外のチャンネルオプションの場合は null を返して警告を送信する", async () => {
     const { buildTargetChannels } = await loadModule();
     const channelOption = {
       id: "ch-1",
@@ -102,7 +102,7 @@ describe("bot/features/message-delete/commands/usecases/buildTargetChannels", ()
     expect(createWarningEmbedMock).toHaveBeenCalled();
   });
 
-  it("returns null and sends error when bot has no access to specified channel", async () => {
+  it("Bot が指定チャンネルにアクセスできない場合は null を返してエラーを送信する", async () => {
     const { buildTargetChannels } = await loadModule();
     const channelOption = {
       id: "ch-1",
@@ -115,7 +115,7 @@ describe("bot/features/message-delete/commands/usecases/buildTargetChannels", ()
     expect(createErrorEmbedMock).toHaveBeenCalled();
   });
 
-  it("returns single channel array when valid text channel is specified", async () => {
+  it("有効なテキストチャンネルが指定された場合は単一チャンネルの配列を返す", async () => {
     const { buildTargetChannels } = await loadModule();
     const channelOption = {
       id: "ch-1",
@@ -128,7 +128,7 @@ describe("bot/features/message-delete/commands/usecases/buildTargetChannels", ()
     expect(result?.[0]).toBe(channelOption);
   });
 
-  it("returns single channel when type is GuildVoice", async () => {
+  it("GuildVoice タイプのチャンネルが指定された場合は単一チャンネルを返す", async () => {
     const { buildTargetChannels } = await loadModule();
     const channelOption = {
       id: "ch-1",
@@ -140,7 +140,7 @@ describe("bot/features/message-delete/commands/usecases/buildTargetChannels", ()
     expect(result).toHaveLength(1);
   });
 
-  it("returns single channel when type is PublicThread", async () => {
+  it("PublicThread タイプのチャンネルが指定された場合は単一チャンネルを返す", async () => {
     const { buildTargetChannels } = await loadModule();
     const channelOption = {
       id: "ch-1",
@@ -152,7 +152,7 @@ describe("bot/features/message-delete/commands/usecases/buildTargetChannels", ()
     expect(result).toHaveLength(1);
   });
 
-  it("returns accessible channels from guild when no channel option", async () => {
+  it("チャンネルオプションなしの場合はギルドからアクセス可能なチャンネルを返す", async () => {
     const { buildTargetChannels } = await loadModule();
     const textChannel = {
       id: "ch-1",
@@ -172,7 +172,7 @@ describe("bot/features/message-delete/commands/usecases/buildTargetChannels", ()
     expect(result?.[0]).toBe(textChannel);
   });
 
-  it("filters out channels without bot permissions when me is set", async () => {
+  it("me が設定されている場合に Bot の権限がないチャンネルを除外する", async () => {
     const { buildTargetChannels } = await loadModule();
     const allowedChannel = {
       id: "ch-1",
@@ -192,7 +192,7 @@ describe("bot/features/message-delete/commands/usecases/buildTargetChannels", ()
     expect(result?.[0]).toBe(allowedChannel);
   });
 
-  it("returns all text channels when me is null", async () => {
+  it("me が null の場合はすべてのテキストチャンネルを返す", async () => {
     const { buildTargetChannels } = await loadModule();
     const ch1 = { id: "ch-1", isTextBased: () => true };
     const ch2 = { id: "ch-2", isTextBased: () => true };
@@ -204,7 +204,7 @@ describe("bot/features/message-delete/commands/usecases/buildTargetChannels", ()
     expect(result).toHaveLength(2);
   });
 
-  it("handles null channels in collection", async () => {
+  it("コレクション内の null チャンネルを適切に処理する", async () => {
     const { buildTargetChannels } = await loadModule();
     const validChannel = {
       id: "ch-1",
@@ -218,7 +218,7 @@ describe("bot/features/message-delete/commands/usecases/buildTargetChannels", ()
     expect(result).toHaveLength(1);
   });
 
-  it("returns channel when me is null and bot access is allowed", async () => {
+  it("me が null でも Bot アクセスが許可されている場合はチャンネルを返す", async () => {
     const { buildTargetChannels } = await loadModule();
     const channelOption = {
       id: "ch-1",

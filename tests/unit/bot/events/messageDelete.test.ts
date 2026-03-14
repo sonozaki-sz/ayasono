@@ -26,12 +26,12 @@ describe("bot/events/messageDelete", () => {
     vi.clearAllMocks();
   });
 
-  it("has expected event metadata", () => {
+  it("イベントメタデータが正しいことを確認", () => {
     expect(messageDeleteEvent.name).toBe(Events.MessageDelete);
     expect(messageDeleteEvent.once).toBe(false);
   });
 
-  it("delegates message to vc-recruit message-delete handler", async () => {
+  it("メッセージが handleVcRecruitMessageDelete へ委譲されることを確認", async () => {
     const message = createMessage();
 
     await messageDeleteEvent.execute(message as never);

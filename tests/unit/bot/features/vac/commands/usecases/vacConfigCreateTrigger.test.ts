@@ -38,7 +38,7 @@ describe("bot/features/vac/commands/usecases/vacConfigCreateTrigger", () => {
     (resolveTargetCategory as Mock).mockResolvedValue(null);
   });
 
-  it("throws ValidationError when guild context is missing", async () => {
+  it("ギルドコンテキストが存在しない場合にValidationErrorをスローする", async () => {
     const interaction = {
       guild: null,
       channelId: "ch-1",
@@ -51,7 +51,7 @@ describe("bot/features/vac/commands/usecases/vacConfigCreateTrigger", () => {
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  it("throws ValidationError when trigger already exists in target category", async () => {
+  it("対象カテゴリにトリガーが既存する場合にValidationErrorをスローする", async () => {
     const getVacConfigOrDefault = vi.fn().mockResolvedValue({
       triggerChannelIds: ["trigger-1"],
     });
@@ -78,7 +78,7 @@ describe("bot/features/vac/commands/usecases/vacConfigCreateTrigger", () => {
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  it("throws ValidationError when target category is full", async () => {
+  it("対象カテゴリのチャンネル数が上限に達している場合にValidationErrorをスローする", async () => {
     const getVacConfigOrDefault = vi.fn().mockResolvedValue({
       triggerChannelIds: [],
     });
@@ -105,7 +105,7 @@ describe("bot/features/vac/commands/usecases/vacConfigCreateTrigger", () => {
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  it("creates trigger channel, persists it, and replies ephemeral", async () => {
+  it("トリガーチャンネルを作成してDBに保存し、エフェメラルで成功応答する", async () => {
     const addTriggerChannel = vi.fn().mockResolvedValue(undefined);
     const getVacConfigOrDefault = vi.fn().mockResolvedValue({
       triggerChannelIds: [],

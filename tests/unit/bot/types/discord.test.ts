@@ -2,7 +2,7 @@
 import { registerBotEvent } from "@/bot/types/discord";
 
 describe("bot/types/discord", () => {
-  it("registers once event with client.once", () => {
+  it("once イベントが client.once で登録されることを確認", () => {
     const once = vi.fn();
     const on = vi.fn();
     const client = { once, on };
@@ -17,7 +17,7 @@ describe("bot/types/discord", () => {
     expect(on).not.toHaveBeenCalled();
   });
 
-  it("registers normal event with client.on", () => {
+  it("通常イベントが client.on で登録されることを確認", () => {
     const once = vi.fn();
     const on = vi.fn();
     const client = { once, on };

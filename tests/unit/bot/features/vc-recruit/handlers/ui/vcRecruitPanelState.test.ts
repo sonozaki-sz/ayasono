@@ -26,27 +26,23 @@ describe("bot/features/vc-recruit/handlers/ui/vcRecruitPanelState", () => {
     vi.useRealTimers();
   });
 
-  // セッションを保存して取得できることを確認
-  it("stores and retrieves a session", () => {
+  it("セッションを保存して取得できる", () => {
     const session = makeSession();
     setVcRecruitSession("interaction-1", session);
     expect(getVcRecruitSession("interaction-1")).toEqual(session);
   });
 
-  // 存在しないキーを取得すると null を返す
-  it("returns null for unknown key", () => {
+  it("存在しないキーを取得すると null を返す", () => {
     expect(getVcRecruitSession("nonexistent")).toBeNull();
   });
 
-  // deleteVcRecruitSession でセッションを削除できる
-  it("deletes a session", () => {
+  it("deleteVcRecruitSession でセッションを削除できる", () => {
     setVcRecruitSession("interaction-2", makeSession());
     deleteVcRecruitSession("interaction-2");
     expect(getVcRecruitSession("interaction-2")).toBeNull();
   });
 
-  // updateVcRecruitSession でセッションを部分更新できる
-  it("updates session fields partially", () => {
+  it("updateVcRecruitSession でセッションを部分更新できる", () => {
     setVcRecruitSession("interaction-3", makeSession());
     updateVcRecruitSession("interaction-3", { mentionRoleId: "role-1" });
     const updated = getVcRecruitSession("interaction-3");
@@ -55,14 +51,12 @@ describe("bot/features/vc-recruit/handlers/ui/vcRecruitPanelState", () => {
     expect(updated?.selectedVcId).toBe("__new__");
   });
 
-  // 存在しないキーを更新しても何も起こらない
-  it("does nothing when updating nonexistent session", () => {
+  it("存在しないキーを更新しても何も起こらない", () => {
     updateVcRecruitSession("nonexistent", { mentionRoleId: "role-1" });
     expect(getVcRecruitSession("nonexistent")).toBeNull();
   });
 
-  // selectedVcId を更新できる
-  it("updates selectedVcId in session", () => {
+  it("selectedVcId を更新できる", () => {
     setVcRecruitSession("interaction-5", makeSession());
     updateVcRecruitSession("interaction-5", { selectedVcId: "vc-123" });
     const updated = getVcRecruitSession("interaction-5");
@@ -70,8 +64,7 @@ describe("bot/features/vc-recruit/handlers/ui/vcRecruitPanelState", () => {
     expect(updated?.mentionRoleId).toBeNull();
   });
 
-  // 15分後にセッションが自動的に削除される
-  it("auto-expires session after 15 minutes", () => {
+  it("15分後にセッションが自動的に削除される", () => {
     setVcRecruitSession("interaction-6", makeSession());
     expect(getVcRecruitSession("interaction-6")).not.toBeNull();
 

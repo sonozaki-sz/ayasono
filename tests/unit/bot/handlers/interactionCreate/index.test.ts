@@ -31,7 +31,7 @@ describe("bot/handlers/interactionCreate/index", () => {
     vi.clearAllMocks();
   });
 
-  it("routes chat input command to chat handler", async () => {
+  it("チャットインプットコマンドが handleChatInputCommand へルーティングされることを確認", async () => {
     const { handleInteractionCreate } =
       await import("@/bot/handlers/interactionCreate/handleInteractionCreate");
 
@@ -50,7 +50,7 @@ describe("bot/handlers/interactionCreate/index", () => {
     expect(handleAutocompleteMock).not.toHaveBeenCalled();
   });
 
-  it("routes user select menu to user select handler", async () => {
+  it("ユーザーセレクトメニューが handleUserSelectMenu へルーティングされることを確認", async () => {
     const { handleInteractionCreate } =
       await import("@/bot/handlers/interactionCreate/handleInteractionCreate");
 
@@ -70,7 +70,7 @@ describe("bot/handlers/interactionCreate/index", () => {
     expect(handleButtonMock).not.toHaveBeenCalled();
   });
 
-  it("routes string select menu to string select handler", async () => {
+  it("ストリングセレクトメニューが handleStringSelectMenu へルーティングされることを確認", async () => {
     const { handleInteractionCreate } =
       await import("@/bot/handlers/interactionCreate/handleInteractionCreate");
 

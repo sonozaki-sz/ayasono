@@ -179,13 +179,13 @@ function makeMember(voiceChannel: unknown | null, setChannelSuccess = true) {
 // ---- テスト ----
 
 describe("vcRecruitModalHandler / matches()", () => {
-  it("matches modal prefix", () => {
+  it("モーダルプレフィックスに一致する", () => {
     expect(vcRecruitModalHandler.matches(`${MODAL_PREFIX}session-1`)).toBe(
       true,
     );
   });
 
-  it("does not match unrelated customId", () => {
+  it("無関係な customId には一致しない", () => {
     expect(vcRecruitModalHandler.matches("vac:modal:session-1")).toBe(false);
   });
 });
@@ -198,16 +198,14 @@ describe("vcRecruitModalHandler / execute()", () => {
     addCreatedVoiceChannelIdMock.mockResolvedValue(undefined);
   });
 
-  // guild が null の場合は早期リターン
-  it("does nothing when guild is null", async () => {
+  it("guild が null の場合は早期リターンして何もしない", async () => {
     const interaction = makeInteraction({ hasGuild: false });
     await vcRecruitModalHandler.execute(interaction as never);
 
     expect(getVcRecruitSessionMock).not.toHaveBeenCalled();
   });
 
-  // セッションが見つからない場合はタイムアウトエラーを返す
-  it("replies with timeout error when session is not found", async () => {
+  it("セッションが見つからない場合はタイムアウトエラーを返す", async () => {
     getVcRecruitSessionMock.mockReturnValue(null);
 
     const interaction = makeInteraction();
@@ -219,8 +217,7 @@ describe("vcRecruitModalHandler / execute()", () => {
     );
   });
 
-  // セットアップが見つからない場合はエラーを返す
-  it("replies with error when setup is not found", async () => {
+  it("セットアップが見つからない場合はエラーを返す", async () => {
     getVcRecruitSessionMock.mockReturnValue({
       panelChannelId: PANEL_CH_ID,
       mentionRoleId: null,
@@ -238,8 +235,7 @@ describe("vcRecruitModalHandler / execute()", () => {
     );
   });
 
-  // 新規VC作成 + メンバーがVCにいる → 成功ケース（deleteReply）
-  it("creates new VC and deletes reply when member is in a voice channel", async () => {
+  it("新規 VC 作成時にメンバーが VC にいる場合は VC を作成して deleteReply する", async () => {
     getVcRecruitSessionMock.mockReturnValue({
       panelChannelId: PANEL_CH_ID,
       mentionRoleId: null,
@@ -270,8 +266,7 @@ describe("vcRecruitModalHandler / execute()", () => {
     expect(interaction.deleteReply).toHaveBeenCalled();
   });
 
-  // 新規VC作成 + メンバーがVCにいない → warning 返信
-  it("shows warning reply when member is not in a voice channel", async () => {
+  it("新規 VC 作成時にメンバーが VC にいない場合は warning 返信をする", async () => {
     getVcRecruitSessionMock.mockReturnValue({
       panelChannelId: PANEL_CH_ID,
       mentionRoleId: null,
@@ -296,8 +291,7 @@ describe("vcRecruitModalHandler / execute()", () => {
     );
   });
 
-  // 既存VC選択 + VC が削除済み → エラー返信
-  it("replies with error when selected existing VC is no longer available", async () => {
+  it("既存 VC を選択したが VC が削除済みの場合はエラー返信をする", async () => {
     const EXISTING_VC_ID = "existing-vc-deleted";
     getVcRecruitSessionMock.mockReturnValue({
       panelChannelId: PANEL_CH_ID,
@@ -318,8 +312,7 @@ describe("vcRecruitModalHandler / execute()", () => {
     );
   });
 
-  // 既存VC選択 + 正常 → VC作成スキップ・deleteReply
-  it("uses existing VC and deletes reply on success", async () => {
+  it("既存 VC を選択して正常に処理された場合は VC 作成をスキップして deleteReply する", async () => {
     const EXISTING_VC_ID = "existing-vc-1";
     getVcRecruitSessionMock.mockReturnValue({
       panelChannelId: PANEL_CH_ID,
@@ -344,8 +337,7 @@ describe("vcRecruitModalHandler / execute()", () => {
     expect(deleteVcRecruitSessionMock).toHaveBeenCalledWith(SESSION_ID);
   });
 
-  // カテゴリーチャンネル数が上限に達している場合 → category_full エラーを返してVC作成しない
-  it("replies with category_full error when category channel limit is reached", async () => {
+  it("カテゴリーチャンネル数が上限に達している場合は category_full エラーを返して VC を作成しない", async () => {
     getVcRecruitSessionMock.mockReturnValue({
       panelChannelId: PANEL_CH_ID,
       mentionRoleId: null,
@@ -368,8 +360,7 @@ describe("vcRecruitModalHandler / execute()", () => {
     expect(deleteVcRecruitSessionMock).toHaveBeenCalledWith(SESSION_ID);
   });
 
-  // setChannel が throw した場合 → vcMoveFailed=true → warning 返信（deleteReply は呼ばれない）
-  it("shows warning reply when setChannel throws", async () => {
+  it("setChannel が throw した場合は vcMoveFailed=true となり warning 返信をする（deleteReply は呼ばれない）", async () => {
     getVcRecruitSessionMock.mockReturnValue({
       panelChannelId: PANEL_CH_ID,
       mentionRoleId: null,

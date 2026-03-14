@@ -46,16 +46,14 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigRemoveRole", 
     vi.clearAllMocks();
   });
 
-  // guild が null の場合は ValidationError を投げる
-  it("throws ValidationError when interaction has no guild", async () => {
+  it("guild が null の場合は ValidationError を投げる", async () => {
     const interaction = makeInteraction({ hasGuild: false });
     await expect(
       handleVcRecruitConfigRemoveRole(interaction as never, GUILD_ID),
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  // ロールが見つからない場合は ValidationError を投げる
-  it("throws ValidationError when role is not found", async () => {
+  it("ロールが見つからない場合は ValidationError を投げる", async () => {
     removeMentionRoleIdMock.mockResolvedValue(VC_RECRUIT_MENTION_ROLE_REMOVE_RESULT.NOT_FOUND);
     const interaction = makeInteraction();
     await expect(
@@ -63,8 +61,7 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigRemoveRole", 
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  // 正常時は success embed でエフェメラル返信する
-  it("replies with success embed on successful role removal", async () => {
+  it("ロール削除成功時は success embed でエフェメラル返信する", async () => {
     removeMentionRoleIdMock.mockResolvedValue(VC_RECRUIT_MENTION_ROLE_REMOVE_RESULT.REMOVED);
     const interaction = makeInteraction();
     await handleVcRecruitConfigRemoveRole(interaction as never, GUILD_ID);

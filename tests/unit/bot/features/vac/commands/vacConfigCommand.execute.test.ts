@@ -58,8 +58,7 @@ describe("bot/features/vac/commands/vacConfigCommand.execute", () => {
     vi.clearAllMocks();
   });
 
-  // DM 等 guildId が null の環境ではギルド専用コマンドとして拒否し、エラーハンドラに委譲することを確認
-  it("delegates guild-only validation error to handleCommandError", async () => {
+  it("DM 等 guildId が null の環境ではギルド専用コマンドとして拒否し、エラーハンドラに委譲することを確認", async () => {
     const interaction = createInteraction({ guildId: null });
 
     await executeVacConfigCommand(interaction as never);
@@ -68,8 +67,7 @@ describe("bot/features/vac/commands/vacConfigCommand.execute", () => {
     expect(handleVacConfigView).not.toHaveBeenCalled();
   });
 
-  // ManageGuild 権限を持たないユーザーのコマンド実行が拒否されることを確認
-  it("delegates permission validation error to handleCommandError", async () => {
+  it("ManageGuild 権限を持たないユーザーのコマンド実行が拒否されることを確認", async () => {
     const interaction = createInteraction({ hasManageGuild: false });
 
     await executeVacConfigCommand(interaction as never);
@@ -80,7 +78,7 @@ describe("bot/features/vac/commands/vacConfigCommand.execute", () => {
     expect(handleVacConfigView).not.toHaveBeenCalled();
   });
 
-  it("delegates create-trigger-vc subcommand to usecase", async () => {
+  it("create-trigger-vcサブコマンドをユースケースへ委譲する", async () => {
     const interaction = createInteraction({
       subcommand: VAC_CONFIG_COMMAND.SUBCOMMAND.CREATE_TRIGGER,
     });
@@ -95,7 +93,7 @@ describe("bot/features/vac/commands/vacConfigCommand.execute", () => {
     expect(handleVacConfigView).not.toHaveBeenCalled();
   });
 
-  it("delegates remove-trigger-vc subcommand to usecase", async () => {
+  it("remove-trigger-vcサブコマンドをユースケースへ委譲する", async () => {
     const interaction = createInteraction({
       subcommand: VAC_CONFIG_COMMAND.SUBCOMMAND.REMOVE_TRIGGER,
     });
@@ -110,7 +108,7 @@ describe("bot/features/vac/commands/vacConfigCommand.execute", () => {
     expect(handleVacConfigView).not.toHaveBeenCalled();
   });
 
-  it("delegates view subcommand to usecase", async () => {
+  it("viewサブコマンドをユースケースへ委譲する", async () => {
     const interaction = createInteraction({
       subcommand: VAC_CONFIG_COMMAND.SUBCOMMAND.VIEW,
     });
@@ -122,8 +120,7 @@ describe("bot/features/vac/commands/vacConfigCommand.execute", () => {
     expect(handleVacConfigRemoveTrigger).not.toHaveBeenCalled();
   });
 
-  // 網羅していないサブコマンド名を渡した場合に unhandled として handleCommandError に委譲されることを確認
-  it("delegates invalid subcommand error to handleCommandError", async () => {
+  it("網羅していないサブコマンド名を渡した場合に unhandled として handleCommandError に委譲されることを確認", async () => {
     const interaction = createInteraction({ subcommand: "invalid-subcommand" });
 
     await executeVacConfigCommand(interaction as never);

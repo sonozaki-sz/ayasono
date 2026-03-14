@@ -37,7 +37,7 @@ describe("bot/features/vac/commands/usecases/vacLimit", () => {
     vi.clearAllMocks();
   });
 
-  it("throws ValidationError when limit is out of allowed range", async () => {
+  it("許容範囲外の上限値が渡された場合にValidationErrorをスローする", async () => {
     const interaction = {
       options: { getInteger: vi.fn(() => 100) },
       reply: vi.fn(),
@@ -48,7 +48,7 @@ describe("bot/features/vac/commands/usecases/vacLimit", () => {
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  it("updates channel limit and replies with unlimited label when limit is 0", async () => {
+  it("上限0を設定して無制限ラベルで成功応答する", async () => {
     const edit = vi.fn().mockResolvedValue(undefined);
     (resolveVacVoiceChannelForEdit as Mock).mockResolvedValue({ edit });
 
@@ -68,7 +68,7 @@ describe("bot/features/vac/commands/usecases/vacLimit", () => {
     });
   });
 
-  it("updates channel limit and replies with numeric label", async () => {
+  it("チャンネル上限を数値で設定して数値ラベルで成功応答する", async () => {
     const edit = vi.fn().mockResolvedValue(undefined);
     (resolveVacVoiceChannelForEdit as Mock).mockResolvedValue({ edit });
 

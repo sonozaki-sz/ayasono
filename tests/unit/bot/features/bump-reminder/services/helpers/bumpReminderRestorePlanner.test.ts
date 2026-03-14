@@ -2,7 +2,7 @@
 import { createBumpReminderRestorePlan } from "@/bot/features/bump-reminder/services/helpers/bumpReminderRestorePlanner";
 
 describe("bot/features/bump-reminder/services/helpers/bumpReminderRestorePlanner", () => {
-  it("keeps latest reminder per guild and collects stale ones", () => {
+  it("ギルドごとに最新のリマインダーを保持し古いものを収集する", () => {
     const reminders = [
       {
         id: "old",
@@ -28,7 +28,7 @@ describe("bot/features/bump-reminder/services/helpers/bumpReminderRestorePlanner
     expect(result.staleReminders.map((item) => item.id)).toEqual(["old"]);
   });
 
-  it("treats same guild + different serviceName as independent entries", () => {
+  it("同一ギルドでも serviceName が異なる場合は独立したエントリとして扱う", () => {
     const reminders = [
       {
         id: "disboard",
@@ -52,7 +52,7 @@ describe("bot/features/bump-reminder/services/helpers/bumpReminderRestorePlanner
     expect(result.staleReminders).toHaveLength(0);
   });
 
-  it("keeps latest per guild:service and marks older as stale", () => {
+  it("guild:service ごとに最新を保持し古いものを stale としてマークする", () => {
     const reminders = [
       {
         id: "disboard-old",

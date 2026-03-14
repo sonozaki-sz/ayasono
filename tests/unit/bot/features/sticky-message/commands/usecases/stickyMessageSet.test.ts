@@ -54,7 +54,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageSet", () =>
     showModalMock.mockResolvedValue(undefined);
   });
 
-  it("replies with warning when channel is not GuildText", async () => {
+  it("チャンネルが GuildText でない場合に警告を Ephemeral 返信する", async () => {
     const { handleStickyMessageSet } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageSet");
     const interaction = createInteractionMock({
@@ -69,7 +69,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageSet", () =>
     expect(findByChannelMock).not.toHaveBeenCalled();
   });
 
-  it("replies with warning when user specifies non-text channel option", async () => {
+  it("テキスト以外のチャンネルオプションを指定した場合に警告を Ephemeral 返信する", async () => {
     const { handleStickyMessageSet } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageSet");
     const interaction = createInteractionMock({
@@ -83,7 +83,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageSet", () =>
     );
   });
 
-  it("replies with warning when sticky already exists", async () => {
+  it("スティッキーメッセージがすでに存在する場合に警告を Ephemeral 返信する", async () => {
     const { handleStickyMessageSet } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageSet");
     findByChannelMock.mockResolvedValue({ id: "existing" });
@@ -97,7 +97,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageSet", () =>
     expect(showModalMock).not.toHaveBeenCalled();
   });
 
-  it("shows plain text modal when embed is false", async () => {
+  it("embed が false の場合にプレーンテキストモーダルを表示する", async () => {
     const { handleStickyMessageSet } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageSet");
     findByChannelMock.mockResolvedValue(null);
@@ -111,7 +111,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageSet", () =>
     expect(modal.data.custom_id).toContain("sticky-message:set-modal:");
   });
 
-  it("shows embed modal when embed is true", async () => {
+  it("embed が true の場合に embed モーダルを表示する", async () => {
     const { handleStickyMessageSet } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageSet");
     findByChannelMock.mockResolvedValue(null);
@@ -124,7 +124,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageSet", () =>
     expect(modal.data.custom_id).toContain("sticky-message:set-embed-modal:");
   });
 
-  it("uses channelOption when provided", async () => {
+  it("channelOption が指定された場合にそのチャンネルを使用する", async () => {
     const { handleStickyMessageSet } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageSet");
     findByChannelMock.mockResolvedValue(null);
@@ -137,7 +137,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageSet", () =>
     expect(findByChannelMock).toHaveBeenCalledWith("specific-ch");
   });
 
-  it("replies with warning when no channel is available (channel is null)", async () => {
+  it("利用可能なチャンネルがない場合（channel が null）に警告を Ephemeral 返信する", async () => {
     const { handleStickyMessageSet } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageSet");
     const interaction = {
@@ -157,7 +157,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageSet", () =>
     );
   });
 
-  it("shows plain text modal when getString returns null (defaults to text style)", async () => {
+  it("getString が null を返す場合（style 未指定）はデフォルトで text スタイルのプレーンテキストモーダルを表示する", async () => {
     const { handleStickyMessageSet } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageSet");
     findByChannelMock.mockResolvedValue(null);

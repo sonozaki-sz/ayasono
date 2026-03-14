@@ -74,8 +74,7 @@ describe("bot/features/bump-reminder/services/usecases/restorePendingBumpReminde
     );
   });
 
-  // stale リマインダーを CANCELLED に更新し、未来の最新リマインダーだけをインメモリスケジューラに登録することを検証
-  it("cancels stale reminders and schedules latest future reminder", async () => {
+  it("stale リマインダーを CANCELLED に更新し、未来の最新リマインダーだけをインメモリスケジューラに登録することを検証", async () => {
     const stale = { id: "stale-1", guildId: "g1" };
     const latest = {
       id: "latest-1",
@@ -121,8 +120,7 @@ describe("bot/features/bump-reminder/services/usecases/restorePendingBumpReminde
     );
   });
 
-  // scheduledAt が過去日時の場合はスケジュール登録をスキップしてタスクを即時実行することを検証
-  it("executes immediately when reminder is already due", async () => {
+  it("scheduledAt が過去日時の場合はスケジュール登録をスキップしてタスクを即時実行することを検証", async () => {
     const latest = {
       id: "latest-1",
       guildId: "g1",

@@ -46,7 +46,7 @@ describe("bot/features/sticky-message/repositories/stickyMessageRepository", () 
     return mod;
   }
 
-  it("findByChannel delegates to prisma.stickyMessage.findUnique", async () => {
+  it("findByChannel が prisma.stickyMessage.findUnique に委譲する", async () => {
     const prisma = createPrismaMock();
     const expected = { id: "s1", channelId: "ch-1", content: "hi" };
     prisma.stickyMessage.findUnique.mockResolvedValue(expected);
@@ -61,7 +61,7 @@ describe("bot/features/sticky-message/repositories/stickyMessageRepository", () 
     expect(result).toBe(expected);
   });
 
-  it("findAllByGuild delegates to prisma.stickyMessage.findMany", async () => {
+  it("findAllByGuild が prisma.stickyMessage.findMany に委譲する", async () => {
     const prisma = createPrismaMock();
     const expected = [{ id: "s1" }, { id: "s2" }];
     prisma.stickyMessage.findMany.mockResolvedValue(expected);
@@ -77,7 +77,7 @@ describe("bot/features/sticky-message/repositories/stickyMessageRepository", () 
     expect(result).toBe(expected);
   });
 
-  it("create delegates to prisma.stickyMessage.create with all fields", async () => {
+  it("create が全フィールドを指定して prisma.stickyMessage.create に委譲する", async () => {
     const prisma = createPrismaMock();
     const expected = { id: "s1" };
     prisma.stickyMessage.create.mockResolvedValue(expected);
@@ -104,7 +104,7 @@ describe("bot/features/sticky-message/repositories/stickyMessageRepository", () 
     expect(result).toBe(expected);
   });
 
-  it("create uses null for undefined embedData and updatedBy", async () => {
+  it("create は embedData と updatedBy が未指定の場合に null を使用する", async () => {
     const prisma = createPrismaMock();
     prisma.stickyMessage.create.mockResolvedValue({ id: "s1" });
 
@@ -123,7 +123,7 @@ describe("bot/features/sticky-message/repositories/stickyMessageRepository", () 
     });
   });
 
-  it("updateLastMessageId delegates to prisma.stickyMessage.update", async () => {
+  it("updateLastMessageId が prisma.stickyMessage.update に委譲する", async () => {
     const prisma = createPrismaMock();
     prisma.stickyMessage.update.mockResolvedValue(undefined);
 
@@ -137,7 +137,7 @@ describe("bot/features/sticky-message/repositories/stickyMessageRepository", () 
     });
   });
 
-  it("updateContent delegates to prisma with embedData and updatedBy", async () => {
+  it("updateContent が embedData と updatedBy を含めて prisma に委譲する", async () => {
     const prisma = createPrismaMock();
     const expected = { id: "s1", content: "new" };
     prisma.stickyMessage.update.mockResolvedValue(expected);
@@ -163,7 +163,7 @@ describe("bot/features/sticky-message/repositories/stickyMessageRepository", () 
     expect(result).toBe(expected);
   });
 
-  it("updateContent skips updatedBy when not provided", async () => {
+  it("updateContent は updatedBy が未指定の場合にそのフィールドを省略する", async () => {
     const prisma = createPrismaMock();
     prisma.stickyMessage.update.mockResolvedValue({ id: "s1" });
 
@@ -181,7 +181,7 @@ describe("bot/features/sticky-message/repositories/stickyMessageRepository", () 
     });
   });
 
-  it("delete delegates to prisma.stickyMessage.delete", async () => {
+  it("delete が prisma.stickyMessage.delete に委譲する", async () => {
     const prisma = createPrismaMock();
     prisma.stickyMessage.delete.mockResolvedValue(undefined);
 
@@ -194,7 +194,7 @@ describe("bot/features/sticky-message/repositories/stickyMessageRepository", () 
     });
   });
 
-  it("deleteByChannel delegates to prisma.stickyMessage.deleteMany", async () => {
+  it("deleteByChannel が prisma.stickyMessage.deleteMany に委譲する", async () => {
     const prisma = createPrismaMock();
     prisma.stickyMessage.deleteMany.mockResolvedValue({ count: 1 });
 
@@ -208,7 +208,7 @@ describe("bot/features/sticky-message/repositories/stickyMessageRepository", () 
     expect(count).toBe(1);
   });
 
-  it("getStickyMessageRepository throws when not initialized without prisma", async () => {
+  it("getStickyMessageRepository は prisma 未指定で未初期化の場合に例外をスローする", async () => {
     const { getStickyMessageRepository } = await loadModule();
 
     expect(() => getStickyMessageRepository()).toThrow(
@@ -216,7 +216,7 @@ describe("bot/features/sticky-message/repositories/stickyMessageRepository", () 
     );
   });
 
-  it("getStickyMessageRepository initializes with prisma and returns singleton", async () => {
+  it("getStickyMessageRepository は prisma で初期化するとシングルトンを返す", async () => {
     const prisma = createPrismaMock();
     const { getStickyMessageRepository, StickyMessageRepository } =
       await loadModule();

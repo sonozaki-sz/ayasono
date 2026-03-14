@@ -22,7 +22,7 @@ describe("shared/utils/errorHandling", () => {
     vi.clearAllMocks();
   });
 
-  it("executeWithDatabaseError returns operation result when successful", async () => {
+  it("executeWithDatabaseError が成功時に操作結果を返すこと", async () => {
     const operation = vi.fn().mockResolvedValue("ok");
 
     await expect(
@@ -32,7 +32,7 @@ describe("shared/utils/errorHandling", () => {
     expect(loggerErrorMock).not.toHaveBeenCalled();
   });
 
-  it("executeWithDatabaseError logs and throws DatabaseError on failure", async () => {
+  it("executeWithDatabaseError が失敗時にログ出力して DatabaseError をスローすること", async () => {
     const cause = new Error("boom");
     const operation = vi.fn().mockRejectedValue(cause);
 
@@ -48,7 +48,7 @@ describe("shared/utils/errorHandling", () => {
     expect(loggerErrorMock).toHaveBeenCalledWith("query failed", cause);
   });
 
-  it("executeWithLoggedError resolves when operation succeeds", async () => {
+  it("executeWithLoggedError が成功時に undefined で解決すること", async () => {
     const operation = vi.fn().mockResolvedValue(undefined);
 
     await expect(
@@ -57,7 +57,7 @@ describe("shared/utils/errorHandling", () => {
     expect(loggerErrorMock).not.toHaveBeenCalled();
   });
 
-  it("executeWithLoggedError logs and swallows operation error", async () => {
+  it("executeWithLoggedError が失敗時にログ出力してエラーを飲み込むこと", async () => {
     const cause = new Error("non-fatal");
     const operation = vi.fn().mockRejectedValue(cause);
 

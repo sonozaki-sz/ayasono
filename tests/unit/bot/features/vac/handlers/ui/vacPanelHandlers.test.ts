@@ -67,8 +67,7 @@ describe("bot/features/vac/ui handlers", () => {
     getAfkConfigMock.mockResolvedValue({ enabled: true, channelId: "afk-1" });
   });
 
-  // `matches` が customId prefix ベースで判定できることを検証
-  it("matches expected custom IDs", () => {
+  it("`matches` が customId prefix ベースで判定できることを検証", () => {
     expect(vacPanelButtonHandler.matches("vac:rename-btn:voice-1")).toBe(true);
     expect(vacPanelButtonHandler.matches("vac:limit-btn:voice-1")).toBe(true);
     expect(vacPanelButtonHandler.matches("vac:afk-btn:voice-1")).toBe(true);
@@ -85,8 +84,7 @@ describe("bot/features/vac/ui handlers", () => {
     expect(vacPanelUserSelectHandler.matches("other:voice-1")).toBe(false);
   });
 
-  // guild が無い場合は副作用なく return することを検証
-  it("returns early when guild is missing", async () => {
+  it("guild が無い場合は副作用なく return することを検証", async () => {
     await expect(
       vacPanelButtonHandler.execute({ guild: null } as never),
     ).resolves.toBeUndefined();
@@ -100,8 +98,7 @@ describe("bot/features/vac/ui handlers", () => {
     ).resolves.toBeUndefined();
   });
 
-  // ボタン処理で対象VCが取得できない場合はエラー応答することを検証
-  it("replies error when button target channel is not a voice channel", async () => {
+  it("ボタン処理で対象VCが取得できない場合はエラー応答することを検証", async () => {
     const interaction = {
       guild: {
         id: "guild-1",
@@ -123,7 +120,7 @@ describe("bot/features/vac/ui handlers", () => {
     });
   });
 
-  it("returns early when button custom id has no panel channel", async () => {
+  it("ボタンのcustomIdにパネルチャンネルが含まれない場合は早期リターンする", async () => {
     const interaction = {
       guild: {
         id: "guild-1",
@@ -143,7 +140,7 @@ describe("bot/features/vac/ui handlers", () => {
     expect(safeReply).not.toHaveBeenCalled();
   });
 
-  it("replies error when button target channel fetch fails", async () => {
+  it("ボタンの対象チャンネルfetchが失敗した場合はエラー応答する", async () => {
     const interaction = {
       guild: {
         id: "guild-1",
@@ -165,7 +162,7 @@ describe("bot/features/vac/ui handlers", () => {
     });
   });
 
-  it("replies error when button target channel is not managed", async () => {
+  it("ボタンの対象チャンネルが管理対象でない場合はエラー応答する", async () => {
     const interaction = {
       guild: {
         id: "guild-1",
@@ -189,7 +186,7 @@ describe("bot/features/vac/ui handlers", () => {
     });
   });
 
-  it("replies error when button operator is not in vc", async () => {
+  it("ボタン操作者がVCに在籍していない場合はエラー応答する", async () => {
     const interaction = {
       guild: {
         id: "guild-1",
@@ -217,7 +214,7 @@ describe("bot/features/vac/ui handlers", () => {
     });
   });
 
-  it("replies error when button operator fetch fails", async () => {
+  it("ボタン操作者のfetchが失敗した場合はエラー応答する", async () => {
     const interaction = {
       guild: {
         id: "guild-1",
@@ -243,7 +240,7 @@ describe("bot/features/vac/ui handlers", () => {
     });
   });
 
-  it("shows rename modal on rename button", async () => {
+  it("リネームボタン押下時にリネームモーダルを表示する", async () => {
     const interaction = {
       guild: {
         id: "guild-1",
@@ -268,7 +265,7 @@ describe("bot/features/vac/ui handlers", () => {
     expect(interaction.showModal).toHaveBeenCalledTimes(1);
   });
 
-  it("shows limit modal on limit button", async () => {
+  it("上限設定ボタン押下時に上限設定モーダルを表示する", async () => {
     const interaction = {
       guild: {
         id: "guild-1",
@@ -293,7 +290,7 @@ describe("bot/features/vac/ui handlers", () => {
     expect(interaction.showModal).toHaveBeenCalledTimes(1);
   });
 
-  it("replies with user-select menu on AFK button", async () => {
+  it("AFKボタン押下時にユーザー選択メニューを返答する", async () => {
     const mockMember1 = { displayName: "User One", id: "user-one" };
     const interaction = {
       guild: {
@@ -332,8 +329,7 @@ describe("bot/features/vac/ui handlers", () => {
     );
   });
 
-  // VC にメンバーが 0 人の場合は not_in_vc エラーを返す
-  it("replies error when AFK button is pressed but VC has no members", async () => {
+  it("VC にメンバーが 0 人の場合は not_in_vc エラーを返す", async () => {
     const interaction = {
       guild: {
         id: "guild-1",
@@ -367,7 +363,7 @@ describe("bot/features/vac/ui handlers", () => {
     );
   });
 
-  it("refreshes panel and replies success when refresh button pressed", async () => {
+  it("更新ボタン押下時にパネルを再送信して成功応答する", async () => {
     const deleteMock = vi.fn().mockResolvedValue(undefined);
     const interaction = {
       guild: {
@@ -412,7 +408,7 @@ describe("bot/features/vac/ui handlers", () => {
     });
   });
 
-  it("refreshes panel when refresh message is not deletable", async () => {
+  it("更新メッセージが削除不可の場合でもパネルを更新する", async () => {
     const deleteMock = vi.fn();
     const interaction = {
       guild: {
@@ -453,7 +449,7 @@ describe("bot/features/vac/ui handlers", () => {
     });
   });
 
-  it("continues refresh flow when delete fails", async () => {
+  it("メッセージ削除が失敗しても更新フローを継続する", async () => {
     const deleteMock = vi.fn().mockRejectedValue(new Error("delete failed"));
     const interaction = {
       guild: {
@@ -494,8 +490,7 @@ describe("bot/features/vac/ui handlers", () => {
     });
   });
 
-  // customId.startsWith を全て偽に制御した場合でも、例外を投げず副作用なしで終了することを検証
-  it("falls through when no button action matches after channel resolution", async () => {
+  it("customId.startsWith を全て偽に制御した場合でも、例外を投げず副作用なしで終了することを検証", async () => {
     const startsWithMock = vi
       .fn()
       .mockReturnValueOnce(false)
@@ -552,8 +547,7 @@ describe("bot/features/vac/ui handlers", () => {
     );
   });
 
-  // モーダル処理で人数制限が範囲外の場合はエラー応答することを検証
-  it("replies error when modal limit input is out of range", async () => {
+  it("モーダル処理で人数制限が範囲外の場合はエラー応答することを検証", async () => {
     const interaction = {
       guild: {
         id: "guild-1",
@@ -586,7 +580,7 @@ describe("bot/features/vac/ui handlers", () => {
     });
   });
 
-  it("replies error when modal target channel is not a voice channel", async () => {
+  it("モーダルの対象チャンネルがボイスチャンネルでない場合はエラー応答する", async () => {
     const interaction = {
       guild: {
         id: "guild-1",
@@ -609,7 +603,7 @@ describe("bot/features/vac/ui handlers", () => {
     });
   });
 
-  it("replies error when modal channel fetch fails", async () => {
+  it("モーダルのチャンネルfetchが失敗した場合はエラー応答する", async () => {
     const interaction = {
       guild: {
         id: "guild-1",
@@ -632,7 +626,7 @@ describe("bot/features/vac/ui handlers", () => {
     });
   });
 
-  it("replies error when modal target channel is not managed", async () => {
+  it("モーダルの対象チャンネルが管理対象でない場合はエラー応答する", async () => {
     const interaction = {
       guild: {
         id: "guild-1",
@@ -666,7 +660,7 @@ describe("bot/features/vac/ui handlers", () => {
     });
   });
 
-  it("replies error when modal operator is not in target voice channel", async () => {
+  it("モーダル操作者が対象ボイスチャンネルに在籍していない場合はエラー応答する", async () => {
     const interaction = {
       guild: {
         id: "guild-1",
@@ -699,7 +693,7 @@ describe("bot/features/vac/ui handlers", () => {
     });
   });
 
-  it("replies error when modal member fetch fails", async () => {
+  it("モーダルのメンバーfetchが失敗した場合はエラー応答する", async () => {
     const interaction = {
       guild: {
         id: "guild-1",
@@ -730,7 +724,7 @@ describe("bot/features/vac/ui handlers", () => {
     });
   });
 
-  it("replies error when modal rename input is empty", async () => {
+  it("モーダルのリネーム入力が空の場合はエラー応答する", async () => {
     const voiceChannel = {
       id: "voice-1",
       type: 2,
@@ -766,7 +760,7 @@ describe("bot/features/vac/ui handlers", () => {
     });
   });
 
-  it("renames channel and replies success on modal rename", async () => {
+  it("モーダルリネームでチャンネルをリネームして成功応答する", async () => {
     const voiceChannel = {
       id: "voice-1",
       type: 2,
@@ -802,7 +796,7 @@ describe("bot/features/vac/ui handlers", () => {
     });
   });
 
-  it("updates channel user limit and replies success for non-zero limit", async () => {
+  it("0以外の人数制限をチャンネルに設定して成功応答する", async () => {
     const voiceChannel = {
       id: "voice-1",
       type: 2,
@@ -838,8 +832,7 @@ describe("bot/features/vac/ui handlers", () => {
     });
   });
 
-  // Discord では userLimit=0 が「人数制限なし（無制限）」を意味するため、0 入力を正しく処理することを検証
-  it("updates channel user limit and treats zero as unlimited", async () => {
+  it("Discord では userLimit=0 が「人数制限なし（無制限）」を意味するため、0 入力を正しく処理することを検証", async () => {
     const voiceChannel = {
       id: "voice-1",
       type: 2,
@@ -875,8 +868,7 @@ describe("bot/features/vac/ui handlers", () => {
     });
   });
 
-  // user-select で対象ユーザーをAFKへ移動し成功応答することを検証
-  it("moves selected users to AFK channel on user-select success path", async () => {
+  it("user-select で対象ユーザーをAFKへ移動し成功応答することを検証", async () => {
     const movedMember = {
       voice: {
         channelId: "voice-1",
@@ -951,7 +943,7 @@ describe("bot/features/vac/ui handlers", () => {
     );
   });
 
-  it("replies error when user-select target channel is invalid", async () => {
+  it("user-selectの対象チャンネルが無効な場合はエラー応答する", async () => {
     const interaction = {
       guild: {
         id: "guild-1",
@@ -972,7 +964,7 @@ describe("bot/features/vac/ui handlers", () => {
     });
   });
 
-  it("replies error when user-select target channel fetch fails", async () => {
+  it("user-selectの対象チャンネルfetchが失敗した場合はエラー応答する", async () => {
     const interaction = {
       guild: {
         id: "guild-1",
@@ -993,7 +985,7 @@ describe("bot/features/vac/ui handlers", () => {
     });
   });
 
-  it("replies error when user-select target channel is not managed", async () => {
+  it("user-selectの対象チャンネルが管理対象でない場合はエラー応答する", async () => {
     const interaction = {
       guild: {
         id: "guild-1",
@@ -1016,7 +1008,7 @@ describe("bot/features/vac/ui handlers", () => {
     });
   });
 
-  it("replies error when user-select operator is not in vc", async () => {
+  it("user-select操作者がVCに在籍していない場合はエラー応答する", async () => {
     const interaction = {
       guild: {
         id: "guild-1",
@@ -1043,7 +1035,7 @@ describe("bot/features/vac/ui handlers", () => {
     });
   });
 
-  it("replies error when user-select operator fetch fails", async () => {
+  it("user-select操作者のfetchが失敗した場合はエラー応答する", async () => {
     const interaction = {
       guild: {
         id: "guild-1",
@@ -1068,8 +1060,7 @@ describe("bot/features/vac/ui handlers", () => {
     });
   });
 
-  // AFK設定がDBに未登録（null）の場合、移動処理をスキップしエラー応答することを検証
-  it("replies error when AFK config is missing", async () => {
+  it("AFK設定がDBに未登録（null）の場合、移動処理をスキップしエラー応答することを検証", async () => {
     const interaction = {
       guild: {
         id: "guild-1",
@@ -1098,8 +1089,7 @@ describe("bot/features/vac/ui handlers", () => {
     });
   });
 
-  // AFK設定は存在するが対象チャンネルが削除済み等で null になる場合のエラー応答を検証
-  it("replies error when AFK channel is not found", async () => {
+  it("AFK設定は存在するが対象チャンネルが削除済み等で null になる場合のエラー応答を検証", async () => {
     const interaction = {
       guild: {
         id: "guild-1",
@@ -1141,7 +1131,7 @@ describe("bot/features/vac/ui handlers", () => {
     });
   });
 
-  it("replies error when AFK channel fetch fails", async () => {
+  it("AFKチャンネルのfetchが失敗した場合はエラー応答する", async () => {
     const interaction = {
       guild: {
         id: "guild-1",
@@ -1183,8 +1173,7 @@ describe("bot/features/vac/ui handlers", () => {
     });
   });
 
-  // setChannel が全員分失敗した場合にのみ afk_move_failed エラーを返すことを検証
-  it("replies error when all moves fail (setChannel throws)", async () => {
+  it("setChannel が全員分失敗した場合にのみ afk_move_failed エラーを返すことを検証", async () => {
     const failingMoveMember = {
       voice: {
         channelId: "voice-1",
@@ -1243,8 +1232,7 @@ describe("bot/features/vac/ui handlers", () => {
     });
   });
 
-  // 選択メンバーの一部 fetch が失敗しても残りを正常に移動し成功応答する、部分失敗への回復性を検証
-  it("continues when selected member fetch fails and still replies success", async () => {
+  it("選択メンバーの一部 fetch が失敗しても残りを正常に移動し成功応答する、部分失敗への回復性を検証", async () => {
     const movableMember = {
       voice: {
         channelId: "voice-1",

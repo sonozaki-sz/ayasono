@@ -66,25 +66,25 @@ function makeInteraction(
 // ---- テスト ----
 
 describe("vcRecruitStringSelectHandler / matches()", () => {
-  it("matches mention select prefix", () => {
+  it("メンション選択プレフィックスに一致する", () => {
     expect(
       vcRecruitStringSelectHandler.matches(`${MENTION_PREFIX}session-1`),
     ).toBe(true);
   });
 
-  it("matches VC select prefix", () => {
+  it("VC 選択プレフィックスに一致する", () => {
     expect(vcRecruitStringSelectHandler.matches(`${VC_PREFIX}session-1`)).toBe(
       true,
     );
   });
 
-  it("matches teardown select prefix", () => {
+  it("teardown 選択プレフィックスに一致する", () => {
     expect(
       vcRecruitStringSelectHandler.matches(`${TEARDOWN_PREFIX}session-1`),
     ).toBe(true);
   });
 
-  it("does not match unrelated customId", () => {
+  it("無関係な customId には一致しない", () => {
     expect(vcRecruitStringSelectHandler.matches("vac:select:session-1")).toBe(
       false,
     );
@@ -96,8 +96,7 @@ describe("vcRecruitStringSelectHandler / mention select", () => {
     vi.clearAllMocks();
   });
 
-  // メンション選択 → session を更新 + deferUpdate を呼ぶ
-  it("updates mentionRoleId in session and defers update", async () => {
+  it("メンション選択でセッションの mentionRoleId を更新し deferUpdate を呼ぶ", async () => {
     const interaction = makeInteraction({
       customId: `${MENTION_PREFIX}session-1`,
       values: ["role-42"],
@@ -111,8 +110,7 @@ describe("vcRecruitStringSelectHandler / mention select", () => {
     expect(interaction.deferUpdate).toHaveBeenCalled();
   });
 
-  // __none__ 選択でも session を更新できる
-  it("updates session with __none__ value", async () => {
+  it("__none__ 選択でもセッションを更新できる", async () => {
     const interaction = makeInteraction({
       customId: `${MENTION_PREFIX}session-2`,
       values: ["__none__"],
@@ -131,8 +129,7 @@ describe("vcRecruitStringSelectHandler / VC select", () => {
     vi.clearAllMocks();
   });
 
-  // VC選択 → session を更新 + deferUpdate を呼ぶ
-  it("updates selectedVcId in session and defers update", async () => {
+  it("VC 選択でセッションの selectedVcId を更新し deferUpdate を呼ぶ", async () => {
     const interaction = makeInteraction({
       customId: `${VC_PREFIX}session-3`,
       values: ["existing-vc-1"],
@@ -146,8 +143,7 @@ describe("vcRecruitStringSelectHandler / VC select", () => {
     expect(interaction.deferUpdate).toHaveBeenCalled();
   });
 
-  // __new__ 選択でも session を更新できる
-  it("updates session with __new__ value", async () => {
+  it("__new__ 選択でもセッションを更新できる", async () => {
     const interaction = makeInteraction({
       customId: `${VC_PREFIX}session-4`,
       values: ["__new__"],
@@ -166,8 +162,7 @@ describe("vcRecruitStringSelectHandler / teardown select", () => {
     vi.clearAllMocks();
   });
 
-  // セットアップが見つからないパネルIDはスキップする
-  it("skips panel channel IDs not found in repo", async () => {
+  it("リポジトリに存在しないパネルチャンネル ID はスキップする", async () => {
     findSetupByPanelChannelIdMock.mockResolvedValue(null);
 
     const interaction = makeInteraction({
@@ -184,8 +179,7 @@ describe("vcRecruitStringSelectHandler / teardown select", () => {
     expect(interaction.update).toHaveBeenCalled();
   });
 
-  // 有効なセットアップが存在する場合は確認パネルを表示する
-  it("shows teardown confirm panel when valid setups are selected", async () => {
+  it("有効なセットアップが存在する場合は teardown 確認パネルを表示する", async () => {
     findSetupByPanelChannelIdMock.mockResolvedValue({
       panelChannelId: "panel-ch-1",
       categoryId: null,
@@ -215,8 +209,7 @@ describe("vcRecruitStringSelectHandler / teardown select", () => {
     );
   });
 
-  // categoryId が既知のチャンネルの場合はチャンネル名をラベルに使用する
-  it("uses channel name as label when category channel is known", async () => {
+  it("categoryId が既知のチャンネルの場合はチャンネル名をラベルに使用する", async () => {
     findSetupByPanelChannelIdMock.mockResolvedValue({
       panelChannelId: "panel-ch-1",
       categoryId: "cat-1",
@@ -242,8 +235,7 @@ describe("vcRecruitStringSelectHandler / teardown select", () => {
     );
   });
 
-  // categoryId がキャッシュに存在しない場合は unknown_category ラベルを使用する
-  it("uses unknown_category label when setup categoryId is not in guild cache", async () => {
+  it("categoryId がキャッシュに存在しない場合は unknown_category ラベルを使用する", async () => {
     findSetupByPanelChannelIdMock.mockResolvedValue({
       panelChannelId: "panel-ch-1",
       categoryId: "cat-unknown",
@@ -274,8 +266,7 @@ describe("vcRecruitStringSelectHandler / teardown select", () => {
     );
   });
 
-  // 60秒後に確認ボタンが無効化される
-  it("disables confirm buttons after 60 seconds", async () => {
+  it("60秒後に確認ボタンが無効化される", async () => {
     vi.useFakeTimers();
     findSetupByPanelChannelIdMock.mockResolvedValue({
       panelChannelId: "panel-ch-1",

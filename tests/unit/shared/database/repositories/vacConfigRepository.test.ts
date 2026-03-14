@@ -17,7 +17,7 @@ describe("shared/database/repositories/vacConfigRepository", () => {
   }
 
   describe("getVacConfig", () => {
-    it("returns null when record not found", async () => {
+    it("レコードが存在しない場合は null を返すこと", async () => {
       const prisma = createPrismaMock();
       prisma.guildVacConfig.findUnique.mockResolvedValue(null);
 
@@ -31,7 +31,7 @@ describe("shared/database/repositories/vacConfigRepository", () => {
       });
     });
 
-    it("returns VacConfig with parsed arrays from record", async () => {
+    it("レコードが見つかった場合は配列をパースした VacConfig を返すこと", async () => {
       const prisma = createPrismaMock();
       prisma.guildVacConfig.findUnique.mockResolvedValue({
         guildId: "guild-1",
@@ -51,7 +51,7 @@ describe("shared/database/repositories/vacConfigRepository", () => {
       });
     });
 
-    it("returns empty arrays for invalid JSON", async () => {
+    it("無効な JSON の場合は空配列を返すこと", async () => {
       const prisma = createPrismaMock();
       prisma.guildVacConfig.findUnique.mockResolvedValue({
         guildId: "guild-1",
@@ -71,7 +71,7 @@ describe("shared/database/repositories/vacConfigRepository", () => {
       });
     });
 
-    it("returns empty arrays for non-array JSON", async () => {
+    it("配列でない JSON の場合は空配列を返すこと", async () => {
       const prisma = createPrismaMock();
       prisma.guildVacConfig.findUnique.mockResolvedValue({
         guildId: "guild-1",
@@ -93,7 +93,7 @@ describe("shared/database/repositories/vacConfigRepository", () => {
   });
 
   describe("updateVacConfig", () => {
-    it("upserts record with JSON-stringified arrays", async () => {
+    it("配列を JSON 文字列化してレコードを upsert すること", async () => {
       const prisma = createPrismaMock();
       prisma.guildVacConfig.upsert.mockResolvedValue({});
 

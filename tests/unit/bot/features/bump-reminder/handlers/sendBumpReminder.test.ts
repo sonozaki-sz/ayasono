@@ -36,8 +36,7 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
     getGuildTranslatorMock.mockResolvedValue((key: string) => key);
   });
 
-  // テキストベースでないチャンネルに対しては送信せず警告ログを出力することを確認
-  it("warns and returns when channel is not text-based", async () => {
+  it("テキストベースでないチャンネルに対しては送信せず警告ログを出力することを確認", async () => {
     const client = {
       channels: {
         fetch: vi.fn().mockResolvedValue({ isTextBased: () => false }),
@@ -57,8 +56,7 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
     expect(loggerWarnMock).toHaveBeenCalled();
   });
 
-  // リマインダー設定で enabled: false の場合はメッセージ送信をスキップすることを確認
-  it("returns when reminder is disabled", async () => {
+  it("リマインダー設定で enabled: false の場合はメッセージ送信をスキップすることを確認", async () => {
     const send = vi.fn();
     const client = {
       channels: {
@@ -86,8 +84,7 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
     expect(loggerDebugMock).toHaveBeenCalled();
   });
 
-  // panelId が渡された場合、送信後の finally でパネルメッセージを削除し、リプライにメンション文字列が含まれることを確認
-  it("sends reply and deletes panel in finally", async () => {
+  it("panelId が渡された場合、送信後の finally でパネルメッセージを削除し、リプライにメンション文字列が含まれることを確認", async () => {
     const panelDelete = vi.fn().mockResolvedValue(undefined);
     const fetchMessage = vi.fn().mockResolvedValue({ delete: panelDelete });
     const channel = {

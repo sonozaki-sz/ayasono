@@ -57,7 +57,7 @@ describe("bot/features/sticky-message/services/stickyMessageResendService", () =
     vi.useRealTimers();
   });
 
-  it("schedules a resend timer and fires after 5 seconds", async () => {
+  it("再送タイマーをスケジュールし 5 秒後に発火する", async () => {
     const repo = createRepoMock();
     const sticky = {
       id: "sticky-1",
@@ -87,7 +87,7 @@ describe("bot/features/sticky-message/services/stickyMessageResendService", () =
     );
   });
 
-  it("debounces multiple messages within 5 seconds", async () => {
+  it("5 秒以内の複数メッセージをデバウンスして 1 回だけ再送する", async () => {
     const repo = createRepoMock();
     const sticky = {
       id: "sticky-1",
@@ -113,7 +113,7 @@ describe("bot/features/sticky-message/services/stickyMessageResendService", () =
     expect(repo.findByChannel).toHaveBeenCalledTimes(1);
   });
 
-  it("deletes previous sticky message before sending new one", async () => {
+  it("新しいスティッキーメッセージを送信する前に前のメッセージを削除する", async () => {
     const repo = createRepoMock();
     const deleteMock = vi.fn();
     const fetchMessageMock = vi.fn().mockResolvedValue({ delete: deleteMock });
@@ -141,8 +141,7 @@ describe("bot/features/sticky-message/services/stickyMessageResendService", () =
     expect(deleteMock).toHaveBeenCalled();
   });
 
-  // 削除済みメッセージへの fetch が 404 エラーになるケース: サービスはクラッシュせず debug ログだけ出すべき
-  it("ignores error when previous sticky message is already deleted", async () => {
+  it("削除済みメッセージへの fetch が 404 エラーになる場合、サービスはクラッシュせず debug ログだけ出す", async () => {
     const repo = createRepoMock();
     const fetchMessageMock = vi.fn().mockRejectedValue(new Error("Not Found"));
     const sticky = {
@@ -169,7 +168,7 @@ describe("bot/features/sticky-message/services/stickyMessageResendService", () =
     expect(loggerMock.debug).toHaveBeenCalled();
   });
 
-  it("logs error when sending sticky message fails", async () => {
+  it("スティッキーメッセージの送信が失敗した場合にエラーをログに記録する", async () => {
     const repo = createRepoMock();
     const sticky = {
       id: "sticky-1",
@@ -197,7 +196,7 @@ describe("bot/features/sticky-message/services/stickyMessageResendService", () =
     );
   });
 
-  it("returns early when no sticky message found for channel", async () => {
+  it("チャンネルにスティッキーメッセージが見つからない場合は早期リターンする", async () => {
     const repo = createRepoMock();
     repo.findByChannel.mockResolvedValue(null);
 
@@ -212,8 +211,7 @@ describe("bot/features/sticky-message/services/stickyMessageResendService", () =
     expect(channel.send).not.toHaveBeenCalled();
   });
 
-  // タイマー登録後に cancelTimer を呼ぶと、その後タイマーが発火しても resend が実行されないことを確認
-  it("cancelTimer removes the scheduled timer", async () => {
+  it("タイマー登録後に cancelTimer を呼ぶと、その後タイマーが発火しても resend が実行されない", async () => {
     const repo = createRepoMock();
     const sticky = {
       id: "sticky-1",
@@ -236,7 +234,7 @@ describe("bot/features/sticky-message/services/stickyMessageResendService", () =
     expect(repo.findByChannel).not.toHaveBeenCalled();
   });
 
-  it("cancelTimer on channel with no timer does nothing", async () => {
+  it("タイマーが存在しないチャンネルに cancelTimer を呼んでも何も起きない", async () => {
     const repo = createRepoMock();
 
     const { StickyMessageResendService } =
@@ -247,8 +245,7 @@ describe("bot/features/sticky-message/services/stickyMessageResendService", () =
     expect(() => service.cancelTimer("no-such-channel")).not.toThrow();
   });
 
-  // 引数なしで呼ぶと「未初期化」エラーになる初期化ガードを検証
-  it("getStickyMessageResendService throws when not initialized", async () => {
+  it("引数なしで呼ぶと「未初期化」エラーになる初期化ガードが働く", async () => {
     const { getStickyMessageResendService } =
       await import("@/bot/features/sticky-message/services/stickyMessageResendService");
 
@@ -257,7 +254,7 @@ describe("bot/features/sticky-message/services/stickyMessageResendService", () =
     );
   });
 
-  it("getStickyMessageResendService initializes and returns singleton", async () => {
+  it("getStickyMessageResendService は初期化してシングルトンを返す", async () => {
     const repo = createRepoMock();
     const { getStickyMessageResendService } =
       await import("@/bot/features/sticky-message/services/stickyMessageResendService");
@@ -268,7 +265,7 @@ describe("bot/features/sticky-message/services/stickyMessageResendService", () =
     expect(service1).toBe(service2);
   });
 
-  it("logs scheduled error when resend rejects (catch callback coverage)", async () => {
+  it("resend が reject した場合にスケジュール済みエラーをログに記録する（catch コールバックのカバレッジ）", async () => {
     const repo = createRepoMock();
     // findByChannel throws to cause resend() itself to reject
     repo.findByChannel.mockRejectedValue(new Error("DB fatal error"));

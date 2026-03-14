@@ -50,13 +50,12 @@ describe("bot/events/channelDelete", () => {
     vi.clearAllMocks();
   });
 
-  it("has expected event metadata", () => {
+  it("イベントメタデータが正しいことを確認", () => {
     expect(channelDeleteEvent.name).toBe(Events.ChannelDelete);
     expect(channelDeleteEvent.once).toBe(false);
   });
 
-  // 実処理は VAC ハンドラーへ委譲されることを検証
-  it("delegates channel to VAC channel-delete handler", async () => {
+  it("チャンネルが handleVacChannelDelete へ委譲されることを確認", async () => {
     const channel = createChannel({ type: ChannelType.GuildText });
 
     await channelDeleteEvent.execute(channel as never);
@@ -64,8 +63,7 @@ describe("bot/events/channelDelete", () => {
     expect(handleVacChannelDeleteMock).toHaveBeenCalledWith(channel);
   });
 
-  // スティッキーメッセージのクリーンアップハンドラーへ委譲されることを検証
-  it("delegates channel to sticky-message channel-delete handler", async () => {
+  it("チャンネルが handleStickyMessageChannelDelete へ委譲されることを確認", async () => {
     const channel = createChannel({ type: ChannelType.GuildText });
 
     await channelDeleteEvent.execute(channel as never);
@@ -73,8 +71,7 @@ describe("bot/events/channelDelete", () => {
     expect(handleStickyMessageChannelDeleteMock).toHaveBeenCalledWith(channel);
   });
 
-  // VC募集のクリーンアップハンドラーへ委譲されることを検証
-  it("delegates channel to vc-recruit channel-delete handler", async () => {
+  it("チャンネルが handleVcRecruitChannelDelete へ委譲されることを確認", async () => {
     const channel = createChannel({ type: ChannelType.GuildText });
 
     await channelDeleteEvent.execute(channel as never);
