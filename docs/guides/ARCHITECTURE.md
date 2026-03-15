@@ -2,7 +2,7 @@
 
 > Architecture Guide - コード設計・モジュール構成・設計パターンの解説
 
-最終更新: 2026年3月14日
+最終更新: 2026年3月16日
 
 ---
 
@@ -71,11 +71,14 @@ src/
 │   │       └── constants/  # 共通定数・CustomID 定義
 │   ├── handlers/interactionCreate/
 │   │   ├── flow/          # command/components/modal のフロー制御
+│   │   │   └── components.ts # customIdベースの汎用ハンドラディスパッチ
 │   │   ├── handleInteractionCreate.ts
 │   │   └── ui/            # UIインタラクションハンドラレジストリ
+│   │       └── types.ts   # InteractionHandler<T> 汎用ハンドラ型定義
 │   ├── shared/            # Bot 層内の複数機能で共用するユーティリティ
 │   │   ├── i18nKeys.ts    # 共通 i18n キー定数
-│   │   └── permissionGuards.ts # 共通権限チェック関数
+│   │   ├── permissionGuards.ts # 共通権限チェック関数
+│   │   └── disableComponentsAfterTimeout.ts # コンポーネント一括無効化
 │   ├── errors/
 │   │   └── interactionErrorHandler.ts
 │   ├── utils/
@@ -134,7 +137,8 @@ src/
 │       ├── logger.ts
 │       ├── prisma.ts
 │       ├── serviceFactory.ts  # createBotServiceAccessor / createServiceGetter
-│       └── jsonUtils.ts       # parseJsonArray 等
+│       ├── jsonUtils.ts       # parseJsonArray 等
+│       └── ttlMap.ts          # TTL付きインメモリMap（UIセッション状態管理）
 │
 └── web/                   # Web プロセス専用
     ├── server.ts          # Fastify サーバー起動

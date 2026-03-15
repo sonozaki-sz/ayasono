@@ -2,7 +2,7 @@
 
 > ayasono のドキュメント一覧
 
-最終更新: 2026年3月14日
+最終更新: 2026年3月16日
 
 ---
 
@@ -22,169 +22,18 @@ docs/
 
 開発者向けの実用的なガイドです。
 
-### [ARCHITECTURE.md](guides/ARCHITECTURE.md)
-
-システム全体の設計方針とアーキテクチャ概要。
-
-**内容:**
-
-- Bot / Web の2プロセス構成図
-- ディレクトリ構成とモジュール境界の設計原則
-- 依存方向と責務境界（bot / web / shared）
-- Discord Gateway Intents の設定と理由
-- Repository / Factory / DI パターンの解説
-- スケジューラー設計（cron + setTimeout の使い分け）
-- Web API エンドポイント一覧（/health, /ready, /api）と認証仕様
-- エラーハンドリング設計（isOperational フラグ、各エラークラスの使い分け）
-- TEST_MODE フラグの動作
-
-**対象:** 開発者（特に新規参加者）
-
----
-
-### [USER_MANUAL.md](guides/USER_MANUAL.md)
-
-ユーザー（サーバーメンバー・管理者）向けの取扱説明書。
-
-**内容:**
-
-- 各機能の概要とユースケース
-- メンバー向けの操作手順（/afk、/vac、Bumpリマインダーのボタン操作など）
-- 管理者向けの初期設定手順
-- よくある質問（FAQ）
-- Botに必要なサーバー権限一覧
-
-**対象:** サーバーメンバー、サーバー管理者
-
----
-
-### [COMMANDS.md](guides/COMMANDS.md)
-
-全スラッシュコマンドの完全なリファレンス。
-
-**内容:**
-
-- コマンド一覧
-- 各コマンドの使用法、オプション、権限
-- 実行例とエラーケース
-- 多言語対応の詳細
-
-**対象:** ユーザー、開発者、管理者
-
----
-
-### [DISCORD_BOT_SETUP.md](guides/DISCORD_BOT_SETUP.md)
-
-Discord Developer Portal でのアプリ作成からサーバーへの招待までの手順。
-
-**内容:**
-
-- Discord アプリの作成
-- Bot トークンの取得
-- Privileged Gateway Intents の有効化（MessageContent / GuildMembers）
-- OAuth2 URL Generator でのスコープ・パーミッション設定
-- サーバーへの招待と動作確認
-
-**対象:** 運用担当者、初回セットアップ担当者
-
----
-
-### [XSERVER_VPS_SETUP.md](guides/XSERVER_VPS_SETUP.md)
-
-XServer VPS の初期設定から Portainer のインストール・ bot コンテナ初回起動確認までの初回セットアップ手順。
-
-**内容:**
-
-- VPS 初期設定（OS・SSH・UFW設定）
-- Docker / Docker Compose のインストール確認
-- Portainer CE の起動（`infra` スタックとして `/opt/infra/` で管理）
-- Portainer の初期設定（管理者アカウント・環境設定）
-- bot コンテナの初回起動確認（`/opt/ayasono/` に Compose ファイルを配置）
-- GitHub Secrets の登録方法（SSH 鍵・Portainer エンドポイント ID 等）
-- 動作確認と手動再起動コマンド
-
-**対象:** 運用担当者、インフラ構築担当者
-
----
-
-### [DEPLOYMENT.md](guides/DEPLOYMENT.md)
-
-SSH + GitHub Actions による自動デプロイフローの詳細解説。
-
-**内容:**
-
-- GitHub Actions ワークフロー構成（Test / Deploy / Discord通知）
-- 必要な GitHub Secrets 一覧
-- デプロイステップ詳細（GHCR ビルド・SSH デプロイ）
-- ロールバック手順（SSH / Portainer UI）
-- トラブルシューティング
-
-**対象:** 運用担当者、デプロイ担当者
-
-### [GIT_WORKFLOW.md](guides/GIT_WORKFLOW.md)
-
-Git ブランチ戦略とコミットメッセージ規約。
-
-**内容:**
-
-- ブランチ構成（main / develop / feature/_ / hotfix/_ 等）
-- 各ブランチの役割とマージ先
-- 通常の開発フロー（PR 必須）
-- ホットフィックスフロー
-- Conventional Commits 規約
-- PR テンプレートとレビュールール
-
-**対象:** 全開発者
-
-### [TESTING_GUIDELINES.md](guides/TESTING_GUIDELINES.md)
-
-テストの方針とガイドライン。
-
-**内容:**
-
-- テスト哲学（AAA パターン）
-- テスト戦略（ユニット、インテグレーション、E2E）
-- テストフォルダ構成
-- Vitestの使い方
-- カバレッジ目標（99% ブランチ / 100% その他）
-- ベストプラクティス
-- テストコメント規約（関数単位・処理ブロック単位）
-- 時刻依存/環境変数依存テストの安定化パターン（fake timers・キー単位復元）
-
-**対象:** 開発者、テスト担当者
-
----
-
-### [IMPLEMENTATION_GUIDELINES.md](guides/IMPLEMENTATION_GUIDELINES.md)
-
-実装時の詳細方針とコーディング規約。
-
-**内容:**
-
-- レイヤ責務（commands / features / shared）の分離ルール
-- featureディレクトリ標準テンプレートと直接import運用ルール
-- 実装時の基本方針（小さく安全な変更、型安全維持）
-- コメント規約（ファイル先頭、関数、共用定数、処理ブロック）
-- リファクタリング手順（定数切り出し、ルーター化、処理分割）
-- 実装チェックリスト
-
-**対象:** 開発者、レビュー担当者
-
----
-
-### [I18N_GUIDE.md](guides/I18N_GUIDE.md)
-
-多言語対応（国際化）の実装ガイド。
-
-**内容:**
-
-- i18nextの使用方法
-- 言語リソースの追加方法
-- コマンドローカライゼーションの自動生成
-- 翻訳キーの命名規則
-- 新しい言語の追加手順
-
-**対象:** 開発者、翻訳担当者
+| ファイル | 概要 |
+| --- | --- |
+| [ARCHITECTURE.md](guides/ARCHITECTURE.md) | システム全体の設計方針とアーキテクチャ概要 |
+| [IMPLEMENTATION_GUIDELINES.md](guides/IMPLEMENTATION_GUIDELINES.md) | 実装方針・命名規則・コメント規約・コーディングルール |
+| [TESTING_GUIDELINES.md](guides/TESTING_GUIDELINES.md) | テスト設計方針・命名規則・カバレッジ目標 |
+| [GIT_WORKFLOW.md](guides/GIT_WORKFLOW.md) | Git ブランチ戦略・コミット規約 |
+| [I18N_GUIDE.md](guides/I18N_GUIDE.md) | 多言語対応（i18next）の実装ガイド |
+| [COMMANDS.md](guides/COMMANDS.md) | 全スラッシュコマンドのリファレンス |
+| [USER_MANUAL.md](guides/USER_MANUAL.md) | ユーザー・管理者向け取扱説明書 |
+| [DISCORD_BOT_SETUP.md](guides/DISCORD_BOT_SETUP.md) | Discord アプリ作成からサーバー招待までの手順 |
+| [XSERVER_VPS_SETUP.md](guides/XSERVER_VPS_SETUP.md) | VPS 初期設定から bot コンテナ起動までの手順 |
+| [DEPLOYMENT.md](guides/DEPLOYMENT.md) | GitHub Actions による自動デプロイフロー |
 
 ---
 
@@ -258,38 +107,10 @@ VC募集機能 - 専用チャンネルでVC参加者を募る投稿を作成。
 
 プロジェクトの実装とテストの進捗状況を管理します。
 
-### [IMPLEMENTATION_PROGRESS.md](progress/IMPLEMENTATION_PROGRESS.md)
-
-機能実装の詳細な進捗状況。
-
-**内容:**
-
-- 実装状況サマリー（カテゴリ別、機能別）
-- 実装完了項目の詳細
-  - 環境構築・インフラ
-  - コア機能
-  - 実装済みコマンド・イベント・サービス
-  - データベーススキーマ
-- 未実装機能の概要
-- 実装統計（ファイル数、コンポーネント数）
-
-**対象:** プロジェクトマネージャー、開発者
-
----
-
-### [TEST_PROGRESS.md](progress/TEST_PROGRESS.md)
-
-テスト実装の詳細な進捗状況。
-
-**内容:**
-
-- テスト統計（総テスト数、カバレッジ）
-- モジュール別カバレッジ詳細
-- 実装済みテストの詳細
-- 未実装テストの計画
-- 今後のテストロードマップ
-
-**対象:** QA担当者、開発者
+| ファイル | 概要 |
+| --- | --- |
+| [IMPLEMENTATION_PROGRESS.md](progress/IMPLEMENTATION_PROGRESS.md) | 機能実装の進捗状況 |
+| [TEST_PROGRESS.md](progress/TEST_PROGRESS.md) | テスト実装の進捗状況・カバレッジ |
 
 ---
 
@@ -314,17 +135,16 @@ VC募集機能 - 専用チャンネルでVC参加者を募る投稿を作成。
 ### 仕様書 (specs/)
 
 - **目的**: 機能の詳細設計、実装仕様
-- **対象読者**: 開発者、アーキテクト
-- **形式**:
+- **対象読者**: 開発者
+- **形式**（必要なセクションのみ記載、機能に応じて取捨選択）:
   - 📋 概要
   - 🎯 主要機能
+  - ⚙️ コマンド仕様
   - 💾 データベース設計
-  - 🏗️ 実装詳細
+  - 🔄 処理フロー
+  - ⚠️ エラーハンドリング
   - 🌐 多言語対応
-  - 🚨 エラーハンドリング
-  - ✅ テストケース
-  - 📊 実装状況
-  - 🔗 関連ドキュメント
+  - 🧪 テストケース
 - **更新頻度**: 機能実装前（仕様策定）、実装完了時
 
 ### 進捗管理 (progress/)

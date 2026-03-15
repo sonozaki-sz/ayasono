@@ -1,102 +1,42 @@
 # ayasono - TODO
 
-> プロジェクト全体のタスク管理と残件リスト
+> タスク管理と残件リスト
 
-最終更新: 2026年3月14日
+最終更新: 2026年3月16日
 
 ---
 
-## 📊 全体進捗サマリー
+## 📊 サマリー
 
-### 残タスク統計
-
-- 残タスク合計: **33件**
-- bot優先対象（1～3）: **17件**
-- デプロイ・運用（4）: **4件**
-- Web UI実装（5 / 凍結中）: **12件**
-
-### 優先カテゴリ別進捗
-
-| No. | 内容               | 残件 | 状態 |
-| --- | ------------------ | ---- | ---- |
-| 1   | 主要機能実装       | 8    | 🛠️   |
-| 2   | 基本コマンド追加   | 3    | 📋   |
-| 3   | テスト・品質向上   | 6    | 🚧   |
-| 4   | デプロイ・運用     | 4    | 🚧   |
-| 5   | Web UI実装（凍結） | 12   | ⏸️   |
-
-> 2026-03-14 更新: メンバーログ機能拡張（招待追跡・カスタムメッセージモーダル・clear コマンド追加）
+| カテゴリ | 残件 | 状態 |
+| --- | --- | --- |
+| 主要機能実装 | 8 | 🛠️ |
+| 基本コマンド追加 | 3 | 📋 |
+| テスト・品質向上 | 6 | 🚧 |
+| デプロイ・運用 | 4 | 🚧 |
+| Web UI実装（凍結） | 12 | ⏸️ |
 
 **凡例**: 🛠️ 着手中 | 🚧 進行中 | 📋 未着手 | ⏸️ 凍結中
 
+### コードベース統計
+
+| 項目 | ファイル数 | 行数 |
+| --- | --- | --- |
+| ソース（`src/**/*.ts`） | 242 | 25,364 |
+| テスト（`tests/**/*.ts`） | 192 | 35,929 |
+| **合計** | **434** | **61,293** |
+
+テスト数: 1,449 / コマンド: 10 実装・4 未実装 / イベント: 8 / サービス: 8
+
+**次のマイルストーン**: ロケール対応（interaction.locale 導入） → ギルド設定機能実装 → E2E テスト着手
+
 ---
 
-## 📋 残タスク一覧
+## 📋 残タスク
 
-> 運用方針（2026-02-21）: Web系（5系統）は一旦凍結し、bot層（1〜3）を優先。bot層が安定したら4（デプロイ・運用）へ進み、5（Web UI実装）を再開する。
+### 1. 主要機能実装
 
-### 1. 主要機能実装 - 残8件
-
-#### 1.1 VC自動作成機能 - ✅ 完了
-
-- [x] テスト実装（コマンド/イベント/パネル操作）
-- [x] VAC挙動のE2E検証（複数カテゴリ・再起動クリーンアップ）※ bot実装完了後にまとめて作成予定。単体テスト完了をもって完了扱い
-
-**仕様書**: [docs/specs/VAC_SPEC.md](docs/specs/VAC_SPEC.md)
-
-#### 1.2 メッセージ固定機能 - ✅ 完了
-
-- [x] `/sticky-message` コマンド実装（set、remove、update、view）
-- [x] messageCreateイベントでの自動再送信ロジック（`StickyMessageResendService`）
-- [x] Prisma Schema更新（StickyMessage テーブル、`updatedBy` フィールド含む）
-- [x] `updatedBy` フィールド: 設定・更新時の操作ユーザー ID を保存し view で `<@userId>` 表示
-- [x] DB アクセスを shared/features ・ configService 経由に統一（commit `1c197d4`）
-- [x] テスト実装
-
-**仕様書**: [docs/specs/STICKY_MESSAGE_SPEC.md](docs/specs/STICKY_MESSAGE_SPEC.md)
-
-#### 1.3 メンバーログ機能 - ✅ 完了
-
-- [x] guildMemberAdd、guildMemberRemoveイベントハンドラ作成
-- [x] Embed形式の通知メッセージ実装
-- [x] `/member-log-config` コマンド実装（set-channel / enable / disable / set-join-message / set-leave-message / clear-join-message / clear-leave-message / view）
-- [x] 招待リンク追跡（インメモリキャッシュによる差分検出方式）
-- [x] カスタムメッセージのモーダル入力対応（最大500文字）
-- [x] Prisma Schema更新（GuildMemberLogConfig 専用テーブル）
-- [x] テスト実装（17テストファイル）
-
-**仕様書**: [docs/specs/MEMBER_LOG_SPEC.md](docs/specs/MEMBER_LOG_SPEC.md)
-
-#### 1.4 メッセージ削除機能 - ✅ 完了
-
-- [x] `/message-delete` コマンド実装（user / bot / keyword / count / days / after / before / channel オプション）
-- [x] 容認範囲内チャンネル削除（channel 未指定時は現在チャンネル）
-- [x] 権限チェック（MANAGE_MESSAGES）
-- [x] ✅ **新仕様移行完了**: 確認ダイアログを2段階構成（プレビュー + 最終確認）に刷新
-  - [x] 削除前プレスキャン（事前スキャン → プレビューダイアログ表示）
-  - [x] プレビューダイアログ（5件/ページページネーション）
-  - [x] 最終確認ダイアログ（対象一覧・`⚠️ この操作は取り消せません`）
-  - [x] `/message-delete-config confirm` スキップ設定の廃止
-  - [x] 削除後の詳細表示（ページネーション付き）廃止 → 完了メッセージのみに変更
-  - [x] スキャン・削除進捗のリアルタイム表示
-  - [x] 処理中ロック（サーバー単位で重複実行防止）
-- [x] テスト実装（usecases 7ファイル含む）
-
-**仕様書**: [docs/specs/MESSAGE_DELETE_SPEC.md](docs/specs/MESSAGE_DELETE_SPEC.md)
-
-#### 1.5 VC募集機能 - ✅ 完了
-
-- [x] `/vc-recruit-config` コマンド実装（setup / teardown / add-role / remove-role / view）
-  - [x] `teardown` サブコマンド: StringSelectMenu → 確認パネル → 撤去処理の新UIフロー
-- [x] パネルチャンネル・投稿チャンネルの自動作成・権限設定
-- [x] ボタン→モーダル→セレクトメニューの2ステップ募集フロー
-- [x] 新規VC作成・設定パネル送信・全員退出時の自動削除
-- [x] Prisma Schema 更新（`GuildVcRecruitConfig` テーブル）
-- [x] テスト実装
-
-**仕様書**: [docs/specs/VC_RECRUIT_SPEC.md](docs/specs/VC_RECRUIT_SPEC.md)
-
-#### 1.6 ロケール対応（interaction.locale 導入） - 残4件
+#### 1.1 ロケール対応（interaction.locale 導入） - 残4件
 
 コマンド応答のロケールを `tGuild`（ギルド設定）から `interaction.locale`（ユーザーのDiscordクライアント言語）に切り替える。
 
@@ -107,247 +47,94 @@
 - チャンネル全体向けの自動メッセージ（Bumpリマインダー通知、メンバーログ、VC募集パネル、スティッキーメッセージ再送信、VACパネル等） → `tGuild` を維持
 - システムログ → `tDefault` を維持
 
-**実装計画**:
+**タスク**:
 
-- [ ] `tInteraction` ヘルパー関数を `localeManager.ts` に追加（`interaction.locale` → `SupportedLocale` 変換 + `getFixedT` で翻訳）
-- [ ] 全コマンドハンドラの `tGuild` 呼び出しを `tInteraction` に置き換え（ping / afk / afk-config / bump-reminder-config / vac / vac-config / sticky-message / member-log-config / message-delete / vc-recruit-config）
-- [ ] UIハンドラ（ボタン・モーダル・セレクトメニュー）のうちユーザー応答部分を `tInteraction` に置き換え
-- [ ] テスト更新（`tGuild` → `tInteraction` の差し替えに伴うモック修正）
+- [ ] `tInteraction` ヘルパー関数を `localeManager.ts` に追加
+- [ ] 全コマンドハンドラの `tGuild` 呼び出しを `tInteraction` に置き換え
+- [ ] UIハンドラ（ボタン・モーダル・セレクトメニュー）のユーザー応答部分を `tInteraction` に置き換え
+- [ ] テスト更新
 
-**対象外（tGuild を維持）**:
+**対象外（tGuild を維持）**: Bumpリマインダー通知 / Bump検知パネル / メンバーログ / スティッキーメッセージ再送信 / VC募集投稿・パネル / VACパネルラベル
 
-- `bumpReminderHandler.ts` / `sendBumpReminder.ts`（2時間後の自動通知）
-- `bumpMessageCreateHandler.ts`（Bump検知パネル）
-- `guildMemberAddHandler.ts` / `guildMemberRemoveHandler.ts`（参加・退出ログ）
-- `stickyMessageResendService.ts`（スティッキーメッセージ再送信）
-- VC募集の投稿・パネル送信
-- VACパネルのラベル
-
-#### 1.7 ギルド設定機能 - 残4件
+#### 1.2 ギルド設定機能 - 残4件
 
 - [ ] `/guild-config set-locale` コマンド実装（ja / en 切り替え）
-- [ ] `/guild-config view` コマンド実装（概要 + 各機能詳細のページネーション・セレクトメニュー）
+- [ ] `/guild-config view` コマンド実装（概要 + 各機能詳細のページネーション）
 - [ ] `/guild-config reset` コマンド実装（確認ダイアログ付き）
 - [ ] テスト実装
 
-**仕様書**: [docs/specs/GUILD_CONFIG_SPEC.md](docs/specs/GUILD_CONFIG_SPEC.md)
+仕様書: [GUILD_CONFIG_SPEC.md](docs/specs/GUILD_CONFIG_SPEC.md)
 
 ### 2. 基本コマンド追加 - 残3件
 
-- [x] `/ping` - 疎通確認（実装済み）
-- [ ] `/help` - コマンド一覧＋ユーザーマニュアルリンク表示
-- [ ] `/server-info` - サーバー情報表示
-- [ ] `/user-info` - ユーザー情報表示
+- [ ] `/help` — コマンド一覧＋ユーザーマニュアルリンク表示
+- [ ] `/server-info` — サーバー情報表示
+- [ ] `/user-info` — ユーザー情報表示
 
-**仕様書**: [docs/specs/BASIC_COMMANDS_SPEC.md](docs/specs/BASIC_COMMANDS_SPEC.md)
-
----
+仕様書: [BASIC_COMMANDS_SPEC.md](docs/specs/BASIC_COMMANDS_SPEC.md)
 
 ### 3. テスト・品質向上 - 残6件
 
-**状況**: ユニットテスト＋インテグレーションテストで1361テスト実装済み（189 suites, 全件PASS）。istanbul によるカバレッジ計測で statements 98.92% / branches 97.89% / functions 95.63% / lines 99.07%（全閾値90%クリア）。
-
-#### 3.1 テストカバレッジ向上 - 残1件
-
-- [x] カバレッジ目標100%達成（statements/functions/lines: 100%, branches: 99.16%）
-- [x] sticky-message 全機能のユニットテスト追加（17ファイル新規作成）
-- [x] エッジケーステスト（null合体演算子・エラーハンドラ・タイムアウトcallback等）
-- [x] 到達不能ブランチへの `/* c8 ignore */` 適用 + テスト追加による branches 閾値維持（2026-03-02）
 - [ ] E2Eテスト追加（Discordモック利用）
-
-#### 3.2 ドキュメント整備 - 残1件
-
 - [ ] API仕様書（OpenAPI/Swagger）
-- [x] デプロイガイド（[XSERVER_VPS_SETUP.md](docs/guides/XSERVER_VPS_SETUP.md)追加済み）
-
-#### 3.3 ソースコメント整備 - ✅ 完了
-
-- [x] `src/` 全ファイル: コメント規約通りのコメントが記載されているか確認・補完（JSDoc / インラインコメントの欠落がないか）
-- [x] `tests/` 全ファイル: テスト観点（何を・なぜ・どの条件で検証するか）がコメントに記載されているか確認・補完
-
-#### 3.4 パフォーマンス最適化 - 残4件
-
 - [ ] データベースクエリ最適化
 - [ ] メモリ使用量プロファイリング
 - [ ] ログローテーション設定
-- [ ] 機能ログのメッセージフォーマット統一（`機能名: xxx機能 メッセージ GuildId: xxx 変数名: 値...` 形式に統一）
-
----
-
----
+- [ ] 機能ログのメッセージフォーマット統一
 
 ### 4. デプロイ・運用 - 残4件
 
-#### 4.1 Docker化 - 全完了
-
-- [x] 本番用Dockerfile最適化（node:24-slim、gosu権限降格、COREPACK_HOME最適化）
-- [x] docker-compose.yml改善（docker-compose.prod.yml 本番水準で完成）
-- [x] マルチステージビルド（base / deps / builder / runner の4ステージ構成）
-- [x] ヘルスチェック設定（docker-compose.prod.yml に `healthcheck` セクション追加済み）
-- [x] Prismaマイグレーション自動実行（`command` に `prisma migrate deploy` を含む）
-
-#### 4.2 CI/CD - 全完了
-
-- [x] GitHub Actions ワークフロー（テスト・型チェック）（`.github/workflows/deploy.yml` の `test` ジョブ）
-- [x] GitHub Actions ワークフロー（リント）（`pnpm lint` を CI に追加済み）
-- [x] Dockerイメージビルド・プッシュ（GHCR への自動プッシュ実装済み）
-- [x] 自動デプロイ設定（SSH 経由で VPS へ自動デプロイ実装済み）
-
-#### 4.3 監視・ログ - 残3件
-
-- [x] **Botエラー時の Discord 通知**: Winston にカスタムトランスポートを追加し、`logger.error()` 呼び出し時に Discord Webhook へ自動通知（`processErrorHandler.ts` が既存のため、プロセスエラーも含め追加実装不要）
-- [ ] **ギルド管理者向けエラー通知チャンネル（複数サーバー公開時）**: `GuildConfig` に `errorNotifyChannelId` フィールドを追加し、チャンネル削除失敗（`Missing Permissions` 等）などのバックグラウンドエラーをギルド内の指定チャンネルへ通知する仕組みを実装する。現状は `logger.error` のみでサーバー管理者（コマンド操作者）には届かない。単一サーバー運用では不要だが、複数サーバーへの公開時には必須。実装時は `/guild-config set-error-channel` サブコマンドとして追加し、`/guild-config view` でも表示する（`set-log-channel` は member-log 等と混同するため不採用）。
+- [ ] ギルド管理者向けエラー通知チャンネル（複数サーバー公開時）
 - [ ] メトリクス収集
 - [ ] アラート設定
-
-#### 4.4 バックアップ - 残1件
-
 - [ ] データベース自動バックアップ・復旧手順
-
----
 
 ### 5. Web UI実装（凍結中） - 残12件
 
-**状況**: Fastifyサーバー基盤、ヘルスチェックAPI、/api/index.tsは実装済み。
-**運用**: 新規実装は凍結。緊急バグ修正のみ対応。
+> bot層が安定したら再開。緊急バグ修正のみ対応。
 
-#### 5.1 認証システム - 残4件
-
-- [ ] Discord OAuth2統合
-- [ ] JWT認証実装
-- [ ] セッション管理
-- [ ] 権限チェックミドルウェア
-
-#### 5.2 管理API - 残5件
-
-- [ ] `/api/guilds` - ギルド一覧取得
-- [ ] `/api/guilds/:id` - ギルド詳細取得
-- [ ] `/api/guilds/:id/config` - 設定取得・更新
-- [ ] `/api/guilds/:id/stats` - 統計情報取得
-- [ ] バリデーション・エラーハンドリング
-
-#### 5.3 フロントエンド - 残3件
-
-- [ ] ダッシュボードUI
-- [ ] ギルド設定画面
-- [ ] 統計表示画面
-
----
-
-## 🎯 優先度別タスク
-
-1. **主要機能実装** - 8件
-2. **基本コマンド追加** - 3件
-3. **テスト・品質向上** - 6件
-4. **デプロイ・運用** - 4件
-5. **Web UI実装（凍結中）** - 12件
+- 認証システム（Discord OAuth2 / JWT / セッション / 権限チェック）— 4件
+- 管理API（guilds CRUD / config / stats / バリデーション）— 5件
+- フロントエンド（ダッシュボード / 設定画面 / 統計表示）— 3件
 
 ---
 
 ## 🔧 技術的改善タスク
 
-### コード品質
-
-- [ ] ESLintルール厳格化
-- [x] コードコメント充実
-- [ ] 未使用コード・デッドコード削除
-- [ ] 一貫性のあるエラーメッセージ
-
-### 設計見直し
-
-- [x] `/message-delete-config confirm` のスキップ設定を廃止する → **新仕様移行で実装完了**（2026-03-13）
-- [x] `teardown` サブコマンドの UI を StringSelectMenu + 確認パネルに変更（feature/vc-recruit で実装済み）
-
-### アーキテクチャ
-
-- [x] リポジトリパターン完全実装（機能別リポジトリに分割済み: afkConfig / bumpReminderConfig / memberLogConfig / vacConfig / vcRecruitConfig）
-- [ ] 依存性注入の導入検討（現状はモジュールレベルのDI + ガード関数）
-- [ ] サービス層の整理
-
-### セキュリティ
-
-- [ ] 依存関係の脆弱性スキャン
-- [ ] 入力バリデーション強化
-- [ ] レート制限実装
-- [ ] セキュリティヘッダー設定
+| カテゴリ | タスク |
+| --- | --- |
+| コード品質 | ESLintルール厳格化 / 未使用コード削除 / エラーメッセージ統一 |
+| アーキテクチャ | DI導入検討 / サービス層整理 |
+| セキュリティ | 依存関係脆弱性スキャン / 入力バリデーション強化 / レート制限 / セキュリティヘッダー |
 
 ---
 
-## 📝 メモ・検討事項
-
-### 技術スタック改善検討
-
-- **キャッシュ**: Redis導入の検討
-- **ロガー**: Winston → Pino 移行検討
-
-### 機能拡張アイデア
+## 💡 機能拡張アイデア
 
 - 自動翻訳機能（DeepL API等）
 - 投票システム（リアクション投票）
 - ウェルカムメッセージ（カスタマイズ可能）
 - ロール管理（自動ロール付与）
-- 音楽Bot機能（検討中）
 
 ---
 
-## 🔗 関連ドキュメント
+## ✅ 完了済み
 
-### プロジェクト管理
+<details>
+<summary>クリックで展開</summary>
 
-- [README.md](README.md) - プロジェクト概要
-- [docs/progress/IMPLEMENTATION_PROGRESS.md](docs/progress/IMPLEMENTATION_PROGRESS.md) - 実装進捗の詳細
-- [docs/progress/TEST_PROGRESS.md](docs/progress/TEST_PROGRESS.md) - テスト進捗の詳細
+- VC自動作成機能（VAC）
+- メッセージ固定機能（sticky-message）
+- メンバーログ機能（member-log）
+- メッセージ削除機能（message-delete V2）
+- VC募集機能（vc-recruit）
+- Bumpリマインダー機能
+- AFK機能
+- 多言語対応（i18next）
+- メッセージレスポンス（Embed ユーティリティ）
+- Docker化・CI/CD・自動デプロイ
+- Botエラー時の Discord 通知
+- ソースコメント整備
+- テストカバレッジ目標達成
 
-### 開発ガイド
-
-- [docs/guides/COMMANDS.md](docs/guides/COMMANDS.md) - コマンドリファレンス
-- [docs/guides/DISCORD_BOT_SETUP.md](docs/guides/DISCORD_BOT_SETUP.md) - Discord Bot セットアップガイド
-- [docs/guides/TESTING_GUIDELINES.md](docs/guides/TESTING_GUIDELINES.md) - テスト方針
-- [docs/guides/I18N_GUIDE.md](docs/guides/I18N_GUIDE.md) - 多言語対応ガイド
-
-### 機能仕様書
-
-- [docs/specs/BUMP_REMINDER_SPEC.md](docs/specs/BUMP_REMINDER_SPEC.md) - Bumpリマインダー機能
-- [docs/specs/AFK_SPEC.md](docs/specs/AFK_SPEC.md) - AFK機能
-- [docs/specs/VAC_SPEC.md](docs/specs/VAC_SPEC.md) - VC自動作成機能
-- [docs/specs/STICKY_MESSAGE_SPEC.md](docs/specs/STICKY_MESSAGE_SPEC.md) - メッセージ固定機能
-- [docs/specs/MEMBER_LOG_SPEC.md](docs/specs/MEMBER_LOG_SPEC.md) - メンバーログ
-- [docs/specs/MESSAGE_DELETE_SPEC.md](docs/specs/MESSAGE_DELETE_SPEC.md) - メッセージ削除
-- [docs/specs/MESSAGE_RESPONSE_SPEC.md](docs/specs/MESSAGE_RESPONSE_SPEC.md) - メッセージレスポンス
-- [docs/specs/GUILD_CONFIG_SPEC.md](docs/specs/GUILD_CONFIG_SPEC.md) - ギルド設定機能
-- [docs/specs/BASIC_COMMANDS_SPEC.md](docs/specs/BASIC_COMMANDS_SPEC.md) - 基本コマンド
-
----
-
-## 🚀 次のアクション
-
-### 直近の推奨作業順序
-
-1. ~~**ソースコメント整備**（セクション 3.3）~~ ✅ **完了**
-
-2. ~~**Botエラー時の Discord 通知実装**（セクション 4.3）~~ ✅ **完了**
-
-3. **主要機能実装**（セクション 1）
-   - ~~メンバーログ機能（`guildMemberAdd` / `guildMemberRemove` + `/member-log-config`）~~ ✅ **完了**
-   - ~~メッセージ削除機能（`/message-delete`）~~ ✅ **完了**
-   - ~~VAC E2E検証~~ ✅ **完了**（bot実装完了後にまとめて作成予定）
-   - ~~VC募集機能実装~~ ✅ **完了**（feature/vc-recruit）
-   - **次: ロケール対応（interaction.locale 導入）**（セクション 1.6）
-   - ギルド設定機能（セクション 1.7）
-
-4. **基本コマンド追加**（セクション 2）
-   - `/help` / `/server-info` / `/user-info`
-
-5. **E2Eフェーズ実装の着手**（VC募集機能・基本コマンドの実装完了後）
-   - `docs/guides/TESTING_GUIDELINES.md` の計画に沿って `tests/e2e` の初期シナリオを追加
-   - VAC / Bumpリマインダー / VC募集機能の基本フローを回帰検証対象とする
-
-6. **残課題の順次解消**
-   - コード品質（未使用コード削減・エラーメッセージ統一）
-   - アーキテクチャ（サービス層整理・DI運用の明文化）
-   - セキュリティ（依存脆弱性・入力検証・レート制限）
-
----
-
-**最終更新**: 2026年3月14日
-**次のマイルストーン**: ロケール対応（interaction.locale 導入） → ギルド設定機能実装 → E2E テスト着手
+</details>
