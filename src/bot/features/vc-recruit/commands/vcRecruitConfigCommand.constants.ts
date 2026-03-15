@@ -112,6 +112,9 @@ export const VC_RECRUIT_ROLE_CUSTOM_ID = {
 /** Discord セレクトメニューのオプション上限 */
 export const DISCORD_SELECT_MAX_OPTIONS = 25;
 
+/** 募集内容テキストの最大文字数 */
+export const VC_RECRUIT_CONTENT_MAX_LENGTH = 500;
+
 /**
  * VC募集機能のタイムアウト定数
  */
