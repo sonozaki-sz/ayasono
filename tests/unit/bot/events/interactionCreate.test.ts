@@ -21,6 +21,10 @@ vi.mock("@/shared/locale/localeManager", () => ({
   tGuild: vi.fn(async (_guildId: string, key: string) => `guild:${key}`),
 }));
 
+vi.mock("@/bot/utils/messageResponse", () => ({
+  STATUS_COLORS: { success: 0x57f287, info: 0x3498db, warning: 0xfee75c, error: 0xed4245 },
+}));
+
 // ログ出力は副作用回避のためダミー化する
 vi.mock("@/shared/utils/logger", () => ({
   logger: {
@@ -85,6 +89,7 @@ type BaseInteraction = {
   isModalSubmit: Mock<() => boolean>;
   isButton: Mock<() => boolean>;
   isUserSelectMenu: Mock<() => boolean>;
+  isRoleSelectMenu: Mock<() => boolean>;
   isStringSelectMenu: Mock<() => boolean>;
 };
 
@@ -108,11 +113,13 @@ function createInteraction(
     isModalSubmit: vi.fn(() => false),
     isButton: vi.fn(() => false),
     isUserSelectMenu: vi.fn(() => false),
+    isRoleSelectMenu: vi.fn(() => false),
     isStringSelectMenu: vi.fn(() => false),
     ...overrides,
   };
 }
 
+// interactionCreate イベントハンドラーの各 interaction 種別ごとのルーティング・クールダウン・エラー委譲を検証
 describe("bot/events/interactionCreate", () => {
   // テスト前にモック状態を初期化し、分岐ごとの副作用検証を安定化する
   beforeEach(() => {

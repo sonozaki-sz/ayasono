@@ -128,6 +128,8 @@ export const system = {
     "[Bumpリマインダー機能] 復元対象のリマインダーなし",
   "scheduler.bump_reminder_sent":
     "[Bumpリマインダー機能] リマインダーを送信 GuildId: {{guildId}} ChannelId: {{channelId}}",
+  "scheduler.bump_reminder_send_failed":
+    "[Bumpリマインダー機能] リマインダー送信に失敗 GuildId: {{guildId}} ChannelId: {{channelId}}",
   "scheduler.bump_reminder_channel_not_found":
     "[Bumpリマインダー機能] チャンネルが見つかりません。 GuildId: {{guildId}} ChannelId: {{channelId}}",
   "scheduler.bump_reminder_disabled":
@@ -447,6 +449,10 @@ export const system = {
     "[VC募集機能] セットアップ作成 GuildId: {{guildId}} CategoryId: {{categoryId}}",
   "vc-recruit.setup_removed":
     "[VC募集機能] セットアップ削除 GuildId: {{guildId}} CategoryId: {{categoryId}}",
+  "vc-recruit.panel_delete_detected":
+    "[VC募集機能] パネルメッセージ削除を検知、パネルを再送信します GuildId: {{guildId}} PanelChannelId: {{panelChannelId}} MessageId: {{messageId}}",
+  "vc-recruit.panel_resent":
+    "[VC募集機能] パネルメッセージを再送信しました GuildId: {{guildId}} PanelChannelId: {{panelChannelId}} NewMessageId: {{newMessageId}}",
 
   // メッセージ削除機能ログ
   "message-delete.cmd_all_channels_start":
@@ -454,7 +460,7 @@ export const system = {
   "message-delete.cmd_channel_count":
     "[MsgDel][CMD] 取得チャンネル数={{count}}",
   "message-delete.svc_scan_start":
-    "[MsgDel][SVC] スキャン開始 channels={{channelCount}} count={{count}} targetUserId={{targetUserId}}",
+    "[MsgDel][SVC] スキャン開始 channels={{channelCount}} count={{count}} targetUserIds={{targetUserIds}}",
   "message-delete.svc_initial_fetch":
     "[MsgDel][SVC] 初期フェッチ ch={{channelId}}",
   "message-delete.svc_refill":
@@ -473,6 +479,14 @@ export const system = {
     "[MsgDel] 削除処理エラー: {{error}}",
   "message-delete.deleted":
     "[MsgDel] {{userId}} deleted {{count}} messages{{countPart}}{{targetPart}}{{keywordPart}}{{periodPart}} channels=[{{channels}}]",
+  "message-delete.lock_acquired":
+    "[MsgDel] ロック取得: guild={{guildId}}",
+  "message-delete.lock_released":
+    "[MsgDel] ロック解放: guild={{guildId}}",
+  "message-delete.cancel_collector_ended":
+    "[MsgDel] Phase1 cancelCollector ended: reason={{reason}}",
+  "message-delete.aborting_non_user_end":
+    "[MsgDel] Phase1 aborting scan due to non-user end",
 } as const;
 
 export type SystemTranslations = typeof system;

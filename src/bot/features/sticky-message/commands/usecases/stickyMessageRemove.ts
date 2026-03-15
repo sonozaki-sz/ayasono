@@ -2,22 +2,23 @@
 // sticky-message remove ユースケース
 
 import {
-  ChannelType,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
   type ChatInputCommandInteraction,
   MessageFlags,
-  type TextChannel,
+  StringSelectMenuBuilder,
+  StringSelectMenuOptionBuilder,
 } from "discord.js";
 import { tGuild } from "../../../../../shared/locale/localeManager";
 import { getBotStickyMessageConfigService } from "../../../../services/botCompositionRoot";
-import {
-  createInfoEmbed,
-  createSuccessEmbed,
-  createWarningEmbed,
-} from "../../../../utils/messageResponse";
+import { createInfoEmbed } from "../../../../utils/messageResponse";
 import { STICKY_MESSAGE_COMMAND } from "../stickyMessageCommand.constants";
 
 /**
  * sticky-message remove を実行する
+ * ギルドで設定済みの全チャンネルを StringSelectMenu（複数選択可）で提示し、
+ * ユーザーが選択したチャンネルのスティッキーメッセージを一括削除する
  * @param interaction コマンド実行インタラクション
  * @param guildId 実行対象ギルドID
  * @returns 実行完了を示す Promise
@@ -26,33 +27,10 @@ export async function handleStickyMessageRemove(
   interaction: ChatInputCommandInteraction,
   guildId: string,
 ): Promise<void> {
-  // チャンネルオプションを取得し、テキストチャンネルであることを検証する
-  const channelOption = interaction.options.getChannel(
-    STICKY_MESSAGE_COMMAND.OPTION.CHANNEL,
-    true,
-  );
-
-  if (channelOption.type !== ChannelType.GuildText) {
-    await interaction.reply({
-      embeds: [
-        createWarningEmbed(
-          await tGuild(
-            guildId,
-            "commands:sticky-message.errors.text_channel_only",
-          ),
-        ),
-      ],
-      flags: MessageFlags.Ephemeral,
-    });
-    return;
-  }
-
   const service = getBotStickyMessageConfigService();
+  const stickies = await service.findAllByGuild(guildId);
 
-  // 既存設定の有無を確認する
-  const existing = await service.findByChannel(channelOption.id);
-
-  if (!existing) {
+  if (stickies.length === 0) {
     await interaction.reply({
       embeds: [
         createInfoEmbed(
@@ -73,43 +51,51 @@ export async function handleStickyMessageRemove(
     return;
   }
 
-  // チャンネルの最後のスティッキーメッセージを削除（キャッシュ未登録でも API で取得）
-  if (existing.lastMessageId) {
-    const fetchedRemoveChannel = await interaction.guild?.channels
-      .fetch(channelOption.id)
-      .catch(() => null);
-    const textChannel =
-      fetchedRemoveChannel?.type === ChannelType.GuildText
-        ? (fetchedRemoveChannel as TextChannel)
-        : undefined;
-    if (textChannel) {
-      try {
-        const msg = await textChannel.messages.fetch(existing.lastMessageId);
-        await msg.delete();
-      } catch {
-        // 既に削除済みの場合は無視
-      }
-    }
-  }
+  // StringSelectMenu を構築（複数選択可）
+  const options = stickies
+    .slice(0, STICKY_MESSAGE_COMMAND.MAX_SELECT_OPTIONS)
+    .map((sticky) => {
+      const channel = interaction.guild?.channels.cache.get(sticky.channelId);
+      const label = channel ? `#${channel.name}` : `#${sticky.channelId}`;
+      const preview =
+        sticky.content.length > 50
+          ? `${sticky.content.substring(0, 50)}...`
+          : sticky.content;
 
-  // DB から削除
-  await service.delete(existing.id);
+      return new StringSelectMenuOptionBuilder()
+        .setLabel(label)
+        .setValue(sticky.channelId)
+        .setDescription(preview);
+    });
+
+  const select = new StringSelectMenuBuilder()
+    .setCustomId(STICKY_MESSAGE_COMMAND.REMOVE_SELECT_CUSTOM_ID)
+    .setPlaceholder(
+      await tGuild(
+        guildId,
+        "commands:sticky-message.remove.select.placeholder",
+      ),
+    )
+    .setMinValues(1)
+    .setMaxValues(
+      Math.min(stickies.length, STICKY_MESSAGE_COMMAND.MAX_SELECT_OPTIONS),
+    )
+    .addOptions(options);
+
+  const selectRow =
+    new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(select);
+
+  const button = new ButtonBuilder()
+    .setCustomId(STICKY_MESSAGE_COMMAND.REMOVE_BUTTON_CUSTOM_ID)
+    .setLabel(
+      await tGuild(guildId, "commands:sticky-message.remove.button.label"),
+    )
+    .setStyle(ButtonStyle.Danger);
+
+  const buttonRow = new ActionRowBuilder<ButtonBuilder>().addComponents(button);
 
   await interaction.reply({
-    embeds: [
-      createSuccessEmbed(
-        await tGuild(
-          guildId,
-          "commands:sticky-message.remove.success.description",
-        ),
-        {
-          title: await tGuild(
-            guildId,
-            "commands:sticky-message.remove.success.title",
-          ),
-        },
-      ),
-    ],
+    components: [selectRow, buttonRow],
     flags: MessageFlags.Ephemeral,
   });
 }

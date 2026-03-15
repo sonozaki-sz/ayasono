@@ -203,48 +203,12 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
     expect(sentContent).toContain("<@user-2>");
   });
 
-  it("チャンネルがテキストベースの場合に finally で panelMessageId をクリーンアップする", async () => {
-    const panelMsgDeleteMock = vi.fn().mockResolvedValue(undefined);
-    const fetchMsgMock = vi
-      .fn()
-      .mockResolvedValue({ delete: panelMsgDeleteMock });
-    const channel = makeChannel({ messagesFetch: fetchMsgMock });
-    const client = makeClient(channel);
-    const service = makeConfigService({
-      enabled: true,
-      mentionRoleId: null,
-      mentionUserIds: [],
-    });
-
-    const { sendBumpReminder } =
-      await import("@/bot/features/bump-reminder/handlers/usecases/sendBumpReminder");
-    await sendBumpReminder(
-      client as never,
-      "guild-1",
-      "ch-1",
-      undefined,
-      "Disboard",
-      service as never,
-      "panel-msg-1",
-    );
-
-    expect(fetchMsgMock).toHaveBeenCalledWith("panel-msg-1");
-    expect(panelMsgDeleteMock).toHaveBeenCalled();
-    expect(loggerMock.debug).toHaveBeenCalled();
-  });
-
-  it("最初の fetch でテキストベース外チャンネルが返った場合でも finally でパネル削除用に再 fetch されることを検証", async () => {
-    const panelMsgDeleteMock = vi.fn().mockResolvedValue(undefined);
-    const textChannelForPanel = makeChannel({
-      messagesFetch: vi.fn().mockResolvedValue({ delete: panelMsgDeleteMock }),
-    });
-    // First fetch returns non-text channel, second returns text channel
+  it("チャンネルフェッチが例外を投げた場合はエラーログを記録する", async () => {
     const fetchMock = vi
       .fn()
-      .mockResolvedValueOnce(makeChannel({ isTextBased: false }))
-      .mockResolvedValueOnce(textChannelForPanel);
+      .mockRejectedValue(new Error("fetch failed"));
     const client = { channels: { fetch: fetchMock } };
-    const service = makeConfigService({ enabled: false });
+    const service = makeConfigService({ enabled: true });
 
     const { sendBumpReminder } =
       await import("@/bot/features/bump-reminder/handlers/usecases/sendBumpReminder");
@@ -255,69 +219,8 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
       undefined,
       "Disboard",
       service as never,
-      "panel-msg-1",
     );
 
-    // Second fetch should be called for panel cleanup
-    expect(fetchMock).toHaveBeenCalledTimes(2);
-  });
-
-  it("パネルメッセージの削除に失敗した場合はデバッグログを記録する", async () => {
-    const fetchMsgMock = vi.fn().mockRejectedValue(new Error("Not found"));
-    const channel = makeChannel({ messagesFetch: fetchMsgMock });
-    const client = makeClient(channel);
-    const service = makeConfigService({
-      enabled: true,
-      mentionRoleId: null,
-      mentionUserIds: [],
-    });
-
-    const { sendBumpReminder } =
-      await import("@/bot/features/bump-reminder/handlers/usecases/sendBumpReminder");
-    await expect(
-      sendBumpReminder(
-        client as never,
-        "guild-1",
-        "ch-1",
-        undefined,
-        "Disboard",
-        service as never,
-        "panel-msg-1",
-      ),
-    ).resolves.not.toThrow();
-
-    expect(loggerMock.debug).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.any(Error),
-    );
-  });
-
-  it("finally での再フェッチが null を返した場合はパネルクリーンアップをスキップする", async () => {
-    // 1回目フェッチ: テキスト以外 → try ブロックで warn して return
-    // 2回目フェッチ: null（取得失敗） → ch?.isTextBased() が falsy → クリーンアップスキップ
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce(makeChannel({ isTextBased: false }))
-      .mockResolvedValueOnce(null);
-    const client = { channels: { fetch: fetchMock } };
-    const service = makeConfigService({ enabled: false });
-
-    const { sendBumpReminder } =
-      await import("@/bot/features/bump-reminder/handlers/usecases/sendBumpReminder");
-    await sendBumpReminder(
-      client as never,
-      "guild-1",
-      "ch-1",
-      undefined,
-      "Disboard",
-      service as never,
-      "panel-msg-1",
-    );
-
-    // 2回フェッチされ、かつ panel_deleted ログは記録されないことを確認
-    expect(fetchMock).toHaveBeenCalledTimes(2);
-    expect(loggerMock.debug).not.toHaveBeenCalledWith(
-      expect.stringContaining("panel_deleted"),
-    );
+    expect(loggerMock.error).toHaveBeenCalled();
   });
 });

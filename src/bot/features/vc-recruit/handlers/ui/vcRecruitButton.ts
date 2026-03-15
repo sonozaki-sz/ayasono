@@ -7,6 +7,7 @@ import {
   ButtonStyle,
   ChannelType,
   DiscordAPIError,
+  EmbedBuilder,
   MessageFlags,
   ModalBuilder,
   RESTJSONErrorCodes,
@@ -25,18 +26,18 @@ import {
 } from "../../../../services/botCompositionRoot";
 import { safeReply } from "../../../../utils/interaction";
 import {
+  STATUS_COLORS,
   createErrorEmbed,
-  createInfoEmbed,
   createSuccessEmbed,
 } from "../../../../utils/messageResponse";
 import { buildTeardownSelectOptions } from "../../commands/usecases/vcRecruitConfigTeardown";
 import {
   VC_RECRUIT_PANEL_CUSTOM_ID,
   VC_RECRUIT_TEARDOWN_CUSTOM_ID,
+  VC_RECRUIT_TIMEOUT,
 } from "../../commands/vcRecruitConfigCommand.constants";
 import {
   NEW_VC_VALUE,
-  NO_MENTION_VALUE,
   getVcRecruitSession,
   setVcRecruitSession,
 } from "./vcRecruitPanelState";
@@ -48,6 +49,8 @@ import {
 export const vcRecruitButtonHandler: ButtonHandler = {
   /**
    * VC募集ボタン（パネル生成ボタン・次へボタン・teardown ボタン）に一致するか判定する
+   * @param customId ボタンの customId
+   * @returns VC募集関連ボタンの場合 true
    */
   matches(customId) {
     return (
@@ -61,6 +64,10 @@ export const vcRecruitButtonHandler: ButtonHandler = {
     );
   },
 
+  /**
+   * VC募集ボタンのインタラクションを処理する
+   * @param interaction ボタンインタラクション
+   */
   async execute(interaction: ButtonInteraction) {
     const guild = interaction.guild;
     if (!guild) return;
@@ -116,16 +123,9 @@ export const vcRecruitButtonHandler: ButtonHandler = {
       // ── メンション候補ロールのセレクトメニューを構築 ────────────
       const config = await repo.getVcRecruitConfigOrDefault(guild.id);
 
-      const mentionOptions: StringSelectMenuOptionBuilder[] = [
-        new StringSelectMenuOptionBuilder()
-          .setValue(NO_MENTION_VALUE)
-          .setLabel(
-            await tGuild(guild.id, "commands:vcRecruit.select.no_mention"),
-          )
-          .setDefault(true),
-      ];
+      const mentionOptions: StringSelectMenuOptionBuilder[] = [];
 
-      for (const roleId of config.mentionRoleIds.slice(0, 24)) {
+      for (const roleId of config.mentionRoleIds.slice(0, 25)) {
         const role = guild.roles.cache.get(roleId);
         if (role) {
           mentionOptions.push(
@@ -136,19 +136,23 @@ export const vcRecruitButtonHandler: ButtonHandler = {
         }
       }
 
-      const mentionSelect = new StringSelectMenuBuilder()
-        .setCustomId(
-          `${VC_RECRUIT_PANEL_CUSTOM_ID.SELECT_MENTION_PREFIX}${interaction.id}`,
-        )
-        .setPlaceholder(
-          await tGuild(
-            guild.id,
-            "commands:vcRecruit.select.mention_placeholder",
-          ),
-        )
-        .setMinValues(1)
-        .setMaxValues(1)
-        .addOptions(mentionOptions);
+      // メンション候補がある場合のみセレクトメニューを構築
+      let mentionSelect: StringSelectMenuBuilder | null = null;
+      if (mentionOptions.length > 0) {
+        mentionSelect = new StringSelectMenuBuilder()
+          .setCustomId(
+            `${VC_RECRUIT_PANEL_CUSTOM_ID.SELECT_MENTION_PREFIX}${interaction.id}`,
+          )
+          .setPlaceholder(
+            await tGuild(
+              guild.id,
+              "commands:vcRecruit.select.mention_placeholder",
+            ),
+          )
+          .setMinValues(0)
+          .setMaxValues(mentionOptions.length)
+          .addOptions(mentionOptions);
+      }
 
       // ── VCセレクトメニューを構築 ────────────────────────────────
       const vacConfig = await getBotVacConfigService().getVacConfigOrDefault(
@@ -211,7 +215,7 @@ export const vcRecruitButtonHandler: ButtonHandler = {
       // ── セッション保存（panelChannelId・デフォルト選択状態） ────
       setVcRecruitSession(interaction.id, {
         panelChannelId,
-        mentionRoleId: NO_MENTION_VALUE,
+        mentionRoleIds: [],
         selectedVcId: NEW_VC_VALUE,
         createdAt: Date.now(),
       });
@@ -221,18 +225,35 @@ export const vcRecruitButtonHandler: ButtonHandler = {
         guild.id,
         "commands:vcRecruit.select.title",
       );
+      const step1Description = await tGuild(
+        guild.id,
+        "commands:vcRecruit.select.description",
+      );
 
-      await interaction.reply({
-        embeds: [createInfoEmbed(step1Title)],
-        components: [
+      const components: (
+        | ActionRowBuilder<StringSelectMenuBuilder>
+        | ActionRowBuilder<ButtonBuilder>
+      )[] = [];
+      if (mentionSelect) {
+        components.push(
           new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
             mentionSelect,
           ),
-          new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
-            vcSelect,
-          ),
-          new ActionRowBuilder<ButtonBuilder>().addComponents(openModalButton),
+        );
+      }
+      components.push(
+        new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(vcSelect),
+        new ActionRowBuilder<ButtonBuilder>().addComponents(openModalButton),
+      );
+
+      await interaction.reply({
+        embeds: [
+          new EmbedBuilder()
+            .setTitle(step1Title)
+            .setDescription(step1Description)
+            .setColor(STATUS_COLORS.info),
         ],
+        components,
         flags: MessageFlags.Ephemeral,
       });
       return;
@@ -372,7 +393,7 @@ export const vcRecruitButtonHandler: ButtonHandler = {
             ],
           })
           .catch(() => null);
-      }, 60_000);
+      }, VC_RECRUIT_TIMEOUT.COMPONENT_DISABLE_MS);
 
       return;
     }

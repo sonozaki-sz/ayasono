@@ -89,7 +89,7 @@ export const errors = {
   "vcRecruit.role_not_found":
     "{{role}} はメンション候補に登録されていません。",
   "vcRecruit.role_limit_exceeded":
-    "メンション候補ロールは最夤25件までです。",
+    "メンション候補ロールは最大25件までです。",
   "vcRecruit.vc_deleted":
     "選択したVCは既に削除されています。",
   "vcRecruit.category_full":
@@ -98,6 +98,12 @@ export const errors = {
     "VC募集パネルチャンネルが見つかりません。セットアップが削除された可能性があります。",
   "vcRecruit.voice_state_update_failed":
     "[VC募集機能] voiceStateUpdate処理失敗",
+  "vcRecruit.no_permission":
+    "この操作は投稿者または管理者のみ実行できます。",
+  "vcRecruit.vc_already_deleted":
+    "対象のVCは既に削除されています。",
+  "vcRecruit.no_roles_registered":
+    "メンション候補ロールが登録されていません。先に add-role で追加してください。",
 } as const;
 
 export type ErrorsTranslations = typeof errors;

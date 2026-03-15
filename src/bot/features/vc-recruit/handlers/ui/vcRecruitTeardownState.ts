@@ -17,34 +17,40 @@ export interface TeardownConfirmSession {
   selectedSetups: TeardownSetupEntry[];
 }
 
-/** セッション有効期間（60秒） */
-const SESSION_TTL_MS = 60 * 1_000;
+import { TtlMap } from "../../../../../shared/utils/ttlMap";
+import { VC_RECRUIT_TIMEOUT } from "../../commands/vcRecruitConfigCommand.constants";
 
 /** セレクトインタラクションID → TeardownConfirmSession のインメモリストア */
-const sessions = new Map<string, TeardownConfirmSession>();
+const sessions = new TtlMap<TeardownConfirmSession>(
+  VC_RECRUIT_TIMEOUT.COMPONENT_DISABLE_MS,
+);
 
 /**
  * teardown 確認セッションを保存する
+ * @param selectInteractionId セレクトインタラクションの ID
+ * @param session 保存するセッション情報
  */
 export function setTeardownConfirmSession(
   selectInteractionId: string,
   session: TeardownConfirmSession,
 ): void {
   sessions.set(selectInteractionId, session);
-  setTimeout(() => sessions.delete(selectInteractionId), SESSION_TTL_MS);
 }
 
 /**
- * teardown 確認セッションを取得する（存在しない場合は null）
+ * teardown 確認セッションを取得する
+ * @param selectInteractionId セレクトインタラクションの ID
+ * @returns セッション情報（存在しない場合は null）
  */
 export function getTeardownConfirmSession(
   selectInteractionId: string,
 ): TeardownConfirmSession | null {
-  return sessions.get(selectInteractionId) ?? null;
+  return sessions.get(selectInteractionId);
 }
 
 /**
  * teardown 確認セッションを削除する
+ * @param selectInteractionId セレクトインタラクションの ID
  */
 export function deleteTeardownConfirmSession(
   selectInteractionId: string,

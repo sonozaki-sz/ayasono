@@ -51,23 +51,11 @@ export const commands = {
   "bump-reminder-config.disable.description":
     "Bumpリマインダー機能を無効化",
   "bump-reminder-config.set-mention.description":
-    "メンションロール・ユーザーを設定",
+    "メンションロールを設定",
   "bump-reminder-config.set-mention.role.description":
     "リマインダーでメンションするロール",
-  "bump-reminder-config.set-mention.user.description":
-    "リマインダーでメンションするユーザー（追加・削除切替）",
   "bump-reminder-config.remove-mention.description":
-    "メンション設定を削除",
-  "bump-reminder-config.remove-mention.target.description":
-    "削除対象",
-  "bump-reminder-config.remove-mention.target.role":
-    "ロール設定",
-  "bump-reminder-config.remove-mention.target.user":
-    "ユーザー（選択UI）",
-  "bump-reminder-config.remove-mention.target.users":
-    "全ユーザー",
-  "bump-reminder-config.remove-mention.target.all":
-    "ロール＋全ユーザー",
+    "メンションロール設定を削除",
   "bump-reminder-config.view.description":
     "現在の設定を表示",
 
@@ -78,35 +66,17 @@ export const commands = {
     "設定完了",
   "bump-reminder-config.embed.not_configured":
     "Bumpリマインダーが設定されていません。",
-  "bump-reminder-config.embed.select_users_to_remove":
-    "削除するユーザーを選択してください：",
   "bump-reminder-config.embed.enable_success":
     "Bumpリマインダー機能を有効化しました。",
   "bump-reminder-config.embed.disable_success":
     "Bumpリマインダー機能を無効化しました。",
-  // メンション設定（追加/削除/入力不備）
+  // メンション設定（ロール設定/削除/入力不備）
   "bump-reminder-config.embed.set_mention_role_success":
     "メンションロールを {{role}} に設定しました。",
-  "bump-reminder-config.embed.set_mention_user_added":
-    "{{user}} を通知リストに登録しました。",
-  "bump-reminder-config.embed.set_mention_user_removed":
-    "{{user}} を通知リストから解除しました。",
-  "bump-reminder-config.embed.set_mention_error_title":
-    "入力エラー",
   "bump-reminder-config.embed.set_mention_error":
-    "ロールまたはユーザーを指定してください。",
+    "メンションロールの設定に失敗しました。",
   "bump-reminder-config.embed.remove_mention_role":
     "メンションロールの登録を削除しました。",
-  "bump-reminder-config.embed.remove_mention_users":
-    "全てのメンションユーザーを削除しました。",
-  "bump-reminder-config.embed.remove_mention_all":
-    "全てのメンション設定を削除しました。",
-  "bump-reminder-config.embed.remove_mention_select":
-    "以下のユーザーを通知リストから解除しました：\n{{users}}",
-  "bump-reminder-config.embed.remove_mention_error_title":
-    "削除エラー",
-  "bump-reminder-config.embed.remove_mention_error_no_users":
-    "削除するユーザーが登録されていません。",
   // view サブコマンド表示用
   "bump-reminder-config.embed.title":
     "Bumpリマインダー機能",
@@ -236,12 +206,16 @@ export const commands = {
     "`after` は `before` より前の日時を指定してください。",
   "message-delete.errors.no_permission":
     "この操作を実行する権限がありません。\n必要な権限: メッセージ管理",
+  "message-delete.errors.bot_no_permission":
+    "Botにメッセージ削除権限がありません。\n必要な権限: メッセージ管理・メッセージ履歴の閲覧・チャンネルの閲覧",
   "message-delete.errors.text_channel_only":
     "テキストチャンネルを指定してください。",
   "message-delete.errors.no_messages_found":
     "削除可能なメッセージが見つかりませんでした。",
   "message-delete.errors.delete_failed":
     "メッセージの削除中にエラーが発生しました。",
+  "message-delete.errors.scan_failed":
+    "メッセージの収集中にエラーが発生しました",
   "message-delete.errors.not_authorized":
     "操作権限がありません。",
   "message-delete.errors.jump_invalid_page":
@@ -406,6 +380,35 @@ export const commands = {
     "{{date}} 以降",
   "message-delete.conditions.before_value":
     "{{date}} 以前",
+  // 条件設定ステップ
+  "message-delete.condition-step.title":
+    "対象ユーザー・チャンネルを選択してください（任意）",
+  "message-delete.condition-step.user_placeholder":
+    "ユーザーを選択",
+  "message-delete.condition-step.channel_placeholder":
+    "チャンネルを選択",
+  "message-delete.condition-step.btn_start_scan":
+    "スキャン開始",
+  "message-delete.condition-step.btn_webhook_input":
+    "Webhook ID を入力",
+  "message-delete.condition-step.btn_cancel":
+    "キャンセル",
+  "message-delete.condition-step.timeout":
+    "条件設定がタイムアウトしました。再度コマンドを実行してください。",
+  "message-delete.condition-step.no_filter":
+    "フィルタ条件が指定されていないため実行できません。\n`count`・`keyword`・`days`・`after`・`before` のいずれかのコマンドオプション、または対象ユーザーを選択してください。",
+  "message-delete.modal.webhook.title":
+    "Webhook ID を入力",
+  "message-delete.modal.webhook.label":
+    "Webhook ID（17〜20桁の数字）",
+  "message-delete.modal.webhook.placeholder":
+    "123456789012345678",
+  "message-delete.errors.webhook_invalid_format":
+    "Webhook ID の形式が不正です。17〜20桁の数字を入力してください。",
+  "message-delete.errors.channel_partial_skip":
+    "以下のチャンネルはBotの権限不足のためスキップしました: {{channels}}",
+  "message-delete.errors.channel_all_no_access":
+    "指定したチャンネルにアクセスできません。BotにReadMessageHistoryおよびManageMessages権限が必要です。",
 
   // メンバーログ設定コマンド
   // スラッシュコマンド本体とサブコマンド説明
@@ -520,16 +523,22 @@ export const commands = {
   // remove サブコマンド
   "sticky-message.remove.description":
     "スティッキーメッセージを削除",
-  "sticky-message.remove.channel.description":
-    "スティッキーメッセージを削除するテキストチャンネル",
+  "sticky-message.remove.select.placeholder":
+    "削除するチャンネルを選択（複数選択可）",
+  "sticky-message.remove.button.label":
+    "削除する",
+  "sticky-message.remove.noSelection.description":
+    "削除するチャンネルを選択してください。",
   "sticky-message.remove.success.title":
     "削除完了",
   "sticky-message.remove.success.description":
-    "スティッキーメッセージを削除しました。",
+    "{{count}}件のスティッキーメッセージを削除しました。",
+  "sticky-message.remove.success.channels":
+    "削除したチャンネル",
   "sticky-message.remove.notFound.title":
     "未設定",
   "sticky-message.remove.notFound.description":
-    "このチャンネルにはスティッキーメッセージが設定されていません。",
+    "スティッキーメッセージは設定されていません。",
 
   // エラー
   "sticky-message.errors.permissionDenied":
@@ -618,7 +627,7 @@ export const commands = {
   "vc-recruit-config.teardown.confirm.field_categories":
     "対象カテゴリー",
   "vc-recruit-config.teardown.confirm.warning":
-    "選択したカテゴリーのパネルチャンネル・投稿チャンネルが削除されます。この操作は取り消せません。",
+    "選択したカテゴリーの募集作成チャンネル・募集一覧チャンネルが削除されます。この操作は取り消せません。",
   "vc-recruit-config.teardown.confirm.button_confirm":
     "🗑️ 撤去する",
   "vc-recruit-config.teardown.confirm.button_cancel":
@@ -627,12 +636,28 @@ export const commands = {
     "選び直す",
   "vc-recruit-config.add-role.description":
     "メンション候補ロールを追加",
-  "vc-recruit-config.add-role.role.description":
-    "追加するロール",
+  "vc-recruit-config.add-role.select.placeholder":
+    "追加するロールを選択（複数選択可）",
+  "vc-recruit-config.add-role.select.title":
+    "追加するロールを選択してください",
+  "vc-recruit-config.add-role.button.confirm":
+    "追加する",
+  "vc-recruit-config.add-role.button.cancel":
+    "キャンセル",
+  "vc-recruit-config.add-role.noSelection":
+    "追加するロールを選択してください。",
   "vc-recruit-config.remove-role.description":
     "メンション候補ロールを削除",
-  "vc-recruit-config.remove-role.role.description":
-    "削除するロール",
+  "vc-recruit-config.remove-role.select.placeholder":
+    "削除するロールを選択（複数選択可）",
+  "vc-recruit-config.remove-role.select.title":
+    "削除するロールを選択してください",
+  "vc-recruit-config.remove-role.button.confirm":
+    "削除する",
+  "vc-recruit-config.remove-role.button.cancel":
+    "キャンセル",
+  "vc-recruit-config.remove-role.noSelection":
+    "削除するロールを選択してください。",
   "vc-recruit-config.view.description":
     "現在のVC募集設定を表示",
   // setup 成功
@@ -648,7 +673,7 @@ export const commands = {
   "vc-recruit-config.embed.teardown_category_item":
     "🗑️ {{category}}",
   "vc-recruit-config.embed.teardown_partial_error":
-    "⚠️ 以下のカテゴリーで一部エラーが発生しました：",
+    "以下のカテゴリーで一部エラーが発生しました：",
   "vc-recruit-config.embed.teardown_cancelled":
     "キャンセルしました",
   // add-role/remove-role 成功
@@ -671,20 +696,38 @@ export const commands = {
     "TOP",
   "vc-recruit-config.embed.setup_item":
     "• {{category}}\n　募集作成: {{panel}}\n　募集投稿: {{post}}",
+  "vc-recruit-config.embed.add_role_success_title":
+    "ロールの登録に成功",
+  "vc-recruit-config.embed.add_role_success_field":
+    "登録したロール",
+  "vc-recruit-config.embed.add_role_limit_title":
+    "上限超過でロールの登録に失敗",
+  "vc-recruit-config.embed.add_role_limit_desc":
+    "メンション候補ロールの登録上限({{limit}}件)に達したため、以下のロールは登録できませんでした。",
+  "vc-recruit-config.embed.add_role_limit_field":
+    "登録できなかったロール",
+  "vc-recruit-config.embed.remove_role_success_title":
+    "ロールの削除に成功",
+  "vc-recruit-config.embed.remove_role_success_field":
+    "削除したロール",
   "vc-recruit-config.embed.success_title":
     "設定完了",
 
+  // 共通
+  "common.cancelled":
+    "キャンセルしました",
+
   // VC募集機能 チャンネル名
   "vcRecruit.channelName.panel":
-    "vc募集",
+    "募集作成",
   "vcRecruit.channelName.post":
-    "vc募集板",
+    "募集一覧",
 
   // VC募集パネル
   "vcRecruit.panel.title":
     "🎤 VC募集",
   "vcRecruit.panel.description":
-    "VC参加者を募集しましょう！\nボタンを押して募集を作成してください。",
+    "ボタンからVC参加者の募集を作成できます。\n\n**作成手順**\n1. 下のボタンを押して募集作成を開始します\n2. メンションするロールと参加するVCを選択します\n3. 募集内容を入力して送信すると、募集一覧チャンネルに投稿されます",
   "vcRecruit.panel.create_button":
     "VC募集を作成",
 
@@ -701,8 +744,8 @@ export const commands = {
     "「新規VC作成」選択時のみ使用（未入力: 表示名's Room）",
 
   // VC募集セレクトメニュー（ステップ1）
-  "vcRecruit.select.title":
-    "📋 ステップ 1/2 — VC・メンションを選択してください",
+  "vcRecruit.select.title": "📋 ステップ 1/2",
+  "vcRecruit.select.description": "メンション・VCを選択してください",
   "vcRecruit.select.mention_placeholder":
     "メンション（なし）",
   "vcRecruit.select.vc_placeholder":
@@ -728,9 +771,55 @@ export const commands = {
   "vcRecruit.thread_name":
     "{{recruiter}}の募集",
 
-  // 自動移動スキップ通知
-  "vcRecruit.embed.not_in_vc_skipped":
-    "⚠️ VCに参加していないため自動移動できませんでした",
+  // 投稿完了通知
+  "vcRecruit.embed.post_success":
+    "募集を投稿しました",
+  "vcRecruit.embed.post_success_link":
+    "投稿を確認する",
+
+  // 募集メッセージボタン
+  "vcRecruit.button.join_vc":
+    "🎤 VCに参加",
+  "vcRecruit.button.rename_vc":
+    "✏️ VC名を変更",
+  "vcRecruit.button.end_vc":
+    "🔇 VCを終了",
+  "vcRecruit.button.delete_post":
+    "🗑️ 募集を削除",
+  "vcRecruit.button.vc_ended":
+    "🔇 VC終了済み",
+
+  // VCを終了 確認
+  "vcRecruit.confirm.end_vc_created":
+    "VCを終了しますか？\nVCが削除され、募集投稿が終了済みに更新されます。投稿とスレッドは残ります。",
+  "vcRecruit.confirm.end_vc_existing":
+    "VCを終了しますか？\n募集投稿が終了済みに更新されます。VCは削除されません。",
+  "vcRecruit.confirm.end_vc_button":
+    "終了する",
+  "vcRecruit.confirm.cancel_button":
+    "キャンセル",
+  "vcRecruit.confirm.end_vc_success":
+    "VCを終了しました",
+  "vcRecruit.confirm.cancelled":
+    "キャンセルしました",
+
+  // 募集を削除 確認
+  "vcRecruit.confirm.delete_created":
+    "この募集を削除しますか？\n投稿・スレッド・新規作成VCがすべて削除されます。",
+  "vcRecruit.confirm.delete_existing":
+    "この募集を削除しますか？\n投稿・スレッドが削除されます。VCは削除されません。",
+  "vcRecruit.confirm.delete_button":
+    "削除する",
+
+  // VC名変更
+  "vcRecruit.rename.modal_title":
+    "VC名を変更",
+  "vcRecruit.rename.vc_name_label":
+    "VC名",
+  "vcRecruit.rename.vc_name_placeholder":
+    "新しいVC名を入力してください（最大100文字）",
+  "vcRecruit.rename.success":
+    "VC名を変更しました",
 } as const;
 
 export type CommandsTranslations = typeof commands;

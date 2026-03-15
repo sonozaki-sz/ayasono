@@ -6,11 +6,19 @@ import { tDefault } from "../../shared/locale/localeManager";
 
 export type MessageStatus = "success" | "info" | "warning" | "error";
 
-const STATUS_COLORS: Record<MessageStatus, number> = {
+/** ステータス種別ごとの Embed カラーコード */
+export const STATUS_COLORS: Record<MessageStatus, number> & {
+  danger: number;
+  muted: number;
+} = {
   success: 0x57f287,
   info: 0x3498db,
   warning: 0xfee75c,
   error: 0xed4245,
+  /** 破壊的操作（削除確認など）の強調色 */
+  danger: 0xe74c3c,
+  /** 二次情報・条件表示などの控えめな色 */
+  muted: 0x95a5a6,
 };
 
 const STATUS_EMOJIS: Record<MessageStatus, string> = {

@@ -25,14 +25,16 @@ export interface ParsedOptions {
   count: number;
   /** ユーザーが count を明示指定したかどうか（ログ出力の有無に使用） */
   countSpecified: boolean;
-  targetUserId?: string;
+  /** 対象ユーザーID一覧（条件設定ステップで選択、空配列で全員対象） */
+  targetUserIds: string[];
   keyword?: string;
   afterTs: number;
   beforeTs: number;
   afterStr?: string;
   beforeStr?: string;
   daysOption?: number;
-  channelId?: string;
+  /** 対象チャンネルID一覧（条件設定ステップで選択、空配列でサーバー全体） */
+  channelIds: string[];
 }
 
 /** モーダルフィルター設定 */

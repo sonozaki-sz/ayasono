@@ -9,7 +9,7 @@ import {
   createWarningEmbed,
 } from "../../../../utils/messageResponse";
 import {
-  MSG_DEL_CONFIRM_TIMEOUT_MS,
+  MSG_DEL_PHASE_TIMEOUT_MS,
   type ScannedMessageWithChannel,
 } from "../../constants/messageDeleteConstants";
 import {
@@ -38,7 +38,7 @@ export async function executeDelete(
   // Phase 3 タイムアウトタイマー（14分で削除を中断）
   const deleteTimeoutId = setTimeout(() => {
     deleteController.abort();
-  }, MSG_DEL_CONFIRM_TIMEOUT_MS);
+  }, MSG_DEL_PHASE_TIMEOUT_MS);
 
   // オブジェクト参照にすることで TypeScript の制御フロー解析による誤ナローイングを回避
   const progressRef = { data: null as DeleteProgressData | null };
@@ -81,9 +81,10 @@ export async function executeDelete(
 
       // 仕様ログフォーマット: [count=N] [target=<id>] [keyword="..."] [days=N | after=... before=...]
       const countPart = options.countSpecified ? ` count=${options.count}` : "";
-      const targetPart = options.targetUserId
-        ? ` target=${options.targetUserId}`
-        : "";
+      const targetPart =
+        options.targetUserIds.length > 0
+          ? ` target=${options.targetUserIds.join(",")}`
+          : "";
       const keywordPart = options.keyword
         ? ` keyword="${options.keyword}"`
         : "";

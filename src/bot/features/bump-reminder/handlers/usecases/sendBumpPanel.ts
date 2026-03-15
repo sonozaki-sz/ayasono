@@ -56,7 +56,7 @@ export async function sendBumpPanel(
       { title: tGuild("events:bump-reminder.panel.title") },
     );
 
-    // ON/OFF ボタン行を構築して元メッセージへの返信として送信
+    // トグルボタン行を構築して元メッセージへの返信として送信
     const row = createBumpPanelButtons(guildId, tGuild);
 
     if (channel.isSendable()) {
@@ -84,7 +84,7 @@ export async function sendBumpPanel(
 }
 
 /**
- * Bump パネル用のボタン行を構築する関数
+ * Bump パネル用の通知 ON/OFF ボタン行を構築する関数
  * @param guildId customId 埋め込みに使用するギルドID
  * @param tGuild ギルドロケール用翻訳関数
  * @returns ON/OFF ボタンを含む ActionRow
@@ -94,7 +94,7 @@ function createBumpPanelButtons(
   tGuild: GuildTFunction,
 ): ActionRowBuilder<ButtonBuilder> {
   // 同一guildをcustomIdへ埋め込み、他guild操作を防ぐ
-  // ON/OFF の2ボタンを固定配置して自己登録/解除を切り替える
+  // ON/OFF 2ボタンで冪等に通知状態を設定する
   // customId は handler 側の prefix 判定と厳密に対になる
   return new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()

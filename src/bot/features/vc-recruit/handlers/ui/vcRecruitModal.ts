@@ -2,6 +2,9 @@
 // VC募集モーダル送信処理（ステップ2 → VC作成・募集投稿）
 
 import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
   ChannelType,
   EmbedBuilder,
   MessageFlags,
@@ -16,25 +19,83 @@ import { getBotVcRecruitRepository } from "../../../../services/botCompositionRo
 import { safeReply } from "../../../../utils/interaction";
 import {
   createErrorEmbed,
-  createWarningEmbed,
+  createSuccessEmbed,
 } from "../../../../utils/messageResponse";
+import { VC_RECRUIT_PANEL_COLOR } from "../../commands/vcRecruitConfigCommand.constants";
 import { sendVcControlPanel } from "../../../vc-panel/vcControlPanel";
 import {
   VC_RECRUIT_CONFIG_COMMAND,
   VC_RECRUIT_PANEL_CUSTOM_ID,
+  VC_RECRUIT_POST_CUSTOM_ID,
 } from "../../commands/vcRecruitConfigCommand.constants";
 import {
   NEW_VC_VALUE,
-  NO_MENTION_VALUE,
   deleteVcRecruitSession,
   getVcRecruitSession,
 } from "./vcRecruitPanelState";
 
+/**
+ * 募集メッセージに添付するボタン行を構築する
+ * @param guildId ギルドID
+ * @param recruiterId 募集投稿者のユーザーID
+ * @param voiceChannelId 対象VCのチャンネルID
+ * @returns ボタン行の ActionRow 配列
+ */
+async function buildRecruitMessageButtons(
+  guildId: string,
+  recruiterId: string,
+  voiceChannelId: string,
+): Promise<ActionRowBuilder<ButtonBuilder>[]> {
+  const idSuffix = `${recruiterId}:${voiceChannelId}`;
+
+  // 「VCに参加」リンクボタン
+  const joinButton = new ButtonBuilder()
+    .setLabel(await tGuild(guildId, "commands:vcRecruit.button.join_vc"))
+    .setStyle(ButtonStyle.Link)
+    .setURL(`https://discord.com/channels/${guildId}/${voiceChannelId}`);
+
+  // 「VC名を変更」ボタン
+  const renameButton = new ButtonBuilder()
+    .setCustomId(`${VC_RECRUIT_POST_CUSTOM_ID.RENAME_VC_PREFIX}${idSuffix}`)
+    .setLabel(await tGuild(guildId, "commands:vcRecruit.button.rename_vc"))
+    .setStyle(ButtonStyle.Secondary);
+
+  // 「VCを終了」ボタン
+  const endButton = new ButtonBuilder()
+    .setCustomId(`${VC_RECRUIT_POST_CUSTOM_ID.END_VC_PREFIX}${idSuffix}`)
+    .setLabel(await tGuild(guildId, "commands:vcRecruit.button.end_vc"))
+    .setStyle(ButtonStyle.Secondary);
+
+  // 「募集を削除」ボタン
+  const deleteButton = new ButtonBuilder()
+    .setCustomId(`${VC_RECRUIT_POST_CUSTOM_ID.DELETE_POST_PREFIX}${idSuffix}`)
+    .setLabel(await tGuild(guildId, "commands:vcRecruit.button.delete_post"))
+    .setStyle(ButtonStyle.Danger);
+
+  return [
+    new ActionRowBuilder<ButtonBuilder>().addComponents(
+      joinButton,
+      renameButton,
+      endButton,
+      deleteButton,
+    ),
+  ];
+}
+
 export const vcRecruitModalHandler: ModalHandler = {
+  /**
+   * VC募集モーダル送信に一致するか判定する
+   * @param customId インタラクションのカスタムID
+   * @returns 一致する場合 true
+   */
   matches(customId) {
     return customId.startsWith(VC_RECRUIT_PANEL_CUSTOM_ID.MODAL_PREFIX);
   },
 
+  /**
+   * VC募集モーダル送信を処理する（VC作成・募集メッセージ投稿・ボタン添付）
+   * @param interaction モーダル送信インタラクション
+   */
   async execute(interaction: ModalSubmitInteraction) {
     const guild = interaction.guild;
     if (!guild) return;
@@ -158,10 +219,12 @@ export const vcRecruitModalHandler: ModalHandler = {
       .fetch(setup.postChannelId)
       .catch(() => null)) as TextChannel | null;
 
+    let postedMessageUrl: string | null = null;
+
     if (postChannel && postChannel.isSendable()) {
       const mentionText =
-        session.mentionRoleId && session.mentionRoleId !== NO_MENTION_VALUE
-          ? `<@&${session.mentionRoleId}>`
+        session.mentionRoleIds.length > 0
+          ? session.mentionRoleIds.map((id) => `<@&${id}>`).join(" ")
           : "";
 
       const embedTitle = await tGuild(
@@ -191,13 +254,23 @@ export const vcRecruitModalHandler: ModalHandler = {
             value: `<@${interaction.user.id}>`,
           },
         )
-        .setColor(0x5865f2)
+        .setColor(VC_RECRUIT_PANEL_COLOR)
         .setTimestamp();
+
+      // 募集メッセージにボタンを添付して送信
+      const buttonRows = await buildRecruitMessageButtons(
+        guild.id,
+        interaction.user.id,
+        voiceChannel.id,
+      );
 
       const message = await postChannel.send({
         content: mentionText || undefined,
         embeds: [recruitEmbed],
+        components: buttonRows,
       });
+
+      postedMessageUrl = message.url;
 
       // スレッドを作成
       const threadName = await tGuild(
@@ -215,34 +288,45 @@ export const vcRecruitModalHandler: ModalHandler = {
     }
 
     // 投稿者をVCへ移動
-    let vcMoveFailed = false;
     if (member && member.voice.channel) {
-      await member.voice.setChannel(voiceChannel).catch(() => {
-        vcMoveFailed = true;
-      });
-    } else {
-      vcMoveFailed = true;
+      await member.voice.setChannel(voiceChannel).catch(() => null);
     }
 
     // セッションを削除
     deleteVcRecruitSession(sessionId);
 
-    // エフェメラルメッセージで完了通知
-    if (vcMoveFailed) {
+    // エフェメラルメッセージで成功通知＋投稿リンク
+    const successText = await tGuild(
+      guild.id,
+      "commands:vcRecruit.embed.post_success",
+    );
+
+    if (postedMessageUrl) {
+      const linkLabel = await tGuild(
+        guild.id,
+        "commands:vcRecruit.embed.post_success_link",
+      );
+      const linkButton = new ButtonBuilder()
+        .setLabel(linkLabel)
+        .setStyle(ButtonStyle.Link)
+        .setURL(postedMessageUrl);
+
       await interaction
         .editReply({
-          embeds: [
-            createWarningEmbed(
-              await tGuild(
-                guild.id,
-                "commands:vcRecruit.embed.not_in_vc_skipped",
-              ),
-            ),
+          embeds: [createSuccessEmbed(successText)],
+          components: [
+            new ActionRowBuilder<ButtonBuilder>().addComponents(linkButton),
           ],
         })
         .catch(() => null);
     } else {
-      await interaction.deleteReply().catch(() => null);
+      await interaction
+        .editReply({
+          embeds: [createSuccessEmbed(successText)],
+        })
+        .catch(() => null);
     }
   },
 };
+
+export { buildRecruitMessageButtons };

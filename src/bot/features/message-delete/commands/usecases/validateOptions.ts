@@ -32,6 +32,23 @@ export function hasManageMessagesPermission(
 }
 
 /**
+ * Bot がメッセージ削除に必要なグローバル権限を持つかどうかを確認する
+ * @param interaction コマンド実行の ChatInputCommandInteraction
+ * @returns 必要な権限（ManageMessages / ReadMessageHistory / ViewChannel）をすべて持つ場合は true
+ */
+export function hasBotRequiredPermissions(
+  interaction: ChatInputCommandInteraction,
+): boolean {
+  const me = interaction.guild?.members.me;
+  if (!me) return true; // me が取得できない場合はチャンネル個別チェックに委ねる
+  return me.permissions.has([
+    PermissionFlagsBits.ManageMessages,
+    PermissionFlagsBits.ReadMessageHistory,
+    PermissionFlagsBits.ViewChannel,
+  ]);
+}
+
+/**
  * コマンドオプションをパースしてバリデーションを行う
  * @param interaction コマンド実行の ChatInputCommandInteraction
  * @returns バリデーション済みオプション（エラー時は null）
@@ -41,10 +58,6 @@ export async function parseAndValidateOptions(
 ): Promise<ParsedOptions | null> {
   const countOption = interaction.options.getInteger(
     MSG_DEL_COMMAND.OPTION.COUNT,
-  );
-  const userInput = interaction.options.getString(
-    MSG_DEL_COMMAND.OPTION.USER,
-    false,
   );
   const keyword = interaction.options.getString(
     MSG_DEL_COMMAND.OPTION.KEYWORD,
@@ -62,51 +75,6 @@ export async function parseAndValidateOptions(
     MSG_DEL_COMMAND.OPTION.BEFORE,
     false,
   );
-  // channelId はコマンドオプションで明示指定された場合のみセット（全チャンネルスキャン時は undefined）
-  const channelId =
-    interaction.options.getChannel(MSG_DEL_COMMAND.OPTION.CHANNEL, false)?.id ??
-    undefined;
-
-  // user オプション: メンション or 生ID をパース
-  let targetUserId: string | undefined;
-  if (userInput) {
-    const mentionMatch = userInput.match(/^<@!?(\d+)>$/);
-    const rawId = mentionMatch
-      ? mentionMatch[1]
-      : /^\d{17,20}$/.test(userInput)
-        ? userInput
-        : null;
-    if (!rawId) {
-      await interaction.editReply({
-        embeds: [
-          createWarningEmbed(
-            tDefault("commands:message-delete.errors.user_invalid_format"),
-          ),
-        ],
-      });
-      return null;
-    }
-    targetUserId = rawId;
-  }
-
-  // 少なくとも1つのフィルター必須
-  if (
-    !countOption &&
-    !targetUserId &&
-    !keyword &&
-    !daysOption &&
-    !afterStr &&
-    !beforeStr
-  ) {
-    await interaction.editReply({
-      embeds: [
-        createWarningEmbed(
-          tDefault("commands:message-delete.errors.no_filter"),
-        ),
-      ],
-    });
-    return null;
-  }
 
   // days と after/before は排他
   if (daysOption && (afterStr || beforeStr)) {
@@ -196,13 +164,29 @@ export async function parseAndValidateOptions(
   return {
     count: countOption ?? MSG_DEL_DEFAULT_COUNT,
     countSpecified: countOption !== null,
-    targetUserId,
+    targetUserIds: [],
     keyword: keyword ?? undefined,
     afterTs,
     beforeTs,
     afterStr: afterStr ?? undefined,
     beforeStr: beforeStr ?? undefined,
     daysOption: daysOption ?? undefined,
-    channelId,
+    channelIds: [],
   };
+}
+
+/**
+ * スラッシュコマンドオプションでフィルタ条件が1つ以上指定されているかを判定する
+ * （条件設定ステップのバリデーションで使用）
+ * @param options パース済みオプション
+ * @returns フィルタ条件が1つ以上あれば true
+ */
+export function hasSlashCommandFilter(options: ParsedOptions): boolean {
+  return !!(
+    options.countSpecified ||
+    options.keyword ||
+    options.daysOption ||
+    options.afterStr ||
+    options.beforeStr
+  );
 }

@@ -60,7 +60,6 @@ vi.mock("@/bot/features/vc-recruit/handlers/ui/vcRecruitPanelState", () => ({
   setVcRecruitSession: vi.fn(),
   deleteVcRecruitSession: vi.fn(),
   NEW_VC_VALUE: "__new__",
-  NO_MENTION_VALUE: "__none__",
 }));
 
 vi.mock(
@@ -77,7 +76,7 @@ const PANEL_CHANNEL_ID = "panel-ch-1";
 const POST_CHANNEL_ID = "post-ch-1";
 const PANEL_MSG_ID = "panel-msg-1";
 const SELECT_INTERACTION_ID = "select-001";
-const CONFIRM_PREFIX = "vc-recruit-teardown-confirm:";
+const CONFIRM_PREFIX = "vc-recruit:teardown-confirm:";
 
 /** 実際の DiscordAPIError インスタンスをアプローチした UnknownChannel エラーモックを作成する */
 function makeUnknownChannelError(): DiscordAPIError {
@@ -449,7 +448,7 @@ describe("vcRecruitButtonHandler / teardown cancel", () => {
 
   it("CANCEL ボタンでセッションを削除してキャンセル成功 embed を表示する", async () => {
     const interaction = {
-      customId: `vc-recruit-teardown-cancel:${SELECT_INTERACTION_ID}`,
+      customId: `vc-recruit:teardown-cancel:${SELECT_INTERACTION_ID}`,
       guild: { id: GUILD_ID },
       update: vi.fn().mockResolvedValue(undefined),
       deferUpdate: vi.fn(),
@@ -468,7 +467,7 @@ describe("vcRecruitButtonHandler / teardown cancel", () => {
 
   it("guild が null の場合は早期リターンして何もしない", async () => {
     const interaction = {
-      customId: `vc-recruit-teardown-cancel:${SELECT_INTERACTION_ID}`,
+      customId: `vc-recruit:teardown-cancel:${SELECT_INTERACTION_ID}`,
       guild: null,
       update: vi.fn(),
     };
@@ -486,7 +485,7 @@ describe("vcRecruitButtonHandler / teardown redo", () => {
 
   it("REDO ボタンでセッションを削除して teardown セレクトメニューを再表示する", async () => {
     const interaction = {
-      customId: `vc-recruit-teardown-redo:${SELECT_INTERACTION_ID}`,
+      customId: `vc-recruit:teardown-redo:${SELECT_INTERACTION_ID}`,
       guild: { id: GUILD_ID },
       id: "new-interaction-1",
       update: vi.fn().mockResolvedValue(undefined),
@@ -507,7 +506,7 @@ describe("vcRecruitButtonHandler / teardown redo", () => {
   it("REDO の 60秒後にセレクトメニューが無効化される", async () => {
     vi.useFakeTimers();
     const interaction = {
-      customId: `vc-recruit-teardown-redo:${SELECT_INTERACTION_ID}`,
+      customId: `vc-recruit:teardown-redo:${SELECT_INTERACTION_ID}`,
       guild: { id: GUILD_ID },
       id: "new-interaction-2",
       update: vi.fn().mockResolvedValue(undefined),
@@ -525,7 +524,7 @@ describe("vcRecruitButtonHandler / teardown redo", () => {
   it("タイムアウト後に editReply が throw しても（トークン失効）エラーにならない", async () => {
     vi.useFakeTimers();
     const interaction = {
-      customId: `vc-recruit-teardown-redo:${SELECT_INTERACTION_ID}`,
+      customId: `vc-recruit:teardown-redo:${SELECT_INTERACTION_ID}`,
       guild: { id: GUILD_ID },
       id: "new-interaction-3",
       update: vi.fn().mockResolvedValue(undefined),

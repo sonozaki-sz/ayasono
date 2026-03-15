@@ -55,6 +55,15 @@ vi.mock("@/shared/locale/helpers", () => ({
   getTimezoneOffsetForLocale: vi.fn(() => "+00:00"),
 }));
 
+const runConditionSetupStepMock = vi.fn();
+vi.mock(
+  "@/bot/features/message-delete/commands/usecases/runConditionSetupStep",
+  () => ({
+    runConditionSetupStep: (...args: unknown[]) =>
+      runConditionSetupStepMock(...args),
+  }),
+);
+
 // ── テスト用コレクターヘルパー ───────────────────────────────────────────────
 
 function makeMockCollector() {
@@ -88,12 +97,47 @@ function makeComponentInteraction(customId: string, userId: string) {
   };
 }
 
+// ── scanInteraction ファクトリ（条件設定ステップの戻り値に含まれる） ──────────
+
+function makeScanInteraction(userId: string, guildId: string) {
+  const me = {
+    displayName: "Bot",
+    permissions: { has: vi.fn(() => true) },
+    permissionsFor: vi.fn(() => ({ has: vi.fn(() => true) })),
+  };
+  const mockChannel = {
+    id: "channel-1",
+    name: "general",
+    isTextBased: () => true,
+    permissionsFor: vi.fn(() => ({ has: vi.fn(() => true) })),
+    guildId,
+    guild: { members: { me } },
+    messages: { fetch: vi.fn().mockResolvedValue(new Map()) },
+  };
+  const base = makeComponentInteraction("message-delete:start-scan", userId);
+  return {
+    ...base,
+    guildId,
+    guild: {
+      id: guildId,
+      members: { me },
+      channels: {
+        fetch: vi.fn().mockResolvedValue({ size: 1, values: () => [mockChannel] }),
+      },
+    },
+    editReply: vi.fn().mockResolvedValue({
+      createMessageComponentCollector: vi.fn(() => makeMockCollector()),
+    }) as ReturnType<typeof vi.fn>,
+  };
+}
+
 // ── メインインタラクションファクトリ ────────────────────────────────────────
 
 interface InteractionOverrides {
   guildId?: string | null;
   userId?: string;
   hasPermission?: boolean;
+  botHasPermission?: boolean;
   count?: number | null;
   userInput?: string | null;
   keyword?: string | null;
@@ -109,6 +153,7 @@ function createInteraction(overrides: InteractionOverrides = {}) {
     guildId = "guild-1",
     userId = "user-1",
     hasPermission = true,
+    botHasPermission = true,
     count = null,
     userInput = null,
     keyword = null,
@@ -121,6 +166,7 @@ function createInteraction(overrides: InteractionOverrides = {}) {
 
   const me = {
     displayName: "Bot",
+    permissions: { has: vi.fn(() => botHasPermission) },
     permissionsFor: vi.fn(() => ({ has: vi.fn(() => true) })),
   };
 
@@ -199,7 +245,9 @@ const mockScannedMessages: ScannedMessageWithChannel[] = [
 // テストスイート
 // ════════════════════════════════════════════════════════════════════════════
 
+// executeMessageDeleteCommand のエラー分岐（権限・バリデーション・ロック）と正常フロー全体を検証
 describe("executeMessageDeleteCommand", () => {
+  // 各テストケースでモック状態をリセットし、デフォルトのスキャン結果・条件設定ステップ戻り値を設定する
   beforeEach(() => {
     vi.clearAllMocks();
     // デフォルト: scanMessages は即座に解決
@@ -208,12 +256,21 @@ describe("executeMessageDeleteCommand", () => {
       totalDeleted: 1,
       channelBreakdown: { "channel-1": { name: "general", count: 1 } },
     });
+    // デフォルト: 条件設定ステップはユーザー/チャンネル未選択で即座に返す
+    // scanInteraction は buildTargetChannels / runScanPhase で使用される
+    const defaultScanInteraction = makeScanInteraction("user-1", "guild-1");
+    runConditionSetupStepMock.mockResolvedValue({
+      targetUserIds: [],
+      channelIds: [],
+      scanInteraction: defaultScanInteraction,
+    });
   });
 
   // ══════════════════════════════════════════════════════════════════════════
   // エラー系
   // ══════════════════════════════════════════════════════════════════════════
 
+  // 権限不足・バリデーション失敗・ロック競合・スキャン0件など全エラー分岐を検証
   describe("エラー系", () => {
     it("guildId が null の場合はエラー Embed を返して終了する", async () => {
       const interaction = createInteraction({ guildId: null });
@@ -226,24 +283,13 @@ describe("executeMessageDeleteCommand", () => {
       );
     });
 
-    it("フィルター指定が何もない場合は警告 Embed を返して終了する", async () => {
-      // count / user / keyword / days / after / before がすべて未指定
-      const interaction = createInteraction({ daysOption: null });
+    it("条件設定ステップがキャンセルされた場合は早期終了する", async () => {
+      runConditionSetupStepMock.mockResolvedValue(null);
+      const interaction = createInteraction();
 
       await executeMessageDeleteCommand(interaction as never);
 
-      expect(createWarningEmbedMock).toHaveBeenCalledOnce();
-      expect(interaction.editReply).toHaveBeenCalledWith(
-        expect.objectContaining({ embeds: [expect.objectContaining({ _type: "warning" })] }),
-      );
-    });
-
-    it("user オプションのフォーマットが不正な場合は警告 Embed を返して終了する", async () => {
-      const interaction = createInteraction({ userInput: "not-a-valid-id" });
-
-      await executeMessageDeleteCommand(interaction as never);
-
-      expect(createWarningEmbedMock).toHaveBeenCalledOnce();
+      expect(scanMessagesMock).not.toHaveBeenCalled();
     });
 
     it("days と after/before が同時指定された場合は警告 Embed を返して終了する", async () => {
@@ -316,6 +362,14 @@ describe("executeMessageDeleteCommand", () => {
       expect(createErrorEmbedMock).toHaveBeenCalledOnce();
     });
 
+    it("Bot に必要な権限がない場合はエラー Embed を返して終了する", async () => {
+      const interaction = createInteraction({ botHasPermission: false });
+
+      await executeMessageDeleteCommand(interaction as never);
+
+      expect(createErrorEmbedMock).toHaveBeenCalledOnce();
+    });
+
     it("同一ギルドで既に処理中の場合は警告 Embed を返して終了する（ロック）", async () => {
       const LOCK_GUILD = "guild-locked";
 
@@ -328,10 +382,9 @@ describe("executeMessageDeleteCommand", () => {
       // 1回目を開始（await しない）
       void executeMessageDeleteCommand(interaction1 as never);
 
-      // deferReply + parseAndValidateOptions の2非同期境界を越えてロック取得を待機
-      await Promise.resolve();
-      await Promise.resolve();
-      await Promise.resolve();
+      // deferReply + parseAndValidateOptions + runConditionSetupStep + buildTargetChannels
+      // の非同期境界を越えてロック取得を待機
+      for (let i = 0; i < 10; i++) await Promise.resolve();
 
       // 2回目: ロック済みのはずなので警告が返る
       await executeMessageDeleteCommand(interaction2 as never);
@@ -355,6 +408,7 @@ describe("executeMessageDeleteCommand", () => {
   // 正常系: スキャン → プレビュー確認 → 最終確認 → 削除完了
   // ══════════════════════════════════════════════════════════════════════════
 
+  // スキャン→プレビュー確認→最終確認→削除完了の一連フローが正常に完了することを検証
   describe("正常系", () => {
     it("スキャン → プレビュー確認 → 最終確認 → 削除完了 の一連のフローが正常に動作する", async () => {
       // ── 各フェーズのクリックインタラクションを準備 ──
@@ -401,17 +455,23 @@ describe("executeMessageDeleteCommand", () => {
         createMessageComponentCollector: vi.fn(() => cancelCollector),
       };
 
-      // editReply の呼び出し順:
+      // scanInteraction の editReply の呼び出し順:
       //   1回目 → スキャン進捗 (scanReplyMsg)
       //   2回目 → プレビュー  (previewReplyMsg)
       //   以降  → undefined（不使用）
-      const editReply = vi
-        .fn()
+      const testScanInteraction = makeScanInteraction("user-1", "guild-1");
+      testScanInteraction.editReply
         .mockResolvedValueOnce(scanReplyMsg)
         .mockResolvedValueOnce(previewReplyMsg)
         .mockResolvedValue(undefined);
 
-      const interaction = createInteraction({ editReplies: editReply });
+      runConditionSetupStepMock.mockResolvedValue({
+        targetUserIds: [],
+        channelIds: [],
+        scanInteraction: testScanInteraction,
+      });
+
+      const interaction = createInteraction();
 
       // ── 実行 ──
       await executeMessageDeleteCommand(interaction as never);

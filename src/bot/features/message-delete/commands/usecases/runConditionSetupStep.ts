@@ -1,0 +1,274 @@
+// src/bot/features/message-delete/commands/usecases/runConditionSetupStep.ts
+// 条件設定ステップ: UserSelectMenu / ChannelSelectMenu でユーザー・チャンネルを選択
+
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  ChannelSelectMenuBuilder,
+  ChannelType,
+  ComponentType,
+  ModalBuilder,
+  TextInputBuilder,
+  TextInputStyle,
+  UserSelectMenuBuilder,
+  type ChatInputCommandInteraction,
+} from "discord.js";
+import { tDefault } from "../../../../../shared/locale/localeManager";
+import {
+  createInfoEmbed,
+  createWarningEmbed,
+} from "../../../../utils/messageResponse";
+import {
+  MSG_DEL_CONDITION_STEP_TIMEOUT_MS,
+  MSG_DEL_CUSTOM_ID,
+  MSG_DEL_MODAL_TIMEOUT_MS,
+  MSG_DEL_SELECT_MAX_OPTIONS,
+  type ConditionSetupResult,
+} from "../../constants/messageDeleteConstants";
+
+/**
+ * 条件設定ステップを表示し、ユーザー・チャンネルの選択結果を返す
+ *
+ * UserSelectMenu（最大25人）と ChannelSelectMenu（最大25チャンネル）を Ephemeral で表示し、
+ * 「スキャン開始」ボタン押下で選択結果を返す。3分のタイムアウトを持つ。
+ * スキャン開始ボタンの interaction を返すことで、後続フェーズが fresh な 15分 token を使えるようにする。
+ *
+ * @param interaction deferReply 済みの ChatInputCommandInteraction
+ * @param hasSlashCommandFilter スラッシュコマンドオプションでフィルタ条件が1つ以上指定されているか
+ * @returns 条件設定の結果（キャンセル/タイムアウト時は null）
+ */
+export async function runConditionSetupStep(
+  interaction: ChatInputCommandInteraction,
+  hasSlashCommandFilter: boolean,
+): Promise<ConditionSetupResult | null> {
+  // 選択状態を保持（セレクトメニューの interaction ごとに更新）
+  let selectedUserIds: string[] = [];
+  let selectedChannelIds: string[] = [];
+  let webhookIds: string[] = [];
+
+  // Row 1: UserSelectMenu
+  const userSelect = new UserSelectMenuBuilder()
+    .setCustomId(MSG_DEL_CUSTOM_ID.SELECT_USER)
+    .setPlaceholder(
+      tDefault("commands:message-delete.condition-step.user_placeholder"),
+    )
+    .setMinValues(0)
+    .setMaxValues(MSG_DEL_SELECT_MAX_OPTIONS);
+
+  // Row 2: ChannelSelectMenu
+  const channelSelect = new ChannelSelectMenuBuilder()
+    .setCustomId(MSG_DEL_CUSTOM_ID.SELECT_CHANNEL)
+    .setPlaceholder(
+      tDefault("commands:message-delete.condition-step.channel_placeholder"),
+    )
+    .setMinValues(0)
+    .setMaxValues(MSG_DEL_SELECT_MAX_OPTIONS)
+    .setChannelTypes(
+      ChannelType.GuildText,
+      ChannelType.GuildAnnouncement,
+      ChannelType.AnnouncementThread,
+      ChannelType.PublicThread,
+      ChannelType.PrivateThread,
+      ChannelType.GuildVoice,
+    );
+
+  // Row 3: ボタン（スキャン開始・Webhook ID 入力・キャンセル）
+  const buttonRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+    new ButtonBuilder()
+      .setCustomId(MSG_DEL_CUSTOM_ID.START_SCAN)
+      .setEmoji("🔍")
+      .setLabel(
+        tDefault("commands:message-delete.condition-step.btn_start_scan"),
+      )
+      .setStyle(ButtonStyle.Primary),
+    new ButtonBuilder()
+      .setCustomId(MSG_DEL_CUSTOM_ID.WEBHOOK_INPUT)
+      .setEmoji("📩")
+      .setLabel(
+        tDefault("commands:message-delete.condition-step.btn_webhook_input"),
+      )
+      .setStyle(ButtonStyle.Secondary),
+    new ButtonBuilder()
+      .setCustomId(MSG_DEL_CUSTOM_ID.COND_CANCEL)
+      .setEmoji("❌")
+      .setLabel(tDefault("commands:message-delete.condition-step.btn_cancel"))
+      .setStyle(ButtonStyle.Secondary),
+  );
+
+  // 条件設定 UI を表示
+  const message = await interaction.editReply({
+    embeds: [
+      createInfoEmbed(tDefault("commands:message-delete.condition-step.title")),
+    ],
+    components: [
+      new ActionRowBuilder<UserSelectMenuBuilder>().addComponents(userSelect),
+      new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(
+        channelSelect,
+      ),
+      buttonRow,
+    ],
+    content: "",
+  });
+
+  // コレクターで操作を待機（3分タイムアウト）
+  const collector = message.createMessageComponentCollector({
+    time: MSG_DEL_CONDITION_STEP_TIMEOUT_MS,
+  });
+
+  return new Promise<ConditionSetupResult | null>((resolve) => {
+    let resolved = false;
+
+    collector.on("collect", async (i) => {
+      // 実行者本人以外の操作は無視
+      if (i.user.id !== interaction.user.id) {
+        await i.deferUpdate().catch(() => {});
+        return;
+      }
+
+      const { customId } = i;
+
+      // UserSelectMenu
+      if (
+        customId === MSG_DEL_CUSTOM_ID.SELECT_USER &&
+        i.componentType === ComponentType.UserSelect
+      ) {
+        selectedUserIds = [...i.values];
+        await i.deferUpdate().catch(() => {});
+        return;
+      }
+
+      // ChannelSelectMenu
+      if (
+        customId === MSG_DEL_CUSTOM_ID.SELECT_CHANNEL &&
+        i.componentType === ComponentType.ChannelSelect
+      ) {
+        selectedChannelIds = [...i.values];
+        await i.deferUpdate().catch(() => {});
+        return;
+      }
+
+      // Webhook ID 入力ボタン
+      if (customId === MSG_DEL_CUSTOM_ID.WEBHOOK_INPUT) {
+        const modal = new ModalBuilder()
+          .setCustomId(MSG_DEL_CUSTOM_ID.MODAL_WEBHOOK)
+          .setTitle(tDefault("commands:message-delete.modal.webhook.title"))
+          .addComponents(
+            new ActionRowBuilder<TextInputBuilder>().addComponents(
+              new TextInputBuilder()
+                .setCustomId(MSG_DEL_CUSTOM_ID.MODAL_INPUT_WEBHOOK)
+                .setLabel(
+                  tDefault("commands:message-delete.modal.webhook.label"),
+                )
+                .setStyle(TextInputStyle.Short)
+                .setRequired(true)
+                .setPlaceholder(
+                  tDefault("commands:message-delete.modal.webhook.placeholder"),
+                ),
+            ),
+          );
+
+        await i.showModal(modal);
+        const submit = await i
+          .awaitModalSubmit({ time: MSG_DEL_MODAL_TIMEOUT_MS })
+          .catch(() => null);
+        if (!submit) return;
+
+        const webhookId = submit.fields
+          .getTextInputValue(MSG_DEL_CUSTOM_ID.MODAL_INPUT_WEBHOOK)
+          .trim();
+
+        // バリデーション: 17〜20桁の数字
+        if (!/^\d{17,20}$/.test(webhookId)) {
+          await submit.reply({
+            embeds: [
+              createWarningEmbed(
+                tDefault(
+                  "commands:message-delete.errors.webhook_invalid_format",
+                ),
+              ),
+            ],
+            ephemeral: true,
+          });
+          return;
+        }
+
+        // 重複を排除してリストに追加
+        if (!webhookIds.includes(webhookId)) {
+          webhookIds.push(webhookId);
+        }
+        await submit.deferUpdate().catch(() => {});
+        return;
+      }
+
+      // スキャン開始ボタン
+      if (customId === MSG_DEL_CUSTOM_ID.START_SCAN) {
+        // フィルタ条件の最終バリデーション
+        const hasUserFilter =
+          selectedUserIds.length > 0 || webhookIds.length > 0;
+        if (!hasSlashCommandFilter && !hasUserFilter) {
+          await i.reply({
+            embeds: [
+              createWarningEmbed(
+                tDefault("commands:message-delete.condition-step.no_filter"),
+              ),
+            ],
+            ephemeral: true,
+          });
+          return;
+        }
+
+        await i.deferUpdate().catch(() => {});
+        resolved = true;
+        collector.stop("start_scan");
+        resolve({
+          targetUserIds: [...selectedUserIds, ...webhookIds],
+          channelIds: selectedChannelIds,
+          scanInteraction: i,
+        });
+        return;
+      }
+
+      // キャンセルボタン
+      if (customId === MSG_DEL_CUSTOM_ID.COND_CANCEL) {
+        await i.deferUpdate().catch(() => {});
+        resolved = true;
+        collector.stop("cancel");
+
+        await interaction
+          .editReply({
+            embeds: [
+              createInfoEmbed(
+                tDefault("commands:message-delete.confirm.cancelled"),
+              ),
+            ],
+            components: [],
+            content: "",
+          })
+          .catch(() => {});
+
+        resolve(null);
+        return;
+      }
+    });
+
+    collector.on("end", async (_collected, _reason) => {
+      if (resolved) return;
+
+      // タイムアウト: コンポーネントを無効化してメッセージを更新
+      await interaction
+        .editReply({
+          embeds: [
+            createWarningEmbed(
+              tDefault("commands:message-delete.condition-step.timeout"),
+            ),
+          ],
+          components: [],
+          content: "",
+        })
+        .catch(() => {});
+
+      resolve(null);
+    });
+  });
+}

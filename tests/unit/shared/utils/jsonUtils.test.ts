@@ -51,6 +51,18 @@ describe("shared/utils/jsonUtils - parseJsonArray", () => {
     expect(warnSpy).toHaveBeenCalledOnce();
   });
 
+  it("エラー系: JSON.parse が Error 以外を throw した場合も空配列を返すこと", () => {
+    // JSON.parse が非 Error オブジェクトを throw するケースをシミュレート
+    const spy = vi.spyOn(JSON, "parse").mockImplementationOnce(() => {
+      throw "string error";
+    });
+    expect(parseJsonArray<string>("[1,2]")).toEqual([]);
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining("string error"),
+    );
+    spy.mockRestore();
+  });
+
   it("非配列ケース: JSON がオブジェクトの場合は空配列を返すこと", () => {
     expect(parseJsonArray<string>('{"key":"value"}')).toEqual([]);
     expect(warnSpy).not.toHaveBeenCalled();

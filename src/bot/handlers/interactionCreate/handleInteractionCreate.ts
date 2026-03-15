@@ -6,6 +6,7 @@ import type { BotClient } from "../../client";
 import { handleAutocomplete, handleChatInputCommand } from "./flow/command";
 import {
   handleButton,
+  handleRoleSelectMenu,
   handleStringSelectMenu,
   handleUserSelectMenu,
 } from "./flow/components";
@@ -43,6 +44,11 @@ export async function handleInteractionCreate(
 
   if (interaction.isUserSelectMenu()) {
     await handleUserSelectMenu(interaction);
+    return;
+  }
+
+  if (interaction.isRoleSelectMenu()) {
+    await handleRoleSelectMenu(interaction);
     return;
   }
 

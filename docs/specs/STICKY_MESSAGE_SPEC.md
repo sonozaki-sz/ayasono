@@ -73,7 +73,7 @@
 | サブコマンド | 役割                                                              | 必要権限          |
 | ------------ | ----------------------------------------------------------------- | ----------------- |
 | `set`        | チャンネルにスティッキーメッセージを設定                          | `MANAGE_CHANNELS` |
-| `remove`     | チャンネルのスティッキーメッセージを削除                          | `MANAGE_CHANNELS` |
+| `remove`     | セレクトメニューでチャンネルを選んで一括削除                      | `MANAGE_CHANNELS` |
 | `update`     | 既存スティッキーメッセージの内容を更新                            | `MANAGE_CHANNELS` |
 | `view`       | セレクトメニューで設定チャンネルを選んで 詳細確認（一覧も兼ねる） | `MANAGE_CHANNELS` |
 
@@ -154,37 +154,58 @@ _Embed モーダル（`style:embed`）:_
 
 ### `/sticky-message remove`
 
-**説明**: 指定チャンネルのスティッキーメッセージを削除
+**説明**: 設定済みチャンネルをセレクトメニューから選択してスティッキーメッセージを一括削除
 
-**オプション:**
-
-| オプション名 | 型             | 必須 | 説明                                       |
-| ------------ | -------------- | ---- | ------------------------------------------ |
-| `channel`    | Channel (TEXT) | ✅   | スティッキーメッセージを削除するチャンネル |
+**オプション**: なし
 
 **権限**: `MANAGE_CHANNELS`
 
 **実行例:**
 
 ```
-/sticky-message remove channel:#rules
+/sticky-message remove
+# → 設定済みチャンネルのセレクトメニュー（複数選択可）が表示される
 ```
+
+**UXフロー:**
+
+```
+1. /sticky-message remove を実行
+   ↓
+2. 設定済みチャンネルの一覧をセレクトメニュー（複数選択可）で表示（Ephemeral）
+   ↓
+3. 削除したいチャンネルを1つ以上選択し「削除する」ボタンを押下
+   ↓
+4. 選択されたチャンネルのスティッキーメッセージを一括削除
+   ↓
+5. 削除結果を Ephemeral で返信
+```
+
+**セレクトメニューイメージ:**
+
+<table border="1" cellpadding="6" width="420">
+<tr><th align="left">🗑️ 削除するチャンネルを選択（複数選択可）</th></tr>
+<tr><td>☐ #rules<br>☐ #announcements<br>☐ #general</td></tr>
+<tr><td align="center"><kbd>　削除する　</kbd></td></tr>
+</table>
 
 **処理:**
 
 1. 権限チェック（`MANAGE_CHANNELS` または `ADMINISTRATOR`）
-2. データベースから該当チャンネルのスティッキーメッセージを検索
-3. 存在する場合は削除
-   - チャンネル内の最後のスティッキーメッセージを削除（`last_message_id` で対象を特定）
-   - データベースレコードを削除
-4. 削除完了メッセージを Ephemeral で返信
+2. データベースから現在のギルドのすべてのスティッキーメッセージを取得
+3. チャンネル名と ID のセレクトメニュー（`min_values: 1`, `max_values`: 設定数）を生成して Ephemeral で返信
+4. 「削除する」ボタン押下時
+   - 選択された各チャンネルについて:
+     - チャンネル内の最後のスティッキーメッセージを削除（`last_message_id` で対象を特定、失敗は無視）
+     - データベースレコードを削除
+   - 削除完了メッセージを Ephemeral で返信（削除したチャンネル一覧を表示）
 
 **エラーケース:**
 
 | 状況     | メッセージ                                                         |
 | -------- | ------------------------------------------------------------------ |
 | 権限不足 | この操作を実行する権限がありません。チャンネル管理権限が必要です。 |
-| 設定なし | このチャンネルにはスティッキーメッセージが設定されていません。     |
+| 設定なし | スティッキーメッセージは設定されていません。                       |
 
 ---
 
@@ -545,11 +566,13 @@ function hasPermission(member: GuildMember): boolean {
 
 // remove
 "sticky-message.remove.description": "スティッキーメッセージを削除"
-"sticky-message.remove.channel.description": "スティッキーメッセージを削除するテキストチャンネル"
+"sticky-message.remove.select.placeholder": "削除するチャンネルを選択（複数選択可）"
+"sticky-message.remove.button.label": "削除する"
 "sticky-message.remove.success.title": "削除完了"
-"sticky-message.remove.success.description": "スティッキーメッセージを削除しました。"
+"sticky-message.remove.success.description": "{{count}}件のスティッキーメッセージを削除しました。"
+"sticky-message.remove.success.channels": "削除したチャンネル: {{channels}}"
 "sticky-message.remove.notFound.title": "未設定"
-"sticky-message.remove.notFound.description": "このチャンネルにはスティッキーメッセージが設定されていません。"
+"sticky-message.remove.notFound.description": "スティッキーメッセージは設定されていません。"
 
 // update（スラッシュオプション）
 "sticky-message.update.description": "スティッキーメッセージの内容を更新"
@@ -649,10 +672,12 @@ function hasPermission(member: GuildMember): boolean {
    - 異常系: テキストチャンネル以外でエラー
 
 2. **remove**
-   - 正常系: スティッキーメッセージ削除成功（Discord側メッセージも削除）
+   - 正常系: 設定済みチャンネルのセレクトメニュー（複数選択可）が表示される
+   - 正常系: 1チャンネル選択で削除成功（Discord側メッセージも削除）
+   - 正常系: 複数チャンネル選択で一括削除成功
    - 正常系: Discord側メッセージが既に削除済みでも DB から削除成功
    - 異常系: 権限不足でエラー
-   - 異常系: 設定が存在しない場合
+   - 異常系: 設定が存在しない場合（セレクトメニューが表示されない）
 
 3. **update**
    - 正常系: テキスト内容の更新（旧メッセージ削除・新送信）

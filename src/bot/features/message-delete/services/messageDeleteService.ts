@@ -18,6 +18,7 @@ import {
   MSG_DEL_CONTENT_MAX_LENGTH,
   MSG_DEL_FETCH_BATCH_SIZE,
   MSG_DEL_INDIVIDUAL_WAIT_MS,
+  MSG_DEL_PROGRESS_THROTTLE_MS,
   MSG_DEL_REFILL_WAIT_MS,
   type ScannedMessageWithChannel,
 } from "../constants/messageDeleteConstants";
@@ -26,8 +27,8 @@ import {
 export interface MessageScanOptions {
   /** 収集するメッセージの上限件数（未指定で無限） */
   count: number;
-  /** 対象ユーザーID（未指定で全ユーザー） */
-  targetUserId?: string;
+  /** 対象ユーザーID一覧（空配列で全ユーザー） */
+  targetUserIds: string[];
   /** キーワード部分一致（case-insensitive、未指定でフィルタなし） */
   keyword?: string;
   /** afterTs の Unix ミリ秒（0 = 制限なし） */
@@ -84,7 +85,7 @@ export interface MessageDeleteResult {
  */
 function createThrottledReporter<T>(
   callback: ((data: T) => Promise<void>) | undefined,
-  intervalMs = 3000,
+  intervalMs = MSG_DEL_PROGRESS_THROTTLE_MS,
 ) {
   let lastTs = 0;
   return async (data: T, force = false) => {
@@ -145,7 +146,7 @@ export async function scanMessages(
 ): Promise<ScannedMessageWithChannel[]> {
   const {
     count,
-    targetUserId,
+    targetUserIds,
     keyword,
     afterTs,
     beforeTs,
@@ -168,7 +169,8 @@ export async function scanMessages(
     tDefault("system:message-delete.svc_scan_start", {
       channelCount: channels.length,
       count,
-      targetUserId: targetUserId ?? "none",
+      targetUserIds:
+        targetUserIds.length > 0 ? targetUserIds.join(",") : "none",
     }),
   );
 
@@ -305,9 +307,9 @@ export async function scanMessages(
 
     // フィルタ適用
     if (
-      targetUserId &&
-      msg.author.id !== targetUserId &&
-      msg.webhookId !== targetUserId
+      targetUserIds.length > 0 &&
+      !targetUserIds.includes(msg.author.id) &&
+      (!msg.webhookId || !targetUserIds.includes(msg.webhookId))
     )
       continue;
     if (keyword && !msg.content.toLowerCase().includes(keyword.toLowerCase()))

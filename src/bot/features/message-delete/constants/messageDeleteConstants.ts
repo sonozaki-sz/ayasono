@@ -1,52 +1,75 @@
 // src/bot/features/message-delete/constants/messageDeleteConstants.ts
 // message-delete 機能の定数・型定義
 
-import type { GuildTextBasedChannel } from "discord.js";
+import type {
+  GuildTextBasedChannel,
+  MessageComponentInteraction,
+} from "discord.js";
 
 /** UI コンポーネントの customId 定数 */
 export const MSG_DEL_CUSTOM_ID = {
+  // 条件設定ステップ
+  SELECT_USER: "message-delete:select-user",
+  SELECT_CHANNEL: "message-delete:select-channel",
+  START_SCAN: "message-delete:start-scan",
+  WEBHOOK_INPUT: "message-delete:webhook-input",
+  COND_CANCEL: "message-delete:cond-cancel",
+  // Webhook ID 入力モーダル
+  MODAL_WEBHOOK: "message-delete:modal-webhook",
+  MODAL_INPUT_WEBHOOK: "message-delete:modal-input-webhook",
   // スキャン中キャンセルボタン
-  SCAN_CANCEL: "msgdel_scan_cancel",
+  SCAN_CANCEL: "message-delete:scan-cancel",
   // 確認ダイアログ（プレビュー：Stage 1）
-  CONFIRM_YES: "msgdel_confirm_yes",
-  CONFIRM_NO: "msgdel_confirm_no",
-  CONFIRM_EXCLUDE: "msgdel_confirm_exclude",
+  CONFIRM_YES: "message-delete:confirm-yes",
+  CONFIRM_NO: "message-delete:confirm-no",
+  CONFIRM_EXCLUDE: "message-delete:confirm-exclude",
   // ページネイション（Stage 1 プレビュー）
-  FIRST: "msgdel_first",
-  PREV: "msgdel_prev",
-  NEXT: "msgdel_next",
-  LAST: "msgdel_last",
-  JUMP: "msgdel_jump",
+  FIRST: "message-delete:first",
+  PREV: "message-delete:prev",
+  NEXT: "message-delete:next",
+  LAST: "message-delete:last",
+  JUMP: "message-delete:jump",
   // 最終確認ダイアログ（Stage 2）ナビゲーションは Stage 1 と同一 customId（FIRST/PREV/JUMP/NEXT/LAST）を使用
-  FINAL_YES: "msgdel_final_yes",
-  FINAL_BACK: "msgdel_final_back",
-  FINAL_NO: "msgdel_final_no",
+  FINAL_YES: "message-delete:final-yes",
+  FINAL_BACK: "message-delete:final-back",
+  FINAL_NO: "message-delete:final-no",
   // フィルター（Stage 1 共通）
-  FILTER_AUTHOR: "msgdel_filter_author",
-  FILTER_KEYWORD: "msgdel_filter_keyword",
-  FILTER_DAYS: "msgdel_filter_days",
-  FILTER_AFTER: "msgdel_filter_after",
-  FILTER_BEFORE: "msgdel_filter_before",
-  FILTER_RESET: "msgdel_filter_reset",
+  FILTER_AUTHOR: "message-delete:filter-author",
+  FILTER_KEYWORD: "message-delete:filter-keyword",
+  FILTER_DAYS: "message-delete:filter-days",
+  FILTER_AFTER: "message-delete:filter-after",
+  FILTER_BEFORE: "message-delete:filter-before",
+  FILTER_RESET: "message-delete:filter-reset",
   // フィルターモーダル
-  MODAL_KEYWORD: "msgdel_modal_keyword",
-  MODAL_DAYS: "msgdel_modal_days",
-  MODAL_AFTER: "msgdel_modal_after",
-  MODAL_BEFORE: "msgdel_modal_before",
-  MODAL_JUMP: "msgdel_modal_jump",
+  MODAL_KEYWORD: "message-delete:modal-keyword",
+  MODAL_DAYS: "message-delete:modal-days",
+  MODAL_AFTER: "message-delete:modal-after",
+  MODAL_BEFORE: "message-delete:modal-before",
+  MODAL_JUMP: "message-delete:modal-jump",
   // モーダル入力フィールド
-  MODAL_INPUT_KEYWORD: "msgdel_modal_input_keyword",
-  MODAL_INPUT_DAYS: "msgdel_modal_input_days",
-  MODAL_INPUT_AFTER: "msgdel_modal_input_after",
-  MODAL_INPUT_BEFORE: "msgdel_modal_input_before",
-  MODAL_INPUT_JUMP: "msgdel_modal_input_jump",
+  MODAL_INPUT_KEYWORD: "message-delete:modal-input-keyword",
+  MODAL_INPUT_DAYS: "message-delete:modal-input-days",
+  MODAL_INPUT_AFTER: "message-delete:modal-input-after",
+  MODAL_INPUT_BEFORE: "message-delete:modal-input-before",
+  MODAL_INPUT_JUMP: "message-delete:modal-input-jump",
 } as const;
+
+/** 進捗レポートのスロットル間隔（ミリ秒） */
+export const MSG_DEL_PROGRESS_THROTTLE_MS = 3000;
+
+/** Discord セレクトメニューのオプション上限 */
+export const MSG_DEL_SELECT_MAX_OPTIONS = 25;
 
 /** 1ページあたりの表示件数 */
 export const MSG_DEL_PAGE_SIZE = 5;
 
-/** 確認ダイアログのタイムアウト（14分）- Discord Interaction token 15分制限に対して1分のバッファ */
-export const MSG_DEL_CONFIRM_TIMEOUT_MS = 840_000;
+/**
+ * 各フェーズ共通のタイムアウト（14分）
+ * Discord Interaction token 15分制限に対して1分のバッファ。
+ * 各フェーズはボタン操作の deferUpdate() で fresh token を取得するため、
+ * フェーズごとに独立して14分使える。
+ */
+export const MSG_DEL_PHASE_TIMEOUT_MS = 840_000;
 
 /**
  * Phase 2 コレクターのアイドルタイムアウト（3分）
@@ -54,6 +77,9 @@ export const MSG_DEL_CONFIRM_TIMEOUT_MS = 840_000;
  * 無操作が続いた場合にコレクターを自動終了してロックを解放する
  */
 export const MSG_DEL_COLLECTOR_IDLE_MS = 180_000;
+
+/** 条件設定ステップのタイムアウト（3分） */
+export const MSG_DEL_CONDITION_STEP_TIMEOUT_MS = 180_000;
 
 /** モーダル送信タイムアウト（60秒） */
 export const MSG_DEL_MODAL_TIMEOUT_MS = 60_000;
@@ -93,12 +119,10 @@ export const MSG_DEL_COMMAND = {
   NAME: "message-delete",
   OPTION: {
     COUNT: "count",
-    USER: "user",
     KEYWORD: "keyword",
     DAYS: "days",
     AFTER: "after",
     BEFORE: "before",
-    CHANNEL: "channel",
   },
 } as const;
 
@@ -137,8 +161,8 @@ export interface ScannedMessageWithChannel extends ScannedMessage {
 export interface CommandConditionsDisplay {
   /** count オプション値（未指定時は MSG_DEL_DEFAULT_COUNT） */
   count: number;
-  /** 対象ユーザーID（未指定で全員対象） */
-  targetUserId?: string;
+  /** 対象ユーザーID一覧（空配列で全員対象） */
+  targetUserIds: string[];
   /** キーワード（未指定でフィルタなし） */
   keyword?: string;
   /** days オプション値（未指定で undefined） */
@@ -147,8 +171,18 @@ export interface CommandConditionsDisplay {
   afterStr?: string;
   /** before オプションの入力文字列 */
   beforeStr?: string;
-  /** 対象チャンネルID（未指定でサーバー全体） */
-  channelId?: string;
+  /** 対象チャンネルID一覧（空配列でサーバー全体） */
+  channelIds: string[];
+}
+
+/** 条件設定ステップの結果型 */
+export interface ConditionSetupResult {
+  /** 選択されたユーザーID一覧 */
+  targetUserIds: string[];
+  /** 選択されたチャンネルID一覧 */
+  channelIds: string[];
+  /** スキャン開始ボタン押下時の interaction（後続フェーズで fresh token として使用） */
+  scanInteraction: MessageComponentInteraction;
 }
 
 /**

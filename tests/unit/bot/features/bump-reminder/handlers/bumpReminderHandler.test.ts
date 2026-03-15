@@ -28,8 +28,13 @@ const toScheduledAtMock = vi.fn(
   (_delayMinutes: number) => new Date("2026-02-20T01:00:00.000Z"),
 );
 
+const getBotBumpReminderRepositoryMock = vi.fn(() => ({
+  findPendingByGuild: vi.fn().mockResolvedValue(null),
+}));
+
 vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotBumpReminderConfigService: () => getBotBumpReminderConfigServiceMock(),
+  getBotBumpReminderRepository: () => getBotBumpReminderRepositoryMock(),
 }));
 
 vi.mock(
@@ -362,113 +367,6 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
       expect(sendMock).toHaveBeenCalledWith(
         "events:bump-reminder.reminder_message.dissoku",
       );
-    });
-
-    it("通知送信後の finally ブロックでパネルメッセージが消去されることを検証", async () => {
-      const deleteMock = vi.fn().mockResolvedValue(undefined);
-      const channel = {
-        isTextBased: () => true,
-        isSendable: () => true,
-        send: vi.fn().mockResolvedValue(undefined),
-        messages: {
-          fetch: vi.fn().mockResolvedValue({
-            delete: deleteMock,
-          }),
-        },
-      };
-      const client = {
-        channels: {
-          fetch: vi.fn().mockResolvedValue(channel),
-        },
-      };
-      const repository = {
-        getBumpReminderConfigOrDefault: vi.fn().mockResolvedValue({
-          enabled: true,
-          mentionRoleId: null,
-          mentionUserIds: [],
-        }),
-      };
-      getGuildTranslatorMock.mockResolvedValue((key: string) => key);
-
-      await sendBumpReminder(
-        client as never,
-        "guild-1",
-        "ch-1",
-        undefined,
-        "Disboard",
-        repository as never,
-        "panel-1",
-      );
-
-      expect(channel.messages.fetch).toHaveBeenCalledWith("panel-1");
-      expect(deleteMock).toHaveBeenCalledTimes(1);
-      expect(loggerMock.debug).toHaveBeenCalledWith(
-        "system:scheduler.bump_reminder_panel_deleted",
-      );
-    });
-
-    it("finally 内のパネル削除時にフェッチが失敗した場合、創り投げず debug ログだけ出すことを検証", async () => {
-      const channel = {
-        isTextBased: () => true,
-        isSendable: () => true,
-        send: vi.fn().mockResolvedValue(undefined),
-        messages: {
-          fetch: vi.fn().mockRejectedValue(new Error("panel fetch failed")),
-        },
-      };
-      const client = {
-        channels: {
-          fetch: vi.fn().mockResolvedValue(channel),
-        },
-      };
-      const repository = {
-        getBumpReminderConfigOrDefault: vi.fn().mockResolvedValue({
-          enabled: true,
-          mentionRoleId: null,
-          mentionUserIds: [],
-        }),
-      };
-      getGuildTranslatorMock.mockResolvedValue((key: string) => key);
-
-      await sendBumpReminder(
-        client as never,
-        "guild-1",
-        "ch-1",
-        undefined,
-        "Disboard",
-        repository as never,
-        "panel-1",
-      );
-
-      expect(loggerMock.debug).toHaveBeenCalledWith(
-        "system:scheduler.bump_reminder_panel_delete_failed",
-        expect.any(Error),
-      );
-    });
-
-    it("チャンネル取得失敗時、finally 内でもパネル削除のために再フェッチを試みることを検証", async () => {
-      const client = {
-        channels: {
-          fetch: vi.fn().mockRejectedValue(new Error("fetch failed")),
-        },
-      };
-      const repository = {
-        getBumpReminderConfig: vi.fn(),
-      };
-
-      await expect(
-        sendBumpReminder(
-          client as never,
-          "guild-1",
-          "ch-1",
-          "msg-1",
-          "Disboard",
-          repository as never,
-          "panel-1",
-        ),
-      ).rejects.toThrow("fetch failed");
-
-      expect(client.channels.fetch).toHaveBeenCalledTimes(2);
     });
 
     it("チャンネルに送信不可の場合はメッセージを送信しない", async () => {

@@ -13,11 +13,20 @@ import type { VcRecruitSetup } from "../../../../../shared/database/types";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
 import { tDefault, tGuild } from "../../../../../shared/locale/localeManager";
 import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
-import { getBotVcRecruitRepository } from "../../../../services/botCompositionRoot";
-import { VC_RECRUIT_TEARDOWN_CUSTOM_ID } from "../vcRecruitConfigCommand.constants";
+import { getBotVcRecruitConfigService } from "../../../../services/botCompositionRoot";
+import { disableComponentsAfterTimeout } from "../../../../shared/disableComponentsAfterTimeout";
+import {
+  DISCORD_SELECT_MAX_OPTIONS,
+  VC_RECRUIT_TEARDOWN_CUSTOM_ID,
+  VC_RECRUIT_TIMEOUT,
+} from "../vcRecruitConfigCommand.constants";
 
 /**
  * teardown セレクトメニューのオプション一覧を構築する（コマンド初回表示・やり直し共用）
+ * @param guild 対象ギルド
+ * @param guildId ギルド ID
+ * @param setups セットアップ情報の配列
+ * @returns セレクトメニューオプションの配列
  */
 export async function buildTeardownSelectOptions(
   guild: Guild,
@@ -65,7 +74,7 @@ export async function handleVcRecruitConfigTeardown(
     throw new ValidationError(tDefault(COMMON_I18N_KEYS.GUILD_ONLY));
   }
 
-  const repo = getBotVcRecruitRepository();
+  const repo = getBotVcRecruitConfigService();
   const config = await repo.getVcRecruitConfigOrDefault(guildId);
 
   if (config.setups.length === 0) {
@@ -92,29 +101,20 @@ export async function handleVcRecruitConfigTeardown(
     )
     .setPlaceholder(placeholder)
     .setMinValues(1)
-    .setMaxValues(Math.min(config.setups.length, 25))
+    .setMaxValues(Math.min(config.setups.length, DISCORD_SELECT_MAX_OPTIONS))
     .addOptions(options);
 
+  const selectRow =
+    new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(selectMenu);
+
   await interaction.reply({
-    components: [
-      new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(selectMenu),
-    ],
+    components: [selectRow],
     flags: MessageFlags.Ephemeral,
   });
 
-  // 60秒後にセレクトメニューを無効化
-  setTimeout(async () => {
-    const disabledMenu = StringSelectMenuBuilder.from(
-      selectMenu.toJSON(),
-    ).setDisabled(true);
-    await interaction
-      .editReply({
-        components: [
-          new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
-            disabledMenu,
-          ),
-        ],
-      })
-      .catch(() => null);
-  }, 60_000);
+  disableComponentsAfterTimeout(
+    interaction,
+    [selectRow],
+    VC_RECRUIT_TIMEOUT.COMPONENT_DISABLE_MS,
+  );
 }

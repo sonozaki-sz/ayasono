@@ -21,10 +21,14 @@ vi.mock("@/shared/utils/logger", () => ({
 
 vi.mock("@/shared/locale/localeManager", () => ({
   tGuild: vi.fn(async (_guildId: string, key: string) => key),
+  tDefault: vi.fn((key: string) => key),
 }));
 
-vi.mock("@/bot/utils/messageResponse", () => ({
-  createInfoEmbed: vi.fn(() => ({ title: "panel" })),
+vi.mock("@/bot/features/vc-recruit/commands/vcRecruitPanelEmbed", () => ({
+  buildVcRecruitPanelComponents: vi.fn(async () => ({
+    embed: { title: "panel" },
+    row: { components: [] },
+  })),
 }));
 
 // ---- ヘルパー ----

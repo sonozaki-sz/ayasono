@@ -68,6 +68,7 @@ describe("bot/features/bump-reminder/handlers/bumpReminderStartup", () => {
     expect(typeof task).toBe("function");
 
     await task();
+    // panelMessageId は sendBumpReminder に渡さない（パネル常設化のため）
     expect(sendBumpReminderMock).toHaveBeenCalledWith(
       client,
       "guild-1",
@@ -75,7 +76,6 @@ describe("bot/features/bump-reminder/handlers/bumpReminderStartup", () => {
       "msg-1",
       "disboard",
       expect.any(Object),
-      "panel-1",
     );
   });
 

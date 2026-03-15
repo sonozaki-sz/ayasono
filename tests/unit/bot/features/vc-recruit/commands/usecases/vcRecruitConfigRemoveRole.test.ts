@@ -1,22 +1,25 @@
 // tests/unit/bot/features/vc-recruit/commands/usecases/vcRecruitConfigRemoveRole.test.ts
 import { handleVcRecruitConfigRemoveRole } from "@/bot/features/vc-recruit/commands/usecases/vcRecruitConfigRemoveRole";
-import { VC_RECRUIT_MENTION_ROLE_REMOVE_RESULT } from "@/shared/database/types";
+import { VC_RECRUIT_ROLE_CUSTOM_ID } from "@/bot/features/vc-recruit/commands/vcRecruitConfigCommand.constants";
 import { ValidationError } from "@/shared/errors/customErrors";
 
 // ---- モック定義 ----
 
-const removeMentionRoleIdMock = vi.fn();
+const getVcRecruitConfigOrDefaultMock = vi.fn();
 const tGuildMock = vi.fn(
-  async (_guildId: string, key: string, opts?: Record<string, unknown>) =>
-    opts ? `${key}:${JSON.stringify(opts)}` : key,
+  async (_guildId: string, key: string, _opts?: Record<string, unknown>) =>
+    key,
 );
 const tDefaultMock = vi.fn((key: string) => key);
 
 vi.mock("@/bot/services/botCompositionRoot", () => ({
-  getBotVcRecruitRepository: () => ({
-    removeMentionRoleId: (...args: unknown[]) =>
-      removeMentionRoleIdMock(...args),
+  getBotVcRecruitConfigService: () => ({
+    getVcRecruitConfigOrDefault: (...args: unknown[]) =>
+      getVcRecruitConfigOrDefaultMock(...args),
   }),
+}));
+vi.mock("@/bot/shared/disableComponentsAfterTimeout", () => ({
+  disableComponentsAfterTimeout: vi.fn(),
 }));
 vi.mock("@/shared/locale/localeManager", () => ({
   tGuild: (...args: unknown[]) =>
@@ -28,20 +31,25 @@ vi.mock("@/shared/locale/localeManager", () => ({
 // ---- ヘルパー ----
 
 const GUILD_ID = "guild-1";
-const ROLE_ID = "role-42";
 
-function makeInteraction(opts: { hasGuild?: boolean; roleId?: string } = {}) {
-  const { hasGuild = true, roleId = ROLE_ID } = opts;
+function makeInteraction(opts: { hasGuild?: boolean } = {}) {
+  const { hasGuild = true } = opts;
   return {
-    guild: hasGuild ? { id: GUILD_ID } : null,
-    options: {
-      getRole: vi.fn().mockReturnValue({ id: roleId }),
-    },
+    id: "interaction-456",
+    guild: hasGuild
+      ? {
+          id: GUILD_ID,
+          roles: { cache: new Map([["role-1", { name: "TestRole" }]]) },
+        }
+      : null,
     reply: vi.fn().mockResolvedValue(undefined),
+    editReply: vi.fn().mockResolvedValue(undefined),
   };
 }
 
+// handleVcRecruitConfigRemoveRole のギルドチェック・ロール0件エラー・StringSelectMenu 返信を検証
 describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigRemoveRole", () => {
+  // 各テストケースでモック状態をリセットする
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -53,25 +61,41 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigRemoveRole", 
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  it("ロールが見つからない場合は ValidationError を投げる", async () => {
-    removeMentionRoleIdMock.mockResolvedValue(VC_RECRUIT_MENTION_ROLE_REMOVE_RESULT.NOT_FOUND);
+  it("登録ロールが 0 件の場合は ValidationError を投げる", async () => {
+    getVcRecruitConfigOrDefaultMock.mockResolvedValue({
+      mentionRoleIds: [],
+    });
     const interaction = makeInteraction();
     await expect(
       handleVcRecruitConfigRemoveRole(interaction as never, GUILD_ID),
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  it("ロール削除成功時は success embed でエフェメラル返信する", async () => {
-    removeMentionRoleIdMock.mockResolvedValue(VC_RECRUIT_MENTION_ROLE_REMOVE_RESULT.REMOVED);
+  it("登録ロールがある場合は StringSelectMenu + ボタンをエフェメラルで返信する", async () => {
+    getVcRecruitConfigOrDefaultMock.mockResolvedValue({
+      mentionRoleIds: ["role-1"],
+    });
     const interaction = makeInteraction();
     await handleVcRecruitConfigRemoveRole(interaction as never, GUILD_ID);
 
-    expect(interaction.reply).toHaveBeenCalledWith(
-      expect.objectContaining({
-        embeds: expect.any(Array),
-        flags: expect.anything(),
-      }),
+    expect(interaction.reply).toHaveBeenCalledTimes(1);
+    const call = interaction.reply.mock.calls[0][0];
+    expect(call.components).toHaveLength(2);
+    expect(call.flags).toBeDefined();
+  });
+
+  it("セレクトメニューの customId にセッション ID が含まれる", async () => {
+    getVcRecruitConfigOrDefaultMock.mockResolvedValue({
+      mentionRoleIds: ["role-1"],
+    });
+    const interaction = makeInteraction();
+    await handleVcRecruitConfigRemoveRole(interaction as never, GUILD_ID);
+
+    const call = interaction.reply.mock.calls[0][0];
+    const selectRow = call.components[0];
+    const selectJson = selectRow.toJSON();
+    expect(selectJson.components[0].custom_id).toBe(
+      `${VC_RECRUIT_ROLE_CUSTOM_ID.REMOVE_ROLE_SELECT_PREFIX}${interaction.id}`,
     );
-    expect(removeMentionRoleIdMock).toHaveBeenCalledWith(GUILD_ID, ROLE_ID);
   });
 });

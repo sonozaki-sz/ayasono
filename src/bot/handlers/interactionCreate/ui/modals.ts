@@ -9,6 +9,7 @@ import { stickyMessageUpdateEmbedModalHandler } from "../../../features/sticky-m
 import { stickyMessageUpdateModalHandler } from "../../../features/sticky-message/handlers/ui/stickyMessageUpdateModalHandler";
 import { vcPanelModalHandler } from "../../../features/vc-panel/handlers/ui/vcPanelModal";
 import { vcRecruitModalHandler } from "../../../features/vc-recruit/handlers/ui/vcRecruitModal";
+import { vcRecruitRenameModalHandler } from "../../../features/vc-recruit/handlers/ui/vcRecruitRenameModal";
 import type { ModalHandler } from "./types";
 
 export const modalHandlers: ModalHandler[] = [
@@ -16,6 +17,8 @@ export const modalHandlers: ModalHandler[] = [
   vcPanelModalHandler,
   // VC募集モーダル送信（ステップ1→2）を処理
   vcRecruitModalHandler,
+  // VC募集メッセージからのVC名変更モーダルを処理
+  vcRecruitRenameModalHandler,
   // sticky-message set プレーンテキストモーダルを処理
   stickyMessageSetModalHandler,
   // sticky-message set Embed モーダルを処理

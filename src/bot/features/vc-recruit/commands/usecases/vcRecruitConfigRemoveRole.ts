@@ -1,17 +1,28 @@
 // src/bot/features/vc-recruit/commands/usecases/vcRecruitConfigRemoveRole.ts
 // vc-recruit-config remove-role のユースケース処理
 
-import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  MessageFlags,
+  StringSelectMenuBuilder,
+  StringSelectMenuOptionBuilder,
+  type ChatInputCommandInteraction,
+} from "discord.js";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
 import { tDefault, tGuild } from "../../../../../shared/locale/localeManager";
 import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
-import { getBotVcRecruitRepository } from "../../../../services/botCompositionRoot";
-import { createSuccessEmbed } from "../../../../utils/messageResponse";
-import { VC_RECRUIT_CONFIG_COMMAND } from "../vcRecruitConfigCommand.constants";
-import { VC_RECRUIT_MENTION_ROLE_REMOVE_RESULT } from "../../../../../shared/database/types";
+import { getBotVcRecruitConfigService } from "../../../../services/botCompositionRoot";
+import { disableComponentsAfterTimeout } from "../../../../shared/disableComponentsAfterTimeout";
+import {
+  VC_RECRUIT_ROLE_CUSTOM_ID,
+  VC_RECRUIT_TIMEOUT,
+} from "../vcRecruitConfigCommand.constants";
 
 /**
  * vc-recruit-config remove-role を実行する
+ * 登録済みロールの StringSelectMenu（複数選択可）をエフェメラルで表示する
  * @param interaction コマンド実行インタラクション
  * @param guildId 実行対象ギルドID
  */
@@ -23,40 +34,83 @@ export async function handleVcRecruitConfigRemoveRole(
     throw new ValidationError(tDefault(COMMON_I18N_KEYS.GUILD_ONLY));
   }
 
-  const role = interaction.options.getRole(
-    VC_RECRUIT_CONFIG_COMMAND.OPTION.ROLE,
-    true,
-  );
+  const repo = getBotVcRecruitConfigService();
+  const config = await repo.getVcRecruitConfigOrDefault(guildId);
 
-  const result = await getBotVcRecruitRepository().removeMentionRoleId(
-    guildId,
-    role.id,
-  );
-
-  if (result === VC_RECRUIT_MENTION_ROLE_REMOVE_RESULT.NOT_FOUND) {
+  if (config.mentionRoleIds.length === 0) {
     throw new ValidationError(
-      await tGuild(guildId, "errors:vcRecruit.role_not_found", {
-        role: `<@&${role.id}>`,
-      }),
+      await tGuild(guildId, "errors:vcRecruit.no_roles_registered"),
     );
   }
 
-  const embed = createSuccessEmbed(
-    await tGuild(
-      guildId,
-      "commands:vc-recruit-config.embed.remove_role_success",
-      { role: `<@&${role.id}>` },
-    ),
-    {
-      title: await tGuild(
+  const sessionId = interaction.id;
+
+  // 登録済みロールをセレクトメニューのオプションに変換
+  const options = config.mentionRoleIds.map((roleId) => {
+    const role = interaction.guild?.roles.cache.get(roleId);
+    const label = role ? `@${role.name}` : `@${roleId}`;
+    return new StringSelectMenuOptionBuilder().setLabel(label).setValue(roleId);
+  });
+
+  const selectMenu = new StringSelectMenuBuilder()
+    .setCustomId(
+      `${VC_RECRUIT_ROLE_CUSTOM_ID.REMOVE_ROLE_SELECT_PREFIX}${sessionId}`,
+    )
+    .setPlaceholder(
+      await tGuild(
         guildId,
-        "commands:vc-recruit-config.embed.success_title",
+        "commands:vc-recruit-config.remove-role.select.placeholder",
       ),
-    },
+    )
+    .setMinValues(1)
+    .setMaxValues(options.length)
+    .addOptions(options);
+
+  const confirmButton = new ButtonBuilder()
+    .setCustomId(
+      `${VC_RECRUIT_ROLE_CUSTOM_ID.REMOVE_ROLE_CONFIRM_PREFIX}${sessionId}`,
+    )
+    .setLabel(
+      await tGuild(
+        guildId,
+        "commands:vc-recruit-config.remove-role.button.confirm",
+      ),
+    )
+    .setStyle(ButtonStyle.Danger)
+    .setEmoji("🗑️");
+
+  const cancelButton = new ButtonBuilder()
+    .setCustomId(
+      `${VC_RECRUIT_ROLE_CUSTOM_ID.REMOVE_ROLE_CANCEL_PREFIX}${sessionId}`,
+    )
+    .setLabel(
+      await tGuild(
+        guildId,
+        "commands:vc-recruit-config.remove-role.button.cancel",
+      ),
+    )
+    .setStyle(ButtonStyle.Secondary)
+    .setEmoji("❌");
+
+  const selectRow =
+    new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(selectMenu);
+  const buttonRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+    confirmButton,
+    cancelButton,
   );
 
   await interaction.reply({
-    embeds: [embed],
+    content: await tGuild(
+      guildId,
+      "commands:vc-recruit-config.remove-role.select.title",
+    ),
+    components: [selectRow, buttonRow],
     flags: MessageFlags.Ephemeral,
   });
+
+  disableComponentsAfterTimeout(
+    interaction,
+    [selectRow, buttonRow],
+    VC_RECRUIT_TIMEOUT.ROLE_SELECT_TIMEOUT_MS,
+  );
 }

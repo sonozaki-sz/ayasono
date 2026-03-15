@@ -18,7 +18,6 @@ export const messageDeleteCommand: Command = {
     const countDesc = getCommandLocalizations(
       "message-delete.count.description",
     );
-    const userDesc = getCommandLocalizations("message-delete.user.description");
     const keywordDesc = getCommandLocalizations(
       "message-delete.keyword.description",
     );
@@ -29,10 +28,8 @@ export const messageDeleteCommand: Command = {
     const beforeDesc = getCommandLocalizations(
       "message-delete.before.description",
     );
-    const channelDesc = getCommandLocalizations(
-      "message-delete.channel.description",
-    );
 
+    // user / channel は条件設定ステップの SelectMenu で選択するためスラッシュコマンドオプションから除外
     return new SlashCommandBuilder()
       .setName(MSG_DEL_COMMAND.NAME)
       .setDescription(desc.ja)
@@ -46,13 +43,6 @@ export const messageDeleteCommand: Command = {
           .setRequired(false)
           .setMinValue(1)
           .setMaxValue(1000),
-      )
-      .addStringOption((opt) =>
-        opt
-          .setName(MSG_DEL_COMMAND.OPTION.USER)
-          .setDescription(userDesc.ja)
-          .setDescriptionLocalizations(userDesc.localizations)
-          .setRequired(false),
       )
       .addStringOption((opt) =>
         opt
@@ -82,13 +72,6 @@ export const messageDeleteCommand: Command = {
           .setName(MSG_DEL_COMMAND.OPTION.BEFORE)
           .setDescription(beforeDesc.ja)
           .setDescriptionLocalizations(beforeDesc.localizations)
-          .setRequired(false),
-      )
-      .addChannelOption((opt) =>
-        opt
-          .setName(MSG_DEL_COMMAND.OPTION.CHANNEL)
-          .setDescription(channelDesc.ja)
-          .setDescriptionLocalizations(channelDesc.localizations)
           .setRequired(false),
       );
   })(),

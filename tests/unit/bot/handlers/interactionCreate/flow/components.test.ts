@@ -2,6 +2,7 @@
 import { handleInteractionError } from "@/bot/errors/interactionErrorHandler";
 import {
   handleButton,
+  handleRoleSelectMenu,
   handleStringSelectMenu,
   handleUserSelectMenu,
 } from "@/bot/handlers/interactionCreate/flow/components";
@@ -40,6 +41,12 @@ vi.mock("@/bot/handlers/interactionCreate/ui/selectMenus", () => ({
   userSelectHandlers: [
     {
       matches: vi.fn((id: string) => id === "target"),
+      execute: vi.fn().mockResolvedValue(undefined),
+    },
+  ],
+  roleSelectHandlers: [
+    {
+      matches: vi.fn((id: string) => id === "role-target"),
       execute: vi.fn().mockResolvedValue(undefined),
     },
   ],
@@ -122,6 +129,19 @@ describe("bot/handlers/interactionCreate/flow/components", () => {
     await handleStringSelectMenu(interaction as never);
 
     expect(uiModule.stringSelectHandlers[0].execute).not.toHaveBeenCalled();
+  });
+
+  it("customId に一致するロールセレクトハンドラーが実行されることを確認", async () => {
+    const interaction = { customId: "role-target" };
+    const uiModule = (await vi.importMock(
+      "@/bot/handlers/interactionCreate/ui/selectMenus",
+    )) as { roleSelectHandlers: Array<{ execute: Mock }> };
+
+    await handleRoleSelectMenu(interaction as never);
+
+    expect(uiModule.roleSelectHandlers[0].execute).toHaveBeenCalledWith(
+      interaction,
+    );
   });
 
   it("ストリングセレクトハンドラーが例外を投げた場合に handleInteractionError へ委譲されることを確認", async () => {

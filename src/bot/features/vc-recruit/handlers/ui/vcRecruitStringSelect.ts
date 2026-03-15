@@ -11,9 +11,11 @@ import {
 import { tGuild } from "../../../../../shared/locale/localeManager";
 import type { StringSelectHandler } from "../../../../handlers/interactionCreate/ui/types";
 import { getBotVcRecruitRepository } from "../../../../services/botCompositionRoot";
+import { STATUS_COLORS } from "../../../../utils/messageResponse";
 import {
   VC_RECRUIT_PANEL_CUSTOM_ID,
   VC_RECRUIT_TEARDOWN_CUSTOM_ID,
+  VC_RECRUIT_TIMEOUT,
 } from "../../commands/vcRecruitConfigCommand.constants";
 import { updateVcRecruitSession } from "./vcRecruitPanelState";
 import {
@@ -24,6 +26,8 @@ import {
 export const vcRecruitStringSelectHandler: StringSelectHandler = {
   /**
    * VC募集関連セレクトメニューに一致するか判定する
+   * @param customId セレクトメニューの customId
+   * @returns VC募集関連セレクトメニューの場合 true
    */
   matches(customId) {
     return (
@@ -33,6 +37,10 @@ export const vcRecruitStringSelectHandler: StringSelectHandler = {
     );
   },
 
+  /**
+   * VC募集関連セレクトメニューのインタラクションを処理する
+   * @param interaction セレクトメニューインタラクション
+   */
   async execute(interaction: StringSelectMenuInteraction) {
     const { customId, values } = interaction;
 
@@ -42,17 +50,16 @@ export const vcRecruitStringSelectHandler: StringSelectHandler = {
       return;
     }
 
-    const selectedValue = values[0] ?? "";
-
     // ── パネル用セレクトメニュー ────────────────────────────────────
     if (customId.startsWith(VC_RECRUIT_PANEL_CUSTOM_ID.SELECT_MENTION_PREFIX)) {
       const interactionId = customId.slice(
         VC_RECRUIT_PANEL_CUSTOM_ID.SELECT_MENTION_PREFIX.length,
       );
-      updateVcRecruitSession(interactionId, { mentionRoleId: selectedValue });
+      updateVcRecruitSession(interactionId, { mentionRoleIds: values });
     } else if (
       customId.startsWith(VC_RECRUIT_PANEL_CUSTOM_ID.SELECT_VC_PREFIX)
     ) {
+      const selectedValue = values[0] ?? "";
       const interactionId = customId.slice(
         VC_RECRUIT_PANEL_CUSTOM_ID.SELECT_VC_PREFIX.length,
       );
@@ -66,6 +73,8 @@ export const vcRecruitStringSelectHandler: StringSelectHandler = {
 
 /**
  * teardown カテゴリー選択後の確認パネルを表示する
+ * @param interaction セレクトメニューインタラクション
+ * @param selectedPanelChannelIds 選択されたパネルチャンネルID一覧
  */
 async function handleTeardownSelect(
   interaction: StringSelectMenuInteraction,
@@ -130,7 +139,7 @@ async function handleTeardownSelect(
     .setTitle(confirmTitle)
     .addFields({ name: fieldCategories, value: categoryList })
     .setDescription(`⚠️ ${warning}`)
-    .setColor(0xed4245);
+    .setColor(STATUS_COLORS.error);
 
   // ボタンを構築
   const confirmLabel = await tGuild(
@@ -200,5 +209,5 @@ async function handleTeardownSelect(
         ],
       })
       .catch(() => null);
-  }, 60_000);
+  }, VC_RECRUIT_TIMEOUT.COMPONENT_DISABLE_MS);
 }

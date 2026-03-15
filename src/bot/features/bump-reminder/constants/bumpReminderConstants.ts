@@ -15,8 +15,10 @@ export const BUMP_CONSTANTS = {
 
   /** カスタムID接頭辞 */
   CUSTOM_ID_PREFIX: {
-    MENTION_ON: "bump_mention_on:",
-    MENTION_OFF: "bump_mention_off:",
+    /** ユーザー通知ONボタンの customId 接頭辞 */
+    MENTION_ON: "bump-reminder:mention-on:",
+    /** ユーザー通知OFFボタンの customId 接頭辞 */
+    MENTION_OFF: "bump-reminder:mention-off:",
   },
 
   /** ジョブID接頭辞 */

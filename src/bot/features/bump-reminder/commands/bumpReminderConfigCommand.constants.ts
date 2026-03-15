@@ -2,7 +2,7 @@
 // bump-reminder-config コマンドの定数定義
 
 /**
- * bump-reminder-config コマンドで共用するコマンド名・サブコマンド名・オプション名・選択値・CustomId 接頭辞定数
+ * bump-reminder-config コマンドで共用するコマンド名・サブコマンド名・オプション名定数
  */
 export const BUMP_REMINDER_CONFIG_COMMAND = {
   NAME: "bump-reminder-config",
@@ -15,16 +15,5 @@ export const BUMP_REMINDER_CONFIG_COMMAND = {
   },
   OPTION: {
     ROLE: "role",
-    USER: "user",
-    TARGET: "target",
-  },
-  TARGET_VALUE: {
-    ROLE: "role",
-    USER: "user",
-    USERS: "users",
-    ALL: "all",
-  },
-  CUSTOM_ID_PREFIX: {
-    REMOVE_USERS: "bump-remove-users-",
   },
 } as const;

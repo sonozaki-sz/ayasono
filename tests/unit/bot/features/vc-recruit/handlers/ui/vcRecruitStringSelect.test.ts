@@ -12,7 +12,6 @@ vi.mock("@/bot/features/vc-recruit/handlers/ui/vcRecruitPanelState", () => ({
   updateVcRecruitSession: (...args: unknown[]) =>
     updateVcRecruitSessionMock(...args),
   NEW_VC_VALUE: "__new__",
-  NO_MENTION_VALUE: "__none__",
 }));
 vi.mock("@/bot/features/vc-recruit/handlers/ui/vcRecruitTeardownState", () => ({
   setTeardownConfirmSession: (...args: unknown[]) =>
@@ -35,7 +34,7 @@ vi.mock("@/shared/locale/localeManager", () => ({
 const GUILD_ID = "guild-1";
 const MENTION_PREFIX = "vc-recruit:select-mention:";
 const VC_PREFIX = "vc-recruit:select-vc:";
-const TEARDOWN_PREFIX = "vc-recruit-teardown-select:";
+const TEARDOWN_PREFIX = "vc-recruit:teardown-select:";
 
 function makeInteraction(
   opts: {
@@ -96,7 +95,7 @@ describe("vcRecruitStringSelectHandler / mention select", () => {
     vi.clearAllMocks();
   });
 
-  it("メンション選択でセッションの mentionRoleId を更新し deferUpdate を呼ぶ", async () => {
+  it("メンション選択でセッションの mentionRoleIds を values 配列で更新し deferUpdate を呼ぶ", async () => {
     const interaction = makeInteraction({
       customId: `${MENTION_PREFIX}session-1`,
       values: ["role-42"],
@@ -105,21 +104,34 @@ describe("vcRecruitStringSelectHandler / mention select", () => {
     await vcRecruitStringSelectHandler.execute(interaction as never);
 
     expect(updateVcRecruitSessionMock).toHaveBeenCalledWith("session-1", {
-      mentionRoleId: "role-42",
+      mentionRoleIds: ["role-42"],
     });
     expect(interaction.deferUpdate).toHaveBeenCalled();
   });
 
-  it("__none__ 選択でもセッションを更新できる", async () => {
+  it("複数ロール選択でセッションの mentionRoleIds を配列で更新する", async () => {
     const interaction = makeInteraction({
       customId: `${MENTION_PREFIX}session-2`,
-      values: ["__none__"],
+      values: ["role-42", "role-99"],
     });
 
     await vcRecruitStringSelectHandler.execute(interaction as never);
 
     expect(updateVcRecruitSessionMock).toHaveBeenCalledWith("session-2", {
-      mentionRoleId: "__none__",
+      mentionRoleIds: ["role-42", "role-99"],
+    });
+  });
+
+  it("空の values 配列でセッションの mentionRoleIds を空配列で更新する", async () => {
+    const interaction = makeInteraction({
+      customId: `${MENTION_PREFIX}session-3`,
+      values: [],
+    });
+
+    await vcRecruitStringSelectHandler.execute(interaction as never);
+
+    expect(updateVcRecruitSessionMock).toHaveBeenCalledWith("session-3", {
+      mentionRoleIds: [],
     });
   });
 });

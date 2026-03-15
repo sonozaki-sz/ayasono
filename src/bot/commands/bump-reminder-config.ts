@@ -28,26 +28,8 @@ export const bumpReminderConfigCommand: Command = {
     const roleDesc = getCommandLocalizations(
       "bump-reminder-config.set-mention.role.description",
     );
-    const userDesc = getCommandLocalizations(
-      "bump-reminder-config.set-mention.user.description",
-    );
     const removeMentionDesc = getCommandLocalizations(
       "bump-reminder-config.remove-mention.description",
-    );
-    const targetDesc = getCommandLocalizations(
-      "bump-reminder-config.remove-mention.target.description",
-    );
-    const targetRoleDesc = getCommandLocalizations(
-      "bump-reminder-config.remove-mention.target.role",
-    );
-    const targetUserDesc = getCommandLocalizations(
-      "bump-reminder-config.remove-mention.target.user",
-    );
-    const targetUsersDesc = getCommandLocalizations(
-      "bump-reminder-config.remove-mention.target.users",
-    );
-    const targetAllDesc = getCommandLocalizations(
-      "bump-reminder-config.remove-mention.target.all",
     );
     const viewDesc = getCommandLocalizations(
       "bump-reminder-config.view.description",
@@ -76,7 +58,7 @@ export const bumpReminderConfigCommand: Command = {
             .setDescriptionLocalizations(disableDesc.localizations),
         )
         .addSubcommand((subcommand) =>
-          // メンション対象設定（role/user）
+          // メンションロール設定
           subcommand
             .setName(BUMP_REMINDER_CONFIG_COMMAND.SUBCOMMAND.SET_MENTION)
             .setDescription(setMentionDesc.ja)
@@ -86,51 +68,15 @@ export const bumpReminderConfigCommand: Command = {
                 .setName(BUMP_REMINDER_CONFIG_COMMAND.OPTION.ROLE)
                 .setDescription(roleDesc.ja)
                 .setDescriptionLocalizations(roleDesc.localizations)
-                .setRequired(false),
-            )
-            .addUserOption((option) =>
-              option
-                .setName(BUMP_REMINDER_CONFIG_COMMAND.OPTION.USER)
-                .setDescription(userDesc.ja)
-                .setDescriptionLocalizations(userDesc.localizations)
-                .setRequired(false),
+                .setRequired(true),
             ),
         )
         .addSubcommand((subcommand) =>
-          // メンション設定削除（target別）
+          // メンションロール削除
           subcommand
             .setName(BUMP_REMINDER_CONFIG_COMMAND.SUBCOMMAND.REMOVE_MENTION)
             .setDescription(removeMentionDesc.ja)
-            .setDescriptionLocalizations(removeMentionDesc.localizations)
-            .addStringOption((option) =>
-              option
-                .setName(BUMP_REMINDER_CONFIG_COMMAND.OPTION.TARGET)
-                .setDescription(targetDesc.ja)
-                .setDescriptionLocalizations(targetDesc.localizations)
-                .setRequired(true)
-                .addChoices(
-                  {
-                    name: targetRoleDesc.ja,
-                    name_localizations: targetRoleDesc.localizations,
-                    value: BUMP_REMINDER_CONFIG_COMMAND.TARGET_VALUE.ROLE,
-                  },
-                  {
-                    name: targetUserDesc.ja,
-                    name_localizations: targetUserDesc.localizations,
-                    value: BUMP_REMINDER_CONFIG_COMMAND.TARGET_VALUE.USER,
-                  },
-                  {
-                    name: targetUsersDesc.ja,
-                    name_localizations: targetUsersDesc.localizations,
-                    value: BUMP_REMINDER_CONFIG_COMMAND.TARGET_VALUE.USERS,
-                  },
-                  {
-                    name: targetAllDesc.ja,
-                    name_localizations: targetAllDesc.localizations,
-                    value: BUMP_REMINDER_CONFIG_COMMAND.TARGET_VALUE.ALL,
-                  },
-                ),
-            ),
+            .setDescriptionLocalizations(removeMentionDesc.localizations),
         )
         .addSubcommand((subcommand) =>
           // 現在設定表示

@@ -80,14 +80,14 @@ function makeComponentInteraction(customId: string, userId = "user-1") {
 }
 
 const MSG_DEL_CUSTOM_ID = {
-  FINAL_YES: "msgdel_final_yes",
-  FINAL_NO: "msgdel_final_no",
-  FINAL_BACK: "msgdel_final_back",
-  FIRST: "msgdel_first",
-  PREV: "msgdel_prev",
-  NEXT: "msgdel_next",
-  LAST: "msgdel_last",
-  JUMP: "msgdel_jump",
+  FINAL_YES: "message-delete:final-yes",
+  FINAL_NO: "message-delete:final-no",
+  FINAL_BACK: "message-delete:final-back",
+  FIRST: "message-delete:first",
+  PREV: "message-delete:prev",
+  NEXT: "message-delete:next",
+  LAST: "message-delete:last",
+  JUMP: "message-delete:jump",
 };
 
 describe("bot/features/message-delete/commands/usecases/runFinalConfirmDialog", () => {

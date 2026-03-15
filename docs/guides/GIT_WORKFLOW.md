@@ -228,6 +228,8 @@ git commit -m "test(afk): AFK自動解除のユニットテストを追加"
 
 ### develop への直接 push 時のチェック
 
+- [ ] コミット前に `pnpm test` を実行し、全テストが通ることを確認している
+- [ ] コミットを分割する場合は、各コミット単体でも全テストが通る状態を維持している
 - [ ] コミットメッセージが Conventional Commits 形式になっている（husky が自動検証）
 - [ ] `pnpm test` が通っている（husky が push 前に自動実行）
 

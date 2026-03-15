@@ -98,6 +98,12 @@ export const errors = {
     "VC recruit panel channel not found. It may have been deleted.",
   "vcRecruit.voice_state_update_failed":
     "[VcRecruit] Failed to process voiceStateUpdate",
+  "vcRecruit.no_permission":
+    "Only the recruiter or a channel manager can perform this action.",
+  "vcRecruit.vc_already_deleted":
+    "The target VC has already been deleted.",
+  "vcRecruit.no_roles_registered":
+    "No mention candidate roles are registered. Please add roles first with add-role.",
 } as const;
 
 export type ErrorsTranslations = typeof errors;

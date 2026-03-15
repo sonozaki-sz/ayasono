@@ -84,14 +84,11 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
     expect(loggerDebugMock).toHaveBeenCalled();
   });
 
-  it("panelId が渡された場合、送信後の finally でパネルメッセージを削除し、リプライにメンション文字列が含まれることを確認", async () => {
-    const panelDelete = vi.fn().mockResolvedValue(undefined);
-    const fetchMessage = vi.fn().mockResolvedValue({ delete: panelDelete });
+  it("ロールとユーザーのメンション文字列がリプライに含まれることを確認", async () => {
     const channel = {
       isTextBased: () => true,
       isSendable: () => true,
       send: vi.fn().mockResolvedValue(undefined),
-      messages: { fetch: fetchMessage },
     };
     const client = {
       channels: {
@@ -113,7 +110,6 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
       "msg-1",
       BUMP_SERVICES.DISBOARD,
       configService as never,
-      "panel-1",
     );
 
     expect(channel.send).toHaveBeenCalledWith(
@@ -122,8 +118,6 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
         reply: { messageReference: "msg-1" },
       }),
     );
-    expect(fetchMessage).toHaveBeenCalledWith("panel-1");
-    expect(panelDelete).toHaveBeenCalled();
     expect(loggerInfoMock).toHaveBeenCalled();
   });
 });

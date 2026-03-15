@@ -1,6 +1,9 @@
 // tests/unit/bot/features/vc-recruit/handlers/ui/vcRecruitModal.test.ts
-import { vcRecruitModalHandler } from "@/bot/features/vc-recruit/handlers/ui/vcRecruitModal";
-import { ChannelType, MessageFlags } from "discord.js";
+import {
+  vcRecruitModalHandler,
+  buildRecruitMessageButtons,
+} from "@/bot/features/vc-recruit/handlers/ui/vcRecruitModal";
+import { ButtonStyle, ChannelType, MessageFlags } from "discord.js";
 
 // ---- モック定義 ----
 
@@ -17,7 +20,6 @@ vi.mock("@/bot/features/vc-recruit/handlers/ui/vcRecruitPanelState", () => ({
   deleteVcRecruitSession: (...args: unknown[]) =>
     deleteVcRecruitSessionMock(...args),
   NEW_VC_VALUE: "__new__",
-  NO_MENTION_VALUE: "__none__",
 }));
 vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotVcRecruitRepository: () => ({
@@ -35,9 +37,9 @@ vi.mock("@/bot/utils/interaction", () => ({
 }));
 vi.mock("@/bot/utils/messageResponse", () => ({
   createErrorEmbed: vi.fn((msg: string) => ({ error: msg })),
-  createWarningEmbed: vi.fn((msg: string) => ({ warning: msg })),
-  createInfoEmbed: vi.fn((msg: string) => ({ info: msg })),
   createSuccessEmbed: vi.fn((msg: string) => ({ success: msg })),
+  createInfoEmbed: vi.fn((msg: string) => ({ info: msg })),
+  STATUS_COLORS: { success: 0x57f287, info: 0x3498db, warning: 0xfee75c, error: 0xed4245 },
 }));
 vi.mock("@/shared/locale/localeManager", () => ({
   tGuild: (...args: unknown[]) =>
@@ -87,9 +89,11 @@ function makeGuild(
     categorySize = 0,
   } = opts;
 
-  const sendMock = vi.fn().mockResolvedValue({
+  const postedMessage = {
+    url: "https://discord.com/channels/guild-1/post-ch-1/posted-msg-1",
     startThread: vi.fn().mockResolvedValue(undefined),
-  });
+  };
+  const sendMock = vi.fn().mockResolvedValue(postedMessage);
 
   const resolvedPostChannel = postChannel ?? {
     id: POST_CH_ID,
@@ -142,7 +146,7 @@ function makeInteraction(
   return {
     customId: `${MODAL_PREFIX}${sessionId}`,
     guild,
-    user: { id: "user-1", username: "testuser" },
+    user: { id: "user-1", username: "testuser", displayName: "testuser" },
     fields: {
       getTextInputValue: (key: string) => {
         if (key === "vc-recruit:content") return content;
@@ -152,7 +156,6 @@ function makeInteraction(
     },
     deferReply: vi.fn().mockResolvedValue(undefined),
     editReply: vi.fn().mockResolvedValue(undefined),
-    deleteReply: vi.fn().mockResolvedValue(undefined),
     _guildObj: guild,
     _memberVoiceChannel: memberVoiceChannel,
   };
@@ -178,6 +181,7 @@ function makeMember(voiceChannel: unknown | null, setChannelSuccess = true) {
 
 // ---- テスト ----
 
+// matches() の検証
 describe("vcRecruitModalHandler / matches()", () => {
   it("モーダルプレフィックスに一致する", () => {
     expect(vcRecruitModalHandler.matches(`${MODAL_PREFIX}session-1`)).toBe(
@@ -190,7 +194,9 @@ describe("vcRecruitModalHandler / matches()", () => {
   });
 });
 
+// execute() の検証
 describe("vcRecruitModalHandler / execute()", () => {
+  // beforeEach: 各テストの前にモックをリセットして副作用を分離する
   beforeEach(() => {
     vi.clearAllMocks();
     safeReplyMock.mockResolvedValue(undefined);
@@ -220,7 +226,7 @@ describe("vcRecruitModalHandler / execute()", () => {
   it("セットアップが見つからない場合はエラーを返す", async () => {
     getVcRecruitSessionMock.mockReturnValue({
       panelChannelId: PANEL_CH_ID,
-      mentionRoleId: null,
+      mentionRoleIds: [],
       selectedVcId: "__new__",
       createdAt: Date.now(),
     });
@@ -235,10 +241,10 @@ describe("vcRecruitModalHandler / execute()", () => {
     );
   });
 
-  it("新規 VC 作成時にメンバーが VC にいる場合は VC を作成して deleteReply する", async () => {
+  it("新規 VC 作成時にメンバーが VC にいる場合は VC を作成して成功メッセージとリンクボタンを表示する", async () => {
     getVcRecruitSessionMock.mockReturnValue({
       panelChannelId: PANEL_CH_ID,
-      mentionRoleId: null,
+      mentionRoleIds: [],
       selectedVcId: "__new__",
       createdAt: Date.now(),
     });
@@ -263,13 +269,25 @@ describe("vcRecruitModalHandler / execute()", () => {
       "new-vc-1",
     );
     expect(sendVcControlPanelMock).toHaveBeenCalledWith(newVc);
-    expect(interaction.deleteReply).toHaveBeenCalled();
+    // send() にはコンポーネント（ボタン行）が含まれる
+    expect(guild._postChannelSendMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        components: expect.any(Array),
+      }),
+    );
+    // 成功メッセージ + リンクボタンで editReply
+    expect(interaction.editReply).toHaveBeenCalledWith(
+      expect.objectContaining({
+        embeds: [{ success: "commands:vcRecruit.embed.post_success" }],
+        components: expect.any(Array),
+      }),
+    );
   });
 
-  it("新規 VC 作成時にメンバーが VC にいない場合は warning 返信をする", async () => {
+  it("新規 VC 作成時にメンバーが VC にいない場合も成功メッセージを表示する", async () => {
     getVcRecruitSessionMock.mockReturnValue({
       panelChannelId: PANEL_CH_ID,
-      mentionRoleId: null,
+      mentionRoleIds: [],
       selectedVcId: "__new__",
       createdAt: Date.now(),
     });
@@ -286,8 +304,11 @@ describe("vcRecruitModalHandler / execute()", () => {
 
     await vcRecruitModalHandler.execute(interaction as never);
 
+    // editReply で成功メッセージが表示される
     expect(interaction.editReply).toHaveBeenCalledWith(
-      expect.objectContaining({ embeds: expect.any(Array) }),
+      expect.objectContaining({
+        embeds: [{ success: "commands:vcRecruit.embed.post_success" }],
+      }),
     );
   });
 
@@ -295,7 +316,7 @@ describe("vcRecruitModalHandler / execute()", () => {
     const EXISTING_VC_ID = "existing-vc-deleted";
     getVcRecruitSessionMock.mockReturnValue({
       panelChannelId: PANEL_CH_ID,
-      mentionRoleId: null,
+      mentionRoleIds: [],
       selectedVcId: EXISTING_VC_ID,
       createdAt: Date.now(),
     });
@@ -312,11 +333,11 @@ describe("vcRecruitModalHandler / execute()", () => {
     );
   });
 
-  it("既存 VC を選択して正常に処理された場合は VC 作成をスキップして deleteReply する", async () => {
+  it("既存 VC を選択して正常に処理された場合は VC 作成をスキップして成功メッセージを表示する", async () => {
     const EXISTING_VC_ID = "existing-vc-1";
     getVcRecruitSessionMock.mockReturnValue({
       panelChannelId: PANEL_CH_ID,
-      mentionRoleId: null,
+      mentionRoleIds: [],
       selectedVcId: EXISTING_VC_ID,
       createdAt: Date.now(),
     });
@@ -333,14 +354,19 @@ describe("vcRecruitModalHandler / execute()", () => {
     await vcRecruitModalHandler.execute(interaction as never);
 
     expect(guild.channels.create).not.toHaveBeenCalled();
-    expect(interaction.deleteReply).toHaveBeenCalled();
+    // 成功メッセージで editReply が呼ばれる
+    expect(interaction.editReply).toHaveBeenCalledWith(
+      expect.objectContaining({
+        embeds: [{ success: "commands:vcRecruit.embed.post_success" }],
+      }),
+    );
     expect(deleteVcRecruitSessionMock).toHaveBeenCalledWith(SESSION_ID);
   });
 
   it("カテゴリーチャンネル数が上限に達している場合は category_full エラーを返して VC を作成しない", async () => {
     getVcRecruitSessionMock.mockReturnValue({
       panelChannelId: PANEL_CH_ID,
-      mentionRoleId: null,
+      mentionRoleIds: [],
       selectedVcId: "__new__",
       createdAt: Date.now(),
     });
@@ -360,10 +386,10 @@ describe("vcRecruitModalHandler / execute()", () => {
     expect(deleteVcRecruitSessionMock).toHaveBeenCalledWith(SESSION_ID);
   });
 
-  it("setChannel が throw した場合は vcMoveFailed=true となり warning 返信をする（deleteReply は呼ばれない）", async () => {
+  it("setChannel が throw した場合でも成功メッセージが表示される", async () => {
     getVcRecruitSessionMock.mockReturnValue({
       panelChannelId: PANEL_CH_ID,
-      mentionRoleId: null,
+      mentionRoleIds: [],
       selectedVcId: "__new__",
       createdAt: Date.now(),
     });
@@ -381,11 +407,338 @@ describe("vcRecruitModalHandler / execute()", () => {
     await vcRecruitModalHandler.execute(interaction as never);
 
     expect(member.voice.setChannel).toHaveBeenCalledWith(newVc);
-    // warning embed で editReply が呼ばれる
+    // 成功メッセージで editReply が呼ばれる（setChannel失敗はcatchされる）
     expect(interaction.editReply).toHaveBeenCalledWith(
-      expect.objectContaining({ embeds: expect.any(Array) }),
+      expect.objectContaining({
+        embeds: [{ success: "commands:vcRecruit.embed.post_success" }],
+      }),
     );
-    // deleteReply は呼ばれない
-    expect(interaction.deleteReply).not.toHaveBeenCalled();
+  });
+
+  it("投稿チャンネルが送信不可の場合はリンクなしの成功メッセージを表示する", async () => {
+    getVcRecruitSessionMock.mockReturnValue({
+      panelChannelId: PANEL_CH_ID,
+      mentionRoleIds: [],
+      selectedVcId: "__new__",
+      createdAt: Date.now(),
+    });
+    findSetupByPanelChannelIdMock.mockResolvedValue(makeSetup());
+
+    const newVc = makeVoiceChannel("new-vc-nosend");
+    // postChannel が isSendable() = false を返す
+    const guild = makeGuild({
+      createVcResult: newVc,
+      postChannel: {
+        id: POST_CH_ID,
+        isSendable: () => false,
+        send: vi.fn(),
+      },
+    });
+    const member = makeMember(null);
+    guild.members.fetch = vi.fn().mockResolvedValue(member);
+
+    const interaction = makeInteraction();
+    (interaction as Record<string, unknown>).guild = guild;
+
+    await vcRecruitModalHandler.execute(interaction as never);
+
+    // postedMessageUrl が null なのでリンクボタンなしの editReply
+    expect(interaction.editReply).toHaveBeenCalledWith(
+      expect.objectContaining({
+        embeds: [{ success: "commands:vcRecruit.embed.post_success" }],
+      }),
+    );
+    // components が含まれないことを確認
+    const callArgs = (interaction.editReply as ReturnType<typeof vi.fn>).mock
+      .calls[0]?.[0] as Record<string, unknown> | undefined;
+    expect(callArgs?.components).toBeUndefined();
+  });
+
+  it("投稿チャンネルが取得できない場合はリンクなしの成功メッセージを表示する", async () => {
+    getVcRecruitSessionMock.mockReturnValue({
+      panelChannelId: PANEL_CH_ID,
+      mentionRoleIds: [],
+      selectedVcId: "__new__",
+      createdAt: Date.now(),
+    });
+    findSetupByPanelChannelIdMock.mockResolvedValue(makeSetup());
+
+    const newVc = makeVoiceChannel("new-vc-nopostch");
+    const guild = makeGuild({ createVcResult: newVc });
+    const member = makeMember(null);
+    guild.members.fetch = vi.fn().mockResolvedValue(member);
+    // postChannelId の fetch が null を返すようにオーバーライド
+    const originalFetch = guild.channels.fetch;
+    guild.channels.fetch = vi.fn(async (id: string) => {
+      if (id === POST_CH_ID) return null;
+      return originalFetch(id);
+    });
+
+    const interaction = makeInteraction();
+    (interaction as Record<string, unknown>).guild = guild;
+
+    await vcRecruitModalHandler.execute(interaction as never);
+
+    // postedMessageUrl が null なのでリンクボタンなしの editReply
+    const callArgs = (interaction.editReply as ReturnType<typeof vi.fn>).mock
+      .calls[0]?.[0] as Record<string, unknown> | undefined;
+    expect(callArgs?.components).toBeUndefined();
+  });
+
+  it("startThread が失敗しても成功メッセージを表示する", async () => {
+    getVcRecruitSessionMock.mockReturnValue({
+      panelChannelId: PANEL_CH_ID,
+      mentionRoleIds: [],
+      selectedVcId: "__new__",
+      createdAt: Date.now(),
+    });
+    findSetupByPanelChannelIdMock.mockResolvedValue(makeSetup());
+
+    const newVc = makeVoiceChannel("new-vc-threadfail");
+    const postedMessage = {
+      url: "https://discord.com/channels/guild-1/post-ch-1/msg-threadfail",
+      startThread: vi.fn().mockRejectedValue(new Error("スレッド作成失敗")),
+    };
+    const sendMock = vi.fn().mockResolvedValue(postedMessage);
+    const guild = makeGuild({
+      createVcResult: newVc,
+      postChannel: {
+        id: POST_CH_ID,
+        isSendable: () => true,
+        send: sendMock,
+      },
+    });
+    const member = makeMember(null);
+    guild.members.fetch = vi.fn().mockResolvedValue(member);
+
+    const interaction = makeInteraction();
+    (interaction as Record<string, unknown>).guild = guild;
+
+    await vcRecruitModalHandler.execute(interaction as never);
+
+    // startThread が呼ばれたがエラーは握りつぶされる
+    expect(postedMessage.startThread).toHaveBeenCalled();
+    // 成功メッセージ + リンクボタンが表示される
+    expect(interaction.editReply).toHaveBeenCalledWith(
+      expect.objectContaining({
+        embeds: [{ success: "commands:vcRecruit.embed.post_success" }],
+        components: expect.any(Array),
+      }),
+    );
+  });
+
+  it("editReply が失敗しても例外がスローされない（ポストURL あり）", async () => {
+    getVcRecruitSessionMock.mockReturnValue({
+      panelChannelId: PANEL_CH_ID,
+      mentionRoleIds: [],
+      selectedVcId: "__new__",
+      createdAt: Date.now(),
+    });
+    findSetupByPanelChannelIdMock.mockResolvedValue(makeSetup());
+
+    const newVc = makeVoiceChannel("new-vc-editfail");
+    const guild = makeGuild({ createVcResult: newVc });
+    const member = makeMember(null);
+    guild.members.fetch = vi.fn().mockResolvedValue(member);
+
+    const interaction = makeInteraction();
+    (interaction as Record<string, unknown>).guild = guild;
+    interaction.editReply = vi.fn().mockRejectedValue(new Error("editReply失敗"));
+
+    await expect(
+      vcRecruitModalHandler.execute(interaction as never),
+    ).resolves.toBeUndefined();
+  });
+
+  it("editReply が失敗しても例外がスローされない（ポストURL なし）", async () => {
+    getVcRecruitSessionMock.mockReturnValue({
+      panelChannelId: PANEL_CH_ID,
+      mentionRoleIds: [],
+      selectedVcId: "__new__",
+      createdAt: Date.now(),
+    });
+    findSetupByPanelChannelIdMock.mockResolvedValue(makeSetup());
+
+    const newVc = makeVoiceChannel("new-vc-editfail2");
+    const guild = makeGuild({
+      createVcResult: newVc,
+      postChannel: {
+        id: POST_CH_ID,
+        isSendable: () => false,
+        send: vi.fn(),
+      },
+    });
+    const member = makeMember(null);
+    guild.members.fetch = vi.fn().mockResolvedValue(member);
+
+    const interaction = makeInteraction();
+    (interaction as Record<string, unknown>).guild = guild;
+    interaction.editReply = vi.fn().mockRejectedValue(new Error("editReply失敗"));
+
+    await expect(
+      vcRecruitModalHandler.execute(interaction as never),
+    ).resolves.toBeUndefined();
+  });
+
+  it("メンションロールが指定されている場合はメンションテキスト付きで送信する", async () => {
+    getVcRecruitSessionMock.mockReturnValue({
+      panelChannelId: PANEL_CH_ID,
+      mentionRoleIds: ["role-123"],
+      selectedVcId: "__new__",
+      createdAt: Date.now(),
+    });
+    findSetupByPanelChannelIdMock.mockResolvedValue(makeSetup());
+
+    const newVc = makeVoiceChannel("new-vc-mention");
+    const guild = makeGuild({ createVcResult: newVc });
+    const member = makeMember(null);
+    guild.members.fetch = vi.fn().mockResolvedValue(member);
+
+    const interaction = makeInteraction();
+    (interaction as Record<string, unknown>).guild = guild;
+
+    await vcRecruitModalHandler.execute(interaction as never);
+
+    expect(guild._postChannelSendMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        content: "<@&role-123>",
+      }),
+    );
+  });
+
+  it("メンションロールが複数指定されている場合はスペース区切りで送信する", async () => {
+    getVcRecruitSessionMock.mockReturnValue({
+      panelChannelId: PANEL_CH_ID,
+      mentionRoleIds: ["role-123", "role-456"],
+      selectedVcId: "__new__",
+      createdAt: Date.now(),
+    });
+    findSetupByPanelChannelIdMock.mockResolvedValue(makeSetup());
+
+    const newVc = makeVoiceChannel("new-vc-multi-mention");
+    const guild = makeGuild({ createVcResult: newVc });
+    const member = makeMember(null);
+    guild.members.fetch = vi.fn().mockResolvedValue(member);
+
+    const interaction = makeInteraction();
+    (interaction as Record<string, unknown>).guild = guild;
+
+    await vcRecruitModalHandler.execute(interaction as never);
+
+    expect(guild._postChannelSendMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        content: "<@&role-123> <@&role-456>",
+      }),
+    );
+  });
+
+  it("メンションロールが空配列の場合はメンションなしで送信する", async () => {
+    getVcRecruitSessionMock.mockReturnValue({
+      panelChannelId: PANEL_CH_ID,
+      mentionRoleIds: [],
+      selectedVcId: "__new__",
+      createdAt: Date.now(),
+    });
+    findSetupByPanelChannelIdMock.mockResolvedValue(makeSetup());
+
+    const newVc = makeVoiceChannel("new-vc-nomention");
+    const guild = makeGuild({ createVcResult: newVc });
+    const member = makeMember(null);
+    guild.members.fetch = vi.fn().mockResolvedValue(member);
+
+    const interaction = makeInteraction();
+    (interaction as Record<string, unknown>).guild = guild;
+
+    await vcRecruitModalHandler.execute(interaction as never);
+
+    expect(guild._postChannelSendMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        content: undefined,
+      }),
+    );
+  });
+
+  it("members.fetch が失敗した場合でも処理が続行される", async () => {
+    getVcRecruitSessionMock.mockReturnValue({
+      panelChannelId: PANEL_CH_ID,
+      mentionRoleIds: [],
+      selectedVcId: "__new__",
+      createdAt: Date.now(),
+    });
+    findSetupByPanelChannelIdMock.mockResolvedValue(makeSetup());
+
+    const newVc = makeVoiceChannel("new-vc-nofetch");
+    const guild = makeGuild({ createVcResult: newVc });
+    guild.members.fetch = vi.fn().mockRejectedValue(new Error("メンバー取得失敗"));
+
+    const interaction = makeInteraction();
+    (interaction as Record<string, unknown>).guild = guild;
+
+    await vcRecruitModalHandler.execute(interaction as never);
+
+    // member が null なので setChannel は呼ばれない
+    expect(interaction.editReply).toHaveBeenCalled();
+  });
+});
+
+// buildRecruitMessageButtons() の検証
+describe("buildRecruitMessageButtons()", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("正しい構造のボタン行を返す", async () => {
+    const rows = await buildRecruitMessageButtons("guild-1", "user-1", "vc-1");
+
+    expect(rows).toHaveLength(1);
+    // ActionRowBuilder のコンポーネントが4つ
+    const row = rows[0]!;
+    expect(row.components).toHaveLength(4);
+  });
+
+  it("参加ボタンがリンクスタイルで正しいURLを持つ", async () => {
+    const rows = await buildRecruitMessageButtons("guild-1", "user-1", "vc-1");
+    const joinButton = rows[0]!.components[0]!;
+
+    // ButtonBuilder の data を確認
+    const data = joinButton.toJSON() as unknown as Record<string, unknown>;
+    expect(data.style).toBe(ButtonStyle.Link);
+    expect(data.url).toBe("https://discord.com/channels/guild-1/vc-1");
+  });
+
+  it("VC名変更ボタンのカスタムIDに正しいプレフィックスとサフィックスが含まれる", async () => {
+    const rows = await buildRecruitMessageButtons("guild-1", "user-1", "vc-1");
+    const renameButton = rows[0]!.components[1]!;
+
+    const data = renameButton.toJSON() as unknown as Record<string, unknown>;
+    expect(data.style).toBe(ButtonStyle.Secondary);
+    expect(data.custom_id).toBe("vc-recruit:rename-vc:user-1:vc-1");
+  });
+
+  it("VC終了ボタンのカスタムIDに正しいプレフィックスとサフィックスが含まれる", async () => {
+    const rows = await buildRecruitMessageButtons("guild-1", "user-1", "vc-1");
+    const endButton = rows[0]!.components[2]!;
+
+    const data = endButton.toJSON() as unknown as Record<string, unknown>;
+    expect(data.style).toBe(ButtonStyle.Secondary);
+    expect(data.custom_id).toBe("vc-recruit:end-vc:user-1:vc-1");
+  });
+
+  it("募集削除ボタンが Danger スタイルで正しいカスタムIDを持つ", async () => {
+    const rows = await buildRecruitMessageButtons("guild-1", "user-1", "vc-1");
+    const deleteButton = rows[0]!.components[3]!;
+
+    const data = deleteButton.toJSON() as unknown as Record<string, unknown>;
+    expect(data.style).toBe(ButtonStyle.Danger);
+    expect(data.custom_id).toBe("vc-recruit:delete-post:user-1:vc-1");
+  });
+
+  it("tGuild がボタンラベル用に呼ばれる", async () => {
+    await buildRecruitMessageButtons("guild-1", "user-1", "vc-1");
+
+    expect(tGuildMock).toHaveBeenCalledWith("guild-1", "commands:vcRecruit.button.join_vc");
+    expect(tGuildMock).toHaveBeenCalledWith("guild-1", "commands:vcRecruit.button.rename_vc");
+    expect(tGuildMock).toHaveBeenCalledWith("guild-1", "commands:vcRecruit.button.end_vc");
+    expect(tGuildMock).toHaveBeenCalledWith("guild-1", "commands:vcRecruit.button.delete_post");
   });
 });

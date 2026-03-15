@@ -30,10 +30,11 @@ export async function restoreBumpRemindersOnStartup(
       guildId: string,
       channelId: string,
       messageId?: string,
-      panelMessageId?: string,
+      _panelMessageId?: string,
       serviceName?: BumpServiceName,
     ) => {
       // 復元後の実行時に必要な引数を閉じ込めたクロージャを返す
+      // panelMessageId は常設パネルのため送信時の削除に使用しない
       return () =>
         sendBumpReminder(
           client,
@@ -42,7 +43,6 @@ export async function restoreBumpRemindersOnStartup(
           messageId,
           serviceName,
           bumpReminderConfigService,
-          panelMessageId,
         );
     };
 

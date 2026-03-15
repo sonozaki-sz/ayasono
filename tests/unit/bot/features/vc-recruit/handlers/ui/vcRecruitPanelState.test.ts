@@ -11,7 +11,7 @@ const makeSession = (
   overrides?: Partial<VcRecruitSession>,
 ): VcRecruitSession => ({
   panelChannelId: "panel-ch-1",
-  mentionRoleId: null,
+  mentionRoleIds: [],
   selectedVcId: "__new__",
   createdAt: Date.now(),
   ...overrides,
@@ -44,15 +44,17 @@ describe("bot/features/vc-recruit/handlers/ui/vcRecruitPanelState", () => {
 
   it("updateVcRecruitSession でセッションを部分更新できる", () => {
     setVcRecruitSession("interaction-3", makeSession());
-    updateVcRecruitSession("interaction-3", { mentionRoleId: "role-1" });
+    updateVcRecruitSession("interaction-3", {
+      mentionRoleIds: ["role-1", "role-2"],
+    });
     const updated = getVcRecruitSession("interaction-3");
-    expect(updated?.mentionRoleId).toBe("role-1");
+    expect(updated?.mentionRoleIds).toEqual(["role-1", "role-2"]);
     expect(updated?.panelChannelId).toBe("panel-ch-1");
     expect(updated?.selectedVcId).toBe("__new__");
   });
 
   it("存在しないキーを更新しても何も起こらない", () => {
-    updateVcRecruitSession("nonexistent", { mentionRoleId: "role-1" });
+    updateVcRecruitSession("nonexistent", { mentionRoleIds: ["role-1"] });
     expect(getVcRecruitSession("nonexistent")).toBeNull();
   });
 
@@ -61,7 +63,7 @@ describe("bot/features/vc-recruit/handlers/ui/vcRecruitPanelState", () => {
     updateVcRecruitSession("interaction-5", { selectedVcId: "vc-123" });
     const updated = getVcRecruitSession("interaction-5");
     expect(updated?.selectedVcId).toBe("vc-123");
-    expect(updated?.mentionRoleId).toBeNull();
+    expect(updated?.mentionRoleIds).toEqual([]);
   });
 
   it("15分後にセッションが自動的に削除される", () => {
