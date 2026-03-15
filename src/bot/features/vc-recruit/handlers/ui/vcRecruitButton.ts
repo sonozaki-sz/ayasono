@@ -32,6 +32,7 @@ import {
 } from "../../../../utils/messageResponse";
 import { buildTeardownSelectOptions } from "../../commands/usecases/vcRecruitConfigTeardown";
 import {
+  VC_RECRUIT_CONTENT_MAX_LENGTH,
   VC_RECRUIT_PANEL_CUSTOM_ID,
   VC_RECRUIT_TEARDOWN_CUSTOM_ID,
   VC_RECRUIT_TIMEOUT,
@@ -307,7 +308,7 @@ export const vcRecruitButtonHandler: ButtonHandler = {
               .setPlaceholder(contentPlaceholder)
               .setStyle(TextInputStyle.Paragraph)
               .setRequired(true)
-              .setMaxLength(200),
+              .setMaxLength(VC_RECRUIT_CONTENT_MAX_LENGTH),
           ),
         );
 
