@@ -187,6 +187,93 @@ describe("bot/features/message-delete/commands/usecases/runScanPhase", () => {
     expect(result).toBeNull();
   });
 
+  it("ユーザーが「収集分を確認」ボタンを押して中断した場合に収集済みメッセージを返す", async () => {
+    const { runScanPhase } = await loadModule();
+
+    // scanMessages が呼ばれたら、collect イベントでユーザー中断をシミュレートしてから結果を返す
+    scanMessagesMock.mockImplementation(
+      async (_channels: never, opts: { signal?: AbortSignal }) => {
+        // signal が abort されるまで待機
+        await new Promise<void>((resolve) => {
+          if (opts.signal?.aborted) { resolve(); return; }
+          opts.signal?.addEventListener("abort", () => resolve());
+        });
+        return [{ messageId: "msg-1" }];
+      },
+    );
+
+    const cancelCollector = makeMockCollector();
+    const scanReply = {
+      createMessageComponentCollector: vi.fn(() => cancelCollector),
+    };
+    const interaction = makeInteraction(scanReply);
+
+    const runPromise = runScanPhase(
+      interaction as never,
+      [] as never,
+      mockOptions,
+    );
+
+    // scanMessages が開始されるまで待機
+    await Promise.resolve();
+    await Promise.resolve();
+
+    // ユーザーが「収集分を確認」ボタンを押す — collect イベントをトリガー
+    const mockButtonInteraction = {
+      deferUpdate: vi.fn().mockResolvedValue(undefined),
+    };
+    cancelCollector._trigger("collect", mockButtonInteraction);
+
+    const result = await runPromise;
+
+    // deferUpdate が呼ばれること
+    expect(mockButtonInteraction.deferUpdate).toHaveBeenCalledTimes(1);
+    // 収集1件以上あるのでメッセージ配列が返る
+    expect(result).toEqual([{ messageId: "msg-1" }]);
+  });
+
+  it("タイムアウトで中断され収集1件以上の場合はタイムアウト通知を表示してメッセージを返す", async () => {
+    const { runScanPhase } = await loadModule();
+
+    // scanMessages が呼ばれたら、signal の abort を待って結果を返す
+    scanMessagesMock.mockImplementation(
+      async (_channels: never, opts: { signal?: AbortSignal }) => {
+        await new Promise<void>((resolve) => {
+          if (opts.signal?.aborted) { resolve(); return; }
+          opts.signal?.addEventListener("abort", () => resolve());
+        });
+        return [{ messageId: "msg-timeout" }];
+      },
+    );
+
+    const cancelCollector = makeMockCollector();
+    const scanReply = {
+      createMessageComponentCollector: vi.fn(() => cancelCollector),
+    };
+    const interaction = makeInteraction(scanReply);
+
+    // タイムアウトを即座に発火させるため setTimeout をモックする
+    vi.useFakeTimers();
+
+    const runPromise = runScanPhase(
+      interaction as never,
+      [] as never,
+      mockOptions,
+    );
+
+    // タイムアウトタイマーを発火させる
+    await vi.advanceTimersByTimeAsync(15 * 60 * 1000);
+
+    const result = await runPromise;
+
+    vi.useRealTimers();
+
+    // タイムアウト通知 embed が表示されること
+    expect(createInfoEmbedMock).toHaveBeenCalled();
+    // 収集済みメッセージが返ること
+    expect(result).toEqual([{ messageId: "msg-timeout" }]);
+  });
+
   it("スキャン中に進捗コンテンツで editReply を呼び出す", async () => {
     const { runScanPhase } = await loadModule();
 

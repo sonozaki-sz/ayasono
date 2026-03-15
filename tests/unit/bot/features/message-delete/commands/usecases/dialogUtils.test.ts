@@ -19,23 +19,20 @@ vi.mock("@/shared/locale/localeManager", () => ({
 // Mock discord.js builders to avoid needing a real Discord environment
 vi.mock("discord.js", async (importOriginal) => {
   const orig = await importOriginal<typeof import("discord.js")>();
+
+  function MockClass(methods: string[]) {
+    return vi.fn().mockImplementation(function (this: Record<string, unknown>) {
+      for (const m of methods) {
+        this[m] = vi.fn().mockReturnValue(this);
+      }
+    });
+  }
+
   return {
     ...orig,
-    ModalBuilder: vi.fn().mockReturnValue({
-      setCustomId: vi.fn().mockReturnThis(),
-      setTitle: vi.fn().mockReturnThis(),
-      addComponents: vi.fn().mockReturnThis(),
-    }),
-    ActionRowBuilder: vi.fn().mockReturnValue({
-      addComponents: vi.fn().mockReturnThis(),
-    }),
-    TextInputBuilder: vi.fn().mockReturnValue({
-      setCustomId: vi.fn().mockReturnThis(),
-      setLabel: vi.fn().mockReturnThis(),
-      setStyle: vi.fn().mockReturnThis(),
-      setRequired: vi.fn().mockReturnThis(),
-      setPlaceholder: vi.fn().mockReturnThis(),
-    }),
+    ModalBuilder: MockClass(["setCustomId", "setTitle", "addComponents"]),
+    ActionRowBuilder: MockClass(["addComponents"]),
+    TextInputBuilder: MockClass(["setCustomId", "setLabel", "setStyle", "setRequired", "setPlaceholder"]),
   };
 });
 
@@ -310,6 +307,103 @@ describe("bot/features/message-delete/commands/usecases/dialogUtils", () => {
       expect(DIALOG_TYPE.Cancel).toBe("cancel");
       expect(DIALOG_TYPE.Timeout).toBe("timeout");
       expect(DIALOG_TYPE.Back).toBe("back");
+    });
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // showFilterModal — フィルターモーダル表示・入力値取得
+  // ─────────────────────────────────────────────────────────────
+
+  describe("showFilterModal", () => {
+    it("モーダル送信が成功した場合にトリム済みの入力値を返す", async () => {
+      const { showFilterModal, MODAL_FILTER_CONFIG } = await loadModule();
+      const { MSG_DEL_CUSTOM_ID } = await import(
+        "@/bot/features/message-delete/constants/messageDeleteConstants"
+      );
+
+      const config = MODAL_FILTER_CONFIG.get(MSG_DEL_CUSTOM_ID.FILTER_KEYWORD)!;
+      const mockSubmit = {
+        deferUpdate: vi.fn().mockResolvedValue(undefined),
+        fields: {
+          getTextInputValue: vi.fn().mockReturnValue("  hello  "),
+        },
+      };
+      const mockInteraction = {
+        showModal: vi.fn().mockResolvedValue(undefined),
+        awaitModalSubmit: vi.fn().mockResolvedValue(mockSubmit),
+      };
+
+      const result = await showFilterModal(mockInteraction as never, config);
+
+      expect(mockInteraction.showModal).toHaveBeenCalledTimes(1);
+      expect(mockSubmit.deferUpdate).toHaveBeenCalledTimes(1);
+      expect(mockSubmit.fields.getTextInputValue).toHaveBeenCalledWith(
+        config.inputId,
+      );
+      expect(result).toBe("hello");
+    });
+
+    it("モーダル送信がタイムアウトした場合に null を返す", async () => {
+      const { showFilterModal, MODAL_FILTER_CONFIG } = await loadModule();
+      const { MSG_DEL_CUSTOM_ID } = await import(
+        "@/bot/features/message-delete/constants/messageDeleteConstants"
+      );
+
+      const config = MODAL_FILTER_CONFIG.get(MSG_DEL_CUSTOM_ID.FILTER_KEYWORD)!;
+      const mockInteraction = {
+        showModal: vi.fn().mockResolvedValue(undefined),
+        awaitModalSubmit: vi.fn().mockRejectedValue(new Error("timeout")),
+      };
+
+      const result = await showFilterModal(mockInteraction as never, config);
+
+      expect(result).toBeNull();
+    });
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // showJumpModal — ページジャンプモーダル表示・入力値取得
+  // ─────────────────────────────────────────────────────────────
+
+  describe("showJumpModal", () => {
+    it("モーダル送信が成功した場合にトリム済みの入力値を返す", async () => {
+      const { showJumpModal } = await loadModule();
+      const { MSG_DEL_CUSTOM_ID } = await import(
+        "@/bot/features/message-delete/constants/messageDeleteConstants"
+      );
+
+      const mockSubmit = {
+        deferUpdate: vi.fn().mockResolvedValue(undefined),
+        fields: {
+          getTextInputValue: vi.fn().mockReturnValue("  5  "),
+        },
+      };
+      const mockInteraction = {
+        showModal: vi.fn().mockResolvedValue(undefined),
+        awaitModalSubmit: vi.fn().mockResolvedValue(mockSubmit),
+      };
+
+      const result = await showJumpModal(mockInteraction as never, 10);
+
+      expect(mockInteraction.showModal).toHaveBeenCalledTimes(1);
+      expect(mockSubmit.deferUpdate).toHaveBeenCalledTimes(1);
+      expect(mockSubmit.fields.getTextInputValue).toHaveBeenCalledWith(
+        MSG_DEL_CUSTOM_ID.MODAL_INPUT_JUMP,
+      );
+      expect(result).toBe("5");
+    });
+
+    it("モーダル送信がタイムアウトした場合に null を返す", async () => {
+      const { showJumpModal } = await loadModule();
+
+      const mockInteraction = {
+        showModal: vi.fn().mockResolvedValue(undefined),
+        awaitModalSubmit: vi.fn().mockRejectedValue(new Error("timeout")),
+      };
+
+      const result = await showJumpModal(mockInteraction as never, 10);
+
+      expect(result).toBeNull();
     });
   });
 });
