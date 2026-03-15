@@ -124,35 +124,37 @@ function makeComponentInteraction(
 }
 
 const MSG_DEL_CUSTOM_ID = {
-  CONFIRM_YES: "msgdel_confirm_yes",
-  CONFIRM_NO: "msgdel_confirm_no",
-  CONFIRM_EXCLUDE: "msgdel_confirm_exclude",
-  FIRST: "msgdel_first",
-  PREV: "msgdel_prev",
-  NEXT: "msgdel_next",
-  LAST: "msgdel_last",
-  JUMP: "msgdel_jump",
-  FILTER_AUTHOR: "msgdel_filter_author",
-  FILTER_RESET: "msgdel_filter_reset",
-  FILTER_DAYS: "msgdel_filter_days",
-  FILTER_AFTER: "msgdel_filter_after",
-  FILTER_BEFORE: "msgdel_filter_before",
-  FILTER_KEYWORD: "msgdel_filter_keyword",
+  CONFIRM_YES: "message-delete:confirm-yes",
+  CONFIRM_NO: "message-delete:confirm-no",
+  CONFIRM_EXCLUDE: "message-delete:confirm-exclude",
+  FIRST: "message-delete:first",
+  PREV: "message-delete:prev",
+  NEXT: "message-delete:next",
+  LAST: "message-delete:last",
+  JUMP: "message-delete:jump",
+  FILTER_AUTHOR: "message-delete:filter-author",
+  FILTER_RESET: "message-delete:filter-reset",
+  FILTER_DAYS: "message-delete:filter-days",
+  FILTER_AFTER: "message-delete:filter-after",
+  FILTER_BEFORE: "message-delete:filter-before",
+  FILTER_KEYWORD: "message-delete:filter-keyword",
 };
 
 const DUMMY_OPTIONS = {
   count: 1000,
-  targetUserId: undefined,
+  targetUserIds: [],
   keyword: undefined,
   daysOption: undefined,
   afterStr: undefined,
   beforeStr: undefined,
-  channelId: undefined,
+  channelIds: [],
   afterTs: 0,
   beforeTs: Infinity,
 };
 
+// showPreviewDialog の終端アクション・タイムアウト・ページネーション・フィルター操作を検証
 describe("bot/features/message-delete/commands/usecases/runPreviewDialog", () => {
+  // 各テストケースでモック状態をリセットし、buildFilteredMessages のデフォルト動作を設定する
   beforeEach(() => {
     vi.clearAllMocks();
     buildFilteredMessagesMock.mockImplementation((msgs: unknown[]) => msgs);

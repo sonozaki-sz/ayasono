@@ -4,7 +4,6 @@ import { getBotBumpReminderConfigService } from "@/bot/services/botCompositionRo
 import {
   createErrorEmbed,
   createSuccessEmbed,
-  createWarningEmbed,
 } from "@/bot/utils/messageResponse";
 import { getGuildTranslator } from "@/shared/locale/helpers";
 import { tDefault } from "@/shared/locale/localeManager";
@@ -44,8 +43,8 @@ vi.mock(
   () => ({
     BUMP_CONSTANTS: {
       CUSTOM_ID_PREFIX: {
-        MENTION_ON: "bump:on:",
-        MENTION_OFF: "bump:off:",
+        MENTION_ON: "bump-reminder:mention-on:",
+        MENTION_OFF: "bump-reminder:mention-off:",
       },
     },
   }),
@@ -69,7 +68,6 @@ vi.mock("@/shared/utils/logger", () => ({
 vi.mock("@/bot/utils/messageResponse", () => ({
   createErrorEmbed: vi.fn((message: string) => ({ message })),
   createSuccessEmbed: vi.fn((message: string) => ({ message })),
-  createWarningEmbed: vi.fn((message: string) => ({ message })),
 }));
 
 type ButtonInteractionLike = {
@@ -83,13 +81,14 @@ function createInteraction(
   overrides?: Partial<ButtonInteractionLike>,
 ): ButtonInteractionLike {
   return {
-    customId: "bump:on:guild-1",
+    customId: "bump-reminder:mention-on:guild-1",
     guild: { id: "guild-1" },
     user: { id: "user-1" },
     ...overrides,
   };
 }
 
+// bumpPanelButtonHandler の ON/OFF ボタン判定・冪等動作・エラーハンドリングを検証
 describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
   // モック履歴をケースごとに初期化
   beforeEach(() => {
@@ -99,15 +98,19 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
     removeMentionUserMock.mockResolvedValue("removed");
   });
 
-  it("customId prefix 判定が有効であることを検証", () => {
-    expect(bumpPanelButtonHandler.matches("bump:on:guild-1")).toBe(true);
-    expect(bumpPanelButtonHandler.matches("bump:off:guild-1")).toBe(true);
+  it("ON/OFF ボタンの customId prefix 判定が有効であることを検証", () => {
+    expect(bumpPanelButtonHandler.matches("bump-reminder:mention-on:guild-1")).toBe(
+      true,
+    );
+    expect(bumpPanelButtonHandler.matches("bump-reminder:mention-off:guild-1")).toBe(
+      true,
+    );
     expect(bumpPanelButtonHandler.matches("other:guild-1")).toBe(false);
   });
 
   it("ギルド不一致時にエラー応答して終了することを検証", async () => {
     const interaction = createInteraction({
-      customId: "bump:on:guild-1",
+      customId: "bump-reminder:mention-on:guild-1",
       guild: { id: "guild-x" },
     });
 
@@ -130,131 +133,148 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
     });
   });
 
-  it("追加パスで NOT_CONFIGURED エラーが返った場合はエラー応答する", async () => {
-    addMentionUserMock.mockResolvedValueOnce("not_configured");
-    const interaction = createInteraction({ customId: "bump:on:guild-1" });
+  // ON ボタンの追加成功・冪等動作・NOT_CONFIGURED エラーを検証
+  describe("ONボタン", () => {
+    it("未登録ユーザーを追加して成功応答を返す", async () => {
+      const interaction = createInteraction();
 
-    await bumpPanelButtonHandler.execute(interaction as never);
+      await bumpPanelButtonHandler.execute(interaction as never);
 
-    expect(addMentionUserMock).toHaveBeenCalledWith("guild-1", "user-1");
-    expect(safeReplyMock).toHaveBeenCalledWith(interaction, {
-      content: "events:bump-reminder.panel.error",
-      flags: MessageFlags.Ephemeral,
+      expect(getBotBumpReminderConfigService).toHaveBeenCalledTimes(1);
+      expect(getGuildTranslator).toHaveBeenCalledWith("guild-1");
+      expect(addMentionUserMock).toHaveBeenCalledWith("guild-1", "user-1");
+      expect(createSuccessEmbed).toHaveBeenCalledWith(
+        "events:bump-reminder.panel.mention_toggled_on",
+        { title: "events:bump-reminder.panel.success_title" },
+      );
+      expect(safeReplyMock).toHaveBeenCalledWith(interaction, {
+        embeds: [
+          { message: "events:bump-reminder.panel.mention_toggled_on" },
+        ],
+        flags: MessageFlags.Ephemeral,
+      });
+      expect(logger.debug).toHaveBeenCalled();
+    });
+
+    it("既に登録済みのユーザーでも冪等に成功応答を返す", async () => {
+      addMentionUserMock.mockResolvedValueOnce("already_exists");
+      const interaction = createInteraction();
+
+      await bumpPanelButtonHandler.execute(interaction as never);
+
+      // 削除は呼ばれない（冪等動作）
+      expect(removeMentionUserMock).not.toHaveBeenCalled();
+      expect(createSuccessEmbed).toHaveBeenCalledWith(
+        "events:bump-reminder.panel.mention_toggled_on",
+        { title: "events:bump-reminder.panel.success_title" },
+      );
+    });
+
+    it("NOT_CONFIGURED の場合はエラー応答する", async () => {
+      addMentionUserMock.mockResolvedValueOnce("not_configured");
+      const interaction = createInteraction();
+
+      await bumpPanelButtonHandler.execute(interaction as never);
+
+      expect(safeReplyMock).toHaveBeenCalledWith(interaction, {
+        content: "events:bump-reminder.panel.error",
+        flags: MessageFlags.Ephemeral,
+      });
     });
   });
 
-  it("追加対象がすでに存在する場合は警告応答を返す", async () => {
-    addMentionUserMock.mockResolvedValueOnce("already_exists");
-    const interaction = createInteraction({ customId: "bump:on:guild-1" });
+  // OFF ボタンの削除成功・冪等動作・NOT_CONFIGURED エラーを検証
+  describe("OFFボタン", () => {
+    it("登録済みユーザーを削除して成功応答を返す", async () => {
+      const interaction = createInteraction({
+        customId: "bump-reminder:mention-off:guild-1",
+      });
 
-    await bumpPanelButtonHandler.execute(interaction as never);
+      await bumpPanelButtonHandler.execute(interaction as never);
 
-    expect(createWarningEmbed).toHaveBeenCalledWith(
-      "events:bump-reminder.panel.already_added",
-    );
-    expect(safeReplyMock).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "events:bump-reminder.panel.already_added" }],
-      flags: MessageFlags.Ephemeral,
+      expect(removeMentionUserMock).toHaveBeenCalledWith("guild-1", "user-1");
+      expect(createSuccessEmbed).toHaveBeenCalledWith(
+        "events:bump-reminder.panel.mention_toggled_off",
+        { title: "events:bump-reminder.panel.success_title" },
+      );
+      expect(safeReplyMock).toHaveBeenCalledWith(interaction, {
+        embeds: [
+          { message: "events:bump-reminder.panel.mention_toggled_off" },
+        ],
+        flags: MessageFlags.Ephemeral,
+      });
+      expect(logger.debug).toHaveBeenCalled();
+    });
+
+    it("未登録ユーザーでも冪等に成功応答を返す", async () => {
+      removeMentionUserMock.mockResolvedValueOnce("not_found");
+      const interaction = createInteraction({
+        customId: "bump-reminder:mention-off:guild-1",
+      });
+
+      await bumpPanelButtonHandler.execute(interaction as never);
+
+      // 追加は呼ばれない（冪等動作）
+      expect(addMentionUserMock).not.toHaveBeenCalled();
+      expect(createSuccessEmbed).toHaveBeenCalledWith(
+        "events:bump-reminder.panel.mention_toggled_off",
+        { title: "events:bump-reminder.panel.success_title" },
+      );
+    });
+
+    it("NOT_CONFIGURED の場合はエラー応答する", async () => {
+      removeMentionUserMock.mockResolvedValueOnce("not_configured");
+      const interaction = createInteraction({
+        customId: "bump-reminder:mention-off:guild-1",
+      });
+
+      await bumpPanelButtonHandler.execute(interaction as never);
+
+      expect(safeReplyMock).toHaveBeenCalledWith(interaction, {
+        content: "events:bump-reminder.panel.error",
+        flags: MessageFlags.Ephemeral,
+      });
     });
   });
 
-  it("メンション追加成功時に成功応答を返してデバッグログを記録する", async () => {
-    const interaction = createInteraction({ customId: "bump:on:guild-1" });
+  // 想定外エラー発生時のフォールバック応答・二次エラーログを検証
+  describe("エラーハンドリング", () => {
+    it("実行エラー発生時にフォールバックのエラー embed を送信する", async () => {
+      addMentionUserMock.mockRejectedValueOnce(new Error("db failed"));
+      const interaction = createInteraction();
 
-    await bumpPanelButtonHandler.execute(interaction as never);
+      await bumpPanelButtonHandler.execute(interaction as never);
 
-    expect(getBotBumpReminderConfigService).toHaveBeenCalledTimes(1);
-    expect(getGuildTranslator).toHaveBeenCalledWith("guild-1");
-    expect(createSuccessEmbed).toHaveBeenCalledWith(
-      "events:bump-reminder.panel.mention_added",
-      { title: "events:bump-reminder.panel.success_title" },
-    );
-    expect(safeReplyMock).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "events:bump-reminder.panel.mention_added" }],
-      flags: MessageFlags.Ephemeral,
+      expect(logger.error).toHaveBeenCalledWith(
+        "system:bump-reminder.panel_handle_failed",
+        expect.any(Error),
+      );
+      expect(tDefault).toHaveBeenCalledWith("errors:general.error_title");
+      expect(createErrorEmbed).toHaveBeenCalledWith(
+        "events:bump-reminder.panel.error",
+        { title: "errors:general.error_title" },
+      );
+      expect(safeReplyMock).toHaveBeenCalledWith(interaction, {
+        embeds: [{ message: "events:bump-reminder.panel.error" }],
+        flags: MessageFlags.Ephemeral,
+      });
     });
-    expect(logger.debug).toHaveBeenCalled();
-  });
 
-  it("削除パスで NOT_CONFIGURED エラーが返った場合はエラー応答する", async () => {
-    removeMentionUserMock.mockResolvedValueOnce("not_configured");
-    const interaction = createInteraction({ customId: "bump:off:guild-1" });
+    it("フォールバック返答も失敗した場合は二次エラーをログに記録する", async () => {
+      addMentionUserMock.mockRejectedValueOnce(new Error("db failed"));
+      safeReplyMock.mockRejectedValueOnce(new Error("reply failed"));
+      const interaction = createInteraction();
 
-    await bumpPanelButtonHandler.execute(interaction as never);
+      await bumpPanelButtonHandler.execute(interaction as never);
 
-    expect(removeMentionUserMock).toHaveBeenCalledWith("guild-1", "user-1");
-    expect(safeReplyMock).toHaveBeenCalledWith(interaction, {
-      content: "events:bump-reminder.panel.error",
-      flags: MessageFlags.Ephemeral,
+      expect(logger.error).toHaveBeenCalledWith(
+        "system:bump-reminder.panel_handle_failed",
+        expect.any(Error),
+      );
+      expect(logger.error).toHaveBeenCalledWith(
+        "system:bump-reminder.panel_reply_failed",
+        expect.any(Error),
+      );
     });
-  });
-
-  it("削除対象が見つからない場合は警告応答を返す", async () => {
-    removeMentionUserMock.mockResolvedValueOnce("not_found");
-    const interaction = createInteraction({ customId: "bump:off:guild-1" });
-
-    await bumpPanelButtonHandler.execute(interaction as never);
-
-    expect(createWarningEmbed).toHaveBeenCalledWith(
-      "events:bump-reminder.panel.not_in_list",
-    );
-    expect(safeReplyMock).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "events:bump-reminder.panel.not_in_list" }],
-      flags: MessageFlags.Ephemeral,
-    });
-  });
-
-  it("メンション削除成功時に成功応答を返してデバッグログを記録する", async () => {
-    const interaction = createInteraction({ customId: "bump:off:guild-1" });
-
-    await bumpPanelButtonHandler.execute(interaction as never);
-
-    expect(createSuccessEmbed).toHaveBeenCalledWith(
-      "events:bump-reminder.panel.mention_removed",
-      { title: "events:bump-reminder.panel.success_title" },
-    );
-    expect(safeReplyMock).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "events:bump-reminder.panel.mention_removed" }],
-      flags: MessageFlags.Ephemeral,
-    });
-    expect(logger.debug).toHaveBeenCalled();
-  });
-
-  it("実行エラー発生時にフォールバックのエラー embed を送信する", async () => {
-    addMentionUserMock.mockRejectedValueOnce(new Error("db failed"));
-    const interaction = createInteraction({ customId: "bump:on:guild-1" });
-
-    await bumpPanelButtonHandler.execute(interaction as never);
-
-    expect(logger.error).toHaveBeenCalledWith(
-      "system:bump-reminder.panel_handle_failed",
-      expect.any(Error),
-    );
-    expect(tDefault).toHaveBeenCalledWith("errors:general.error_title");
-    expect(createErrorEmbed).toHaveBeenCalledWith(
-      "events:bump-reminder.panel.error",
-      { title: "errors:general.error_title" },
-    );
-    expect(safeReplyMock).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "events:bump-reminder.panel.error" }],
-      flags: MessageFlags.Ephemeral,
-    });
-  });
-
-  it("フォールバック返答も失敗した場合は二次エラーをログに記録する", async () => {
-    addMentionUserMock.mockRejectedValueOnce(new Error("db failed"));
-    safeReplyMock.mockRejectedValueOnce(new Error("reply failed"));
-    const interaction = createInteraction({ customId: "bump:on:guild-1" });
-
-    await bumpPanelButtonHandler.execute(interaction as never);
-
-    expect(logger.error).toHaveBeenCalledWith(
-      "system:bump-reminder.panel_handle_failed",
-      expect.any(Error),
-    );
-    expect(logger.error).toHaveBeenCalledWith(
-      "system:bump-reminder.panel_reply_failed",
-      expect.any(Error),
-    );
   });
 });

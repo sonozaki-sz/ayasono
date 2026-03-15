@@ -1,17 +1,27 @@
 // src/bot/features/vc-recruit/commands/usecases/vcRecruitConfigAddRole.ts
 // vc-recruit-config add-role のユースケース処理
 
-import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  MessageFlags,
+  RoleSelectMenuBuilder,
+  type ChatInputCommandInteraction,
+} from "discord.js";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
 import { tDefault, tGuild } from "../../../../../shared/locale/localeManager";
 import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
-import { getBotVcRecruitRepository } from "../../../../services/botCompositionRoot";
-import { createSuccessEmbed } from "../../../../utils/messageResponse";
-import { VC_RECRUIT_CONFIG_COMMAND } from "../vcRecruitConfigCommand.constants";
-import { VC_RECRUIT_MENTION_ROLE_ADD_RESULT } from "../../../../../shared/database/types";
+import { disableComponentsAfterTimeout } from "../../../../shared/disableComponentsAfterTimeout";
+import {
+  DISCORD_SELECT_MAX_OPTIONS,
+  VC_RECRUIT_ROLE_CUSTOM_ID,
+  VC_RECRUIT_TIMEOUT,
+} from "../vcRecruitConfigCommand.constants";
 
 /**
  * vc-recruit-config add-role を実行する
+ * RoleSelectMenu（複数選択可）をエフェメラルで表示する
  * @param interaction コマンド実行インタラクション
  * @param guildId 実行対象ギルドID
  */
@@ -23,44 +33,67 @@ export async function handleVcRecruitConfigAddRole(
     throw new ValidationError(tDefault(COMMON_I18N_KEYS.GUILD_ONLY));
   }
 
-  const role = interaction.options.getRole(
-    VC_RECRUIT_CONFIG_COMMAND.OPTION.ROLE,
-    true,
-  );
+  const sessionId = interaction.id;
 
-  const result = await getBotVcRecruitRepository().addMentionRoleId(
-    guildId,
-    role.id,
-  );
-
-  if (result === VC_RECRUIT_MENTION_ROLE_ADD_RESULT.ALREADY_EXISTS) {
-    throw new ValidationError(
-      await tGuild(guildId, "errors:vcRecruit.role_already_added", {
-        role: `<@&${role.id}>`,
-      }),
-    );
-  }
-
-  if (result === VC_RECRUIT_MENTION_ROLE_ADD_RESULT.LIMIT_EXCEEDED) {
-    throw new ValidationError(
-      await tGuild(guildId, "errors:vcRecruit.role_limit_exceeded"),
-    );
-  }
-
-  const embed = createSuccessEmbed(
-    await tGuild(guildId, "commands:vc-recruit-config.embed.add_role_success", {
-      role: `<@&${role.id}>`,
-    }),
-    {
-      title: await tGuild(
+  const roleSelect = new RoleSelectMenuBuilder()
+    .setCustomId(
+      `${VC_RECRUIT_ROLE_CUSTOM_ID.ADD_ROLE_SELECT_PREFIX}${sessionId}`,
+    )
+    .setPlaceholder(
+      await tGuild(
         guildId,
-        "commands:vc-recruit-config.embed.success_title",
+        "commands:vc-recruit-config.add-role.select.placeholder",
       ),
-    },
+    )
+    .setMinValues(1)
+    .setMaxValues(DISCORD_SELECT_MAX_OPTIONS);
+
+  const confirmButton = new ButtonBuilder()
+    .setCustomId(
+      `${VC_RECRUIT_ROLE_CUSTOM_ID.ADD_ROLE_CONFIRM_PREFIX}${sessionId}`,
+    )
+    .setLabel(
+      await tGuild(
+        guildId,
+        "commands:vc-recruit-config.add-role.button.confirm",
+      ),
+    )
+    .setStyle(ButtonStyle.Success)
+    .setEmoji("✅");
+
+  const cancelButton = new ButtonBuilder()
+    .setCustomId(
+      `${VC_RECRUIT_ROLE_CUSTOM_ID.ADD_ROLE_CANCEL_PREFIX}${sessionId}`,
+    )
+    .setLabel(
+      await tGuild(
+        guildId,
+        "commands:vc-recruit-config.add-role.button.cancel",
+      ),
+    )
+    .setStyle(ButtonStyle.Secondary)
+    .setEmoji("❌");
+
+  const selectRow = new ActionRowBuilder<RoleSelectMenuBuilder>().addComponents(
+    roleSelect,
+  );
+  const buttonRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+    confirmButton,
+    cancelButton,
   );
 
   await interaction.reply({
-    embeds: [embed],
+    content: await tGuild(
+      guildId,
+      "commands:vc-recruit-config.add-role.select.title",
+    ),
+    components: [selectRow, buttonRow],
     flags: MessageFlags.Ephemeral,
   });
+
+  disableComponentsAfterTimeout(
+    interaction,
+    [selectRow, buttonRow],
+    VC_RECRUIT_TIMEOUT.ROLE_SELECT_TIMEOUT_MS,
+  );
 }

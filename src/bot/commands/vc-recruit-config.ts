@@ -36,14 +36,8 @@ export const vcRecruitConfigCommand: Command = {
     const addRoleDesc = getCommandLocalizations(
       "vc-recruit-config.add-role.description",
     );
-    const addRoleRoleDesc = getCommandLocalizations(
-      "vc-recruit-config.add-role.role.description",
-    );
     const removeRoleDesc = getCommandLocalizations(
       "vc-recruit-config.remove-role.description",
-    );
-    const removeRoleRoleDesc = getCommandLocalizations(
-      "vc-recruit-config.remove-role.role.description",
     );
     const viewDesc = getCommandLocalizations(
       "vc-recruit-config.view.description",
@@ -86,27 +80,13 @@ export const vcRecruitConfigCommand: Command = {
         subcommand
           .setName(VC_RECRUIT_CONFIG_COMMAND.SUBCOMMAND.ADD_ROLE)
           .setDescription(addRoleDesc.ja)
-          .setDescriptionLocalizations(addRoleDesc.localizations)
-          .addRoleOption((option) =>
-            option
-              .setName(VC_RECRUIT_CONFIG_COMMAND.OPTION.ROLE)
-              .setDescription(addRoleRoleDesc.ja)
-              .setDescriptionLocalizations(addRoleRoleDesc.localizations)
-              .setRequired(true),
-          ),
+          .setDescriptionLocalizations(addRoleDesc.localizations),
       )
       .addSubcommand((subcommand) =>
         subcommand
           .setName(VC_RECRUIT_CONFIG_COMMAND.SUBCOMMAND.REMOVE_ROLE)
           .setDescription(removeRoleDesc.ja)
-          .setDescriptionLocalizations(removeRoleDesc.localizations)
-          .addRoleOption((option) =>
-            option
-              .setName(VC_RECRUIT_CONFIG_COMMAND.OPTION.ROLE)
-              .setDescription(removeRoleRoleDesc.ja)
-              .setDescriptionLocalizations(removeRoleRoleDesc.localizations)
-              .setRequired(true),
-          ),
+          .setDescriptionLocalizations(removeRoleDesc.localizations),
       )
       .addSubcommand((subcommand) =>
         subcommand

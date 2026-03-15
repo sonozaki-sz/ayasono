@@ -1,21 +1,18 @@
 // tests/unit/bot/features/vc-recruit/commands/usecases/vcRecruitConfigAddRole.test.ts
 import { handleVcRecruitConfigAddRole } from "@/bot/features/vc-recruit/commands/usecases/vcRecruitConfigAddRole";
-import { VC_RECRUIT_MENTION_ROLE_ADD_RESULT } from "@/shared/database/types";
+import { VC_RECRUIT_ROLE_CUSTOM_ID } from "@/bot/features/vc-recruit/commands/vcRecruitConfigCommand.constants";
 import { ValidationError } from "@/shared/errors/customErrors";
 
 // ---- モック定義 ----
 
-const addMentionRoleIdMock = vi.fn();
 const tGuildMock = vi.fn(
-  async (_guildId: string, key: string, opts?: Record<string, unknown>) =>
-    opts ? `${key}:${JSON.stringify(opts)}` : key,
+  async (_guildId: string, key: string, _opts?: Record<string, unknown>) =>
+    key,
 );
 const tDefaultMock = vi.fn((key: string) => key);
 
-vi.mock("@/bot/services/botCompositionRoot", () => ({
-  getBotVcRecruitRepository: () => ({
-    addMentionRoleId: (...args: unknown[]) => addMentionRoleIdMock(...args),
-  }),
+vi.mock("@/bot/shared/disableComponentsAfterTimeout", () => ({
+  disableComponentsAfterTimeout: vi.fn(),
 }));
 vi.mock("@/shared/locale/localeManager", () => ({
   tGuild: (...args: unknown[]) =>
@@ -27,20 +24,20 @@ vi.mock("@/shared/locale/localeManager", () => ({
 // ---- ヘルパー ----
 
 const GUILD_ID = "guild-1";
-const ROLE_ID = "role-42";
 
-function makeInteraction(opts: { hasGuild?: boolean; roleId?: string } = {}) {
-  const { hasGuild = true, roleId = ROLE_ID } = opts;
+function makeInteraction(opts: { hasGuild?: boolean } = {}) {
+  const { hasGuild = true } = opts;
   return {
+    id: "interaction-123",
     guild: hasGuild ? { id: GUILD_ID } : null,
-    options: {
-      getRole: vi.fn().mockReturnValue({ id: roleId }),
-    },
     reply: vi.fn().mockResolvedValue(undefined),
+    editReply: vi.fn().mockResolvedValue(undefined),
   };
 }
 
+// handleVcRecruitConfigAddRole のギルドチェック・RoleSelectMenu 返信・customId 構造を検証
 describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigAddRole", () => {
+  // 各テストケースでモック状態をリセットする
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -52,33 +49,27 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigAddRole", () 
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  it("ロールが既に追加済みの場合は ValidationError を投げる", async () => {
-    addMentionRoleIdMock.mockResolvedValue(VC_RECRUIT_MENTION_ROLE_ADD_RESULT.ALREADY_EXISTS);
-    const interaction = makeInteraction();
-    await expect(
-      handleVcRecruitConfigAddRole(interaction as never, GUILD_ID),
-    ).rejects.toBeInstanceOf(ValidationError);
-  });
-
-  it("ロール数が上限超えの場合は ValidationError を投げる", async () => {
-    addMentionRoleIdMock.mockResolvedValue(VC_RECRUIT_MENTION_ROLE_ADD_RESULT.LIMIT_EXCEEDED);
-    const interaction = makeInteraction();
-    await expect(
-      handleVcRecruitConfigAddRole(interaction as never, GUILD_ID),
-    ).rejects.toBeInstanceOf(ValidationError);
-  });
-
-  it("ロール追加成功時は success embed でエフェメラル返信する", async () => {
-    addMentionRoleIdMock.mockResolvedValue(VC_RECRUIT_MENTION_ROLE_ADD_RESULT.ADDED);
+  it("RoleSelectMenu とボタンをエフェメラルで返信する", async () => {
     const interaction = makeInteraction();
     await handleVcRecruitConfigAddRole(interaction as never, GUILD_ID);
 
-    expect(interaction.reply).toHaveBeenCalledWith(
-      expect.objectContaining({
-        embeds: expect.any(Array),
-        flags: expect.anything(),
-      }),
+    expect(interaction.reply).toHaveBeenCalledTimes(1);
+    const call = interaction.reply.mock.calls[0][0];
+    // コンポーネントが2行（セレクト + ボタン）
+    expect(call.components).toHaveLength(2);
+    // エフェメラル
+    expect(call.flags).toBeDefined();
+  });
+
+  it("セレクトメニューの customId にセッション ID が含まれる", async () => {
+    const interaction = makeInteraction();
+    await handleVcRecruitConfigAddRole(interaction as never, GUILD_ID);
+
+    const call = interaction.reply.mock.calls[0][0];
+    const selectRow = call.components[0];
+    const selectJson = selectRow.toJSON();
+    expect(selectJson.components[0].custom_id).toBe(
+      `${VC_RECRUIT_ROLE_CUSTOM_ID.ADD_ROLE_SELECT_PREFIX}${interaction.id}`,
     );
-    expect(addMentionRoleIdMock).toHaveBeenCalledWith(GUILD_ID, ROLE_ID);
   });
 });

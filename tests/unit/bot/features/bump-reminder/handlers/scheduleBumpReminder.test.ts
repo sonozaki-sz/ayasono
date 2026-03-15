@@ -7,7 +7,6 @@ const getReminderDelayMinutesMock = vi.fn();
 const getBotBumpReminderManagerMock = vi.fn();
 const setReminderMock = vi.fn();
 const sendBumpReminderMock = vi.fn();
-const loggerDebugMock = vi.fn();
 
 vi.mock("@/bot/features/bump-reminder/constants/bumpReminderConstants", () => ({
   getReminderDelayMinutes: (...args: unknown[]) =>
@@ -32,12 +31,12 @@ vi.mock("@/shared/locale/localeManager", () => ({
 
 vi.mock("@/shared/utils/logger", () => ({
   logger: {
-    debug: (...args: unknown[]) => loggerDebugMock(...args),
+    debug: vi.fn(),
   },
 }));
 
 // バンプリマインダーのスケジュール登録ユースケース全体を検証するグループ:
-// 正常登録・登録失敗時の孤立パネルクリーンアップ・登録済みタスクの実行内容を確認する
+// 正常登録・登録済みタスクの実行内容を確認する
 describe("bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder", () => {
   // 各テスト前にモックをリセットし、リマインダー遅延120分とマネージャーの標準動作を設定する
   beforeEach(() => {
@@ -68,37 +67,7 @@ describe("bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder", ()
     expect(setReminderMock.mock.calls[0][6]).toBe("Disboard");
   });
 
-  it("リマインダー登録失敗時に孤立パネルメッセージをチャンネルから削除したうえでエラーを再スローする正常系クリーンアップを検証", async () => {
-    const panelDelete = vi.fn().mockResolvedValue(undefined);
-    const fetchMessage = vi.fn().mockResolvedValue({ delete: panelDelete });
-    const fetchChannel = vi.fn().mockResolvedValue({
-      isTextBased: () => true,
-      messages: { fetch: fetchMessage },
-    });
-
-    const client = { channels: { fetch: fetchChannel } };
-    const configService = { getBumpReminderConfig: vi.fn() };
-
-    setReminderMock.mockRejectedValueOnce(new Error("set failed"));
-
-    await expect(
-      scheduleBumpReminder(
-        client as never,
-        "guild-1",
-        "channel-1",
-        "msg-1",
-        SERVICE_NAME,
-        configService as never,
-        "panel-1",
-      ),
-    ).rejects.toThrow("set failed");
-
-    expect(fetchChannel).toHaveBeenCalledWith("channel-1");
-    expect(fetchMessage).toHaveBeenCalledWith("panel-1");
-    expect(panelDelete).toHaveBeenCalled();
-  });
-
-  it("登録されたタスクが sendBumpReminder を実行することを確認する", async () => {
+  it("登録されたタスクが sendBumpReminder を panelMessageId なしで実行することを確認する", async () => {
     const client = { channels: { fetch: vi.fn() } };
     const configService = { getBumpReminderConfig: vi.fn() };
 
@@ -115,6 +84,7 @@ describe("bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder", ()
     const task = setReminderMock.mock.calls[0][5] as () => Promise<void>;
     await task();
 
+    // panelMessageId は sendBumpReminder に渡さない（パネル常設化のため）
     expect(sendBumpReminderMock).toHaveBeenCalledWith(
       client,
       "guild-1",
@@ -122,18 +92,11 @@ describe("bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder", ()
       "msg-1",
       SERVICE_NAME,
       configService,
-      "panel-1",
     );
   });
 
-  it("パネル削除自体も失敗した場合、クリーンアップエラーを握りつぶしてデバッグログに記録し元エラーを再スローすることを確認", async () => {
-    const fetchMessage = vi.fn().mockRejectedValue(new Error("fetch failed"));
-    const fetchChannel = vi.fn().mockResolvedValue({
-      isTextBased: () => true,
-      messages: { fetch: fetchMessage },
-    });
-
-    const client = { channels: { fetch: fetchChannel } };
+  it("リマインダー登録失敗時にエラーがそのまま伝播する", async () => {
+    const client = { channels: { fetch: vi.fn() } };
     const configService = { getBumpReminderConfig: vi.fn() };
     setReminderMock.mockRejectedValueOnce(new Error("set failed"));
 
@@ -148,55 +111,5 @@ describe("bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder", ()
         "panel-1",
       ),
     ).rejects.toThrow("set failed");
-
-    expect(loggerDebugMock).toHaveBeenCalledWith(
-      "system:scheduler.bump_reminder_orphaned_panel_delete_failed",
-      expect.any(Error),
-    );
-  });
-
-  it("panelMessageId が未定義の場合はチャンネルフェッチを行わず元エラーをそのまま再スローする", async () => {
-    const fetchChannel = vi.fn();
-    const client = { channels: { fetch: fetchChannel } };
-    const configService = { getBumpReminderConfig: vi.fn() };
-    setReminderMock.mockRejectedValueOnce(new Error("set failed"));
-
-    await expect(
-      scheduleBumpReminder(
-        client as never,
-        "guild-1",
-        "channel-1",
-        "msg-1",
-        SERVICE_NAME,
-        configService as never,
-        undefined,
-      ),
-    ).rejects.toThrow("set failed");
-
-    expect(fetchChannel).not.toHaveBeenCalled();
-  });
-
-  it("取得したチャンネルがテキストチャンネルでない場合はメッセージ削除をスキップし元エラーだけを再スローすることを確認", async () => {
-    const fetchChannel = vi.fn().mockResolvedValue({
-      isTextBased: () => false,
-      messages: { fetch: vi.fn() },
-    });
-    const client = { channels: { fetch: fetchChannel } };
-    const configService = { getBumpReminderConfig: vi.fn() };
-    setReminderMock.mockRejectedValueOnce(new Error("set failed"));
-
-    await expect(
-      scheduleBumpReminder(
-        client as never,
-        "guild-1",
-        "channel-1",
-        "msg-1",
-        SERVICE_NAME,
-        configService as never,
-        "panel-1",
-      ),
-    ).rejects.toThrow("set failed");
-
-    expect(fetchChannel).toHaveBeenCalledWith("channel-1");
   });
 });

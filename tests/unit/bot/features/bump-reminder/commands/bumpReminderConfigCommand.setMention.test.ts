@@ -1,9 +1,10 @@
 // tests/unit/bot/features/bump-reminder/commands/bumpReminderConfigCommand.setMention.test.ts
 import { handleBumpReminderConfigSetMention } from "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.setMention";
 import { ValidationError } from "@/shared/errors/customErrors";
+import { BUMP_REMINDER_MENTION_ROLE_RESULT } from "@/shared/features/bump-reminder/bumpReminderConfigService";
 
 const ensureManageGuildPermissionMock = vi.fn();
-const getBumpReminderConfigMock = vi.fn();
+const setBumpReminderMentionRoleMock = vi.fn();
 
 vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: vi.fn((key: string) => `default:${key}`),
@@ -16,11 +17,8 @@ vi.mock("@/shared/utils/logger", () => ({
 
 vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotBumpReminderConfigService: () => ({
-    getBumpReminderConfig: (...args: unknown[]) =>
-      getBumpReminderConfigMock(...args),
-    addBumpReminderMentionUser: vi.fn(),
-    removeBumpReminderMentionUser: vi.fn(),
-    setBumpReminderMentionRole: vi.fn(),
+    setBumpReminderMentionRole: (...args: unknown[]) =>
+      setBumpReminderMentionRoleMock(...args),
   }),
 }));
 
@@ -40,18 +38,39 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.setMenti
   beforeEach(() => {
     vi.clearAllMocks();
     ensureManageGuildPermissionMock.mockResolvedValue(undefined);
-    getBumpReminderConfigMock.mockResolvedValue({
-      enabled: true,
-      mentionRoleId: undefined,
-      mentionUserIds: [],
+    setBumpReminderMentionRoleMock.mockResolvedValue(
+      BUMP_REMINDER_MENTION_ROLE_RESULT.UPDATED,
+    );
+  });
+
+  it("ロールが正常に設定された場合は成功応答を返す", async () => {
+    const interaction = {
+      options: {
+        getRole: vi.fn(() => ({ id: "role-1" })),
+      },
+      reply: vi.fn().mockResolvedValue(undefined),
+    };
+
+    await handleBumpReminderConfigSetMention(interaction as never, "guild-1");
+
+    expect(setBumpReminderMentionRoleMock).toHaveBeenCalledWith(
+      "guild-1",
+      "role-1",
+    );
+    expect(interaction.reply).toHaveBeenCalledWith({
+      embeds: [{ description: "translated" }],
+      flags: 64,
     });
   });
 
-  it("ロールもユーザーも指定されていない場合は ValidationError をスローする", async () => {
+  it("サービスが NOT_CONFIGURED を返した場合は ValidationError をスローする", async () => {
+    setBumpReminderMentionRoleMock.mockResolvedValue(
+      BUMP_REMINDER_MENTION_ROLE_RESULT.NOT_CONFIGURED,
+    );
+
     const interaction = {
       options: {
-        getRole: vi.fn(() => null),
-        getUser: vi.fn(() => null),
+        getRole: vi.fn(() => ({ id: "role-1" })),
       },
       reply: vi.fn(),
     };

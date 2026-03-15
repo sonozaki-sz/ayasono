@@ -1,4 +1,5 @@
 // tests/unit/bot/features/message-delete/commands/usecases/buildTargetChannels.test.ts
+// buildTargetChannels: channelIds 配列を受け取り、対象チャンネルリストを構築する
 
 import { ChannelType } from "discord.js";
 import type { Mock } from "vitest";
@@ -27,18 +28,27 @@ vi.mock("@/shared/utils/logger", () => ({
   },
 }));
 
+/** guild.channels.fetch が返す Map 風オブジェクトを生成する */
+function makeChannelCollection(channels: (object | null)[]) {
+  const map = new Map<string, object | null>();
+  for (const ch of channels) {
+    if (ch && "id" in ch) {
+      map.set((ch as { id: string }).id, ch);
+    }
+  }
+  return {
+    size: map.size,
+    values: () => map.values(),
+    get: (id: string) => map.get(id),
+  };
+}
+
 function makeInteraction(opts: {
   guildId?: string | null;
-  channelOption?: object | null;
   meNull?: boolean;
   channels?: (object | null)[];
 }) {
-  const {
-    guildId = "guild-1",
-    channelOption = null,
-    meNull = false,
-    channels = [],
-  } = opts;
+  const { guildId = "guild-1", meNull = false, channels = [] } = opts;
 
   const me = meNull
     ? null
@@ -51,10 +61,9 @@ function makeInteraction(opts: {
         id: guildId,
         members: { me },
         channels: {
-          fetch: vi.fn().mockResolvedValue({
-            size: channels.length,
-            values: () => channels,
-          }) as Mock,
+          fetch: vi
+            .fn()
+            .mockResolvedValue(makeChannelCollection(channels)) as Mock,
         },
       }
     : null;
@@ -62,17 +71,14 @@ function makeInteraction(opts: {
   return {
     guild,
     guildId,
-    options: {
-      getChannel: vi.fn((name: string) => {
-        if (name === "channel") return channelOption;
-        return null;
-      }),
-    },
     editReply: vi.fn().mockResolvedValue(undefined) as Mock,
+    followUp: vi.fn().mockResolvedValue(undefined) as Mock,
   };
 }
 
+// buildTargetChannels の channelIds 指定あり/なし・権限チェック・null チャンネル処理を検証
 describe("bot/features/message-delete/commands/usecases/buildTargetChannels", () => {
+  // 各テストケースでモック状態をリセットする
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -86,73 +92,89 @@ describe("bot/features/message-delete/commands/usecases/buildTargetChannels", ()
   it("guild が null の場合は null を返す", async () => {
     const { buildTargetChannels } = await loadModule();
     const interaction = makeInteraction({ guildId: null });
-    const result = await buildTargetChannels(interaction as never);
+    const result = await buildTargetChannels(interaction as never, []);
     expect(result).toBeNull();
   });
 
-  it("テキスト以外のチャンネルオプションの場合は null を返して警告を送信する", async () => {
+  // ── channelIds 指定あり ──
+
+  it("指定チャンネルIDのテキストチャンネルを返す", async () => {
     const { buildTargetChannels } = await loadModule();
-    const channelOption = {
+    const ch1 = {
       id: "ch-1",
-      type: ChannelType.GuildCategory, // not a text-based channel
+      type: ChannelType.GuildText,
+      isTextBased: () => true,
+      permissionsFor: vi.fn(() => ({ has: vi.fn(() => true) })),
     };
-    const interaction = makeInteraction({ channelOption });
-    const result = await buildTargetChannels(interaction as never);
-    expect(result).toBeNull();
+    const interaction = makeInteraction({ channels: [ch1] });
+    const result = await buildTargetChannels(interaction as never, ["ch-1"]);
+    expect(result).toHaveLength(1);
+    expect(result?.[0]).toBe(ch1);
+  });
+
+  it("テキスト以外のチャンネルIDを指定した場合はスキップする", async () => {
+    const { buildTargetChannels } = await loadModule();
+    const catCh = {
+      id: "ch-cat",
+      type: ChannelType.GuildCategory,
+      isTextBased: () => false,
+    };
+    const textCh = {
+      id: "ch-text",
+      type: ChannelType.GuildText,
+      isTextBased: () => true,
+      permissionsFor: vi.fn(() => ({ has: vi.fn(() => true) })),
+    };
+    const interaction = makeInteraction({ channels: [catCh, textCh] });
+    const result = await buildTargetChannels(interaction as never, [
+      "ch-cat",
+      "ch-text",
+    ]);
+    expect(result).toHaveLength(1);
+    expect(result?.[0]).toBe(textCh);
+  });
+
+  it("Bot がアクセスできないチャンネルをスキップして警告を送信する", async () => {
+    const { buildTargetChannels } = await loadModule();
+    const allowedCh = {
+      id: "ch-1",
+      type: ChannelType.GuildText,
+      isTextBased: () => true,
+      permissionsFor: vi.fn(() => ({ has: vi.fn(() => true) })),
+    };
+    const deniedCh = {
+      id: "ch-2",
+      type: ChannelType.GuildText,
+      isTextBased: () => true,
+      permissionsFor: vi.fn(() => ({ has: vi.fn(() => false) })),
+    };
+    const interaction = makeInteraction({ channels: [allowedCh, deniedCh] });
+    const result = await buildTargetChannels(interaction as never, [
+      "ch-1",
+      "ch-2",
+    ]);
+    expect(result).toHaveLength(1);
+    expect(result?.[0]).toBe(allowedCh);
     expect(createWarningEmbedMock).toHaveBeenCalled();
   });
 
-  it("Bot が指定チャンネルにアクセスできない場合は null を返してエラーを送信する", async () => {
+  it("指定チャンネルすべてにアクセスできない場合は null を返してエラーを送信する", async () => {
     const { buildTargetChannels } = await loadModule();
-    const channelOption = {
+    const deniedCh = {
       id: "ch-1",
       type: ChannelType.GuildText,
+      isTextBased: () => true,
       permissionsFor: vi.fn(() => ({ has: vi.fn(() => false) })),
     };
-    const interaction = makeInteraction({ channelOption });
-    const result = await buildTargetChannels(interaction as never);
+    const interaction = makeInteraction({ channels: [deniedCh] });
+    const result = await buildTargetChannels(interaction as never, ["ch-1"]);
     expect(result).toBeNull();
     expect(createErrorEmbedMock).toHaveBeenCalled();
   });
 
-  it("有効なテキストチャンネルが指定された場合は単一チャンネルの配列を返す", async () => {
-    const { buildTargetChannels } = await loadModule();
-    const channelOption = {
-      id: "ch-1",
-      type: ChannelType.GuildText,
-      permissionsFor: vi.fn(() => ({ has: vi.fn(() => true) })),
-    };
-    const interaction = makeInteraction({ channelOption });
-    const result = await buildTargetChannels(interaction as never);
-    expect(result).toHaveLength(1);
-    expect(result?.[0]).toBe(channelOption);
-  });
+  // ── channelIds 未指定（空配列）──
 
-  it("GuildVoice タイプのチャンネルが指定された場合は単一チャンネルを返す", async () => {
-    const { buildTargetChannels } = await loadModule();
-    const channelOption = {
-      id: "ch-1",
-      type: ChannelType.GuildVoice,
-      permissionsFor: vi.fn(() => ({ has: vi.fn(() => true) })),
-    };
-    const interaction = makeInteraction({ channelOption });
-    const result = await buildTargetChannels(interaction as never);
-    expect(result).toHaveLength(1);
-  });
-
-  it("PublicThread タイプのチャンネルが指定された場合は単一チャンネルを返す", async () => {
-    const { buildTargetChannels } = await loadModule();
-    const channelOption = {
-      id: "ch-1",
-      type: ChannelType.PublicThread,
-      permissionsFor: vi.fn(() => ({ has: vi.fn(() => true) })),
-    };
-    const interaction = makeInteraction({ channelOption });
-    const result = await buildTargetChannels(interaction as never);
-    expect(result).toHaveLength(1);
-  });
-
-  it("チャンネルオプションなしの場合はギルドからアクセス可能なチャンネルを返す", async () => {
+  it("channelIds が空の場合はギルドからアクセス可能なチャンネルを返す", async () => {
     const { buildTargetChannels } = await loadModule();
     const textChannel = {
       id: "ch-1",
@@ -167,7 +189,7 @@ describe("bot/features/message-delete/commands/usecases/buildTargetChannels", ()
     const interaction = makeInteraction({
       channels: [textChannel, voiceChannel],
     });
-    const result = await buildTargetChannels(interaction as never);
+    const result = await buildTargetChannels(interaction as never, []);
     expect(result).toHaveLength(1);
     expect(result?.[0]).toBe(textChannel);
   });
@@ -187,7 +209,7 @@ describe("bot/features/message-delete/commands/usecases/buildTargetChannels", ()
     const interaction = makeInteraction({
       channels: [allowedChannel, deniedChannel],
     });
-    const result = await buildTargetChannels(interaction as never);
+    const result = await buildTargetChannels(interaction as never, []);
     expect(result).toHaveLength(1);
     expect(result?.[0]).toBe(allowedChannel);
   });
@@ -200,7 +222,7 @@ describe("bot/features/message-delete/commands/usecases/buildTargetChannels", ()
       channels: [ch1, ch2],
       meNull: true,
     });
-    const result = await buildTargetChannels(interaction as never);
+    const result = await buildTargetChannels(interaction as never, []);
     expect(result).toHaveLength(2);
   });
 
@@ -214,34 +236,7 @@ describe("bot/features/message-delete/commands/usecases/buildTargetChannels", ()
     const interaction = makeInteraction({
       channels: [null, validChannel, null],
     });
-    const result = await buildTargetChannels(interaction as never);
-    expect(result).toHaveLength(1);
-  });
-
-  it("me が null でも Bot アクセスが許可されている場合はチャンネルを返す", async () => {
-    const { buildTargetChannels } = await loadModule();
-    const channelOption = {
-      id: "ch-1",
-      type: ChannelType.GuildText,
-      permissionsFor: vi.fn(() => null), // permissionsFor returns null when no me
-    };
-
-    const guild = {
-      id: "guild-1",
-      members: { me: null },
-    };
-
-    const interaction = {
-      guild,
-      guildId: "guild-1",
-      options: {
-        getChannel: vi.fn(() => channelOption),
-      },
-      editReply: vi.fn().mockResolvedValue(undefined) as Mock,
-    };
-
-    const result = await buildTargetChannels(interaction as never);
-    // When me is null, hasAccess is true (no restriction)
+    const result = await buildTargetChannels(interaction as never, []);
     expect(result).toHaveLength(1);
   });
 });

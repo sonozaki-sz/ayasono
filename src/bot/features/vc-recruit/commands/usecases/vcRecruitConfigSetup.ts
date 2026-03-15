@@ -2,9 +2,6 @@
 // vc-recruit-config setup のユースケース処理
 
 import {
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
   ChannelType,
   MessageFlags,
   type OverwriteResolvable,
@@ -16,16 +13,13 @@ import { ValidationError } from "../../../../../shared/errors/customErrors";
 import { tDefault, tGuild } from "../../../../../shared/locale/localeManager";
 import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
 import { getBotVcRecruitRepository } from "../../../../services/botCompositionRoot";
-import {
-  createInfoEmbed,
-  createSuccessEmbed,
-} from "../../../../utils/messageResponse";
+import { createSuccessEmbed } from "../../../../utils/messageResponse";
 import { resolveTargetCategory } from "../helpers/vcRecruitTargetResolver";
 import {
   THREAD_ARCHIVE_DURATION_MAP,
   VC_RECRUIT_CONFIG_COMMAND,
-  VC_RECRUIT_PANEL_CUSTOM_ID,
 } from "../vcRecruitConfigCommand.constants";
+import { buildVcRecruitPanelComponents } from "../vcRecruitPanelEmbed";
 
 /**
  * vc-recruit-config setup を実行する
@@ -153,26 +147,8 @@ export async function handleVcRecruitConfigSetup(
   })) as TextChannel;
 
   // ── パネルメッセージ送信 ──────────────────────────────────────────
-  const panelTitle = await tGuild(guildId, "commands:vcRecruit.panel.title");
-  const panelDescription = await tGuild(
-    guildId,
-    "commands:vcRecruit.panel.description",
-  );
-  const createButtonLabel = await tGuild(
-    guildId,
-    "commands:vcRecruit.panel.create_button",
-  );
-
-  const panelEmbed = createInfoEmbed(panelDescription, { title: panelTitle });
-  const createRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
-    new ButtonBuilder()
-      .setCustomId(
-        `${VC_RECRUIT_PANEL_CUSTOM_ID.CREATE_BUTTON_PREFIX}${panelChannel.id}`,
-      )
-      .setLabel(createButtonLabel)
-      .setEmoji("📢")
-      .setStyle(ButtonStyle.Success),
-  );
+  const { embed: panelEmbed, row: createRow } =
+    await buildVcRecruitPanelComponents(guildId, panelChannel.id);
 
   const panelMessage = await panelChannel.send({
     embeds: [panelEmbed],

@@ -9,7 +9,9 @@ vi.mock("@/bot/features/vac/handlers/vacVoiceStateUpdate", () => ({
     handleVacVoiceStateUpdateMock(...args),
 }));
 
+// voiceStateUpdate イベントの検証
 describe("bot/events/voiceStateUpdate", () => {
+  // beforeEach: 各テストの前にモックをリセットして副作用を分離する
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -29,5 +31,15 @@ describe("bot/events/voiceStateUpdate", () => {
       oldState,
       newState,
     );
+  });
+
+  it("VC募集の voiceStateUpdate ハンドラーは呼ばれない", async () => {
+    const oldState = { channelId: "old" };
+    const newState = { channelId: "new" };
+
+    await voiceStateUpdateEvent.execute(oldState as never, newState as never);
+
+    // VAC のみが呼ばれ、VC募集のハンドラーは存在しない
+    expect(handleVacVoiceStateUpdateMock).toHaveBeenCalledTimes(1);
   });
 });

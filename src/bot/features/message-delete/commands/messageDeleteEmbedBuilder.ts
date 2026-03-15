@@ -9,10 +9,12 @@ import {
   StringSelectMenuBuilder,
 } from "discord.js";
 import { tDefault } from "../../../../shared/locale/localeManager";
+import { STATUS_COLORS } from "../../../utils/messageResponse";
 import {
   MSG_DEL_CUSTOM_ID,
   MSG_DEL_DEFAULT_COUNT,
   MSG_DEL_PAGE_SIZE,
+  MSG_DEL_SELECT_MAX_OPTIONS,
   MS_PER_DAY,
   type CommandConditionsDisplay,
   type MessageDeleteFilter,
@@ -92,6 +94,54 @@ export function buildFilteredMessages<T extends ScannedMessage>(
 }
 
 /**
+ * ページネーション用ナビゲーションボタン行を生成する
+ * @param page 現在のページ番号（0-indexed）
+ * @param totalPages 総ページ数
+ * @returns ナビゲーション用 ActionRow
+ */
+function buildPaginationNavRow(
+  page: number,
+  totalPages: number,
+): ActionRowBuilder<ButtonBuilder> {
+  return new ActionRowBuilder<ButtonBuilder>().addComponents(
+    new ButtonBuilder()
+      .setCustomId(MSG_DEL_CUSTOM_ID.FIRST)
+      .setEmoji("⏮")
+      .setLabel(tDefault("commands:message-delete.pagination.btn_first"))
+      .setStyle(ButtonStyle.Secondary)
+      .setDisabled(page === 0),
+    new ButtonBuilder()
+      .setCustomId(MSG_DEL_CUSTOM_ID.PREV)
+      .setEmoji("◀")
+      .setLabel(tDefault("commands:message-delete.pagination.btn_prev"))
+      .setStyle(ButtonStyle.Secondary)
+      .setDisabled(page === 0),
+    new ButtonBuilder()
+      .setCustomId(MSG_DEL_CUSTOM_ID.JUMP)
+      .setLabel(
+        tDefault("commands:message-delete.pagination.btn_jump", {
+          page: page + 1,
+          total: Math.max(1, totalPages),
+        }),
+      )
+      .setStyle(ButtonStyle.Secondary)
+      .setDisabled(totalPages <= 1),
+    new ButtonBuilder()
+      .setCustomId(MSG_DEL_CUSTOM_ID.NEXT)
+      .setEmoji("▶")
+      .setLabel(tDefault("commands:message-delete.pagination.btn_next"))
+      .setStyle(ButtonStyle.Secondary)
+      .setDisabled(page >= totalPages - 1),
+    new ButtonBuilder()
+      .setCustomId(MSG_DEL_CUSTOM_ID.LAST)
+      .setEmoji("⏭")
+      .setLabel(tDefault("commands:message-delete.pagination.btn_last"))
+      .setStyle(ButtonStyle.Secondary)
+      .setDisabled(page >= totalPages - 1),
+  );
+}
+
+/**
  * プレビュー Embed（Stage 1）を生成する
  * @param filteredMessages フィルター適用済みのスキャン済みメッセージ
  * @param page 現在のページ番号（0-indexed）
@@ -105,7 +155,7 @@ export function buildPreviewEmbed(
   totalPages: number,
   excludedIds: ReadonlySet<string>,
 ): EmbedBuilder {
-  const embed = new EmbedBuilder().setColor(0x3498db).setTitle(
+  const embed = new EmbedBuilder().setColor(STATUS_COLORS.info).setTitle(
     tDefault("commands:message-delete.confirm.embed_title", {
       page: page + 1,
       total: Math.max(1, totalPages),
@@ -158,42 +208,7 @@ export function buildPreviewComponents(
   const hasAfterOrBefore = !!(filter.after || filter.before);
 
   // Row 1: ページ移動ボタン（⏮ 前へ ページ数 次へ ⏭）
-  const navRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
-    new ButtonBuilder()
-      .setCustomId(MSG_DEL_CUSTOM_ID.FIRST)
-      .setEmoji("⏮")
-      .setLabel(tDefault("commands:message-delete.pagination.btn_first"))
-      .setStyle(ButtonStyle.Secondary)
-      .setDisabled(page === 0),
-    new ButtonBuilder()
-      .setCustomId(MSG_DEL_CUSTOM_ID.PREV)
-      .setEmoji("◀")
-      .setLabel(tDefault("commands:message-delete.pagination.btn_prev"))
-      .setStyle(ButtonStyle.Secondary)
-      .setDisabled(page === 0),
-    new ButtonBuilder()
-      .setCustomId(MSG_DEL_CUSTOM_ID.JUMP)
-      .setLabel(
-        tDefault("commands:message-delete.pagination.btn_jump", {
-          page: page + 1,
-          total: Math.max(1, totalPages),
-        }),
-      )
-      .setStyle(ButtonStyle.Secondary)
-      .setDisabled(totalPages <= 1),
-    new ButtonBuilder()
-      .setCustomId(MSG_DEL_CUSTOM_ID.NEXT)
-      .setEmoji("▶")
-      .setLabel(tDefault("commands:message-delete.pagination.btn_next"))
-      .setStyle(ButtonStyle.Secondary)
-      .setDisabled(page >= totalPages - 1),
-    new ButtonBuilder()
-      .setCustomId(MSG_DEL_CUSTOM_ID.LAST)
-      .setEmoji("⏭")
-      .setLabel(tDefault("commands:message-delete.pagination.btn_last"))
-      .setStyle(ButtonStyle.Secondary)
-      .setDisabled(page >= totalPages - 1),
-  );
+  const navRow = buildPaginationNavRow(page, totalPages);
 
   // Row 2: 投稿者フィルターセレクト
   const uniqueAuthors = [
@@ -214,7 +229,7 @@ export function buildPreviewComponents(
         value: "__all__",
       },
       ...uniqueAuthors
-        .slice(0, 24) // Discord SelectMenu は最大25件（先頭の「全員」分を含む）
+        .slice(0, MSG_DEL_SELECT_MAX_OPTIONS - 1) // Discord SelectMenu は最大25件（先頭の「全員」分を含む）
         .map(([id, tag]) => ({ label: tag, value: id })),
     ]);
 
@@ -365,7 +380,7 @@ export function buildFinalConfirmEmbed(
   totalDeleteCount: number,
 ): EmbedBuilder {
   const embed = new EmbedBuilder()
-    .setColor(0xe74c3c)
+    .setColor(STATUS_COLORS.danger)
     .setTitle(
       tDefault("commands:message-delete.final.embed_title", {
         page: page + 1,
@@ -403,42 +418,7 @@ export function buildFinalConfirmComponents(
   deleteCount: number,
 ): ActionRowBuilder<ButtonBuilder>[] {
   // 仕様: 最終確認のナビゲーションはプレビューと同一 customId（⏮ 前へ 1/N 次へ ⏭）
-  const navRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
-    new ButtonBuilder()
-      .setCustomId(MSG_DEL_CUSTOM_ID.FIRST)
-      .setEmoji("⏮")
-      .setLabel(tDefault("commands:message-delete.pagination.btn_first"))
-      .setStyle(ButtonStyle.Secondary)
-      .setDisabled(page === 0),
-    new ButtonBuilder()
-      .setCustomId(MSG_DEL_CUSTOM_ID.PREV)
-      .setEmoji("◀")
-      .setLabel(tDefault("commands:message-delete.pagination.btn_prev"))
-      .setStyle(ButtonStyle.Secondary)
-      .setDisabled(page === 0),
-    new ButtonBuilder()
-      .setCustomId(MSG_DEL_CUSTOM_ID.JUMP)
-      .setLabel(
-        tDefault("commands:message-delete.pagination.btn_jump", {
-          page: page + 1,
-          total: Math.max(1, totalPages),
-        }),
-      )
-      .setStyle(ButtonStyle.Secondary)
-      .setDisabled(totalPages <= 1),
-    new ButtonBuilder()
-      .setCustomId(MSG_DEL_CUSTOM_ID.NEXT)
-      .setEmoji("▶")
-      .setLabel(tDefault("commands:message-delete.pagination.btn_next"))
-      .setStyle(ButtonStyle.Secondary)
-      .setDisabled(page >= totalPages - 1),
-    new ButtonBuilder()
-      .setCustomId(MSG_DEL_CUSTOM_ID.LAST)
-      .setEmoji("⏭")
-      .setLabel(tDefault("commands:message-delete.pagination.btn_last"))
-      .setStyle(ButtonStyle.Secondary)
-      .setDisabled(page >= totalPages - 1),
-  );
+  const navRow = buildPaginationNavRow(page, totalPages);
 
   const actionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
@@ -486,7 +466,7 @@ export function buildCompletionEmbed(
       .join("\n") || tDefault("commands:message-delete.embed.breakdown_empty");
 
   return new EmbedBuilder()
-    .setColor(0x2ecc71)
+    .setColor(STATUS_COLORS.success)
     .setTitle(tDefault("commands:message-delete.embed.summary_title"))
     .addFields(
       {
@@ -513,12 +493,12 @@ export function buildCommandConditionsEmbed(
 ): EmbedBuilder {
   const {
     count,
-    targetUserId,
+    targetUserIds,
     keyword,
     daysOption,
     afterStr,
     beforeStr,
-    channelId,
+    channelIds,
   } = conditions;
 
   const hasDays = daysOption !== undefined;
@@ -531,17 +511,19 @@ export function buildCommandConditionsEmbed(
         })
       : tDefault("commands:message-delete.conditions.count_limited", { count });
 
-  const userValue = targetUserId
-    ? `<@${targetUserId}>`
-    : tDefault("commands:message-delete.conditions.user_all");
+  const userValue =
+    targetUserIds.length > 0
+      ? targetUserIds.map((id) => `<@${id}>`).join(" ")
+      : tDefault("commands:message-delete.conditions.user_all");
 
   const keywordValue = keyword
     ? `"${keyword}"`
     : tDefault("commands:message-delete.conditions.none");
 
-  const channelValue = channelId
-    ? `<#${channelId}>`
-    : tDefault("commands:message-delete.conditions.channel_all");
+  const channelValue =
+    channelIds.length > 0
+      ? channelIds.map((id) => `<#${id}>`).join(" ")
+      : tDefault("commands:message-delete.conditions.channel_all");
 
   // days と after/before は排他。指定されている方のフィールドのみ表示し、もう一方は省略する
   const periodFields: { name: string; value: string; inline: true }[] = [];
@@ -582,7 +564,7 @@ export function buildCommandConditionsEmbed(
   }
 
   return new EmbedBuilder()
-    .setColor(0x95a5a6)
+    .setColor(STATUS_COLORS.muted)
     .setTitle(tDefault("commands:message-delete.conditions.title"))
     .addFields(
       { name: "count", value: countValue, inline: true },

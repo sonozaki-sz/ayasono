@@ -7,6 +7,7 @@ import {
   ButtonStyle,
   type ChatInputCommandInteraction,
   type GuildTextBasedChannel,
+  type MessageComponentInteraction,
 } from "discord.js";
 import { tDefault } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
@@ -15,7 +16,7 @@ import {
   createInfoEmbed,
 } from "../../../../utils/messageResponse";
 import {
-  MSG_DEL_CONFIRM_TIMEOUT_MS,
+  MSG_DEL_PHASE_TIMEOUT_MS,
   MSG_DEL_CUSTOM_ID,
   type ScannedMessageWithChannel,
 } from "../../constants/messageDeleteConstants";
@@ -30,17 +31,17 @@ import type { ParsedOptions } from "./dialogUtils";
  * - 「収集分を確認」ボタンで中断可能
  * - 14分タイムアウトでスキャンを自動中断
  * - 中断/タイムアウト時に収集済みメッセージがあればプレビューへ遷移
- * @param interaction コマンド実行の ChatInputCommandInteraction
+ * @param interaction 条件設定ステップから渡された interaction（fresh な 15分 token）
  * @param channels スキャン対象のチャンネル一覧
  * @param options パース済みコマンドオプション
  * @returns 収集済みメッセージ配列（null の場合は処理終了）
  */
 export async function runScanPhase(
-  interaction: ChatInputCommandInteraction,
+  interaction: ChatInputCommandInteraction | MessageComponentInteraction,
   channels: GuildTextBasedChannel[],
   options: ParsedOptions,
 ): Promise<ScannedMessageWithChannel[] | null> {
-  const { count, targetUserId, keyword, afterTs, beforeTs } = options;
+  const { count, targetUserIds, keyword, afterTs, beforeTs } = options;
   const controller = new AbortController();
 
   // タイムアウト原因の追跡（タイムアウト vs ユーザー中断）
@@ -71,7 +72,7 @@ export async function runScanPhase(
   const scanTimeoutId = setTimeout(() => {
     cancelState.reason = "timeout";
     controller.abort();
-  }, MSG_DEL_CONFIRM_TIMEOUT_MS);
+  }, MSG_DEL_PHASE_TIMEOUT_MS);
 
   // 「収集分を確認」ボタンコレクター（ユーザーによる任意中断）
   const cancelCollector = scanReply.createMessageComponentCollector({
@@ -91,10 +92,12 @@ export async function runScanPhase(
       // "user" 以外（messageDelete / channelDelete 等）でメッセージが削除された場合は
       // スキャンを即座に中断する。"user" は finally の cancelCollector.stop() による通常停止。
       logger.debug(
-        `[MsgDel] Phase1 cancelCollector ended: reason=${String(reason)}`,
+        tDefault("system:message-delete.cancel_collector_ended", {
+          reason: String(reason),
+        }),
       );
       if (reason !== "user") {
-        logger.debug(`[MsgDel] Phase1 aborting scan due to non-user end`);
+        logger.debug(tDefault("system:message-delete.aborting_non_user_end"));
         controller.abort();
       }
       resolve();
@@ -105,7 +108,7 @@ export async function runScanPhase(
   try {
     scannedMessages = await scanMessages(channels, {
       count,
-      targetUserId,
+      targetUserIds,
       keyword,
       afterTs,
       beforeTs,
@@ -125,7 +128,7 @@ export async function runScanPhase(
     await interaction.editReply({
       embeds: [
         createErrorEmbed(
-          tDefault("commands:message-delete.errors.delete_failed"),
+          tDefault("commands:message-delete.errors.scan_failed"),
         ),
       ],
       content: "",

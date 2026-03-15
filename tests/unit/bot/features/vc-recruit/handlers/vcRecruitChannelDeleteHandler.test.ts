@@ -7,7 +7,9 @@ import { ChannelType } from "discord.js";
 
 const findSetupByPanelChannelIdMock = vi.fn();
 const findSetupByPostChannelIdMock = vi.fn();
+const findSetupByCreatedVcIdMock = vi.fn();
 const removeSetupMock = vi.fn();
+const removeCreatedVoiceChannelIdMock = vi.fn();
 
 vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotVcRecruitRepository: () => ({
@@ -15,12 +17,20 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
       findSetupByPanelChannelIdMock(...args),
     findSetupByPostChannelId: (...args: unknown[]) =>
       findSetupByPostChannelIdMock(...args),
+    findSetupByCreatedVcId: (...args: unknown[]) =>
+      findSetupByCreatedVcIdMock(...args),
     removeSetup: (...args: unknown[]) => removeSetupMock(...args),
+    removeCreatedVoiceChannelId: (...args: unknown[]) =>
+      removeCreatedVoiceChannelIdMock(...args),
   }),
 }));
 
 vi.mock("@/shared/utils/logger", () => ({
   logger: { info: vi.fn(), error: vi.fn(), debug: vi.fn() },
+}));
+
+vi.mock("@/shared/locale/localeManager", () => ({
+  tGuild: vi.fn(async (_guildId: string, key: string) => key),
 }));
 
 // ---- ヘルパー ----
@@ -63,11 +73,14 @@ function makeDMChannel() {
 
 // VC募集 channelDelete ハンドラーの動作を検証
 describe("bot/features/vc-recruit/handlers/vcRecruitChannelDeleteHandler", () => {
+  // beforeEach: 各テストの前にモックをリセットして副作用を分離する
   beforeEach(() => {
     vi.clearAllMocks();
     findSetupByPanelChannelIdMock.mockResolvedValue(null);
     findSetupByPostChannelIdMock.mockResolvedValue(null);
+    findSetupByCreatedVcIdMock.mockResolvedValue(null);
     removeSetupMock.mockResolvedValue(undefined);
+    removeCreatedVoiceChannelIdMock.mockResolvedValue(undefined);
   });
 
   it("DM チャンネルは対象外でリポジトリを呼ばない", async () => {
@@ -215,6 +228,99 @@ describe("bot/features/vc-recruit/handlers/vcRecruitChannelDeleteHandler", () =>
     expect(logger.error).toHaveBeenCalledWith(
       expect.stringContaining("パネルチャンネル削除失敗"),
       expect.objectContaining({ error: expect.any(Error) }),
+    );
+  });
+
+  it("作成VCが手動削除された場合、DBから削除し投稿ボタンをVC終了済みに更新する", async () => {
+    const setup = {
+      panelChannelId: "panel-ch-7",
+      postChannelId: "post-ch-7",
+    };
+    findSetupByCreatedVcIdMock.mockResolvedValue(setup);
+
+    const editMock = vi.fn().mockResolvedValue(undefined);
+    const msgWithTarget = {
+      components: [
+        {
+          components: [
+            { customId: "vc-recruit:end-vc:user-1:vc-deleted-1" },
+            { customId: "vc-recruit:delete-post:user-1:vc-deleted-1" },
+          ],
+        },
+      ],
+      edit: editMock,
+    };
+    const msgWithoutTarget = {
+      components: [
+        {
+          components: [
+            { customId: "vc-recruit:end-vc:user-2:other-vc" },
+          ],
+        },
+      ],
+      edit: vi.fn(),
+    };
+
+    const messagesFetchMock = vi.fn().mockResolvedValue(
+      new Map([
+        ["msg-1", msgWithTarget],
+        ["msg-2", msgWithoutTarget],
+      ]),
+    );
+    const postChannel = {
+      id: "post-ch-7",
+      messages: { fetch: messagesFetchMock },
+    };
+
+    const channel = {
+      id: "vc-deleted-1",
+      guildId: GUILD_ID,
+      isDMBased: () => false,
+      guild: {
+        channels: {
+          fetch: vi.fn().mockResolvedValue(postChannel),
+        },
+      },
+    };
+
+    await handleVcRecruitChannelDelete(channel as never);
+
+    expect(removeCreatedVoiceChannelIdMock).toHaveBeenCalledWith(
+      GUILD_ID,
+      "vc-deleted-1",
+    );
+    expect(editMock).toHaveBeenCalledWith(
+      expect.objectContaining({ components: expect.any(Array) }),
+    );
+    // 無関係なメッセージは更新されない
+    expect(msgWithoutTarget.edit).not.toHaveBeenCalled();
+  });
+
+  it("作成VCが削除されたが投稿チャンネルが見つからない場合もエラーにならない", async () => {
+    const setup = {
+      panelChannelId: "panel-ch-8",
+      postChannelId: "post-ch-8",
+    };
+    findSetupByCreatedVcIdMock.mockResolvedValue(setup);
+
+    const channel = {
+      id: "vc-deleted-2",
+      guildId: GUILD_ID,
+      isDMBased: () => false,
+      guild: {
+        channels: {
+          fetch: vi.fn().mockResolvedValue(null),
+        },
+      },
+    };
+
+    await expect(
+      handleVcRecruitChannelDelete(channel as never),
+    ).resolves.toBeUndefined();
+
+    expect(removeCreatedVoiceChannelIdMock).toHaveBeenCalledWith(
+      GUILD_ID,
+      "vc-deleted-2",
     );
   });
 });

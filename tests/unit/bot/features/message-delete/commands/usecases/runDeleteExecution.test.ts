@@ -44,8 +44,10 @@ const mockOptions: import("@/bot/features/message-delete/commands/usecases/dialo
   {
     count: 10,
     countSpecified: false,
+    targetUserIds: [],
     afterTs: 0,
     beforeTs: Infinity,
+    channelIds: [],
   };
 
 function makeInteraction() {
@@ -55,7 +57,9 @@ function makeInteraction() {
   };
 }
 
+// executeDelete の削除実行・進捗コールバック・エラーハンドリングを検証
 describe("bot/features/message-delete/commands/usecases/runDeleteExecution", () => {
+  // 各テストケースでモック状態をリセットする
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -102,7 +106,7 @@ describe("bot/features/message-delete/commands/usecases/runDeleteExecution", () 
     await executeDelete(interaction as never, [] as never, {
       ...mockOptions,
       countSpecified: true,
-      targetUserId: "user-2",
+      targetUserIds: ["user-2"],
       keyword: "hello",
       daysOption: 7,
     });

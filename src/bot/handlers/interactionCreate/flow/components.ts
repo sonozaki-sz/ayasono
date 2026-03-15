@@ -1,8 +1,10 @@
 // src/bot/handlers/interactionCreate/flow/components.ts
-// ボタン / ユーザーセレクト処理
+// ボタン / セレクトメニュー インタラクションの共通ディスパッチ
 
 import type {
   ButtonInteraction,
+  RepliableInteraction,
+  RoleSelectMenuInteraction,
   StringSelectMenuInteraction,
   UserSelectMenuInteraction,
 } from "discord.js";
@@ -10,22 +12,33 @@ import { tDefault } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import { handleInteractionError } from "../../../errors/interactionErrorHandler";
 import { buttonHandlers } from "../ui/buttons";
-import { stringSelectHandlers, userSelectHandlers } from "../ui/selectMenus";
+import {
+  roleSelectHandlers,
+  stringSelectHandlers,
+  userSelectHandlers,
+} from "../ui/selectMenus";
+import type { InteractionHandler } from "../ui/types";
 
 /**
- * ボタンインタラクションをレジストリ解決して実行する関数
+ * customId に一致する最初のハンドラを検索し実行する汎用ディスパッチ関数
+ * @param interaction 対象インタラクション
+ * @param handlers ハンドラレジストリ
+ * @param errorKey エラーログ用 i18n キー
  */
-export async function handleButton(
-  interaction: ButtonInteraction,
+async function dispatchByCustomId<
+  T extends RepliableInteraction & { customId: string },
+>(
+  interaction: T,
+  handlers: readonly InteractionHandler<T>[],
+  errorKey: string,
 ): Promise<void> {
-  // customId に一致する最初のボタンハンドラのみ実行する
-  for (const handler of buttonHandlers) {
+  for (const handler of handlers) {
     if (handler.matches(interaction.customId)) {
       try {
         await handler.execute(interaction);
       } catch (error) {
         logger.error(
-          tDefault("system:interaction.button_error", {
+          tDefault(errorKey as Parameters<typeof tDefault>[0], {
             customId: interaction.customId,
           }),
           error,
@@ -39,53 +52,55 @@ export async function handleButton(
 }
 
 /**
- * ユーザーセレクトメニューインタラクションを処理する関数
+ * ボタンインタラクションをレジストリ解決して実行する
+ * @param interaction 対象ボタンインタラクション
  */
-export async function handleUserSelectMenu(
+export function handleButton(interaction: ButtonInteraction): Promise<void> {
+  return dispatchByCustomId(
+    interaction,
+    buttonHandlers,
+    "system:interaction.button_error",
+  );
+}
+
+/**
+ * ユーザーセレクトメニューインタラクションを処理する
+ * @param interaction 対象ユーザーセレクトインタラクション
+ */
+export function handleUserSelectMenu(
   interaction: UserSelectMenuInteraction,
 ): Promise<void> {
-  // customId に一致する最初の user-select ハンドラのみ実行する
-  for (const handler of userSelectHandlers) {
-    if (handler.matches(interaction.customId)) {
-      try {
-        await handler.execute(interaction);
-      } catch (error) {
-        logger.error(
-          tDefault("system:interaction.select_menu_error", {
-            customId: interaction.customId,
-          }),
-          error,
-        );
-        await handleInteractionError(interaction, error);
-      }
-      // 最初に一致したハンドラのみ処理して終了
-      break;
-    }
-  }
+  return dispatchByCustomId(
+    interaction,
+    userSelectHandlers,
+    "system:interaction.select_menu_error",
+  );
 }
 
 /**
- * 文字列セレクトメニューインタラクションを処理する関数
+ * ロールセレクトメニューインタラクションを処理する
+ * @param interaction 対象ロールセレクトインタラクション
  */
-export async function handleStringSelectMenu(
+export function handleRoleSelectMenu(
+  interaction: RoleSelectMenuInteraction,
+): Promise<void> {
+  return dispatchByCustomId(
+    interaction,
+    roleSelectHandlers,
+    "system:interaction.select_menu_error",
+  );
+}
+
+/**
+ * 文字列セレクトメニューインタラクションを処理する
+ * @param interaction 対象文字列セレクトインタラクション
+ */
+export function handleStringSelectMenu(
   interaction: StringSelectMenuInteraction,
 ): Promise<void> {
-  // customId に一致する最初の string-select ハンドラのみ実行する
-  for (const handler of stringSelectHandlers) {
-    if (handler.matches(interaction.customId)) {
-      try {
-        await handler.execute(interaction);
-      } catch (error) {
-        logger.error(
-          tDefault("system:interaction.select_menu_error", {
-            customId: interaction.customId,
-          }),
-          error,
-        );
-        await handleInteractionError(interaction, error);
-      }
-      // 最初に一致したハンドラのみ処理して終了
-      break;
-    }
-  }
+  return dispatchByCustomId(
+    interaction,
+    stringSelectHandlers,
+    "system:interaction.select_menu_error",
+  );
 }

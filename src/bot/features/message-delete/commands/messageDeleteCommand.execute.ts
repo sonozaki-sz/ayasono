@@ -15,18 +15,24 @@ import {
   createInfoEmbed,
   createWarningEmbed,
 } from "../../../utils/messageResponse";
-import { type ScannedMessageWithChannel } from "../constants/messageDeleteConstants";
+import {
+  type MessageDeleteFilter,
+  type ScannedMessageWithChannel,
+} from "../constants/messageDeleteConstants";
 import { buildTargetChannels } from "./usecases/buildTargetChannels";
 import { DIALOG_TYPE, type ParsedOptions } from "./usecases/dialogUtils";
+import { runConditionSetupStep } from "./usecases/runConditionSetupStep";
 import { executeDelete } from "./usecases/runDeleteExecution";
 import { showFinalConfirmDialog } from "./usecases/runFinalConfirmDialog";
 import { showPreviewDialog } from "./usecases/runPreviewDialog";
 import { runScanPhase } from "./usecases/runScanPhase";
 import {
+  hasBotRequiredPermissions,
   hasManageMessagesPermission,
+  hasSlashCommandFilter,
   parseAndValidateOptions,
 } from "./usecases/validateOptions";
-import { MSG_DEL_CONFIRM_TIMEOUT_MS } from "../constants/messageDeleteConstants";
+import { MSG_DEL_PHASE_TIMEOUT_MS } from "../constants/messageDeleteConstants";
 
 // ===== サーバー単位の処理中ロック =====
 // Phase 1〜3 の実行中はロックを保持し、同一サーバー内の重複実行を防止する
@@ -67,6 +73,18 @@ export async function executeMessageDeleteCommand(
       return;
     }
 
+    // Bot 権限チェック（ManageMessages / ReadMessageHistory / ViewChannel）
+    if (!hasBotRequiredPermissions(interaction)) {
+      await interaction.editReply({
+        embeds: [
+          createErrorEmbed(
+            tDefault("commands:message-delete.errors.bot_no_permission"),
+          ),
+        ],
+      });
+      return;
+    }
+
     // ── 処理中ロック取得（Phase 1〜3 の重複実行防止） ──
     const guildId = interaction.guildId;
     if (executingGuilds.has(guildId)) {
@@ -78,21 +96,38 @@ export async function executeMessageDeleteCommand(
       return;
     }
     executingGuilds.add(guildId);
-    logger.debug(`[MsgDel] lock acquired: guild=${guildId}`);
+    logger.debug(tDefault("system:message-delete.lock_acquired", { guildId }));
 
     try {
-      const targetChannels = await buildTargetChannels(interaction);
+      // ── 条件設定ステップ（user / channel をセレクトメニューで選択） ──
+      const conditionResult = await runConditionSetupStep(
+        interaction,
+        hasSlashCommandFilter(options),
+      );
+      if (!conditionResult) return;
+
+      // 条件設定ステップの結果をオプションに反映
+      options.targetUserIds = conditionResult.targetUserIds;
+      options.channelIds = conditionResult.channelIds;
+
+      // 条件設定ステップの「スキャン開始」ボタンで得た fresh token を以降のフェーズで使う
+      const scanInteraction = conditionResult.scanInteraction;
+
+      const targetChannels = await buildTargetChannels(
+        scanInteraction,
+        conditionResult.channelIds,
+      );
       if (!targetChannels) return;
 
       const scannedMessages = await runScanPhase(
-        interaction,
+        scanInteraction,
         targetChannels,
         options,
       );
       if (!scannedMessages) return;
 
       if (scannedMessages.length === 0) {
-        await interaction.editReply({
+        await scanInteraction.editReply({
           embeds: [
             createInfoEmbed(
               tDefault("commands:message-delete.errors.no_messages_found"),
@@ -103,11 +138,13 @@ export async function executeMessageDeleteCommand(
         return;
       }
 
-      await runConfirmDeletePhase(interaction, scannedMessages, options);
+      await runConfirmDeletePhase(scanInteraction, scannedMessages, options);
     } finally {
       // 正常完了・キャンセル・タイムアウト・エラーすべての終了パスでロックを解放
       executingGuilds.delete(guildId);
-      logger.debug(`[MsgDel] lock released: guild=${guildId}`);
+      logger.debug(
+        tDefault("system:message-delete.lock_released", { guildId }),
+      );
     }
   } catch (error) {
     await handleCommandError(interaction, error);
@@ -119,40 +156,34 @@ export async function executeMessageDeleteCommand(
 /**
  * Phase 2〜3: プレビュー → 最終確認 → 削除の一連のフローを管理する
  * Stage 2（最終確認）の「戻る」で Stage 1（プレビュー）に戻るループ構造
- * @param interaction コマンド実行の ChatInputCommandInteraction
+ * @param interaction スキャン開始ボタンの interaction（Phase 1 完了後も有効な token）
  * @param scannedMessages スキャン済みメッセージ配列
  * @param options パース済みコマンドオプション
  * @returns 処理完了を示す Promise
  */
 async function runConfirmDeletePhase(
-  interaction: ChatInputCommandInteraction,
+  interaction: ChatInputCommandInteraction | MessageComponentInteraction,
   scannedMessages: ScannedMessageWithChannel[],
   options: ParsedOptions,
 ): Promise<void> {
   // Stage1 (プレビュー) → Stage2 (最終確認) ループ
   // Stage2 の「戻る」で Stage1 に戻る
-  let filter = {};
+  // 各ダイアログはボタン操作の deferUpdate() で fresh token を取得するため、
+  // フェーズごとに独立して MSG_DEL_PHASE_TIMEOUT_MS（14分）使える
+  let filter: MessageDeleteFilter = {} as MessageDeleteFilter;
   let excludedIds = new Set<string>();
   let currentBaseInteraction:
     | ChatInputCommandInteraction
     | MessageComponentInteraction = interaction;
 
-  // Phase 2 全体（プレビュー＋最終確認）で 14 分タイムアウトを共有するため開始時刻を記録
-  const phase2StartTs = Date.now();
-
   while (true) {
-    // プレビューダイアログに Phase 2 の残り時間を渡す
-    const previewRemainingMs = Math.max(
-      1,
-      MSG_DEL_CONFIRM_TIMEOUT_MS - (Date.now() - phase2StartTs),
-    );
     const previewResult = await showPreviewDialog(
       currentBaseInteraction,
       scannedMessages,
       filter,
       excludedIds,
       options,
-      previewRemainingMs,
+      MSG_DEL_PHASE_TIMEOUT_MS,
     );
 
     if (previewResult.type === DIALOG_TYPE.Timeout) return;
@@ -168,15 +199,10 @@ async function runConfirmDeletePhase(
       (m) => !excludedIds.has(m.messageId),
     );
 
-    // 最終確認ダイアログにもプレビューで消費した時間を差し引いた残り時間を渡す
-    const finalRemainingMs = Math.max(
-      1,
-      MSG_DEL_CONFIRM_TIMEOUT_MS - (Date.now() - phase2StartTs),
-    );
     const finalResult = await showFinalConfirmDialog(
       previewResult.confirmInteraction,
       targetMessages,
-      finalRemainingMs,
+      MSG_DEL_PHASE_TIMEOUT_MS,
     );
 
     if (finalResult.type === DIALOG_TYPE.Confirm) {

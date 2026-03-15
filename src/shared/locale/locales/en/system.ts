@@ -130,6 +130,8 @@ export const system = {
     "[BumpReminder] No pending reminders to restore",
   "scheduler.bump_reminder_sent":
     "[BumpReminder] Reminder sent GuildId: {{guildId}} ChannelId: {{channelId}}",
+  "scheduler.bump_reminder_send_failed":
+    "[BumpReminder] Reminder send failed GuildId: {{guildId}} ChannelId: {{channelId}}",
   "scheduler.bump_reminder_channel_not_found":
     "[BumpReminder] Channel not found GuildId: {{guildId}} ChannelId: {{channelId}}",
   "scheduler.bump_reminder_disabled":
@@ -451,6 +453,10 @@ export const system = {
     "[VcRecruit] setup created GuildId: {{guildId}} CategoryId: {{categoryId}}",
   "vc-recruit.setup_removed":
     "[VcRecruit] setup removed GuildId: {{guildId}} CategoryId: {{categoryId}}",
+  "vc-recruit.panel_delete_detected":
+    "[VcRecruit] panel message deletion detected, resending panel GuildId: {{guildId}} PanelChannelId: {{panelChannelId}} MessageId: {{messageId}}",
+  "vc-recruit.panel_resent":
+    "[VcRecruit] panel message resent GuildId: {{guildId}} PanelChannelId: {{panelChannelId}} NewMessageId: {{newMessageId}}",
 
   // Message Delete feature logs
   "message-delete.cmd_all_channels_start":
@@ -458,7 +464,7 @@ export const system = {
   "message-delete.cmd_channel_count":
     "[MsgDel][CMD] channel count={{count}}",
   "message-delete.svc_scan_start":
-    "[MsgDel][SVC] scan start channels={{channelCount}} count={{count}} targetUserId={{targetUserId}}",
+    "[MsgDel][SVC] scan start channels={{channelCount}} count={{count}} targetUserIds={{targetUserIds}}",
   "message-delete.svc_initial_fetch":
     "[MsgDel][SVC] initial fetch ch={{channelId}}",
   "message-delete.svc_refill":
@@ -477,6 +483,14 @@ export const system = {
     "[MsgDel] delete error: {{error}}",
   "message-delete.deleted":
     "[MsgDel] {{userId}} deleted {{count}} messages{{countPart}}{{targetPart}}{{keywordPart}}{{periodPart}} channels=[{{channels}}]",
+  "message-delete.lock_acquired":
+    "[MsgDel] lock acquired: guild={{guildId}}",
+  "message-delete.lock_released":
+    "[MsgDel] lock released: guild={{guildId}}",
+  "message-delete.cancel_collector_ended":
+    "[MsgDel] Phase1 cancelCollector ended: reason={{reason}}",
+  "message-delete.aborting_non_user_end":
+    "[MsgDel] Phase1 aborting scan due to non-user end",
 } as const;
 
 export type SystemTranslations = typeof system;

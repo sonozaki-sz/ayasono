@@ -1,5 +1,7 @@
 // tests/unit/bot/features/vc-recruit/commands/usecases/vcRecruitConfigTeardown.test.ts
 import { handleVcRecruitConfigTeardown } from "@/bot/features/vc-recruit/commands/usecases/vcRecruitConfigTeardown";
+import { disableComponentsAfterTimeout } from "@/bot/shared/disableComponentsAfterTimeout";
+import { VC_RECRUIT_TIMEOUT } from "@/bot/features/vc-recruit/commands/vcRecruitConfigCommand.constants";
 import { ValidationError } from "@/shared/errors/customErrors";
 
 // ---- モック定義 ----
@@ -12,10 +14,13 @@ const tGuildMock = vi.fn(
 const tDefaultMock = vi.fn((key: string) => key);
 
 vi.mock("@/bot/services/botCompositionRoot", () => ({
-  getBotVcRecruitRepository: () => ({
+  getBotVcRecruitConfigService: () => ({
     getVcRecruitConfigOrDefault: (...args: unknown[]) =>
       getVcRecruitConfigOrDefaultMock(...args),
   }),
+}));
+vi.mock("@/bot/shared/disableComponentsAfterTimeout", () => ({
+  disableComponentsAfterTimeout: vi.fn(),
 }));
 
 vi.mock("@/shared/locale/localeManager", () => ({
@@ -50,11 +55,6 @@ function makeInteraction(guildChannels: Record<string, { name: string }> = {}) {
 describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigTeardown", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.useFakeTimers();
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
   });
 
   it("guild が null の場合は ValidationError を投げる", async () => {
@@ -168,7 +168,7 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigTeardown", ()
     expect(selectOptions[0].data.label).toBe(unknownLabel);
   });
 
-  it("60秒後にセレクトメニューが無効化される", async () => {
+  it("disableComponentsAfterTimeout が COMPONENT_DISABLE_MS で呼ばれる", async () => {
     getVcRecruitConfigOrDefaultMock.mockResolvedValue({
       setups: [{ categoryId: null, panelChannelId: "panel-ch-1" }],
     });
@@ -176,13 +176,10 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigTeardown", ()
     const interaction = makeInteraction();
     await handleVcRecruitConfigTeardown(interaction as never, GUILD_ID);
 
-    expect(interaction.editReply).not.toHaveBeenCalled();
-
-    vi.advanceTimersByTime(60_000);
-
-    // setTimeout は非同期コールバックなので、runAllTimersAsync で実行
-    await vi.runAllTimersAsync();
-
-    expect(interaction.editReply).toHaveBeenCalled();
+    expect(disableComponentsAfterTimeout).toHaveBeenCalledWith(
+      interaction,
+      expect.any(Array),
+      VC_RECRUIT_TIMEOUT.COMPONENT_DISABLE_MS,
+    );
   });
 });

@@ -112,8 +112,12 @@
 
 ### shared/features 経由の DB アクセス（2026-02-22 追加）
 
-Bot 層のハンドラー・ユースケースが DB へアクセスする際は、必ず `src/shared/features/<feature>/` の `configService` 経由で行う。
-リポジトリ実装を Bot 層のハンドラーから直接取得・呼び出すことを **禁止** する。
+Bot 層のハンドラー・ユースケースが DB へアクセスする際は、原則として `src/shared/features/<feature>/` の `configService` 経由で行う。
+リポジトリ実装を Bot 層のハンドラーから直接取得・呼び出すことは **原則禁止** とする。
+
+> **例外**: configService がリポジトリの完全な 1:1 委譲ラッパーであり、configService 経由にすることで不必要な複雑性が増す場合は、
+> `botCompositionRoot` に configService のエイリアスアクセサを追加するか、リポジトリを直接使用してもよい。
+> ただしその場合はコード内コメントで理由を明記すること。
 
 **正しいアクセス経路（ギルド設定データ）:**
 
@@ -401,6 +405,65 @@ async function getGuildConfig(guildId: string): Promise<GuildConfig | null> { ..
 - 推奨: 1〜2行で簡潔に書く
 - 禁止: 逐語的で自明な説明
 
+### 5. マジックナンバー禁止
+
+タイムアウト値・制限値・閾値などの数値リテラルをコード中に直接書くことを **禁止** する。必ず名前付き定数として `*.constants.ts` に定義し、意図を明確にする。
+
+```ts
+// ❌ 禁止: マジックナンバーを直接使用
+setTimeout(() => disableComponents(), 14 * 60 * 1000);
+const collector = channel.createMessageComponentCollector({ time: 60_000 });
+
+// ✅ 正しい: 名前付き定数を使用
+// constants/vcRecruitCommand.constants.ts
+/** Discord Interaction token の有効期限（15分）に対し1分のバッファを設けたタイムアウト */
+export const VC_RECRUIT_INTERACTION_TIMEOUT_MS = 14 * 60 * 1000;
+/** 条件設定ステップのタイムアウト（60秒） */
+export const VC_RECRUIT_CONDITION_STEP_TIMEOUT_MS = 60 * 1000;
+
+// 使用側
+setTimeout(() => disableComponents(), VC_RECRUIT_INTERACTION_TIMEOUT_MS);
+const collector = channel.createMessageComponentCollector({ time: VC_RECRUIT_CONDITION_STEP_TIMEOUT_MS });
+```
+
+> **背景**: vc-recruit 機能の実装でタイムアウト値が `60_000` や `14 * 60 * 1000` のようにマジックナンバーとして散在していた。値の意味が不明瞭で、変更時に漏れが発生しやすい状態だった。再発防止のためルール化した。
+
+### 6. 処理の共通化
+
+同一または類似のロジックが2箇所以上に存在する場合、共通関数に抽出することを **必須** とする。「動けばいい」で重複を放置しない。
+
+#### ルール
+
+1. **新規実装時**: 同じ処理を2箇所に書く時点で共通関数に抽出する
+2. **既存コード変更時**: 変更対象の処理が他のファイルにも存在しないか確認し、重複があれば共通関数に抽出してから両方を差し替える
+3. **配置先**: 同一 feature 内の共通処理は `src/bot/features/<feature>/commands/` または `src/bot/features/<feature>/` 直下に配置する。feature をまたぐ場合は `src/bot/shared/` に配置する
+
+#### 確認手順
+
+コードを変更する前に、変更対象の処理（Embed 構築、ボタン生成、メッセージ送信パターン等）が他のファイルにも存在しないか `Grep` で確認する。
+
+```typescript
+// ❌ 禁止: 同じ Embed + ボタン構築を setup と messageDeleteHandler に二重に書く
+// vcRecruitConfigSetup.ts
+const panelEmbed = new EmbedBuilder().setTitle(title).setDescription(desc).setColor(0x5865f2);
+const createRow = new ActionRowBuilder<ButtonBuilder>().addComponents(/* ... */);
+
+// vcRecruitMessageDeleteHandler.ts（全く同じコード）
+const panelEmbed = new EmbedBuilder().setTitle(title).setDescription(desc).setColor(0x5865f2);
+const createRow = new ActionRowBuilder<ButtonBuilder>().addComponents(/* ... */);
+
+// ✅ 正しい: 共通関数に抽出して両方から呼ぶ
+// vcRecruitPanelEmbed.ts
+export async function buildVcRecruitPanelComponents(guildId, panelChannelId) {
+  // Embed + ボタン構築を1箇所にまとめる
+}
+
+// vcRecruitConfigSetup.ts / vcRecruitMessageDeleteHandler.ts
+const { embed, row } = await buildVcRecruitPanelComponents(guildId, channelId);
+```
+
+> **背景**: vc-recruit 機能のパネル Embed 変更時に、setup と messageDeleteHandler に全く同じパネル構築コードが重複していた。片方だけ修正してもう片方に反映漏れが発生するリスクがあった。再発防止のためルール化した。
+
 ---
 
 ## 🔁 リファクタリング手順（推奨）
@@ -438,6 +501,8 @@ async function getGuildConfig(guildId: string): Promise<GuildConfig | null> { ..
 - [ ] クラスの public メソッドにも JSDoc（`@param` / `@returns` 含む）がある
 - [ ] 共用定数に説明コメントがある
 - [ ] 処理ブロックの意図コメントがある
+- [ ] タイムアウト値・制限値・閾値にマジックナンバーを使っていない（名前付き定数を `*.constants.ts` に定義している）
+- [ ] 同一・類似のロジックが2箇所以上に存在しない（重複があれば共通関数に抽出している）
 - [ ] テストの `it()` 文字列に日本語で検証の観点・条件・前提を記載している
 - [ ] 新機能実装時は `bot/commands/`・`bot/events/` のテストも作成している（[テストチェックリスト参照](TESTING_GUIDELINES.md#-新機能テスト実装チェックリスト)）
   - `bot/commands/<name>.ts` と `bot/events/<name>.ts` は **バレルへの手動追加不要**。ファイルを置くだけで `commandLoader.ts` / `eventLoader.ts` が自動ロードする

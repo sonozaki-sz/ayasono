@@ -131,6 +131,10 @@ export const getBotVcRecruitRepository: () => IVcRecruitRepository =
 export const setBotVcRecruitRepository: (value: IVcRecruitRepository) => void =
   _vcRecruitRepositoryAccessor[1];
 
+/** getBotVcRecruitRepository のエイリアス（config 操作用途で意図を明示する） */
+export const getBotVcRecruitConfigService: () => IVcRecruitRepository =
+  _vcRecruitRepositoryAccessor[0];
+
 // ---------------------------------------------------------------------------
 // Composition Root initializer
 // ---------------------------------------------------------------------------

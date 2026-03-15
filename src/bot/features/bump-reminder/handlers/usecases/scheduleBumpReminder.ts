@@ -3,8 +3,6 @@
 
 import type { Client } from "discord.js";
 import type { BumpReminderConfigService } from "../../../../../shared/features/bump-reminder/bumpReminderConfigService";
-import { tDefault } from "../../../../../shared/locale/localeManager";
-import { logger } from "../../../../../shared/utils/logger";
 import { getBotBumpReminderManager } from "../../../../services/botCompositionRoot";
 import {
   getReminderDelayMinutes,
@@ -20,7 +18,7 @@ import { sendBumpReminder } from "./sendBumpReminder";
  * @param messageId 検知元メッセージID
  * @param serviceName 検知サービス名
  * @param bumpReminderConfigService 設定取得サービス
- * @param panelMessageId 送信済みパネルメッセージID
+ * @param panelMessageId 送信済みパネルメッセージID（DB記録用）
  */
 export async function scheduleBumpReminder(
   client: Client,
@@ -44,44 +42,18 @@ export async function scheduleBumpReminder(
       messageId,
       serviceName,
       bumpReminderConfigService,
-      panelMessageId,
     );
   };
 
-  try {
-    // 既存予約を考慮しつつ、今回のリマインダーを登録
-    // 同一キー既存予約の置換/取消は manager 側契約に委譲する
-    await bumpReminderManager.setReminder(
-      guildId,
-      channelId,
-      messageId,
-      panelMessageId,
-      delayMinutes,
-      reminderTask,
-      serviceName,
-    );
-  } catch (setReminderError) {
-    // 登録失敗時は孤立パネルを削除して後片付け
-    if (panelMessageId) {
-      try {
-        // 予約登録前に送った仮パネルを回収して孤立を防止
-        const ch = await client.channels.fetch(channelId);
-        if (ch?.isTextBased()) {
-          const panelMsg = await ch.messages.fetch(panelMessageId);
-          await panelMsg.delete();
-        }
-      } catch (deleteError) {
-        logger.debug(
-          tDefault(
-            "system:scheduler.bump_reminder_orphaned_panel_delete_failed",
-            {
-              panelMessageId,
-            },
-          ),
-          deleteError,
-        );
-      }
-    }
-    throw setReminderError;
-  }
+  // 既存予約を考慮しつつ、今回のリマインダーを登録
+  // 同一キー既存予約の置換/取消は manager 側契約に委譲する
+  await bumpReminderManager.setReminder(
+    guildId,
+    channelId,
+    messageId,
+    panelMessageId,
+    delayMinutes,
+    reminderTask,
+    serviceName,
+  );
 }

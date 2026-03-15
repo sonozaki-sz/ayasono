@@ -26,6 +26,7 @@ function makeCollection<T extends { id: string }>(msgs: T[]) {
   return col;
 }
 
+// messageDeleteService の parseDateStr・scanMessages・deleteScannedMessages を検証
 describe("bot/features/message-delete/services/messageDeleteService", () => {
   async function loadModule() {
     return import(
@@ -37,6 +38,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
   // parseDateStr
   // ─────────────────────────────────────────────────────────────
 
+  // 各日付フォーマット（YYYY-MM-DD / ISO / オフセット付き）のパースと無効入力を検証
   describe("parseDateStr", () => {
     it("endOfDay=false で YYYY-MM-DD 形式をパースする", async () => {
       const { parseDateStr } = await loadModule();
@@ -100,6 +102,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
   // scanMessages
   // ─────────────────────────────────────────────────────────────
 
+  // チャンネルからのメッセージ収集・フィルタリング・上限・abort・進捗コールバックを検証
   describe("scanMessages", () => {
     function makeMessage(
       id: string,
@@ -155,6 +158,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
       const channel = makeChannel("ch-1", { hasPermission: false });
       const result = await scanMessages([channel as never], {
         count: 10,
+        targetUserIds: [],
         afterTs: 0,
         beforeTs: Infinity,
       });
@@ -175,6 +179,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
 
       const result = await scanMessages([channel as never], {
         count: 10,
+        targetUserIds: [],
         afterTs: 0,
         beforeTs: Infinity,
       });
@@ -182,7 +187,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
       expect(result).toHaveLength(2);
     });
 
-    it("targetUserId でフィルタリングする", async () => {
+    it("targetUserIds でフィルタリングする", async () => {
       const { scanMessages } = await loadModule();
 
       const now = Date.now();
@@ -196,7 +201,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
 
       const result = await scanMessages([channel as never], {
         count: 10,
-        targetUserId: "user-1",
+        targetUserIds: ["user-1"],
         afterTs: 0,
         beforeTs: Infinity,
       });
@@ -219,6 +224,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
 
       const result = await scanMessages([channel as never], {
         count: 10,
+        targetUserIds: [],
         keyword: "hello",
         afterTs: 0,
         beforeTs: Infinity,
@@ -242,6 +248,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
 
       const result = await scanMessages([channel as never], {
         count: 3,
+        targetUserIds: [],
         afterTs: 0,
         beforeTs: Infinity,
       });
@@ -260,6 +267,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
 
       const result = await scanMessages([channel as never], {
         count: 10,
+        targetUserIds: [],
         afterTs: 0,
         beforeTs: Infinity,
         signal: controller.signal,
@@ -283,6 +291,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
 
       const result = await scanMessages([channel as never], {
         count: 10,
+        targetUserIds: [],
         afterTs: 0,
         beforeTs: Infinity,
       });
@@ -305,6 +314,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
 
       const result = await scanMessages([channel as never], {
         count: 10,
+        targetUserIds: [],
         afterTs: 0,
         beforeTs: Infinity,
       });
@@ -321,6 +331,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
 
       await scanMessages([channel as never], {
         count: 10,
+        targetUserIds: [],
         afterTs: 0,
         beforeTs: Infinity,
         onProgress,
@@ -342,6 +353,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
 
       const result = await scanMessages([channel as never], {
         count: 10,
+        targetUserIds: [],
         afterTs: 0,
         beforeTs: Infinity,
       });
@@ -363,6 +375,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
 
       const result = await scanMessages([channel as never], {
         count: 10,
+        targetUserIds: [],
         afterTs: 0,
         beforeTs: Infinity,
       });
@@ -376,6 +389,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
   // deleteScannedMessages
   // ─────────────────────────────────────────────────────────────
 
+  // 一括削除・個別削除・エラーハンドリング・abort・進捗コールバックを検証
   describe("deleteScannedMessages", () => {
     function makeScannedMessage(
       id: string,

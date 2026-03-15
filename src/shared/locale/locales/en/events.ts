@@ -17,20 +17,16 @@ export const events = {
     "Bump Reminder",
   "bump-reminder.panel.scheduled_at":
     "Reminder will be sent <t:{{timestamp}}:R>.",
-  // Panel button labels (notification on/off)
+  // Panel button labels (ON/OFF)
   "bump-reminder.panel.button_mention_on":
-    "Receive Notifications",
+    "Turn Notification ON",
   "bump-reminder.panel.button_mention_off":
-    "Don't Receive Notifications",
-  // Panel action result messages
-  "bump-reminder.panel.mention_added":
-    "{{user}} has been added to the notification list.",
-  "bump-reminder.panel.mention_removed":
-    "{{user}} has been removed from the notification list.",
-  "bump-reminder.panel.already_added":
-    "You are already in the notification list.",
-  "bump-reminder.panel.not_in_list":
-    "You are not in the notification list.",
+    "Turn Notification OFF",
+  // Panel idempotent ON/OFF result messages
+  "bump-reminder.panel.mention_toggled_on":
+    "Notification turned ON.",
+  "bump-reminder.panel.mention_toggled_off":
+    "Notification turned OFF.",
   "bump-reminder.panel.success_title":
     "Settings Updated",
   "bump-reminder.panel.error":

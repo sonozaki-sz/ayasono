@@ -1,11 +1,12 @@
 // tests/unit/bot/features/message-delete/commands/usecases/validateOptions.test.ts
 // hasManageMessagesPermission・parseAndValidateOptions の単体テスト
-// - ユーザーIDパース（メンション・生ID・無効形式）
-// - フィルター必須チェック・days×日付範囲排他バリデーション
+// - フィルター必須チェック（hasSlashCommandFilter）・days×日付範囲排他バリデーション
 // - 日付パース・未来日チェック（YYYY-MM-DD 当日許容の特例を含む）
 // - 正常系: ParsedOptions 構造検証
+// ※ user / channel オプションは条件設定ステップに移動したため validateOptions ではパースしない
 
 import {
+  hasBotRequiredPermissions,
   hasManageMessagesPermission,
   parseAndValidateOptions,
 } from "@/bot/features/message-delete/commands/usecases/validateOptions";
@@ -45,12 +46,10 @@ vi.mock("@/shared/locale/helpers", () => ({
 
 type OptionValues = {
   count?: number | null;
-  user?: string | null;
   keyword?: string | null;
   days?: number | null;
   after?: string | null;
   before?: string | null;
-  channel?: { id: string } | null;
   hasPermission?: boolean;
 };
 
@@ -67,13 +66,11 @@ function createInteraction(opts: OptionValues = {}) {
         return null;
       }),
       getString: vi.fn((key: string) => {
-        if (key === "user") return opts.user ?? null;
         if (key === "keyword") return opts.keyword ?? null;
         if (key === "after") return opts.after ?? null;
         if (key === "before") return opts.before ?? null;
         return null;
       }),
-      getChannel: vi.fn().mockReturnValue(opts.channel ?? null),
     },
     editReply,
     _hasMock: hasMock,
@@ -82,12 +79,15 @@ function createInteraction(opts: OptionValues = {}) {
 
 // ── テスト ────────────────────────────────────────────────────────────────
 
+// hasManageMessagesPermission・hasBotRequiredPermissions・parseAndValidateOptions の各分岐を検証
 describe("bot/features/message-delete/commands/usecases/validateOptions", () => {
+  // 各テストケースでモック状態をリセットする
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   // =========================================================================
+  // ユーザーの ManageMessages 権限チェックを検証
   describe("hasManageMessagesPermission", () => {
     it("memberPermissions.has() が true を返す場合は true を返す", () => {
       const interaction = createInteraction({ hasPermission: true });
@@ -107,86 +107,63 @@ describe("bot/features/message-delete/commands/usecases/validateOptions", () => 
   });
 
   // =========================================================================
+  // Bot に必要な権限が揃っているかのチェックを検証
+  describe("hasBotRequiredPermissions", () => {
+    it("Bot が必要な権限をすべて持つ場合は true を返す", () => {
+      const interaction = {
+        guild: {
+          members: {
+            me: { permissions: { has: vi.fn(() => true) } },
+          },
+        },
+      };
+      expect(hasBotRequiredPermissions(interaction as never)).toBe(true);
+    });
+
+    it("Bot に必要な権限が欠けている場合は false を返す", () => {
+      const interaction = {
+        guild: {
+          members: {
+            me: { permissions: { has: vi.fn(() => false) } },
+          },
+        },
+      };
+      expect(hasBotRequiredPermissions(interaction as never)).toBe(false);
+    });
+
+    it("guild.members.me が null の場合は true を返す（チャンネル個別チェックに委ねる）", () => {
+      const interaction = {
+        guild: { members: { me: null } },
+      };
+      expect(hasBotRequiredPermissions(interaction as never)).toBe(true);
+    });
+  });
+
+  // =========================================================================
+  // コマンドオプションのパース・バリデーション全体を検証
   describe("parseAndValidateOptions", () => {
-    // ── user オプションのパース ──────────────────────────────────────────
-    describe("user オプションのパース", () => {
-      // <@id> 形式: Discord のメンション（通常形式）
-      it("メンション形式 <@id> から userId を正しく抽出する", async () => {
-        const interaction = createInteraction({
-          user: "<@123456789012345678>",
-          keyword: "test",
-        });
-        const result = await parseAndValidateOptions(interaction as never);
-        expect(result?.targetUserId).toBe("123456789012345678");
-      });
-
-      // <@!id> 形式: ニックネームメンション（旧 Discord 仕様、現在も入力される）
-      it("メンション形式 <@!id> から userId を正しく抽出する", async () => {
-        const interaction = createInteraction({
-          user: "<@!987654321098765432>",
-          keyword: "test",
-        });
-        const result = await parseAndValidateOptions(interaction as never);
-        expect(result?.targetUserId).toBe("987654321098765432");
-      });
-
-      // 生 ID: 17〜20桁の数字文字列（スノーフレーク形式）
-      it("生 ID（17〜20桁の数字）を正しくパースする", async () => {
-        const interaction = createInteraction({
-          user: "123456789012345678",
-          keyword: "test",
-        });
-        const result = await parseAndValidateOptions(interaction as never);
-        expect(result?.targetUserId).toBe("123456789012345678");
-      });
-
-      it("無効な形式はエラー embed を返し null を返す", async () => {
-        const interaction = createInteraction({
-          user: "invalid-user-format",
-          keyword: "test",
-        });
-        const result = await parseAndValidateOptions(interaction as never);
-        expect(result).toBeNull();
-        expect(interaction.editReply).toHaveBeenCalledWith({
-          embeds: [expect.objectContaining({ _type: "warning" })],
-        });
-        expect(tDefaultMock).toHaveBeenCalledWith(
-          "commands:message-delete.errors.user_invalid_format",
-        );
-      });
-
-      it("user 未指定時は targetUserId が undefined になる", async () => {
+    // ── targetUserIds は常に空配列 ──────────────────────────────────────
+    // targetUserIds が条件設定ステップ移行後も空配列であることを検証
+    describe("targetUserIds", () => {
+      it("targetUserIds は常に空配列を返す", async () => {
         const interaction = createInteraction({ keyword: "test" });
         const result = await parseAndValidateOptions(interaction as never);
-        expect(result?.targetUserId).toBeUndefined();
+        expect(result?.targetUserIds).toEqual([]);
       });
     });
 
-    // ── フィルター必須チェック ───────────────────────────────────────────
-    describe("フィルター必須チェック", () => {
-      it("全フィルター未指定はエラー embed を返し null を返す", async () => {
-        const interaction = createInteraction();
-        const result = await parseAndValidateOptions(interaction as never);
-        expect(result).toBeNull();
-        expect(tDefaultMock).toHaveBeenCalledWith(
-          "commands:message-delete.errors.no_filter",
-        );
-      });
-
-      it("count のみ指定で通過する", async () => {
-        const interaction = createInteraction({ count: 100 });
-        const result = await parseAndValidateOptions(interaction as never);
-        expect(result).not.toBeNull();
-      });
-
-      it("keyword のみ指定で通過する", async () => {
+    // ── channelIds は常に空配列 ─────────────────────────────────────────
+    // channelIds が条件設定ステップ移行後も空配列であることを検証
+    describe("channelIds", () => {
+      it("channelIds は常に空配列を返す", async () => {
         const interaction = createInteraction({ keyword: "test" });
         const result = await parseAndValidateOptions(interaction as never);
-        expect(result).not.toBeNull();
+        expect(result?.channelIds).toEqual([]);
       });
     });
 
     // ── days と日付範囲の排他バリデーション ─────────────────────────────
+    // days と after/before の同時指定がエラーになることを検証
     describe("days と日付範囲の排他バリデーション", () => {
       // days と after/before の同時指定はコマンド仕様として禁止
       it("days と afterStr の同時指定はエラー embed を返し null を返す", async () => {
@@ -212,6 +189,7 @@ describe("bot/features/message-delete/commands/usecases/validateOptions", () => 
     });
 
     // ── afterStr のバリデーション ────────────────────────────────────────
+    // afterStr の日付パース失敗・未来日チェック・正常変換を検証
     describe("afterStr のバリデーション", () => {
       it("日付パースが失敗した場合はエラー embed を返し null を返す", async () => {
         parseDateStrMock.mockReturnValue(null);
@@ -252,6 +230,7 @@ describe("bot/features/message-delete/commands/usecases/validateOptions", () => 
     });
 
     // ── beforeStr のバリデーション ───────────────────────────────────────
+    // beforeStr の日付パース失敗・未来日チェック・YYYY-MM-DD 当日許容特例・正常変換を検証
     describe("beforeStr のバリデーション", () => {
       it("日付パースが失敗した場合はエラー embed を返し null を返す", async () => {
         parseDateStrMock.mockReturnValue(null);
@@ -310,6 +289,7 @@ describe("bot/features/message-delete/commands/usecases/validateOptions", () => 
     });
 
     // ── 日付範囲チェック（afterTs >= beforeTs）───────────────────────────
+    // after >= before の逆転範囲がエラーになることを検証
     describe("日付範囲チェック", () => {
       // after が before 以降の場合は範囲として成立しない
       it("afterTs が beforeTs 以上の場合はエラー embed を返し null を返す", async () => {
@@ -332,6 +312,7 @@ describe("bot/features/message-delete/commands/usecases/validateOptions", () => 
     });
 
     // ── 正常系: ParsedOptions 構造検証 ──────────────────────────────────
+    // count・days・keyword 等の正常入力時に ParsedOptions が正しく構築されることを検証
     describe("正常系", () => {
       it("count 未指定時は MSG_DEL_DEFAULT_COUNT が設定され countSpecified が false になる", async () => {
         const interaction = createInteraction({ keyword: "test" });
@@ -347,15 +328,6 @@ describe("bot/features/message-delete/commands/usecases/validateOptions", () => 
         expect(result?.countSpecified).toBe(true);
       });
 
-      it("channelId を正しく設定する", async () => {
-        const interaction = createInteraction({
-          keyword: "test",
-          channel: { id: "channel-123" },
-        });
-        const result = await parseAndValidateOptions(interaction as never);
-        expect(result?.channelId).toBe("channel-123");
-      });
-
       // days 指定時は afterTs = Date.now() - days * MS_PER_DAY で設定される
       it("days 指定時は afterTs が現在時刻から days 日前になり beforeTs が Infinity になる", async () => {
         const before = Date.now();
@@ -368,16 +340,14 @@ describe("bot/features/message-delete/commands/usecases/validateOptions", () => 
         expect(result?.beforeTs).toBe(Infinity);
       });
 
-      it("keyword・targetUserId・channelId が正しく ParsedOptions に設定される", async () => {
+      it("keyword が正しく ParsedOptions に設定され targetUserIds・channelIds は空配列になる", async () => {
         const interaction = createInteraction({
           keyword: "hello",
-          user: "<@123456789012345678>",
-          channel: { id: "ch-1" },
         });
         const result = await parseAndValidateOptions(interaction as never);
         expect(result?.keyword).toBe("hello");
-        expect(result?.targetUserId).toBe("123456789012345678");
-        expect(result?.channelId).toBe("ch-1");
+        expect(result?.targetUserIds).toEqual([]);
+        expect(result?.channelIds).toEqual([]);
       });
     });
   });

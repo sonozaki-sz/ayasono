@@ -4,7 +4,10 @@
 import type { Client } from "discord.js";
 import { tDefault } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
-import { getBotBumpReminderConfigService } from "../../../services/botCompositionRoot";
+import {
+  getBotBumpReminderConfigService,
+  getBotBumpReminderRepository,
+} from "../../../services/botCompositionRoot";
 import {
   getReminderDelayMinutes,
   type BumpServiceName,
@@ -19,7 +22,6 @@ import { sendBumpPanel } from "./usecases/sendBumpPanel";
  * @param channelId 検知チャンネルID
  * @param messageId 検知元メッセージID
  * @param serviceName 検知サービス名
- * @returns 実行完了を示す Promise
  */
 export async function handleBumpDetected(
   client: Client,
@@ -55,6 +57,10 @@ export async function handleBumpDetected(
       return;
     }
 
+    // 前回のパネルメッセージが残っていれば削除する
+    // パネルは常設だが、新しいBump検知時は最新のパネルに置き換える
+    await deleteOldPanel(client, guildId, channelId);
+
     // 通知予定を示すパネルを先に送信し、メッセージIDを保持
     // 予約キーは manager 側で guild/channel/message 単位に正規化される
     const panelMessageId = await sendBumpPanel(
@@ -87,6 +93,56 @@ export async function handleBumpDetected(
     logger.error(
       tDefault("system:bump-reminder.detection_failed", {
         guildId,
+      }),
+      error,
+    );
+  }
+}
+
+/**
+ * 前回の Bump パネルメッセージを削除する関数
+ * DB の pending レコードから panelMessageId を取得して削除を試みる
+ * @param client Discord クライアント
+ * @param guildId 対象ギルドID
+ * @param channelId パネルが存在するチャンネルID
+ */
+async function deleteOldPanel(
+  client: Client,
+  guildId: string,
+  channelId: string,
+): Promise<void> {
+  try {
+    const repository = getBotBumpReminderRepository();
+    const pendingReminder = await repository.findPendingByGuild(guildId);
+
+    if (!pendingReminder?.panelMessageId) {
+      return;
+    }
+
+    // 前回パネルのチャンネルIDを使用（現在のchannelIdと異なる場合もある）
+    const panelChannelId = pendingReminder.channelId || channelId;
+    const channel = await client.channels
+      .fetch(panelChannelId)
+      .catch(() => null);
+    if (channel?.isTextBased()) {
+      const panelMessage = await channel.messages
+        .fetch(pendingReminder.panelMessageId)
+        .catch(() => null);
+      if (panelMessage) {
+        await panelMessage.delete();
+        logger.debug(
+          tDefault("system:scheduler.bump_reminder_panel_deleted", {
+            panelMessageId: pendingReminder.panelMessageId,
+            guildId,
+          }),
+        );
+      }
+    }
+  } catch (error) {
+    // 旧パネル削除の失敗は新パネル送信を妨げない
+    logger.debug(
+      tDefault("system:scheduler.bump_reminder_panel_delete_failed", {
+        panelMessageId: "unknown",
       }),
       error,
     );

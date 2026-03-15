@@ -1,18 +1,11 @@
 // src/bot/features/vc-recruit/handlers/vcRecruitMessageDeleteHandler.ts
 // VC募集パネルメッセージ削除の自己修復ハンドラー
 
-import {
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  type Message,
-  type PartialMessage,
-} from "discord.js";
-import { tGuild } from "../../../../shared/locale/localeManager";
+import { type Message, type PartialMessage } from "discord.js";
+import { tDefault } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import { getBotVcRecruitRepository } from "../../../services/botCompositionRoot";
-import { createInfoEmbed } from "../../../utils/messageResponse";
-import { VC_RECRUIT_PANEL_CUSTOM_ID } from "../commands/vcRecruitConfigCommand.constants";
+import { buildVcRecruitPanelComponents } from "../commands/vcRecruitPanelEmbed";
 
 /**
  * messageDelete 時にVC募集パネルメッセージが削除されていた場合、再送信して DB を更新する
@@ -37,7 +30,11 @@ export async function handleVcRecruitMessageDelete(
   if (setup.panelMessageId !== message.id) return;
 
   logger.info(
-    `[vc-recruit] パネルメッセージ削除を検知、パネルを再送信します: guildId=${guildId}, panelChannelId=${message.channelId}, messageId=${message.id}`,
+    tDefault("system:vc-recruit.panel_delete_detected", {
+      guildId,
+      panelChannelId: message.channelId,
+      messageId: message.id,
+    }),
   );
 
   // パネルチャンネルを取得
@@ -50,29 +47,13 @@ export async function handleVcRecruitMessageDelete(
   if (!panelChannel || !panelChannel.isSendable()) return;
 
   // パネルメッセージを再送信
-  const panelTitle = await tGuild(guildId, "commands:vcRecruit.panel.title");
-  const panelDescription = await tGuild(
+  const { embed, row } = await buildVcRecruitPanelComponents(
     guildId,
-    "commands:vcRecruit.panel.description",
-  );
-  const createButtonLabel = await tGuild(
-    guildId,
-    "commands:vcRecruit.panel.create_button",
-  );
-
-  const panelEmbed = createInfoEmbed(panelDescription, { title: panelTitle });
-  const createRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
-    new ButtonBuilder()
-      .setCustomId(
-        `${VC_RECRUIT_PANEL_CUSTOM_ID.CREATE_BUTTON_PREFIX}${setup.panelChannelId}`,
-      )
-      .setLabel(createButtonLabel)
-      .setEmoji("📢")
-      .setStyle(ButtonStyle.Success),
+    setup.panelChannelId,
   );
 
   const newMessage = await panelChannel
-    .send({ embeds: [panelEmbed], components: [createRow] })
+    .send({ embeds: [embed], components: [row] })
     .catch(() => null);
   if (!newMessage) return;
 
@@ -80,6 +61,10 @@ export async function handleVcRecruitMessageDelete(
   await repo.updatePanelMessageId(guildId, setup.panelChannelId, newMessage.id);
 
   logger.info(
-    `[vc-recruit] パネルメッセージを再送信しました: guildId=${guildId}, panelChannelId=${setup.panelChannelId}, newMessageId=${newMessage.id}`,
+    tDefault("system:vc-recruit.panel_resent", {
+      guildId,
+      panelChannelId: setup.panelChannelId,
+      newMessageId: newMessage.id,
+    }),
   );
 }

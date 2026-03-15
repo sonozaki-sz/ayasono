@@ -7,8 +7,8 @@
 export interface VcRecruitSession {
   /** 操作したパネルチャンネルID */
   panelChannelId: string;
-  /** 選択されたメンションロールID（null = なし） */
-  mentionRoleId: string | null;
+  /** 選択されたメンションロールID一覧（空配列 = なし） */
+  mentionRoleIds: string[];
   /** 選択されたVC ID（"__new__" = 新規作成 / 既存VC ID） */
   selectedVcId: string;
   /** セッション作成時刻（タイムアウト管理用） */
@@ -18,37 +18,40 @@ export interface VcRecruitSession {
 /** 新規VC作成を表す特殊値 */
 export const NEW_VC_VALUE = "__new__" as const;
 
-/** 新規VC作成のデフォルト選択値（セレクトメニューのデフォルト初期値） */
-export const NO_MENTION_VALUE = "__none__" as const;
-
-const SESSION_TTL_MS = 15 * 60 * 1000; // 15分（Discord インタラクションの Collector デフォルト）
+import { TtlMap } from "../../../../../shared/utils/ttlMap";
+import { VC_RECRUIT_TIMEOUT } from "../../commands/vcRecruitConfigCommand.constants";
 
 /** モーダル interactionId → VcRecruitSession のインメモリストア */
-const sessions = new Map<string, VcRecruitSession>();
+const sessions = new TtlMap<VcRecruitSession>(
+  VC_RECRUIT_TIMEOUT.SESSION_TTL_MS,
+);
 
 /**
  * セッションを保存する
+ * @param interactionId インタラクション ID
+ * @param session 保存するセッション情報
  */
 export function setVcRecruitSession(
   interactionId: string,
   session: VcRecruitSession,
 ): void {
   sessions.set(interactionId, session);
-  // 古いセッションを自動クリーンアップ
-  setTimeout(() => sessions.delete(interactionId), SESSION_TTL_MS);
 }
 
 /**
- * セッションを取得する（存在しない場合は null）
+ * セッションを取得する
+ * @param interactionId インタラクション ID
+ * @returns セッション情報（存在しない場合は null）
  */
 export function getVcRecruitSession(
   interactionId: string,
 ): VcRecruitSession | null {
-  return sessions.get(interactionId) ?? null;
+  return sessions.get(interactionId);
 }
 
 /**
  * セッションを削除する
+ * @param interactionId インタラクション ID
  */
 export function deleteVcRecruitSession(interactionId: string): void {
   sessions.delete(interactionId);
@@ -56,6 +59,8 @@ export function deleteVcRecruitSession(interactionId: string): void {
 
 /**
  * セッションを部分更新する
+ * @param interactionId インタラクション ID
+ * @param updates 更新する部分フィールド
  */
 export function updateVcRecruitSession(
   interactionId: string,

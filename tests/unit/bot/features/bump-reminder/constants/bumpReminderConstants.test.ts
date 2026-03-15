@@ -31,10 +31,10 @@ describe("shared/features/bump-reminder/constants", () => {
     expect(mod.BUMP_CONSTANTS.DISBOARD_BOT_ID).toBe("302050872383242240");
     expect(mod.BUMP_CONSTANTS.DISSOKU_BOT_ID).toBe("761562078095867916");
     expect(mod.BUMP_CONSTANTS.CUSTOM_ID_PREFIX.MENTION_ON).toBe(
-      "bump_mention_on:",
+      "bump-reminder:mention-on:",
     );
     expect(mod.BUMP_CONSTANTS.CUSTOM_ID_PREFIX.MENTION_OFF).toBe(
-      "bump_mention_off:",
+      "bump-reminder:mention-off:",
     );
     expect(mod.BUMP_CONSTANTS.JOB_ID_PREFIX).toBe("bump-reminder-");
   });

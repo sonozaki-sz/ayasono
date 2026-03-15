@@ -17,20 +17,16 @@ export const events = {
     "Bumpリマインダー機能",
   "bump-reminder.panel.scheduled_at":
     "<t:{{timestamp}}:R>にリマインドが通知されます。",
-  // パネルボタンラベル（通知受け取り ON/OFF）
+  // パネルボタンラベル（ON/OFF）
   "bump-reminder.panel.button_mention_on":
-    "通知を受け取る",
+    "ユーザー通知をONにする",
   "bump-reminder.panel.button_mention_off":
-    "通知を受け取らない",
-  // パネル操作結果（追加/削除/状態通知）
-  "bump-reminder.panel.mention_added":
-    "{{user}} をBump通知リストに登録しました。",
-  "bump-reminder.panel.mention_removed":
-    "{{user}} をBump通知リストから解除しました。",
-  "bump-reminder.panel.already_added":
-    "既にBump通知リストに登録されています。",
-  "bump-reminder.panel.not_in_list":
-    "Bump通知リストに登録されていません。",
+    "ユーザー通知をOFFにする",
+  // パネル操作結果（冪等ON/OFF）
+  "bump-reminder.panel.mention_toggled_on":
+    "通知をONにしました。",
+  "bump-reminder.panel.mention_toggled_off":
+    "通知をOFFにしました。",
   "bump-reminder.panel.success_title":
     "設定完了",
   "bump-reminder.panel.error":

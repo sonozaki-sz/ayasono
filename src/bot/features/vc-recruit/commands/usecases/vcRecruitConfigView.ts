@@ -60,7 +60,7 @@ export async function handleVcRecruitConfigView(
       "commands:vc-recruit-config.embed.no_roles",
     );
   } else {
-    rolesValue = config.mentionRoleIds.map((id) => `• <@&${id}>`).join("\n");
+    rolesValue = config.mentionRoleIds.map((id) => `<@&${id}>`).join(", ");
   }
 
   const fieldSetups = await tGuild(

@@ -1,15 +1,13 @@
 // tests/unit/bot/features/sticky-message/commands/usecases/stickyMessageRemove.test.ts
 
-import { ChannelType, MessageFlags } from "discord.js";
+import { MessageFlags } from "discord.js";
 
-const findByChannelMock = vi.fn();
-const deleteMock = vi.fn();
+const findAllByGuildMock = vi.fn();
 const tGuildMock = vi.fn(async (_guildId: string, key: string) => `[${key}]`);
 
 vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotStickyMessageConfigService: vi.fn(() => ({
-    findByChannel: findByChannelMock,
-    delete: deleteMock,
+    findAllByGuild: findAllByGuildMock,
   })),
 }));
 
@@ -18,95 +16,41 @@ vi.mock("@/shared/locale/localeManager", () => ({
 }));
 
 vi.mock("@/bot/utils/messageResponse", () => ({
-  createWarningEmbed: vi.fn((msg: string) => ({
-    type: "warning",
-    description: msg,
-  })),
   createInfoEmbed: vi.fn((msg: string, opts?: object) => ({
     type: "info",
-    description: msg,
-    ...opts,
-  })),
-  createSuccessEmbed: vi.fn((msg: string, opts?: object) => ({
-    type: "success",
     description: msg,
     ...opts,
   })),
 }));
 
 function createInteractionMock({
-  channelType = ChannelType.GuildText,
-  guildChannels = true,
-  deleteMsgSuccess = true,
+  guildChannels = [] as { id: string; name: string }[],
 }: {
-  channelType?: ChannelType;
-  lastMessageId?: string | null;
-  guildChannels?: boolean;
-  deleteMsgSuccess?: boolean;
+  guildChannels?: { id: string; name: string }[];
 } = {}) {
   const replyMock = vi.fn().mockResolvedValue(undefined);
-  const msgDeleteMock = vi.fn();
-  if (!deleteMsgSuccess) {
-    msgDeleteMock.mockRejectedValue(new Error("Not found"));
-  } else {
-    msgDeleteMock.mockResolvedValue(undefined);
-  }
-  const fetchMsgMock = vi.fn().mockResolvedValue({ delete: msgDeleteMock });
+  const channelCache = new Map(guildChannels.map((c) => [c.id, c]));
   return {
     reply: replyMock,
-    options: {
-      getChannel: vi.fn((_name: string, _required: boolean) => ({
-        id: "ch-1",
-        type: channelType,
-      })),
+    guild: {
+      channels: { cache: { get: (id: string) => channelCache.get(id) } },
     },
-    guild: guildChannels
-      ? {
-          channels: {
-            fetch: vi.fn(async (id: string) =>
-              id === "ch-1"
-                ? {
-                    type: ChannelType.GuildText,
-                    messages: { fetch: fetchMsgMock },
-                  }
-                : null,
-            ),
-          },
-        }
-      : null,
     _replyMock: replyMock,
-    _msgDeleteMock: msgDeleteMock,
-    _fetchMsgMock: fetchMsgMock,
   };
 }
 
-// スティッキーメッセージの削除ユースケースを検証する。DB記録削除とDiscordメッセージ削除の協調動作、および各エラーケースの耐性を確認する
+// sticky-message remove ユースケース（セレクトメニュー表示）のテスト
 describe("bot/features/sticky-message/commands/usecases/stickyMessageRemove", () => {
-  // deleteMockのデフォルト成功値を設定し、テスト間のモック状態汚染を防ぐ
+  // 各テストでモック呼び出し記録をリセットし、テスト間の副作用を排除する
   beforeEach(() => {
     vi.clearAllMocks();
-    deleteMock.mockResolvedValue(undefined);
   });
 
-  it("チャンネルが GuildText でない場合に警告を Ephemeral 返信する", async () => {
-    const { handleStickyMessageRemove } =
-      await import("@/bot/features/sticky-message/commands/usecases/stickyMessageRemove");
-    const interaction = createInteractionMock({
-      channelType: ChannelType.GuildVoice,
-    });
-
-    await handleStickyMessageRemove(interaction as never, "guild-1");
-
-    expect(interaction._replyMock).toHaveBeenCalledWith(
-      expect.objectContaining({ flags: MessageFlags.Ephemeral }),
+  it("設定が存在しない場合に未設定メッセージを Ephemeral 返信する", async () => {
+    const { handleStickyMessageRemove } = await import(
+      "@/bot/features/sticky-message/commands/usecases/stickyMessageRemove"
     );
-    expect(findByChannelMock).not.toHaveBeenCalled();
-  });
-
-  it("スティッキーメッセージが見つからない場合に情報を Ephemeral 返信する", async () => {
-    const { handleStickyMessageRemove } =
-      await import("@/bot/features/sticky-message/commands/usecases/stickyMessageRemove");
-    findByChannelMock.mockResolvedValue(null);
+    findAllByGuildMock.mockResolvedValue([]);
     const interaction = createInteractionMock();
 
     await handleStickyMessageRemove(interaction as never, "guild-1");
@@ -114,72 +58,50 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageRemove", ()
     expect(interaction._replyMock).toHaveBeenCalledWith(
       expect.objectContaining({ flags: MessageFlags.Ephemeral }),
     );
-    expect(deleteMock).not.toHaveBeenCalled();
   });
 
-  it("DBレコード削除とDiscordの投稿削除が両方呼ばれ、成功返信が送られる正常系フロー全体を確認する", async () => {
-    const { handleStickyMessageRemove } =
-      await import("@/bot/features/sticky-message/commands/usecases/stickyMessageRemove");
-    findByChannelMock.mockResolvedValue({
-      id: "sticky-1",
-      lastMessageId: "msg-1",
+  it("設定済みチャンネルがある場合にセレクトメニューとボタンを含む返信を送る", async () => {
+    const { handleStickyMessageRemove } = await import(
+      "@/bot/features/sticky-message/commands/usecases/stickyMessageRemove"
+    );
+    findAllByGuildMock.mockResolvedValue([
+      { channelId: "ch-1", content: "Message 1" },
+      { channelId: "ch-2", content: "Message 2" },
+    ]);
+    const interaction = createInteractionMock({
+      guildChannels: [
+        { id: "ch-1", name: "rules" },
+        { id: "ch-2", name: "general" },
+      ],
     });
-    const interaction = createInteractionMock({ lastMessageId: "msg-1" });
 
     await handleStickyMessageRemove(interaction as never, "guild-1");
 
-    expect(interaction._fetchMsgMock).toHaveBeenCalledWith("msg-1");
-    expect(interaction._msgDeleteMock).toHaveBeenCalled();
-    expect(deleteMock).toHaveBeenCalledWith("sticky-1");
     expect(interaction._replyMock).toHaveBeenCalledWith(
-      expect.objectContaining({ flags: MessageFlags.Ephemeral }),
+      expect.objectContaining({
+        flags: MessageFlags.Ephemeral,
+        components: expect.arrayContaining([
+          expect.objectContaining({ components: expect.any(Array) }),
+          expect.objectContaining({ components: expect.any(Array) }),
+        ]),
+      }),
     );
   });
 
-  it("lastMessageId がない場合はメッセージ削除をスキップする", async () => {
-    const { handleStickyMessageRemove } =
-      await import("@/bot/features/sticky-message/commands/usecases/stickyMessageRemove");
-    findByChannelMock.mockResolvedValue({
-      id: "sticky-1",
-      lastMessageId: null,
-    });
-    const interaction = createInteractionMock();
+  it("チャンネルキャッシュにない場合は ID をラベルとして使用する", async () => {
+    const { handleStickyMessageRemove } = await import(
+      "@/bot/features/sticky-message/commands/usecases/stickyMessageRemove"
+    );
+    findAllByGuildMock.mockResolvedValue([
+      { channelId: "ch-1", content: "Message 1" },
+    ]);
+    const interaction = createInteractionMock({ guildChannels: [] });
 
     await handleStickyMessageRemove(interaction as never, "guild-1");
 
-    expect(deleteMock).toHaveBeenCalledWith("sticky-1");
-    expect(interaction._replyMock).toHaveBeenCalled();
-  });
-
-  it("Discordのメッセージが既に削除済み等で取得・削除に失敗しても、DBレコード削除は続行されエラーが上位に伝播しない", async () => {
-    const { handleStickyMessageRemove } =
-      await import("@/bot/features/sticky-message/commands/usecases/stickyMessageRemove");
-    findByChannelMock.mockResolvedValue({
-      id: "sticky-1",
-      lastMessageId: "gone-msg",
-    });
-    const interaction = createInteractionMock({
-      lastMessageId: "gone-msg",
-      deleteMsgSuccess: false,
-    });
-
-    await expect(
-      handleStickyMessageRemove(interaction as never, "guild-1"),
-    ).resolves.not.toThrow();
-    expect(deleteMock).toHaveBeenCalledWith("sticky-1");
-  });
-
-  it("guildチャンネルキャッシュに対象チャンネルがない場合でも、DBのスティッキー設定は正常に削除される", async () => {
-    const { handleStickyMessageRemove } =
-      await import("@/bot/features/sticky-message/commands/usecases/stickyMessageRemove");
-    findByChannelMock.mockResolvedValue({
-      id: "sticky-1",
-      lastMessageId: "msg-1",
-    });
-    const interaction = createInteractionMock({ guildChannels: false });
-
-    await handleStickyMessageRemove(interaction as never, "guild-1");
-
-    expect(deleteMock).toHaveBeenCalledWith("sticky-1");
+    // ID フォールバックでもクラッシュせず返信できる
+    expect(interaction._replyMock).toHaveBeenCalledWith(
+      expect.objectContaining({ flags: MessageFlags.Ephemeral }),
+    );
   });
 });

@@ -30,6 +30,8 @@ const mockOptions: import("@/bot/features/message-delete/commands/usecases/dialo
   {
     count: 10,
     countSpecified: false,
+    targetUserIds: [],
+    channelIds: [],
     afterTs: 0,
     beforeTs: Infinity,
   };
@@ -66,7 +68,9 @@ function makeInteraction(
   };
 }
 
+// runScanPhase のスキャン成功・例外・中断・進捗コールバックを検証
 describe("bot/features/message-delete/commands/usecases/runScanPhase", () => {
+  // 各テストケースでモック状態をリセットする
   beforeEach(() => {
     vi.clearAllMocks();
   });

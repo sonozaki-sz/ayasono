@@ -53,23 +53,11 @@ export const commands = {
   "bump-reminder-config.disable.description":
     "Disable bump reminder feature",
   "bump-reminder-config.set-mention.description":
-    "Set mention role or user",
+    "Set mention role",
   "bump-reminder-config.set-mention.role.description":
     "Role to mention in reminders",
-  "bump-reminder-config.set-mention.user.description":
-    "User to mention in reminders (toggle add/remove)",
   "bump-reminder-config.remove-mention.description":
-    "Remove mention settings",
-  "bump-reminder-config.remove-mention.target.description":
-    "Target to remove",
-  "bump-reminder-config.remove-mention.target.role":
-    "Role setting",
-  "bump-reminder-config.remove-mention.target.user":
-    "User (with selection UI)",
-  "bump-reminder-config.remove-mention.target.users":
-    "All users",
-  "bump-reminder-config.remove-mention.target.all":
-    "Role + All users",
+    "Remove mention role setting",
   "bump-reminder-config.view.description":
     "Show current settings",
 
@@ -80,35 +68,17 @@ export const commands = {
     "Settings Updated",
   "bump-reminder-config.embed.not_configured":
     "Bump reminder is not configured.",
-  "bump-reminder-config.embed.select_users_to_remove":
-    "Select users to remove:",
   "bump-reminder-config.embed.enable_success":
     "Bump reminder feature has been enabled",
   "bump-reminder-config.embed.disable_success":
     "Bump reminder feature has been disabled",
-  // Mention setting results (add/remove/validation)
+  // Mention setting results (role set/remove/error)
   "bump-reminder-config.embed.set_mention_role_success":
     "Mention role set to {{role}}",
-  "bump-reminder-config.embed.set_mention_user_added":
-    "Added {{user}} to notification list",
-  "bump-reminder-config.embed.set_mention_user_removed":
-    "Removed {{user}} from notification list",
-  "bump-reminder-config.embed.set_mention_error_title":
-    "Input Error",
   "bump-reminder-config.embed.set_mention_error":
-    "Please specify a role or user",
+    "Failed to set mention role.",
   "bump-reminder-config.embed.remove_mention_role":
     "Mention role registration has been removed",
-  "bump-reminder-config.embed.remove_mention_users":
-    "All mention users have been removed",
-  "bump-reminder-config.embed.remove_mention_all":
-    "All mention settings have been removed",
-  "bump-reminder-config.embed.remove_mention_select":
-    "Removed the following users from notification list:\n{{users}}",
-  "bump-reminder-config.embed.remove_mention_error_title":
-    "Deletion Error",
-  "bump-reminder-config.embed.remove_mention_error_no_users":
-    "No users are registered to remove",
   // view subcommand display fields
   "bump-reminder-config.embed.title":
     "Bump Reminder Feature",
@@ -239,12 +209,16 @@ export const commands = {
     "`after` must be earlier than `before`.",
   "message-delete.errors.no_permission":
     "You do not have permission to perform this action.\nRequired permission: Manage Messages",
+  "message-delete.errors.bot_no_permission":
+    "The bot does not have the required permissions to delete messages.\nRequired: Manage Messages, Read Message History, View Channel",
   "message-delete.errors.text_channel_only":
     "Please specify a text channel.",
   "message-delete.errors.no_messages_found":
     "No deletable messages were found.",
   "message-delete.errors.delete_failed":
     "An error occurred while deleting messages.",
+  "message-delete.errors.scan_failed":
+    "An error occurred while scanning messages.",
   "message-delete.errors.not_authorized":
     "You are not authorized to do this.",
   "message-delete.errors.jump_invalid_page":
@@ -409,6 +383,35 @@ export const commands = {
     "After {{date}}",
   "message-delete.conditions.before_value":
     "Before {{date}}",
+  // Condition setup step
+  "message-delete.condition-step.title":
+    "Select target users and channels (optional)",
+  "message-delete.condition-step.user_placeholder":
+    "Select users",
+  "message-delete.condition-step.channel_placeholder":
+    "Select channels",
+  "message-delete.condition-step.btn_start_scan":
+    "Start Scan",
+  "message-delete.condition-step.btn_webhook_input":
+    "Enter Webhook ID",
+  "message-delete.condition-step.btn_cancel":
+    "Cancel",
+  "message-delete.condition-step.timeout":
+    "Condition setup timed out. Please run the command again.",
+  "message-delete.condition-step.no_filter":
+    "No filter conditions specified.\nPlease specify at least one of: `count`, `keyword`, `days`, `after`, `before`, or select target users.",
+  "message-delete.modal.webhook.title":
+    "Enter Webhook ID",
+  "message-delete.modal.webhook.label":
+    "Webhook ID (17-20 digit number)",
+  "message-delete.modal.webhook.placeholder":
+    "123456789012345678",
+  "message-delete.errors.webhook_invalid_format":
+    "Invalid Webhook ID format. Please enter a 17-20 digit number.",
+  "message-delete.errors.channel_partial_skip":
+    "Skipped channels due to insufficient bot permissions: {{channels}}",
+  "message-delete.errors.channel_all_no_access":
+    "Cannot access specified channels. Bot requires ReadMessageHistory and ManageMessages permissions.",
 
   // Member log config command (Discord UI labels)
   // Slash command and subcommand descriptions
@@ -521,17 +524,23 @@ export const commands = {
     "A sticky message is already configured for this channel. Remove it first before setting a new one.",
   // remove subcommand
   "sticky-message.remove.description":
-    "Remove a sticky message",
-  "sticky-message.remove.channel.description":
-    "Text channel to remove the sticky message from",
+    "Remove sticky messages",
+  "sticky-message.remove.select.placeholder":
+    "Select channels to remove (multiple)",
+  "sticky-message.remove.button.label":
+    "Remove",
+  "sticky-message.remove.noSelection.description":
+    "Please select channels to remove.",
   "sticky-message.remove.success.title":
     "Removed",
   "sticky-message.remove.success.description":
-    "Sticky message has been removed.",
+    "Removed {{count}} sticky message(s).",
+  "sticky-message.remove.success.channels":
+    "Removed channels",
   "sticky-message.remove.notFound.title":
     "Not Found",
   "sticky-message.remove.notFound.description":
-    "No sticky message is configured for this channel.",
+    "No sticky messages are configured.",
 
   // errors
   "sticky-message.errors.permissionDenied":
@@ -620,7 +629,7 @@ export const commands = {
   "vc-recruit-config.teardown.confirm.field_categories":
     "Target categories",
   "vc-recruit-config.teardown.confirm.warning":
-    "The panel channel and post channel for the selected categories will be deleted. This action cannot be undone.",
+    "The recruit panel and recruit list channels for the selected categories will be deleted. This action cannot be undone.",
   "vc-recruit-config.teardown.confirm.button_confirm":
     "🗑️ Remove",
   "vc-recruit-config.teardown.confirm.button_cancel":
@@ -629,12 +638,28 @@ export const commands = {
     "Reselect",
   "vc-recruit-config.add-role.description":
     "Add a role to the mention candidates",
-  "vc-recruit-config.add-role.role.description":
-    "Role to add",
+  "vc-recruit-config.add-role.select.placeholder":
+    "Select roles to add (multiple)",
+  "vc-recruit-config.add-role.select.title":
+    "Select the roles to add",
+  "vc-recruit-config.add-role.button.confirm":
+    "Add",
+  "vc-recruit-config.add-role.button.cancel":
+    "Cancel",
+  "vc-recruit-config.add-role.noSelection":
+    "Please select the roles to add.",
   "vc-recruit-config.remove-role.description":
     "Remove a role from the mention candidates",
-  "vc-recruit-config.remove-role.role.description":
-    "Role to remove",
+  "vc-recruit-config.remove-role.select.placeholder":
+    "Select roles to remove (multiple)",
+  "vc-recruit-config.remove-role.select.title":
+    "Select the roles to remove",
+  "vc-recruit-config.remove-role.button.confirm":
+    "Remove",
+  "vc-recruit-config.remove-role.button.cancel":
+    "Cancel",
+  "vc-recruit-config.remove-role.noSelection":
+    "Please select the roles to remove.",
   "vc-recruit-config.view.description":
     "Show current VC recruit settings",
   // setup success
@@ -650,7 +675,7 @@ export const commands = {
   "vc-recruit-config.embed.teardown_category_item":
     "🗑️ {{category}}",
   "vc-recruit-config.embed.teardown_partial_error":
-    "⚠️ The following categories had errors:",
+    "The following categories had errors:",
   "vc-recruit-config.embed.teardown_cancelled":
     "Cancelled.",
   // add-role/remove-role success
@@ -673,20 +698,38 @@ export const commands = {
     "TOP",
   "vc-recruit-config.embed.setup_item":
     "• {{category}}\n　Panel: {{panel}}\n　Board: {{post}}",
+  "vc-recruit-config.embed.add_role_success_title":
+    "Roles Registered",
+  "vc-recruit-config.embed.add_role_success_field":
+    "Registered Roles",
+  "vc-recruit-config.embed.add_role_limit_title":
+    "Role Limit Exceeded",
+  "vc-recruit-config.embed.add_role_limit_desc":
+    "The mention role limit ({{limit}}) has been reached. The following roles could not be registered.",
+  "vc-recruit-config.embed.add_role_limit_field":
+    "Roles Not Registered",
+  "vc-recruit-config.embed.remove_role_success_title":
+    "Roles Removed",
+  "vc-recruit-config.embed.remove_role_success_field":
+    "Removed Roles",
   "vc-recruit-config.embed.success_title":
     "Settings Updated",
 
+  // Common
+  "common.cancelled":
+    "Cancelled.",
+
   // VC recruit channel names
   "vcRecruit.channelName.panel":
-    "vc-recruit",
+    "vc-create",
   "vcRecruit.channelName.post":
-    "vc-recruit-board",
+    "vc-recruit-list",
 
   // VC recruit panel
   "vcRecruit.panel.title":
     "🎤 VC Recruit",
   "vcRecruit.panel.description":
-    "Looking for VC participants?\nPress the button to create a recruitment post.",
+    "You can create a VC recruitment post using the button below.\n\n**How to create**\n1. Press the button below to start\n2. Select the roles to mention and the VC to join\n3. Enter the details and submit — your post will appear in the recruitment list channel",
   "vcRecruit.panel.create_button":
     "Create VC Recruit",
 
@@ -703,8 +746,8 @@ export const commands = {
     "Used only if \"Create new VC\" is selected (blank: DisplayName's Room)",
 
   // VC recruit select (step 1)
-  "vcRecruit.select.title":
-    "📋 Step 1/2 — Select VC and mention",
+  "vcRecruit.select.title": "📋 Step 1/2",
+  "vcRecruit.select.description": "Select mention and VC",
   "vcRecruit.select.mention_placeholder":
     "Mention (none)",
   "vcRecruit.select.vc_placeholder":
@@ -730,9 +773,55 @@ export const commands = {
   "vcRecruit.thread_name":
     "{{recruiter}}'s recruit",
 
-  // Auto-move skip notification
-  "vcRecruit.embed.not_in_vc_skipped":
-    "⚠️ Could not auto-move: you are not in a voice channel",
+  // Post success notification
+  "vcRecruit.embed.post_success":
+    "Recruitment posted successfully",
+  "vcRecruit.embed.post_success_link":
+    "View post",
+
+  // Recruit message buttons
+  "vcRecruit.button.join_vc":
+    "🎤 Join VC",
+  "vcRecruit.button.rename_vc":
+    "✏️ Rename VC",
+  "vcRecruit.button.end_vc":
+    "🔇 End VC",
+  "vcRecruit.button.delete_post":
+    "🗑️ Delete post",
+  "vcRecruit.button.vc_ended":
+    "🔇 VC Ended",
+
+  // End VC confirmation
+  "vcRecruit.confirm.end_vc_created":
+    "End VC?\nThe VC will be deleted and the recruit post will be marked as ended. The post and thread will remain.",
+  "vcRecruit.confirm.end_vc_existing":
+    "End VC?\nThe recruit post will be marked as ended. The VC will not be deleted.",
+  "vcRecruit.confirm.end_vc_button":
+    "End VC",
+  "vcRecruit.confirm.cancel_button":
+    "Cancel",
+  "vcRecruit.confirm.end_vc_success":
+    "VC has been ended",
+  "vcRecruit.confirm.cancelled":
+    "Cancelled.",
+
+  // Delete post confirmation
+  "vcRecruit.confirm.delete_created":
+    "Delete this recruitment?\nThe post, thread, and created VC will all be deleted.",
+  "vcRecruit.confirm.delete_existing":
+    "Delete this recruitment?\nThe post and thread will be deleted. The VC will not be deleted.",
+  "vcRecruit.confirm.delete_button":
+    "Delete",
+
+  // VC rename
+  "vcRecruit.rename.modal_title":
+    "Rename VC",
+  "vcRecruit.rename.vc_name_label":
+    "VC Name",
+  "vcRecruit.rename.vc_name_placeholder":
+    "Enter a new VC name (max 100 characters)",
+  "vcRecruit.rename.success":
+    "VC name has been changed",
 } as const;
 
 export type CommandsTranslations = typeof commands;

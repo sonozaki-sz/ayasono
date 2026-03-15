@@ -6,6 +6,7 @@ const handleButtonMock: Mock = vi.fn();
 const handleChatInputCommandMock: Mock = vi.fn();
 const handleModalSubmitMock: Mock = vi.fn();
 const handleUserSelectMenuMock: Mock = vi.fn();
+const handleRoleSelectMenuMock: Mock = vi.fn();
 const handleStringSelectMenuMock: Mock = vi.fn();
 
 vi.mock("@/bot/handlers/interactionCreate/flow/command", () => ({
@@ -18,15 +19,23 @@ vi.mock("@/bot/handlers/interactionCreate/flow/modal", () => ({
   handleModalSubmit: (...args: unknown[]) => handleModalSubmitMock(...args),
 }));
 
+vi.mock("@/bot/utils/messageResponse", () => ({
+  STATUS_COLORS: { success: 0x57f287, info: 0x3498db, warning: 0xfee75c, error: 0xed4245 },
+}));
+
 vi.mock("@/bot/handlers/interactionCreate/flow/components", () => ({
   handleButton: (...args: unknown[]) => handleButtonMock(...args),
   handleUserSelectMenu: (...args: unknown[]) =>
     handleUserSelectMenuMock(...args),
+  handleRoleSelectMenu: (...args: unknown[]) =>
+    handleRoleSelectMenuMock(...args),
   handleStringSelectMenu: (...args: unknown[]) =>
     handleStringSelectMenuMock(...args),
 }));
 
+// handleInteractionCreate の各 interaction 種別から対応ハンドラーへのルーティングを検証
 describe("bot/handlers/interactionCreate/index", () => {
+  // 各テストケースでモック状態をリセットする
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -42,6 +51,7 @@ describe("bot/handlers/interactionCreate/index", () => {
       isModalSubmit: () => false,
       isButton: () => false,
       isUserSelectMenu: () => false,
+      isRoleSelectMenu: () => false,
     };
 
     await handleInteractionCreate(interaction as never);
@@ -61,6 +71,7 @@ describe("bot/handlers/interactionCreate/index", () => {
       isModalSubmit: () => false,
       isButton: () => false,
       isUserSelectMenu: () => true,
+      isRoleSelectMenu: () => false,
       isStringSelectMenu: () => false,
     };
 
@@ -81,6 +92,7 @@ describe("bot/handlers/interactionCreate/index", () => {
       isModalSubmit: () => false,
       isButton: () => false,
       isUserSelectMenu: () => false,
+      isRoleSelectMenu: () => false,
       isStringSelectMenu: () => true,
     };
 
