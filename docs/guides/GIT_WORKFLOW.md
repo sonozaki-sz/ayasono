@@ -254,7 +254,7 @@ git commit -m "test(afk): AFK自動解除のユニットテストを追加"
 | -------------------------------- | ---------------- | ---------------------------- |
 | **main / develop 向け PR**       | `deploy.yml`     | lint・型チェック・テスト実行 |
 | **main / develop 向け PR**       | `commitlint.yml` | コミットメッセージ形式の検証 |
-| **main への push（PRマージ後）** | `deploy.yml`     | VPS へ自動デプロイ           |
+| **main への push（PRマージ後）** | `deploy.yml`     | Portainer Stack を自動デプロイ |
 
 ### マージ戦略（PR 経由の場合）
 

@@ -10,8 +10,8 @@ services:
   bot:
     image: ghcr.io/sonozaki-sz/ayasono:latest
     container_name: ayasono-bot
-    # マイグレーション実行後に Bot を起動
-    command: sh -c "pnpm prisma migrate deploy && node dist/bot/main.js"
+    # マイグレーションは entrypoint 内で実行後、Bot を起動
+    command: node dist/bot/main.js
     restart: unless-stopped
     environment:
       # --- 必須 ---
@@ -29,11 +29,12 @@ services:
       # ログファイルの永続化（ホストバインドマウント）
       - /opt/ayasono/logs:/app/logs
     healthcheck:
-      test: ["CMD", "node", "-e", "process.exit(0)"]
+      # ボットプロセス内の HTTP ヘルスサーバー（:8080）で Discord 接続状態を確認
+      test: ["CMD", "node", "-e", "const http=require('http');const r=http.get('http://localhost:8080/health',s=>{process.exit(s.statusCode===200?0:1)});r.on('error',()=>process.exit(1))"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 15s
+      start_period: 30s
     logging:
       driver: json-file
       options:

@@ -181,8 +181,8 @@ jobs:
                       \"inline\": false
                     },
                     {
-                      \"name\": \"リポジトリ\",
-                      \"value\": \"[ayasono](https://github.com/${{ github.repository }})\",
+                      \"name\": \"手動ロールバック\",
+                      \"value\": \"Portainer で前回の SHA タグを指定して再デプロイ\",
                       \"inline\": false
                     },
                     {
