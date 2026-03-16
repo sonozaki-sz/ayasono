@@ -727,7 +727,7 @@ export const commands = {
 
   // VC recruit panel
   "vcRecruit.panel.title":
-    "🎤 VC Recruit",
+    "📝 VC Recruit",
   "vcRecruit.panel.description":
     "You can create a VC recruitment post using the button below.\n\n**How to create**\n1. Press the button below to start\n2. Select the roles to mention and the VC to join\n3. Enter the details and submit — your post will appear in the recruitment list channel",
   "vcRecruit.panel.create_button":
@@ -762,6 +762,8 @@ export const commands = {
   // Recruit message
   "vcRecruit.embed.title":
     "📢 VC Recruit",
+  "vcRecruit.embed.title_ended":
+    "📢 VC Recruit [Ended]",
   "vcRecruit.embed.field_content":
     "Recruit message",
   "vcRecruit.embed.field_vc":
@@ -785,23 +787,23 @@ export const commands = {
   "vcRecruit.button.rename_vc":
     "✏️ Rename VC",
   "vcRecruit.button.end_vc":
-    "🔇 End VC",
+    "🔇 End Recruitment",
   "vcRecruit.button.delete_post":
     "🗑️ Delete post",
   "vcRecruit.button.vc_ended":
-    "🔇 VC Ended",
+    "🔇 Recruitment Ended",
 
-  // End VC confirmation
+  // End recruitment confirmation
   "vcRecruit.confirm.end_vc_created":
-    "End VC?\nThe VC will be deleted and the recruit post will be marked as ended. The post and thread will remain.",
+    "End recruitment?\nThe VC will be deleted and the recruit post will be marked as ended. The post and thread will remain.",
   "vcRecruit.confirm.end_vc_existing":
-    "End VC?\nThe recruit post will be marked as ended. The VC will not be deleted.",
+    "End recruitment?\nThe recruit post will be marked as ended. The VC will not be deleted.",
   "vcRecruit.confirm.end_vc_button":
-    "End VC",
+    "End",
   "vcRecruit.confirm.cancel_button":
     "Cancel",
   "vcRecruit.confirm.end_vc_success":
-    "VC has been ended",
+    "Recruitment has been ended",
   "vcRecruit.confirm.cancelled":
     "Cancelled.",
 
@@ -812,6 +814,8 @@ export const commands = {
     "Delete this recruitment?\nThe post and thread will be deleted. The VC will not be deleted.",
   "vcRecruit.confirm.delete_button":
     "Delete",
+  "vcRecruit.confirm.delete_success":
+    "Recruitment has been deleted",
 
   // VC rename
   "vcRecruit.rename.modal_title":

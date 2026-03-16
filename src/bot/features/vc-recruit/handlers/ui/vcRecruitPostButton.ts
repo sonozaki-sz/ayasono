@@ -6,6 +6,7 @@ import {
   ButtonBuilder,
   ButtonStyle,
   ChannelType,
+  EmbedBuilder,
   MessageFlags,
   ModalBuilder,
   PermissionFlagsBits,
@@ -76,6 +77,10 @@ async function updateToEndedState(
     guildId,
     "commands:vcRecruit.button.delete_post",
   );
+  const endedTitle = await tGuild(
+    guildId,
+    "commands:vcRecruit.embed.title_ended",
+  );
 
   // 元の削除ボタンのカスタムIDを維持
   let resolvedDeleteId: string | undefined;
@@ -91,6 +96,11 @@ async function updateToEndedState(
     }
   }
 
+  // embedのタイトルを「募集終了」に更新
+  const updatedEmbeds = message.embeds.map((embed) =>
+    EmbedBuilder.from(embed).setTitle(endedTitle),
+  );
+
   const endedButton = new ButtonBuilder()
     .setCustomId("vc-recruit:ended-placeholder")
     .setLabel(endedLabel)
@@ -103,6 +113,7 @@ async function updateToEndedState(
     .setStyle(ButtonStyle.Danger);
 
   await message.edit({
+    embeds: updatedEmbeds,
     components: [
       new ActionRowBuilder<ButtonBuilder>().addComponents(
         endedButton,
@@ -564,7 +575,7 @@ async function handleConfirmDelete(
       content: null,
       embeds: [
         createSuccessEmbed(
-          await tGuild(guild.id, "commands:vcRecruit.confirm.cancelled"),
+          await tGuild(guild.id, "commands:vcRecruit.confirm.delete_success"),
         ),
       ],
       components: [],

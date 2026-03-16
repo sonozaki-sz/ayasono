@@ -5,6 +5,7 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
+  EmbedBuilder,
   type Channel,
   type TextChannel,
 } from "discord.js";
@@ -144,7 +145,7 @@ async function updatePostButtonsForDeletedVc(
 
     if (!hasTargetVc) continue;
 
-    // ボタンを「VC終了済み」状態に更新
+    // ボタンを「募集終了済み」状態に更新
     const endedLabel = await tGuild(
       guildId,
       "commands:vcRecruit.button.vc_ended",
@@ -152,6 +153,17 @@ async function updatePostButtonsForDeletedVc(
     const deleteLabel = await tGuild(
       guildId,
       "commands:vcRecruit.button.delete_post",
+    );
+    const endedTitle = await tGuild(
+      guildId,
+      "commands:vcRecruit.embed.title_ended",
+    );
+
+    // embedのタイトルを「募集終了」に更新
+    const updatedEmbeds = msg.embeds.map((embed: unknown) =>
+      EmbedBuilder.from(
+        embed as Parameters<typeof EmbedBuilder.from>[0],
+      ).setTitle(endedTitle),
     );
 
     const endedButton = new ButtonBuilder()
@@ -167,6 +179,7 @@ async function updatePostButtonsForDeletedVc(
 
     await msg
       .edit({
+        embeds: updatedEmbeds,
         components: [
           new ActionRowBuilder<ButtonBuilder>().addComponents(
             endedButton,

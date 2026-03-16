@@ -725,7 +725,7 @@ export const commands = {
 
   // VC募集パネル
   "vcRecruit.panel.title":
-    "🎤 VC募集",
+    "📝 VC募集",
   "vcRecruit.panel.description":
     "ボタンからVC参加者の募集を作成できます。\n\n**作成手順**\n1. 下のボタンを押して募集作成を開始します\n2. メンションするロールと参加するVCを選択します\n3. 募集内容を入力して送信すると、募集一覧チャンネルに投稿されます",
   "vcRecruit.panel.create_button":
@@ -760,6 +760,8 @@ export const commands = {
   // 募集メッセージ
   "vcRecruit.embed.title":
     "📢 VC募集",
+  "vcRecruit.embed.title_ended":
+    "📢 VC募集【募集終了】",
   "vcRecruit.embed.field_content":
     "募集内容",
   "vcRecruit.embed.field_vc":
@@ -783,23 +785,23 @@ export const commands = {
   "vcRecruit.button.rename_vc":
     "✏️ VC名を変更",
   "vcRecruit.button.end_vc":
-    "🔇 VCを終了",
+    "🔇 募集終了",
   "vcRecruit.button.delete_post":
     "🗑️ 募集を削除",
   "vcRecruit.button.vc_ended":
-    "🔇 VC終了済み",
+    "🔇 募集終了済み",
 
-  // VCを終了 確認
+  // 募集終了 確認
   "vcRecruit.confirm.end_vc_created":
-    "VCを終了しますか？\nVCが削除され、募集投稿が終了済みに更新されます。投稿とスレッドは残ります。",
+    "募集を終了しますか？\nVCが削除され、募集投稿が終了済みに更新されます。投稿とスレッドは残ります。",
   "vcRecruit.confirm.end_vc_existing":
-    "VCを終了しますか？\n募集投稿が終了済みに更新されます。VCは削除されません。",
+    "募集を終了しますか？\n募集投稿が終了済みに更新されます。VCは削除されません。",
   "vcRecruit.confirm.end_vc_button":
     "終了する",
   "vcRecruit.confirm.cancel_button":
     "キャンセル",
   "vcRecruit.confirm.end_vc_success":
-    "VCを終了しました",
+    "募集を終了しました",
   "vcRecruit.confirm.cancelled":
     "キャンセルしました",
 
@@ -810,6 +812,8 @@ export const commands = {
     "この募集を削除しますか？\n投稿・スレッドが削除されます。VCは削除されません。",
   "vcRecruit.confirm.delete_button":
     "削除する",
+  "vcRecruit.confirm.delete_success":
+    "募集を削除しました",
 
   // VC名変更
   "vcRecruit.rename.modal_title":

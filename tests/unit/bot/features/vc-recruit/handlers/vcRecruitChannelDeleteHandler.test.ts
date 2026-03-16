@@ -248,6 +248,7 @@ describe("bot/features/vc-recruit/handlers/vcRecruitChannelDeleteHandler", () =>
           ],
         },
       ],
+      embeds: [{ toJSON: () => ({ title: "📢 VC募集" }) }],
       edit: editMock,
     };
     const msgWithoutTarget = {
@@ -258,6 +259,7 @@ describe("bot/features/vc-recruit/handlers/vcRecruitChannelDeleteHandler", () =>
           ],
         },
       ],
+      embeds: [],
       edit: vi.fn(),
     };
 
