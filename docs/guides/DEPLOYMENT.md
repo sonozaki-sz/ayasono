@@ -1,16 +1,16 @@
 # デプロイガイド
 
-> SSH + GitHub Actions による ayasono のデプロイフロー詳細
+> GitHub Actions + Portainer API による ayasono の自動デプロイフロー
 
-最終更新: 2026年3月1日（`ENOENT: scandir '/app/commands'` トラブルシューティング追加）
+最終更新: 2026年3月16日（SSH/SCP 方式から Portainer API 方式に移行）
 
 ---
 
-## 📋 概要
+## 概要
 
-このドキュメントでは、GitHub Actions が main ブランチへの push を検知してから Discord 通知を送信するまでの自動デプロイフロー全体を説明します。
+GitHub Actions が main ブランチへの push を検知すると、Docker イメージのビルド・GHCR への push・Portainer Stack の再デプロイまでを自動で行う。
 
-初回セットアップ（VPS の初期設定・Portainer のインストール・ファイル配置）は **[XSERVER_VPS_SETUP.md](XSERVER_VPS_SETUP.md)** を参照してください。
+初回セットアップ（VPS の初期設定・Portainer のインストール）は **[XSERVER_VPS_SETUP.md](XSERVER_VPS_SETUP.md)** を参照。
 
 ### デプロイフロー全体図
 
@@ -19,144 +19,149 @@ main へ push / PR マージ
   └── [Test] 型チェック・vitest によるテスト
         └── [Deploy to VPS] テスト成功時のみ
               ├── Docker イメージをビルドして GHCR にプッシュ
-              ├── SSH で VPS に接続 → docker compose pull && up -d
+              ├── Portainer API で Stack を再デプロイ（compose pull + コンテナ再起動）
               ├── [Discord通知（成功）] デプロイ成功時
               └── [Discord通知（失敗）] test または deploy 失敗時
 ```
 
 ---
 
-## 🤖 1. GitHub Actions ワークフロー
+## 1. GitHub Actions ワークフロー
 
 ワークフロー定義は [.github/workflows/deploy.yml](../../.github/workflows/deploy.yml)。
 
 ### トリガー条件
 
-| イベント                                  | 実行されるジョブ                         |
-| ----------------------------------------- | ---------------------------------------- |
-| `main` / `develop` へ直接 push            | Test + Deploy（main のみ）+ Discord 通知 |
-| `main` / `develop` への PR オープン・更新 | Test のみ                                |
-| `main` への PR がマージ完了               | Test + Deploy + Discord 通知             |
+| イベント                                  | 実行されるジョブ             |
+| ----------------------------------------- | ---------------------------- |
+| `main` / `develop` への PR オープン・更新 | Test のみ                    |
+| `main` への push（PR マージ含む）         | Test + Deploy + Discord 通知 |
 
 ### ジョブ構成
 
-| ジョブ           | 条件                         | 内容                               |
-| ---------------- | ---------------------------- | ---------------------------------- |
-| `test`           | push/PR すべて（close 除く） | pnpm typecheck + pnpm test         |
-| `deploy`         | main への push のみ          | GHCR イメージビルド + SSH デプロイ |
-| `notify-success` | deploy 成功時                | Discord に成功 Embed を送信        |
-| `notify-failure` | test または deploy 失敗時    | Discord に失敗 Embed を送信        |
+| ジョブ           | 条件                         | 内容                                         |
+| ---------------- | ---------------------------- | -------------------------------------------- |
+| `test`           | push/PR すべて（close 除く） | pnpm typecheck + pnpm test                   |
+| `deploy`         | main への push のみ          | GHCR イメージビルド + Portainer API デプロイ |
+| `notify-success` | deploy 成功時                | Discord に成功 Embed を送信                  |
+| `notify-failure` | test または deploy 失敗時    | Discord に失敗 Embed を送信                  |
 
 ---
 
-## 🔑 2. 必要な GitHub Secrets
+## 2. 必要な GitHub Secrets
 
-- **`SSH_HOST`**: VPS の IP アドレス（例: `220.158.17.101`）
-- **`SSH_USER`**: SSH ユーザー名（例: `deploy`）
-- **`SSH_PRIVATE_KEY`**: デプロイ用 SSH 秘密鍵（`-----BEGIN OPENSSH PRIVATE KEY-----` から末尾まで）
-- **`PORTAINER_HOST`**: VPS の IP アドレス（Discord 通知の Portainer リンク用）
-- **`PORTAINER_ENDPOINT_ID`**: Portainer エンドポイント ID（Discord 通知のリンク用）
-- **`DISCORD_WEBHOOK_URL`**: Discord の Webhook URL
+### デプロイ用（必須）
 
-> `PORTAINER_HOST` と `PORTAINER_ENDPOINT_ID` の2つはデプロイには使用しない。Discord 通知の Portainer 管理リンク生成のみに使用する。
+| Secret                  | 説明                                   | 例                           |
+| ----------------------- | -------------------------------------- | ---------------------------- |
+| `PORTAINER_URL`         | Portainer の URL（末尾 `/` なし）      | `http://220.158.17.101:9000` |
+| `PORTAINER_API_KEY`     | Portainer API トークン                 | My account > Access tokens   |
+| `PORTAINER_STACK_ID`    | Stack の ID（URL の `?id=` から確認）  | `15`                         |
+| `PORTAINER_ENDPOINT_ID` | エンドポイント ID（URL の `#!/` 直後） | `3`                          |
+
+### 通知用
+
+| Secret                | 説明                                |
+| --------------------- | ----------------------------------- |
+| `PORTAINER_HOST`      | Portainer の IP（Discord リンク用） |
+| `DISCORD_WEBHOOK_URL` | Discord Webhook URL                 |
+
+> `PORTAINER_URL` の末尾に `/` をつけると API パスが `//api/...` になり 404 エラーになるため注意。
 
 ---
 
-## 🚀 3. デプロイステップ詳細
+## 3. デプロイステップ詳細
 
 ### 3-1. Docker イメージのビルドと GHCR プッシュ
 
 `docker/build-push-action` を使って `Dockerfile` の `runner` ステージをビルドし、以下のタグで GHCR にプッシュする。
 
-| タグ                                 | 用途               |
-| ------------------------------------ | ------------------ |
-| `ghcr.io/sonozaki-sz/ayasono:latest` | VPS が参照するタグ |
-| `ghcr.io/sonozaki-sz/ayasono:<SHA>`  | ロールバック用     |
+| タグ                                 | 用途             |
+| ------------------------------------ | ---------------- |
+| `ghcr.io/sonozaki-sz/ayasono:latest` | Portainer が参照 |
+| `ghcr.io/sonozaki-sz/ayasono:<SHA>`  | ロールバック用   |
 
 GitHub Actions のキャッシュ（`cache-from/cache-to: type=gha`）によりビルド時間を短縮している。
 
-### 3-2. SSH によるデプロイ
+### 3-2. Portainer API による Stack 再デプロイ
 
-`appleboy/ssh-action` を使って VPS に SSH 接続し、以下を実行する。
-
-```bash
-cd /opt/ayasono
-echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
-docker compose -f docker-compose.prod.yml pull   # GHCR から :latest をプル
-docker compose -f docker-compose.prod.yml up -d --remove-orphans
-docker logout ghcr.io
-```
-
-> `GITHUB_TOKEN` は GitHub Actions が自動発行するリポジトリ書き込みトークン。`GHCR_USER` / `GHCR_TOKEN` などの別途 Secret 登録は不要。
-
-### 3-3. VPS 上のファイル構成
-
-```
-/opt/ayasono/
-├── docker-compose.prod.yml   ← compose 定義（初回は手動配置、以降は Actions が自動転送）
-├── .env                      ← 環境変数（VPS 上で直接管理、権限 600）
-└── logs/                     ← ログ出力先（bot コンテナがマウント）
-```
-
-**環境変数の追加・変更は `/opt/ayasono/.env` を編集するだけでよい。** compose ファイルの変更は不要。
+GHCR への push 後、Portainer の REST API を呼び出して Stack を再デプロイする。
 
 ```bash
-# VPS 上での .env 編集
-vim /opt/ayasono/.env
-# 変更後はコンテナを再起動
-docker compose -f /opt/ayasono/docker-compose.prod.yml up -d
+curl -fsSL -X PUT \
+  "$PORTAINER_URL/api/stacks/$STACK_ID/git/redeploy?endpointId=$ENDPOINT_ID" \
+  -H "X-API-Key: $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"pullImage": true, "repositoryReferenceName": "refs/heads/main"}'
 ```
 
-### 3-4. Discord 通知の Portainer リンク
+Portainer が行う処理:
 
-Discord の成功/失敗 Embed には Portainer のコンテナ管理ページへのリンクが付く。
+1. GitHub リポジトリから `docker-compose.portainer.yml` を pull
+2. 新しいイメージ（`:latest`）を GHCR から pull
+3. コンテナを再作成して起動
+
+### 3-3. 環境変数の管理
+
+環境変数は **Portainer UI** で管理する。サーバー上の `.env` ファイルは使用しない。
+
+**変更手順:**
+
+1. Portainer → **Stacks** → **ayasono** → **Editor**
+2. **Environment variables** セクションで値を変更
+3. **Pull and redeploy** をクリック
+
+### 3-4. Compose ファイルの構成
+
+| ファイル                       | 用途                                     |
+| ------------------------------ | ---------------------------------------- |
+| `docker-compose.portainer.yml` | Portainer Stack 用（本番デプロイで使用） |
+| `docker-compose.prod.yml`      | 旧方式（参考用、使用しない）             |
+
+Portainer Stack は Repository 方式で `docker-compose.portainer.yml` を参照している。compose ファイルの変更はリポジトリに push すれば次回デプロイ時に自動で反映される。
+
+### 3-5. Discord 通知
+
+成功/失敗の Embed に Portainer Stack ページへのリンクが含まれる。
 
 ```
-http://<PORTAINER_HOST>:9000/#!/<PORTAINER_ENDPOINT_ID>/docker/containers
+http://<PORTAINER_HOST>:9000/#!/<ENDPOINT_ID>/docker/stacks/ayasono?id=<STACK_ID>&type=2
 ```
-
-デプロイ自体は SSH 経由で行うが、コンテナ管理 UI として Portainer は引き続き利用できる。
 
 ---
 
-## 🔄 4. ロールバック手順
+## 4. ロールバック手順
 
-### 4-1. SSH でのロールバック
+### 4-1. Portainer UI でのロールバック
+
+1. Portainer → **Stacks** → **ayasono** → **Editor**
+2. compose ファイル内のイメージタグを `ghcr.io/sonozaki-sz/ayasono:<旧SHA>` に変更
+3. **Update the stack** をクリック
+4. 復旧後、タグを `:latest` に戻して再度更新
+
+### 4-2. Git revert でのロールバック
 
 ```bash
-ssh deploy@220.158.17.101
-cd /opt/ayasono
-
-# docker-compose.prod.yml のイメージタグを一時的に変更
-sed -i 's|:latest|:<旧SHA>|' docker-compose.prod.yml
-docker compose -f docker-compose.prod.yml pull
-docker compose -f docker-compose.prod.yml up -d
-
-# ロールバック後、latest に戻す
-sed -i 's|:<旧SHA>|:latest|' docker-compose.prod.yml
+git revert <問題のコミットSHA>
+git push origin main
+# → GitHub Actions が自動でデプロイ
 ```
-
-### 4-2. Portainer UI でのロールバック
-
-1. Portainer → **Containers** → `ayasono-bot` → **Duplicate/Edit**
-2. イメージタグを `:<SHA>` に変更して再デプロイ
 
 ---
 
-## 🆘 5. トラブルシューティング
+## 5. トラブルシューティング
 
-### デプロイジョブが失敗する
+### deploy ジョブが 404 エラーで失敗する
 
-**SSH 接続に失敗している場合:**
+- `PORTAINER_URL` の末尾に `/` がついていないか確認（`http://xxx:9000` が正しい）
+- `PORTAINER_STACK_ID` / `PORTAINER_ENDPOINT_ID` が正しいか確認（Portainer の Stack URL から取得）
 
-- `SSH_HOST` / `SSH_USER` / `SSH_PRIVATE_KEY` が正しく登録されているか確認
-- VPS で `deploy` ユーザーの `~/.ssh/authorized_keys` に GitHub Actions 用公開鍵が登録されているか確認
+### deploy ジョブが 401/403 エラーで失敗する
 
-```bash
-ssh deploy@220.158.17.101 "cat ~/.ssh/authorized_keys"
-```
+- `PORTAINER_API_KEY` が有効か確認（Portainer → My account → Access tokens）
+- トークンが期限切れの場合は再発行して GitHub Secrets を更新
 
-**GHCR へのプッシュ・プルに失敗している場合:**
+### GHCR へのプッシュ・プルに失敗する
 
 - リポジトリの **Settings → Actions → General** で「Allow GitHub Actions to create and approve pull requests」が有効か確認
 - `GITHUB_TOKEN` の `packages: write` 権限が有効か確認（deploy ジョブの `permissions:` で設定済み）
@@ -164,64 +169,31 @@ ssh deploy@220.158.17.101 "cat ~/.ssh/authorized_keys"
 ### bot コンテナの起動後すぐクラッシュする
 
 ```bash
+# Portainer UI → Containers → ayasono-bot → Logs で確認
+# または SSH で:
 docker logs ayasono-bot --tail 50
 ```
 
-- `/opt/ayasono/.env` の各変数が正しく設定されているか確認
+- Portainer の環境変数が正しく設定されているか確認
 - `sqlite_data` ボリュームの権限エラーがないか確認
 
-### SQLITE_READONLY エラーが発生する (データベース書き込み不可)
+### SQLITE_READONLY エラーが発生する
 
-**症状**: Bump リマインダーなど書き込み操作で `SQLITE_READONLY: attempt to write a readonly database` が発生する。
-**原因**: `sqlite_data` ボリューム内の `db.sqlite` (および WAL ファイル) が root 所有になっており、node ユーザーで動くアプリが書き込めない状態。過去のデプロイで root 権限のプロセスがファイルを作成した場合に発生する。
-
-#### 緊急修復手順（現在稼働中のコンテナへの即時対応）
+`docker-entrypoint.sh` がコンテナ起動時に `chown -R node:node /app/storage` を自動実行するため、通常は発生しない。発生した場合:
 
 ```bash
-ssh deploy@<VPS_IP>
-
-# コンテナ内のストレージファイル所有者を確認
-docker exec ayasono-bot ls -la /app/storage/
-
-# node:node (UID 1000) 以外が所有者の場合は修正
 docker exec -u root ayasono-bot chown -R node:node /app/storage
-
-# 修正後に確認
-docker exec ayasono-bot ls -la /app/storage/
-```
-
-> **恒久対応済み**: `docker-entrypoint.sh` がコンテナ起動時に自動で `chown -R node:node /app/storage` を実行するよう修正済み。次回デプロイ後は自動的に解消される。
-
-### `ENOENT: no such file or directory, scandir '/app/commands'` が発生する
-
-**症状**: Bot コンテナ起動直後に以下のエラーでクラッシュする。
-
-```
-Error: ENOENT: no such file or directory, scandir '/app/commands'
-  at loadCommands (dist/chunk-XXXXXXXX.js:...)
-```
-
-**原因**: tsup の `splitting: true` により `loadCommands` / `loadEvents` のコードが共有チャンク（`dist/chunk-XXXXXXXX.js`）に移動したとき、関数内の `import.meta.dirname` がチャンクの置き場所（`/app/dist/`）を返す。相対パス `../commands` を解決すると存在しない `/app/commands` になる。
-
-**対処済み（2026-03-01）**: `loadCommands()` / `loadEvents()` はディレクトリパスを引数で受け取る設計に変更済み。`main.ts`（= `/app/dist/bot/main.js`）から `import.meta.dirname` を基準にした正しいパスを渡している。
-
-**同様の問題が再発した場合**: `src/bot/main.ts` で `loadCommands()` / `loadEvents()` を呼ぶ際に明示パスが渡されているか確認する。
-
-```typescript
-// 正しい呼び出し（main.ts の import.meta.dirname = dist/bot/）
-const commands = await loadCommands(resolve(import.meta.dirname, "commands"));
-const events = await loadEvents(resolve(import.meta.dirname, "events"));
 ```
 
 ### Discord 通知の Portainer リンクが機能しない
 
-- `PORTAINER_HOST` / `PORTAINER_ENDPOINT_ID` が正しく設定されているか確認
+- `PORTAINER_HOST` / `PORTAINER_ENDPOINT_ID` / `PORTAINER_STACK_ID` が正しく設定されているか確認
 
 ---
 
-## ⚠️ 6. Docker・デプロイ関連ファイルの変更ルール
+## 6. Docker・デプロイ関連ファイルの変更ルール
 
-> **Dockerfile / docker-compose ファイル / GitHub Actions ワークフローを変更する場合は、必ずローカルでテストを通過させてからコミットすること。**
+> Dockerfile / docker-compose ファイル / GitHub Actions ワークフローを変更する場合は、必ずローカルでテストを通過させてからコミットすること。
 > CI/CD を使ったデプロイは失敗するたびに本番停止時間が発生するため、ローカル確認を必須とする。
 
 ### 対象ファイル
@@ -229,22 +201,8 @@ const events = await loadEvents(resolve(import.meta.dirname, "events"));
 | ファイル                       | ローカルテスト方法                                                                  |
 | ------------------------------ | ----------------------------------------------------------------------------------- |
 | `Dockerfile`                   | `docker build --target runner .` が成功すること                                     |
-| `docker-compose.prod.yml`      | `docker compose -f docker-compose.prod.yml config` でバリデーションが通ること       |
-| `docker-compose.infra.yml`     | `docker compose -f docker-compose.infra.yml config` でバリデーションが通ること      |
+| `docker-compose.portainer.yml` | `docker compose -f docker-compose.portainer.yml config` でバリデーションが通ること  |
 | `.github/workflows/deploy.yml` | [act](https://github.com/nektos/act) または PR を作成してテストジョブを確認すること |
-
-> **ローカルで `docker-compose.prod.yml config` を実行する場合の注意**
-> `env_file:` が `/opt/ayasono/.env` を参照しているため、ファイルが存在しないとエラーになる。
-> 事前に以下のいずれかを実行しておくこと。
->
-> ```bash
-> # 方法A: ローカルの .env をシンボリックリンクで配置（推奨）
-> sudo mkdir -p /opt/ayasono
-> sudo ln -s "$(pwd)/.env" /opt/ayasono/.env
->
-> # 方法B: ダミーファイルを配置（構文チェックのみ目的の場合）
-> sudo mkdir -p /opt/ayasono && sudo touch /opt/ayasono/.env
-> ```
 
 ### Dockerfile 変更時の必須手順
 
@@ -256,20 +214,18 @@ docker build --target runner .
 docker build --target runner --progress=plain . 2>&1 | tail -50
 ```
 
-> **背景**: 2026-03-01 に `COREPACK_HOME` 設定順序の誤りと `husky: not found` エラーにより本番デプロイが2回連続で失敗した。どちらもローカルで `docker build` を実行すれば即座に発見できた問題だった。
-
-### チェックリスト（デプロイ関連ファイル変更時）
+### チェックリスト
 
 - [ ] `docker build --target runner .` がエラーなく完了する
-- [ ] `docker compose -f docker-compose.prod.yml config` がバリデーションを通る
+- [ ] `docker compose -f docker-compose.portainer.yml config` がバリデーションを通る
 - [ ] ローカルビルド確認後にコミットしている
 
 ---
 
-## 📖 関連ドキュメント
+## 関連ドキュメント
 
 - [XSERVER_VPS_SETUP.md](XSERVER_VPS_SETUP.md) — VPS・Portainer の初回セットアップ手順
 - [ARCHITECTURE.md](ARCHITECTURE.md) — システム構成・アーキテクチャ解説
-- [docker-compose.prod.yml](../../docker-compose.prod.yml) — 本番用 Compose 定義
-- [docker-compose.infra.yml](../../docker-compose.infra.yml) — Infra スタック定義（Portainer 用）
+- [docker-compose.portainer.yml](../../docker-compose.portainer.yml) — Portainer Stack 用 Compose 定義
+- [docker-compose.prod.yml](../../docker-compose.prod.yml) — 旧本番用 Compose 定義（参考）
 - [.github/workflows/deploy.yml](../../.github/workflows/deploy.yml) — CI/CD ワークフロー定義
