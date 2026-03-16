@@ -215,11 +215,11 @@ export const commands = {
   "message-delete.errors.delete_failed":
     "メッセージの削除中にエラーが発生しました。",
   "message-delete.errors.scan_failed":
-    "メッセージの収集中にエラーが発生しました",
+    "メッセージの収集中にエラーが発生しました。",
   "message-delete.errors.not_authorized":
     "操作権限がありません。",
   "message-delete.errors.jump_invalid_page":
-    "ページ番号は 1〜{{total}} の整数で入力してください",
+    "ページ番号は 1〜{{total}} の整数で入力してください。",
   "message-delete.errors.days_invalid_value":
     "日数は1以上の整数で入力してください。",
   "message-delete.errors.after_future":
@@ -662,25 +662,25 @@ export const commands = {
     "現在のVC募集設定を表示",
   // setup 成功
   "vc-recruit-config.embed.setup_success":
-    "VC募集チャンネルを作成しました",
+    "VC募集チャンネルを作成しました。",
   "vc-recruit-config.embed.setup_panel_channel":
     "募集作成: {{channel}}",
   "vc-recruit-config.embed.setup_post_channel":
     "募集投稿: {{channel}}",
   // teardown
   "vc-recruit-config.embed.teardown_success":
-    "VC募集チャンネルを撤去しました",
+    "VC募集チャンネルを撤去しました。",
   "vc-recruit-config.embed.teardown_category_item":
     "🗑️ {{category}}",
   "vc-recruit-config.embed.teardown_partial_error":
     "以下のカテゴリーで一部エラーが発生しました：",
   "vc-recruit-config.embed.teardown_cancelled":
-    "キャンセルしました",
+    "キャンセルしました。",
   // add-role/remove-role 成功
   "vc-recruit-config.embed.add_role_success":
-    "{{role}} をメンション候補に追加しました",
+    "{{role}} をメンション候補に追加しました。",
   "vc-recruit-config.embed.remove_role_success":
-    "{{role}} をメンション候補から削除しました",
+    "{{role}} をメンション候補から削除しました。",
   // view
   "vc-recruit-config.embed.view_title":
     "VC募集設定",
@@ -715,7 +715,7 @@ export const commands = {
 
   // 共通
   "common.cancelled":
-    "キャンセルしました",
+    "キャンセルしました。",
 
   // VC募集機能 チャンネル名
   "vcRecruit.channelName.panel":
@@ -775,7 +775,7 @@ export const commands = {
 
   // 投稿完了通知
   "vcRecruit.embed.post_success":
-    "募集を投稿しました",
+    "募集を投稿しました。",
   "vcRecruit.embed.post_success_link":
     "投稿を確認する",
 
@@ -801,9 +801,9 @@ export const commands = {
   "vcRecruit.confirm.cancel_button":
     "キャンセル",
   "vcRecruit.confirm.end_vc_success":
-    "募集を終了しました",
+    "募集を終了しました。",
   "vcRecruit.confirm.cancelled":
-    "キャンセルしました",
+    "キャンセルしました。",
 
   // 募集を削除 確認
   "vcRecruit.confirm.delete_created":
@@ -813,7 +813,7 @@ export const commands = {
   "vcRecruit.confirm.delete_button":
     "削除する",
   "vcRecruit.confirm.delete_success":
-    "募集を削除しました",
+    "募集を削除しました。",
 
   // VC名変更
   "vcRecruit.rename.modal_title":
@@ -823,7 +823,7 @@ export const commands = {
   "vcRecruit.rename.vc_name_placeholder":
     "新しいVC名を入力してください（最大100文字）",
   "vcRecruit.rename.success":
-    "VC名を変更しました",
+    "VC名を変更しました。",
 } as const;
 
 export type CommandsTranslations = typeof commands;
