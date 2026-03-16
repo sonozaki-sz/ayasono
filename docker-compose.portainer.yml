@@ -1,0 +1,69 @@
+# ─────────────────────────────────────────────────────
+# ayasono Portainer Stack 用 compose ファイル
+# ─────────────────────────────────────────────────────
+# Portainer の「Stacks > + Add stack」から Web editor に貼り付けて使用する。
+# 環境変数は Portainer の「Environment variables」セクションで設定すること。
+# ※ env_file は使わず、すべて Portainer 側で管理する。
+
+services:
+  # ─── Discord Bot ───
+  bot:
+    image: ghcr.io/sonozaki-sz/ayasono:latest
+    container_name: ayasono-bot
+    # マイグレーション実行後に Bot を起動
+    command: sh -c "pnpm prisma migrate deploy && node dist/bot/main.js"
+    restart: unless-stopped
+    environment:
+      # --- 必須 ---
+      DISCORD_TOKEN: ${DISCORD_TOKEN}
+      DISCORD_APP_ID: ${DISCORD_APP_ID}
+      DATABASE_URL: ${DATABASE_URL:-file:./storage/db.sqlite}
+      LOCALE: ${LOCALE:-ja}
+      NODE_ENV: ${NODE_ENV:-production}
+      # --- 任意 ---
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      DISCORD_ERROR_WEBHOOK_URL: ${DISCORD_ERROR_WEBHOOK_URL:-}
+    volumes:
+      # SQLite データの永続化（名前付きボリューム）
+      - sqlite_data:/app/storage
+      # ログファイルの永続化（ホストバインドマウント）
+      - /opt/ayasono/logs:/app/logs
+    healthcheck:
+      test: ["CMD", "node", "-e", "process.exit(0)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  # ─── Web UI（実装完了後に有効化）───
+  # web:
+  #   image: ghcr.io/sonozaki-sz/ayasono:latest
+  #   container_name: ayasono-web
+  #   command: sh -c "node dist/web/server.js"
+  #   restart: unless-stopped
+  #   environment:
+  #     DATABASE_URL: ${DATABASE_URL:-file:./storage/db.sqlite}
+  #     NODE_ENV: ${NODE_ENV:-production}
+  #     WEB_PORT: ${WEB_PORT:-3000}
+  #     WEB_HOST: ${WEB_HOST:-0.0.0.0}
+  #     JWT_SECRET: ${JWT_SECRET}
+  #     CORS_ORIGIN: ${CORS_ORIGIN:-}
+  #   ports:
+  #     # ホスト側ポート:コンテナ側ポート
+  #     - "${WEB_PORT:-3000}:3000"
+  #   volumes:
+  #     # Bot と同じ SQLite データを共有
+  #     - sqlite_data:/app/storage
+  #   logging:
+  #     driver: json-file
+  #     options:
+  #       max-size: "10m"
+  #       max-file: "5"
+
+volumes:
+  sqlite_data:
