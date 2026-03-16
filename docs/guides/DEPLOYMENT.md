@@ -116,7 +116,6 @@ Portainer が行う処理:
 | ファイル                       | 用途                                     |
 | ------------------------------ | ---------------------------------------- |
 | `docker-compose.portainer.yml` | Portainer Stack 用（本番デプロイで使用） |
-| `docker-compose.prod.yml`      | 旧方式（参考用、使用しない）             |
 
 Portainer Stack は Repository 方式で `docker-compose.portainer.yml` を参照している。compose ファイルの変更はリポジトリに push すれば次回デプロイ時に自動で反映される。
 
@@ -227,5 +226,4 @@ docker build --target runner --progress=plain . 2>&1 | tail -50
 - [XSERVER_VPS_SETUP.md](XSERVER_VPS_SETUP.md) — VPS・Portainer の初回セットアップ手順
 - [ARCHITECTURE.md](ARCHITECTURE.md) — システム構成・アーキテクチャ解説
 - [docker-compose.portainer.yml](../../docker-compose.portainer.yml) — Portainer Stack 用 Compose 定義
-- [docker-compose.prod.yml](../../docker-compose.prod.yml) — 旧本番用 Compose 定義（参考）
 - [.github/workflows/deploy.yml](../../.github/workflows/deploy.yml) — CI/CD ワークフロー定義
