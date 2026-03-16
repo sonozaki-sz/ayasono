@@ -92,16 +92,29 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Portainer Stack を再デプロイ
+      - name: Portainer Stack を再デプロイ（環境変数を保持）
         run: |
+          PORTAINER_URL="${{ secrets.PORTAINER_URL }}"
+          STACK_ID="${{ secrets.PORTAINER_STACK_ID }}"
+          ENDPOINT_ID="${{ secrets.PORTAINER_ENDPOINT_ID }}"
+          API_KEY="${{ secrets.PORTAINER_API_KEY }}"
+
+          # 現在の Stack から環境変数を取得
+          ENV_VARS=$(curl -fsSL \
+            "${PORTAINER_URL}/api/stacks/${STACK_ID}" \
+            -H "X-API-Key: ${API_KEY}" \
+            | jq '.Env // []')
+
+          # 環境変数を含めて再デプロイ
           curl -fsSL -X PUT \
-            "${{ secrets.PORTAINER_URL }}/api/stacks/${{ secrets.PORTAINER_STACK_ID }}/git/redeploy?endpointId=${{ secrets.PORTAINER_ENDPOINT_ID }}" \
-            -H "X-API-Key: ${{ secrets.PORTAINER_API_KEY }}" \
+            "${PORTAINER_URL}/api/stacks/${STACK_ID}/git/redeploy?endpointId=${ENDPOINT_ID}" \
+            -H "X-API-Key: ${API_KEY}" \
             -H "Content-Type: application/json" \
-            -d '{
-              "pullImage": true,
-              "repositoryReferenceName": "refs/heads/main"
-            }'
+            -d "$(jq -n --argjson env "$ENV_VARS" '{
+              pullImage: true,
+              repositoryReferenceName: "refs/heads/main",
+              env: $env
+            }')"
 
   # ─────────────────────────────────────────────
   # Discord 通知（成功）

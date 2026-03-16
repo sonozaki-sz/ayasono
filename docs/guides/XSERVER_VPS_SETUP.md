@@ -2,7 +2,7 @@
 
 > XServer VPS に Docker + Portainer CE を導入し、ayasono を稼働させるための初回セットアップ手順
 
-最終更新: 2026年2月28日（SSH デプロイ方式に移行）
+最終更新: 2026年3月16日（Portainer API デプロイ方式に移行）
 
 ---
 
@@ -16,14 +16,13 @@
 ```
 XServer VPS (Ubuntu 24.04)
 ├── Docker Compose (Infra スタック: infra)       ← /opt/infra/ で管理
-│   └── portainer コンテナ                       ← コンテナ管理 UI
-└── Docker Compose (ayasono)                     ← /opt/ayasono/ で管理
+│   └── portainer コンテナ                       ← コンテナ管理 UI + デプロイ API
+└── Portainer Stack (ayasono)                    ← Portainer が GitHub リポジトリから管理
     └── bot コンテナ  (ayasono-bot)              ← Discord Bot 本体
 ```
 
 > Portainer 自体は `/opt/infra/docker-compose.infra.yml` で管理する **Infra スタック**として起動します。
-> bot は `/opt/ayasono/` の compose ファイルで管理し、**GitHub Actions が SSH 経由でデプロイ**します。
-> Portainer はコンテナの監視・管理 UI として使用します（デプロイには使用しません）。
+> bot は Portainer Stack（Repository 方式）で管理し、**GitHub Actions が Portainer API 経由でデプロイ**します。
 
 ### 必要なもの
 
@@ -232,43 +231,27 @@ sudo chown deploy:deploy /opt/ayasono
 Portainer Stack で `docker-compose.portainer.yml` を自動取得するため、手動コピーは不要。
 Portainer の Stack 設定でリポジトリ URL とファイルパスを指定すれば、デプロイ時に自動で最新の compose 定義が反映される。
 
-### 5-2. .env ファイルの作成
+### 5-2. 環境変数の設定
 
-VPS 上で直接 `.env` を作成し、権限を制限する。
+環境変数は **Portainer UI** で管理する。サーバー上の `.env` ファイルは使用しない。
 
-```bash
-cat > /opt/ayasono/.env << 'EOF'
-DISCORD_TOKEN=<Discord Developer Portal で取得>
-DISCORD_APP_ID=<Discord Developer Portal で取得>
-DISCORD_GUILD_ID=
-NODE_ENV=production
-DATABASE_URL=file:/storage/db.sqlite
-LOCALE=ja
-LOG_LEVEL=info
-DISCORD_ERROR_WEBHOOK_URL=<Discord Webhook URL>
-EOF
-chmod 600 /opt/ayasono/.env
-```
+1. Portainer → **Stacks** → **ayasono** → **Editor**
+2. **Environment variables** セクションで以下を設定:
 
-> ⚠️ `.env` はトークン等の機密情報を含むため、権限は必ず `600` にすること。
-> 環境変数を追加・変更する場合は `.env` を編集するだけでよい（compose ファイルの変更は不要）。
+| 変数名 | 内容 |
+| -- | -- |
+| `DISCORD_TOKEN` | Discord Developer Portal で取得 |
+| `DISCORD_APP_ID` | Discord Developer Portal で取得 |
+| `DISCORD_GUILD_ID` | （任意）特定サーバー限定時に指定 |
+| `NODE_ENV` | `production` |
+| `DATABASE_URL` | `file:/storage/db.sqlite` |
+| `LOCALE` | `ja` |
+| `LOG_LEVEL` | `info` |
+| `DISCORD_ERROR_WEBHOOK_URL` | Discord Webhook URL |
 
-### 5-3. GitHub Actions 用 SSH 鍵の設定
+> GitHub Actions による再デプロイ時も環境変数は自動で保持される（ワークフローが既存の環境変数を取得して引き継ぐ）。
 
-GitHub Actions が SSH でデプロイできるよう、専用の鍵ペアを生成して登録する。
-
-```bash
-# VPS 上で鍵ペアを生成
-ssh-keygen -t ed25519 -C "github-actions-ayasono" -f ~/.ssh/ayasono_deploy -N ""
-
-# 公開鍵を authorized_keys に追加
-cat ~/.ssh/ayasono_deploy.pub >> ~/.ssh/authorized_keys
-
-# 秘密鍵の中身を表示 → GitHub Secrets に登録する
-cat ~/.ssh/ayasono_deploy
-```
-
-### 5-4. 起動確認（初回 GitHub Actions デプロイ後）
+### 5-3. 起動確認（初回 GitHub Actions デプロイ後）
 
 > ⚠️ イメージは初回 GitHub Actions 実行（セクション 7）で GHCR にプッシュされる。
 > **セクション 6 の Secrets 登録 → セクション 7 の動作確認を先に完了させてから以下を実行すること。**
@@ -285,16 +268,23 @@ docker logs ayasono-bot --tail 50
 
 GitHub リポジトリ → **Settings → Secrets and variables → Actions → New repository secret** から以下を登録する。
 
+### デプロイ用（必須）
+
 | Secret 名 | 内容 | 取得方法 |
 | -- | -- | -- |
-| `SSH_HOST` | VPS の IP アドレス | コントロールパネルで確認 |
-| `SSH_USER` | SSH ユーザー名（例: `deploy`） | 固定値 |
-| `SSH_PRIVATE_KEY` | デプロイ用 SSH 秘密鍵 | セクション 5-3 で生成した秘密鍵の中身 |
-| `PORTAINER_HOST` | VPS の IP アドレス | コントロールパネルで確認（通知用） |
-| `PORTAINER_ENDPOINT_ID` | Portainer エンドポイント ID（通常 `3`） | セクション 4-3 参照（通知用） |
+| `PORTAINER_URL` | Portainer の URL（末尾 `/` なし） | `http://<IP>:9000` |
+| `PORTAINER_API_KEY` | Portainer API トークン | Portainer → My account → Access tokens |
+| `PORTAINER_STACK_ID` | Stack の ID | Portainer の Stack URL の `?id=` から確認 |
+| `PORTAINER_ENDPOINT_ID` | エンドポイント ID | セクション 4-3 参照 |
+
+### 通知用
+
+| Secret 名 | 内容 | 取得方法 |
+| -- | -- | -- |
+| `PORTAINER_HOST` | VPS の IP アドレス | コントロールパネルで確認 |
 | `DISCORD_WEBHOOK_URL` | Discord の Webhook URL | Discord チャンネル設定から取得 |
 
-> `PORTAINER_HOST` と `PORTAINER_ENDPOINT_ID` の2つはデプロイには使用しない。Discord 通知の Portainer 管理リンク生成のみに使用する。
+> `PORTAINER_HOST` はデプロイには使用しない。Discord 通知の Portainer 管理リンク生成のみに使用する。
 
 ---
 
