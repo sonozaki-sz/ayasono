@@ -92,30 +92,42 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: docker-compose.prod.yml を VPS に転送
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: docker-compose.prod.yml
-          target: /opt/ayasono/
-
-      - name: SSH でデプロイ
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            cd /opt/ayasono
-            echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            docker compose -f docker-compose.prod.yml pull
-            docker compose -f docker-compose.prod.yml up -d --remove-orphans
-            docker logout ghcr.io
-            # pull 後に残るダングリングイメージを削除
-            docker image prune -f
-            echo "==> デプロイ完了: $(date '+%Y-%m-%d %H:%M:%S %Z')"
+      - name: Portainer Stack を再デプロイ
+        run: |
+          PAYLOAD=$(jq -n \
+            --arg token "$DISCORD_TOKEN" \
+            --arg app_id "$DISCORD_APP_ID" \
+            --arg db_url "${DATABASE_URL:-file:./storage/db.sqlite}" \
+            --arg locale "${LOCALE:-ja}" \
+            --arg node_env "${NODE_ENV:-production}" \
+            --arg log_level "${LOG_LEVEL:-info}" \
+            --arg webhook "${DISCORD_ERROR_WEBHOOK_URL:-}" \
+            '{
+              pullImage: true,
+              repositoryReferenceName: "refs/heads/main",
+              env: [
+                {name: "DISCORD_TOKEN", value: $token},
+                {name: "DISCORD_APP_ID", value: $app_id},
+                {name: "DATABASE_URL", value: $db_url},
+                {name: "LOCALE", value: $locale},
+                {name: "NODE_ENV", value: $node_env},
+                {name: "LOG_LEVEL", value: $log_level},
+                {name: "DISCORD_ERROR_WEBHOOK_URL", value: $webhook}
+              ]
+            }')
+          curl -fsSL -X PUT \
+            "${{ secrets.PORTAINER_URL }}/api/stacks/${{ secrets.PORTAINER_STACK_ID }}/git/redeploy?endpointId=${{ secrets.PORTAINER_ENDPOINT_ID }}" \
+            -H "X-API-Key: ${{ secrets.PORTAINER_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD"
+        env:
+          DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+          DISCORD_APP_ID: ${{ secrets.DISCORD_APP_ID }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          LOCALE: ${{ secrets.LOCALE }}
+          NODE_ENV: ${{ secrets.NODE_ENV }}
+          LOG_LEVEL: ${{ secrets.LOG_LEVEL }}
+          DISCORD_ERROR_WEBHOOK_URL: ${{ secrets.DISCORD_ERROR_WEBHOOK_URL }}
 
   # ─────────────────────────────────────────────
   # Discord 通知（成功）
@@ -149,7 +161,7 @@ jobs:
                     },
                     {
                       "name": "Portainer",
-                      "value": "Container: [ayasono-bot](http://${{ secrets.PORTAINER_HOST }}:9000/#!/${{ secrets.PORTAINER_ENDPOINT_ID }}/docker/containers)",
+                      "value": "Stack: [ayasono](http://${{ secrets.PORTAINER_HOST }}:9000/#!/${{ secrets.PORTAINER_ENDPOINT_ID }}/docker/stacks/ayasono?id=${{ secrets.PORTAINER_STACK_ID }}&type=2)",
                       "inline": false
                     }
                   ],
@@ -201,7 +213,7 @@ jobs:
                     },
                     {
                       \"name\": \"Portainer\",
-                      \"value\": \"Container: [ayasono-bot](http://${{ secrets.PORTAINER_HOST }}:9000/#!/${{ secrets.PORTAINER_ENDPOINT_ID }}/docker/containers)\",
+                      \"value\": \"Stack: [ayasono](http://${{ secrets.PORTAINER_HOST }}:9000/#!/${{ secrets.PORTAINER_ENDPOINT_ID }}/docker/stacks/ayasono?id=${{ secrets.PORTAINER_STACK_ID }}&type=2)\",
                       \"inline\": false
                     }
                   ],
