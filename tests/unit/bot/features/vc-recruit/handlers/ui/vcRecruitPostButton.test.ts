@@ -470,6 +470,7 @@ describe("vcRecruitPostButtonHandler / handleConfirmEndVc", () => {
           ],
         },
       ],
+      embeds: [{ toJSON: () => ({ title: "📢 VC募集" }) }],
       edit: messageEditMock,
     };
 
@@ -524,6 +525,7 @@ describe("vcRecruitPostButtonHandler / handleConfirmEndVc", () => {
     const postMessage = {
       id: MESSAGE_ID,
       components: [],
+      embeds: [],
       edit: messageEditMock,
     };
 
@@ -740,6 +742,7 @@ describe("updateToEndedState", () => {
           ],
         },
       ],
+      embeds: [{ toJSON: () => ({ title: "📢 VC募集" }) }],
       edit: editMock,
     };
 
@@ -747,6 +750,7 @@ describe("updateToEndedState", () => {
 
     expect(editMock).toHaveBeenCalledWith(
       expect.objectContaining({
+        embeds: expect.any(Array),
         components: expect.any(Array),
       }),
     );
@@ -756,6 +760,7 @@ describe("updateToEndedState", () => {
     const editMock = vi.fn().mockResolvedValue(undefined);
     const message = {
       components: [],
+      embeds: [],
       edit: editMock,
     };
 
@@ -763,6 +768,7 @@ describe("updateToEndedState", () => {
 
     expect(editMock).toHaveBeenCalledWith(
       expect.objectContaining({
+        embeds: expect.any(Array),
         components: expect.any(Array),
       }),
     );
@@ -772,6 +778,7 @@ describe("updateToEndedState", () => {
     const editMock = vi.fn().mockResolvedValue(undefined);
     const message = {
       components: [{ noComponents: true }],
+      embeds: [],
       edit: editMock,
     };
 
@@ -969,6 +976,7 @@ describe("vcRecruitPostButtonHandler / handleConfirmEndVc 追加パス", () => {
     interaction.channel!.messages.fetch = vi.fn().mockResolvedValue({
       id: MESSAGE_ID,
       components: [],
+      embeds: [],
       edit: vi.fn().mockResolvedValue(undefined),
     });
     interaction.editReply = vi
@@ -1027,7 +1035,7 @@ describe("vcRecruitPostButtonHandler / handleConfirmDelete 追加パス", () => 
     expect(interaction.deferUpdate).toHaveBeenCalled();
     expect(interaction.editReply).toHaveBeenCalledWith(
       expect.objectContaining({
-        embeds: [{ success: "commands:vcRecruit.confirm.cancelled" }],
+        embeds: [{ success: "commands:vcRecruit.confirm.delete_success" }],
         components: [],
       }),
     );
