@@ -29,7 +29,7 @@ const toScheduledAtMock = vi.fn(
 );
 
 const getBotBumpReminderRepositoryMock = vi.fn(() => ({
-  findPendingByGuild: vi.fn().mockResolvedValue(null),
+  findPendingByGuildAndService: vi.fn().mockResolvedValue(null),
 }));
 
 vi.mock("@/bot/services/botCompositionRoot", () => ({
@@ -369,6 +369,46 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
       );
     });
 
+    it("任意のサービス名から翻訳キーが動的に組み立てられる", async () => {
+      const sendMock = vi.fn().mockResolvedValue(undefined);
+      const channel = {
+        isTextBased: () => true,
+        isSendable: () => true,
+        send: sendMock,
+        messages: {
+          fetch: vi.fn(),
+        },
+      };
+      const client = {
+        channels: {
+          fetch: vi.fn().mockResolvedValue(channel),
+        },
+      };
+      const repository = {
+        getBumpReminderConfigOrDefault: vi.fn().mockResolvedValue({
+          enabled: true,
+          mentionRoleId: null,
+          mentionUserIds: [],
+        }),
+      };
+      getGuildTranslatorMock.mockResolvedValue((key: string) => key);
+
+      // 既存サービスではない任意のサービス名を渡す
+      await sendBumpReminder(
+        client as never,
+        "guild-1",
+        "ch-1",
+        undefined,
+        "NewService" as never,
+        repository as never,
+      );
+
+      // サービス名が小文字化されてキーに組み込まれる
+      expect(sendMock).toHaveBeenCalledWith(
+        "events:bump-reminder.reminder_message.newservice",
+      );
+    });
+
     it("チャンネルに送信不可の場合はメッセージを送信しない", async () => {
       const sendMock = vi.fn().mockResolvedValue(undefined);
       const channel = {
@@ -403,6 +443,123 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
       );
 
       expect(sendMock).not.toHaveBeenCalled();
+      expect(loggerMock.info).toHaveBeenCalledWith(
+        "system:scheduler.bump_reminder_sent",
+      );
+    });
+
+    it("リマインド送信後にパネルメッセージを削除する", async () => {
+      const deleteMock = vi.fn().mockResolvedValue(undefined);
+      const panelMessage = { delete: deleteMock };
+      const sendMock = vi.fn().mockResolvedValue(undefined);
+      const channel = {
+        isTextBased: () => true,
+        isSendable: () => true,
+        send: sendMock,
+        messages: {
+          fetch: vi.fn().mockResolvedValue(panelMessage),
+        },
+      };
+      const client = {
+        channels: {
+          fetch: vi.fn().mockResolvedValue(channel),
+        },
+      };
+      const repository = {
+        getBumpReminderConfigOrDefault: vi.fn().mockResolvedValue({
+          enabled: true,
+          mentionRoleId: null,
+          mentionUserIds: [],
+        }),
+      };
+      getGuildTranslatorMock.mockResolvedValue((key: string) => key);
+
+      await sendBumpReminder(
+        client as never,
+        "guild-1",
+        "ch-1",
+        "msg-1",
+        "Disboard",
+        repository as never,
+        "panel-msg-1",
+      );
+
+      expect(channel.messages.fetch).toHaveBeenCalledWith("panel-msg-1");
+      expect(deleteMock).toHaveBeenCalled();
+    });
+
+    it("panelMessageId が未指定の場合はパネル削除をスキップする", async () => {
+      const sendMock = vi.fn().mockResolvedValue(undefined);
+      const channel = {
+        isTextBased: () => true,
+        isSendable: () => true,
+        send: sendMock,
+        messages: {
+          fetch: vi.fn(),
+        },
+      };
+      const client = {
+        channels: {
+          fetch: vi.fn().mockResolvedValue(channel),
+        },
+      };
+      const repository = {
+        getBumpReminderConfigOrDefault: vi.fn().mockResolvedValue({
+          enabled: true,
+          mentionRoleId: null,
+          mentionUserIds: [],
+        }),
+      };
+      getGuildTranslatorMock.mockResolvedValue((key: string) => key);
+
+      await sendBumpReminder(
+        client as never,
+        "guild-1",
+        "ch-1",
+        "msg-1",
+        "Disboard",
+        repository as never,
+      );
+
+      // panelMessageId 未指定なのでパネル削除のための messages.fetch は呼ばれない
+      expect(channel.messages.fetch).not.toHaveBeenCalled();
+    });
+
+    it("パネル削除に失敗してもリマインド送信は成功扱いになる", async () => {
+      const sendMock = vi.fn().mockResolvedValue(undefined);
+      const channel = {
+        isTextBased: () => true,
+        isSendable: () => true,
+        send: sendMock,
+        messages: {
+          fetch: vi.fn().mockRejectedValue(new Error("message not found")),
+        },
+      };
+      const client = {
+        channels: {
+          fetch: vi.fn().mockResolvedValue(channel),
+        },
+      };
+      const repository = {
+        getBumpReminderConfigOrDefault: vi.fn().mockResolvedValue({
+          enabled: true,
+          mentionRoleId: null,
+          mentionUserIds: [],
+        }),
+      };
+      getGuildTranslatorMock.mockResolvedValue((key: string) => key);
+
+      await sendBumpReminder(
+        client as never,
+        "guild-1",
+        "ch-1",
+        "msg-1",
+        "Disboard",
+        repository as never,
+        "panel-msg-1",
+      );
+
+      // リマインド送信自体は成功
       expect(loggerMock.info).toHaveBeenCalledWith(
         "system:scheduler.bump_reminder_sent",
       );
@@ -453,6 +610,59 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
         "system:scheduler.bump_reminder_unregistered_channel",
       );
       expect(scheduleBumpReminderMock).not.toHaveBeenCalled();
+    });
+
+    it("同一サービスの前回パネルを findPendingByGuildAndService で検索して削除する", async () => {
+      const panelDeleteMock = vi.fn().mockResolvedValue(undefined);
+      const panelMessage = { delete: panelDeleteMock };
+      const findPendingByGuildAndServiceMock = vi.fn().mockResolvedValue({
+        panelMessageId: "old-panel-1",
+        channelId: "ch-1",
+      });
+      getBotBumpReminderRepositoryMock.mockReturnValue({
+        findPendingByGuildAndService: findPendingByGuildAndServiceMock,
+      });
+
+      const configService = {
+        getBumpReminderConfigOrDefault: vi
+          .fn()
+          .mockResolvedValue({ enabled: true, mentionUserIds: [] }),
+      };
+      getBotBumpReminderConfigServiceMock.mockReturnValue(configService);
+      scheduleBumpReminderMock.mockResolvedValue(undefined);
+
+      const sendMock = vi.fn().mockResolvedValue({ id: "new-panel-1" });
+      const channel = {
+        isTextBased: () => true,
+        isSendable: () => true,
+        send: sendMock,
+        messages: {
+          fetch: vi.fn().mockResolvedValue(panelMessage),
+        },
+      };
+      const client = {
+        channels: {
+          fetch: vi.fn().mockResolvedValue(channel),
+        },
+      };
+      getGuildTranslatorMock.mockResolvedValue((key: string) => key);
+
+      await handleBumpDetected(
+        client as never,
+        "guild-1",
+        "ch-1",
+        "msg-1",
+        "Disboard",
+      );
+
+      // サービス名を指定して検索していること
+      expect(findPendingByGuildAndServiceMock).toHaveBeenCalledWith(
+        "guild-1",
+        "Disboard",
+      );
+      // 前回パネルが削除されていること
+      expect(channel.messages.fetch).toHaveBeenCalledWith("old-panel-1");
+      expect(panelDeleteMock).toHaveBeenCalled();
     });
 
     it("リマインダーをスケジュールし、成功時に検出ログを記録する", async () => {

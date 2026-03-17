@@ -32,7 +32,10 @@ export interface IBumpReminderRepository {
     serviceName?: string,
   ): Promise<BumpReminder>;
   findById(id: string): Promise<BumpReminder | null>;
-  findPendingByGuild(guildId: string): Promise<BumpReminder | null>;
+  findPendingByGuildAndService(
+    guildId: string,
+    serviceName: string,
+  ): Promise<BumpReminder | null>;
   findAllPending(): Promise<BumpReminder[]>;
   updateStatus(id: string, status: BumpReminderStatus): Promise<void>;
   delete(id: string): Promise<void>;

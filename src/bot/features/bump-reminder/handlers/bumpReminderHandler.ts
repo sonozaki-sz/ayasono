@@ -8,10 +8,8 @@ import {
   getBotBumpReminderConfigService,
   getBotBumpReminderRepository,
 } from "../../../services/botCompositionRoot";
-import {
-  getReminderDelayMinutes,
-  type BumpServiceName,
-} from "../constants/bumpReminderConstants";
+import type { BumpServiceName } from "../constants/bumpReminderConstants";
+import { getReminderDelayMinutes } from "../constants/bumpReminderConstants";
 import { scheduleBumpReminder } from "./usecases/scheduleBumpReminder";
 import { sendBumpPanel } from "./usecases/sendBumpPanel";
 
@@ -57,9 +55,9 @@ export async function handleBumpDetected(
       return;
     }
 
-    // 前回のパネルメッセージが残っていれば削除する
-    // パネルは常設だが、新しいBump検知時は最新のパネルに置き換える
-    await deleteOldPanel(client, guildId, channelId);
+    // 同一サービスの前回パネルメッセージが残っていれば削除する
+    // 異なるサービスのパネルはリマインド完了まで残す
+    await deleteOldPanel(client, guildId, channelId, serviceName);
 
     // 通知予定を示すパネルを先に送信し、メッセージIDを保持
     // 予約キーは manager 側で guild/channel/message 単位に正規化される
@@ -100,20 +98,25 @@ export async function handleBumpDetected(
 }
 
 /**
- * 前回の Bump パネルメッセージを削除する関数
+ * 同一サービスの前回 Bump パネルメッセージを削除する関数
  * DB の pending レコードから panelMessageId を取得して削除を試みる
  * @param client Discord クライアント
  * @param guildId 対象ギルドID
  * @param channelId パネルが存在するチャンネルID
+ * @param serviceName 削除対象のサービス名
  */
 async function deleteOldPanel(
   client: Client,
   guildId: string,
   channelId: string,
+  serviceName: BumpServiceName,
 ): Promise<void> {
   try {
     const repository = getBotBumpReminderRepository();
-    const pendingReminder = await repository.findPendingByGuild(guildId);
+    const pendingReminder = await repository.findPendingByGuildAndService(
+      guildId,
+      serviceName,
+    );
 
     if (!pendingReminder?.panelMessageId) {
       return;

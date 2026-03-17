@@ -67,7 +67,7 @@ describe("bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder", ()
     expect(setReminderMock.mock.calls[0][6]).toBe("Disboard");
   });
 
-  it("登録されたタスクが sendBumpReminder を panelMessageId なしで実行することを確認する", async () => {
+  it("登録されたタスクが sendBumpReminder を panelMessageId 付きで実行することを確認する", async () => {
     const client = { channels: { fetch: vi.fn() } };
     const configService = { getBumpReminderConfig: vi.fn() };
 
@@ -84,7 +84,7 @@ describe("bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder", ()
     const task = setReminderMock.mock.calls[0][5] as () => Promise<void>;
     await task();
 
-    // panelMessageId は sendBumpReminder に渡さない（パネル常設化のため）
+    // panelMessageId も sendBumpReminder に渡してリマインド後にパネルを削除する
     expect(sendBumpReminderMock).toHaveBeenCalledWith(
       client,
       "guild-1",
@@ -92,6 +92,7 @@ describe("bot/features/bump-reminder/handlers/usecases/scheduleBumpReminder", ()
       "msg-1",
       SERVICE_NAME,
       configService,
+      "panel-1",
     );
   });
 

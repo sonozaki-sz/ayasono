@@ -194,13 +194,14 @@ describe("BumpReminderRepository", () => {
     });
   });
 
-  describe("findPendingByGuild()", () => {
-    it("ギルドの pending リマインダーを返すこと", async () => {
+  describe("findPendingByGuildAndService()", () => {
+    it("ギルド+サービスの pending リマインダーを返すこと", async () => {
       const mockReminder = {
         id: "reminder-1",
         guildId: "guild-123",
         channelId: "channel-456",
         messageId: "msg-789",
+        serviceName: "Disboard",
         scheduledAt: atOffsetMs(10 * 60 * 1000),
         status: "pending",
         createdAt: atOffsetMs(0),
@@ -209,11 +210,18 @@ describe("BumpReminderRepository", () => {
 
       mockPrismaClient.bumpReminder.findFirst.mockResolvedValue(mockReminder);
 
-      const result = await repository.findPendingByGuild("guild-123");
+      const result = await repository.findPendingByGuildAndService(
+        "guild-123",
+        "Disboard",
+      );
 
       expect(result).toEqual(mockReminder);
       expect(mockPrismaClient.bumpReminder.findFirst).toHaveBeenCalledWith({
-        where: { guildId: "guild-123", status: "pending" },
+        where: {
+          guildId: "guild-123",
+          serviceName: "Disboard",
+          status: "pending",
+        },
         orderBy: { scheduledAt: "asc" },
       });
     });
@@ -221,19 +229,22 @@ describe("BumpReminderRepository", () => {
     it("pending リマインダーがない場合は null を返すこと", async () => {
       mockPrismaClient.bumpReminder.findFirst.mockResolvedValue(null);
 
-      const result = await repository.findPendingByGuild("guild-123");
+      const result = await repository.findPendingByGuildAndService(
+        "guild-123",
+        "Disboard",
+      );
 
       expect(result).toBeNull();
     });
 
-    it("findPendingByGuild 失敗時に DatabaseError をスローすること", async () => {
+    it("findPendingByGuildAndService 失敗時に DatabaseError をスローすること", async () => {
       mockPrismaClient.bumpReminder.findFirst.mockRejectedValue(
         new Error("DB error"),
       );
 
-      await expect(repository.findPendingByGuild("guild-123")).rejects.toThrow(
-        DatabaseError,
-      );
+      await expect(
+        repository.findPendingByGuildAndService("guild-123", "Disboard"),
+      ).rejects.toThrow(DatabaseError);
     });
   });
 

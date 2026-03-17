@@ -13,7 +13,7 @@ import { deleteBumpReminderUseCase } from "./usecases/deleteBumpReminder";
 import { findBumpReminderByIdUseCase } from "./usecases/findBumpReminderById";
 import {
   findAllPendingUseCase,
-  findPendingByGuildUseCase,
+  findPendingByGuildAndServiceUseCase,
 } from "./usecases/findPendingReminders";
 import {
   cancelPendingByGuildAndChannelUseCase,
@@ -89,16 +89,22 @@ export class BumpReminderRepository implements IBumpReminderRepository {
   }
 
   /**
-   * ギルドのpendingリマインダーを取得（1つのみ）
+   * ギルド+サービスのpendingリマインダーを取得（1つのみ）
    * @param guildId 取得対象のギルドID
+   * @param serviceName 取得対象のサービス名
    * @returns pending リマインダー（未存在時は null）
    */
-  async findPendingByGuild(guildId: string): Promise<BumpReminder | null> {
+  async findPendingByGuildAndService(
+    guildId: string,
+    serviceName: string,
+  ): Promise<BumpReminder | null> {
     return executeWithDatabaseError(
       async () => {
-        const result = await findPendingByGuildUseCase(this.prisma, guildId);
-        // manager 復元時は最短時刻1件のみ扱うため findFirst を使う
-        return result as BumpReminder | null;
+        return findPendingByGuildAndServiceUseCase(
+          this.prisma,
+          guildId,
+          serviceName,
+        );
       },
       tDefault("system:database.bump_reminder_find_failed", { guildId }),
     );
