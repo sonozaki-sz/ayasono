@@ -28,13 +28,6 @@ services:
       - sqlite_data:/app/storage
       # ログファイルの永続化（ホストバインドマウント）
       - /opt/ayasono/logs:/app/logs
-    healthcheck:
-      # ボットプロセス内の HTTP ヘルスサーバー（:8080）で Discord 接続状態を確認
-      test: ["CMD", "node", "-e", "const http=require('http');const r=http.get('http://localhost:8080/health',s=>{process.exit(s.statusCode===200?0:1)});r.on('error',()=>process.exit(1))"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
     logging:
       driver: json-file
       options:
