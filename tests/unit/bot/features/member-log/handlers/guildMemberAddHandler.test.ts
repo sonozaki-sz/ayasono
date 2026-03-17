@@ -100,6 +100,7 @@ function makeGuildMember(overrides: Record<string, unknown> = {}) {
     },
     guild: {
       id: "guild-1",
+      name: "TestGuild",
       memberCount: 100,
       channels: {
         fetch: vi.fn(async (id: string) => channelMap.get(id) ?? null),

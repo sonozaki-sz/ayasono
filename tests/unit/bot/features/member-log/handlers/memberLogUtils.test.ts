@@ -14,6 +14,7 @@ describe("bot/features/member-log/handlers/memberLogUtils", () => {
         "<@123>",
         "Alice",
         10,
+        "TestServer",
       );
       expect(result).toBe("ようこそ <@123>！");
     });
@@ -24,28 +25,42 @@ describe("bot/features/member-log/handlers/memberLogUtils", () => {
         "<@456>",
         "Bob",
         5,
+        "TestServer",
       );
       expect(result).toBe("さようなら Bob");
     });
 
-    it("{count} がメンバー数の文字列に置換されることを確認", () => {
+    it("{memberCount} がメンバー数の文字列に置換されることを確認", () => {
       const result = formatCustomMessage(
-        "現在 {count} 人",
+        "現在 {memberCount} 人",
         "<@789>",
         "Carol",
         42,
+        "TestServer",
       );
       expect(result).toBe("現在 42 人");
     });
 
+    it("{serverName} がサーバー名に置換されることを確認", () => {
+      const result = formatCustomMessage(
+        "ようこそ {serverName} へ！",
+        "<@123>",
+        "Alice",
+        10,
+        "MyServer",
+      );
+      expect(result).toBe("ようこそ MyServer へ！");
+    });
+
     it("複数のプレースホルダーが同時に置換されることを確認", () => {
       const result = formatCustomMessage(
-        "{userMention}（{userName}）が参加。計{count}人。",
+        "{userMention}（{userName}）が{serverName}に参加。計{memberCount}人。",
         "<@111>",
         "Dave",
         100,
+        "TestServer",
       );
-      expect(result).toBe("<@111>（Dave）が参加。計100人。");
+      expect(result).toBe("<@111>（Dave）がTestServerに参加。計100人。");
     });
 
     it("同じプレースホルダーが複数ある場合にすべて置換されることを確認", () => {
@@ -54,12 +69,19 @@ describe("bot/features/member-log/handlers/memberLogUtils", () => {
         "<@222>",
         "Eve",
         1,
+        "TestServer",
       );
       expect(result).toBe("<@222> さん、<@222> さん");
     });
 
     it("プレースホルダーがない場合はテンプレートをそのまま返すことを確認", () => {
-      const result = formatCustomMessage("固定メッセージ", "<@333>", "Frank", 7);
+      const result = formatCustomMessage(
+        "固定メッセージ",
+        "<@333>",
+        "Frank",
+        7,
+        "TestServer",
+      );
       expect(result).toBe("固定メッセージ");
     });
   });

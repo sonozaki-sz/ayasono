@@ -8,20 +8,23 @@ import type { GuildTFunction } from "../../../../shared/locale/helpers";
  * @param template プレースホルダー付きテンプレート文字列
  * @param user ユーザーメンション文字列
  * @param username ユーザー名
- * @param count メンバー数
+ * @param memberCount メンバー数
+ * @param serverName サーバー名
  * @returns 置換済み文字列
  */
 export function formatCustomMessage(
   template: string,
   user: string,
   username: string,
-  count: number,
+  memberCount: number,
+  serverName: string,
 ): string {
-  // {userMention}, {userName}, {count} プレースホルダーを実値へ置換
+  // {userMention}, {userName}, {memberCount}, {serverName} プレースホルダーを実値へ置換
   return template
     .replace(/\{userMention\}/g, user)
     .replace(/\{userName\}/g, username)
-    .replace(/\{count\}/g, String(count));
+    .replace(/\{memberCount\}/g, String(memberCount))
+    .replace(/\{serverName\}/g, serverName);
 }
 
 /**

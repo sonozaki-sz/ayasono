@@ -117,7 +117,7 @@
 
 <table border="1" cellpadding="8" width="420">
 <tr><th align="left">参加メッセージ</th></tr>
-<tr><td><i>ようこそ {userMention}さん！<br>メンバー数: {count}人になりました！</i><br><br><br></td></tr>
+<tr><td><i>ようこそ {userMention}さん！<br>メンバー数: {memberCount}人になりました！</i><br><br><br></td></tr>
 <tr><td align="center"><kbd>　送信する　</kbd></td></tr>
 </table>
 
@@ -125,7 +125,8 @@
 
 - `{userMention}`: ユーザーメンション（`<@userId>` 形式）
 - `{userName}`: ユーザー名
-- `{count}`: メンバー数
+- `{memberCount}`: メンバー数
+- `{serverName}`: サーバー名
 
 **5. `set-leave-message` - カスタム退出メッセージ設定**
 
@@ -188,8 +189,8 @@
 | `guildId`      | String  | ギルドID（主キー）                                                   |
 | `enabled`      | Boolean | 機能の有効/無効（デフォルト: false）                                 |
 | `channelId`    | String? | 通知チャンネルID（未設定時は null）                                  |
-| `joinMessage`  | String? | カスタム参加メッセージ（`{userMention}` / `{userName}` / `{count}` 置換可） |
-| `leaveMessage` | String? | カスタム退出メッセージ（`{userMention}` / `{userName}` / `{count}` 置換可） |
+| `joinMessage`  | String? | カスタム参加メッセージ（`{userMention}` / `{userName}` / `{memberCount}` / `{serverName}` 置換可） |
+| `leaveMessage` | String? | カスタム退出メッセージ（`{userMention}` / `{userName}` / `{memberCount}` / `{serverName}` 置換可） |
 
 ---
 

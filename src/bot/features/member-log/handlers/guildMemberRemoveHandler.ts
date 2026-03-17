@@ -143,6 +143,7 @@ export async function handleGuildMemberRemove(
           userMention,
           username,
           memberCount,
+          member.guild.name,
         )
       : undefined;
 

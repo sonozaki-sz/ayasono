@@ -472,13 +472,13 @@ export const commands = {
   "member-log-config.modal.set_join_message.label":
     "Join message",
   "member-log-config.modal.set_join_message.placeholder":
-    "Supports {userMention}, {userName}, {count} (max 500 characters)",
+    "Supports {userMention}, {userName}, {memberCount}, {serverName} (max 500 characters)",
   "member-log-config.modal.set_leave_message.title":
     "Set Leave Message",
   "member-log-config.modal.set_leave_message.label":
     "Leave message",
   "member-log-config.modal.set_leave_message.placeholder":
-    "Supports {userMention}, {userName}, {count} (max 500 characters)",
+    "Supports {userMention}, {userName}, {memberCount}, {serverName} (max 500 characters)",
   // errors
   "member-log-config.errors.text_channel_only":
     "Please specify a text channel.",
