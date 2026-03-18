@@ -27,7 +27,7 @@ export const system = {
   "bot.client.shutdown_complete":
     "[Bot] Bot client shut down successfully",
   "bot.presence_activity":
-    "growin' up~ | {{count}}servers | by sonozaki",
+    "growin' up~ | {{count}} servers | by sonozaki",
 
   // BumpReminder feature logs
   "bump-reminder.detected":
