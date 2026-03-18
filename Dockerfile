@@ -10,7 +10,7 @@ RUN apt-get update && apt-get upgrade -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # pnpm のインストール
-RUN corepack enable && corepack prepare pnpm@10.30.1 --activate
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # ─── 依存関係インストール ───
 FROM base AS deps
@@ -40,7 +40,7 @@ RUN apt-get update && apt-get upgrade -y --no-install-recommends \
 ENV COREPACK_HOME=/app/.cache/corepack
 RUN mkdir -p /app/.cache/corepack
 
-RUN corepack enable && corepack prepare pnpm@10.30.1 --activate
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # 本番依存のみインストール（--ignore-scripts で prepare/husky 等を無効化）
 COPY package.json pnpm-lock.yaml ./
