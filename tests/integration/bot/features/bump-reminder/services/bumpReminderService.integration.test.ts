@@ -31,7 +31,7 @@ vi.mock("@/shared/utils/prisma", () => ({
 const mockRepository = {
   create: vi.fn(),
   findById: vi.fn(),
-  findPendingByGuild: vi.fn(),
+  findPendingByGuildAndService: vi.fn(),
   findAllPending: vi.fn(),
   updateStatus: vi.fn(),
   delete: vi.fn(),

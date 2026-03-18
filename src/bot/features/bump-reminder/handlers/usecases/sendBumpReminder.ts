@@ -2,14 +2,13 @@
 // スケジュール到達時のBumpリマインダー送信ユースケース
 
 import type { Client } from "discord.js";
+import type { ParseKeys } from "i18next";
 import type { BumpReminderConfigService } from "../../../../../shared/features/bump-reminder/bumpReminderConfigService";
+import type { AllNamespaces } from "../../../../../shared/locale/i18n";
 import { getGuildTranslator } from "../../../../../shared/locale/helpers";
 import { tDefault } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
-import {
-  BUMP_SERVICES,
-  type BumpServiceName,
-} from "../../constants/bumpReminderConstants";
+import type { BumpServiceName } from "../../constants/bumpReminderConstants";
 
 /**
  * スケジュール到達時に Bump リマインダー通知を送信する関数
@@ -19,6 +18,7 @@ import {
  * @param messageId 返信参照に使う元メッセージID
  * @param serviceName 通知文言切り替え用サービス名
  * @param bumpReminderConfigService 設定取得サービス
+ * @param panelMessageId 通知完了後に削除するパネルメッセージID
  * @returns 実行完了を示す Promise
  */
 export async function sendBumpReminder(
@@ -28,6 +28,7 @@ export async function sendBumpReminder(
   messageId: string | undefined,
   serviceName: BumpServiceName | undefined,
   bumpReminderConfigService: BumpReminderConfigService,
+  panelMessageId?: string,
 ): Promise<void> {
   try {
     let channel: Awaited<ReturnType<Client["channels"]["fetch"]>> | undefined;
@@ -78,17 +79,14 @@ export async function sendBumpReminder(
 
     const tGuild = await getGuildTranslator(guildId);
 
-    // サービスごとに文言キーを切り替えて通知本文を生成
-    let reminderMessage: string;
-    if (serviceName === BUMP_SERVICES.DISBOARD) {
-      reminderMessage = tGuild(
-        "events:bump-reminder.reminder_message.disboard",
-      );
-    } else if (serviceName === BUMP_SERVICES.DISSOKU) {
-      reminderMessage = tGuild("events:bump-reminder.reminder_message.dissoku");
-    } else {
-      reminderMessage = tGuild("events:bump-reminder.reminder_message");
-    }
+    // サービス名から翻訳キーを動的に組み立て（サービス追加時にこの関数の変更は不要）
+    const serviceKey = serviceName?.toLowerCase();
+    const messageKey = (
+      serviceKey
+        ? `events:bump-reminder.reminder_message.${serviceKey}`
+        : "events:bump-reminder.reminder_message"
+    ) as ParseKeys<AllNamespaces>;
+    const reminderMessage = tGuild(messageKey);
 
     // メンション有無に応じて本文を整形
     const content = mentionText
@@ -118,13 +116,58 @@ export async function sendBumpReminder(
         channelId,
       }),
     );
-    // パネルメッセージは常設のため削除しない
-    // 次回Bump検知時に前のパネルを削除して新しいパネルを送信する
+
+    // リマインド完了後にパネルメッセージを削除する
+    await deletePanelMessage(client, channelId, panelMessageId, guildId);
   } catch (error) {
     logger.error(
       tDefault("system:scheduler.bump_reminder_send_failed", {
         guildId,
         channelId,
+      }),
+      error,
+    );
+  }
+}
+
+/**
+ * リマインド完了後にパネルメッセージを削除する
+ * @param client Discord クライアント
+ * @param channelId パネルが存在するチャンネルID
+ * @param panelMessageId 削除対象のパネルメッセージID
+ * @param guildId ログ用ギルドID
+ */
+async function deletePanelMessage(
+  client: Client,
+  channelId: string,
+  panelMessageId: string | undefined,
+  guildId: string,
+): Promise<void> {
+  if (!panelMessageId) {
+    return;
+  }
+
+  try {
+    const channel = await client.channels.fetch(channelId).catch(() => null);
+    if (channel?.isTextBased()) {
+      const panelMessage = await channel.messages
+        .fetch(panelMessageId)
+        .catch(() => null);
+      if (panelMessage) {
+        await panelMessage.delete();
+        logger.debug(
+          tDefault("system:scheduler.bump_reminder_panel_deleted", {
+            panelMessageId,
+            guildId,
+          }),
+        );
+      }
+    }
+  } catch (error) {
+    // パネル削除失敗はリマインド送信の成功に影響しない
+    logger.debug(
+      tDefault("system:scheduler.bump_reminder_panel_delete_failed", {
+        panelMessageId,
       }),
       error,
     );

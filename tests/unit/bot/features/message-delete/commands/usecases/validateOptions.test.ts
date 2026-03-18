@@ -3,7 +3,7 @@
 // - フィルター必須チェック（hasSlashCommandFilter）・days×日付範囲排他バリデーション
 // - 日付パース・未来日チェック（YYYY-MM-DD 当日許容の特例を含む）
 // - 正常系: ParsedOptions 構造検証
-// ※ user / channel オプションは条件設定ステップに移動したため validateOptions ではパースしない
+// ※ user / channel オプションは条件設定フェーズに移動したため validateOptions ではパースしない
 
 import {
   hasBotRequiredPermissions,
@@ -143,7 +143,7 @@ describe("bot/features/message-delete/commands/usecases/validateOptions", () => 
   // コマンドオプションのパース・バリデーション全体を検証
   describe("parseAndValidateOptions", () => {
     // ── targetUserIds は常に空配列 ──────────────────────────────────────
-    // targetUserIds が条件設定ステップ移行後も空配列であることを検証
+    // targetUserIds が条件設定フェーズ移行後も空配列であることを検証
     describe("targetUserIds", () => {
       it("targetUserIds は常に空配列を返す", async () => {
         const interaction = createInteraction({ keyword: "test" });
@@ -153,7 +153,7 @@ describe("bot/features/message-delete/commands/usecases/validateOptions", () => 
     });
 
     // ── channelIds は常に空配列 ─────────────────────────────────────────
-    // channelIds が条件設定ステップ移行後も空配列であることを検証
+    // channelIds が条件設定フェーズ移行後も空配列であることを検証
     describe("channelIds", () => {
       it("channelIds は常に空配列を返す", async () => {
         const interaction = createInteraction({ keyword: "test" });

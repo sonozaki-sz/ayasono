@@ -2,19 +2,27 @@
 import { BUMP_REMINDER_STATUS } from "@/bot/features/bump-reminder/constants/bumpReminderConstants";
 import {
   findAllPendingUseCase,
-  findPendingByGuildUseCase,
+  findPendingByGuildAndServiceUseCase,
 } from "@/bot/features/bump-reminder/repositories/usecases/findPendingReminders";
 
 describe("bot/features/bump-reminder/repositories/usecases/findPendingReminders", () => {
-  it("ギルドの次の pending リマインダーを取得する", async () => {
+  it("ギルド+サービスの次の pending リマインダーを取得する", async () => {
     const findFirst = vi.fn().mockResolvedValue({ id: "r1" });
     const prisma = { bumpReminder: { findFirst } };
 
-    const result = await findPendingByGuildUseCase(prisma as never, "guild-1");
+    const result = await findPendingByGuildAndServiceUseCase(
+      prisma as never,
+      "guild-1",
+      "Disboard",
+    );
 
     expect(result).toEqual({ id: "r1" });
     expect(findFirst).toHaveBeenCalledWith({
-      where: { guildId: "guild-1", status: BUMP_REMINDER_STATUS.PENDING },
+      where: {
+        guildId: "guild-1",
+        serviceName: "Disboard",
+        status: BUMP_REMINDER_STATUS.PENDING,
+      },
       orderBy: { scheduledAt: "asc" },
     });
   });

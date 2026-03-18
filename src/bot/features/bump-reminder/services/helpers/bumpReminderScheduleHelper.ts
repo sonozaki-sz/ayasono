@@ -13,7 +13,7 @@ export interface ScheduledReminderRef {
  */
 export function scheduleReminderInMemory(
   reminders: Map<string, ScheduledReminderRef>,
-  guildId: string,
+  reminderKey: string,
   jobId: string,
   reminderId: string,
   delayMs: number,
@@ -24,11 +24,11 @@ export function scheduleReminderInMemory(
     try {
       await task();
     } finally {
-      reminders.delete(guildId);
+      reminders.delete(reminderKey);
     }
   });
 
-  reminders.set(guildId, { jobId, reminderId });
+  reminders.set(reminderKey, { jobId, reminderId });
 }
 
 /**
@@ -36,14 +36,14 @@ export function scheduleReminderInMemory(
  */
 export function cancelScheduledReminder(
   reminders: Map<string, ScheduledReminderRef>,
-  guildId: string,
+  reminderKey: string,
 ): ScheduledReminderRef | undefined {
-  const reminder = reminders.get(guildId);
+  const reminder = reminders.get(reminderKey);
   if (!reminder) {
     return undefined;
   }
 
   jobScheduler.removeJob(reminder.jobId);
-  reminders.delete(guildId);
+  reminders.delete(reminderKey);
   return reminder;
 }

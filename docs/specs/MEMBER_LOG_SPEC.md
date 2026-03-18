@@ -2,11 +2,11 @@
 
 > Member Log - メンバー参加・脱退時のログ機能
 
-最終更新: 2026年3月14日（招待リンク追跡機能を追加・カスタムメッセージをモーダル入力に変更）
+最終更新: 2026年3月18日（{serverName}プレースホルダー追加・{count}を{memberCount}にリネーム）
 
 ---
 
-## 📋 概要
+## 概要
 
 ### 目的
 
@@ -30,7 +30,7 @@
 
 ---
 
-## 🎯 主要機能
+## 主要機能
 
 ### 1. メンバー参加通知
 
@@ -73,7 +73,7 @@
 
 ---
 
-## ⚙️ 設定コマンド
+## 設定コマンド
 
 ### `/member-log-config`
 
@@ -117,7 +117,7 @@
 
 <table border="1" cellpadding="8" width="420">
 <tr><th align="left">参加メッセージ</th></tr>
-<tr><td><i>ようこそ {userMention}さん！<br>メンバー数: {count}人になりました！</i><br><br><br></td></tr>
+<tr><td><i>ようこそ {userMention}さん！<br>メンバー数: {memberCount}人になりました！</i><br><br><br></td></tr>
 <tr><td align="center"><kbd>　送信する　</kbd></td></tr>
 </table>
 
@@ -125,7 +125,8 @@
 
 - `{userMention}`: ユーザーメンション（`<@userId>` 形式）
 - `{userName}`: ユーザー名
-- `{count}`: メンバー数
+- `{memberCount}`: メンバー数
+- `{serverName}`: サーバー名
 
 **5. `set-leave-message` - カスタム退出メッセージ設定**
 
@@ -177,7 +178,7 @@
 
 ---
 
-## 💾 データベーススキーマ
+## データベーススキーマ
 
 ### GuildMemberLogConfig テーブル
 
@@ -188,12 +189,12 @@
 | `guildId`      | String  | ギルドID（主キー）                                                   |
 | `enabled`      | Boolean | 機能の有効/無効（デフォルト: false）                                 |
 | `channelId`    | String? | 通知チャンネルID（未設定時は null）                                  |
-| `joinMessage`  | String? | カスタム参加メッセージ（`{userMention}` / `{userName}` / `{count}` 置換可） |
-| `leaveMessage` | String? | カスタム退出メッセージ（`{userMention}` / `{userName}` / `{count}` 置換可） |
+| `joinMessage`  | String? | カスタム参加メッセージ（`{userMention}` / `{userName}` / `{memberCount}` / `{serverName}` 置換可） |
+| `leaveMessage` | String? | カスタム退出メッセージ（`{userMention}` / `{userName}` / `{memberCount}` / `{serverName}` 置換可） |
 
 ---
 
-## 🔄 処理フロー
+## 処理フロー
 
 ### 参加通知フロー
 
@@ -231,7 +232,7 @@
 
 ---
 
-## 🎨 Embed生成の詳細
+## Embed生成の詳細
 
 ### アカウント作成日時の表示形式
 
@@ -254,7 +255,7 @@
 
 ---
 
-## 🛡️ エラーハンドリング
+## エラーハンドリング
 
 ### 想定されるエラー
 
@@ -282,9 +283,7 @@
 
 ---
 
-## 🧪 テストケース
-
-最新の件数とカバレッジは [TEST_PROGRESS.md](../progress/TEST_PROGRESS.md) を参照。
+## テストケース
 
 ### ユニットテスト
 
@@ -302,7 +301,7 @@
 
 ---
 
-## 🌐 多言語対応（i18next）
+## 多言語対応（i18next）
 
 ### メッセージ一覧（`events` ネームスペース）
 
@@ -337,7 +336,7 @@
 
 ---
 
-## 🔗 招待リンク追跡の仕組み
+## 招待リンク追跡の仕組み
 
 ### 差分比較によるリンク特定
 

@@ -6,14 +6,14 @@
 
 ---
 
-## 📋 概要
+## 概要
 
 このドキュメントは、ayasono におけるテスト設計方針・命名規則・実行方法を定義します。
 Vitest を前提に、回帰を素早く検知できるテスト運用を目的とします。
 
 ---
 
-## 🎯 テスト方針
+## テスト方針
 
 ### 基本方針
 
@@ -186,7 +186,7 @@ pnpm test:coverage     # カバレッジ付き実行
 
 ---
 
-## ✅ チェックリスト
+## チェックリスト
 
 ### テスト作成
 
@@ -213,7 +213,6 @@ pnpm test:coverage     # カバレッジ付き実行
 
 ---
 
-## 🔗 関連ドキュメント
+## 関連ドキュメント
 
-- [../progress/TEST_PROGRESS.md](../progress/TEST_PROGRESS.md): テスト実装進捗
 - [IMPLEMENTATION_GUIDELINES.md](IMPLEMENTATION_GUIDELINES.md): 実装ガイドライン

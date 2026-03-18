@@ -14,7 +14,6 @@ import { localeManager, tDefault } from "../shared/locale/localeManager";
 import { logger } from "../shared/utils/logger";
 import { setPrismaClient } from "../shared/utils/prisma";
 import { createBotClient } from "./client";
-import { startHealthServer } from "./healthServer";
 import { initializeBotCompositionRoot } from "./services/botCompositionRoot";
 import { registerBotEvents } from "./services/botEventRegistration";
 import { loadCommands } from "./utils/commandLoader";
@@ -57,12 +56,8 @@ async function startBot() {
   // Discord クライアント生成（command/cooldown など含む）
   const client = createBotClient();
 
-  // ヘルスチェック用 HTTP サーバーを起動（Docker ヘルスチェックから利用）
-  const healthServer = startHealthServer(client);
-
   // グレースフルシャットダウンを設定
   setupGracefulShutdown(async () => {
-    healthServer.close();
     await client.shutdown();
     await prisma.$disconnect();
   });

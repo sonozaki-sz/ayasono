@@ -106,6 +106,7 @@ function makeGuildMember(
           },
     guild: {
       id: "guild-1",
+      name: "TestGuild",
       memberCount: overrides.memberCount ?? 99,
       channels: {
         fetch: vi.fn(async (id: string) => channelMap.get(id) ?? null),
@@ -395,6 +396,7 @@ describe("bot/features/member-log/handlers/guildMemberRemoveHandler", () => {
         },
         guild: {
           id: "guild-1",
+          name: "TestGuild",
           memberCount: 99,
           channels: {
             fetch: vi.fn(async (id: string) =>

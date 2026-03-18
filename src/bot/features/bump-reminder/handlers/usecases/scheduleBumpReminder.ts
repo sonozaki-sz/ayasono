@@ -42,6 +42,7 @@ export async function scheduleBumpReminder(
       messageId,
       serviceName,
       bumpReminderConfigService,
+      panelMessageId,
     );
   };
 

@@ -6,18 +6,21 @@ import { BUMP_REMINDER_STATUS } from "../../constants/bumpReminderConstants";
 import type { BumpReminder } from "../types";
 
 /**
- * ギルド単位で次回実行予定のpendingリマインダーを1件取得する
+ * ギルド+サービス単位で次回実行予定のpendingリマインダーを1件取得する
  * @param prisma Prismaクライアント
  * @param guildId 対象ギルドID
+ * @param serviceName 対象サービス名
  * @returns pendingリマインダー（未存在時はnull）
  */
-export async function findPendingByGuildUseCase(
+export async function findPendingByGuildAndServiceUseCase(
   prisma: PrismaClient,
   guildId: string,
+  serviceName: string,
 ): Promise<BumpReminder | null> {
   const result = await prisma.bumpReminder.findFirst({
     where: {
       guildId,
+      serviceName,
       status: BUMP_REMINDER_STATUS.PENDING,
     },
     orderBy: {

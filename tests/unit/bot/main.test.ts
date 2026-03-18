@@ -145,10 +145,6 @@ vi.mock("@/bot/client", () => ({
   createBotClient: vi.fn(() => mutableMocks.client),
 }));
 
-vi.mock("@/bot/healthServer", () => ({
-  startHealthServer: vi.fn(() => ({ close: vi.fn() })),
-}));
-
 vi.mock("@/bot/utils/commandLoader", () => ({
   loadCommands: vi.fn().mockResolvedValue([
     {

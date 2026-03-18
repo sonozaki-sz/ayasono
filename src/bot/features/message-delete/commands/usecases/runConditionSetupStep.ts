@@ -1,5 +1,5 @@
 // src/bot/features/message-delete/commands/usecases/runConditionSetupStep.ts
-// 条件設定ステップ: UserSelectMenu / ChannelSelectMenu でユーザー・チャンネルを選択
+// 条件設定フェーズ: UserSelectMenu / ChannelSelectMenu でユーザー・チャンネルを選択
 
 import {
   ActionRowBuilder,
@@ -28,7 +28,7 @@ import {
 } from "../../constants/messageDeleteConstants";
 
 /**
- * 条件設定ステップを表示し、ユーザー・チャンネルの選択結果を返す
+ * 条件設定フェーズを表示し、ユーザー・チャンネルの選択結果を返す
  *
  * UserSelectMenu（最大25人）と ChannelSelectMenu（最大25チャンネル）を Ephemeral で表示し、
  * 「スキャン開始」ボタン押下で選択結果を返す。3分のタイムアウトを持つ。

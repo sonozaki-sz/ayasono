@@ -6,14 +6,14 @@
 
 ---
 
-## 📋 概要
+## 概要
 
 このドキュメントは、ayasono における実装時の設計方針、責務分離ルール、コメント規約を定義します。
 全体設計は [ARCHITECTURE.md](ARCHITECTURE.md) を参照。
 
 ---
 
-## 🎯 実装方針
+## 実装方針
 
 ### 基本方針
 
@@ -291,7 +291,7 @@ disableComponentsAfterTimeout(interaction, [selectRow, buttonRow], TIMEOUT_MS);
 
 ---
 
-## ✅ チェックリスト
+## チェックリスト
 
 ### レイヤ構成
 
@@ -331,9 +331,8 @@ disableComponentsAfterTimeout(interaction, [selectRow, buttonRow], TIMEOUT_MS);
 
 ---
 
-## 🔗 関連ドキュメント
+## 関連ドキュメント
 
 - [ARCHITECTURE.md](ARCHITECTURE.md)
-- [XSERVER_VPS_SETUP.md](XSERVER_VPS_SETUP.md)
 - [DEPLOYMENT.md](DEPLOYMENT.md)
 - [TESTING_GUIDELINES.md](TESTING_GUIDELINES.md)

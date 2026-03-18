@@ -22,7 +22,7 @@ import { DIALOG_TYPE, showJumpModal, type FinalResult } from "./dialogUtils";
  * フィルターなしで全削除対象を一覧表示し、削除実行・戻る・キャンセルを処理する
  * @param baseInteraction プレビューダイアログで「削除する」を押したときの MessageComponentInteraction
  * @param targetMessages 削除対象メッセージ（除外済みを含まない）
- * @param timeoutMs コレクターのタイムアウト（Phase 2 の残り時間、プレビューと共有）
+ * @param timeoutMs コレクターのタイムアウト（プレビューと共有する残り時間）
  * @returns 最終確認ダイアログの結果（confirm / back / cancel / timeout）
  */
 export async function showFinalConfirmDialog(
@@ -159,7 +159,7 @@ export async function showFinalConfirmDialog(
       // "time" 以外（messageDelete / channelDelete 等）でも未処理なら Timeout として解決し
       // ロックを確実に解放する
       logger.debug(
-        `[MsgDel] Phase2/FinalConfirm collector ended: reason=${String(reason)}, handledByCollect=${handledByCollect}`,
+        `[MsgDel] FinalConfirm collector ended: reason=${String(reason)}, handledByCollect=${handledByCollect}`,
       );
       if (handledByCollect) return;
       void reason;

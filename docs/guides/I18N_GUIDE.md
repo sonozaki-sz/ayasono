@@ -1,10 +1,10 @@
 # i18next 使用ガイド
 
-## 📖 概要
+## 概要
 
 このプロジェクトでは、多言語対応に **i18next** を使用しています。
 
-## 🚀 基本的な使い方
+## 基本的な使い方
 
 ### 1. 初期化
 
@@ -60,7 +60,7 @@ const guildT = await localeManager.getGuildT(guildId);
 const message = guildT("commands:example.success");
 ```
 
-## 📁 翻訳ファイルの構造
+## 翻訳ファイルの構造
 
 ```
 src/shared/locale/
@@ -86,7 +86,7 @@ src/shared/locale/
         └── system.ts
 ```
 
-## ✍️ 翻訳の追加方法
+## 翻訳の追加方法
 
 ### 1. 翻訳キーの追加
 
@@ -124,7 +124,7 @@ const message = await tGuild(guildId, "commands:newCommand.success");
 
 > **⚠️ 重要**: コマンド実装において Discord ユーザーの目に触れる文字列はすべて `tDefault()` 経由にする。生文字列のハードコードは **禁止**。詳細は次節参照。
 
-## 🚫 コマンド実装における生文字列禁止
+## コマンド実装における生文字列禁止
 
 Discord ユーザーの目に触れる **すべての文字列** をロケールキー経由にする。
 
@@ -150,7 +150,7 @@ new ButtonBuilder().setLabel(tDefault("commands:foo.btn_delete"));
 
 キーは `ja/commands.ts` と `en/commands.ts` に **同時に** 追加する。片方だけの追加は不完全。
 
-## 🔧 名前空間
+## 名前空間
 
 | 名前空間   | 用途                 | 例                             |
 | ---------- | -------------------- | ------------------------------ |
@@ -160,7 +160,7 @@ new ButtonBuilder().setLabel(tDefault("commands:foo.btn_delete"));
 | `events`   | イベントメッセージ   | `events:ready.logged_in`       |
 | `system`   | オペレーター向けログ | `system:vac.channel_created`   |
 
-## 💡 型安全性
+## 型安全性
 
 i18nextは完全に型安全です：
 
@@ -174,7 +174,7 @@ const msg = tDefault("common:nonexistent");
 // エラー: 型に存在しません
 ```
 
-## 🌐 サポート言語の追加
+## サポート言語の追加
 
 新しい言語を追加する場合：
 
@@ -183,7 +183,7 @@ const msg = tDefault("common:nonexistent");
 3. 各名前空間ファイルを作成
 4. `src/shared/locale/locales/resources.ts` に追加
 
-## 📝 補間（パラメータ）の使い方
+## 補間（パラメータ）の使い方
 
 ```typescript
 // 定義
@@ -198,7 +198,7 @@ const msg = await tGuild(guildId, "events:ready.logged_in", {
 // → "BotName#1234 としてログインしました"
 ```
 
-## 🔄 動的な言語切り替え
+## 動的な言語切り替え
 
 ```typescript
 import { localeManager } from "@/shared/locale/localeManager";
@@ -207,7 +207,7 @@ import { localeManager } from "@/shared/locale/localeManager";
 await localeManager.changeLanguage("en");
 ```
 
-## ⚙️ システムログのi18n化
+## システムログのi18n化
 
 `logger.*()` の引数には生文字列を渡さず、必ず `tDefault("system:...")` 経由のロケールキーを使います。
 
@@ -243,7 +243,7 @@ logger.info("VAC channel created");
 | `sticky-message.*` | スティッキーメッセージログ | `system:sticky-message.send_failed`         |
 | `scheduler.*`      | スケジューラー操作         | `system:scheduler.bump_reminder_cancelling` |
 
-## 📌 ベストプラクティス
+## ベストプラクティス
 
 1. **キーは階層的に**: `category.subcategory.key` の形式
 2. **名前空間を活用**: 関連する翻訳をグループ化
@@ -260,7 +260,7 @@ logger.info("VAC channel created");
    // ✅ "条件が不正です"    → タイトル "⚠️ 警告" + description "条件が不正です"
    ```
 
-## 🐛 トラブルシューティング
+## トラブルシューティング
 
 ### 翻訳が表示されない
 

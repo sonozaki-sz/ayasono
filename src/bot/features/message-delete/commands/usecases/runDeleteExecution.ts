@@ -1,5 +1,5 @@
 // src/bot/features/message-delete/commands/usecases/runDeleteExecution.ts
-// Phase 3: 削除実行フェーズ
+// 削除実行フェーズ
 
 import { type MessageComponentInteraction } from "discord.js";
 import { tDefault } from "../../../../../shared/locale/localeManager";
@@ -20,7 +20,7 @@ import { buildCompletionEmbed } from "../messageDeleteEmbedBuilder";
 import type { ParsedOptions } from "./dialogUtils";
 
 /**
- * Phase 3: 確認済みメッセージの削除を実行する
+ * 確認済みメッセージの削除を実行する
  * - 14分タイムアウトで削除を中断し、削除済み件数を通知する
  * - 削除進捗をリアルタイムで表示
  * @param interaction 削除実行ボタンの MessageComponentInteraction
@@ -35,7 +35,7 @@ export async function executeDelete(
 ): Promise<void> {
   const deleteController = new AbortController();
 
-  // Phase 3 タイムアウトタイマー（14分で削除を中断）
+  // 削除タイムアウトタイマー（14分で削除を中断）
   const deleteTimeoutId = setTimeout(() => {
     deleteController.abort();
   }, MSG_DEL_PHASE_TIMEOUT_MS);
@@ -110,7 +110,7 @@ export async function executeDelete(
       return;
     }
 
-    // Phase 3 タイムアウト: 削除済み件数を通知して終了
+    // 削除タイムアウト: 削除済み件数を通知して終了
     const deletedCount = progressRef.data?.totalDeleted ?? 0;
     await interaction.editReply({
       embeds: [

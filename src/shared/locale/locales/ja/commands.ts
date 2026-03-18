@@ -469,13 +469,13 @@ export const commands = {
   "member-log-config.modal.set_join_message.label":
     "参加メッセージ",
   "member-log-config.modal.set_join_message.placeholder":
-    "{userMention}, {userName}, {count} を使用可（最大500文字）",
+    "{userMention}, {userName}, {memberCount}, {serverName} を使用可（最大500文字）",
   "member-log-config.modal.set_leave_message.title":
     "退出メッセージを設定",
   "member-log-config.modal.set_leave_message.label":
     "退出メッセージ",
   "member-log-config.modal.set_leave_message.placeholder":
-    "{userMention}, {userName}, {count} を使用可（最大500文字）",
+    "{userMention}, {userName}, {memberCount}, {serverName} を使用可（最大500文字）",
   // エラー
   "member-log-config.errors.text_channel_only":
     "テキストチャンネルを指定してください。",

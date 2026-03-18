@@ -4,7 +4,7 @@
 # 停止:  docker compose -f /opt/infra/docker-compose.infra.yml -p infra down
 #
 # このファイルを /opt/infra/docker-compose.infra.yml としてサーバーに配置すること。
-# セットアップ手順: docs/guides/XSERVER_VPS_SETUP.md
+# セットアップ手順: docs/guides/DEPLOYMENT.md
 
 services:
   portainer:

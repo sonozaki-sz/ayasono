@@ -6,13 +6,13 @@
 
 ---
 
-## 📋 概要
+## 概要
 
 このドキュメントでは、ayasono を動かすために必要な Discord Bot アプリの作成から、サーバーへの追加までを説明します。
 
 ---
 
-## 🔧 1. アプリの作成
+## 1. アプリの作成
 
 1. [Discord Developer Portal](https://discord.com/developers/applications) にログインする
 2. **New Application** をクリック
@@ -20,7 +20,7 @@
 
 ---
 
-## 🤖 2. Bot の設定
+## 2. Bot の設定
 
 ### 2-1. Bot の追加
 
@@ -48,14 +48,14 @@
 
 ---
 
-## 🔑 3. アプリケーション ID の取得
+## 3. アプリケーション ID の取得
 
 1. 左メニュー → **General Information**
 2. **Application ID** をコピーして `.env` の `DISCORD_APP_ID` に登録
 
 ---
 
-## 🔗 4. サーバーへの招待
+## 4. サーバーへの招待
 
 ### 4-1. OAuth2 URL Generator の設定
 
@@ -90,7 +90,7 @@
 
 ---
 
-## ✅ 5. 動作確認
+## 5. 動作確認
 
 Bot がサーバーに参加したら、以下を確認する。
 
@@ -101,7 +101,6 @@ Bot がサーバーに参加したら、以下を確認する。
 
 ---
 
-## 📖 関連ドキュメント
+## 関連ドキュメント
 
-- [XSERVER_VPS_SETUP.md](XSERVER_VPS_SETUP.md) — VPS・Portainer セットアップ手順
 - [DEPLOYMENT.md](DEPLOYMENT.md) — GitHub Actions による自動デプロイフロー

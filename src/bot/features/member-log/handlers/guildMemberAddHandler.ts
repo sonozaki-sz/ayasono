@@ -126,6 +126,7 @@ export async function handleGuildMemberAdd(member: GuildMember): Promise<void> {
           userMention,
           username,
           memberCount,
+          member.guild.name,
         )
       : undefined;
 

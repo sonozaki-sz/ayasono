@@ -41,7 +41,7 @@ import {
  * @param initialFilter 初期フィルター状態（「戻る」後は前回の状態を引き継ぐ）
  * @param initialExcludedIds 初期除外セット（「戻る」後は前回の状態を引き継ぐ）
  * @param options パース済みコマンドオプション（コマンド条件 Embed の表示に使用）
- * @param timeoutMs コレクターのタイムアウト（Phase 2 の残り時間、最終確認と共有）
+ * @param timeoutMs コレクターのタイムアウト（最終確認と共有する残り時間）
  * @returns プレビューダイアログの結果（confirm / cancel / timeout）
  */
 export async function showPreviewDialog(
@@ -274,7 +274,7 @@ export async function showPreviewDialog(
       // "time" 以外（messageDelete / channelDelete 等）でも未処理なら Timeout として解決し
       // ロックを確実に解放する
       logger.debug(
-        `[MsgDel] Phase2/Preview collector ended: reason=${String(reason)}, handledByCollect=${handledByCollect}`,
+        `[MsgDel] Preview collector ended: reason=${String(reason)}, handledByCollect=${handledByCollect}`,
       );
       if (handledByCollect) return;
       void reason;

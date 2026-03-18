@@ -8,7 +8,7 @@ import type {
 
 /** UI コンポーネントの customId 定数 */
 export const MSG_DEL_CUSTOM_ID = {
-  // 条件設定ステップ
+  // 条件設定フェーズ
   SELECT_USER: "message-delete:select-user",
   SELECT_CHANNEL: "message-delete:select-channel",
   START_SCAN: "message-delete:start-scan",
@@ -72,13 +72,13 @@ export const MSG_DEL_PAGE_SIZE = 5;
 export const MSG_DEL_PHASE_TIMEOUT_MS = 840_000;
 
 /**
- * Phase 2 コレクターのアイドルタイムアウト（3分）
+ * 確認フェーズ（プレビュー・最終確認）コレクターのアイドルタイムアウト（3分）
  * エフェメラルメッセージをユーザーが非表示にしても MESSAGE_DELETE イベントは発火しないため、
  * 無操作が続いた場合にコレクターを自動終了してロックを解放する
  */
 export const MSG_DEL_COLLECTOR_IDLE_MS = 180_000;
 
-/** 条件設定ステップのタイムアウト（3分） */
+/** 条件設定フェーズのタイムアウト（3分） */
 export const MSG_DEL_CONDITION_STEP_TIMEOUT_MS = 180_000;
 
 /** モーダル送信タイムアウト（60秒） */
@@ -175,7 +175,7 @@ export interface CommandConditionsDisplay {
   channelIds: string[];
 }
 
-/** 条件設定ステップの結果型 */
+/** 条件設定フェーズの結果型 */
 export interface ConditionSetupResult {
   /** 選択されたユーザーID一覧 */
   targetUserIds: string[];
@@ -186,7 +186,7 @@ export interface ConditionSetupResult {
 }
 
 /**
- * フィルター状態型（Stage 1 プレビューダイアログで使用）
+ * フィルター状態型（プレビューダイアログで使用）
  *
  * days と after/before は排他関係を型レベルで保証する Discriminated Union。
  * - days ブランチ: 過去N日間フィルター（after・before は undefined のみ許容）
