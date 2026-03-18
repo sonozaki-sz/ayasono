@@ -10,7 +10,38 @@
 
 GitHub Actions が main ブランチへの push を検知すると、Docker イメージのビルド・GHCR への push・Portainer Stack の再デプロイまでを自動で行う。
 
-初回セットアップ（VPS の初期設定・Portainer のインストール）は **[XSERVER_VPS_SETUP.md](XSERVER_VPS_SETUP.md)** を参照。
+### 本番環境の構成
+
+```
+XServer VPS (Ubuntu 24.04)
+├── Docker Compose (Infra スタック: infra)       ← /opt/infra/ で管理
+│   └── portainer コンテナ                       ← コンテナ管理 UI + デプロイ API
+└── Portainer Stack (ayasono)                    ← Portainer が GitHub リポジトリから管理
+    └── bot コンテナ  (ayasono-bot)              ← Discord Bot 本体
+```
+
+Portainer 自体は `/opt/infra/docker-compose.infra.yml` で管理する Infra スタックとして起動する。
+bot は Portainer Stack（Repository 方式）で管理し、GitHub Actions が Portainer API 経由でデプロイする。
+
+### Portainer Infra スタックの起動
+
+Portainer の初回起動・再構築時の手順:
+
+```bash
+# ディレクトリ作成
+sudo mkdir -p /opt/infra
+sudo chown deploy:deploy /opt/infra
+
+# リポジトリの docker-compose.infra.yml を配置
+scp docker-compose.infra.yml deploy@<サーバーIP>:/opt/infra/
+
+# 起動
+docker compose -f /opt/infra/docker-compose.infra.yml -p infra up -d
+```
+
+起動後、`http://<サーバーIP>:9000` にアクセスして管理者アカウントを作成する（初回は起動後5分以内）。
+
+**Endpoint ID の確認方法**: Portainer → Environments → `local` の URL から確認（`#!/<ID>/docker/...` の数字部分）。この値を GitHub Secrets `PORTAINER_ENDPOINT_ID` に登録する。
 
 ### デプロイフロー全体図
 
@@ -122,6 +153,19 @@ Portainer が行う処理:
 1. Portainer → **Stacks** → **ayasono** → **Editor**
 2. **Environment variables** セクションで値を変更
 3. **Pull and redeploy** をクリック
+
+**環境変数一覧:**
+
+| 変数名 | 内容 |
+| -- | -- |
+| `DISCORD_TOKEN` | Discord Developer Portal で取得 |
+| `DISCORD_APP_ID` | Discord Developer Portal で取得 |
+| `DISCORD_GUILD_ID` | （任意）特定サーバー限定時に指定 |
+| `NODE_ENV` | `production` |
+| `DATABASE_URL` | `file:/storage/db.sqlite` |
+| `LOCALE` | `ja` |
+| `LOG_LEVEL` | `info` |
+| `DISCORD_ERROR_WEBHOOK_URL` | Discord Webhook URL |
 
 ### 3-4. Compose ファイルの構成
 
@@ -235,7 +279,7 @@ docker build --target runner --progress=plain . 2>&1 | tail -50
 
 ## 関連ドキュメント
 
-- [XSERVER_VPS_SETUP.md](XSERVER_VPS_SETUP.md) — VPS・Portainer の初回セットアップ手順
 - [ARCHITECTURE.md](ARCHITECTURE.md) — システム構成・アーキテクチャ解説
 - [docker-compose.portainer.yml](../../docker-compose.portainer.yml) — Portainer Stack 用 Compose 定義
+- [docker-compose.infra.yml](../../docker-compose.infra.yml) — Infra スタック定義（Portainer 用）
 - [.github/workflows/deploy.yml](../../.github/workflows/deploy.yml) — CI/CD ワークフロー定義

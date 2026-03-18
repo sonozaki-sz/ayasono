@@ -387,7 +387,7 @@ export async function deleteScannedMessages(
   const channelStatuses = [...channelStatusMap.values()];
 
   for (const channelMessages of byChannel.values()) {
-    // キャンセルシグナル確認（Phase 3 タイムアウト時に削除を中断）
+    // キャンセルシグナル確認（削除タイムアウト時に中断）
     if (signal?.aborted) break;
 
     const channelId = channelMessages[0].channelId;

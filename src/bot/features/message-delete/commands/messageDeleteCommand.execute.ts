@@ -35,7 +35,7 @@ import {
 import { MSG_DEL_PHASE_TIMEOUT_MS } from "../constants/messageDeleteConstants";
 
 // ===== サーバー単位の処理中ロック =====
-// Phase 1〜3 の実行中はロックを保持し、同一サーバー内の重複実行を防止する
+// スキャン〜削除実行の間はロックを保持し、同一サーバー内の重複実行を防止する
 // Bot 再起動でクリアされるメモリ管理のため、永続化は不要
 const executingGuilds = new Set<string>();
 
@@ -85,7 +85,7 @@ export async function executeMessageDeleteCommand(
       return;
     }
 
-    // ── 処理中ロック取得（Phase 1〜3 の重複実行防止） ──
+    // ── 処理中ロック取得（スキャン〜削除実行の重複実行防止） ──
     const guildId = interaction.guildId;
     if (executingGuilds.has(guildId)) {
       await interaction.editReply({
@@ -99,18 +99,18 @@ export async function executeMessageDeleteCommand(
     logger.debug(tDefault("system:message-delete.lock_acquired", { guildId }));
 
     try {
-      // ── 条件設定ステップ（user / channel をセレクトメニューで選択） ──
+      // ── 条件設定フェーズ（user / channel をセレクトメニューで選択） ──
       const conditionResult = await runConditionSetupStep(
         interaction,
         hasSlashCommandFilter(options),
       );
       if (!conditionResult) return;
 
-      // 条件設定ステップの結果をオプションに反映
+      // 条件設定フェーズの結果をオプションに反映
       options.targetUserIds = conditionResult.targetUserIds;
       options.channelIds = conditionResult.channelIds;
 
-      // 条件設定ステップの「スキャン開始」ボタンで得た fresh token を以降のフェーズで使う
+      // 条件設定フェーズの「スキャン開始」ボタンで得た fresh token を以降のフェーズで使う
       const scanInteraction = conditionResult.scanInteraction;
 
       const targetChannels = await buildTargetChannels(
@@ -151,12 +151,12 @@ export async function executeMessageDeleteCommand(
   }
 }
 
-// ===== 確認・削除フェーズ =====
+// ===== 確認フェーズ + 削除実行フェーズ =====
 
 /**
- * Phase 2〜3: プレビュー → 最終確認 → 削除の一連のフローを管理する
- * Stage 2（最終確認）の「戻る」で Stage 1（プレビュー）に戻るループ構造
- * @param interaction スキャン開始ボタンの interaction（Phase 1 完了後も有効な token）
+ * 確認フェーズ（Stage 1: プレビュー ↔ Stage 2: 最終確認）→ 削除実行フェーズの一連のフローを管理する
+ * Stage 2 の「戻る」で Stage 1 に戻るループ構造
+ * @param interaction スキャン開始ボタンの interaction（スキャン完了後も有効な token）
  * @param scannedMessages スキャン済みメッセージ配列
  * @param options パース済みコマンドオプション
  * @returns 処理完了を示す Promise
@@ -166,8 +166,8 @@ async function runConfirmDeletePhase(
   scannedMessages: ScannedMessageWithChannel[],
   options: ParsedOptions,
 ): Promise<void> {
-  // Stage1 (プレビュー) → Stage2 (最終確認) ループ
-  // Stage2 の「戻る」で Stage1 に戻る
+  // 確認フェーズ: Stage 1（プレビュー） → Stage 2（最終確認）ループ
+  // Stage 2 の「戻る」で Stage 1 に戻る
   // 各ダイアログはボタン操作の deferUpdate() で fresh token を取得するため、
   // フェーズごとに独立して MSG_DEL_PHASE_TIMEOUT_MS（14分）使える
   let filter: MessageDeleteFilter = {} as MessageDeleteFilter;

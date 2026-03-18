@@ -40,8 +40,8 @@ function hasBotAccess(
 /**
  * 削除対象のチャンネルリストを構築する
  * channelIds 指定時は指定チャンネルのみ、未指定（空配列）時は Bot がアクセス可能な全チャンネルを返す
- * @param interaction 条件設定ステップから渡された interaction
- * @param channelIds 条件設定ステップで選択されたチャンネルID一覧（空配列で全チャンネル）
+ * @param interaction 条件設定フェーズから渡された interaction
+ * @param channelIds 条件設定フェーズで選択されたチャンネルID一覧（空配列で全チャンネル）
  * @returns 対象チャンネル配列（エラー時は null）
  */
 export async function buildTargetChannels(

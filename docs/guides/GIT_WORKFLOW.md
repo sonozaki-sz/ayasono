@@ -6,13 +6,13 @@
 
 ---
 
-## 📋 概要
+## 概要
 
 このドキュメントは、ayasono における Git ブランチ戦略とコミットメッセージ規約を定義します。
 
 ---
 
-## 🌿 ブランチ戦略
+## ブランチ戦略
 
 ### ブランチ構成
 
@@ -42,7 +42,7 @@ refactor/xxx  ← リファクタリング
 
 ---
 
-## 🔄 通常の開発フロー
+## 通常の開発フロー
 
 **`develop` には直接 push できる。`main` へは必ず PR 経由でのみ変更する。**
 
@@ -93,7 +93,7 @@ gh pr merge <PR番号> --merge --auto
 
 ---
 
-## 🚨 ホットフィックスフロー（本番障害時）
+## ホットフィックスフロー（本番障害時）
 
 本番環境で緊急対応が必要な場合のみ使用する。
 
@@ -118,7 +118,7 @@ git push origin develop
 
 ---
 
-## ✍️ コミットメッセージ規約（Conventional Commits）
+## コミットメッセージ規約（Conventional Commits）
 
 ### フォーマット
 
@@ -174,7 +174,7 @@ git push origin develop
 ### コミットメッセージの例
 
 ```bash
-# ✅ 良い例
+# 良い例
 feat(afk): メッセージ送信時にAFK状態を自動解除する機能を追加
 fix(bump-reminder): コマンド登録時に二重登録されるバグを修正
 test(scheduler): scheduleJobのエッジケーステストを追加
@@ -182,7 +182,7 @@ docs: コミット運用ガイドを追加
 ci: developブランチのブランチ保護ルールを追加
 refactor(db): guildConfigRepositoryの責務をusecase/persistenceに分割
 
-# ❌ 悪い例
+# 悪い例
 update                         # type がない
 feat: fix bug                  # type と実際の変更内容が矛盾
 FEAT: 機能追加                 # type は小文字
@@ -195,17 +195,17 @@ feat(afk)(scheduler): ...      # scope は1つ
 1コミットに異なる type の変更を混在させない。分割してコミットすること。
 
 ```bash
-# ❌ 悪い例（1コミットに feat + test を混在）
+# 悪い例（1コミットに feat + test を混在）
 git commit -m "feat(afk): 追加 + テストも書いた"
 
-# ✅ 良い例（分割する）
+# 良い例（分割する）
 git commit -m "feat(afk): メッセージ送信時にAFK状態を自動解除する機能を追加"
 git commit -m "test(afk): AFK自動解除のユニットテストを追加"
 ```
 
 ---
 
-## 🌲 ブランチ命名規則
+## ブランチ命名規則
 
 ```
 <type>/<kebab-case-description>
@@ -224,7 +224,7 @@ git commit -m "test(afk): AFK自動解除のユニットテストを追加"
 
 ---
 
-## 🔍 PR 運用規則
+## PR 運用規則
 
 ### develop への直接 push 時のチェック
 
@@ -271,7 +271,7 @@ git commit -m "test(afk): AFK自動解除のユニットテストを追加"
 
 ---
 
-## 🏷️ ブランチ保護の設定（Branch Protection Rules）
+## ブランチ保護の設定（Branch Protection Rules）
 
 [Settings > Branches](https://github.com/sonozaki-sz/ayasono/settings/branches) で管理。
 
@@ -300,7 +300,7 @@ git commit -m "test(afk): AFK自動解除のユニットテストを追加"
 
 ---
 
-## 📚 参考
+## 参考
 
 - [Conventional Commits](https://www.conventionalcommits.org/ja/v1.0.0/)
 - [commitlint 設定](../../commitlint.config.js)

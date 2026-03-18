@@ -488,9 +488,9 @@ export const system = {
   "message-delete.lock_released":
     "[MsgDel] lock released: guild={{guildId}}",
   "message-delete.cancel_collector_ended":
-    "[MsgDel] Phase1 cancelCollector ended: reason={{reason}}",
+    "[MsgDel] Scan cancelCollector ended: reason={{reason}}",
   "message-delete.aborting_non_user_end":
-    "[MsgDel] Phase1 aborting scan due to non-user end",
+    "[MsgDel] Aborting scan due to non-user end",
 } as const;
 
 export type SystemTranslations = typeof system;

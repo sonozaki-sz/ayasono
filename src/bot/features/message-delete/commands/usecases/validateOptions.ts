@@ -177,7 +177,7 @@ export async function parseAndValidateOptions(
 
 /**
  * スラッシュコマンドオプションでフィルタ条件が1つ以上指定されているかを判定する
- * （条件設定ステップのバリデーションで使用）
+ * （条件設定フェーズのバリデーションで使用）
  * @param options パース済みオプション
  * @returns フィルタ条件が1つ以上あれば true
  */

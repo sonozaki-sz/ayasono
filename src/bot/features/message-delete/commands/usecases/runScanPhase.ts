@@ -1,5 +1,5 @@
 // src/bot/features/message-delete/commands/usecases/runScanPhase.ts
-// Phase 1: メッセージスキャンフェーズ
+// メッセージスキャンフェーズ
 
 import {
   ActionRowBuilder,
@@ -27,11 +27,11 @@ import {
 import type { ParsedOptions } from "./dialogUtils";
 
 /**
- * Phase 1: メッセージのプレスキャンを実行する
+ * メッセージのプレスキャンを実行する
  * - 「収集分を確認」ボタンで中断可能
  * - 14分タイムアウトでスキャンを自動中断
  * - 中断/タイムアウト時に収集済みメッセージがあればプレビューへ遷移
- * @param interaction 条件設定ステップから渡された interaction（fresh な 15分 token）
+ * @param interaction 条件設定フェーズから渡された interaction（fresh な15分 token）
  * @param channels スキャン対象のチャンネル一覧
  * @param options パース済みコマンドオプション
  * @returns 収集済みメッセージ配列（null の場合は処理終了）
@@ -68,7 +68,7 @@ export async function runScanPhase(
     components: [cancelRow],
   });
 
-  // Phase 1 タイムアウトタイマー（14分でスキャンを中断）
+  // スキャンタイムアウトタイマー（14分でスキャンを中断）
   const scanTimeoutId = setTimeout(() => {
     cancelState.reason = "timeout";
     controller.abort();

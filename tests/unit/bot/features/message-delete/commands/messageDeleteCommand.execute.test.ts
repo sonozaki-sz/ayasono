@@ -97,7 +97,7 @@ function makeComponentInteraction(customId: string, userId: string) {
   };
 }
 
-// ── scanInteraction ファクトリ（条件設定ステップの戻り値に含まれる） ──────────
+// ── scanInteraction ファクトリ（条件設定フェーズの戻り値に含まれる） ──────────
 
 function makeScanInteraction(userId: string, guildId: string) {
   const me = {
@@ -247,7 +247,7 @@ const mockScannedMessages: ScannedMessageWithChannel[] = [
 
 // executeMessageDeleteCommand のエラー分岐（権限・バリデーション・ロック）と正常フロー全体を検証
 describe("executeMessageDeleteCommand", () => {
-  // 各テストケースでモック状態をリセットし、デフォルトのスキャン結果・条件設定ステップ戻り値を設定する
+  // 各テストケースでモック状態をリセットし、デフォルトのスキャン結果・条件設定フェーズ戻り値を設定する
   beforeEach(() => {
     vi.clearAllMocks();
     // デフォルト: scanMessages は即座に解決
@@ -256,7 +256,7 @@ describe("executeMessageDeleteCommand", () => {
       totalDeleted: 1,
       channelBreakdown: { "channel-1": { name: "general", count: 1 } },
     });
-    // デフォルト: 条件設定ステップはユーザー/チャンネル未選択で即座に返す
+    // デフォルト: 条件設定フェーズはユーザー/チャンネル未選択で即座に返す
     // scanInteraction は buildTargetChannels / runScanPhase で使用される
     const defaultScanInteraction = makeScanInteraction("user-1", "guild-1");
     runConditionSetupStepMock.mockResolvedValue({
@@ -283,7 +283,7 @@ describe("executeMessageDeleteCommand", () => {
       );
     });
 
-    it("条件設定ステップがキャンセルされた場合は早期終了する", async () => {
+    it("条件設定フェーズがキャンセルされた場合は早期終了する", async () => {
       runConditionSetupStepMock.mockResolvedValue(null);
       const interaction = createInteraction();
 
@@ -411,15 +411,15 @@ describe("executeMessageDeleteCommand", () => {
   // スキャン→プレビュー確認→最終確認→削除完了の一連フローが正常に完了することを検証
   describe("正常系", () => {
     it("スキャン → プレビュー確認 → 最終確認 → 削除完了 の一連のフローが正常に動作する", async () => {
-      // ── 各フェーズのクリックインタラクションを準備 ──
+      // ── 各フェーズ・ステージのクリックインタラクションを準備 ──
 
-      // Phase 3: FINAL_YES クリック（deleteScannedMessages の interaction になる）
+      // 削除実行フェーズ: FINAL_YES クリック（deleteScannedMessages の interaction になる）
       const finalClickInteraction = makeComponentInteraction(
         MSG_DEL_CUSTOM_ID.FINAL_YES,
         "user-1",
       );
 
-      // Phase 2: 最終確認ダイアログ（Stage 2）のコレクター
+      // 確認フェーズ Stage 2（最終確認）のコレクター
       // createMessageComponentCollector が呼ばれたら次のマイクロタスクで FINAL_YES を発火
       const finalConfirmCollector = makeMockCollector();
       const finalReplyMsg = {
@@ -439,7 +439,7 @@ describe("executeMessageDeleteCommand", () => {
         .fn()
         .mockResolvedValue(finalReplyMsg) as ReturnType<typeof vi.fn>;
 
-      // Phase 2: プレビューダイアログ（Stage 1）のコレクター
+      // 確認フェーズ Stage 1（プレビュー）のコレクター
       // createMessageComponentCollector が呼ばれたら次のマイクロタスクで CONFIRM_YES を発火
       const previewCollector = makeMockCollector();
       const previewReplyMsg = {
@@ -449,7 +449,7 @@ describe("executeMessageDeleteCommand", () => {
         }),
       };
 
-      // Phase 1: スキャン進捗メッセージ（キャンセルボタン付き）
+      // スキャンフェーズ: 進捗メッセージ（キャンセルボタン付き）
       const cancelCollector = makeMockCollector();
       const scanReplyMsg = {
         createMessageComponentCollector: vi.fn(() => cancelCollector),
