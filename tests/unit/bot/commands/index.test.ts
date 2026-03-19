@@ -38,7 +38,7 @@ const KNOWN_COMMAND_NAMES = [
   "member-log-config",
   "message-delete",
   "sticky-message",
-  "vac",
+  "vc",
   "vac-config",
   "vc-recruit-config",
   "ping",

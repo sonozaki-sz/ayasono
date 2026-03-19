@@ -129,19 +129,26 @@ export const commands = {
   "vac-config.embed.remove_error_title":
     "削除エラー",
 
-  // VAC操作コマンド
-  // VC操作（リネーム/人数上限）
-  // `vac.panel.*` はボタン customId の表示順に合わせる
-  "vac.description":
-    "自動作成VCの設定を変更",
-  "vac.vc-rename.description":
+  // VC操作コマンド（/vc rename, /vc limit）
+  "vc.description":
+    "VCの設定を変更",
+  "vc.rename.description":
     "参加中のVC名を変更",
-  "vac.vc-rename.name.description":
+  "vc.rename.name.description":
     "新しいVC名",
-  "vac.vc-limit.description":
+  "vc.limit.description":
     "参加中VCの人数制限を変更",
-  "vac.vc-limit.limit.description":
+  "vc.limit.limit.description":
     "人数制限（0=無制限、0~99）",
+  "vc.embed.renamed":
+    "VC名を {{name}} に変更しました。",
+  "vc.embed.limit_changed":
+    "人数制限を {{limit}} に設定しました。",
+  "vc.embed.unlimited":
+    "無制限",
+
+  // VAC操作パネル
+  // `vac.panel.*` はボタン customId の表示順に合わせる
   "vac.embed.renamed":
     "VC名を {{name}} に変更しました。",
   "vac.embed.limit_changed":

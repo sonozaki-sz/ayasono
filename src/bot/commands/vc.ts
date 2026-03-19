@@ -1,5 +1,5 @@
-// src/bot/commands/vac.ts
-// VAC管理VCの設定変更コマンド定義
+// src/bot/commands/vc.ts
+// VC操作コマンド定義
 
 import {
   type ChatInputCommandInteraction,
@@ -7,38 +7,38 @@ import {
 } from "discord.js";
 import { getCommandLocalizations } from "../../shared/locale/commandLocalizations";
 import { handleCommandError } from "../errors/interactionErrorHandler";
-import { VAC_COMMAND } from "../features/vac/commands/vacCommand.constants";
-import { executeVacCommand } from "../features/vac/commands/vacCommand.execute";
+import { VC_COMMAND } from "../features/vc-command/commands/vcCommand.constants";
+import { executeVcCommand } from "../features/vc-command/commands/vcCommand.execute";
 import type { Command } from "../types/discord";
 
 /**
- * VAC（自動作成VC）操作コマンド
- * 所有VCのリネーム・人数制限変更を提供する
+ * VC操作コマンド
+ * Bot管理下VCのリネーム・人数制限変更を提供する
  */
-export const vacCommand: Command = {
+export const vcCommand: Command = {
   data: (() => {
-    const cmdDesc = getCommandLocalizations("vac.description");
-    const renameDesc = getCommandLocalizations("vac.vc-rename.description");
+    const cmdDesc = getCommandLocalizations("vc.description");
+    const renameDesc = getCommandLocalizations("vc.rename.description");
     const renameNameDesc = getCommandLocalizations(
-      "vac.vc-rename.name.description",
+      "vc.rename.name.description",
     );
-    const limitDesc = getCommandLocalizations("vac.vc-limit.description");
+    const limitDesc = getCommandLocalizations("vc.limit.description");
     const limitValueDesc = getCommandLocalizations(
-      "vac.vc-limit.limit.description",
+      "vc.limit.limit.description",
     );
 
     return new SlashCommandBuilder()
-      .setName(VAC_COMMAND.NAME)
+      .setName(VC_COMMAND.NAME)
       .setDescription(cmdDesc.ja)
       .setDescriptionLocalizations(cmdDesc.localizations)
       .addSubcommand((subcommand) =>
         subcommand
-          .setName(VAC_COMMAND.SUBCOMMAND.VC_RENAME)
+          .setName(VC_COMMAND.SUBCOMMAND.RENAME)
           .setDescription(renameDesc.ja)
           .setDescriptionLocalizations(renameDesc.localizations)
           .addStringOption((option) =>
             option
-              .setName(VAC_COMMAND.OPTION.NAME)
+              .setName(VC_COMMAND.OPTION.NAME)
               .setDescription(renameNameDesc.ja)
               .setDescriptionLocalizations(renameNameDesc.localizations)
               .setRequired(true)
@@ -47,29 +47,24 @@ export const vacCommand: Command = {
       )
       .addSubcommand((subcommand) =>
         subcommand
-          .setName(VAC_COMMAND.SUBCOMMAND.VC_LIMIT)
+          .setName(VC_COMMAND.SUBCOMMAND.LIMIT)
           .setDescription(limitDesc.ja)
           .setDescriptionLocalizations(limitDesc.localizations)
           .addIntegerOption((option) =>
             option
-              .setName(VAC_COMMAND.OPTION.LIMIT)
+              .setName(VC_COMMAND.OPTION.LIMIT)
               .setDescription(limitValueDesc.ja)
               .setDescriptionLocalizations(limitValueDesc.localizations)
               .setRequired(true)
-              .setMinValue(VAC_COMMAND.LIMIT_MIN)
-              .setMaxValue(VAC_COMMAND.LIMIT_MAX),
+              .setMinValue(VC_COMMAND.LIMIT_MIN)
+              .setMaxValue(VC_COMMAND.LIMIT_MAX),
           ),
       );
   })(),
 
-  /**
-   * vac コマンド実行を features 側へ委譲する
-   * @param interaction コマンド実行インタラクション
-   * @returns 実行完了を示す Promise
-   */
   async execute(interaction: ChatInputCommandInteraction) {
     try {
-      await executeVacCommand(interaction);
+      await executeVcCommand(interaction);
     } catch (error) {
       await handleCommandError(interaction, error);
     }
@@ -78,4 +73,4 @@ export const vacCommand: Command = {
   cooldown: 3,
 };
 
-export default vacCommand;
+export default vcCommand;

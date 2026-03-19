@@ -1,7 +1,7 @@
-// tests/unit/bot/features/vac/commands/usecases/vacLimit.test.ts
+// tests/unit/bot/features/vc-command/commands/usecases/vcLimit.test.ts
 import type { Mock } from "vitest";
-import { resolveVacVoiceChannelForEdit } from "@/bot/features/vac/commands/helpers/vacVoiceChannelResolver";
-import { executeVacLimit } from "@/bot/features/vac/commands/usecases/vacLimit";
+import { resolveVoiceChannelForEdit } from "@/bot/features/vc-command/commands/helpers/vcVoiceChannelResolver";
+import { executeVcLimit } from "@/bot/features/vc-command/commands/usecases/vcLimit";
 import { createSuccessEmbed } from "@/bot/utils/messageResponse";
 import { ValidationError } from "@/shared/errors/customErrors";
 import { MessageFlags } from "discord.js";
@@ -9,10 +9,10 @@ import { MessageFlags } from "discord.js";
 vi.mock("@/shared/locale/localeManager", () => ({
   tInteraction: vi.fn(
     (_locale: string, key: string, params?: Record<string, unknown>) => {
-      if (key === "commands:vac.embed.unlimited") {
+      if (key === "commands:vc.embed.unlimited") {
         return "unlimited";
       }
-      if (key === "commands:vac.embed.limit_changed") {
+      if (key === "commands:vc.embed.limit_changed") {
         return `limit:${String(params?.limit)}`;
       }
       return key;
@@ -21,9 +21,9 @@ vi.mock("@/shared/locale/localeManager", () => ({
 }));
 
 vi.mock(
-  "@/bot/features/vac/commands/helpers/vacVoiceChannelResolver",
+  "@/bot/features/vc-command/commands/helpers/vcVoiceChannelResolver",
   () => ({
-    resolveVacVoiceChannelForEdit: vi.fn(),
+    resolveVoiceChannelForEdit: vi.fn(),
   }),
 );
 
@@ -31,8 +31,7 @@ vi.mock("@/bot/utils/messageResponse", () => ({
   createSuccessEmbed: vi.fn((description: string) => ({ description })),
 }));
 
-describe("bot/features/vac/commands/usecases/vacLimit", () => {
-  // VC上限変更の範囲検証と通知内容を検証する
+describe("bot/features/vc-command/commands/usecases/vcLimit", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -45,13 +44,13 @@ describe("bot/features/vac/commands/usecases/vacLimit", () => {
     };
 
     await expect(
-      executeVacLimit(interaction as never, "guild-1", "voice-1"),
+      executeVcLimit(interaction as never, "voice-1"),
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
   it("上限0を設定して無制限ラベルで成功応答する", async () => {
     const edit = vi.fn().mockResolvedValue(undefined);
-    (resolveVacVoiceChannelForEdit as Mock).mockResolvedValue({ edit });
+    (resolveVoiceChannelForEdit as Mock).mockResolvedValue({ edit });
 
     const reply = vi.fn().mockResolvedValue(undefined);
     const interaction = {
@@ -60,7 +59,7 @@ describe("bot/features/vac/commands/usecases/vacLimit", () => {
       reply,
     };
 
-    await executeVacLimit(interaction as never, "guild-1", "voice-1");
+    await executeVcLimit(interaction as never, "voice-1");
 
     expect(edit).toHaveBeenCalledWith({ userLimit: 0 });
     expect(createSuccessEmbed).toHaveBeenCalledWith("limit:unlimited");
@@ -72,7 +71,7 @@ describe("bot/features/vac/commands/usecases/vacLimit", () => {
 
   it("チャンネル上限を数値で設定して数値ラベルで成功応答する", async () => {
     const edit = vi.fn().mockResolvedValue(undefined);
-    (resolveVacVoiceChannelForEdit as Mock).mockResolvedValue({ edit });
+    (resolveVoiceChannelForEdit as Mock).mockResolvedValue({ edit });
 
     const reply = vi.fn().mockResolvedValue(undefined);
     const interaction = {
@@ -81,7 +80,7 @@ describe("bot/features/vac/commands/usecases/vacLimit", () => {
       reply,
     };
 
-    await executeVacLimit(interaction as never, "guild-1", "voice-1");
+    await executeVcLimit(interaction as never, "voice-1");
 
     expect(edit).toHaveBeenCalledWith({ userLimit: 8 });
     expect(createSuccessEmbed).toHaveBeenCalledWith("limit:8");
