@@ -26,6 +26,7 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
 vi.mock("@/shared/locale/localeManager", () => ({
   tGuild: mocks.tGuild,
   tDefault: mocks.tDefault,
+  tInteraction: (...args: unknown[]) => args[1],
 }));
 
 vi.mock("@/shared/utils/logger", () => ({

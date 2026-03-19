@@ -59,6 +59,7 @@ vi.mock("@/shared/locale/commandLocalizations", () => ({
 vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: tDefaultMock,
   tGuild: tGuildMock,
+  tInteraction: (...args: unknown[]) => args[1],
 }));
 
 // メッセージ生成は簡易オブジェクト化
@@ -84,6 +85,7 @@ import { handleCommandError } from "@/bot/errors/interactionErrorHandler";
 type InteractionLike = {
   guildId: string | null;
   channelId: string;
+  locale: string;
   user: { id: string };
   guild?: {
     members: {
@@ -106,6 +108,7 @@ function createInteraction(
   return {
     guildId: "guild-1",
     channelId: "channel-1",
+    locale: "ja",
     user: { id: "operator-1" },
     guild: {
       members: {
@@ -130,7 +133,7 @@ describe("bot/commands/bump-reminder-config", () => {
   // ケースごとにモックを初期化する
   beforeEach(() => {
     vi.clearAllMocks();
-    tGuildMock.mockResolvedValue("translated");
+    // tInteraction mock returns the key as-is (configured in vi.mock)
     cancelReminderMock.mockResolvedValue(undefined);
     setBumpReminderEnabledMock.mockResolvedValue(undefined);
     getBumpReminderConfigMock.mockResolvedValue({
@@ -163,7 +166,12 @@ describe("bot/commands/bump-reminder-config", () => {
       "channel-1",
     );
     expect(interaction.reply).toHaveBeenCalledWith({
-      embeds: [{ description: "translated" }],
+      embeds: [
+        {
+          description:
+            "commands:bump-reminder-config.embed.enable_success",
+        },
+      ],
       flags: MessageFlags.Ephemeral,
     });
   });
@@ -183,7 +191,12 @@ describe("bot/commands/bump-reminder-config", () => {
     expect(cancelReminderMock).toHaveBeenCalledWith("guild-1");
     expect(setBumpReminderEnabledMock).toHaveBeenCalledWith("guild-1", false);
     expect(interaction.reply).toHaveBeenCalledWith({
-      embeds: [{ description: "translated" }],
+      embeds: [
+        {
+          description:
+            "commands:bump-reminder-config.embed.disable_success",
+        },
+      ],
       flags: MessageFlags.Ephemeral,
     });
   });
@@ -242,7 +255,12 @@ describe("bot/commands/bump-reminder-config", () => {
       "role-7",
     );
     expect(interaction.reply).toHaveBeenCalledWith({
-      embeds: [{ description: "translated" }],
+      embeds: [
+        {
+          description:
+            "commands:bump-reminder-config.embed.set_mention_role_success",
+        },
+      ],
       flags: MessageFlags.Ephemeral,
     });
   });
@@ -277,7 +295,12 @@ describe("bot/commands/bump-reminder-config", () => {
     );
 
     expect(interaction.reply).toHaveBeenCalledWith({
-      embeds: [{ message: "translated" }],
+      embeds: [
+        {
+          message:
+            "commands:bump-reminder-config.embed.not_configured",
+        },
+      ],
       flags: MessageFlags.Ephemeral,
     });
   });
@@ -355,7 +378,12 @@ describe("bot/commands/bump-reminder-config", () => {
       undefined,
     );
     expect(interaction.reply).toHaveBeenCalledWith({
-      embeds: [{ description: "translated" }],
+      embeds: [
+        {
+          description:
+            "commands:bump-reminder-config.embed.remove_mention_role",
+        },
+      ],
       flags: MessageFlags.Ephemeral,
     });
   });

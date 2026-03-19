@@ -18,7 +18,7 @@ import {
   type ButtonInteraction,
   type VoiceChannel,
 } from "discord.js";
-import { tGuild } from "../../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../../shared/locale/localeManager";
 import type { ButtonHandler } from "../../../../handlers/interactionCreate/ui/types";
 import {
   getBotVacConfigService,
@@ -93,8 +93,8 @@ export const vcRecruitButtonHandler: ButtonHandler = {
         await safeReply(interaction, {
           embeds: [
             createErrorEmbed(
-              await tGuild(
-                guild.id,
+              tInteraction(
+                interaction.locale,
                 "errors:vcRecruit.panel_channel_not_found",
               ),
             ),
@@ -113,7 +113,7 @@ export const vcRecruitButtonHandler: ButtonHandler = {
         await safeReply(interaction, {
           embeds: [
             createErrorEmbed(
-              await tGuild(guild.id, "errors:vcRecruit.not_setup"),
+              tInteraction(interaction.locale, "errors:vcRecruit.not_setup"),
             ),
           ],
           flags: MessageFlags.Ephemeral,
@@ -145,8 +145,8 @@ export const vcRecruitButtonHandler: ButtonHandler = {
             `${VC_RECRUIT_PANEL_CUSTOM_ID.SELECT_MENTION_PREFIX}${interaction.id}`,
           )
           .setPlaceholder(
-            await tGuild(
-              guild.id,
+            tInteraction(
+              interaction.locale,
               "commands:vcRecruit.select.mention_placeholder",
             ),
           )
@@ -171,8 +171,8 @@ export const vcRecruitButtonHandler: ButtonHandler = {
         .sort((a, b) => a.position - b.position)
         .toJSON();
 
-      const newVcLabel = await tGuild(
-        guild.id,
+      const newVcLabel = tInteraction(
+        interaction.locale,
         "commands:vcRecruit.select.new_vc_label",
       );
 
@@ -195,15 +195,18 @@ export const vcRecruitButtonHandler: ButtonHandler = {
           `${VC_RECRUIT_PANEL_CUSTOM_ID.SELECT_VC_PREFIX}${interaction.id}`,
         )
         .setPlaceholder(
-          await tGuild(guild.id, "commands:vcRecruit.select.vc_placeholder"),
+          tInteraction(
+            interaction.locale,
+            "commands:vcRecruit.select.vc_placeholder",
+          ),
         )
         .setMinValues(1)
         .setMaxValues(1)
         .addOptions(vcOptions);
 
       // ── 「次へ（詳細入力）」ボタンを構築 ──────────────────────────
-      const openModalLabel = await tGuild(
-        guild.id,
+      const openModalLabel = tInteraction(
+        interaction.locale,
         "commands:vcRecruit.select.open_modal_button",
       );
       const openModalButton = new ButtonBuilder()
@@ -222,12 +225,12 @@ export const vcRecruitButtonHandler: ButtonHandler = {
       });
 
       // ── ステップ1 エフェメラルを送信 ──────────────────────────
-      const step1Title = await tGuild(
-        guild.id,
+      const step1Title = tInteraction(
+        interaction.locale,
         "commands:vcRecruit.select.title",
       );
-      const step1Description = await tGuild(
-        guild.id,
+      const step1Description = tInteraction(
+        interaction.locale,
         "commands:vcRecruit.select.description",
       );
 
@@ -276,7 +279,7 @@ export const vcRecruitButtonHandler: ButtonHandler = {
         await safeReply(interaction, {
           embeds: [
             createErrorEmbed(
-              await tGuild(guild.id, "errors:interaction.timeout"),
+              tInteraction(interaction.locale, "errors:interaction.timeout"),
             ),
           ],
           flags: MessageFlags.Ephemeral,
@@ -284,16 +287,16 @@ export const vcRecruitButtonHandler: ButtonHandler = {
         return;
       }
 
-      const modalTitle = await tGuild(
-        guild.id,
+      const modalTitle = tInteraction(
+        interaction.locale,
         "commands:vcRecruit.modal.title",
       );
-      const contentLabel = await tGuild(
-        guild.id,
+      const contentLabel = tInteraction(
+        interaction.locale,
         "commands:vcRecruit.modal.content_label",
       );
-      const contentPlaceholder = await tGuild(
-        guild.id,
+      const contentPlaceholder = tInteraction(
+        interaction.locale,
         "commands:vcRecruit.modal.content_placeholder",
       );
 
@@ -314,12 +317,12 @@ export const vcRecruitButtonHandler: ButtonHandler = {
 
       // 新規VC作成が選択されている場合のみ VC名フィールドを追加
       if (session.selectedVcId === NEW_VC_VALUE) {
-        const vcNameLabel = await tGuild(
-          guild.id,
+        const vcNameLabel = tInteraction(
+          interaction.locale,
           "commands:vcRecruit.modal.vc_name_label",
         );
-        const vcNamePlaceholder = await tGuild(
-          guild.id,
+        const vcNamePlaceholder = tInteraction(
+          interaction.locale,
           "commands:vcRecruit.modal.vc_name_placeholder",
         );
         modal.addComponents(
@@ -351,14 +354,14 @@ export const vcRecruitButtonHandler: ButtonHandler = {
       // teardown select menu を再構築する
       const repo = getBotVcRecruitRepository();
       const config = await repo.getVcRecruitConfigOrDefault(guild.id);
-      const options = await buildTeardownSelectOptions(
+      const options = buildTeardownSelectOptions(
         guild,
-        guild.id,
+        interaction.locale,
         config.setups,
       );
 
-      const placeholder = await tGuild(
-        guild.id,
+      const placeholder = tInteraction(
+        interaction.locale,
         "commands:vc-recruit-config.teardown.select.placeholder",
       );
 
@@ -409,8 +412,8 @@ export const vcRecruitButtonHandler: ButtonHandler = {
       );
       deleteTeardownConfirmSession(selectInteractionId);
 
-      const cancelledText = await tGuild(
-        guild.id,
+      const cancelledText = tInteraction(
+        interaction.locale,
         "commands:vc-recruit-config.embed.teardown_cancelled",
       );
       await interaction.update({
@@ -435,7 +438,7 @@ export const vcRecruitButtonHandler: ButtonHandler = {
         await safeReply(interaction, {
           embeds: [
             createErrorEmbed(
-              await tGuild(guild.id, "errors:interaction.timeout"),
+              tInteraction(interaction.locale, "errors:interaction.timeout"),
             ),
           ],
           flags: MessageFlags.Ephemeral,
@@ -505,8 +508,8 @@ export const vcRecruitButtonHandler: ButtonHandler = {
             });
           }
 
-          const itemText = await tGuild(
-            guild.id,
+          const itemText = tInteraction(
+            interaction.locale,
             "commands:vc-recruit-config.embed.teardown_category_item",
             { category: entry.categoryLabel },
           );
@@ -518,16 +521,16 @@ export const vcRecruitButtonHandler: ButtonHandler = {
       }
 
       // 完了メッセージを構築
-      const successHeader = await tGuild(
-        guild.id,
+      const successHeader = tInteraction(
+        interaction.locale,
         "commands:vc-recruit-config.embed.teardown_success",
       );
 
       let description = successLines.join("\n");
 
       if (errorLines.length > 0) {
-        const errorHeader = await tGuild(
-          guild.id,
+        const errorHeader = tInteraction(
+          interaction.locale,
           "commands:vc-recruit-config.embed.teardown_partial_error",
         );
         description += "\n\n" + errorHeader + "\n" + errorLines.join("\n");

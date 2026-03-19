@@ -3,7 +3,7 @@
 
 import { ChannelType, type ChatInputCommandInteraction } from "discord.js";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
-import { tGuild } from "../../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../../shared/locale/localeManager";
 import { getBotVacConfigService } from "../../../../services/botCompositionRoot";
 
 /**
@@ -22,7 +22,7 @@ export async function getManagedVacVoiceChannel(
 
   if (!voiceChannel || voiceChannel.type !== ChannelType.GuildVoice) {
     throw new ValidationError(
-      await tGuild(guildId, "errors:vac.not_in_any_vc"),
+      tInteraction(interaction.locale, "errors:vac.not_in_any_vc"),
     );
   }
 
@@ -32,7 +32,7 @@ export async function getManagedVacVoiceChannel(
   );
   if (!isManaged) {
     throw new ValidationError(
-      await tGuild(guildId, "errors:vac.not_vac_channel"),
+      tInteraction(interaction.locale, "errors:vac.not_vac_channel"),
     );
   }
 

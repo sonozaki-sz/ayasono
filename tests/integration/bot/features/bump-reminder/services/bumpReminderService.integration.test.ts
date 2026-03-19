@@ -20,6 +20,7 @@ vi.mock("@/shared/utils/logger", () => ({
 // i18n のモック
 vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string) => `mocked:${key}`,
+  tInteraction: (...args: unknown[]) => args[1],
 }));
 
 // Prismaユーティリティのモック

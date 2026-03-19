@@ -17,6 +17,7 @@ vi.mock("@/shared/locale/localeManager", () => ({
     tDefaultMock(key),
   tGuild: (guildId: string, key: string, params?: Record<string, unknown>) =>
     tGuildMock(guildId, key, params),
+  tInteraction: vi.fn((_locale: string, key: string) => key),
 }));
 
 vi.mock("@/shared/utils/logger", () => ({
@@ -55,6 +56,7 @@ describe("bot/handlers/interactionCreate/flow/command", () => {
     const interaction = {
       commandName: "ping",
       guildId: "guild-1",
+      locale: "ja",
       user: { id: "user-1", tag: "user#0001" },
       reply: vi.fn().mockResolvedValue(undefined),
     };
@@ -70,7 +72,7 @@ describe("bot/handlers/interactionCreate/flow/command", () => {
     await handleChatInputCommand(interaction as never, client as never);
 
     expect(interaction.reply).toHaveBeenCalledWith({
-      content: "guild:cooldown",
+      content: "commands:cooldown.wait",
       flags: 64,
     });
     expect(command.execute).not.toHaveBeenCalled();
@@ -81,6 +83,7 @@ describe("bot/handlers/interactionCreate/flow/command", () => {
     const interaction = {
       commandName: "ping",
       guildId: "guild-1",
+      locale: "ja",
       user: { id: "user-1", tag: "user#0001" },
       reply: vi.fn(),
     };

@@ -9,7 +9,7 @@ const createInfoEmbedMock = vi.fn((description: string) => ({
 }));
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  tGuild: vi.fn(async () => "translated"),
+  tInteraction: vi.fn((_locale: string, key: string) => key),
 }));
 
 vi.mock("@/bot/services/botCompositionRoot", () => ({
@@ -34,17 +34,26 @@ vi.mock(
 describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.view", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    ensureManageGuildPermissionMock.mockResolvedValue(undefined);
+    ensureManageGuildPermissionMock.mockReturnValue(undefined);
   });
 
   it("設定が null の場合は未設定状態を示す embed を返す", async () => {
     getBumpReminderConfigMock.mockResolvedValueOnce(null);
-    const interaction = { reply: vi.fn().mockResolvedValue(undefined) };
+    const interaction = {
+      locale: "ja",
+      reply: vi.fn().mockResolvedValue(undefined),
+    };
 
     await handleBumpReminderConfigView(interaction as never, "guild-1");
 
     expect(interaction.reply).toHaveBeenCalledWith({
-      embeds: [{ description: "translated", kind: "info" }],
+      embeds: [
+        {
+          description:
+            "commands:bump-reminder-config.embed.not_configured",
+          kind: "info",
+        },
+      ],
       flags: 64,
     });
   });
@@ -55,7 +64,10 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.view", (
       mentionRoleId: "role-1",
       mentionUserIds: ["user-1"],
     });
-    const interaction = { reply: vi.fn().mockResolvedValue(undefined) };
+    const interaction = {
+      locale: "ja",
+      reply: vi.fn().mockResolvedValue(undefined),
+    };
 
     await handleBumpReminderConfigView(interaction as never, "guild-1");
 

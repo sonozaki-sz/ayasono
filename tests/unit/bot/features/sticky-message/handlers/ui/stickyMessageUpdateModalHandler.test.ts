@@ -23,6 +23,7 @@ vi.mock(
 vi.mock("@/shared/locale/localeManager", () => ({
   tGuild: tGuildMock,
   tDefault: vi.fn((key: string) => key),
+  tInteraction: (...args: unknown[]) => args[1],
 }));
 vi.mock("@/shared/utils/logger", () => ({ logger: loggerMock }));
 vi.mock("@/bot/utils/messageResponse", () => ({

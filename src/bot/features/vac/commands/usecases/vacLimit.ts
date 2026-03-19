@@ -3,7 +3,7 @@
 
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
-import { tGuild } from "../../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../../shared/locale/localeManager";
 import { createSuccessEmbed } from "../../../../utils/messageResponse";
 import { resolveVacVoiceChannelForEdit } from "../helpers/vacVoiceChannelResolver";
 import { VAC_COMMAND } from "../vacCommand.constants";
@@ -25,7 +25,7 @@ export async function executeVacLimit(
 
   if (limit < VAC_COMMAND.LIMIT_MIN || limit > VAC_COMMAND.LIMIT_MAX) {
     throw new ValidationError(
-      await tGuild(guildId, "errors:vac.limit_out_of_range"),
+      tInteraction(interaction.locale, "errors:vac.limit_out_of_range"),
     );
   }
 
@@ -41,10 +41,10 @@ export async function executeVacLimit(
   // 0 は無制限ラベルに変換して結果を返す
   const limitLabel =
     limit === 0
-      ? await tGuild(guildId, "commands:vac.embed.unlimited")
+      ? tInteraction(interaction.locale, "commands:vac.embed.unlimited")
       : String(limit);
   const embed = createSuccessEmbed(
-    await tGuild(guildId, "commands:vac.embed.limit_changed", {
+    tInteraction(interaction.locale, "commands:vac.embed.limit_changed", {
       limit: limitLabel,
     }),
   );

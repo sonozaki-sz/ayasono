@@ -7,8 +7,8 @@ import { ValidationError } from "@/shared/errors/customErrors";
 import { MessageFlags } from "discord.js";
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  tGuild: vi.fn(
-    async (_guildId: string, key: string, params?: Record<string, unknown>) => {
+  tInteraction: vi.fn(
+    (_locale: string, key: string, params?: Record<string, unknown>) => {
       if (key === "commands:vac.embed.unlimited") {
         return "unlimited";
       }
@@ -39,6 +39,7 @@ describe("bot/features/vac/commands/usecases/vacLimit", () => {
 
   it("許容範囲外の上限値が渡された場合にValidationErrorをスローする", async () => {
     const interaction = {
+      locale: "ja",
       options: { getInteger: vi.fn(() => 100) },
       reply: vi.fn(),
     };
@@ -54,6 +55,7 @@ describe("bot/features/vac/commands/usecases/vacLimit", () => {
 
     const reply = vi.fn().mockResolvedValue(undefined);
     const interaction = {
+      locale: "ja",
       options: { getInteger: vi.fn(() => 0) },
       reply,
     };
@@ -74,6 +76,7 @@ describe("bot/features/vac/commands/usecases/vacLimit", () => {
 
     const reply = vi.fn().mockResolvedValue(undefined);
     const interaction = {
+      locale: "ja",
       options: { getInteger: vi.fn(() => 8) },
       reply,
     };

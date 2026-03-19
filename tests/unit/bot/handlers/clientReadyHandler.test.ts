@@ -18,6 +18,7 @@ const initGuildInviteCacheMock = vi.fn();
 vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string, params?: Record<string, unknown>) =>
     tDefaultMock(key, params),
+  tInteraction: (...args: unknown[]) => args[1],
 }));
 
 vi.mock("@/shared/utils/logger", () => ({

@@ -13,6 +13,7 @@ vi.mock("@/bot/errors/interactionErrorHandler", () => ({
 vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: vi.fn((key: string) => key),
   tGuild: vi.fn(async (_guildId: string, key: string) => key),
+  tInteraction: (...args: unknown[]) => args[1],
 }));
 vi.mock("@/shared/utils/logger", () => ({
   logger: {

@@ -33,6 +33,7 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
 
 vi.mock("@/shared/locale/localeManager", () => ({
   tGuild: (guildId: string, key: string) => tGuildMock(guildId, key),
+  tInteraction: vi.fn((_locale: string, key: string) => key),
   tDefault: (key: string, opts?: Record<string, unknown>) =>
     tDefaultMock(key, opts),
 }));

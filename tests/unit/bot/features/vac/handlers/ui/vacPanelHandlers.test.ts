@@ -9,6 +9,7 @@ const isVcPanelManagedChannelMock = vi.fn().mockResolvedValue(true);
 const getAfkConfigMock = vi.fn();
 const getGuildConfigRepositoryMock = vi.fn(() => ({
   getAfkConfig: (...args: unknown[]) => getAfkConfigMock(...args),
+  tInteraction: vi.fn((_locale: string, key: string) => key),
 }));
 
 // VC操作パネル customId 定数を固定化して matches 判定を検証しやすくする
@@ -26,24 +27,29 @@ vi.mock("@/bot/features/vc-panel/vcControlPanel", () => ({
   },
   getVacPanelChannelId: vi.fn(() => "voice-1"),
   sendVcControlPanel: vi.fn(),
+  tInteraction: vi.fn((_locale: string, key: string) => key),
 }));
 
 // 所有権レジストリをモックして管理対象チェックを制御する
 vi.mock("@/bot/features/vc-panel/vcPanelOwnershipRegistry", () => ({
   isVcPanelManagedChannel: (...args: unknown[]) =>
     isVcPanelManagedChannelMock(...args),
+  tInteraction: vi.fn((_locale: string, key: string) => key),
 }));
 vi.mock("@/shared/features/afk/afkConfigService", () => ({
   getAfkConfig: (...args: unknown[]) => getAfkConfigMock(...args),
+  tInteraction: vi.fn((_locale: string, key: string) => key),
 }));
 vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotGuildConfigRepository: vi.fn(() => getGuildConfigRepositoryMock()),
+  tInteraction: vi.fn((_locale: string, key: string) => key),
 }));
 vi.mock("@/shared/database/guildConfigRepositoryProvider", () => ({
   getGuildConfigRepository: getGuildConfigRepositoryMock,
+  tInteraction: vi.fn((_locale: string, key: string) => key),
 }));
 vi.mock("@/shared/locale/localeManager", () => ({
-  tGuild: vi.fn(async (_guildId: string, key: string) => key),
+  tInteraction: vi.fn((_locale: string, key: string) => key),
 }));
 vi.mock("@/bot/utils/interaction", () => ({
   safeReply: vi.fn(),
@@ -100,6 +106,7 @@ describe("bot/features/vac/ui handlers", () => {
 
   it("ボタン処理で対象VCが取得できない場合はエラー応答することを検証", async () => {
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {
@@ -122,6 +129,7 @@ describe("bot/features/vac/ui handlers", () => {
 
   it("ボタンのcustomIdにパネルチャンネルが含まれない場合は早期リターンする", async () => {
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {
@@ -142,6 +150,7 @@ describe("bot/features/vac/ui handlers", () => {
 
   it("ボタンの対象チャンネルfetchが失敗した場合はエラー応答する", async () => {
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {
@@ -164,6 +173,7 @@ describe("bot/features/vac/ui handlers", () => {
 
   it("ボタンの対象チャンネルが管理対象でない場合はエラー応答する", async () => {
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {
@@ -188,6 +198,7 @@ describe("bot/features/vac/ui handlers", () => {
 
   it("ボタン操作者がVCに在籍していない場合はエラー応答する", async () => {
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {
@@ -216,6 +227,7 @@ describe("bot/features/vac/ui handlers", () => {
 
   it("ボタン操作者のfetchが失敗した場合はエラー応答する", async () => {
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {
@@ -242,6 +254,7 @@ describe("bot/features/vac/ui handlers", () => {
 
   it("リネームボタン押下時にリネームモーダルを表示する", async () => {
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {
@@ -267,6 +280,7 @@ describe("bot/features/vac/ui handlers", () => {
 
   it("上限設定ボタン押下時に上限設定モーダルを表示する", async () => {
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {
@@ -293,6 +307,7 @@ describe("bot/features/vac/ui handlers", () => {
   it("AFKボタン押下時にユーザー選択メニューを返答する", async () => {
     const mockMember1 = { displayName: "User One", id: "user-one" };
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {
@@ -331,6 +346,7 @@ describe("bot/features/vac/ui handlers", () => {
 
   it("VC にメンバーが 0 人の場合は not_in_vc エラーを返す", async () => {
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {
@@ -366,6 +382,7 @@ describe("bot/features/vac/ui handlers", () => {
   it("更新ボタン押下時にパネルを再送信して成功応答する", async () => {
     const deleteMock = vi.fn().mockResolvedValue(undefined);
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {
@@ -411,6 +428,7 @@ describe("bot/features/vac/ui handlers", () => {
   it("更新メッセージが削除不可の場合でもパネルを更新する", async () => {
     const deleteMock = vi.fn();
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {
@@ -452,6 +470,7 @@ describe("bot/features/vac/ui handlers", () => {
   it("メッセージ削除が失敗しても更新フローを継続する", async () => {
     const deleteMock = vi.fn().mockRejectedValue(new Error("delete failed"));
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {
@@ -507,6 +526,7 @@ describe("bot/features/vac/ui handlers", () => {
     } as unknown as string;
 
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {
@@ -549,6 +569,7 @@ describe("bot/features/vac/ui handlers", () => {
 
   it("モーダル処理で人数制限が範囲外の場合はエラー応答することを検証", async () => {
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {
@@ -582,6 +603,7 @@ describe("bot/features/vac/ui handlers", () => {
 
   it("モーダルの対象チャンネルがボイスチャンネルでない場合はエラー応答する", async () => {
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {
@@ -605,6 +627,7 @@ describe("bot/features/vac/ui handlers", () => {
 
   it("モーダルのチャンネルfetchが失敗した場合はエラー応答する", async () => {
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {
@@ -628,6 +651,7 @@ describe("bot/features/vac/ui handlers", () => {
 
   it("モーダルの対象チャンネルが管理対象でない場合はエラー応答する", async () => {
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {
@@ -662,6 +686,7 @@ describe("bot/features/vac/ui handlers", () => {
 
   it("モーダル操作者が対象ボイスチャンネルに在籍していない場合はエラー応答する", async () => {
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {
@@ -695,6 +720,7 @@ describe("bot/features/vac/ui handlers", () => {
 
   it("モーダルのメンバーfetchが失敗した場合はエラー応答する", async () => {
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {
@@ -732,6 +758,7 @@ describe("bot/features/vac/ui handlers", () => {
     };
 
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {
@@ -768,6 +795,7 @@ describe("bot/features/vac/ui handlers", () => {
     };
 
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {
@@ -804,6 +832,7 @@ describe("bot/features/vac/ui handlers", () => {
     };
 
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {
@@ -840,6 +869,7 @@ describe("bot/features/vac/ui handlers", () => {
     };
 
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {
@@ -883,6 +913,7 @@ describe("bot/features/vac/ui handlers", () => {
     };
 
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {
@@ -945,6 +976,7 @@ describe("bot/features/vac/ui handlers", () => {
 
   it("user-selectの対象チャンネルが無効な場合はエラー応答する", async () => {
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {
@@ -966,6 +998,7 @@ describe("bot/features/vac/ui handlers", () => {
 
   it("user-selectの対象チャンネルfetchが失敗した場合はエラー応答する", async () => {
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {
@@ -987,6 +1020,7 @@ describe("bot/features/vac/ui handlers", () => {
 
   it("user-selectの対象チャンネルが管理対象でない場合はエラー応答する", async () => {
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {
@@ -1010,6 +1044,7 @@ describe("bot/features/vac/ui handlers", () => {
 
   it("user-select操作者がVCに在籍していない場合はエラー応答する", async () => {
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {
@@ -1037,6 +1072,7 @@ describe("bot/features/vac/ui handlers", () => {
 
   it("user-select操作者のfetchが失敗した場合はエラー応答する", async () => {
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {
@@ -1062,6 +1098,7 @@ describe("bot/features/vac/ui handlers", () => {
 
   it("AFK設定がDBに未登録（null）の場合、移動処理をスキップしエラー応答することを検証", async () => {
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {
@@ -1091,6 +1128,7 @@ describe("bot/features/vac/ui handlers", () => {
 
   it("AFK設定は存在するが対象チャンネルが削除済み等で null になる場合のエラー応答を検証", async () => {
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {
@@ -1133,6 +1171,7 @@ describe("bot/features/vac/ui handlers", () => {
 
   it("AFKチャンネルのfetchが失敗した場合はエラー応答する", async () => {
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {
@@ -1182,6 +1221,7 @@ describe("bot/features/vac/ui handlers", () => {
     };
 
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {
@@ -1241,6 +1281,7 @@ describe("bot/features/vac/ui handlers", () => {
     };
 
     const interaction = {
+      locale: "ja",
       guild: {
         id: "guild-1",
         channels: {

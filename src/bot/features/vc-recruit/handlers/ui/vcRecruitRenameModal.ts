@@ -6,7 +6,7 @@ import {
   MessageFlags,
   type ModalSubmitInteraction,
 } from "discord.js";
-import { tGuild } from "../../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../../shared/locale/localeManager";
 import type { ModalHandler } from "../../../../handlers/interactionCreate/ui/types";
 import { safeReply } from "../../../../utils/interaction";
 import {
@@ -49,7 +49,10 @@ export const vcRecruitRenameModalHandler: ModalHandler = {
       await safeReply(interaction, {
         embeds: [
           createErrorEmbed(
-            await tGuild(guild.id, "errors:vcRecruit.vc_already_deleted"),
+            tInteraction(
+              interaction.locale,
+              "errors:vcRecruit.vc_already_deleted",
+            ),
           ),
         ],
         flags: MessageFlags.Ephemeral,
@@ -61,8 +64,8 @@ export const vcRecruitRenameModalHandler: ModalHandler = {
     await vc.setName(newName.trim());
 
     // 成功通知
-    const successText = await tGuild(
-      guild.id,
+    const successText = tInteraction(
+      interaction.locale,
       "commands:vcRecruit.rename.success",
     );
     await safeReply(interaction, {

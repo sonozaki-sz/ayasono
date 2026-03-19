@@ -7,7 +7,7 @@ import {
   type VoiceChannel,
 } from "discord.js";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
-import { tGuild } from "../../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../../shared/locale/localeManager";
 
 /**
  * 指定チャンネルIDから編集対象のVACボイスチャンネルを解決する
@@ -18,14 +18,14 @@ import { tGuild } from "../../../../../shared/locale/localeManager";
  */
 export async function resolveVacVoiceChannelForEdit(
   interaction: ChatInputCommandInteraction,
-  guildId: string,
+  _guildId: string,
   channelId: string,
 ): Promise<VoiceChannel> {
   // 指定チャンネルを取得し、編集対象として扱えるかを検証する
   const channel = await interaction.guild?.channels.fetch(channelId);
   if (!channel || channel.type !== ChannelType.GuildVoice) {
     throw new ValidationError(
-      await tGuild(guildId, "errors:vac.not_vac_channel"),
+      tInteraction(interaction.locale, "errors:vac.not_vac_channel"),
     );
   }
 

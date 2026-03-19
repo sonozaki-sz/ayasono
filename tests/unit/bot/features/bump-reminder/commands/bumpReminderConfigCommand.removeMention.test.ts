@@ -10,6 +10,7 @@ const setMentionRoleMock = vi.fn();
 vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: vi.fn((key: string) => `default:${key}`),
   tGuild: vi.fn(async () => "translated"),
+  tInteraction: (...args: unknown[]) => args[1],
 }));
 
 vi.mock("@/shared/utils/logger", () => ({
@@ -61,6 +62,7 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.removeMe
     );
 
     const interaction = {
+      locale: "ja",
       options: {
         getString: vi.fn(() => "role"),
       },
@@ -78,6 +80,7 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.removeMe
     );
 
     const interaction = {
+      locale: "ja",
       options: {
         getString: vi.fn(() => "role"),
       },
@@ -91,7 +94,12 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.removeMe
 
     expect(setMentionRoleMock).toHaveBeenCalledWith("guild-1", undefined);
     expect(interaction.reply).toHaveBeenCalledWith({
-      embeds: [{ description: "translated" }],
+      embeds: [
+        {
+          description:
+            "commands:bump-reminder-config.embed.remove_mention_role",
+        },
+      ],
       flags: 64,
     });
   });

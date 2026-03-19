@@ -440,9 +440,37 @@ export const system = {
   "member-log.config_leave_message_cleared":
     "[MemberLog] leave message cleared GuildId: {{guildId}}",
 
+  // Translation system
+  "locale.translation_failed":
+    "[Bot] Translation failed for key: {{key}}",
+
+  // Error utilities
+  "error.base_error_log":
+    "[{{errorName}}] {{message}}",
+  "error.unhandled_error_log":
+    "[UnhandledError] {{message}}",
+
+  // JSON utilities
+  "json.parse_array_failed":
+    "[JSON] parseJsonArray: failed to parse, returning empty array. value=\"{{value}}\" error=\"{{error}}\"",
+
   // VC Recruit feature logs
   "vc-recruit.voice_state_update_failed":
     "[VcRecruit] Failed to process voiceStateUpdate",
+  "vc-recruit.empty_vc_deleted":
+    "[VcRecruit] Deleted empty VC GuildId: {{guildId}} ChannelId: {{channelId}} ChannelName: {{channelName}}",
+  "vc-recruit.voice_state_update_error":
+    "[VcRecruit] voiceStateUpdate processing error",
+  "vc-recruit.panel_channel_delete_detected":
+    "[VcRecruit] Panel channel deletion detected, deleting post channel and setup GuildId: {{guildId}} PanelChannelId: {{panelChannelId}}",
+  "vc-recruit.post_channel_delete_failed":
+    "[VcRecruit] Failed to delete post channel GuildId: {{guildId}} PostChannelId: {{postChannelId}}",
+  "vc-recruit.post_channel_delete_detected":
+    "[VcRecruit] Post channel deletion detected, deleting panel channel and setup GuildId: {{guildId}} PostChannelId: {{postChannelId}}",
+  "vc-recruit.panel_channel_cleanup_failed":
+    "[VcRecruit] Failed to delete panel channel GuildId: {{guildId}} PanelChannelId: {{panelChannelId}}",
+  "vc-recruit.created_vc_manual_delete_detected":
+    "[VcRecruit] Created VC manual deletion detected, updating DB and marking post button as ended GuildId: {{guildId}} VcId: {{vcId}}",
   "vc-recruit.channel_created":
     "[VcRecruit] new VC created GuildId: {{guildId}} ChannelId: {{channelId}}",
   "vc-recruit.channel_deleted":

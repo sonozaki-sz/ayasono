@@ -3,7 +3,7 @@
 import { MessageFlags } from "discord.js";
 
 const findAllByGuildMock = vi.fn();
-const tGuildMock = vi.fn(async (_guildId: string, key: string) => `[${key}]`);
+const tInteractionMock = vi.fn((_locale: string, key: string) => key);
 
 vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotStickyMessageConfigService: vi.fn(() => ({
@@ -12,7 +12,7 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
 }));
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  tGuild: tGuildMock,
+  tInteraction: (_locale: string, key: string) => tInteractionMock(_locale, key),
 }));
 
 vi.mock("@/bot/utils/messageResponse", () => ({
@@ -32,6 +32,7 @@ function createInteractionMock({
   const channelCache = new Map(guildChannels.map((c) => [c.id, c]));
   return {
     reply: replyMock,
+    locale: "ja",
     guild: {
       channels: { cache: { get: (id: string) => channelCache.get(id) } },
     },

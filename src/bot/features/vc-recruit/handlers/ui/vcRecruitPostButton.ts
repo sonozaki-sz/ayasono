@@ -15,7 +15,10 @@ import {
   type ButtonInteraction,
   type Message,
 } from "discord.js";
-import { tGuild } from "../../../../../shared/locale/localeManager";
+import {
+  tGuild,
+  tInteraction,
+} from "../../../../../shared/locale/localeManager";
 import type { ButtonHandler } from "../../../../handlers/interactionCreate/ui/types";
 import { getBotVcRecruitRepository } from "../../../../services/botCompositionRoot";
 import { safeReply } from "../../../../utils/interaction";
@@ -237,7 +240,7 @@ async function handleRenameVc(interaction: ButtonInteraction): Promise<void> {
     await safeReply(interaction, {
       embeds: [
         createErrorEmbed(
-          await tGuild(guild.id, "errors:vcRecruit.no_permission"),
+          tInteraction(interaction.locale, "errors:vcRecruit.no_permission"),
         ),
       ],
       flags: MessageFlags.Ephemeral,
@@ -253,7 +256,10 @@ async function handleRenameVc(interaction: ButtonInteraction): Promise<void> {
     await safeReply(interaction, {
       embeds: [
         createErrorEmbed(
-          await tGuild(guild.id, "errors:vcRecruit.vc_already_deleted"),
+          tInteraction(
+            interaction.locale,
+            "errors:vcRecruit.vc_already_deleted",
+          ),
         ),
       ],
       flags: MessageFlags.Ephemeral,
@@ -262,16 +268,16 @@ async function handleRenameVc(interaction: ButtonInteraction): Promise<void> {
   }
 
   // モーダルを表示（現在のVC名をプリフィル）
-  const modalTitle = await tGuild(
-    guild.id,
+  const modalTitle = tInteraction(
+    interaction.locale,
     "commands:vcRecruit.rename.modal_title",
   );
-  const vcNameLabel = await tGuild(
-    guild.id,
+  const vcNameLabel = tInteraction(
+    interaction.locale,
     "commands:vcRecruit.rename.vc_name_label",
   );
-  const vcNamePlaceholder = await tGuild(
-    guild.id,
+  const vcNamePlaceholder = tInteraction(
+    interaction.locale,
     "commands:vcRecruit.rename.vc_name_placeholder",
   );
 
@@ -314,7 +320,7 @@ async function handleEndVc(interaction: ButtonInteraction): Promise<void> {
     await safeReply(interaction, {
       embeds: [
         createErrorEmbed(
-          await tGuild(guild.id, "errors:vcRecruit.no_permission"),
+          tInteraction(interaction.locale, "errors:vcRecruit.no_permission"),
         ),
       ],
       flags: MessageFlags.Ephemeral,
@@ -330,15 +336,21 @@ async function handleEndVc(interaction: ButtonInteraction): Promise<void> {
 
   // 確認メッセージの文面を決定
   const confirmText = isCreatedVc
-    ? await tGuild(guild.id, "commands:vcRecruit.confirm.end_vc_created")
-    : await tGuild(guild.id, "commands:vcRecruit.confirm.end_vc_existing");
+    ? tInteraction(
+        interaction.locale,
+        "commands:vcRecruit.confirm.end_vc_created",
+      )
+    : tInteraction(
+        interaction.locale,
+        "commands:vcRecruit.confirm.end_vc_existing",
+      );
 
-  const confirmLabel = await tGuild(
-    guild.id,
+  const confirmLabel = tInteraction(
+    interaction.locale,
     "commands:vcRecruit.confirm.end_vc_button",
   );
-  const cancelLabel = await tGuild(
-    guild.id,
+  const cancelLabel = tInteraction(
+    interaction.locale,
     "commands:vcRecruit.confirm.cancel_button",
   );
 
@@ -388,7 +400,7 @@ async function handleDeletePost(interaction: ButtonInteraction): Promise<void> {
     await safeReply(interaction, {
       embeds: [
         createErrorEmbed(
-          await tGuild(guild.id, "errors:vcRecruit.no_permission"),
+          tInteraction(interaction.locale, "errors:vcRecruit.no_permission"),
         ),
       ],
       flags: MessageFlags.Ephemeral,
@@ -404,15 +416,21 @@ async function handleDeletePost(interaction: ButtonInteraction): Promise<void> {
 
   // 確認メッセージの文面を決定
   const confirmText = isCreatedVc
-    ? await tGuild(guild.id, "commands:vcRecruit.confirm.delete_created")
-    : await tGuild(guild.id, "commands:vcRecruit.confirm.delete_existing");
+    ? tInteraction(
+        interaction.locale,
+        "commands:vcRecruit.confirm.delete_created",
+      )
+    : tInteraction(
+        interaction.locale,
+        "commands:vcRecruit.confirm.delete_existing",
+      );
 
-  const confirmLabel = await tGuild(
-    guild.id,
+  const confirmLabel = tInteraction(
+    interaction.locale,
     "commands:vcRecruit.confirm.delete_button",
   );
-  const cancelLabel = await tGuild(
-    guild.id,
+  const cancelLabel = tInteraction(
+    interaction.locale,
     "commands:vcRecruit.confirm.cancel_button",
   );
 
@@ -510,8 +528,8 @@ async function handleConfirmEndVc(
   }
 
   // エフェメラルを成功メッセージに更新
-  const successText = await tGuild(
-    guild.id,
+  const successText = tInteraction(
+    interaction.locale,
     "commands:vcRecruit.confirm.end_vc_success",
   );
   await interaction
@@ -575,7 +593,10 @@ async function handleConfirmDelete(
       content: null,
       embeds: [
         createSuccessEmbed(
-          await tGuild(guild.id, "commands:vcRecruit.confirm.delete_success"),
+          tInteraction(
+            interaction.locale,
+            "commands:vcRecruit.confirm.delete_success",
+          ),
         ),
       ],
       components: [],
@@ -590,8 +611,8 @@ async function handleConfirmDelete(
 async function handleCancel(interaction: ButtonInteraction): Promise<void> {
   const guild = interaction.guild;
   if (!guild) return;
-  const cancelText = await tGuild(
-    guild.id,
+  const cancelText = tInteraction(
+    interaction.locale,
     "commands:vcRecruit.confirm.cancelled",
   );
   await interaction

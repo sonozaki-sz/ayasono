@@ -3,7 +3,7 @@
 
 import { type ButtonInteraction } from "discord.js";
 import { VC_RECRUIT_MENTION_ROLE_ADD_RESULT } from "../../../../../shared/database/types";
-import { tGuild } from "../../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../../shared/locale/localeManager";
 import type { ButtonHandler } from "../../../../handlers/interactionCreate/ui/types";
 import { getBotVcRecruitConfigService } from "../../../../services/botCompositionRoot";
 import {
@@ -75,7 +75,9 @@ export const vcRecruitRoleButtonHandler: ButtonHandler = {
 
       await interaction.update({
         embeds: [
-          createInfoEmbed(await tGuild(guildId, "commands:common.cancelled")),
+          createInfoEmbed(
+            tInteraction(interaction.locale, "commands:common.cancelled"),
+          ),
         ],
         components: [],
       });
@@ -95,8 +97,8 @@ export const vcRecruitRoleButtonHandler: ButtonHandler = {
         await interaction.reply({
           embeds: [
             createInfoEmbed(
-              await tGuild(
-                guildId,
+              tInteraction(
+                interaction.locale,
                 "commands:vc-recruit-config.add-role.noSelection",
               ),
             ),
@@ -132,14 +134,14 @@ export const vcRecruitRoleButtonHandler: ButtonHandler = {
         const roleMentions = succeededRoles.map((id) => `<@&${id}>`).join(", ");
         embeds.push(
           createSuccessEmbed("", {
-            title: await tGuild(
-              guildId,
+            title: tInteraction(
+              interaction.locale,
               "commands:vc-recruit-config.embed.add_role_success_title",
             ),
             fields: [
               {
-                name: await tGuild(
-                  guildId,
+                name: tInteraction(
+                  interaction.locale,
                   "commands:vc-recruit-config.embed.add_role_success_field",
                 ),
                 value: roleMentions,
@@ -154,20 +156,20 @@ export const vcRecruitRoleButtonHandler: ButtonHandler = {
         const failedMentions = failedRoles.map((id) => `<@&${id}>`).join(", ");
         embeds.push(
           createErrorEmbed(
-            await tGuild(
-              guildId,
+            tInteraction(
+              interaction.locale,
               "commands:vc-recruit-config.embed.add_role_limit_desc",
               { limit: DISCORD_SELECT_MAX_OPTIONS },
             ),
             {
-              title: await tGuild(
-                guildId,
+              title: tInteraction(
+                interaction.locale,
                 "commands:vc-recruit-config.embed.add_role_limit_title",
               ),
               fields: [
                 {
-                  name: await tGuild(
-                    guildId,
+                  name: tInteraction(
+                    interaction.locale,
                     "commands:vc-recruit-config.embed.add_role_limit_field",
                   ),
                   value: failedMentions,
@@ -198,8 +200,8 @@ export const vcRecruitRoleButtonHandler: ButtonHandler = {
         await interaction.reply({
           embeds: [
             createInfoEmbed(
-              await tGuild(
-                guildId,
+              tInteraction(
+                interaction.locale,
                 "commands:vc-recruit-config.remove-role.noSelection",
               ),
             ),
@@ -223,14 +225,14 @@ export const vcRecruitRoleButtonHandler: ButtonHandler = {
       await interaction.update({
         embeds: [
           createSuccessEmbed("", {
-            title: await tGuild(
-              guildId,
+            title: tInteraction(
+              interaction.locale,
               "commands:vc-recruit-config.embed.remove_role_success_title",
             ),
             fields: [
               {
-                name: await tGuild(
-                  guildId,
+                name: tInteraction(
+                  interaction.locale,
                   "commands:vc-recruit-config.embed.remove_role_success_field",
                 ),
                 value: roleMentions,

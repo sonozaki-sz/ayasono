@@ -2,7 +2,7 @@
 // ping コマンド実行処理
 
 import type { ChatInputCommandInteraction } from "discord.js";
-import { tGuild } from "../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../shared/locale/localeManager";
 import { createSuccessEmbed } from "../../../utils/messageResponse";
 
 const PING_I18N_KEYS = {
@@ -18,9 +18,10 @@ const PING_I18N_KEYS = {
 export async function executePingCommand(
   interaction: ChatInputCommandInteraction,
 ): Promise<void> {
-  const guildId = interaction.guildId ?? undefined;
-
-  const measuring = await tGuild(guildId, PING_I18N_KEYS.EMBED_MEASURING);
+  const measuring = tInteraction(
+    interaction.locale,
+    PING_I18N_KEYS.EMBED_MEASURING,
+  );
   await interaction.reply({
     content: measuring,
   });
@@ -29,10 +30,14 @@ export async function executePingCommand(
   const apiLatency = sent.createdTimestamp - interaction.createdTimestamp;
   const wsLatency = interaction.client.ws.ping;
 
-  const description = await tGuild(guildId, PING_I18N_KEYS.EMBED_RESPONSE, {
-    apiLatency,
-    wsLatency,
-  });
+  const description = tInteraction(
+    interaction.locale,
+    PING_I18N_KEYS.EMBED_RESPONSE,
+    {
+      apiLatency,
+      wsLatency,
+    },
+  );
 
   const embed = createSuccessEmbed(description);
 

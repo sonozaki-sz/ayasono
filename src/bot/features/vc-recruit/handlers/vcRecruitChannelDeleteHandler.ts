@@ -9,10 +9,22 @@ import {
   type Channel,
   type TextChannel,
 } from "discord.js";
-import { tGuild } from "../../../../shared/locale/localeManager";
+import { tDefault, tGuild } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import { getBotVcRecruitRepository } from "../../../services/botCompositionRoot";
 import { VC_RECRUIT_POST_CUSTOM_ID } from "../commands/vcRecruitConfigCommand.constants";
+
+const VC_RECRUIT_LOG_KEYS = {
+  PANEL_CHANNEL_DELETE_DETECTED:
+    "system:vc-recruit.panel_channel_delete_detected",
+  POST_CHANNEL_DELETE_FAILED: "system:vc-recruit.post_channel_delete_failed",
+  POST_CHANNEL_DELETE_DETECTED:
+    "system:vc-recruit.post_channel_delete_detected",
+  PANEL_CHANNEL_CLEANUP_FAILED:
+    "system:vc-recruit.panel_channel_cleanup_failed",
+  CREATED_VC_MANUAL_DELETE_DETECTED:
+    "system:vc-recruit.created_vc_manual_delete_detected",
+} as const;
 
 /**
  * channelDelete 時にVC募集セットアップのチャンネルが削除された場合、
@@ -36,7 +48,10 @@ export async function handleVcRecruitChannelDelete(
   );
   if (setupByPanel) {
     logger.info(
-      `[vc-recruit] パネルチャンネル削除を検知、投稿チャンネルとセットアップを削除します: guildId=${guildId}, panelChannelId=${channel.id}`,
+      tDefault(VC_RECRUIT_LOG_KEYS.PANEL_CHANNEL_DELETE_DETECTED, {
+        guildId,
+        panelChannelId: channel.id,
+      }),
     );
     // 投稿チャンネルを削除
     const postChannel = await channel.guild.channels
@@ -45,7 +60,10 @@ export async function handleVcRecruitChannelDelete(
     if (postChannel)
       await postChannel.delete().catch((err: unknown) => {
         logger.error(
-          `[vc-recruit] 投稿チャンネル削除失敗: guildId=${guildId}, postChannelId=${setupByPanel.postChannelId}`,
+          tDefault(VC_RECRUIT_LOG_KEYS.POST_CHANNEL_DELETE_FAILED, {
+            guildId,
+            postChannelId: setupByPanel.postChannelId,
+          }),
           { error: err },
         );
       });
@@ -58,7 +76,10 @@ export async function handleVcRecruitChannelDelete(
   const setupByPost = await repo.findSetupByPostChannelId(guildId, channel.id);
   if (setupByPost) {
     logger.info(
-      `[vc-recruit] 投稿チャンネル削除を検知、パネルチャンネルとセットアップを削除します: guildId=${guildId}, postChannelId=${channel.id}`,
+      tDefault(VC_RECRUIT_LOG_KEYS.POST_CHANNEL_DELETE_DETECTED, {
+        guildId,
+        postChannelId: channel.id,
+      }),
     );
     // パネルチャンネルを削除
     const panelChannel = await channel.guild.channels
@@ -67,7 +88,10 @@ export async function handleVcRecruitChannelDelete(
     if (panelChannel)
       await panelChannel.delete().catch((err: unknown) => {
         logger.error(
-          `[vc-recruit] パネルチャンネル削除失敗: guildId=${guildId}, panelChannelId=${setupByPost.panelChannelId}`,
+          tDefault(VC_RECRUIT_LOG_KEYS.PANEL_CHANNEL_CLEANUP_FAILED, {
+            guildId,
+            panelChannelId: setupByPost.panelChannelId,
+          }),
           { error: err },
         );
       });
@@ -83,7 +107,10 @@ export async function handleVcRecruitChannelDelete(
   );
   if (setupByCreatedVc) {
     logger.info(
-      `[vc-recruit] 作成VC手動削除を検知、DBを更新し投稿ボタンをVC終了済みに変更します: guildId=${guildId}, vcId=${channel.id}`,
+      tDefault(VC_RECRUIT_LOG_KEYS.CREATED_VC_MANUAL_DELETE_DETECTED, {
+        guildId,
+        vcId: channel.id,
+      }),
     );
 
     // DB から該当VCのIDを削除

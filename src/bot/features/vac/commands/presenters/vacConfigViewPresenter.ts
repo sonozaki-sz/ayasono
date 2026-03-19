@@ -3,7 +3,7 @@
 
 import { ChannelType, type Guild } from "discord.js";
 import type { VacConfig } from "../../../../../shared/database/types";
-import { tGuild } from "../../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../../shared/locale/localeManager";
 
 export interface VacConfigViewPresentation {
   title: string;
@@ -18,10 +18,10 @@ export interface VacConfigViewPresentation {
  */
 export async function presentVacConfigView(
   guild: Guild,
-  guildId: string,
+  locale: string,
   config: VacConfig,
 ): Promise<VacConfigViewPresentation> {
-  const topLabel = await tGuild(guildId, "commands:vac-config.embed.top");
+  const topLabel = tInteraction(locale, "commands:vac-config.embed.top");
 
   const triggerChannels =
     config.triggerChannelIds.length > 0
@@ -37,22 +37,22 @@ export async function presentVacConfigView(
             }),
           )
         ).join("\n")
-      : await tGuild(guildId, "commands:vac-config.embed.not_configured");
+      : tInteraction(locale, "commands:vac-config.embed.not_configured");
 
   const createdVcDetails =
     config.createdChannels.length > 0
       ? config.createdChannels
           .map((item) => `<#${item.voiceChannelId}>(<@${item.ownerId}>)`)
           .join("\n")
-      : await tGuild(guildId, "commands:vac-config.embed.no_created_vcs");
+      : tInteraction(locale, "commands:vac-config.embed.no_created_vcs");
 
-  const title = await tGuild(guildId, "commands:vac-config.embed.title");
-  const fieldTrigger = await tGuild(
-    guildId,
+  const title = tInteraction(locale, "commands:vac-config.embed.title");
+  const fieldTrigger = tInteraction(
+    locale,
     "commands:vac-config.embed.field.trigger_channels",
   );
-  const fieldCreatedDetails = await tGuild(
-    guildId,
+  const fieldCreatedDetails = tInteraction(
+    locale,
     "commands:vac-config.embed.field.created_vc_details",
   );
 

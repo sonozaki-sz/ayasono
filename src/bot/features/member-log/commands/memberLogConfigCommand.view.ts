@@ -2,7 +2,7 @@
 // member-log-config view 実行処理
 
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
-import { tGuild } from "../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../shared/locale/localeManager";
 import { getBotMemberLogConfigService } from "../../../services/botCompositionRoot";
 import { createInfoEmbed } from "../../../utils/messageResponse";
 import { ensureMemberLogManageGuildPermission } from "./memberLogConfigCommand.guard";
@@ -26,12 +26,12 @@ export async function handleMemberLogConfigView(
 
   // 未設定時は案内メッセージを返す
   if (!config) {
-    const title = await tGuild(
-      guildId,
+    const title = tInteraction(
+      interaction.locale,
       "commands:member-log-config.embed.title",
     );
-    const message = await tGuild(
-      guildId,
+    const message = tInteraction(
+      interaction.locale,
       "commands:member-log-config.embed.not_configured",
     );
     const embed = createInfoEmbed(message, { title });
@@ -43,29 +43,29 @@ export async function handleMemberLogConfigView(
   }
 
   // 表示用のローカライズ文字列を解決
-  const viewTitle = await tGuild(
-    guildId,
+  const viewTitle = tInteraction(
+    interaction.locale,
     "commands:member-log-config.embed.title",
   );
-  const fieldStatus = await tGuild(
-    guildId,
+  const fieldStatus = tInteraction(
+    interaction.locale,
     "commands:member-log-config.embed.field.status",
   );
-  const fieldChannel = await tGuild(
-    guildId,
+  const fieldChannel = tInteraction(
+    interaction.locale,
     "commands:member-log-config.embed.field.channel",
   );
-  const fieldJoinMessage = await tGuild(
-    guildId,
+  const fieldJoinMessage = tInteraction(
+    interaction.locale,
     "commands:member-log-config.embed.field.join_message",
   );
-  const fieldLeaveMessage = await tGuild(
-    guildId,
+  const fieldLeaveMessage = tInteraction(
+    interaction.locale,
     "commands:member-log-config.embed.field.leave_message",
   );
-  const labelEnabled = await tGuild(guildId, "common:enabled");
-  const labelDisabled = await tGuild(guildId, "common:disabled");
-  const labelNone = await tGuild(guildId, "common:none");
+  const labelEnabled = tInteraction(interaction.locale, "common:enabled");
+  const labelDisabled = tInteraction(interaction.locale, "common:disabled");
+  const labelNone = tInteraction(interaction.locale, "common:none");
 
   // 設定内容を固定構成で表示
   const embed = createInfoEmbed("", {

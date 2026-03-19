@@ -10,7 +10,10 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
-import { tDefault, tGuild } from "../../../../../shared/locale/localeManager";
+import {
+  tDefault,
+  tInteraction,
+} from "../../../../../shared/locale/localeManager";
 import { getBotStickyMessageConfigService } from "../../../../services/botCompositionRoot";
 import {
   createInfoEmbed,
@@ -28,7 +31,7 @@ import { STICKY_MESSAGE_COMMAND } from "../stickyMessageCommand.constants";
  */
 export async function handleStickyMessageUpdate(
   interaction: ChatInputCommandInteraction,
-  guildId: string,
+  _guildId: string,
 ): Promise<void> {
   // channel: 省略時はコマンド実行チャンネルを対象にする
   const channelOption = interaction.options.getChannel(
@@ -41,8 +44,8 @@ export async function handleStickyMessageUpdate(
     await interaction.reply({
       embeds: [
         createWarningEmbed(
-          await tGuild(
-            guildId,
+          tInteraction(
+            interaction.locale,
             "commands:sticky-message.errors.text_channel_only",
           ),
         ),
@@ -59,13 +62,13 @@ export async function handleStickyMessageUpdate(
     await interaction.reply({
       embeds: [
         createInfoEmbed(
-          await tGuild(
-            guildId,
+          tInteraction(
+            interaction.locale,
             "commands:sticky-message.remove.notFound.description",
           ),
           {
-            title: await tGuild(
-              guildId,
+            title: tInteraction(
+              interaction.locale,
               "commands:sticky-message.update.notFound.title",
             ),
           },

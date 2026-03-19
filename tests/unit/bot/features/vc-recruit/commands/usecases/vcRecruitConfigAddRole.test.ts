@@ -5,9 +5,8 @@ import { ValidationError } from "@/shared/errors/customErrors";
 
 // ---- モック定義 ----
 
-const tGuildMock = vi.fn(
-  async (_guildId: string, key: string, _opts?: Record<string, unknown>) =>
-    key,
+const tInteractionMock = vi.fn(
+  (_locale: string, key: string, _opts?: Record<string, unknown>) => key,
 );
 const tDefaultMock = vi.fn((key: string) => key);
 
@@ -15,8 +14,8 @@ vi.mock("@/bot/shared/disableComponentsAfterTimeout", () => ({
   disableComponentsAfterTimeout: vi.fn(),
 }));
 vi.mock("@/shared/locale/localeManager", () => ({
-  tGuild: (...args: unknown[]) =>
-    tGuildMock(...(args as Parameters<typeof tGuildMock>)),
+  tInteraction: (...args: unknown[]) =>
+    tInteractionMock(...(args as Parameters<typeof tInteractionMock>)),
   tDefault: (...args: unknown[]) =>
     tDefaultMock(...(args as Parameters<typeof tDefaultMock>)),
 }));
@@ -29,6 +28,7 @@ function makeInteraction(opts: { hasGuild?: boolean } = {}) {
   const { hasGuild = true } = opts;
   return {
     id: "interaction-123",
+    locale: "ja",
     guild: hasGuild ? { id: GUILD_ID } : null,
     reply: vi.fn().mockResolvedValue(undefined),
     editReply: vi.fn().mockResolvedValue(undefined),

@@ -11,8 +11,8 @@ const getTeardownConfirmSessionMock = vi.fn();
 const deleteTeardownConfirmSessionMock = vi.fn();
 const findSetupByPanelChannelIdMock = vi.fn();
 const removeSetupMock = vi.fn();
-const tGuildMock = vi.fn(
-  async (_guildId: string, key: string, opts?: Record<string, unknown>) =>
+const tInteractionMock = vi.fn(
+  (_locale: string, key: string, opts?: Record<string, unknown>) =>
     opts ? `${key}:${JSON.stringify(opts)}` : key,
 );
 
@@ -39,8 +39,8 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
 }));
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  tGuild: (...args: unknown[]) =>
-    tGuildMock(...(args as Parameters<typeof tGuildMock>)),
+  tInteraction: (...args: unknown[]) =>
+    tInteractionMock(...(args as Parameters<typeof tInteractionMock>)),
   tDefault: vi.fn((key: string) => key),
 }));
 
@@ -65,7 +65,7 @@ vi.mock("@/bot/features/vc-recruit/handlers/ui/vcRecruitPanelState", () => ({
 vi.mock(
   "@/bot/features/vc-recruit/commands/usecases/vcRecruitConfigTeardown",
   () => ({
-    buildTeardownSelectOptions: vi.fn().mockResolvedValue([]),
+    buildTeardownSelectOptions: vi.fn().mockReturnValue([]),
   }),
 );
 
@@ -130,6 +130,7 @@ function makeInteraction(
   const postCh = makeGuildChannel();
   return {
     customId,
+    locale: "ja",
     guild: {
       id: GUILD_ID,
       channels: {

@@ -172,7 +172,10 @@ export class LocaleManager {
         : { lng: locale };
       return (i18next.t as unknown as FlexibleT)(key, options);
     } catch (error) {
-      logger.error(`Translation failed for key: ${key}`, error);
+      logger.error(
+        tDefault("system:locale.translation_failed", { key }),
+        error,
+      );
       // 失敗時はキー文字列を返して UI 崩壊を避ける
       return key;
     }
@@ -235,6 +238,24 @@ export const tGuild = async (
 ): Promise<string> => {
   // シングルトン LocaleManager へ委譲（guildId なしは既定言語）
   return localeManager.translate(guildId, key, params);
+};
+
+/**
+ * ヘルパー関数：interaction.locale ベースで翻訳
+ * Discord クライアントの言語設定に基づいてユーザー応答を翻訳する（同期）
+ * "ja" → 日本語、それ以外 → 英語
+ */
+export const tInteraction = (
+  locale: string,
+  key: AllParseKeys,
+  params?: Record<string, unknown>,
+): string => {
+  // Discord locale が "ja" なら日本語、それ以外は英語にフォールバック
+  const resolvedLocale: SupportedLocale = locale === "ja" ? "ja" : "en";
+  const options: TOptionsBase & Record<string, unknown> = params
+    ? { lng: resolvedLocale, ...params }
+    : { lng: resolvedLocale };
+  return (i18next.t as unknown as FlexibleT)(key, options);
 };
 
 /**

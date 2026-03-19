@@ -4,7 +4,10 @@
 import { ChannelType, type ChatInputCommandInteraction } from "discord.js";
 import { ValidationError } from "../../../../shared/errors/customErrors";
 import { getAfkConfig } from "../../../../shared/features/afk/afkConfigService";
-import { tDefault, tGuild } from "../../../../shared/locale/localeManager";
+import {
+  tDefault,
+  tInteraction,
+} from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import { createSuccessEmbed } from "../../../utils/messageResponse";
 import { COMMON_I18N_KEYS } from "../../../shared/i18nKeys";
@@ -34,7 +37,7 @@ export async function executeAfkCommand(
 
   if (!config || !config.enabled || !config.channelId) {
     throw new ValidationError(
-      await tGuild(guildId, AFK_I18N_KEYS.ERROR_NOT_CONFIGURED),
+      tInteraction(interaction.locale, AFK_I18N_KEYS.ERROR_NOT_CONFIGURED),
     );
   }
 
@@ -46,13 +49,13 @@ export async function executeAfkCommand(
 
   if (!member) {
     throw new ValidationError(
-      await tGuild(guildId, AFK_I18N_KEYS.ERROR_MEMBER_NOT_FOUND),
+      tInteraction(interaction.locale, AFK_I18N_KEYS.ERROR_MEMBER_NOT_FOUND),
     );
   }
 
   if (!member.voice.channel) {
     throw new ValidationError(
-      await tGuild(guildId, AFK_I18N_KEYS.ERROR_USER_NOT_IN_VOICE),
+      tInteraction(interaction.locale, AFK_I18N_KEYS.ERROR_USER_NOT_IN_VOICE),
     );
   }
 
@@ -62,16 +65,20 @@ export async function executeAfkCommand(
 
   if (!afkChannel || afkChannel.type !== ChannelType.GuildVoice) {
     throw new ValidationError(
-      await tGuild(guildId, AFK_I18N_KEYS.ERROR_CHANNEL_NOT_FOUND),
+      tInteraction(interaction.locale, AFK_I18N_KEYS.ERROR_CHANNEL_NOT_FOUND),
     );
   }
 
   await member.voice.setChannel(afkChannel);
 
-  const description = await tGuild(guildId, AFK_I18N_KEYS.EMBED_MOVED, {
-    user: `<@${targetUser.id}>`,
-    channel: `<#${config.channelId}>`,
-  });
+  const description = tInteraction(
+    interaction.locale,
+    AFK_I18N_KEYS.EMBED_MOVED,
+    {
+      user: `<@${targetUser.id}>`,
+      channel: `<#${config.channelId}>`,
+    },
+  );
 
   const embed = createSuccessEmbed(description);
 

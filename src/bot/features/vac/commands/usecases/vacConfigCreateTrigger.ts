@@ -7,7 +7,10 @@ import {
   MessageFlags,
 } from "discord.js";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
-import { tDefault, tGuild } from "../../../../../shared/locale/localeManager";
+import {
+  tDefault,
+  tInteraction,
+} from "../../../../../shared/locale/localeManager";
 import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
 import { getBotVacConfigService } from "../../../../services/botCompositionRoot";
 import { createSuccessEmbed } from "../../../../utils/messageResponse";
@@ -54,7 +57,7 @@ export async function handleVacConfigCreateTrigger(
   );
   if (existingTrigger) {
     throw new ValidationError(
-      await tGuild(guildId, "errors:vac.already_exists"),
+      tInteraction(interaction.locale, "errors:vac.already_exists"),
     );
   }
 
@@ -64,7 +67,7 @@ export async function handleVacConfigCreateTrigger(
     category.children.cache.size >= VAC_CONFIG_COMMAND.CATEGORY_CHANNEL_LIMIT
   ) {
     throw new ValidationError(
-      await tGuild(guildId, "errors:vac.category_full"),
+      tInteraction(interaction.locale, "errors:vac.category_full"),
     );
   }
 
@@ -79,11 +82,18 @@ export async function handleVacConfigCreateTrigger(
   await repo.addTriggerChannel(guildId, triggerChannel.id);
 
   const embed = createSuccessEmbed(
-    await tGuild(guildId, "commands:vac-config.embed.trigger_created", {
-      channel: `<#${triggerChannel.id}>`,
-    }),
+    tInteraction(
+      interaction.locale,
+      "commands:vac-config.embed.trigger_created",
+      {
+        channel: `<#${triggerChannel.id}>`,
+      },
+    ),
     {
-      title: await tGuild(guildId, "commands:vac-config.embed.success_title"),
+      title: tInteraction(
+        interaction.locale,
+        "commands:vac-config.embed.success_title",
+      ),
     },
   );
   // 管理系操作の結果は Ephemeral で返してチャンネルノイズを抑える

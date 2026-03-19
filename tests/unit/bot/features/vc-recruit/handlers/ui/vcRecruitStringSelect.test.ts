@@ -6,7 +6,7 @@ import { vcRecruitStringSelectHandler } from "@/bot/features/vc-recruit/handlers
 const updateVcRecruitSessionMock = vi.fn();
 const setTeardownConfirmSessionMock = vi.fn();
 const findSetupByPanelChannelIdMock = vi.fn();
-const tGuildMock = vi.fn(async (_guildId: string, key: string) => key);
+const tInteractionMock = vi.fn((_locale: string, key: string) => key);
 
 vi.mock("@/bot/features/vc-recruit/handlers/ui/vcRecruitPanelState", () => ({
   updateVcRecruitSession: (...args: unknown[]) =>
@@ -25,8 +25,8 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
   }),
 }));
 vi.mock("@/shared/locale/localeManager", () => ({
-  tGuild: (...args: unknown[]) =>
-    tGuildMock(...(args as Parameters<typeof tGuildMock>)),
+  tInteraction: (...args: unknown[]) =>
+    tInteractionMock(...(args as Parameters<typeof tInteractionMock>)),
 }));
 
 // ---- ヘルパー定数 ----
@@ -47,6 +47,7 @@ function makeInteraction(
   return {
     customId,
     values,
+    locale: "ja",
     guild: {
       id: GUILD_ID,
       channels: {
@@ -270,9 +271,9 @@ describe("vcRecruitStringSelectHandler / teardown select", () => {
         ]),
       }),
     );
-    // tGuild が unknown_category キーで呼ばれる
-    expect(tGuildMock).toHaveBeenCalledWith(
-      GUILD_ID,
+    // tInteraction が unknown_category キーで呼ばれる
+    expect(tInteractionMock).toHaveBeenCalledWith(
+      expect.any(String),
       "commands:vc-recruit-config.teardown.select.unknown_category",
       expect.objectContaining({ id: "cat-unknown" }),
     );

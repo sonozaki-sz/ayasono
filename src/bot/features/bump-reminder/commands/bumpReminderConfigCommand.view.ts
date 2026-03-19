@@ -2,7 +2,7 @@
 // bump-reminder-config view 実行処理
 
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
-import { tGuild } from "../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../shared/locale/localeManager";
 import { getBotBumpReminderConfigService } from "../../../services/botCompositionRoot";
 import { createInfoEmbed } from "../../../utils/messageResponse";
 import { ensureManageGuildPermission } from "./bumpReminderConfigCommand.guard";
@@ -26,12 +26,12 @@ export async function handleBumpReminderConfigView(
 
   // 未設定時は案内メッセージを返す
   if (!config) {
-    const title = await tGuild(
-      guildId,
+    const title = tInteraction(
+      interaction.locale,
       "commands:bump-reminder-config.embed.title",
     );
-    const message = await tGuild(
-      guildId,
+    const message = tInteraction(
+      interaction.locale,
       "commands:bump-reminder-config.embed.not_configured",
     );
     const embed = createInfoEmbed(message, { title });
@@ -43,25 +43,25 @@ export async function handleBumpReminderConfigView(
   }
 
   // 表示用のローカライズ文字列を解決
-  const viewTitle = await tGuild(
-    guildId,
+  const viewTitle = tInteraction(
+    interaction.locale,
     "commands:bump-reminder-config.embed.title",
   );
-  const fieldStatus = await tGuild(
-    guildId,
+  const fieldStatus = tInteraction(
+    interaction.locale,
     "commands:bump-reminder-config.embed.field.status",
   );
-  const fieldMentionRole = await tGuild(
-    guildId,
+  const fieldMentionRole = tInteraction(
+    interaction.locale,
     "commands:bump-reminder-config.embed.field.mention_role",
   );
-  const fieldMentionUsers = await tGuild(
-    guildId,
+  const fieldMentionUsers = tInteraction(
+    interaction.locale,
     "commands:bump-reminder-config.embed.field.mention_users",
   );
-  const labelEnabled = await tGuild(guildId, "common:enabled");
-  const labelDisabled = await tGuild(guildId, "common:disabled");
-  const labelNone = await tGuild(guildId, "common:none");
+  const labelEnabled = tInteraction(interaction.locale, "common:enabled");
+  const labelDisabled = tInteraction(interaction.locale, "common:disabled");
+  const labelNone = tInteraction(interaction.locale, "common:none");
 
   // status / mention role / mention users を固定構成で表示
   const embed = createInfoEmbed("", {

@@ -69,19 +69,19 @@ describe("shared/errors/errorUtils", () => {
 
     errorUtils.logError(operational);
     expect(warnMock).toHaveBeenCalledWith(
-      "[ValidationError] invalid",
+      "system:error.base_error_log:invalid",
       expect.objectContaining({ statusCode: 400 }),
     );
 
     errorUtils.logError(nonOperational);
     expect(errorMock).toHaveBeenCalledWith(
-      "[DatabaseError] db down",
+      "system:error.base_error_log:db down",
       expect.objectContaining({ statusCode: 500 }),
     );
 
     errorUtils.logError(new Error("unhandled"));
     expect(errorMock).toHaveBeenCalledWith(
-      "[UnhandledError] unhandled",
+      "system:error.unhandled_error_log:unhandled",
       expect.objectContaining({ stack: expect.anything() }),
     );
   });

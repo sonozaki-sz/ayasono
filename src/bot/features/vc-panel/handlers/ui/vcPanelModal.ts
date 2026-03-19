@@ -7,7 +7,7 @@ import {
   type GuildMember,
   type ModalSubmitInteraction,
 } from "discord.js";
-import { tGuild } from "../../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../../shared/locale/localeManager";
 import type { ModalHandler } from "../../../../handlers/interactionCreate/ui/types";
 import { safeReply } from "../../../../utils/interaction";
 import {
@@ -63,7 +63,7 @@ export const vcPanelModalHandler: ModalHandler = {
       await safeReply(interaction, {
         embeds: [
           createErrorEmbed(
-            await tGuild(guild.id, "errors:vac.not_vac_channel"),
+            tInteraction(interaction.locale, "errors:vac.not_vac_channel"),
           ),
         ],
         flags: MessageFlags.Ephemeral,
@@ -76,7 +76,7 @@ export const vcPanelModalHandler: ModalHandler = {
       await safeReply(interaction, {
         embeds: [
           createErrorEmbed(
-            await tGuild(guild.id, "errors:vac.not_vac_channel"),
+            tInteraction(interaction.locale, "errors:vac.not_vac_channel"),
           ),
         ],
         flags: MessageFlags.Ephemeral,
@@ -91,7 +91,9 @@ export const vcPanelModalHandler: ModalHandler = {
     if (!member || member.voice.channelId !== channel.id) {
       await safeReply(interaction, {
         embeds: [
-          createErrorEmbed(await tGuild(guild.id, "errors:vac.not_in_vc")),
+          createErrorEmbed(
+            tInteraction(interaction.locale, "errors:vac.not_in_vc"),
+          ),
         ],
         flags: MessageFlags.Ephemeral,
       });
@@ -106,7 +108,7 @@ export const vcPanelModalHandler: ModalHandler = {
         await safeReply(interaction, {
           embeds: [
             createErrorEmbed(
-              await tGuild(guild.id, "errors:vac.not_vac_channel"),
+              tInteraction(interaction.locale, "errors:vac.not_vac_channel"),
             ),
           ],
           flags: MessageFlags.Ephemeral,
@@ -118,7 +120,7 @@ export const vcPanelModalHandler: ModalHandler = {
       await safeReply(interaction, {
         embeds: [
           createSuccessEmbed(
-            await tGuild(guild.id, "commands:vac.embed.renamed", {
+            tInteraction(interaction.locale, "commands:vac.embed.renamed", {
               name: newName,
             }),
           ),
@@ -137,7 +139,7 @@ export const vcPanelModalHandler: ModalHandler = {
       await safeReply(interaction, {
         embeds: [
           createErrorEmbed(
-            await tGuild(guild.id, "errors:vac.limit_out_of_range"),
+            tInteraction(interaction.locale, "errors:vac.limit_out_of_range"),
           ),
         ],
         flags: MessageFlags.Ephemeral,
@@ -149,13 +151,13 @@ export const vcPanelModalHandler: ModalHandler = {
 
     const limitLabel =
       limit === 0
-        ? await tGuild(guild.id, "commands:vac.embed.unlimited")
+        ? tInteraction(interaction.locale, "commands:vac.embed.unlimited")
         : String(limit);
 
     await safeReply(interaction, {
       embeds: [
         createSuccessEmbed(
-          await tGuild(guild.id, "commands:vac.embed.limit_changed", {
+          tInteraction(interaction.locale, "commands:vac.embed.limit_changed", {
             limit: limitLabel,
           }),
         ),

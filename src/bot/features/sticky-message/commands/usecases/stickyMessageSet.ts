@@ -10,7 +10,10 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
-import { tDefault, tGuild } from "../../../../../shared/locale/localeManager";
+import {
+  tDefault,
+  tInteraction,
+} from "../../../../../shared/locale/localeManager";
 import { getBotStickyMessageConfigService } from "../../../../services/botCompositionRoot";
 import { createWarningEmbed } from "../../../../utils/messageResponse";
 import { STICKY_MESSAGE_COMMAND } from "../stickyMessageCommand.constants";
@@ -24,7 +27,7 @@ import { STICKY_MESSAGE_COMMAND } from "../stickyMessageCommand.constants";
  */
 export async function handleStickyMessageSet(
   interaction: ChatInputCommandInteraction,
-  guildId: string,
+  _guildId: string,
 ): Promise<void> {
   // channel: 第2引数 false で任意。省略時はコマンド実行チャンネルを対象にする
   const channelOption = interaction.options.getChannel(
@@ -37,8 +40,8 @@ export async function handleStickyMessageSet(
     await interaction.reply({
       embeds: [
         createWarningEmbed(
-          await tGuild(
-            guildId,
+          tInteraction(
+            interaction.locale,
             "commands:sticky-message.errors.text_channel_only",
           ),
         ),
@@ -56,13 +59,13 @@ export async function handleStickyMessageSet(
     await interaction.reply({
       embeds: [
         createWarningEmbed(
-          await tGuild(
-            guildId,
+          tInteraction(
+            interaction.locale,
             "commands:sticky-message.set.alreadyExists.description",
           ),
           {
-            title: await tGuild(
-              guildId,
+            title: tInteraction(
+              interaction.locale,
               "commands:sticky-message.set.alreadyExists.title",
             ),
           },

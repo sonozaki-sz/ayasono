@@ -8,7 +8,7 @@ import {
   EmbedBuilder,
   type StringSelectMenuInteraction,
 } from "discord.js";
-import { tGuild } from "../../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../../shared/locale/localeManager";
 import type { StringSelectHandler } from "../../../../handlers/interactionCreate/ui/types";
 import { getBotVcRecruitRepository } from "../../../../services/botCompositionRoot";
 import { STATUS_COLORS } from "../../../../utils/messageResponse";
@@ -95,8 +95,8 @@ async function handleTeardownSelect(
 
     let categoryLabel: string;
     if (setup.categoryId === null) {
-      categoryLabel = await tGuild(
-        guildId,
+      categoryLabel = tInteraction(
+        interaction.locale,
         "commands:vc-recruit-config.teardown.select.top",
       );
     } else {
@@ -104,8 +104,8 @@ async function handleTeardownSelect(
       if (cat) {
         categoryLabel = cat.name;
       } else {
-        categoryLabel = await tGuild(
-          guildId,
+        categoryLabel = tInteraction(
+          interaction.locale,
           "commands:vc-recruit-config.teardown.select.unknown_category",
           { id: setup.categoryId },
         );
@@ -118,16 +118,16 @@ async function handleTeardownSelect(
   setTeardownConfirmSession(interaction.id, { guildId, selectedSetups });
 
   // 確認パネル Embed を構築
-  const confirmTitle = await tGuild(
-    guildId,
+  const confirmTitle = tInteraction(
+    interaction.locale,
     "commands:vc-recruit-config.teardown.confirm.title",
   );
-  const fieldCategories = await tGuild(
-    guildId,
+  const fieldCategories = tInteraction(
+    interaction.locale,
     "commands:vc-recruit-config.teardown.confirm.field_categories",
   );
-  const warning = await tGuild(
-    guildId,
+  const warning = tInteraction(
+    interaction.locale,
     "commands:vc-recruit-config.teardown.confirm.warning",
   );
 
@@ -142,12 +142,12 @@ async function handleTeardownSelect(
     .setColor(STATUS_COLORS.error);
 
   // ボタンを構築
-  const confirmLabel = await tGuild(
-    guildId,
+  const confirmLabel = tInteraction(
+    interaction.locale,
     "commands:vc-recruit-config.teardown.confirm.button_confirm",
   );
-  const cancelLabel = await tGuild(
-    guildId,
+  const cancelLabel = tInteraction(
+    interaction.locale,
     "commands:vc-recruit-config.teardown.confirm.button_cancel",
   );
 
@@ -165,8 +165,8 @@ async function handleTeardownSelect(
     .setLabel(cancelLabel)
     .setStyle(ButtonStyle.Secondary);
 
-  const redoLabel = await tGuild(
-    guildId,
+  const redoLabel = tInteraction(
+    interaction.locale,
     "commands:vc-recruit-config.teardown.confirm.button_redo",
   );
   const redoButton = new ButtonBuilder()

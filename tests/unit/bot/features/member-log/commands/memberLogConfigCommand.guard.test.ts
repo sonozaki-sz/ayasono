@@ -7,6 +7,7 @@ const tGuildMock = vi.fn(async (_guildId: string, key: string) => key);
 
 vi.mock("@/shared/locale/localeManager", () => ({
   tGuild: (guildId: string, key: string) => tGuildMock(guildId, key),
+  tInteraction: vi.fn((_locale: string, key: string) => key),
 }));
 
 // ---- ヘルパー ----

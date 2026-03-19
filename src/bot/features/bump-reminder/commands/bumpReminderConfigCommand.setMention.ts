@@ -4,7 +4,10 @@
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
 import { ValidationError } from "../../../../shared/errors/customErrors";
 import { BUMP_REMINDER_MENTION_ROLE_RESULT } from "../../../../shared/features/bump-reminder/bumpReminderConfigService";
-import { tDefault, tGuild } from "../../../../shared/locale/localeManager";
+import {
+  tDefault,
+  tInteraction,
+} from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import { getBotBumpReminderConfigService } from "../../../services/botCompositionRoot";
 import { createSuccessEmbed } from "../../../utils/messageResponse";
@@ -38,22 +41,22 @@ export async function handleBumpReminderConfigSetMention(
   );
   if (roleResult === BUMP_REMINDER_MENTION_ROLE_RESULT.NOT_CONFIGURED) {
     throw new ValidationError(
-      await tGuild(
-        guildId,
+      tInteraction(
+        interaction.locale,
         "commands:bump-reminder-config.embed.set_mention_error",
       ),
     );
   }
 
   // 変更内容を返信
-  const roleMessage = await tGuild(
-    guildId,
+  const roleMessage = tInteraction(
+    interaction.locale,
     "commands:bump-reminder-config.embed.set_mention_role_success",
     { role: `<@&${role.id}>` },
   );
   const embed = createSuccessEmbed(roleMessage, {
-    title: await tGuild(
-      guildId,
+    title: tInteraction(
+      interaction.locale,
       "commands:bump-reminder-config.embed.success_title",
     ),
   });

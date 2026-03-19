@@ -10,7 +10,7 @@ import {
   StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder,
 } from "discord.js";
-import { tGuild } from "../../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../../shared/locale/localeManager";
 import { getBotStickyMessageConfigService } from "../../../../services/botCompositionRoot";
 import { createInfoEmbed } from "../../../../utils/messageResponse";
 import { STICKY_MESSAGE_COMMAND } from "../stickyMessageCommand.constants";
@@ -34,13 +34,13 @@ export async function handleStickyMessageRemove(
     await interaction.reply({
       embeds: [
         createInfoEmbed(
-          await tGuild(
-            guildId,
+          tInteraction(
+            interaction.locale,
             "commands:sticky-message.remove.notFound.description",
           ),
           {
-            title: await tGuild(
-              guildId,
+            title: tInteraction(
+              interaction.locale,
               "commands:sticky-message.remove.notFound.title",
             ),
           },
@@ -71,8 +71,8 @@ export async function handleStickyMessageRemove(
   const select = new StringSelectMenuBuilder()
     .setCustomId(STICKY_MESSAGE_COMMAND.REMOVE_SELECT_CUSTOM_ID)
     .setPlaceholder(
-      await tGuild(
-        guildId,
+      tInteraction(
+        interaction.locale,
         "commands:sticky-message.remove.select.placeholder",
       ),
     )
@@ -88,7 +88,10 @@ export async function handleStickyMessageRemove(
   const button = new ButtonBuilder()
     .setCustomId(STICKY_MESSAGE_COMMAND.REMOVE_BUTTON_CUSTOM_ID)
     .setLabel(
-      await tGuild(guildId, "commands:sticky-message.remove.button.label"),
+      tInteraction(
+        interaction.locale,
+        "commands:sticky-message.remove.button.label",
+      ),
     )
     .setStyle(ButtonStyle.Danger);
 

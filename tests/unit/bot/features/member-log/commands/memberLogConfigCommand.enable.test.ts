@@ -6,7 +6,7 @@ import { ValidationError } from "@/shared/errors/customErrors";
 const ensurePermissionMock = vi.fn();
 const getMemberLogConfigMock = vi.fn();
 const setEnabledMock = vi.fn();
-const tGuildMock = vi.fn(async (_guildId: string, key: string) => key);
+const tInteractionMock = vi.fn((_locale: string, key: string, _params?: Record<string, unknown>) => key);
 const tDefaultMock = vi.fn(
   (key: string, _opts?: Record<string, unknown>) => key,
 );
@@ -35,7 +35,8 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
 }));
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  tGuild: (guildId: string, key: string) => tGuildMock(guildId, key),
+  tInteraction: (locale: string, key: string, params?: Record<string, unknown>) =>
+    tInteractionMock(locale, key, params),
   tDefault: (key: string, opts?: Record<string, unknown>) =>
     tDefaultMock(key, opts),
 }));
@@ -54,7 +55,7 @@ vi.mock("@/bot/utils/messageResponse", () => ({
 
 /** テスト用 interaction モックを生成する */
 function makeInteraction() {
-  return { reply: vi.fn().mockResolvedValue(undefined) };
+  return { reply: vi.fn().mockResolvedValue(undefined), locale: "ja" };
 }
 
 // handleMemberLogConfigEnable の権限・前提条件チェック・成功フローを検証

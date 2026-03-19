@@ -2,7 +2,6 @@
 import { ChannelType, MessageFlags } from "discord.js";
 
 const isManagedVacChannelMock = vi.fn();
-const tGuildMock = vi.hoisted(() => vi.fn());
 const createSuccessEmbedMock = vi.fn((description: string) => ({
   description,
 }));
@@ -18,7 +17,7 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
 // i18n は固定値化して期待値を安定させる
 vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: vi.fn((key: string) => `default:${key}`),
-  tGuild: tGuildMock,
+  tInteraction: (...args: unknown[]) => args[1],
 }));
 
 // Embed 生成結果を簡易オブジェクト化
@@ -33,7 +32,6 @@ describe("bot/commands/vac", () => {
   // ケースごとにモックを初期化する
   beforeEach(() => {
     vi.clearAllMocks();
-    tGuildMock.mockResolvedValue("translated");
     isManagedVacChannelMock.mockResolvedValue(true);
   });
 
@@ -41,6 +39,7 @@ describe("bot/commands/vac", () => {
     const editMock = vi.fn().mockResolvedValue(undefined);
     const interaction = {
       guildId: "guild-1",
+      locale: "ja",
       user: { id: "user-1" },
       guild: {
         members: {
@@ -71,7 +70,7 @@ describe("bot/commands/vac", () => {
     expect(isManagedVacChannelMock).toHaveBeenCalledWith("guild-1", "voice-1");
     expect(editMock).toHaveBeenCalledWith({ name: "Renamed VC" });
     expect(interaction.reply).toHaveBeenCalledWith({
-      embeds: [{ description: "translated" }],
+      embeds: [{ description: expect.any(String) }],
       flags: MessageFlags.Ephemeral,
     });
   });
@@ -80,6 +79,7 @@ describe("bot/commands/vac", () => {
     const editMock = vi.fn().mockResolvedValue(undefined);
     const interaction = {
       guildId: "guild-1",
+      locale: "ja",
       user: { id: "user-1" },
       guild: {
         members: {
@@ -109,7 +109,7 @@ describe("bot/commands/vac", () => {
 
     expect(editMock).toHaveBeenCalledWith({ userLimit: 12 });
     expect(interaction.reply).toHaveBeenCalledWith({
-      embeds: [{ description: "translated" }],
+      embeds: [{ description: expect.any(String) }],
       flags: MessageFlags.Ephemeral,
     });
   });
@@ -118,6 +118,7 @@ describe("bot/commands/vac", () => {
     const editMock = vi.fn().mockResolvedValue(undefined);
     const interaction = {
       guildId: "guild-1",
+      locale: "ja",
       user: { id: "user-1" },
       guild: {
         members: {
@@ -148,7 +149,7 @@ describe("bot/commands/vac", () => {
     expect(editMock).toHaveBeenCalledWith({ userLimit: 0 });
     expect(createSuccessEmbedMock).toHaveBeenCalled();
     expect(interaction.reply).toHaveBeenCalledWith({
-      embeds: [{ description: "translated" }],
+      embeds: [{ description: expect.any(String) }],
       flags: MessageFlags.Ephemeral,
     });
   });

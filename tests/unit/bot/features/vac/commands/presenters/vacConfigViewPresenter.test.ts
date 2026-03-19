@@ -4,7 +4,7 @@ import type { VacConfig } from "@/shared/database/types";
 import { ChannelType } from "discord.js";
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  tGuild: vi.fn(async (_guildId: string, key: string) => {
+  tInteraction: vi.fn((_locale: string, key: string) => {
     const labels: Record<string, string> = {
       "commands:vac-config.embed.top": "TOP",
       "commands:vac-config.embed.not_configured": "未設定",
@@ -49,7 +49,7 @@ describe("bot/features/vac/commands/presenters/vacConfigViewPresenter", () => {
 
     const result = await presentVacConfigView(
       guild as never,
-      "guild-1",
+      "ja",
       config,
     );
 
@@ -76,7 +76,7 @@ describe("bot/features/vac/commands/presenters/vacConfigViewPresenter", () => {
 
     const result = await presentVacConfigView(
       guild as never,
-      "guild-1",
+      "ja",
       config,
     );
 

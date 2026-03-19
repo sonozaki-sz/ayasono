@@ -3,7 +3,10 @@
 
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
-import { tDefault, tGuild } from "../../../../../shared/locale/localeManager";
+import {
+  tDefault,
+  tInteraction,
+} from "../../../../../shared/locale/localeManager";
 import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
 import { getBotVcRecruitRepository } from "../../../../services/botCompositionRoot";
 import { createInfoEmbed } from "../../../../utils/messageResponse";
@@ -28,51 +31,52 @@ export async function handleVcRecruitConfigView(
   // ── セットアップ一覧を整形 ──────────────────────────────────────
   let setupsValue: string;
   if (config.setups.length === 0) {
-    setupsValue = await tGuild(
-      guildId,
+    setupsValue = tInteraction(
+      interaction.locale,
       "commands:vc-recruit-config.embed.no_setups",
     );
   } else {
-    const lines = await Promise.all(
-      config.setups.map(async (s) => {
-        const categoryName = s.categoryId
-          ? (guild.channels.cache.get(s.categoryId)?.name ?? s.categoryId)
-          : await tGuild(guildId, "commands:vc-recruit-config.embed.top");
-        return await tGuild(
-          guildId,
-          "commands:vc-recruit-config.embed.setup_item",
-          {
-            category: categoryName,
-            panel: `<#${s.panelChannelId}>`,
-            post: `<#${s.postChannelId}>`,
-          },
-        );
-      }),
-    );
+    const lines = config.setups.map((s) => {
+      const categoryName = s.categoryId
+        ? (guild.channels.cache.get(s.categoryId)?.name ?? s.categoryId)
+        : tInteraction(
+            interaction.locale,
+            "commands:vc-recruit-config.embed.top",
+          );
+      return tInteraction(
+        interaction.locale,
+        "commands:vc-recruit-config.embed.setup_item",
+        {
+          category: categoryName,
+          panel: `<#${s.panelChannelId}>`,
+          post: `<#${s.postChannelId}>`,
+        },
+      );
+    });
     setupsValue = lines.join("\n");
   }
 
   // ── メンションロール一覧を整形 ──────────────────────────────────
   let rolesValue: string;
   if (config.mentionRoleIds.length === 0) {
-    rolesValue = await tGuild(
-      guildId,
+    rolesValue = tInteraction(
+      interaction.locale,
       "commands:vc-recruit-config.embed.no_roles",
     );
   } else {
     rolesValue = config.mentionRoleIds.map((id) => `<@&${id}>`).join(", ");
   }
 
-  const fieldSetups = await tGuild(
-    guildId,
+  const fieldSetups = tInteraction(
+    interaction.locale,
     "commands:vc-recruit-config.embed.field_setups",
   );
-  const fieldRoles = await tGuild(
-    guildId,
+  const fieldRoles = tInteraction(
+    interaction.locale,
     "commands:vc-recruit-config.embed.field_roles",
   );
-  const viewTitle = await tGuild(
-    guildId,
+  const viewTitle = tInteraction(
+    interaction.locale,
     "commands:vc-recruit-config.embed.view_title",
   );
 

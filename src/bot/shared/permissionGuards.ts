@@ -6,7 +6,7 @@ import {
   PermissionFlagsBits,
 } from "discord.js";
 import { ValidationError } from "../../shared/errors/customErrors";
-import { tGuild } from "../../shared/locale/localeManager";
+import { tInteraction } from "../../shared/locale/localeManager";
 import { COMMON_I18N_KEYS } from "./i18nKeys";
 
 /**
@@ -15,14 +15,14 @@ import { COMMON_I18N_KEYS } from "./i18nKeys";
  * @param guildId 権限エラーメッセージのローカライズに使うギルドID
  * @returns 検証完了を示す Promise（権限不足時は ValidationError を送出）
  */
-export async function ensureManageGuildPermission(
+export function ensureManageGuildPermission(
   interaction: ChatInputCommandInteraction,
-  guildId: string,
-): Promise<void> {
+  _guildId: string,
+): void {
   // Discord UI 側の権限制御だけに依存せず、実行時にも明示的に確認する
   if (!interaction.memberPermissions?.has(PermissionFlagsBits.ManageGuild)) {
     throw new ValidationError(
-      await tGuild(guildId, COMMON_I18N_KEYS.MANAGE_GUILD_REQUIRED),
+      tInteraction(interaction.locale, COMMON_I18N_KEYS.MANAGE_GUILD_REQUIRED),
     );
   }
 }

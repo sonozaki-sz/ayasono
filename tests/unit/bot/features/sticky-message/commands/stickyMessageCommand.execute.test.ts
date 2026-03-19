@@ -32,6 +32,7 @@ vi.mock("@/bot/errors/interactionErrorHandler", () => ({
 vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: tDefaultMock,
   tGuild: tGuildMock,
+  tInteraction: (...args: unknown[]) => args[1],
 }));
 
 function createInteractionMock({

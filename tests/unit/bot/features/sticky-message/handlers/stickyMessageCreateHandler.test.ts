@@ -12,7 +12,7 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
 }));
 
 vi.mock("@/shared/utils/logger", () => ({ logger: loggerMock }));
-vi.mock("@/shared/locale/localeManager", () => ({ tDefault: vi.fn((key: string) => key) }));
+vi.mock("@/shared/locale/localeManager", () => ({ tDefault: vi.fn((key: string) => key) , tInteraction: vi.fn((_locale: string, key: string) => key) }));
 
 function createMessageMock(
   overrides: Partial<{

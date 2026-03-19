@@ -7,7 +7,10 @@ import {
   type ModalSubmitInteraction,
   type TextChannel,
 } from "discord.js";
-import { tDefault, tGuild } from "../../../../../shared/locale/localeManager";
+import {
+  tDefault,
+  tInteraction,
+} from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import type { ModalHandler } from "../../../../handlers/interactionCreate/ui/types";
 import { getBotStickyMessageConfigService } from "../../../../services/botCompositionRoot";
@@ -72,8 +75,8 @@ export const stickyMessageUpdateEmbedModalHandler: ModalHandler = {
       await interaction.reply({
         embeds: [
           createWarningEmbed(
-            await tGuild(
-              guildId,
+            tInteraction(
+              interaction.locale,
               "commands:sticky-message.errors.emptyMessage",
             ),
           ),
@@ -96,13 +99,13 @@ export const stickyMessageUpdateEmbedModalHandler: ModalHandler = {
       await interaction.reply({
         embeds: [
           createInfoEmbed(
-            await tGuild(
-              guildId,
+            tInteraction(
+              interaction.locale,
               "commands:sticky-message.remove.notFound.description",
             ),
             {
-              title: await tGuild(
-                guildId,
+              title: tInteraction(
+                interaction.locale,
                 "commands:sticky-message.update.notFound.title",
               ),
             },
@@ -162,13 +165,13 @@ export const stickyMessageUpdateEmbedModalHandler: ModalHandler = {
       await interaction.reply({
         embeds: [
           createSuccessEmbed(
-            await tGuild(
-              guildId,
+            tInteraction(
+              interaction.locale,
               "commands:sticky-message.update.success.description",
             ),
             {
-              title: await tGuild(
-                guildId,
+              title: tInteraction(
+                interaction.locale,
                 "commands:sticky-message.update.success.title",
               ),
             },

@@ -2,7 +2,7 @@
 // VAC VC名変更ユースケース
 
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
-import { tGuild } from "../../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../../shared/locale/localeManager";
 import { createSuccessEmbed } from "../../../../utils/messageResponse";
 import { resolveVacVoiceChannelForEdit } from "../helpers/vacVoiceChannelResolver";
 import { VAC_COMMAND } from "../vacCommand.constants";
@@ -32,7 +32,7 @@ export async function executeVacRename(
 
   // 更新結果を操作者へ通知
   const embed = createSuccessEmbed(
-    await tGuild(guildId, "commands:vac.embed.renamed", {
+    tInteraction(interaction.locale, "commands:vac.embed.renamed", {
       name: newName,
     }),
   );

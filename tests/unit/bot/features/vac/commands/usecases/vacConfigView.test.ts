@@ -9,6 +9,7 @@ import type { Mock } from "vitest";
 
 vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: vi.fn((key: string) => key),
+  tInteraction: (...args: unknown[]) => args[1],
 }));
 
 vi.mock("@/bot/services/botCompositionRoot", () => ({
@@ -66,6 +67,7 @@ describe("bot/features/vac/commands/usecases/vacConfigView", () => {
 
     const reply = vi.fn().mockResolvedValue(undefined);
     const interaction = {
+      locale: "ja",
       guild: { id: "guild-1" },
       reply,
     };
@@ -75,7 +77,7 @@ describe("bot/features/vac/commands/usecases/vacConfigView", () => {
     expect(getVacConfigOrDefault).toHaveBeenCalledWith("guild-1");
     expect(presentVacConfigView).toHaveBeenCalledWith(
       interaction.guild,
-      "guild-1",
+      "ja",
       {
         enabled: true,
         triggerChannelIds: ["trigger-1"],

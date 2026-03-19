@@ -2,8 +2,8 @@
 import type { Mock } from "vitest";
 
 const findByChannelMock: Mock = vi.fn();
-const tGuildMock = vi.fn(
-  async (_guildId: string | undefined, key: string) => `[${key}]`,
+const tInteractionMock = vi.fn(
+  (_locale: string | undefined, key: string) => key,
 );
 
 const warningEmbedMock = vi.fn((msg: string, opts?: object) => ({
@@ -22,7 +22,9 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
     findByChannel: findByChannelMock,
   })),
 }));
-vi.mock("@/shared/locale/localeManager", () => ({ tGuild: tGuildMock }));
+vi.mock("@/shared/locale/localeManager", () => ({
+  tInteraction: (_locale: string, key: string) => tInteractionMock(_locale, key),
+}));
 vi.mock("@/bot/utils/messageResponse", () => ({
   createWarningEmbed: warningEmbedMock,
   createInfoEmbed: infoEmbedMock,
@@ -40,6 +42,7 @@ function createInteractionMock({
   updateMock?: Mock;
 } = {}): {
   guildId: string | null;
+  locale: string;
   values: string[];
   update: Mock;
   message: { components: unknown[] };
@@ -47,6 +50,7 @@ function createInteractionMock({
 } {
   return {
     guildId,
+    locale: "ja",
     values,
     update: updateMock,
     message: { components: messageComponents },
@@ -124,7 +128,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler
     await stickyMessageViewSelectHandler.execute(interaction as never);
 
     expect(infoEmbedMock).toHaveBeenCalled();
-    const formatArg = tGuildMock.mock.calls.some((c) =>
+    const formatArg = tInteractionMock.mock.calls.some((c) =>
       String(c[1]).includes("format_plain"),
     );
     expect(formatArg).toBe(true);
@@ -177,7 +181,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler
 
     await stickyMessageViewSelectHandler.execute(interaction as never);
 
-    const tGuildCalls = tGuildMock.mock.calls.map((c) => c[1]);
+    const tGuildCalls = tInteractionMock.mock.calls.map((c) => c[1]);
     expect(tGuildCalls.some((k) => String(k).includes("updated_by"))).toBe(
       true,
     );
@@ -273,7 +277,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler
     await stickyMessageViewSelectHandler.execute(interaction as never);
 
     // embed_title / embed_color キーは呼ばれない
-    const tGuildKeys = tGuildMock.mock.calls.map((c) => c[1]);
+    const tGuildKeys = tInteractionMock.mock.calls.map((c) => c[1]);
     expect(tGuildKeys).not.toContain(
       "commands:sticky-message.view.field.embed_title",
     );

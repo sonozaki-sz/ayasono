@@ -13,9 +13,9 @@ vi.mock("@/shared/locale/commandLocalizations", () => ({
 }));
 vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: vi.fn((key: string) => key),
-  tGuild: vi.fn(
-    async (
-      _guildId: string | undefined,
+  tInteraction: vi.fn(
+    (
+      _locale: string,
       key: string,
       params?: Record<string, unknown>,
     ) => {
@@ -54,6 +54,7 @@ type CommandInteraction = {
   };
   commandName: string;
   guildId: string;
+  locale: string;
   createdTimestamp: number;
   user: { id: string; tag: string };
   reply: Mock<(arg: unknown) => Promise<void>>;
@@ -77,6 +78,7 @@ function createInteraction(): CommandInteraction {
     },
     commandName: "ping",
     guildId: "guild-1",
+    locale: "ja",
     createdTimestamp: 1_000,
     user: { id: "user-1", tag: "user#0001" },
     reply: vi.fn().mockResolvedValue(undefined),

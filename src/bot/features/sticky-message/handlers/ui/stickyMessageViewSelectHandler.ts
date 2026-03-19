@@ -2,7 +2,7 @@
 // sticky-message view コマンドが送信した StringSelectMenu の選択応答を処理する
 
 import { type StringSelectMenuInteraction } from "discord.js";
-import { tGuild } from "../../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../../shared/locale/localeManager";
 import type { StringSelectHandler } from "../../../../handlers/interactionCreate/ui/types";
 import { getBotStickyMessageConfigService } from "../../../../services/botCompositionRoot";
 import {
@@ -30,7 +30,6 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
    * @returns 実行完了を示す Promise
    */
   async execute(interaction: StringSelectMenuInteraction) {
-    const guildId = interaction.guildId ?? undefined;
     const channelId = interaction.values[0];
     if (!channelId) {
       await interaction.update({ components: [] });
@@ -46,13 +45,13 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
       await interaction.update({
         embeds: [
           createWarningEmbed(
-            await tGuild(
-              guildId,
+            tInteraction(
+              interaction.locale,
               "commands:sticky-message.remove.notFound.description",
             ),
             {
-              title: await tGuild(
-                guildId,
+              title: tInteraction(
+                interaction.locale,
                 "commands:sticky-message.view.notFound.title",
               ),
             },
@@ -65,33 +64,36 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
 
     // 形式（プレーン or Embed）
     const format = sticky.embedData
-      ? await tGuild(guildId, "commands:sticky-message.view.field.format_embed")
-      : await tGuild(
-          guildId,
+      ? tInteraction(
+          interaction.locale,
+          "commands:sticky-message.view.field.format_embed",
+        )
+      : tInteraction(
+          interaction.locale,
           "commands:sticky-message.view.field.format_plain",
         );
 
     // フィールド構築: 1段目（チャンネル/形式/更新日）→ 2段目（Embedメタ）→ 3段目（内容）
     const fields: { name: string; value: string; inline?: boolean }[] = [
       {
-        name: await tGuild(
-          guildId,
+        name: tInteraction(
+          interaction.locale,
           "commands:sticky-message.view.field.channel",
         ),
         value: `<#${sticky.channelId}>`,
         inline: true,
       },
       {
-        name: await tGuild(
-          guildId,
+        name: tInteraction(
+          interaction.locale,
           "commands:sticky-message.view.field.format",
         ),
         value: format,
         inline: true,
       },
       {
-        name: await tGuild(
-          guildId,
+        name: tInteraction(
+          interaction.locale,
           "commands:sticky-message.view.field.updated_at",
         ),
         value: `<t:${Math.floor(sticky.updatedAt.getTime() / 1000)}:f>`,
@@ -109,8 +111,8 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
         };
         if (parsed.title) {
           fields.push({
-            name: await tGuild(
-              guildId,
+            name: tInteraction(
+              interaction.locale,
               "commands:sticky-message.view.field.embed_title",
             ),
             value: parsed.title,
@@ -120,8 +122,8 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
         if (parsed.color !== undefined) {
           embedColor = parsed.color;
           fields.push({
-            name: await tGuild(
-              guildId,
+            name: tInteraction(
+              interaction.locale,
               "commands:sticky-message.view.field.embed_color",
             ),
             // カラーコードを色付きサムネイルとして表示（hex文字列）
@@ -137,8 +139,8 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
     // 2段目末尾: 最終設定・更新者（Embed メタの直後に追加して右端に配置）
     if (sticky.updatedBy) {
       fields.push({
-        name: await tGuild(
-          guildId,
+        name: tInteraction(
+          interaction.locale,
           "commands:sticky-message.view.field.updated_by",
         ),
         value: `<@${sticky.updatedBy}>`,
@@ -152,14 +154,20 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
         ? `${sticky.content.substring(0, PREVIEW_MAX)}...`
         : sticky.content;
     fields.push({
-      name: await tGuild(guildId, "commands:sticky-message.view.field.content"),
+      name: tInteraction(
+        interaction.locale,
+        "commands:sticky-message.view.field.content",
+      ),
       value: `\`\`\`\n${preview}\n\`\`\``,
       inline: false,
     });
 
     // createInfoEmbed で構築し、スティッキーの Embed カラーがあればそれで上書き
     const embed = createInfoEmbed("", {
-      title: await tGuild(guildId, "commands:sticky-message.view.title"),
+      title: tInteraction(
+        interaction.locale,
+        "commands:sticky-message.view.title",
+      ),
       timestamp: true,
       fields,
     });

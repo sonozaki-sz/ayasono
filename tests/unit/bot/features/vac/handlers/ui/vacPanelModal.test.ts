@@ -5,8 +5,8 @@ import { safeReply } from "@/bot/utils/interaction";
 const isVcPanelManagedChannelMock = vi.fn();
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  tGuild: vi.fn(
-    async (_guildId: string, key: string, params?: Record<string, unknown>) => {
+  tInteraction: vi.fn(
+    (_locale: string, key: string, params?: Record<string, unknown>) => {
       if (key === "commands:vac.embed.renamed") {
         return `renamed:${String(params?.name)}`;
       }
@@ -58,6 +58,7 @@ function createBaseInteraction(overrides?: {
     overrides?.channel ?? ({ id: "voice-1", type: 2, edit: vi.fn() } as const);
 
   return {
+    locale: "ja",
     guild: {
       id: "guild-1",
       channels: {

@@ -18,6 +18,7 @@ vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string) => tDefaultMock(key),
   tGuild: (guildId: string, key: string, params?: Record<string, unknown>) =>
     tGuildMock(guildId, key, params),
+  tInteraction: vi.fn((_locale: string, key: string) => key),
 }));
 
 vi.mock("@/bot/utils/messageResponse", () => ({
@@ -35,6 +36,7 @@ function createInteraction() {
   const setChannelMock = vi.fn().mockResolvedValue(undefined);
   return {
     guildId: "guild-1",
+    locale: "ja",
     user: { id: "user-1" },
     options: {
       getUser: vi.fn(() => null),
@@ -70,7 +72,7 @@ describe("bot/features/afk/commands/afkCommand.execute", () => {
       enabled: true,
       channelId: "afk-channel",
     });
-    tGuildMock.mockResolvedValue("translated");
+    // tInteraction mock returns key as-is (no setup needed)
   });
 
   it("guildId が null（DM などギルド外）の場合は ValidationError を投げる", async () => {
@@ -91,9 +93,9 @@ describe("bot/features/afk/commands/afkCommand.execute", () => {
       id: "afk-channel",
       type: 2,
     });
-    expect(createSuccessEmbedMock).toHaveBeenCalledWith("translated");
+    expect(createSuccessEmbedMock).toHaveBeenCalledWith("commands:afk.embed.moved");
     expect(interaction.reply).toHaveBeenCalledWith({
-      embeds: [{ description: "translated" }],
+      embeds: [{ description: "commands:afk.embed.moved" }],
     });
     expect(loggerInfoMock).toHaveBeenCalledTimes(1);
   });

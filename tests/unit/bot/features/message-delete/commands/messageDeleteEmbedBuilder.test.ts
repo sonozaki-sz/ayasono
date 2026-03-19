@@ -5,6 +5,7 @@ vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: vi.fn((key: string, params?: Record<string, unknown>) =>
     params ? `${key}:${JSON.stringify(params)}` : key,
   ),
+  tInteraction: (...args: unknown[]) => args[1],
 }));
 
 import type { ScannedMessage, MessageDeleteFilter } from "@/bot/features/message-delete/constants/messageDeleteConstants";

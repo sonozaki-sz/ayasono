@@ -6,7 +6,7 @@ import {
   type ButtonInteraction,
   type TextChannel,
 } from "discord.js";
-import { tGuild } from "../../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../../shared/locale/localeManager";
 import type { ButtonHandler } from "../../../../handlers/interactionCreate/ui/types";
 import { getBotStickyMessageConfigService } from "../../../../services/botCompositionRoot";
 import {
@@ -33,8 +33,8 @@ export const stickyMessageRemoveButtonHandler: ButtonHandler = {
       await interaction.reply({
         embeds: [
           createInfoEmbed(
-            await tGuild(
-              guildId,
+            tInteraction(
+              interaction.locale,
               "commands:sticky-message.remove.noSelection.description",
             ),
           ),
@@ -85,22 +85,22 @@ export const stickyMessageRemoveButtonHandler: ButtonHandler = {
     await interaction.update({
       embeds: [
         createSuccessEmbed(
-          await tGuild(
-            guildId,
+          tInteraction(
+            interaction.locale,
             "commands:sticky-message.remove.success.description",
             { count: deletedChannels.length },
           ),
           {
-            title: await tGuild(
-              guildId,
+            title: tInteraction(
+              interaction.locale,
               "commands:sticky-message.remove.success.title",
             ),
             fields:
               deletedChannels.length > 0
                 ? [
                     {
-                      name: await tGuild(
-                        guildId,
+                      name: tInteraction(
+                        interaction.locale,
                         "commands:sticky-message.remove.success.channels",
                       ),
                       value: channelMentions,

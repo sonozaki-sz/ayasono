@@ -14,6 +14,7 @@ vi.mock("@/shared/locale/localeManager", () => ({
     invalidateLocaleCache: (...args: unknown[]) =>
       invalidateLocaleCacheMock(...args),
   },
+  tInteraction: vi.fn((_l: string, k: string) => k),
 }));
 
 // locale helper の dynamic import 経路とキャッシュ無効化呼び出しを検証

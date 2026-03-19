@@ -133,9 +133,14 @@ describe("shared/locale/localeManager", () => {
   });
 
   it("翻訳失敗時はキーを返してエラーをログに記録すること", async () => {
-    translateMock.mockImplementation(() => {
-      throw new Error("translation-failed");
-    });
+    translateMock
+      .mockImplementationOnce(() => {
+        throw new Error("translation-failed");
+      })
+      .mockImplementation(
+        (key: string, options?: { lng?: string }) =>
+          `${options?.lng ?? "ja"}:${key}`,
+      );
 
     const { LocaleManager } = await import("@/shared/locale/localeManager");
     const manager = new LocaleManager("ja");
@@ -144,7 +149,7 @@ describe("shared/locale/localeManager", () => {
       manager.translate("guild-3", "vac.description" as never),
     ).resolves.toBe("vac.description");
     expect(loggerMock.error).toHaveBeenCalledWith(
-      "Translation failed for key: vac.description",
+      expect.stringContaining("system:locale.translation_failed"),
       expect.any(Error),
     );
   });

@@ -10,6 +10,7 @@ const createSuccessEmbedMock = vi.fn((description: string) => ({
 vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: vi.fn((key: string) => `default:${key}`),
   tGuild: vi.fn(async () => "translated"),
+  tInteraction: (...args: unknown[]) => args[1],
 }));
 
 vi.mock("@/shared/utils/logger", () => ({
@@ -45,6 +46,7 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.enable",
   it("バンプリマインダーを現在のチャンネルで有効化し成功応答を返す", async () => {
     const interaction = {
       channelId: "channel-1",
+      locale: "ja",
       reply: vi.fn().mockResolvedValue(undefined),
     };
 
@@ -52,7 +54,12 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.enable",
 
     expect(setEnabledMock).toHaveBeenCalledWith("guild-1", true, "channel-1");
     expect(interaction.reply).toHaveBeenCalledWith({
-      embeds: [{ description: "translated" }],
+      embeds: [
+        {
+          description:
+            "commands:bump-reminder-config.embed.enable_success",
+        },
+      ],
       flags: 64,
     });
   });

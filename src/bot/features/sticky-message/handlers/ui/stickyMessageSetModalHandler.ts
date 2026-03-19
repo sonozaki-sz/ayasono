@@ -8,7 +8,10 @@ import {
   type TextChannel,
 } from "discord.js";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
-import { tDefault, tGuild } from "../../../../../shared/locale/localeManager";
+import {
+  tDefault,
+  tInteraction,
+} from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import type { ModalHandler } from "../../../../handlers/interactionCreate/ui/types";
 import { getBotStickyMessageConfigService } from "../../../../services/botCompositionRoot";
@@ -57,8 +60,8 @@ export const stickyMessageSetModalHandler: ModalHandler = {
       await interaction.reply({
         embeds: [
           createWarningEmbed(
-            await tGuild(
-              guildId,
+            tInteraction(
+              interaction.locale,
               "commands:sticky-message.errors.emptyMessage",
             ),
           ),
@@ -76,13 +79,13 @@ export const stickyMessageSetModalHandler: ModalHandler = {
       await interaction.reply({
         embeds: [
           createWarningEmbed(
-            await tGuild(
-              guildId,
+            tInteraction(
+              interaction.locale,
               "commands:sticky-message.set.alreadyExists.description",
             ),
             {
-              title: await tGuild(
-                guildId,
+              title: tInteraction(
+                interaction.locale,
                 "commands:sticky-message.set.alreadyExists.title",
               ),
             },
@@ -103,8 +106,8 @@ export const stickyMessageSetModalHandler: ModalHandler = {
         : undefined;
     if (!textChannel) {
       throw new ValidationError(
-        await tGuild(
-          guildId,
+        tInteraction(
+          interaction.locale,
           "commands:sticky-message.errors.text_channel_only",
         ),
       );
@@ -130,13 +133,13 @@ export const stickyMessageSetModalHandler: ModalHandler = {
       await interaction.reply({
         embeds: [
           createSuccessEmbed(
-            await tGuild(
-              guildId,
+            tInteraction(
+              interaction.locale,
               "commands:sticky-message.set.success.description",
             ),
             {
-              title: await tGuild(
-                guildId,
+              title: tInteraction(
+                interaction.locale,
                 "commands:sticky-message.set.success.title",
               ),
             },

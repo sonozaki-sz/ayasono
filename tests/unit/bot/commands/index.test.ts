@@ -14,6 +14,7 @@ vi.mock("@/shared/locale/commandLocalizations", () => ({
 vi.mock("@/shared/locale/localeManager", () => ({
   tShared: vi.fn((key: string) => key),
   tDefault: vi.fn((key: string) => key),
+  tInteraction: (...args: unknown[]) => args[1],
 }));
 vi.mock("@/shared/utils/prisma", () => ({
   getPrismaClient: vi.fn(),

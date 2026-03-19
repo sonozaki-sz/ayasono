@@ -25,6 +25,7 @@ vi.mock("@/bot/errors/interactionErrorHandler", () => ({
 
 vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: vi.fn((key: string) => `default:${key}`),
+  tInteraction: (...args: unknown[]) => args[1],
 }));
 
 function createInteraction(overrides?: {

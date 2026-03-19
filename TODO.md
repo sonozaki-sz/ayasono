@@ -26,7 +26,7 @@
 
 **凡例**: ✅ 完了 | 🚧 進行中 | ⬜ 未着手
 
-**次のマイルストーン**: ロケール対応（interaction.locale 導入） → メッセージフォーマット改善 → 各機能リセットコマンド
+**次のマイルストーン**: ギルド設定機能 → メッセージフォーマット改善 → 各機能リセットコマンド
 
 ---
 
@@ -34,23 +34,17 @@
 
 ### 1. 主要機能実装
 
-#### 1.1 ロケール対応（interaction.locale 導入） - 残4件
+#### 1.1 ロケール対応（interaction.locale 導入） - ✅完了
 
-コマンド応答のロケールを `tGuild`（ギルド設定）から `interaction.locale`（ユーザーのDiscordクライアント言語）に切り替える。
+コマンド応答のロケールを `tGuild`（ギルド設定）から `interaction.locale`（ユーザーのDiscordクライアント言語）に切り替え済み。
 
-**方針**:
+**実装内容**:
 
-- `interaction.locale` が `ja` → 日本語、それ以外 → 英語
-- ユーザーが直接操作するコマンド応答・エラー応答 → `interaction.locale` を使用
-- チャンネル全体向けの自動メッセージ（Bumpリマインダー通知、メンバーログ、VC募集パネル、スティッキーメッセージ再送信、VACパネル等） → `tGuild` を維持
-- システムログ → `tDefault` を維持
-
-**タスク**:
-
-- [ ] `tInteraction` ヘルパー関数を `localeManager.ts` に追加
-- [ ] 全コマンドハンドラの `tGuild` 呼び出しを `tInteraction` に置き換え
-- [ ] UIハンドラ（ボタン・モーダル・セレクトメニュー）のユーザー応答部分を `tInteraction` に置き換え
-- [ ] テスト更新
+- `tInteraction`（sync）ヘルパー関数を `localeManager.ts` に追加（`"ja"` → 日本語、それ以外 → 英語）
+- `getInteractionTranslator` を `helpers.ts` に追加
+- 全コマンドハンドラ・UIハンドラのユーザー応答を `tGuild` → `tInteraction` に置き換え
+- ハードコードログ（info/warn/error）を `tDefault` + i18n キーに移行
+- テスト更新（モックに `tInteraction` 追加、`locale: "ja"` 追加、アサーション修正）
 
 **対象外（tGuild を維持）**: Bumpリマインダー通知 / Bump検知パネル / メンバーログ / スティッキーメッセージ再送信 / VC募集投稿・パネル / VACパネルラベル
 

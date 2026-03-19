@@ -9,6 +9,7 @@ import { tGuild } from "@/shared/locale/localeManager";
 
 vi.mock("@/shared/locale/localeManager", () => ({
   tGuild: vi.fn(async (_guildId: string, key: string) => key),
+  tInteraction: vi.fn((_locale: string, key: string) => key),
 }));
 
 vi.mock("@/bot/utils/messageResponse", () => ({

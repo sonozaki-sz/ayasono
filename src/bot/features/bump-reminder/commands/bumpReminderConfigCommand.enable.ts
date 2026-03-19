@@ -2,7 +2,10 @@
 // bump-reminder-config enable 実行処理
 
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
-import { tDefault, tGuild } from "../../../../shared/locale/localeManager";
+import {
+  tDefault,
+  tInteraction,
+} from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import { getBotBumpReminderConfigService } from "../../../services/botCompositionRoot";
 import { createSuccessEmbed } from "../../../utils/messageResponse";
@@ -32,12 +35,12 @@ export async function handleBumpReminderConfigEnable(
     channelId,
   );
 
-  const description = await tGuild(
-    guildId,
+  const description = tInteraction(
+    interaction.locale,
     "commands:bump-reminder-config.embed.enable_success",
   );
-  const successTitle = await tGuild(
-    guildId,
+  const successTitle = tInteraction(
+    interaction.locale,
     "commands:bump-reminder-config.embed.success_title",
   );
   const embed = createSuccessEmbed(description, { title: successTitle });

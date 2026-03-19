@@ -10,7 +10,10 @@ import {
   type ChatInputCommandInteraction,
 } from "discord.js";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
-import { tDefault, tGuild } from "../../../../../shared/locale/localeManager";
+import {
+  tDefault,
+  tInteraction,
+} from "../../../../../shared/locale/localeManager";
 import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
 import { disableComponentsAfterTimeout } from "../../../../shared/disableComponentsAfterTimeout";
 import {
@@ -27,7 +30,7 @@ import {
  */
 export async function handleVcRecruitConfigAddRole(
   interaction: ChatInputCommandInteraction,
-  guildId: string,
+  _guildId: string,
 ): Promise<void> {
   if (!interaction.guild) {
     throw new ValidationError(tDefault(COMMON_I18N_KEYS.GUILD_ONLY));
@@ -40,8 +43,8 @@ export async function handleVcRecruitConfigAddRole(
       `${VC_RECRUIT_ROLE_CUSTOM_ID.ADD_ROLE_SELECT_PREFIX}${sessionId}`,
     )
     .setPlaceholder(
-      await tGuild(
-        guildId,
+      tInteraction(
+        interaction.locale,
         "commands:vc-recruit-config.add-role.select.placeholder",
       ),
     )
@@ -53,8 +56,8 @@ export async function handleVcRecruitConfigAddRole(
       `${VC_RECRUIT_ROLE_CUSTOM_ID.ADD_ROLE_CONFIRM_PREFIX}${sessionId}`,
     )
     .setLabel(
-      await tGuild(
-        guildId,
+      tInteraction(
+        interaction.locale,
         "commands:vc-recruit-config.add-role.button.confirm",
       ),
     )
@@ -66,8 +69,8 @@ export async function handleVcRecruitConfigAddRole(
       `${VC_RECRUIT_ROLE_CUSTOM_ID.ADD_ROLE_CANCEL_PREFIX}${sessionId}`,
     )
     .setLabel(
-      await tGuild(
-        guildId,
+      tInteraction(
+        interaction.locale,
         "commands:vc-recruit-config.add-role.button.cancel",
       ),
     )
@@ -83,8 +86,8 @@ export async function handleVcRecruitConfigAddRole(
   );
 
   await interaction.reply({
-    content: await tGuild(
-      guildId,
+    content: tInteraction(
+      interaction.locale,
       "commands:vc-recruit-config.add-role.select.title",
     ),
     components: [selectRow, buttonRow],

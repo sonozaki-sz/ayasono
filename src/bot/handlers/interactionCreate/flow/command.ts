@@ -6,7 +6,10 @@ import {
   type AutocompleteInteraction,
   type ChatInputCommandInteraction,
 } from "discord.js";
-import { tDefault, tGuild } from "../../../../shared/locale/localeManager";
+import {
+  tDefault,
+  tInteraction,
+} from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import type { BotClient } from "../../../client";
 import { handleCommandError } from "../../../errors/interactionErrorHandler";
@@ -48,12 +51,13 @@ export async function handleChatInputCommand(
 
   // クールダウン中はギルド言語で待機メッセージを返して終了
   if (remaining > 0) {
-    const guildId = interaction.guildId;
-    const cooldownMessage = guildId
-      ? await tGuild(guildId, "commands:cooldown.wait", {
-          seconds: remaining,
-        })
-      : tDefault("commands:cooldown.wait", { seconds: remaining });
+    const cooldownMessage = tInteraction(
+      interaction.locale,
+      "commands:cooldown.wait",
+      {
+        seconds: remaining,
+      },
+    );
     await interaction.reply({
       content: cooldownMessage,
       flags: MessageFlags.Ephemeral,

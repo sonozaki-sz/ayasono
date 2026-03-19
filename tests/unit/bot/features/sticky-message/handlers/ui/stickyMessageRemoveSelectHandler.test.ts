@@ -1,7 +1,7 @@
 // tests/unit/bot/features/sticky-message/handlers/ui/stickyMessageRemoveSelectHandler.test.ts
 
-vi.mock("@/bot/services/botCompositionRoot", () => ({}));
-vi.mock("@/shared/locale/localeManager", () => ({}));
+vi.mock("@/bot/services/botCompositionRoot", () => ({ tInteraction: vi.fn((_l: string, k: string) => k) }));
+vi.mock("@/shared/locale/localeManager", () => ({ tInteraction: vi.fn((_l: string, k: string) => k) }));
 
 // stickyMessageRemoveSelectHandler のテスト
 describe("bot/features/sticky-message/handlers/ui/stickyMessageRemoveSelectHandler", () => {

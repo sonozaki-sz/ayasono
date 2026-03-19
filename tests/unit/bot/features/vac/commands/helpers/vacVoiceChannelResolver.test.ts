@@ -1,11 +1,11 @@
 // tests/unit/bot/features/vac/commands/helpers/vacVoiceChannelResolver.test.ts
 import { resolveVacVoiceChannelForEdit } from "@/bot/features/vac/commands/helpers/vacVoiceChannelResolver";
 import { ValidationError } from "@/shared/errors/customErrors";
-import { tGuild } from "@/shared/locale/localeManager";
+import { tInteraction } from "@/shared/locale/localeManager";
 import { ChannelType } from "discord.js";
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  tGuild: vi.fn(async (_guildId: string, key: string) => key),
+  tInteraction: vi.fn((_locale: string, key: string) => key),
 }));
 
 describe("bot/features/vac/commands/helpers/vacVoiceChannelResolver", () => {
@@ -16,6 +16,7 @@ describe("bot/features/vac/commands/helpers/vacVoiceChannelResolver", () => {
       type: ChannelType.GuildVoice,
     };
     const interaction = {
+      locale: "ja",
       guild: {
         channels: {
           fetch: vi.fn().mockResolvedValue(voiceChannel),
@@ -34,6 +35,7 @@ describe("bot/features/vac/commands/helpers/vacVoiceChannelResolver", () => {
 
   it("チャンネルが存在しない場合にValidationErrorをスローする", async () => {
     const interaction = {
+      locale: "ja",
       guild: {
         channels: {
           fetch: vi.fn().mockResolvedValue(null),
@@ -45,14 +47,15 @@ describe("bot/features/vac/commands/helpers/vacVoiceChannelResolver", () => {
       resolveVacVoiceChannelForEdit(interaction as never, "guild-1", "x"),
     ).rejects.toBeInstanceOf(ValidationError);
 
-    expect(tGuild).toHaveBeenCalledWith(
-      "guild-1",
+    expect(tInteraction).toHaveBeenCalledWith(
+      "ja",
       "errors:vac.not_vac_channel",
     );
   });
 
   it("チャンネルがボイスチャンネルでない場合にValidationErrorをスローする", async () => {
     const interaction = {
+      locale: "ja",
       guild: {
         channels: {
           fetch: vi.fn().mockResolvedValue({

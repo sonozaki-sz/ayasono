@@ -6,8 +6,8 @@ import { createSuccessEmbed } from "@/bot/utils/messageResponse";
 import { MessageFlags } from "discord.js";
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  tGuild: vi.fn(
-    async (_guildId: string, key: string, params?: Record<string, unknown>) => {
+  tInteraction: vi.fn(
+    (_locale: string, key: string, params?: Record<string, unknown>) => {
       if (key === "commands:vac.embed.renamed") {
         return `renamed:${String(params?.name)}`;
       }
@@ -39,6 +39,7 @@ describe("bot/features/vac/commands/usecases/vacRename", () => {
 
     const reply = vi.fn().mockResolvedValue(undefined);
     const interaction = {
+      locale: "ja",
       options: { getString: vi.fn(() => "My VC") },
       reply,
     };
@@ -59,6 +60,7 @@ describe("bot/features/vac/commands/usecases/vacRename", () => {
     );
 
     const interaction = {
+      locale: "ja",
       options: { getString: vi.fn(() => "My VC") },
       reply: vi.fn(),
     };
