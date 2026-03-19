@@ -100,7 +100,7 @@
 |                      | `/message-delete-config` — メッセージ削除の設定   |
 |                      | `/bump-reminder-config` — Bumpリマインダーの設定  |
 | `🛠️ 操作`          | `/afk` — AFK チャンネルへ移動                     |
-|                      | `/vac` — VC名・人数制限を変更                     |
+|                      | `/vc` — VC名・人数制限を変更                      |
 |                      | `/message-delete` — メッセージを一括削除          |
 
 ---
