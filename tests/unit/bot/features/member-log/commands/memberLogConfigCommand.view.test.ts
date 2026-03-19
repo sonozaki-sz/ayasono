@@ -5,7 +5,7 @@ import { ValidationError } from "@/shared/errors/customErrors";
 // ---- モック定義 ----
 const ensurePermissionMock = vi.fn();
 const getMemberLogConfigMock = vi.fn();
-const tGuildMock = vi.fn(async (_guildId: string, key: string) => key);
+const tInteractionMock = vi.fn((_locale: string, key: string, _params?: Record<string, unknown>) => key);
 const createInfoEmbedMock = vi.fn(
   (desc: string, opts?: { title?: string; fields?: unknown[] }) => ({
     description: desc,
@@ -29,7 +29,8 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
 }));
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  tGuild: (guildId: string, key: string) => tGuildMock(guildId, key),
+  tInteraction: (locale: string, key: string, params?: Record<string, unknown>) =>
+    tInteractionMock(locale, key, params),
 }));
 
 vi.mock("@/bot/utils/messageResponse", () => ({
@@ -43,7 +44,7 @@ vi.mock("@/bot/utils/messageResponse", () => ({
 
 /** テスト用 interaction モックを生成する */
 function makeInteraction() {
-  return { reply: vi.fn().mockResolvedValue(undefined) };
+  return { reply: vi.fn().mockResolvedValue(undefined), locale: "ja" };
 }
 
 // handleMemberLogConfigView の設定表示ロジックを検証
@@ -64,7 +65,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.view", () => {
   it("config が null の場合に not_configured メッセージで reply が呼ばれることを確認", async () => {
     ensurePermissionMock.mockResolvedValue(undefined);
     getMemberLogConfigMock.mockResolvedValue(null);
-    tGuildMock.mockImplementation(async (_guildId: string, key: string) => key);
+    tInteractionMock.mockImplementation((_locale: string, key: string) => key);
     const interaction = makeInteraction();
 
     await handleMemberLogConfigView(interaction as never, "guild-1");
@@ -88,7 +89,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.view", () => {
       joinMessage: "こんにちは",
       leaveMessage: "さようなら",
     });
-    tGuildMock.mockImplementation(async (_guildId: string, key: string) => key);
+    tInteractionMock.mockImplementation((_locale: string, key: string) => key);
     const interaction = makeInteraction();
 
     await handleMemberLogConfigView(interaction as never, "guild-1");
@@ -122,7 +123,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.view", () => {
       joinMessage: null,
       leaveMessage: null,
     });
-    tGuildMock.mockImplementation(async (_guildId: string, key: string) => key);
+    tInteractionMock.mockImplementation((_locale: string, key: string) => key);
     const interaction = makeInteraction();
 
     await handleMemberLogConfigView(interaction as never, "guild-1");
@@ -142,7 +143,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.view", () => {
       joinMessage: null,
       leaveMessage: null,
     });
-    tGuildMock.mockImplementation(async (_guildId: string, key: string) => key);
+    tInteractionMock.mockImplementation((_locale: string, key: string) => key);
     const interaction = makeInteraction();
 
     await handleMemberLogConfigView(interaction as never, "guild-1");
@@ -162,7 +163,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.view", () => {
       joinMessage: null,
       leaveMessage: null,
     });
-    tGuildMock.mockImplementation(async (_guildId: string, key: string) => key);
+    tInteractionMock.mockImplementation((_locale: string, key: string) => key);
     const interaction = makeInteraction();
 
     await handleMemberLogConfigView(interaction as never, "guild-1");
@@ -182,7 +183,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.view", () => {
       joinMessage: null,
       leaveMessage: null,
     });
-    tGuildMock.mockImplementation(async (_guildId: string, key: string) => key);
+    tInteractionMock.mockImplementation((_locale: string, key: string) => key);
     const interaction = makeInteraction();
 
     await handleMemberLogConfigView(interaction as never, "guild-1");

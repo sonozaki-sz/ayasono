@@ -1,236 +1,156 @@
 # 基本コマンド - 仕様書
 
-> Basic Commands - ユーティリティ系のシンプルなコマンド群
+> 疎通確認・ヘルプ表示などユーティリティ系のシンプルなコマンド群
 
-最終更新: 2026年3月1日
+最終更新: 2026年3月19日
 
 ---
 
 ## 概要
 
-単体では小さくまとめるほどの仕様がないコマンドをまとめた仕様書です。
-疎通確認・ヘルプ・サーバー情報・ユーザー情報の4コマンドを管理します。
+### 機能一覧
 
-### コマンド一覧
+| 機能    | 概要                                         |
+| ------- | -------------------------------------------- |
+| `/ping` | Bot の応答速度（APIレイテンシー・WS Ping）を確認 |
+| `/help` | コマンド一覧とユーザーマニュアルリンクを表示 |
 
-| コマンド       | 権限 | 説明                                         | 状態     |
-| -------------- | ---- | -------------------------------------------- | -------- |
-| `/ping`        | なし | Bot の応答速度（レイテンシー）を確認         | ✅実装済 |
-| `/help`        | なし | コマンド一覧とユーザーマニュアルリンクを表示 | 未実装   |
-| `/server-info` | なし | サーバー（ギルド）情報を表示                 | 未実装   |
-| `/user-info`   | なし | ユーザー情報を表示                           | 未実装   |
+### 権限モデル
 
----
-
-## コマンド仕様
-
-### `/ping` - 疎通確認（実装済み）
-
-```
-/ping
-```
-
-**処理内容:**
-
-1. `🏓 計測中...` を即時返信
-2. `fetchReply()` で送信タイムスタンプを取得して API レイテンシーを算出
-3. `interaction.client.ws.ping` で WebSocket ping を取得
-4. Embed 形式で更新返信
-
-**レスポンス例:**
-
-```
-📡 API レイテンシー: 130ms
-💓 WebSocket Ping: 42ms
-```
-
-**クールダウン**: 5秒
+| 対象   | 権限 | 用途                     |
+| ------ | ---- | ------------------------ |
+| 実行者 | なし | 全メンバーが実行可能     |
+| Bot    | なし | 追加権限不要（応答のみ） |
 
 ---
 
-### `/help` - ヘルプ
+## `/ping`（実装済み）
 
-```
-/help
-```
+### コマンド定義
 
-**処理内容:**
+**コマンド**: `/ping`
 
-- 実装済みコマンドの一覧を Embed で表示
-- ユーザーマニュアルへのリンクを末尾に掲載
+**実行権限**: なし
 
-**表示形式（Embed）:**
+**コマンドオプション**: なし
 
-<table border="1" cellpadding="8" width="480">
-<tr><th align="left">📖 ayasono コマンド一覧</th></tr>
-<tr><td>
-<b>🔧 基本</b><br>
-<code>/ping</code> &emsp; Bot の応答速度を確認<br>
-<code>/help</code> &emsp; このヘルプを表示<br>
-<code>/user-info</code> &emsp; ユーザー情報を表示<br>
-<code>/server-info</code> &emsp; サーバー情報を表示
-</td></tr>
-<tr><td>
-<b>⚙️ 設定（管理者）</b><br>
-<code>/guild-config</code> &emsp; ギルド全体の設定<br>
-<code>/afk-config</code> &emsp; AFK の設定<br>
-<code>/vac-config</code> &emsp; VC自動作成の設定<br>
-<code>/vc-recruit-config</code> &emsp; VC募集の設定<br>
-<code>/sticky-message</code> &emsp; メッセージ固定の設定<br>
-<code>/member-log-config</code> &emsp; メンバーログの設定<br>
-<code>/message-delete-config</code> &emsp; メッセージ削除の設定<br>
-<code>/bump-reminder-config</code> &emsp; Bumpリマインダーの設定
-</td></tr>
-<tr><td>
-<b>🛠️ 操作</b><br>
-<code>/afk</code> &emsp; AFK チャンネルへ移動<br>
-<code>/vac</code> &emsp; VC名・人数制限を変更<br>
-<code>/message-delete</code> &emsp; メッセージを一括削除
-</td></tr>
-<tr><td>📚 詳しい使い方: <a href="../guides/USER_MANUAL.md">ユーザーマニュアル</a></td></tr>
-</table>
+### 動作フロー
 
-**ユーザーマニュアルリンク**: `docs/guides/USER_MANUAL.md` の URL または GitHub Pages 等のホスト先 URL
+1. `🏓 計測中...` を即時返信（`fetchReply: true`）
+2. 返信メッセージのタイムスタンプから API レイテンシーを算出
+3. `interaction.client.ws.ping` で WebSocket Ping を取得
+4. Embed 形式で返信を更新
 
-> リンクは設定値（環境変数または定数）として管理し、未設定の場合はリンク行を省略する。
+### UI
 
-**レスポンス**: ephemeral（実行者のみに表示）
+**Embed:**
+
+| 項目     | 内容                                         |
+| -------- | -------------------------------------------- |
+| タイトル | なし                                         |
+| 説明     | `📡 API レイテンシー: {{apiLatency}}ms`（改行）`💓 WebSocket Ping: {{wsLatency}}ms` |
 
 ---
 
-### `/server-info` - サーバー情報
+## `/help`
 
-```
-/server-info
-```
+### コマンド定義
 
-**処理内容:**
+**コマンド**: `/help`
 
-- `interaction.guild` からサーバー情報を取得して Embed で表示
+**実行権限**: なし
 
-**表示フィールド:**
+**コマンドオプション**: なし
 
-| フィールド     | 内容                                           |
-| -------------- | ---------------------------------------------- |
-| サーバー名     | `guild.name`                                   |
-| サーバーID     | `guild.id`                                     |
-| オーナー       | `<@ownerId>`                                   |
-| メンバー数     | `guild.memberCount`                            |
-| 作成日時       | Discord の `:f` フォーマット                   |
-| 認証レベル     | `guild.verificationLevel`（数値→テキスト変換） |
-| ブースト数     | `guild.premiumSubscriptionCount`               |
-| ブーストレベル | `guild.premiumTier`                            |
+### 動作フロー
 
-**サムネイル**: `guild.iconURL()`（設定されている場合）
+1. コマンド一覧を3カテゴリに分けて Embed を構築
+2. ユーザーマニュアルリンクが設定されていれば末尾に掲載
+3. ephemeral（実行者のみに表示）で返信
 
----
+**ビジネスルール:**
 
-### `/user-info` - ユーザー情報
+- ユーザーマニュアルリンクは環境変数 `USER_MANUAL_URL` で管理し、未設定時はリンク行を省略する
+- コマンド一覧はヘルプ専用の定義テーブルで管理する（`commandLoader.ts` の自動スキャンとは別に、表示順・カテゴリ分けを制御）
 
-```
-/user-info
-/user-info user:@TargetUser
-```
+### UI
 
-**オプション:**
+**Embed:**
 
-| オプション名 | 型   | 必須 | 説明                             |
-| ------------ | ---- | ---- | -------------------------------- |
-| `user`       | User | ❌   | 対象ユーザー（省略時は自分自身） |
+| 項目   | 内容                                                                         |
+| ------ | ---------------------------------------------------------------------------- |
+| タイトル | `📖 ayasono コマンド一覧`                                                  |
+| 説明   | `📚 詳しい使い方: {{url}}`（`USER_MANUAL_URL` 設定時のみ表示） |
+| カラー | デフォルト                                                                   |
 
-**表示フィールド:**
+**Embed フィールド:**
 
-| フィールド       | 内容                                              |
-| ---------------- | ------------------------------------------------- |
-| ユーザー名       | `user.username`（`user.globalName` があれば優先） |
-| ユーザーID       | `user.id`                                         |
-| アカウント作成日 | Discord の `:f` フォーマット                      |
-| サーバー参加日   | `member.joinedAt`（取得可能な場合のみ）           |
-| ロール           | 所持ロール一覧（`@everyone` 除く）                |
-| Bot フラグ       | Bot の場合 `🤖 Bot` を表示                        |
+各カテゴリを Embed のフィールドとして表示する。
 
-**サムネイル**: `user.displayAvatarURL()`
+| フィールド名         | 内容                                              |
+| -------------------- | ------------------------------------------------- |
+| `🔧 基本`           | `/ping` — Bot の応答速度を確認                    |
+|                      | `/help` — このヘルプを表示                        |
+| `⚙️ 設定（管理者）` | `/guild-config` — ギルド全体の設定                |
+|                      | `/afk-config` — AFK の設定                        |
+|                      | `/vac-config` — VC自動作成の設定                  |
+|                      | `/vc-recruit-config` — VC募集の設定               |
+|                      | `/sticky-message` — メッセージ固定の設定          |
+|                      | `/member-log-config` — メンバーログの設定         |
+|                      | `/message-delete-config` — メッセージ削除の設定   |
+|                      | `/bump-reminder-config` — Bumpリマインダーの設定  |
+| `🛠️ 操作`          | `/afk` — AFK チャンネルへ移動                     |
+|                      | `/vc` — VC名・人数制限を変更                      |
+|                      | `/message-delete` — メッセージを一括削除          |
 
 ---
 
-## 多言語対応（i18next）
+## 制約・制限事項
 
-### ローカライゼーションキー（`commands` ネームスペース）
-
-```ts
-// /ping（実装済み）
-"ping.description";
-"ping.embed.measuring";
-"ping.embed.response"; // {{apiLatency}}, {{wsLatency}}
-
-// /help
-"help.description";
-"help.embed.title"; // ayasono コマンド一覧
-"help.embed.section.basic"; // 🔧 基本
-"help.embed.section.config"; // ⚙️ 設定（管理者）
-"help.embed.section.action"; // 🛠️ 操作
-"help.embed.manual_link"; // 📚 詳しい使い方: {{url}}
-
-// /server-info
-"server-info.description";
-"server-info.embed.title"; // サーバー情報
-"server-info.embed.field.owner"; // オーナー
-"server-info.embed.field.members"; // メンバー数
-"server-info.embed.field.created"; // 作成日時
-"server-info.embed.field.verification"; // 認証レベル
-"server-info.embed.field.boosts"; // ブースト数
-"server-info.embed.field.tier"; // ブーストレベル
-
-// /user-info
-"user-info.description";
-"user-info.user.description"; // 対象ユーザー（省略で自分）
-"user-info.embed.title"; // ユーザー情報
-"user-info.embed.field.id"; // ユーザーID
-"user-info.embed.field.created"; // アカウント作成日
-"user-info.embed.field.joined"; // サーバー参加日
-"user-info.embed.field.roles"; // ロール
-"user-info.embed.bot_label"; // 🤖 Bot
-```
+- `/ping` のクールダウン: 5秒
 
 ---
 
-## 実装チェックリスト
+## ローカライズ
 
-### `/ping`（実装済み）
+### ja
 
-- [x] `src/bot/commands/ping.ts`
-- [x] `src/bot/features/ping/commands/pingCommand.execute.ts`
-- [x] テスト実装
+| キー                          | 用途           | メッセージ                                                   |
+| ----------------------------- | -------------- | ------------------------------------------------------------ |
+| `commands:ping.description`   | コマンド説明   | Botの応答速度を確認                                          |
+| `commands:ping.embed.measuring` | レスポンス   | 🏓 計測中...                                                |
+| `commands:ping.embed.response`  | レスポンス   | 📡 API レイテンシー: {{apiLatency}}ms / 💓 WebSocket Ping: {{wsLatency}}ms |
+| `commands:help.description`   | コマンド説明   | コマンド一覧を表示                                           |
+| `commands:help.embed.title`   | Embed タイトル | 📖 ayasono コマンド一覧                                     |
+| `commands:help.embed.section.basic`  | Embed フィールド名 | 🔧 基本                                              |
+| `commands:help.embed.section.config` | Embed フィールド名 | ⚙️ 設定（管理者）                                   |
+| `commands:help.embed.section.action` | Embed フィールド名 | 🛠️ 操作                                            |
+| `commands:help.embed.description`    | Embed 説明         | 📚 詳しい使い方: {{url}}                            |
+| `commands:help.embed.section.basic.content`  | Embed フィールド値 | `/ping` — Bot の応答速度を確認（改行）`/help` — このヘルプを表示 |
+| `commands:help.embed.section.config.content` | Embed フィールド値 | `/guild-config` — ギルド全体の設定（改行）...       |
+| `commands:help.embed.section.action.content` | Embed フィールド値 | `/afk` — AFK チャンネルへ移動（改行）...            |
 
-### `/help`
+### en
 
-- [ ] `src/bot/commands/help.ts`
-- [ ] `src/bot/features/help/commands/helpCommand.execute.ts`
-- [ ] ロケールリソース更新（ja / en）
-- [ ] テスト実装
-
-### `/server-info`
-
-- [ ] `src/bot/commands/server-info.ts`
-- [ ] `src/bot/features/server-info/commands/serverInfoCommand.execute.ts`
-- [ ] ロケールリソース更新（ja / en）
-- [ ] テスト実装
-
-### `/user-info`
-
-- [ ] `src/bot/commands/user-info.ts`
-- [ ] `src/bot/features/user-info/commands/userInfoCommand.execute.ts`
-- [ ] ロケールリソース更新（ja / en）
-- [ ] テスト実装
+| キー                          | 用途           | メッセージ                                                   |
+| ----------------------------- | -------------- | ------------------------------------------------------------ |
+| `commands:ping.description`   | コマンド説明   | Check bot response speed                                     |
+| `commands:ping.embed.measuring` | レスポンス   | 🏓 Measuring...                                             |
+| `commands:ping.embed.response`  | レスポンス   | 📡 API Latency: {{apiLatency}}ms / 💓 WebSocket Ping: {{wsLatency}}ms |
+| `commands:help.description`   | コマンド説明   | Show command list                                            |
+| `commands:help.embed.title`   | Embed タイトル | 📖 ayasono Commands                                         |
+| `commands:help.embed.section.basic`  | Embed フィールド名 | 🔧 Basic                                             |
+| `commands:help.embed.section.config` | Embed フィールド名 | ⚙️ Settings (Admin)                                 |
+| `commands:help.embed.section.action` | Embed フィールド名 | 🛠️ Actions                                         |
+| `commands:help.embed.description`    | Embed 説明         | 📚 Learn more: {{url}}                              |
+| `commands:help.embed.section.basic.content`  | Embed フィールド値 | `/ping` — Check bot response speed（改行）`/help` — Show this help |
+| `commands:help.embed.section.config.content` | Embed フィールド値 | `/guild-config` — Guild settings（改行）...          |
+| `commands:help.embed.section.action.content` | Embed フィールド値 | `/afk` — Move to AFK channel（改行）...              |
 
 ---
 
-## 設計メモ
+## 依存関係
 
-### `/help` のコマンド一覧管理
-
-コマンド一覧は `commandLoader.ts`（ディレクトリ自動スキャン）で動的に収集されるが、ヘルプ用の表示順・カテゴリ分けを柔軟に制御するためにはヘルプ専用の定義テーブルを別途持つ方が適切。実装時に判断する。
-
-### ユーザーマニュアルリンク
-
-外部公開 URL が未定のため、環境変数 `USER_MANUAL_URL` で制御し、未設定時はリンク行を省略する。
+| 依存先               | 内容                                                         |
+| -------------------- | ------------------------------------------------------------ |
+| `USER_MANUAL_URL`    | `/help` のユーザーマニュアルリンク表示に使用（環境変数、未設定時は省略） |

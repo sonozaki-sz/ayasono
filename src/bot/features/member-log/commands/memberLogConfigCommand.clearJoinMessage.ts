@@ -2,7 +2,10 @@
 // member-log-config clear-join-message 実行処理
 
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
-import { tDefault, tGuild } from "../../../../shared/locale/localeManager";
+import {
+  tDefault,
+  tInteraction,
+} from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import { getBotMemberLogConfigService } from "../../../services/botCompositionRoot";
 import { createSuccessEmbed } from "../../../utils/messageResponse";
@@ -24,12 +27,12 @@ export async function handleMemberLogConfigClearJoinMessage(
   // 参加メッセージを削除
   await getBotMemberLogConfigService().clearJoinMessage(guildId);
 
-  const description = await tGuild(
-    guildId,
+  const description = tInteraction(
+    interaction.locale,
     "commands:member-log-config.embed.clear_join_message_success",
   );
-  const successTitle = await tGuild(
-    guildId,
+  const successTitle = tInteraction(
+    interaction.locale,
     "commands:member-log-config.embed.success_title",
   );
   const embed = createSuccessEmbed(description, { title: successTitle });

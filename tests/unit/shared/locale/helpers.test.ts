@@ -1,19 +1,23 @@
 // tests/unit/shared/locale/helpers.test.ts
 import {
   getGuildTranslator,
+  getInteractionTranslator,
   getTimezoneOffsetForLocale,
   invalidateGuildLocaleCache,
 } from "@/shared/locale/helpers";
 
 const getGuildTMock = vi.fn();
+const getFixedTMock = vi.fn();
 const invalidateLocaleCacheMock = vi.fn();
 
 vi.mock("@/shared/locale/localeManager", () => ({
   localeManager: {
     getGuildT: (...args: unknown[]) => getGuildTMock(...args),
+    getFixedT: (...args: unknown[]) => getFixedTMock(...args),
     invalidateLocaleCache: (...args: unknown[]) =>
       invalidateLocaleCacheMock(...args),
   },
+  tInteraction: vi.fn((_l: string, k: string) => k),
 }));
 
 // locale helper の dynamic import 経路とキャッシュ無効化呼び出しを検証
@@ -51,6 +55,32 @@ describe("shared/locale/helpers", () => {
     await invalidateGuildLocaleCache("guild-3");
 
     expect(invalidateLocaleCacheMock).toHaveBeenCalledWith("guild-3");
+  });
+
+  describe("getInteractionTranslator", () => {
+    it("locale が 'ja' の場合は日本語の固定トランスレーターを返すこと", async () => {
+      const fixedT = vi.fn((key: string) => `ja:${key}`);
+      getFixedTMock.mockReturnValue(fixedT);
+
+      const translator = await getInteractionTranslator("ja");
+
+      expect(getFixedTMock).toHaveBeenCalledWith("ja");
+      expect(translator("system:bot.starting" as never)).toBe(
+        "ja:system:bot.starting",
+      );
+    });
+
+    it("locale が 'ja' 以外の場合は英語の固定トランスレーターを返すこと", async () => {
+      const fixedT = vi.fn((key: string) => `en:${key}`);
+      getFixedTMock.mockReturnValue(fixedT);
+
+      const translator = await getInteractionTranslator("en-US");
+
+      expect(getFixedTMock).toHaveBeenCalledWith("en");
+      expect(translator("system:bot.starting" as never)).toBe(
+        "en:system:bot.starting",
+      );
+    });
   });
 
   describe("getTimezoneOffsetForLocale", () => {

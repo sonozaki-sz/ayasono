@@ -28,6 +28,21 @@ export async function getGuildTranslator(
 }
 
 /**
+ * interaction.locale ベースの翻訳関数を取得
+ * コマンド・UIハンドラでユーザー応答を翻訳する際に使用
+ * @param locale interaction.locale の値
+ * @returns 翻訳関数（同期）
+ */
+export async function getInteractionTranslator(
+  locale: string,
+): Promise<GuildTFunction> {
+  // 循環依存を避けるため遅延 import で localeManager を取得
+  const { localeManager } = await import("./localeManager");
+  const resolvedLocale: SupportedLocale = locale === "ja" ? "ja" : "en";
+  return localeManager.getFixedT(resolvedLocale) as unknown as GuildTFunction;
+}
+
+/**
  * ギルドのロケールを取得して LocaleManager キャッシュを更新させる
  * ロケール設定変更後に呼び出すことでキャッシュを無効化する
  */

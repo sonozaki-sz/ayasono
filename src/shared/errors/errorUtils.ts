@@ -6,6 +6,11 @@ import { tDefault } from "../locale/localeManager";
 import { logger } from "../utils/logger";
 import { BaseError } from "./customErrors";
 
+const ERROR_I18N_KEYS = {
+  BASE_ERROR_LOG: "system:error.base_error_log",
+  UNHANDLED_ERROR_LOG: "system:error.unhandled_error_log",
+} as const;
+
 /**
  * 任意の値を Error | BaseError に変換する
  * @param error 変換対象の値
@@ -25,13 +30,17 @@ export const toError = (error: unknown): Error | BaseError => {
  */
 export const logError = (error: Error | BaseError): void => {
   if (error instanceof BaseError) {
+    const msg = tDefault(ERROR_I18N_KEYS.BASE_ERROR_LOG, {
+      errorName: error.name,
+      message: error.message,
+    });
     if (error.isOperational) {
-      logger.warn(`[${error.name}] ${error.message}`, {
+      logger.warn(msg, {
         statusCode: error.statusCode,
         stack: error.stack,
       });
     } else {
-      logger.error(`[${error.name}] ${error.message}`, {
+      logger.error(msg, {
         statusCode: error.statusCode,
         stack: error.stack,
       });
@@ -39,9 +48,10 @@ export const logError = (error: Error | BaseError): void => {
     return;
   }
 
-  logger.error(`[UnhandledError] ${error.message}`, {
-    stack: error.stack,
-  });
+  logger.error(
+    tDefault(ERROR_I18N_KEYS.UNHANDLED_ERROR_LOG, { message: error.message }),
+    { stack: error.stack },
+  );
 };
 
 /**

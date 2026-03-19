@@ -20,6 +20,7 @@ vi.mock("@/bot/utils/messageResponse", () => ({
 
 vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: vi.fn((key: string) => key),
+  tInteraction: (...args: unknown[]) => args[1],
 }));
 
 vi.mock("@/shared/utils/logger", () => ({

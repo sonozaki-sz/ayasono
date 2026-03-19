@@ -2,6 +2,11 @@
 import { vi, beforeEach } from "vitest";
 import { parseJsonArray } from "@/shared/utils/jsonUtils";
 
+vi.mock("@/shared/locale/localeManager", () => ({
+  tDefault: (_key: string, params?: Record<string, unknown>) =>
+    `parse_failed:${params?.error ?? "unknown"}`,
+}));
+
 vi.mock("@/shared/utils/logger", () => ({
   logger: {
     warn: vi.fn(),
@@ -58,7 +63,7 @@ describe("shared/utils/jsonUtils - parseJsonArray", () => {
     });
     expect(parseJsonArray<string>("[1,2]")).toEqual([]);
     expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining("string error"),
+      expect.stringContaining("parse_failed:string error"),
     );
     spy.mockRestore();
   });

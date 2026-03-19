@@ -8,7 +8,7 @@ import {
   StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder,
 } from "discord.js";
-import { tGuild } from "../../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../../shared/locale/localeManager";
 import { getBotStickyMessageConfigService } from "../../../../services/botCompositionRoot";
 import { createInfoEmbed } from "../../../../utils/messageResponse";
 import { STICKY_MESSAGE_COMMAND } from "../stickyMessageCommand.constants";
@@ -36,7 +36,10 @@ export async function handleStickyMessageView(
     await interaction.reply({
       embeds: [
         createInfoEmbed(
-          await tGuild(guildId, "commands:sticky-message.view.empty"),
+          tInteraction(
+            interaction.locale,
+            "commands:sticky-message.view.empty",
+          ),
         ),
       ],
       flags: MessageFlags.Ephemeral,
@@ -64,7 +67,10 @@ export async function handleStickyMessageView(
   const select = new StringSelectMenuBuilder()
     .setCustomId(STICKY_MESSAGE_COMMAND.VIEW_SELECT_CUSTOM_ID)
     .setPlaceholder(
-      await tGuild(guildId, "commands:sticky-message.view.select.placeholder"),
+      tInteraction(
+        interaction.locale,
+        "commands:sticky-message.view.select.placeholder",
+      ),
     )
     .addOptions(options);
 

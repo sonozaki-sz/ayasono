@@ -12,7 +12,10 @@ import {
   getAfkConfig,
   setAfkChannel,
 } from "../../../../shared/features/afk/afkConfigService";
-import { tDefault, tGuild } from "../../../../shared/locale/localeManager";
+import {
+  tDefault,
+  tInteraction,
+} from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import {
   createInfoEmbed,
@@ -38,7 +41,7 @@ export async function executeAfkConfigCommand(
 
   if (!interaction.memberPermissions?.has(PermissionFlagsBits.ManageGuild)) {
     throw new ValidationError(
-      await tGuild(guildId, COMMON_I18N_KEYS.MANAGE_GUILD_REQUIRED),
+      tInteraction(interaction.locale, COMMON_I18N_KEYS.MANAGE_GUILD_REQUIRED),
     );
   }
 
@@ -71,22 +74,22 @@ async function handleSetChannel(
 
   if (channel.type !== ChannelType.GuildVoice) {
     throw new ValidationError(
-      await tGuild(guildId, "errors:afk.invalid_channel_type"),
+      tInteraction(interaction.locale, "errors:afk.invalid_channel_type"),
     );
   }
 
   await setAfkChannel(guildId, channel.id);
 
-  const description = await tGuild(
-    guildId,
+  const description = tInteraction(
+    interaction.locale,
     "commands:afk-config.embed.set_ch_success",
     {
       channel: `<#${channel.id}>`,
     },
   );
 
-  const successTitle = await tGuild(
-    guildId,
+  const successTitle = tInteraction(
+    interaction.locale,
     "commands:afk-config.embed.success_title",
   );
   const embed = createSuccessEmbed(description, { title: successTitle });
@@ -113,11 +116,14 @@ async function handleViewSetting(
 ): Promise<void> {
   const config = await getAfkConfig(guildId);
 
-  const title = await tGuild(guildId, "commands:afk-config.embed.title");
+  const title = tInteraction(
+    interaction.locale,
+    "commands:afk-config.embed.title",
+  );
 
   if (!config || !config.enabled || !config.channelId) {
-    const description = await tGuild(
-      guildId,
+    const description = tInteraction(
+      interaction.locale,
       "commands:afk-config.embed.not_configured",
     );
     const embed = createInfoEmbed(description, { title });
@@ -128,8 +134,8 @@ async function handleViewSetting(
     return;
   }
 
-  const fieldChannel = await tGuild(
-    guildId,
+  const fieldChannel = tInteraction(
+    interaction.locale,
     "commands:afk-config.embed.field.channel",
   );
 

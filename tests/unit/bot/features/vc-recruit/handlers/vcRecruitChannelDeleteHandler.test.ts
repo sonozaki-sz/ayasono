@@ -31,6 +31,8 @@ vi.mock("@/shared/utils/logger", () => ({
 
 vi.mock("@/shared/locale/localeManager", () => ({
   tGuild: vi.fn(async (_guildId: string, key: string) => key),
+  tInteraction: vi.fn((_locale: string, key: string) => key),
+  tDefault: vi.fn((key: string) => key),
 }));
 
 // ---- ヘルパー ----
@@ -202,7 +204,7 @@ describe("bot/features/vc-recruit/handlers/vcRecruitChannelDeleteHandler", () =>
     expect(throwingDelete).toHaveBeenCalled();
     expect(removeSetupMock).toHaveBeenCalledWith(GUILD_ID, "panel-ch-5");
     expect(logger.error).toHaveBeenCalledWith(
-      expect.stringContaining("投稿チャンネル削除失敗"),
+      expect.stringContaining("post_channel_delete_failed"),
       expect.objectContaining({ error: expect.any(Error) }),
     );
   });
@@ -226,7 +228,7 @@ describe("bot/features/vc-recruit/handlers/vcRecruitChannelDeleteHandler", () =>
     expect(throwingDelete).toHaveBeenCalled();
     expect(removeSetupMock).toHaveBeenCalledWith(GUILD_ID, "panel-ch-6");
     expect(logger.error).toHaveBeenCalledWith(
-      expect.stringContaining("パネルチャンネル削除失敗"),
+      expect.stringContaining("panel_channel_cleanup_failed"),
       expect.objectContaining({ error: expect.any(Error) }),
     );
   });

@@ -21,12 +21,12 @@
 | メッセージレスポンス          | ✅           | ✅   | ✅     | Embed ユーティリティ                                       |
 | コア（エラー/DB/ロガー/設定） | ✅           | ✅   | ✅     |                                                            |
 | ギルド設定                    | ✅           | 🚧   | ⬜     | データ層は実装済み、コマンド層が未実装                     |
-| 基本コマンド                  | ✅           | 🚧   | 🚧     | `/ping` のみ。`/help` `/server-info` `/user-info` は未実装 |
+| 基本コマンド                  | ✅           | 🚧   | 🚧     | `/ping` のみ。`/help` は未実装                             |
 | Web UI                        | ⬜           | 🚧   | 🚧     | Fastify + ヘルスチェックのみ                               |
 
 **凡例**: ✅ 完了 | 🚧 進行中 | ⬜ 未着手
 
-**次のマイルストーン**: ロケール対応（interaction.locale 導入） → メッセージフォーマット改善 → 各機能リセットコマンド
+**次のマイルストーン**: メッセージフォーマット改善 → 各機能リセットコマンド
 
 ---
 
@@ -34,40 +34,33 @@
 
 ### 1. 主要機能実装
 
-#### 1.1 ロケール対応（interaction.locale 導入） - 残4件
+#### 1.1 ロケール対応（interaction.locale 導入） - ✅完了
 
-コマンド応答のロケールを `tGuild`（ギルド設定）から `interaction.locale`（ユーザーのDiscordクライアント言語）に切り替える。
+コマンド応答のロケールを `tGuild`（ギルド設定）から `interaction.locale`（ユーザーのDiscordクライアント言語）に切り替え済み。
 
-**方針**:
+**実装内容**:
 
-- `interaction.locale` が `ja` → 日本語、それ以外 → 英語
-- ユーザーが直接操作するコマンド応答・エラー応答 → `interaction.locale` を使用
-- チャンネル全体向けの自動メッセージ（Bumpリマインダー通知、メンバーログ、VC募集パネル、スティッキーメッセージ再送信、VACパネル等） → `tGuild` を維持
-- システムログ → `tDefault` を維持
-
-**タスク**:
-
-- [ ] `tInteraction` ヘルパー関数を `localeManager.ts` に追加
-- [ ] 全コマンドハンドラの `tGuild` 呼び出しを `tInteraction` に置き換え
-- [ ] UIハンドラ（ボタン・モーダル・セレクトメニュー）のユーザー応答部分を `tInteraction` に置き換え
-- [ ] テスト更新
+- `tInteraction`（sync）ヘルパー関数を `localeManager.ts` に追加（`"ja"` → 日本語、それ以外 → 英語）
+- `getInteractionTranslator` を `helpers.ts` に追加
+- 全コマンドハンドラ・UIハンドラのユーザー応答を `tGuild` → `tInteraction` に置き換え
+- ハードコードログ（info/warn/error）を `tDefault` + i18n キーに移行
+- テスト更新（モックに `tInteraction` 追加、`locale: "ja"` 追加、アサーション修正）
 
 **対象外（tGuild を維持）**: Bumpリマインダー通知 / Bump検知パネル / メンバーログ / スティッキーメッセージ再送信 / VC募集投稿・パネル / VACパネルラベル
 
-#### 1.2 ギルド設定機能 - 残4件
+#### 1.2 ギルド設定機能 - 残5件
 
 - [ ] `/guild-config set-locale` コマンド実装（ja / en 切り替え）
 - [ ] `/guild-config view` コマンド実装（概要 + 各機能詳細のページネーション）
 - [ ] `/guild-config reset` コマンド実装（確認ダイアログ付き）
+- [ ] `/guild-config export` / `/guild-config import` コマンド実装（JSON形式の設定バックアップ/リストア、同一サーバー向け）
 - [ ] テスト実装
 
 仕様書: [GUILD_CONFIG_SPEC.md](docs/specs/GUILD_CONFIG_SPEC.md)
 
-### 2. 基本コマンド追加 - 残3件
+### 2. 基本コマンド追加 - 残1件
 
 - [ ] `/help` — コマンド一覧＋ユーザーマニュアルリンク表示
-- [ ] `/server-info` — サーバー情報表示
-- [ ] `/user-info` — ユーザー情報表示
 
 仕様書: [BASIC_COMMANDS_SPEC.md](docs/specs/BASIC_COMMANDS_SPEC.md)
 
@@ -84,7 +77,7 @@
 
 #### 4.2 プロフィール機能
 
-- [ ] 仕様書作成
+- [ ] 仕様書作成（`/user-info` をプロフィール情報と統合して実装予定）
 
 #### 4.3 サポートチャンネル機能（チケット型）
 

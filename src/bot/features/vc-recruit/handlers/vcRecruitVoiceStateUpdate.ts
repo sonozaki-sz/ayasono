@@ -2,8 +2,14 @@
 // VC募集で作成したVCの空検知・自動削除ハンドラー
 
 import { ChannelType, type VoiceState } from "discord.js";
+import { tDefault } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import { getBotVcRecruitRepository } from "../../../services/botCompositionRoot";
+
+const VC_RECRUIT_LOG_KEYS = {
+  EMPTY_VC_DELETED: "system:vc-recruit.empty_vc_deleted",
+  VOICE_STATE_UPDATE_ERROR: "system:vc-recruit.voice_state_update_error",
+} as const;
 
 /**
  * voiceStateUpdate から VC募集で作成したVCの空き検知と自動削除を行う
@@ -40,11 +46,13 @@ export async function handleVcRecruitVoiceStateUpdate(
     await repo.removeCreatedVoiceChannelId(guildId, channel.id);
 
     logger.info(
-      `[vc-recruit] 空VCを削除しました: channel=${channel.name} (${channel.id}), guild=${guildId}`,
+      tDefault(VC_RECRUIT_LOG_KEYS.EMPTY_VC_DELETED, {
+        guildId,
+        channelId: channel.id,
+        channelName: channel.name,
+      }),
     );
   } catch (error) {
-    logger.error(
-      `[vc-recruit] voiceStateUpdate 処理中にエラーが発生しました: ${String(error)}`,
-    );
+    logger.error(tDefault(VC_RECRUIT_LOG_KEYS.VOICE_STATE_UPDATE_ERROR), error);
   }
 }

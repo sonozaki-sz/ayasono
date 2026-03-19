@@ -8,7 +8,7 @@ import { ChannelType } from "discord.js";
 const findSetupByCategoryIdMock = vi.fn();
 const addSetupMock = vi.fn();
 const resolveTargetCategoryMock = vi.fn();
-const tGuildMock = vi.fn(async (_guildId: string, key: string) => key);
+const tInteractionMock = vi.fn((_locale: string, key: string) => key);
 const tDefaultMock = vi.fn((key: string) => key);
 
 vi.mock("@/bot/services/botCompositionRoot", () => ({
@@ -26,10 +26,11 @@ vi.mock(
   }),
 );
 vi.mock("@/shared/locale/localeManager", () => ({
-  tGuild: (...args: unknown[]) =>
-    tGuildMock(...(args as Parameters<typeof tGuildMock>)),
+  tInteraction: (...args: unknown[]) =>
+    tInteractionMock(...(args as Parameters<typeof tInteractionMock>)),
   tDefault: (...args: unknown[]) =>
     tDefaultMock(...(args as Parameters<typeof tDefaultMock>)),
+  tGuild: vi.fn(async (_guildId: string, key: string) => key),
 }));
 
 // ---- ヘルパー ----
@@ -113,6 +114,7 @@ function makeInteraction(
   return {
     guild,
     guildId: GUILD_ID,
+    locale: "ja",
     channelId,
     options: {
       getString: (key: string) => {

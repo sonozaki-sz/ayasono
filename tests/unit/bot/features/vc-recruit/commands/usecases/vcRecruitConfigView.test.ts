@@ -5,8 +5,8 @@ import { ValidationError } from "@/shared/errors/customErrors";
 // ---- モック定義 ----
 
 const getVcRecruitConfigOrDefaultMock = vi.fn();
-const tGuildMock = vi.fn(
-  async (_guildId: string, key: string, opts?: Record<string, unknown>) =>
+const tInteractionMock = vi.fn(
+  (_locale: string, key: string, opts?: Record<string, unknown>) =>
     opts ? `${key}:${JSON.stringify(opts)}` : key,
 );
 const tDefaultMock = vi.fn((key: string) => key);
@@ -18,8 +18,8 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
   }),
 }));
 vi.mock("@/shared/locale/localeManager", () => ({
-  tGuild: (...args: unknown[]) =>
-    tGuildMock(...(args as Parameters<typeof tGuildMock>)),
+  tInteraction: (...args: unknown[]) =>
+    tInteractionMock(...(args as Parameters<typeof tInteractionMock>)),
   tDefault: (...args: unknown[]) =>
     tDefaultMock(...(args as Parameters<typeof tDefaultMock>)),
 }));
@@ -36,6 +36,7 @@ function makeInteraction(
 ) {
   const { hasGuild = true, guildChannels = {} } = opts;
   return {
+    locale: "ja",
     guild: hasGuild
       ? {
           id: GUILD_ID,
@@ -113,8 +114,8 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigView", () => 
     await handleVcRecruitConfigView(interaction as never, GUILD_ID);
 
     expect(interaction.reply).toHaveBeenCalled();
-    expect(tGuildMock).toHaveBeenCalledWith(
-      GUILD_ID,
+    expect(tInteractionMock).toHaveBeenCalledWith(
+      "ja",
       "commands:vc-recruit-config.embed.top",
     );
   });
@@ -136,8 +137,8 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigView", () => 
 
     expect(interaction.reply).toHaveBeenCalled();
     // setup_item の category 引数に categoryId そのものが渡される
-    expect(tGuildMock).toHaveBeenCalledWith(
-      GUILD_ID,
+    expect(tInteractionMock).toHaveBeenCalledWith(
+      "ja",
       "commands:vc-recruit-config.embed.setup_item",
       expect.objectContaining({ category: "cat-missing" }),
     );

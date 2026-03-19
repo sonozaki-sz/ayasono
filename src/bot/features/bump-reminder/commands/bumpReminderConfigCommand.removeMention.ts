@@ -4,7 +4,10 @@
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
 import { ValidationError } from "../../../../shared/errors/customErrors";
 import { BUMP_REMINDER_MENTION_ROLE_RESULT } from "../../../../shared/features/bump-reminder/bumpReminderConfigService";
-import { tDefault, tGuild } from "../../../../shared/locale/localeManager";
+import {
+  tDefault,
+  tInteraction,
+} from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import { getBotBumpReminderConfigService } from "../../../services/botCompositionRoot";
 import { createSuccessEmbed } from "../../../utils/messageResponse";
@@ -23,8 +26,8 @@ export async function handleBumpReminderConfigRemoveMention(
   await ensureManageGuildPermission(interaction, guildId);
 
   const bumpReminderConfigService = getBotBumpReminderConfigService();
-  const successTitle = await tGuild(
-    guildId,
+  const successTitle = tInteraction(
+    interaction.locale,
     "commands:bump-reminder-config.embed.success_title",
   );
 
@@ -35,15 +38,15 @@ export async function handleBumpReminderConfigRemoveMention(
   );
   if (result === BUMP_REMINDER_MENTION_ROLE_RESULT.NOT_CONFIGURED) {
     throw new ValidationError(
-      await tGuild(
-        guildId,
+      tInteraction(
+        interaction.locale,
         "commands:bump-reminder-config.embed.not_configured",
       ),
     );
   }
 
-  const roleDescription = await tGuild(
-    guildId,
+  const roleDescription = tInteraction(
+    interaction.locale,
     "commands:bump-reminder-config.embed.remove_mention_role",
   );
   const roleEmbed = createSuccessEmbed(roleDescription, {

@@ -8,7 +8,7 @@ import {
   type StringSelectMenuInteraction,
 } from "discord.js";
 import { getAfkConfig } from "../../../../../shared/features/afk/afkConfigService";
-import { tGuild } from "../../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../../shared/locale/localeManager";
 import type { StringSelectHandler } from "../../../../handlers/interactionCreate/ui/types";
 import { safeReply } from "../../../../utils/interaction";
 import {
@@ -52,7 +52,7 @@ export const vcPanelUserSelectHandler: StringSelectHandler = {
       await safeReply(interaction, {
         embeds: [
           createErrorEmbed(
-            await tGuild(guild.id, "errors:vac.not_vac_channel"),
+            tInteraction(interaction.locale, "errors:vac.not_vac_channel"),
           ),
         ],
         flags: MessageFlags.Ephemeral,
@@ -65,7 +65,7 @@ export const vcPanelUserSelectHandler: StringSelectHandler = {
       await safeReply(interaction, {
         embeds: [
           createErrorEmbed(
-            await tGuild(guild.id, "errors:vac.not_vac_channel"),
+            tInteraction(interaction.locale, "errors:vac.not_vac_channel"),
           ),
         ],
         flags: MessageFlags.Ephemeral,
@@ -80,7 +80,9 @@ export const vcPanelUserSelectHandler: StringSelectHandler = {
     if (!operator || operator.voice.channelId !== channel.id) {
       await safeReply(interaction, {
         embeds: [
-          createErrorEmbed(await tGuild(guild.id, "errors:vac.not_in_vc")),
+          createErrorEmbed(
+            tInteraction(interaction.locale, "errors:vac.not_in_vc"),
+          ),
         ],
         flags: MessageFlags.Ephemeral,
       });
@@ -91,7 +93,9 @@ export const vcPanelUserSelectHandler: StringSelectHandler = {
     if (!afkConfig || !afkConfig.enabled || !afkConfig.channelId) {
       await safeReply(interaction, {
         embeds: [
-          createErrorEmbed(await tGuild(guild.id, "errors:afk.not_configured")),
+          createErrorEmbed(
+            tInteraction(interaction.locale, "errors:afk.not_configured"),
+          ),
         ],
         flags: MessageFlags.Ephemeral,
       });
@@ -106,7 +110,7 @@ export const vcPanelUserSelectHandler: StringSelectHandler = {
       await safeReply(interaction, {
         embeds: [
           createErrorEmbed(
-            await tGuild(guild.id, "errors:afk.channel_not_found"),
+            tInteraction(interaction.locale, "errors:afk.channel_not_found"),
           ),
         ],
         flags: MessageFlags.Ephemeral,
@@ -134,7 +138,7 @@ export const vcPanelUserSelectHandler: StringSelectHandler = {
       await safeReply(interaction, {
         embeds: [
           createErrorEmbed(
-            await tGuild(guild.id, "errors:vac.afk_move_failed"),
+            tInteraction(interaction.locale, "errors:vac.afk_move_failed"),
           ),
         ],
         flags: MessageFlags.Ephemeral,
@@ -145,7 +149,7 @@ export const vcPanelUserSelectHandler: StringSelectHandler = {
     await safeReply(interaction, {
       embeds: [
         createSuccessEmbed(
-          await tGuild(guild.id, "commands:vac.embed.members_moved", {
+          tInteraction(interaction.locale, "commands:vac.embed.members_moved", {
             channel: afkChannel.toString(),
           }),
         ),

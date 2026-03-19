@@ -1,11 +1,10 @@
 // tests/unit/bot/features/ping/commands/pingCommand.execute.test.ts
-import type { Mock } from "vitest";
 import { executePingCommand } from "@/bot/features/ping/commands/pingCommand.execute";
 import { createSuccessEmbed } from "@/bot/utils/messageResponse";
-import { tGuild } from "@/shared/locale/localeManager";
 
 vi.mock("@/shared/locale/localeManager", () => ({
   tGuild: vi.fn(),
+  tInteraction: vi.fn((_locale: string, key: string) => key),
 }));
 
 vi.mock("@/bot/utils/messageResponse", () => ({
@@ -15,6 +14,7 @@ vi.mock("@/bot/utils/messageResponse", () => ({
 function createInteraction() {
   return {
     guildId: "guild-1",
+    locale: "ja",
     createdTimestamp: 1_000,
     client: { ws: { ping: 42 } },
     reply: vi.fn().mockResolvedValue(undefined),
@@ -31,33 +31,26 @@ describe("bot/features/ping/commands/pingCommand.execute", () => {
   it("計測中メッセージを返信し、レイテンシ embed で編集する", async () => {
     const interaction = createInteraction();
 
-    (tGuild as Mock)
-      .mockResolvedValueOnce("計測中...")
-      .mockResolvedValueOnce("API: 130ms / WS: 42ms");
-
     await executePingCommand(interaction as never);
 
-    expect(interaction.reply).toHaveBeenCalledWith({ content: "計測中..." });
-    expect(createSuccessEmbed).toHaveBeenCalledWith("API: 130ms / WS: 42ms");
+    // tInteraction returns the key as-is
+    expect(interaction.reply).toHaveBeenCalledWith({ content: "commands:ping.embed.measuring" });
+    expect(createSuccessEmbed).toHaveBeenCalledWith("commands:ping.embed.response");
     expect(interaction.editReply).toHaveBeenCalledWith({
       content: "",
-      embeds: [{ description: "API: 130ms / WS: 42ms" }],
+      embeds: [{ description: "commands:ping.embed.response" }],
     });
   });
 
-  it("interaction の guildId が null の場合は翻訳に undefined を渡す", async () => {
+  it("interaction の locale が使用されること", async () => {
     const interaction = createInteraction();
-    interaction.guildId = null as never;
-
-    (tGuild as Mock)
-      .mockResolvedValueOnce("計測中...")
-      .mockResolvedValueOnce("API: 130ms / WS: 42ms");
+    interaction.locale = "en-US" as never;
 
     await executePingCommand(interaction as never);
 
-    expect(tGuild).toHaveBeenNthCalledWith(
-      1,
-      undefined,
+    const { tInteraction } = await import("@/shared/locale/localeManager");
+    expect(tInteraction).toHaveBeenCalledWith(
+      "en-US",
       "commands:ping.embed.measuring",
     );
   });

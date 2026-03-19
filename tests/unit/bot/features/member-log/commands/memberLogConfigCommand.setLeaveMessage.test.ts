@@ -20,6 +20,7 @@ vi.mock(
 vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string, opts?: Record<string, unknown>) =>
     tDefaultMock(key, opts),
+  tInteraction: (...args: unknown[]) => args[1],
 }));
 
 // ---- ヘルパー ----

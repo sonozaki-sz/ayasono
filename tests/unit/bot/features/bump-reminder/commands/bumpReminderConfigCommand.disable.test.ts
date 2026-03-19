@@ -11,6 +11,7 @@ const createSuccessEmbedMock = vi.fn((description: string) => ({
 vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: vi.fn((key: string) => `default:${key}`),
   tGuild: vi.fn(async () => "translated"),
+  tInteraction: (...args: unknown[]) => args[1],
 }));
 
 vi.mock("@/shared/utils/logger", () => ({
@@ -49,6 +50,7 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.disable"
 
   it("リマインダーをキャンセルし、設定を無効化して成功応答を返す", async () => {
     const interaction = {
+      locale: "ja",
       reply: vi.fn().mockResolvedValue(undefined),
     };
 
@@ -57,7 +59,12 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.disable"
     expect(cancelReminderMock).toHaveBeenCalledWith("guild-1");
     expect(setEnabledMock).toHaveBeenCalledWith("guild-1", false);
     expect(interaction.reply).toHaveBeenCalledWith({
-      embeds: [{ description: "translated" }],
+      embeds: [
+        {
+          description:
+            "commands:bump-reminder-config.embed.disable_success",
+        },
+      ],
       flags: 64,
     });
   });

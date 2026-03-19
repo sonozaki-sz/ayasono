@@ -6,7 +6,10 @@ import {
   PermissionFlagsBits,
 } from "discord.js";
 import { ValidationError } from "../../../../shared/errors/customErrors";
-import { tDefault, tGuild } from "../../../../shared/locale/localeManager";
+import {
+  tDefault,
+  tInteraction,
+} from "../../../../shared/locale/localeManager";
 import { handleCommandError } from "../../../errors/interactionErrorHandler";
 import { COMMON_I18N_KEYS } from "../../../shared/i18nKeys";
 import { STICKY_MESSAGE_COMMAND } from "./stickyMessageCommand.constants";
@@ -36,8 +39,8 @@ export async function executeStickyMessageCommand(
       !interaction.memberPermissions?.has(PermissionFlagsBits.Administrator)
     ) {
       throw new ValidationError(
-        await tGuild(
-          guildId,
+        tInteraction(
+          interaction.locale,
           "commands:sticky-message.errors.permissionDenied",
         ),
       );
@@ -59,7 +62,7 @@ export async function executeStickyMessageCommand(
         break;
       default:
         throw new ValidationError(
-          await tGuild(guildId, COMMON_I18N_KEYS.INVALID_SUBCOMMAND),
+          tInteraction(interaction.locale, COMMON_I18N_KEYS.INVALID_SUBCOMMAND),
         );
     }
   } catch (error) {

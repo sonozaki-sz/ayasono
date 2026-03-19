@@ -436,9 +436,37 @@ export const system = {
   "member-log.config_leave_message_cleared":
     "[メンバーログ機能] 退出メッセージ削除 GuildId: {{guildId}}",
 
+  // 翻訳システム
+  "locale.translation_failed":
+    "[Bot] 翻訳に失敗しました Key: {{key}}",
+
+  // エラーユーティリティ
+  "error.base_error_log":
+    "[{{errorName}}] {{message}}",
+  "error.unhandled_error_log":
+    "[UnhandledError] {{message}}",
+
+  // JSONユーティリティ
+  "json.parse_array_failed":
+    "[JSON] parseJsonArray: パースに失敗しました。空配列を返します。 value=\"{{value}}\" error=\"{{error}}\"",
+
   // VC募集機能ログ
   "vc-recruit.voice_state_update_failed":
     "[VC募集機能] voiceStateUpdate処理失敗",
+  "vc-recruit.empty_vc_deleted":
+    "[VC募集機能] 空VCを削除 GuildId: {{guildId}} ChannelId: {{channelId}} ChannelName: {{channelName}}",
+  "vc-recruit.voice_state_update_error":
+    "[VC募集機能] voiceStateUpdate処理エラー",
+  "vc-recruit.panel_channel_delete_detected":
+    "[VC募集機能] パネルチャンネル削除を検知、投稿チャンネルとセットアップを削除 GuildId: {{guildId}} PanelChannelId: {{panelChannelId}}",
+  "vc-recruit.post_channel_delete_failed":
+    "[VC募集機能] 投稿チャンネル削除失敗 GuildId: {{guildId}} PostChannelId: {{postChannelId}}",
+  "vc-recruit.post_channel_delete_detected":
+    "[VC募集機能] 投稿チャンネル削除を検知、パネルチャンネルとセットアップを削除 GuildId: {{guildId}} PostChannelId: {{postChannelId}}",
+  "vc-recruit.panel_channel_cleanup_failed":
+    "[VC募集機能] パネルチャンネル削除失敗 GuildId: {{guildId}} PanelChannelId: {{panelChannelId}}",
+  "vc-recruit.created_vc_manual_delete_detected":
+    "[VC募集機能] 作成VC手動削除を検知、DBを更新し投稿ボタンをVC終了済みに変更 GuildId: {{guildId}} VcId: {{vcId}}",
   "vc-recruit.channel_created":
     "[VC募集機能] 新規VC作成 GuildId: {{guildId}} ChannelId: {{channelId}}",
   "vc-recruit.channel_deleted":

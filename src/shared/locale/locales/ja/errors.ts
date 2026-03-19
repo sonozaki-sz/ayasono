@@ -67,6 +67,14 @@ export const errors = {
     "このVCは自動作成チャンネルではありません。",
   "vac.limit_out_of_range":
     "人数制限は0〜99の範囲で指定してください。",
+
+  // VC操作コマンド（/vc rename, /vc limit）
+  "vc.not_in_any_vc":
+    "このコマンドはVC参加中にのみ使用できます。",
+  "vc.not_managed_channel":
+    "このVCはBot管理のチャンネルではありません。",
+  "vc.limit_out_of_range":
+    "人数制限は0〜99の範囲で指定してください。",
   "vac.afk_move_failed":
     "AFK チャンネルへの移動に失敗しました。対象ユーザーがVCから退出した可能性があります。",
 

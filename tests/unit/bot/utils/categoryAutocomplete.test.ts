@@ -4,6 +4,7 @@ import { ChannelType } from "discord.js";
 
 vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: vi.fn((_key: string) => "TOP"),
+  tInteraction: (...args: unknown[]) => args[1],
 }));
 
 const COMMAND = "test-command";

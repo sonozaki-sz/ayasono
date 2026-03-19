@@ -14,6 +14,7 @@ const viewMock = vi.fn();
 
 vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: vi.fn((key: string) => key),
+  tInteraction: (...args: unknown[]) => args[1],
 }));
 
 vi.mock("@/bot/errors/interactionErrorHandler", () => ({

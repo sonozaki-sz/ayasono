@@ -7,7 +7,10 @@ import {
   type ChatInputCommandInteraction,
 } from "discord.js";
 import { ValidationError } from "../../../../shared/errors/customErrors";
-import { tDefault, tGuild } from "../../../../shared/locale/localeManager";
+import {
+  tDefault,
+  tInteraction,
+} from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import { getBotMemberLogConfigService } from "../../../services/botCompositionRoot";
 import { createSuccessEmbed } from "../../../utils/messageResponse";
@@ -36,8 +39,8 @@ export async function handleMemberLogConfigSetChannel(
   // テキストチャンネル以外は拒否
   if (channel.type !== ChannelType.GuildText) {
     throw new ValidationError(
-      await tGuild(
-        guildId,
+      tInteraction(
+        interaction.locale,
         "commands:member-log-config.errors.text_channel_only",
       ),
     );
@@ -46,13 +49,13 @@ export async function handleMemberLogConfigSetChannel(
   // 通知チャンネルを保存
   await getBotMemberLogConfigService().setChannelId(guildId, channel.id);
 
-  const description = await tGuild(
-    guildId,
+  const description = tInteraction(
+    interaction.locale,
     "commands:member-log-config.embed.set_channel_success",
     { channel: `<#${channel.id}>` },
   );
-  const successTitle = await tGuild(
-    guildId,
+  const successTitle = tInteraction(
+    interaction.locale,
     "commands:member-log-config.embed.success_title",
   );
   const embed = createSuccessEmbed(description, { title: successTitle });

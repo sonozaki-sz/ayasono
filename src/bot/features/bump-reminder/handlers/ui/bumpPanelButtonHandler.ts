@@ -6,8 +6,10 @@ import {
   BUMP_REMINDER_MENTION_USER_ADD_RESULT,
   BUMP_REMINDER_MENTION_USER_REMOVE_RESULT,
 } from "../../../../../shared/features/bump-reminder/bumpReminderConfigService";
-import { getGuildTranslator } from "../../../../../shared/locale/helpers";
-import { tDefault } from "../../../../../shared/locale/localeManager";
+import {
+  tDefault,
+  tInteraction,
+} from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import type { ButtonHandler } from "../../../../handlers/interactionCreate/ui/types";
 import { getBotBumpReminderConfigService } from "../../../../services/botCompositionRoot";
@@ -67,10 +69,11 @@ export const bumpPanelButtonHandler: ButtonHandler = {
 
       const bumpReminderConfigService = getBotBumpReminderConfigService();
       const userId = interaction.user.id;
-      // ギルドロケールに固定した翻訳関数を取得
-      const tGuild = await getGuildTranslator(guildId);
       // 成功系レスポンスで使う共通タイトル
-      const successTitle = tGuild("events:bump-reminder.panel.success_title");
+      const successTitle = tInteraction(
+        interaction.locale,
+        "events:bump-reminder.panel.success_title",
+      );
 
       if (isOnButton) {
         // ON ボタン: 追加を試み、冪等に成功応答を返す
@@ -95,7 +98,10 @@ export const bumpPanelButtonHandler: ButtonHandler = {
         await safeReply(interaction, {
           embeds: [
             createSuccessEmbed(
-              tGuild("events:bump-reminder.panel.mention_toggled_on"),
+              tInteraction(
+                interaction.locale,
+                "events:bump-reminder.panel.mention_toggled_on",
+              ),
               { title: successTitle },
             ),
           ],
@@ -133,7 +139,10 @@ export const bumpPanelButtonHandler: ButtonHandler = {
         await safeReply(interaction, {
           embeds: [
             createSuccessEmbed(
-              tGuild("events:bump-reminder.panel.mention_toggled_off"),
+              tInteraction(
+                interaction.locale,
+                "events:bump-reminder.panel.mention_toggled_off",
+              ),
               { title: successTitle },
             ),
           ],

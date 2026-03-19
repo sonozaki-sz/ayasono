@@ -15,6 +15,7 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
 vi.mock("@/shared/locale/localeManager", () => ({
   tGuild: tGuildMock,
   tDefault: tDefaultMock,
+  tInteraction: (...args: unknown[]) => args[1],
 }));
 vi.mock("@/bot/utils/messageResponse", () => ({
   createWarningEmbed: vi.fn((msg: string) => ({

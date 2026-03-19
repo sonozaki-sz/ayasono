@@ -10,7 +10,10 @@ import {
   type TextChannel,
 } from "discord.js";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
-import { tDefault, tGuild } from "../../../../../shared/locale/localeManager";
+import {
+  tDefault,
+  tInteraction,
+} from "../../../../../shared/locale/localeManager";
 import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
 import { getBotVcRecruitRepository } from "../../../../services/botCompositionRoot";
 import { createSuccessEmbed } from "../../../../utils/messageResponse";
@@ -58,7 +61,7 @@ export async function handleVcRecruitConfigSetup(
   const existing = await repo.findSetupByCategoryId(guildId, targetCategoryId);
   if (existing) {
     throw new ValidationError(
-      await tGuild(guildId, "errors:vcRecruit.already_setup"),
+      tInteraction(interaction.locale, "errors:vcRecruit.already_setup"),
     );
   }
 
@@ -69,7 +72,7 @@ export async function handleVcRecruitConfigSetup(
       VC_RECRUIT_CONFIG_COMMAND.CATEGORY_CHANNEL_LIMIT
   ) {
     throw new ValidationError(
-      await tGuild(guildId, "errors:vcRecruit.category_full"),
+      tInteraction(interaction.locale, "errors:vcRecruit.category_full"),
     );
   }
 
@@ -126,11 +129,14 @@ export async function handleVcRecruitConfigSetup(
   }
 
   // ── チャンネル作成 ────────────────────────────────────────────────
-  const panelName = await tGuild(
-    guildId,
+  const panelName = tInteraction(
+    interaction.locale,
     "commands:vcRecruit.channelName.panel",
   );
-  const postName = await tGuild(guildId, "commands:vcRecruit.channelName.post");
+  const postName = tInteraction(
+    interaction.locale,
+    "commands:vcRecruit.channelName.post",
+  );
 
   const panelChannel = (await guild.channels.create({
     name: panelName,
@@ -167,23 +173,26 @@ export async function handleVcRecruitConfigSetup(
   // ── 成功レスポンス ────────────────────────────────────────────────
   const categoryName = category?.name ?? "TOP";
   const embed = createSuccessEmbed(
-    await tGuild(guildId, "commands:vc-recruit-config.embed.setup_success"),
+    tInteraction(
+      interaction.locale,
+      "commands:vc-recruit-config.embed.setup_success",
+    ),
     {
-      title: await tGuild(
-        guildId,
+      title: tInteraction(
+        interaction.locale,
         "commands:vc-recruit-config.embed.success_title",
       ),
       fields: [
         {
           name: categoryName,
           value: [
-            await tGuild(
-              guildId,
+            tInteraction(
+              interaction.locale,
               "commands:vc-recruit-config.embed.setup_panel_channel",
               { channel: `<#${panelChannel.id}>` },
             ),
-            await tGuild(
-              guildId,
+            tInteraction(
+              interaction.locale,
               "commands:vc-recruit-config.embed.setup_post_channel",
               { channel: `<#${postChannel.id}>` },
             ),

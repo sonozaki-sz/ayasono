@@ -25,6 +25,7 @@ vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string) => tDefaultMock(key),
   tGuild: (guildId: string, key: string, params?: Record<string, unknown>) =>
     tGuildMock(guildId, key, params),
+  tInteraction: vi.fn((_locale: string, key: string) => key),
 }));
 
 vi.mock("@/shared/utils/logger", () => ({
@@ -42,6 +43,7 @@ vi.mock("@/bot/utils/messageResponse", () => ({
 function createInteraction(subcommand: string) {
   return {
     guildId: "guild-1",
+    locale: "ja",
     memberPermissions: {
       has: vi.fn(() => true),
     },
@@ -62,7 +64,7 @@ describe("bot/features/afk/commands/afkConfigCommand.execute", () => {
   // 各ケースで翻訳・設定取得のモックが一定の返却値を持つよう準備する
   beforeEach(() => {
     vi.clearAllMocks();
-    tGuildMock.mockResolvedValue("translated");
+    // tInteraction mock returns key as-is (no setup needed)
     getAfkConfigMock.mockResolvedValue({
       enabled: true,
       channelId: "afk-channel",
@@ -88,7 +90,7 @@ describe("bot/features/afk/commands/afkConfigCommand.execute", () => {
 
     expect(setAfkChannelMock).toHaveBeenCalledWith("guild-1", "afk-channel");
     expect(interaction.reply).toHaveBeenCalledWith({
-      embeds: [{ description: "translated", kind: "success" }],
+      embeds: [{ description: "commands:afk-config.embed.set_ch_success", kind: "success" }],
       flags: 64,
     });
   });

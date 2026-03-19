@@ -34,6 +34,7 @@ vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: vi.fn((key: string, params?: Record<string, unknown>) =>
     params ? `${key}:${JSON.stringify(params)}` : key,
   ),
+  tInteraction: (...args: unknown[]) => args[1],
 }));
 
 vi.mock("@/shared/utils/logger", () => ({
@@ -141,6 +142,53 @@ describe("bot/features/message-delete/commands/usecases/runDeleteExecution", () 
     await executeDelete(interaction as never, [] as never, mockOptions);
 
     expect(createErrorEmbedMock).toHaveBeenCalled();
+  });
+
+  it("タイムアウトで削除が中断された場合は警告 embed と削除済み件数を表示する", async () => {
+    const { executeDelete } = await loadModule();
+
+    // deleteScannedMessages 内で AbortSignal を監視し、abort されたら中断する動作をシミュレート
+    deleteScannedMessagesMock.mockImplementation(
+      async (
+        _msgs: never,
+        onProgress?: (data: object) => Promise<void>,
+        signal?: AbortSignal,
+      ) => {
+        // 進捗を報告
+        if (onProgress) {
+          await onProgress({
+            totalDeleted: 3,
+            total: 10,
+            channelStatuses: [
+              { channelId: "ch-1", name: "general", deleted: 3, total: 10 },
+            ],
+          });
+        }
+        // signal.abort() が呼ばれるまで待機（setTimeout の発火をシミュレート）
+        await vi.advanceTimersByTimeAsync(840_001);
+        // abort 後に結果を返す（実際のコードでは abort チェックで早期終了する）
+        if (signal?.aborted) {
+          return { totalDeleted: 3, channelBreakdown: {} };
+        }
+        return { totalDeleted: 10, channelBreakdown: {} };
+      },
+    );
+
+    vi.useFakeTimers();
+
+    const interaction = makeInteraction();
+    await executeDelete(interaction as never, [] as never, mockOptions);
+
+    vi.useRealTimers();
+
+    expect(createWarningEmbedMock).toHaveBeenCalled();
+    expect(interaction.editReply).toHaveBeenCalledWith(
+      expect.objectContaining({
+        embeds: [expect.objectContaining({ _type: "warning" })],
+        components: [],
+        content: "",
+      }),
+    );
   });
 
   it("削除中に onProgress コールバックを呼び出す", async () => {

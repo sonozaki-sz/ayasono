@@ -26,7 +26,11 @@ export async function handleVacConfigView(
   }
 
   const config = await getBotVacConfigService().getVacConfigOrDefault(guildId);
-  const presentation = await presentVacConfigView(guild, guildId, config);
+  const presentation = await presentVacConfigView(
+    guild,
+    interaction.locale,
+    config,
+  );
 
   // トリガー一覧と作成済みVC一覧を Embed で返す
   const embed = createInfoEmbed("", {

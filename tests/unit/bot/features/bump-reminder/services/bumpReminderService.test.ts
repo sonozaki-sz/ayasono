@@ -15,6 +15,7 @@ const repositoryMock = {
 
 vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string) => key,
+  tInteraction: (...args: unknown[]) => args[1],
 }));
 
 vi.mock("@/shared/utils/logger", () => ({

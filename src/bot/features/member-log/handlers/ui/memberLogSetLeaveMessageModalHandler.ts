@@ -2,7 +2,10 @@
 // member-log-config set-leave-message モーダル送信処理
 
 import { MessageFlags, type ModalSubmitInteraction } from "discord.js";
-import { tDefault, tGuild } from "../../../../../shared/locale/localeManager";
+import {
+  tDefault,
+  tInteraction,
+} from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import type { ModalHandler } from "../../../../handlers/interactionCreate/ui/types";
 import { getBotMemberLogConfigService } from "../../../../services/botCompositionRoot";
@@ -26,12 +29,12 @@ export const memberLogSetLeaveMessageModalHandler: ModalHandler = {
 
     await getBotMemberLogConfigService().setLeaveMessage(guildId, message);
 
-    const description = await tGuild(
-      guildId,
+    const description = tInteraction(
+      interaction.locale,
       "commands:member-log-config.embed.set_leave_message_success",
     );
-    const successTitle = await tGuild(
-      guildId,
+    const successTitle = tInteraction(
+      interaction.locale,
       "commands:member-log-config.embed.success_title",
     );
     await interaction.reply({

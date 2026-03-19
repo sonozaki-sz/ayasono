@@ -133,9 +133,14 @@ describe("shared/locale/localeManager", () => {
   });
 
   it("翻訳失敗時はキーを返してエラーをログに記録すること", async () => {
-    translateMock.mockImplementation(() => {
-      throw new Error("translation-failed");
-    });
+    translateMock
+      .mockImplementationOnce(() => {
+        throw new Error("translation-failed");
+      })
+      .mockImplementation(
+        (key: string, options?: { lng?: string }) =>
+          `${options?.lng ?? "ja"}:${key}`,
+      );
 
     const { LocaleManager } = await import("@/shared/locale/localeManager");
     const manager = new LocaleManager("ja");
@@ -144,7 +149,7 @@ describe("shared/locale/localeManager", () => {
       manager.translate("guild-3", "vac.description" as never),
     ).resolves.toBe("vac.description");
     expect(loggerMock.error).toHaveBeenCalledWith(
-      "Translation failed for key: vac.description",
+      expect.stringContaining("system:locale.translation_failed"),
       expect.any(Error),
     );
   });
@@ -213,5 +218,52 @@ describe("shared/locale/localeManager", () => {
       "afk.description",
       expect.objectContaining({ lng: "ja", value: 2 }),
     );
+  });
+
+  describe("tInteraction", () => {
+    it("locale が 'ja' の場合は日本語で翻訳すること", async () => {
+      const module = await import("@/shared/locale/localeManager");
+
+      const result = module.tInteraction("ja", "ping.description" as never);
+
+      expect(result).toBe("ja:ping.description");
+      expect(translateMock).toHaveBeenCalledWith(
+        "ping.description",
+        expect.objectContaining({ lng: "ja" }),
+      );
+    });
+
+    it("locale が 'ja' 以外の場合は英語にフォールバックすること", async () => {
+      const module = await import("@/shared/locale/localeManager");
+
+      const result = module.tInteraction("en-US", "ping.description" as never);
+
+      expect(result).toBe("en:ping.description");
+      expect(translateMock).toHaveBeenCalledWith(
+        "ping.description",
+        expect.objectContaining({ lng: "en" }),
+      );
+    });
+
+    it("params が渡された場合はオプションにマージされること", async () => {
+      const module = await import("@/shared/locale/localeManager");
+
+      module.tInteraction("ja", "ping.description" as never, { count: 3 });
+
+      expect(translateMock).toHaveBeenCalledWith(
+        "ping.description",
+        expect.objectContaining({ lng: "ja", count: 3 }),
+      );
+    });
+
+    it("params が未指定の場合は lng のみのオプションで翻訳すること", async () => {
+      const module = await import("@/shared/locale/localeManager");
+
+      module.tInteraction("ko", "afk.description" as never);
+
+      expect(translateMock).toHaveBeenCalledWith("afk.description", {
+        lng: "en",
+      });
+    });
   });
 });

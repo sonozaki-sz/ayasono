@@ -11,7 +11,10 @@ import {
   type ChatInputCommandInteraction,
 } from "discord.js";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
-import { tDefault, tGuild } from "../../../../../shared/locale/localeManager";
+import {
+  tDefault,
+  tInteraction,
+} from "../../../../../shared/locale/localeManager";
 import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
 import { getBotVcRecruitConfigService } from "../../../../services/botCompositionRoot";
 import { disableComponentsAfterTimeout } from "../../../../shared/disableComponentsAfterTimeout";
@@ -39,7 +42,7 @@ export async function handleVcRecruitConfigRemoveRole(
 
   if (config.mentionRoleIds.length === 0) {
     throw new ValidationError(
-      await tGuild(guildId, "errors:vcRecruit.no_roles_registered"),
+      tInteraction(interaction.locale, "errors:vcRecruit.no_roles_registered"),
     );
   }
 
@@ -57,8 +60,8 @@ export async function handleVcRecruitConfigRemoveRole(
       `${VC_RECRUIT_ROLE_CUSTOM_ID.REMOVE_ROLE_SELECT_PREFIX}${sessionId}`,
     )
     .setPlaceholder(
-      await tGuild(
-        guildId,
+      tInteraction(
+        interaction.locale,
         "commands:vc-recruit-config.remove-role.select.placeholder",
       ),
     )
@@ -71,8 +74,8 @@ export async function handleVcRecruitConfigRemoveRole(
       `${VC_RECRUIT_ROLE_CUSTOM_ID.REMOVE_ROLE_CONFIRM_PREFIX}${sessionId}`,
     )
     .setLabel(
-      await tGuild(
-        guildId,
+      tInteraction(
+        interaction.locale,
         "commands:vc-recruit-config.remove-role.button.confirm",
       ),
     )
@@ -84,8 +87,8 @@ export async function handleVcRecruitConfigRemoveRole(
       `${VC_RECRUIT_ROLE_CUSTOM_ID.REMOVE_ROLE_CANCEL_PREFIX}${sessionId}`,
     )
     .setLabel(
-      await tGuild(
-        guildId,
+      tInteraction(
+        interaction.locale,
         "commands:vc-recruit-config.remove-role.button.cancel",
       ),
     )
@@ -100,8 +103,8 @@ export async function handleVcRecruitConfigRemoveRole(
   );
 
   await interaction.reply({
-    content: await tGuild(
-      guildId,
+    content: tInteraction(
+      interaction.locale,
       "commands:vc-recruit-config.remove-role.select.title",
     ),
     components: [selectRow, buttonRow],

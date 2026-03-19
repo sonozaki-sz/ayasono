@@ -7,8 +7,8 @@ import { ValidationError } from "@/shared/errors/customErrors";
 // ---- モック定義 ----
 
 const getVcRecruitConfigOrDefaultMock = vi.fn();
-const tGuildMock = vi.fn(
-  async (_guildId: string, key: string, opts?: Record<string, unknown>) =>
+const tInteractionMock = vi.fn(
+  (_locale: string, key: string, opts?: Record<string, unknown>) =>
     opts ? `${key}:${JSON.stringify(opts)}` : key,
 );
 const tDefaultMock = vi.fn((key: string) => key);
@@ -24,8 +24,8 @@ vi.mock("@/bot/shared/disableComponentsAfterTimeout", () => ({
 }));
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  tGuild: (...args: unknown[]) =>
-    tGuildMock(...(args as Parameters<typeof tGuildMock>)),
+  tInteraction: (...args: unknown[]) =>
+    tInteractionMock(...(args as Parameters<typeof tInteractionMock>)),
   tDefault: (...args: unknown[]) =>
     tDefaultMock(...(args as Parameters<typeof tDefaultMock>)),
 }));
@@ -38,6 +38,7 @@ const GUILD_ID = "guild-1";
 function makeInteraction(guildChannels: Record<string, { name: string }> = {}) {
   return {
     id: "interaction-001",
+    locale: "ja",
     guild: {
       id: GUILD_ID,
       channels: {
@@ -91,7 +92,7 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigTeardown", ()
 
   it("categoryId が null の場合は TOP ラベルを使用する", async () => {
     const topLabel = "TOP（カテゴリーなし）";
-    tGuildMock.mockImplementation(async (_guildId: string, key: string) => {
+    tInteractionMock.mockImplementation((_locale: string, key: string) => {
       if (key === "commands:vc-recruit-config.teardown.select.top")
         return topLabel;
       return key;
@@ -140,8 +141,8 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigTeardown", ()
 
   it("categoryId が存在しないチャンネルの場合は unknown_category ラベルを使用する", async () => {
     const unknownLabel = "不明なカテゴリー（ID: cat-999）";
-    tGuildMock.mockImplementation(
-      async (_guildId: string, key: string, opts?: Record<string, unknown>) => {
+    tInteractionMock.mockImplementation(
+      (_locale: string, key: string, opts?: Record<string, unknown>) => {
         if (
           key === "commands:vc-recruit-config.teardown.select.unknown_category"
         )

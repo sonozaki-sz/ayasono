@@ -2,7 +2,10 @@
 // member-log-config enable 実行処理
 
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
-import { tDefault, tGuild } from "../../../../shared/locale/localeManager";
+import {
+  tDefault,
+  tInteraction,
+} from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import { getBotMemberLogConfigService } from "../../../services/botCompositionRoot";
 import {
@@ -31,8 +34,8 @@ export async function handleMemberLogConfigEnable(
 
   // チャンネルが未設定の場合は有効化できない
   if (!config?.channelId) {
-    const description = await tGuild(
-      guildId,
+    const description = tInteraction(
+      interaction.locale,
       "commands:member-log-config.embed.enable_error_no_channel",
     );
     const embed = createWarningEmbed(description);
@@ -46,12 +49,12 @@ export async function handleMemberLogConfigEnable(
   // 機能を有効化
   await getBotMemberLogConfigService().setEnabled(guildId, true);
 
-  const description = await tGuild(
-    guildId,
+  const description = tInteraction(
+    interaction.locale,
     "commands:member-log-config.embed.enable_success",
   );
-  const successTitle = await tGuild(
-    guildId,
+  const successTitle = tInteraction(
+    interaction.locale,
     "commands:member-log-config.embed.success_title",
   );
   const embed = createSuccessEmbed(description, { title: successTitle });

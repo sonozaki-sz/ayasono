@@ -44,6 +44,7 @@ vi.mock("@/bot/utils/messageResponse", () => ({
 vi.mock("@/shared/locale/localeManager", () => ({
   tGuild: (...args: unknown[]) =>
     tGuildMock(...(args as Parameters<typeof tGuildMock>)),
+  tInteraction: vi.fn((_locale: string, key: string) => key),
 }));
 
 // ---- ヘルパー ----

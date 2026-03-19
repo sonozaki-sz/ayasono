@@ -12,7 +12,7 @@ const getVacConfigOrDefaultMock = vi.fn();
 const getVcRecruitSessionMock = vi.fn();
 const setVcRecruitSessionMock = vi.fn();
 const safeReplyMock = vi.fn();
-const tGuildMock = vi.fn(async (_guildId: string, key: string) => key);
+const tInteractionMock = vi.fn((_locale: string, key: string) => key);
 
 vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotVcRecruitRepository: () => ({
@@ -41,7 +41,7 @@ vi.mock("@/bot/features/vc-recruit/handlers/ui/vcRecruitTeardownState", () => ({
 vi.mock(
   "@/bot/features/vc-recruit/commands/usecases/vcRecruitConfigTeardown",
   () => ({
-    buildTeardownSelectOptions: vi.fn().mockResolvedValue([]),
+    buildTeardownSelectOptions: vi.fn().mockReturnValue([]),
   }),
 );
 vi.mock("@/bot/utils/interaction", () => ({
@@ -55,8 +55,8 @@ vi.mock("@/bot/utils/messageResponse", () => ({
   STATUS_COLORS: { success: 0x57f287, info: 0x3498db, warning: 0xfee75c, error: 0xed4245 },
 }));
 vi.mock("@/shared/locale/localeManager", () => ({
-  tGuild: (...args: unknown[]) =>
-    tGuildMock(...(args as Parameters<typeof tGuildMock>)),
+  tInteraction: (...args: unknown[]) =>
+    tInteractionMock(...(args as Parameters<typeof tInteractionMock>)),
   tDefault: vi.fn((key: string) => key),
 }));
 
@@ -111,6 +111,7 @@ function makeCreateButtonInteraction(
   return {
     customId,
     guild,
+    locale: "ja",
     user: { id: "user-1" },
     id: "interaction-create-1",
     reply: vi.fn().mockResolvedValue(undefined),
@@ -126,6 +127,7 @@ function makeModalOpenButtonInteraction(
   return {
     customId: `${MODAL_OPEN_PREFIX}${sessionId}`,
     guild,
+    locale: "ja",
     user: { id: "user-1" },
     id: "interaction-modal-1",
     reply: vi.fn().mockResolvedValue(undefined),

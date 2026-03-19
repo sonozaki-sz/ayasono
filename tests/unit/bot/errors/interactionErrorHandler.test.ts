@@ -37,6 +37,8 @@ vi.mock("@/shared/locale/localeManager", () => ({
         "予期しないエラーが発生しました。",
       "errors:general.unexpected_with_message": `予期しないエラー: ${params?.message || ""}`,
       "system:error.reply_failed": "返信に失敗しました",
+      "system:error.base_error_log": `[${params?.errorName || ""}] ${params?.message || ""}`,
+      "system:error.unhandled_error_log": `[UnhandledError] ${params?.message || ""}`,
     };
     return translations[key] || key;
   },
@@ -46,6 +48,7 @@ vi.mock("@/shared/locale/localeManager", () => ({
     }
     return key;
   },
+  tInteraction: (...args: unknown[]) => args[1],
 }));
 
 describe("ErrorHandler", () => {
@@ -162,6 +165,7 @@ describe("ErrorHandler", () => {
       mockInteraction = {
         replied: false,
         deferred: false,
+        locale: "ja",
         reply: vi.fn().mockResolvedValue(undefined),
         editReply: vi.fn().mockResolvedValue(undefined),
       } as unknown as Mocked<ChatInputCommandInteraction>;
@@ -257,6 +261,7 @@ describe("ErrorHandler", () => {
         replied: false,
         deferred: false,
         guildId: "guild-1",
+        locale: "ja",
         reply: vi.fn().mockResolvedValue(undefined),
         editReply: vi.fn().mockResolvedValue(undefined),
       };
@@ -276,6 +281,7 @@ describe("ErrorHandler", () => {
         replied: false,
         deferred: false,
         guildId: null,
+        locale: "ja",
         reply: vi.fn().mockResolvedValue(undefined),
         editReply: vi.fn().mockResolvedValue(undefined),
       };
@@ -305,6 +311,7 @@ describe("ErrorHandler", () => {
         replied: false,
         deferred: false,
         guildId: null,
+        locale: "ja",
         reply: vi.fn().mockResolvedValue(undefined),
         editReply: vi.fn().mockResolvedValue(undefined),
       };
@@ -326,6 +333,7 @@ describe("ErrorHandler", () => {
       const mockInteraction = {
         replied: false,
         deferred: false,
+        locale: "ja",
         reply: vi.fn().mockResolvedValue(undefined),
         editReply: vi.fn().mockResolvedValue(undefined),
       } as unknown as Mocked<ChatInputCommandInteraction>;

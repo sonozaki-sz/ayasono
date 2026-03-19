@@ -21,6 +21,7 @@ vi.mock("@/shared/utils/logger", () => ({
 vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string, params?: Record<string, unknown>) =>
     `${key}:${JSON.stringify(params || {})}`,
+  tInteraction: (...args: unknown[]) => args[1],
 }));
 
 describe("CooldownManager", () => {

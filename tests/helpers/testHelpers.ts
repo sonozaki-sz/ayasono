@@ -85,6 +85,7 @@ export const createMockInteraction = (
   ({
     id: "interaction-123",
     commandName: "test",
+    locale: "ja",
     user: createMockUser(),
     guild: createMockGuild(),
     member: createMockMember(),

@@ -119,6 +119,7 @@ vi.mock("@/shared/locale/localeManager", () => ({
     setRepository: vi.fn(),
   },
   tDefault: vi.fn((key: string) => key),
+  tInteraction: vi.fn((_l: string, k: string) => k),
 }));
 
 vi.mock("@/shared/utils/logger", () => ({

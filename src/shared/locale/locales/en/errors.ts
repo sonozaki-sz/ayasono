@@ -67,6 +67,14 @@ export const errors = {
     "This VC is not managed by auto-create feature.",
   "vac.limit_out_of_range":
     "User limit must be between 0 and 99.",
+
+  // VC command (/vc rename, /vc limit)
+  "vc.not_in_any_vc":
+    "You must be in a voice channel to use this command.",
+  "vc.not_managed_channel":
+    "This voice channel is not managed by the Bot.",
+  "vc.limit_out_of_range":
+    "User limit must be between 0 and 99.",
   "vac.afk_move_failed":
     "Failed to move to AFK channel. The target user(s) may have left the VC.",
 

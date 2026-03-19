@@ -12,7 +12,7 @@ import {
   logError,
   toError,
 } from "../../shared/errors/errorHandler";
-import { tDefault, tGuild } from "../../shared/locale/localeManager";
+import { tDefault, tInteraction } from "../../shared/locale/localeManager";
 import { logger } from "../../shared/utils/logger";
 import { createErrorEmbed } from "../utils/messageResponse";
 
@@ -22,19 +22,16 @@ import { createErrorEmbed } from "../utils/messageResponse";
  * @param err 発生したエラー
  * @returns Embedタイトル文字列
  */
-const getErrorTitle = async (
+const getErrorTitle = (
   interaction: RepliableInteraction,
   err: Error | BaseError,
-): Promise<string> => {
+): string => {
   if (err instanceof BaseError && err.embedTitle) {
     return err.embedTitle;
   }
 
   if (err instanceof ValidationError) {
-    if (interaction.guildId) {
-      return await tGuild(interaction.guildId, "errors:validation.error_title");
-    }
-    return tDefault("errors:validation.error_title");
+    return tInteraction(interaction.locale, "errors:validation.error_title");
   }
 
   if (err instanceof BaseError && err.name) {
@@ -59,7 +56,7 @@ const replyWithError = async (
   logError(err);
 
   const message = getUserFriendlyMessage(err);
-  const title = await getErrorTitle(interaction, err);
+  const title = getErrorTitle(interaction, err);
   const embed = createErrorEmbed(message, { title });
 
   try {

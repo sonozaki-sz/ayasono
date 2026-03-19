@@ -13,7 +13,7 @@ import {
   type ButtonInteraction,
   type GuildMember,
 } from "discord.js";
-import { tGuild } from "../../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../../shared/locale/localeManager";
 import type { ButtonHandler } from "../../../../handlers/interactionCreate/ui/types";
 import { safeReply } from "../../../../utils/interaction";
 import {
@@ -63,7 +63,7 @@ export const vcPanelButtonHandler: ButtonHandler = {
       await safeReply(interaction, {
         embeds: [
           createErrorEmbed(
-            await tGuild(guild.id, "errors:vac.not_vac_channel"),
+            tInteraction(interaction.locale, "errors:vac.not_vac_channel"),
           ),
         ],
         flags: MessageFlags.Ephemeral,
@@ -76,7 +76,7 @@ export const vcPanelButtonHandler: ButtonHandler = {
       await safeReply(interaction, {
         embeds: [
           createErrorEmbed(
-            await tGuild(guild.id, "errors:vac.not_vac_channel"),
+            tInteraction(interaction.locale, "errors:vac.not_vac_channel"),
           ),
         ],
         flags: MessageFlags.Ephemeral,
@@ -91,7 +91,9 @@ export const vcPanelButtonHandler: ButtonHandler = {
     if (!member || member.voice.channelId !== channel.id) {
       await safeReply(interaction, {
         embeds: [
-          createErrorEmbed(await tGuild(guild.id, "errors:vac.not_in_vc")),
+          createErrorEmbed(
+            tInteraction(interaction.locale, "errors:vac.not_in_vc"),
+          ),
         ],
         flags: MessageFlags.Ephemeral,
       });
@@ -101,7 +103,10 @@ export const vcPanelButtonHandler: ButtonHandler = {
     if (
       interaction.customId.startsWith(VAC_PANEL_CUSTOM_ID.RENAME_BUTTON_PREFIX)
     ) {
-      const title = await tGuild(guild.id, "commands:vac.panel.rename_button");
+      const title = tInteraction(
+        interaction.locale,
+        "commands:vac.panel.rename_button",
+      );
       const modal = new ModalBuilder()
         .setCustomId(`${VAC_PANEL_CUSTOM_ID.RENAME_MODAL_PREFIX}${channel.id}`)
         .setTitle(title)
@@ -123,7 +128,10 @@ export const vcPanelButtonHandler: ButtonHandler = {
     if (
       interaction.customId.startsWith(VAC_PANEL_CUSTOM_ID.LIMIT_BUTTON_PREFIX)
     ) {
-      const title = await tGuild(guild.id, "commands:vac.panel.limit_button");
+      const title = tInteraction(
+        interaction.locale,
+        "commands:vac.panel.limit_button",
+      );
       const modal = new ModalBuilder()
         .setCustomId(`${VAC_PANEL_CUSTOM_ID.LIMIT_MODAL_PREFIX}${channel.id}`)
         .setTitle(title)
@@ -133,8 +141,8 @@ export const vcPanelButtonHandler: ButtonHandler = {
               .setCustomId(VAC_PANEL_CUSTOM_ID.LIMIT_INPUT)
               .setLabel(title)
               .setPlaceholder(
-                await tGuild(
-                  guild.id,
+                tInteraction(
+                  interaction.locale,
                   "commands:vac.panel.limit_input_placeholder",
                 ),
               )
@@ -156,7 +164,9 @@ export const vcPanelButtonHandler: ButtonHandler = {
       if (vcMembers.length === 0) {
         await safeReply(interaction, {
           embeds: [
-            createErrorEmbed(await tGuild(guild.id, "errors:vac.not_in_vc")),
+            createErrorEmbed(
+              tInteraction(interaction.locale, "errors:vac.not_in_vc"),
+            ),
           ],
           flags: MessageFlags.Ephemeral,
         });
@@ -173,7 +183,9 @@ export const vcPanelButtonHandler: ButtonHandler = {
 
       const selectMenu = new StringSelectMenuBuilder()
         .setCustomId(`${VAC_PANEL_CUSTOM_ID.AFK_SELECT_PREFIX}${channel.id}`)
-        .setPlaceholder(await tGuild(guild.id, "commands:vac.panel.afk_button"))
+        .setPlaceholder(
+          tInteraction(interaction.locale, "commands:vac.panel.afk_button"),
+        )
         .setMinValues(1)
         .setMaxValues(Math.min(25, vcMembers.length))
         .addOptions(options);
@@ -200,7 +212,10 @@ export const vcPanelButtonHandler: ButtonHandler = {
       await safeReply(interaction, {
         embeds: [
           createSuccessEmbed(
-            await tGuild(guild.id, "commands:vac.embed.panel_refreshed"),
+            tInteraction(
+              interaction.locale,
+              "commands:vac.embed.panel_refreshed",
+            ),
           ),
         ],
         flags: MessageFlags.Ephemeral,

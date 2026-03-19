@@ -132,19 +132,26 @@ export const commands = {
   "vac-config.embed.remove_error_title":
     "Removal Error",
 
-  // VAC command
-  // VC operation commands (rename/user limit)
-  // Runtime panel/manual operation result messages
-  "vac.description":
-    "Change settings of an auto-created VC",
-  "vac.vc-rename.description":
+  // VC command (/vc rename, /vc limit)
+  "vc.description":
+    "Change VC settings",
+  "vc.rename.description":
     "Rename your current VC",
-  "vac.vc-rename.name.description":
+  "vc.rename.name.description":
     "New VC name",
-  "vac.vc-limit.description":
+  "vc.limit.description":
     "Change user limit of your current VC",
-  "vac.vc-limit.limit.description":
+  "vc.limit.limit.description":
     "User limit (0=unlimited, max 99)",
+  "vc.embed.renamed":
+    "VC name has been changed to {{name}}",
+  "vc.embed.limit_changed":
+    "User limit has been set to {{limit}}",
+  "vc.embed.unlimited":
+    "unlimited",
+
+  // VAC panel
+  // Runtime panel/manual operation result messages
   "vac.embed.renamed":
     "VC name has been changed to {{name}}",
   "vac.embed.limit_changed":

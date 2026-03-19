@@ -58,6 +58,7 @@ vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: (...args: unknown[]) =>
     tDefaultMock(...(args as Parameters<typeof tDefaultMock>)),
   tGuild: (guildId: string, key: string) => tGuildMock(guildId, key),
+  tInteraction: vi.fn((_locale: string, key: string) => key),
 }));
 
 // ---- ヘルパー ----

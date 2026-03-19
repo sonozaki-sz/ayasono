@@ -42,6 +42,7 @@ vi.mock("@/shared/locale/commandLocalizations", () => ({
 vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: tDefaultMock,
   tGuild: tGuildMock,
+  tInteraction: (...args: unknown[]) => args[1],
 }));
 
 // メッセージ生成ユーティリティは生成結果を簡易オブジェクトに置換する
@@ -58,6 +59,7 @@ import { handleCommandError } from "@/bot/errors/interactionErrorHandler";
 type AfkConfigInteraction = {
   guildId: string | null;
   channelId: string;
+  locale: string;
   memberPermissions: { has: Mock };
   options: {
     getSubcommand: Mock<() => string>;
@@ -73,6 +75,7 @@ function createInteraction(
   return {
     guildId: "guild-1",
     channelId: "channel-1",
+    locale: "ja",
     memberPermissions: {
       has: vi.fn(() => true),
     },
@@ -92,7 +95,7 @@ describe("bot/commands/afk-config", () => {
   // ケースごとにモック状態を初期化する
   beforeEach(() => {
     vi.clearAllMocks();
-    tGuildMock.mockResolvedValue("translated");
+    // tInteraction mock returns key as-is (no setup needed)
     getAfkConfigMock.mockResolvedValue({ enabled: false, channelId: null });
   });
 
@@ -116,7 +119,7 @@ describe("bot/commands/afk-config", () => {
     );
     expect(setAfkChannelMock).toHaveBeenCalledWith("guild-1", "afk-channel");
     expect(interaction.reply).toHaveBeenCalledWith({
-      embeds: [{ kind: "success", description: "translated" }],
+      embeds: [{ kind: "success", description: "commands:afk-config.embed.set_ch_success" }],
       flags: 64,
     });
   });
@@ -156,7 +159,7 @@ describe("bot/commands/afk-config", () => {
     expect(getAfkConfigMock).toHaveBeenCalledWith("guild-1");
     expect(createInfoEmbedMock).toHaveBeenCalled();
     expect(interaction.reply).toHaveBeenCalledWith({
-      embeds: [{ kind: "info", description: "translated" }],
+      embeds: [{ kind: "info", description: "commands:afk-config.embed.not_configured" }],
       flags: 64,
     });
   });
@@ -178,8 +181,8 @@ describe("bot/commands/afk-config", () => {
       interaction as unknown as ChatInputCommandInteraction,
     );
 
-    expect(createInfoEmbedMock).toHaveBeenCalledWith("translated", {
-      title: "translated",
+    expect(createInfoEmbedMock).toHaveBeenCalledWith("commands:afk-config.embed.not_configured", {
+      title: "commands:afk-config.embed.title",
     });
   });
 
@@ -200,8 +203,8 @@ describe("bot/commands/afk-config", () => {
     );
 
     expect(createInfoEmbedMock).toHaveBeenCalledWith("", {
-      title: "translated",
-      fields: [{ name: "translated", value: "<#afk-channel>", inline: true }],
+      title: "commands:afk-config.embed.title",
+      fields: [{ name: "commands:afk-config.embed.field.channel", value: "<#afk-channel>", inline: true }],
     });
     expect(interaction.reply).toHaveBeenCalledWith({
       embeds: [{ kind: "info", description: "" }],

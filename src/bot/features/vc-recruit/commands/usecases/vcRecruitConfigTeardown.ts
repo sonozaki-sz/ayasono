@@ -11,7 +11,10 @@ import {
 } from "discord.js";
 import type { VcRecruitSetup } from "../../../../../shared/database/types";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
-import { tDefault, tGuild } from "../../../../../shared/locale/localeManager";
+import {
+  tDefault,
+  tInteraction,
+} from "../../../../../shared/locale/localeManager";
 import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
 import { getBotVcRecruitConfigService } from "../../../../services/botCompositionRoot";
 import { disableComponentsAfterTimeout } from "../../../../shared/disableComponentsAfterTimeout";
@@ -24,40 +27,38 @@ import {
 /**
  * teardown セレクトメニューのオプション一覧を構築する（コマンド初回表示・やり直し共用）
  * @param guild 対象ギルド
- * @param guildId ギルド ID
+ * @param locale ユーザーのロケール
  * @param setups セットアップ情報の配列
  * @returns セレクトメニューオプションの配列
  */
-export async function buildTeardownSelectOptions(
+export function buildTeardownSelectOptions(
   guild: Guild,
-  guildId: string,
+  locale: string,
   setups: VcRecruitSetup[],
-): Promise<StringSelectMenuOptionBuilder[]> {
-  return Promise.all(
-    setups.map(async (setup) => {
-      let label: string;
-      if (setup.categoryId === null) {
-        label = await tGuild(
-          guildId,
-          "commands:vc-recruit-config.teardown.select.top",
-        );
+): StringSelectMenuOptionBuilder[] {
+  return setups.map((setup) => {
+    let label: string;
+    if (setup.categoryId === null) {
+      label = tInteraction(
+        locale,
+        "commands:vc-recruit-config.teardown.select.top",
+      );
+    } else {
+      const cat = guild.channels.cache.get(setup.categoryId);
+      if (cat) {
+        label = cat.name;
       } else {
-        const cat = guild.channels.cache.get(setup.categoryId);
-        if (cat) {
-          label = cat.name;
-        } else {
-          label = await tGuild(
-            guildId,
-            "commands:vc-recruit-config.teardown.select.unknown_category",
-            { id: setup.categoryId },
-          );
-        }
+        label = tInteraction(
+          locale,
+          "commands:vc-recruit-config.teardown.select.unknown_category",
+          { id: setup.categoryId },
+        );
       }
-      return new StringSelectMenuOptionBuilder()
-        .setValue(setup.panelChannelId)
-        .setLabel(label);
-    }),
-  );
+    }
+    return new StringSelectMenuOptionBuilder()
+      .setValue(setup.panelChannelId)
+      .setLabel(label);
+  });
 }
 
 /**
@@ -79,19 +80,19 @@ export async function handleVcRecruitConfigTeardown(
 
   if (config.setups.length === 0) {
     throw new ValidationError(
-      await tGuild(guildId, "errors:vcRecruit.not_setup"),
+      tInteraction(interaction.locale, "errors:vcRecruit.not_setup"),
     );
   }
 
   // セットアップごとのセレクトオプションを構築
-  const options = await buildTeardownSelectOptions(
+  const options = buildTeardownSelectOptions(
     guild,
-    guildId,
+    interaction.locale,
     config.setups,
   );
 
-  const placeholder = await tGuild(
-    guildId,
+  const placeholder = tInteraction(
+    interaction.locale,
     "commands:vc-recruit-config.teardown.select.placeholder",
   );
 

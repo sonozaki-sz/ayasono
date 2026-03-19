@@ -5,7 +5,6 @@ import {
   createErrorEmbed,
   createSuccessEmbed,
 } from "@/bot/utils/messageResponse";
-import { getGuildTranslator } from "@/shared/locale/helpers";
 import { tDefault } from "@/shared/locale/localeManager";
 import { logger } from "@/shared/utils/logger";
 import { MessageFlags } from "discord.js";
@@ -54,6 +53,7 @@ vi.mock("@/shared/locale/helpers", () => ({
 }));
 vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: vi.fn((key: string) => key),
+  tInteraction: (...args: unknown[]) => args[1],
 }));
 
 // interaction 応答は safeReply 経由のみ検証する
@@ -79,11 +79,12 @@ type ButtonInteractionLike = {
 // bumpPanel ハンドラ検証用の最小 interaction モック
 function createInteraction(
   overrides?: Partial<ButtonInteractionLike>,
-): ButtonInteractionLike {
+): ButtonInteractionLike & { locale: string } {
   return {
     customId: "bump-reminder:mention-on:guild-1",
     guild: { id: "guild-1" },
     user: { id: "user-1" },
+    locale: "ja",
     ...overrides,
   };
 }
@@ -141,7 +142,6 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
       await bumpPanelButtonHandler.execute(interaction as never);
 
       expect(getBotBumpReminderConfigService).toHaveBeenCalledTimes(1);
-      expect(getGuildTranslator).toHaveBeenCalledWith("guild-1");
       expect(addMentionUserMock).toHaveBeenCalledWith("guild-1", "user-1");
       expect(createSuccessEmbed).toHaveBeenCalledWith(
         "events:bump-reminder.panel.mention_toggled_on",

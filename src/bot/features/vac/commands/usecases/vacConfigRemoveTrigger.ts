@@ -7,7 +7,10 @@ import {
   MessageFlags,
 } from "discord.js";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
-import { tDefault, tGuild } from "../../../../../shared/locale/localeManager";
+import {
+  tDefault,
+  tInteraction,
+} from "../../../../../shared/locale/localeManager";
 import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
 import { getBotVacConfigService } from "../../../../services/botCompositionRoot";
 import { createSuccessEmbed } from "../../../../utils/messageResponse";
@@ -54,8 +57,11 @@ export async function handleVacConfigRemoveTrigger(
 
   if (!triggerChannel) {
     throw new ValidationError(
-      await tGuild(guildId, "errors:vac.trigger_not_found"),
-      await tGuild(guildId, "commands:vac-config.embed.remove_error_title"),
+      tInteraction(interaction.locale, "errors:vac.trigger_not_found"),
+      tInteraction(
+        interaction.locale,
+        "commands:vac-config.embed.remove_error_title",
+      ),
     );
   }
 
@@ -70,11 +76,18 @@ export async function handleVacConfigRemoveTrigger(
   }
 
   const embed = createSuccessEmbed(
-    await tGuild(guildId, "commands:vac-config.embed.trigger_removed", {
-      channel: `#${triggerChannel.name}`,
-    }),
+    tInteraction(
+      interaction.locale,
+      "commands:vac-config.embed.trigger_removed",
+      {
+        channel: `#${triggerChannel.name}`,
+      },
+    ),
     {
-      title: await tGuild(guildId, "commands:vac-config.embed.success_title"),
+      title: tInteraction(
+        interaction.locale,
+        "commands:vac-config.embed.success_title",
+      ),
     },
   );
   // 管理系操作の結果は Ephemeral で返してチャンネルノイズを抑える

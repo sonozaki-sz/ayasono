@@ -10,7 +10,6 @@ const addTriggerChannelMock = vi.fn();
 const getVacConfigOrDefaultMock = vi.fn();
 const removeTriggerChannelMock = vi.fn();
 const tDefaultMock = vi.hoisted(() => vi.fn((key: string) => `default:${key}`));
-const tGuildMock = vi.hoisted(() => vi.fn());
 const createSuccessEmbedMock = vi.fn((description: string) => ({
   description,
 }));
@@ -44,7 +43,7 @@ vi.mock("@/shared/locale/commandLocalizations", () => ({
 }));
 vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: tDefaultMock,
-  tGuild: tGuildMock,
+  tInteraction: (...args: unknown[]) => args[1],
 }));
 
 // Embed 生成は簡易オブジェクトを返す
@@ -60,6 +59,7 @@ import { handleCommandError } from "@/bot/errors/interactionErrorHandler";
 
 type CommandInteractionLike = {
   guildId: string | null;
+  locale: string;
   guild: {
     channels: {
       create: Mock;
@@ -104,6 +104,7 @@ function createCommandInteraction(
 ): CommandInteractionLike {
   return {
     guildId: "guild-1",
+    locale: "ja",
     guild: {
       channels: {
         create: vi.fn().mockResolvedValue({ id: "trigger-1" }),
@@ -198,7 +199,6 @@ describe("bot/commands/vac-config", () => {
   // ケース間でモック状態を初期化する
   beforeEach(() => {
     vi.clearAllMocks();
-    tGuildMock.mockResolvedValue("translated");
     getVacConfigOrDefaultMock.mockResolvedValue({
       enabled: true,
       triggerChannelIds: [],
@@ -238,7 +238,7 @@ describe("bot/commands/vac-config", () => {
     });
     expect(addTriggerChannelMock).toHaveBeenCalledWith("guild-1", "trigger-1");
     expect(interaction.reply).toHaveBeenCalledWith({
-      embeds: [{ description: "translated" }],
+      embeds: [expect.objectContaining({ description: expect.any(String) })],
       flags: 64,
     });
   });
@@ -575,7 +575,7 @@ describe("bot/commands/vac-config", () => {
     expect(removeTriggerChannelMock).toHaveBeenCalledWith("guild-1", "tr-1");
     expect(deleteMock).toHaveBeenCalledTimes(1);
     expect(interaction.reply).toHaveBeenCalledWith({
-      embeds: [{ description: "translated" }],
+      embeds: [expect.objectContaining({ description: expect.any(String) })],
       flags: 64,
     });
   });

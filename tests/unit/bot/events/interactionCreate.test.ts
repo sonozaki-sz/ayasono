@@ -4,7 +4,7 @@ import {
   handleInteractionError,
 } from "@/bot/errors/interactionErrorHandler";
 import { interactionCreateEvent } from "@/bot/events/interactionCreate";
-import { tGuild } from "@/shared/locale/localeManager";
+import { tInteraction } from "@/shared/locale/localeManager";
 import { logger } from "@/shared/utils/logger";
 import { Events, MessageFlags } from "discord.js";
 import type { Mock } from "vitest";
@@ -18,7 +18,7 @@ vi.mock("@/bot/errors/interactionErrorHandler", () => ({
 // ローカライズは固定文字列化してアサーションを簡潔にする
 vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: vi.fn((key: string) => `default:${key}`),
-  tGuild: vi.fn(async (_guildId: string, key: string) => `guild:${key}`),
+  tInteraction: vi.fn((_locale: string, key: string) => `interaction:${key}`),
 }));
 
 vi.mock("@/bot/utils/messageResponse", () => ({
@@ -82,6 +82,7 @@ type BaseInteraction = {
   commandName: string;
   customId: string;
   guildId: string;
+  locale: string;
   user: { id: string; tag: string };
   reply: Mock<(arg: unknown) => Promise<void>>;
   isChatInputCommand: Mock<() => boolean>;
@@ -106,6 +107,7 @@ function createInteraction(
     commandName: "ping",
     customId: "custom-id",
     guildId: "guild-1",
+    locale: "ja",
     user: { id: "user-1", tag: "user#0001" },
     reply: vi.fn().mockResolvedValue(undefined),
     isChatInputCommand: vi.fn(() => false),
@@ -145,11 +147,11 @@ describe("bot/events/interactionCreate", () => {
 
     await interactionCreateEvent.execute(interaction as never);
 
-    expect(tGuild).toHaveBeenCalledWith("guild-1", "commands:cooldown.wait", {
+    expect(tInteraction).toHaveBeenCalledWith("ja", "commands:cooldown.wait", {
       seconds: 2,
     });
     expect(interaction.reply).toHaveBeenCalledWith({
-      content: "guild:commands:cooldown.wait",
+      content: "interaction:commands:cooldown.wait",
       flags: MessageFlags.Ephemeral,
     });
     expect(command.execute).not.toHaveBeenCalled();
@@ -262,7 +264,7 @@ describe("bot/events/interactionCreate", () => {
     expect(interaction.reply).not.toHaveBeenCalled();
   });
 
-  it("ギルド外では tDefault のクールダウンメッセージを使うことを確認", async () => {
+  it("ギルド外でも tInteraction のクールダウンメッセージを使うことを確認", async () => {
     const command = {
       data: { name: "ping" },
       cooldown: undefined,
@@ -277,9 +279,11 @@ describe("bot/events/interactionCreate", () => {
 
     await interactionCreateEvent.execute(interaction as never);
 
-    expect(tGuild).not.toHaveBeenCalled();
+    expect(tInteraction).toHaveBeenCalledWith("ja", "commands:cooldown.wait", {
+      seconds: 1,
+    });
     expect(interaction.reply).toHaveBeenCalledWith({
-      content: "default:commands:cooldown.wait",
+      content: "interaction:commands:cooldown.wait",
       flags: MessageFlags.Ephemeral,
     });
   });

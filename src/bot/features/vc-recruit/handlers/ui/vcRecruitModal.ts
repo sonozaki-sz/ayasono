@@ -13,7 +13,10 @@ import {
   type TextChannel,
   type VoiceChannel,
 } from "discord.js";
-import { tGuild } from "../../../../../shared/locale/localeManager";
+import {
+  tGuild,
+  tInteraction,
+} from "../../../../../shared/locale/localeManager";
 import type { ModalHandler } from "../../../../handlers/interactionCreate/ui/types";
 import { getBotVcRecruitRepository } from "../../../../services/botCompositionRoot";
 import { safeReply } from "../../../../utils/interaction";
@@ -110,7 +113,7 @@ export const vcRecruitModalHandler: ModalHandler = {
       await safeReply(interaction, {
         embeds: [
           createErrorEmbed(
-            await tGuild(guild.id, "errors:interaction.timeout"),
+            tInteraction(interaction.locale, "errors:interaction.timeout"),
           ),
         ],
         flags: MessageFlags.Ephemeral,
@@ -136,7 +139,7 @@ export const vcRecruitModalHandler: ModalHandler = {
       await safeReply(interaction, {
         embeds: [
           createErrorEmbed(
-            await tGuild(guild.id, "errors:vcRecruit.not_setup"),
+            tInteraction(interaction.locale, "errors:vcRecruit.not_setup"),
           ),
         ],
         flags: MessageFlags.Ephemeral,
@@ -166,7 +169,10 @@ export const vcRecruitModalHandler: ModalHandler = {
           await interaction.editReply({
             embeds: [
               createErrorEmbed(
-                await tGuild(guild.id, "errors:vcRecruit.category_full"),
+                tInteraction(
+                  interaction.locale,
+                  "errors:vcRecruit.category_full",
+                ),
               ),
             ],
           });
@@ -204,7 +210,7 @@ export const vcRecruitModalHandler: ModalHandler = {
         await interaction.editReply({
           embeds: [
             createErrorEmbed(
-              await tGuild(guild.id, "errors:vcRecruit.vc_deleted"),
+              tInteraction(interaction.locale, "errors:vcRecruit.vc_deleted"),
             ),
           ],
         });
@@ -227,20 +233,20 @@ export const vcRecruitModalHandler: ModalHandler = {
           ? session.mentionRoleIds.map((id) => `<@&${id}>`).join(" ")
           : "";
 
-      const embedTitle = await tGuild(
-        guild.id,
+      const embedTitle = tInteraction(
+        interaction.locale,
         "commands:vcRecruit.embed.title",
       );
-      const fieldContent = await tGuild(
-        guild.id,
+      const fieldContent = tInteraction(
+        interaction.locale,
         "commands:vcRecruit.embed.field_content",
       );
-      const fieldVc = await tGuild(
-        guild.id,
+      const fieldVc = tInteraction(
+        interaction.locale,
         "commands:vcRecruit.embed.field_vc",
       );
-      const fieldRecruiter = await tGuild(
-        guild.id,
+      const fieldRecruiter = tInteraction(
+        interaction.locale,
         "commands:vcRecruit.embed.field_recruiter",
       );
 
@@ -273,8 +279,8 @@ export const vcRecruitModalHandler: ModalHandler = {
       postedMessageUrl = message.url;
 
       // スレッドを作成
-      const threadName = await tGuild(
-        guild.id,
+      const threadName = tInteraction(
+        interaction.locale,
         "commands:vcRecruit.thread_name",
         { recruiter: member?.displayName ?? interaction.user.displayName },
       );
@@ -296,14 +302,14 @@ export const vcRecruitModalHandler: ModalHandler = {
     deleteVcRecruitSession(sessionId);
 
     // エフェメラルメッセージで成功通知＋投稿リンク
-    const successText = await tGuild(
-      guild.id,
+    const successText = tInteraction(
+      interaction.locale,
       "commands:vcRecruit.embed.post_success",
     );
 
     if (postedMessageUrl) {
-      const linkLabel = await tGuild(
-        guild.id,
+      const linkLabel = tInteraction(
+        interaction.locale,
         "commands:vcRecruit.embed.post_success_link",
       );
       const linkButton = new ButtonBuilder()

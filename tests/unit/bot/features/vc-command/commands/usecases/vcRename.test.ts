@@ -1,14 +1,14 @@
-// tests/unit/bot/features/vac/commands/usecases/vacRename.test.ts
+// tests/unit/bot/features/vc-command/commands/usecases/vcRename.test.ts
 import type { Mock } from "vitest";
-import { resolveVacVoiceChannelForEdit } from "@/bot/features/vac/commands/helpers/vacVoiceChannelResolver";
-import { executeVacRename } from "@/bot/features/vac/commands/usecases/vacRename";
+import { resolveVoiceChannelForEdit } from "@/bot/features/vc-command/commands/helpers/vcVoiceChannelResolver";
+import { executeVcRename } from "@/bot/features/vc-command/commands/usecases/vcRename";
 import { createSuccessEmbed } from "@/bot/utils/messageResponse";
 import { MessageFlags } from "discord.js";
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  tGuild: vi.fn(
-    async (_guildId: string, key: string, params?: Record<string, unknown>) => {
-      if (key === "commands:vac.embed.renamed") {
+  tInteraction: vi.fn(
+    (_locale: string, key: string, params?: Record<string, unknown>) => {
+      if (key === "commands:vc.embed.renamed") {
         return `renamed:${String(params?.name)}`;
       }
       return key;
@@ -17,9 +17,9 @@ vi.mock("@/shared/locale/localeManager", () => ({
 }));
 
 vi.mock(
-  "@/bot/features/vac/commands/helpers/vacVoiceChannelResolver",
+  "@/bot/features/vc-command/commands/helpers/vcVoiceChannelResolver",
   () => ({
-    resolveVacVoiceChannelForEdit: vi.fn(),
+    resolveVoiceChannelForEdit: vi.fn(),
   }),
 );
 
@@ -27,23 +27,23 @@ vi.mock("@/bot/utils/messageResponse", () => ({
   createSuccessEmbed: vi.fn((description: string) => ({ description })),
 }));
 
-describe("bot/features/vac/commands/usecases/vacRename", () => {
-  // VC名変更の成功経路と依存エラー伝播を検証する
+describe("bot/features/vc-command/commands/usecases/vcRename", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it("チャンネルをリネームしてエフェメラルで成功応答する", async () => {
     const edit = vi.fn().mockResolvedValue(undefined);
-    (resolveVacVoiceChannelForEdit as Mock).mockResolvedValue({ edit });
+    (resolveVoiceChannelForEdit as Mock).mockResolvedValue({ edit });
 
     const reply = vi.fn().mockResolvedValue(undefined);
     const interaction = {
+      locale: "ja",
       options: { getString: vi.fn(() => "My VC") },
       reply,
     };
 
-    await executeVacRename(interaction as never, "guild-1", "voice-1");
+    await executeVcRename(interaction as never, "voice-1");
 
     expect(edit).toHaveBeenCalledWith({ name: "My VC" });
     expect(createSuccessEmbed).toHaveBeenCalledWith("renamed:My VC");
@@ -54,17 +54,18 @@ describe("bot/features/vac/commands/usecases/vacRename", () => {
   });
 
   it("resolverの失敗を呼び出し元に伝播する", async () => {
-    (resolveVacVoiceChannelForEdit as Mock).mockRejectedValue(
-      new Error("not vac channel"),
+    (resolveVoiceChannelForEdit as Mock).mockRejectedValue(
+      new Error("not managed"),
     );
 
     const interaction = {
+      locale: "ja",
       options: { getString: vi.fn(() => "My VC") },
       reply: vi.fn(),
     };
 
     await expect(
-      executeVacRename(interaction as never, "guild-1", "voice-1"),
-    ).rejects.toThrow("not vac channel");
+      executeVcRename(interaction as never, "voice-1"),
+    ).rejects.toThrow("not managed");
   });
 });
