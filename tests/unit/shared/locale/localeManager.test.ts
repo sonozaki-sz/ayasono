@@ -219,4 +219,51 @@ describe("shared/locale/localeManager", () => {
       expect.objectContaining({ lng: "ja", value: 2 }),
     );
   });
+
+  describe("tInteraction", () => {
+    it("locale が 'ja' の場合は日本語で翻訳すること", async () => {
+      const module = await import("@/shared/locale/localeManager");
+
+      const result = module.tInteraction("ja", "ping.description" as never);
+
+      expect(result).toBe("ja:ping.description");
+      expect(translateMock).toHaveBeenCalledWith(
+        "ping.description",
+        expect.objectContaining({ lng: "ja" }),
+      );
+    });
+
+    it("locale が 'ja' 以外の場合は英語にフォールバックすること", async () => {
+      const module = await import("@/shared/locale/localeManager");
+
+      const result = module.tInteraction("en-US", "ping.description" as never);
+
+      expect(result).toBe("en:ping.description");
+      expect(translateMock).toHaveBeenCalledWith(
+        "ping.description",
+        expect.objectContaining({ lng: "en" }),
+      );
+    });
+
+    it("params が渡された場合はオプションにマージされること", async () => {
+      const module = await import("@/shared/locale/localeManager");
+
+      module.tInteraction("ja", "ping.description" as never, { count: 3 });
+
+      expect(translateMock).toHaveBeenCalledWith(
+        "ping.description",
+        expect.objectContaining({ lng: "ja", count: 3 }),
+      );
+    });
+
+    it("params が未指定の場合は lng のみのオプションで翻訳すること", async () => {
+      const module = await import("@/shared/locale/localeManager");
+
+      module.tInteraction("ko", "afk.description" as never);
+
+      expect(translateMock).toHaveBeenCalledWith("afk.description", {
+        lng: "en",
+      });
+    });
+  });
 });

@@ -666,6 +666,142 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
       expect(panelDeleteMock).toHaveBeenCalled();
     });
 
+    it("前回パネルの panelMessageId が未設定の場合はパネル削除をスキップする", async () => {
+      const findPendingByGuildAndServiceMock = vi.fn().mockResolvedValue({
+        panelMessageId: undefined,
+        channelId: "ch-1",
+      });
+      getBotBumpReminderRepositoryMock.mockReturnValue({
+        findPendingByGuildAndService: findPendingByGuildAndServiceMock,
+      });
+
+      const configService = {
+        getBumpReminderConfigOrDefault: vi
+          .fn()
+          .mockResolvedValue({ enabled: true, mentionUserIds: [] }),
+      };
+      getBotBumpReminderConfigServiceMock.mockReturnValue(configService);
+      scheduleBumpReminderMock.mockResolvedValue(undefined);
+
+      const sendMock = vi.fn().mockResolvedValue({ id: "new-panel-1" });
+      const channel = {
+        isTextBased: () => true,
+        isSendable: () => true,
+        send: sendMock,
+        messages: { fetch: vi.fn() },
+      };
+      const client = {
+        channels: {
+          fetch: vi.fn().mockResolvedValue(channel),
+        },
+      };
+      getGuildTranslatorMock.mockResolvedValue((key: string) => key);
+
+      await handleBumpDetected(
+        client as never,
+        "guild-1",
+        "ch-1",
+        "msg-1",
+        "Disboard",
+      );
+
+      // panelMessageId が未設定なのでメッセージフェッチは呼ばれない
+      expect(channel.messages.fetch).not.toHaveBeenCalled();
+      // 新パネルは正常にスケジュールされる
+      expect(scheduleBumpReminderMock).toHaveBeenCalled();
+    });
+
+    it("前回パネルのチャンネルフェッチが失敗した場合でも新パネル送信に影響しない", async () => {
+      const findPendingByGuildAndServiceMock = vi.fn().mockResolvedValue({
+        panelMessageId: "old-panel-1",
+        channelId: "ch-old",
+      });
+      getBotBumpReminderRepositoryMock.mockReturnValue({
+        findPendingByGuildAndService: findPendingByGuildAndServiceMock,
+      });
+
+      const configService = {
+        getBumpReminderConfigOrDefault: vi
+          .fn()
+          .mockResolvedValue({ enabled: true, mentionUserIds: [] }),
+      };
+      getBotBumpReminderConfigServiceMock.mockReturnValue(configService);
+      scheduleBumpReminderMock.mockResolvedValue(undefined);
+
+      const sendMock = vi.fn().mockResolvedValue({ id: "new-panel-1" });
+      // channels.fetch は最初の呼び出し（旧パネルチャンネル）で失敗、
+      // 2回目（新パネルチャンネル）で成功する
+      const client = {
+        channels: {
+          fetch: vi
+            .fn()
+            .mockRejectedValueOnce(new Error("channel not found"))
+            .mockResolvedValue({
+              isTextBased: () => true,
+              isSendable: () => true,
+              send: sendMock,
+            }),
+        },
+      };
+      getGuildTranslatorMock.mockResolvedValue((key: string) => key);
+
+      await handleBumpDetected(
+        client as never,
+        "guild-1",
+        "ch-1",
+        "msg-1",
+        "Disboard",
+      );
+
+      // 旧パネル削除失敗にかかわらず新パネルがスケジュールされる
+      expect(scheduleBumpReminderMock).toHaveBeenCalled();
+    });
+
+    it("前回パネルのメッセージフェッチが失敗した場合でも新パネル送信に影響しない", async () => {
+      const findPendingByGuildAndServiceMock = vi.fn().mockResolvedValue({
+        panelMessageId: "old-panel-1",
+        channelId: "ch-1",
+      });
+      getBotBumpReminderRepositoryMock.mockReturnValue({
+        findPendingByGuildAndService: findPendingByGuildAndServiceMock,
+      });
+
+      const configService = {
+        getBumpReminderConfigOrDefault: vi
+          .fn()
+          .mockResolvedValue({ enabled: true, mentionUserIds: [] }),
+      };
+      getBotBumpReminderConfigServiceMock.mockReturnValue(configService);
+      scheduleBumpReminderMock.mockResolvedValue(undefined);
+
+      const sendMock = vi.fn().mockResolvedValue({ id: "new-panel-1" });
+      const channel = {
+        isTextBased: () => true,
+        isSendable: () => true,
+        send: sendMock,
+        messages: {
+          fetch: vi.fn().mockRejectedValue(new Error("message not found")),
+        },
+      };
+      const client = {
+        channels: {
+          fetch: vi.fn().mockResolvedValue(channel),
+        },
+      };
+      getGuildTranslatorMock.mockResolvedValue((key: string) => key);
+
+      await handleBumpDetected(
+        client as never,
+        "guild-1",
+        "ch-1",
+        "msg-1",
+        "Disboard",
+      );
+
+      // メッセージフェッチ失敗にかかわらず新パネルがスケジュールされる
+      expect(scheduleBumpReminderMock).toHaveBeenCalled();
+    });
+
     it("リマインダーをスケジュールし、成功時に検出ログを記録する", async () => {
       const configService = {
         getBumpReminderConfigOrDefault: vi

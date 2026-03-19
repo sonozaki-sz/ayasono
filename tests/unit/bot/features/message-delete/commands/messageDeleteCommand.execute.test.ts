@@ -498,5 +498,241 @@ describe("executeMessageDeleteCommand", () => {
         }),
       );
     });
+
+    it("プレビューでキャンセルした場合はキャンセル Embed を表示して終了する", async () => {
+      // プレビューで CONFIRM_NO をクリック
+      const cancelClickInteraction = makeComponentInteraction(
+        MSG_DEL_CUSTOM_ID.CONFIRM_NO,
+        "user-1",
+      );
+
+      const previewCollector = makeMockCollector();
+      const previewReplyMsg = {
+        createMessageComponentCollector: vi.fn(() => {
+          queueMicrotask(() => previewCollector._trigger("collect", cancelClickInteraction));
+          return previewCollector;
+        }),
+      };
+
+      const cancelCollector = makeMockCollector();
+      const scanReplyMsg = {
+        createMessageComponentCollector: vi.fn(() => cancelCollector),
+      };
+
+      const testScanInteraction = makeScanInteraction("user-1", "guild-1");
+      testScanInteraction.editReply
+        .mockResolvedValueOnce(scanReplyMsg)
+        .mockResolvedValueOnce(previewReplyMsg)
+        .mockResolvedValue(undefined);
+
+      runConditionSetupStepMock.mockResolvedValue({
+        targetUserIds: [],
+        channelIds: [],
+        scanInteraction: testScanInteraction,
+      });
+
+      const interaction = createInteraction();
+      await executeMessageDeleteCommand(interaction as never);
+
+      // キャンセル通知が editReply で送られた
+      expect(cancelClickInteraction.editReply).toHaveBeenCalledWith(
+        expect.objectContaining({
+          embeds: [expect.objectContaining({ _type: "info" })],
+          components: [],
+          content: "",
+        }),
+      );
+      // 削除は実行されない
+      expect(deleteScannedMessagesMock).not.toHaveBeenCalled();
+    });
+
+    it("最終確認でキャンセルした場合はキャンセル Embed を表示して終了する", async () => {
+      // 最終確認で FINAL_NO をクリック
+      const finalCancelInteraction = makeComponentInteraction(
+        MSG_DEL_CUSTOM_ID.FINAL_NO,
+        "user-1",
+      );
+
+      const finalConfirmCollector = makeMockCollector();
+      const finalReplyMsg = {
+        createMessageComponentCollector: vi.fn(() => {
+          queueMicrotask(() => finalConfirmCollector._trigger("collect", finalCancelInteraction));
+          return finalConfirmCollector;
+        }),
+      };
+
+      // プレビューで CONFIRM_YES をクリック
+      const confirmClickInteraction = makeComponentInteraction(
+        MSG_DEL_CUSTOM_ID.CONFIRM_YES,
+        "user-1",
+      );
+      confirmClickInteraction.editReply = vi
+        .fn()
+        .mockResolvedValue(finalReplyMsg) as ReturnType<typeof vi.fn>;
+
+      const previewCollector = makeMockCollector();
+      const previewReplyMsg = {
+        createMessageComponentCollector: vi.fn(() => {
+          queueMicrotask(() => previewCollector._trigger("collect", confirmClickInteraction));
+          return previewCollector;
+        }),
+      };
+
+      const cancelCollector = makeMockCollector();
+      const scanReplyMsg = {
+        createMessageComponentCollector: vi.fn(() => cancelCollector),
+      };
+
+      const testScanInteraction = makeScanInteraction("user-1", "guild-1");
+      testScanInteraction.editReply
+        .mockResolvedValueOnce(scanReplyMsg)
+        .mockResolvedValueOnce(previewReplyMsg)
+        .mockResolvedValue(undefined);
+
+      runConditionSetupStepMock.mockResolvedValue({
+        targetUserIds: [],
+        channelIds: [],
+        scanInteraction: testScanInteraction,
+      });
+
+      const interaction = createInteraction();
+      await executeMessageDeleteCommand(interaction as never);
+
+      // キャンセル通知が editReply で送られた
+      expect(finalCancelInteraction.editReply).toHaveBeenCalledWith(
+        expect.objectContaining({
+          embeds: [expect.objectContaining({ _type: "info" })],
+          components: [],
+          content: "",
+        }),
+      );
+      expect(deleteScannedMessagesMock).not.toHaveBeenCalled();
+    });
+
+    it("最終確認で戻るボタンを押した場合はプレビューに戻り、再度確認→削除できる", async () => {
+      // ── 2回目のフロー: プレビュー→最終確認→削除実行 ──
+      const finalYesInteraction = makeComponentInteraction(
+        MSG_DEL_CUSTOM_ID.FINAL_YES,
+        "user-1",
+      );
+      finalYesInteraction.editReply = vi.fn().mockResolvedValue(undefined);
+
+      const finalConfirmCollector2 = makeMockCollector();
+      const finalReplyMsg2 = {
+        createMessageComponentCollector: vi.fn(() => {
+          queueMicrotask(() => finalConfirmCollector2._trigger("collect", finalYesInteraction));
+          return finalConfirmCollector2;
+        }),
+      };
+
+      const confirmClickInteraction2 = makeComponentInteraction(
+        MSG_DEL_CUSTOM_ID.CONFIRM_YES,
+        "user-1",
+      );
+      confirmClickInteraction2.editReply = vi
+        .fn()
+        .mockResolvedValue(finalReplyMsg2) as ReturnType<typeof vi.fn>;
+
+      // 2回目プレビューのコレクター
+      const previewCollector2 = makeMockCollector();
+      const previewReplyMsg2 = {
+        createMessageComponentCollector: vi.fn(() => {
+          queueMicrotask(() => previewCollector2._trigger("collect", confirmClickInteraction2));
+          return previewCollector2;
+        }),
+      };
+
+      // ── 1回目のフロー: プレビュー→最終確認→戻る ──
+      const finalBackInteraction = makeComponentInteraction(
+        MSG_DEL_CUSTOM_ID.FINAL_BACK,
+        "user-1",
+      );
+      // 戻るボタンの editReply は2回目のプレビュー表示に使われる
+      finalBackInteraction.editReply = vi
+        .fn()
+        .mockResolvedValue(previewReplyMsg2) as ReturnType<typeof vi.fn>;
+
+      const finalConfirmCollector1 = makeMockCollector();
+      const finalReplyMsg1 = {
+        createMessageComponentCollector: vi.fn(() => {
+          queueMicrotask(() => finalConfirmCollector1._trigger("collect", finalBackInteraction));
+          return finalConfirmCollector1;
+        }),
+      };
+
+      const confirmClickInteraction1 = makeComponentInteraction(
+        MSG_DEL_CUSTOM_ID.CONFIRM_YES,
+        "user-1",
+      );
+      confirmClickInteraction1.editReply = vi
+        .fn()
+        .mockResolvedValue(finalReplyMsg1) as ReturnType<typeof vi.fn>;
+
+      const previewCollector1 = makeMockCollector();
+      const previewReplyMsg1 = {
+        createMessageComponentCollector: vi.fn(() => {
+          queueMicrotask(() => previewCollector1._trigger("collect", confirmClickInteraction1));
+          return previewCollector1;
+        }),
+      };
+
+      const cancelCollector = makeMockCollector();
+      const scanReplyMsg = {
+        createMessageComponentCollector: vi.fn(() => cancelCollector),
+      };
+
+      const testScanInteraction = makeScanInteraction("user-1", "guild-1");
+      testScanInteraction.editReply
+        .mockResolvedValueOnce(scanReplyMsg)
+        .mockResolvedValueOnce(previewReplyMsg1)
+        .mockResolvedValue(undefined);
+
+      runConditionSetupStepMock.mockResolvedValue({
+        targetUserIds: [],
+        channelIds: [],
+        scanInteraction: testScanInteraction,
+      });
+
+      const interaction = createInteraction();
+      await executeMessageDeleteCommand(interaction as never);
+
+      // 戻る→再プレビュー→削除実行が完了
+      expect(deleteScannedMessagesMock).toHaveBeenCalledOnce();
+    });
+
+    it("プレビューがタイムアウトした場合は何も表示せず終了する", async () => {
+      // タイムアウト: collector の "end" イベントが "idle" 理由で発火
+      const previewCollector = makeMockCollector();
+      const previewReplyMsg = {
+        createMessageComponentCollector: vi.fn(() => {
+          // タイムアウトをシミュレート: "collect" を発火せず "end" が idle で発火
+          queueMicrotask(() => previewCollector._trigger("end", new Map(), "idle"));
+          return previewCollector;
+        }),
+      };
+
+      const cancelCollector = makeMockCollector();
+      const scanReplyMsg = {
+        createMessageComponentCollector: vi.fn(() => cancelCollector),
+      };
+
+      const testScanInteraction = makeScanInteraction("user-1", "guild-1");
+      testScanInteraction.editReply
+        .mockResolvedValueOnce(scanReplyMsg)
+        .mockResolvedValueOnce(previewReplyMsg)
+        .mockResolvedValue(undefined);
+
+      runConditionSetupStepMock.mockResolvedValue({
+        targetUserIds: [],
+        channelIds: [],
+        scanInteraction: testScanInteraction,
+      });
+
+      const interaction = createInteraction();
+      await executeMessageDeleteCommand(interaction as never);
+
+      // タイムアウト時は削除もキャンセル表示もされない
+      expect(deleteScannedMessagesMock).not.toHaveBeenCalled();
+    });
   });
 });
