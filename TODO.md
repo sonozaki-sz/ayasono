@@ -80,22 +80,94 @@
 
 - [x] エラー・警告Embedのタイトルを原因名詞に統一（`common:title_*` キー24種を `common.ts` に定義、全Embed呼び出しに適用、`interactionErrorHandler` のエラークラス別タイトルも日本語化）
 - [x] ログフォーマット統一（`logPrefixed()` / `logCommand()` ヘルパーを導入、`log_prefix.*` キーで機能名をi18n管理、イベント名は Discord.js 準拠、サブプレフィックス `[interactionCreate:command]` 形式対応）
+- [x] ユーザーレスポンスの warning / error レベル整理（基準: ユーザーが修正可能 → warning、システム的に不可 → error。`interactionErrorHandler` で `ValidationError`/`NotFoundError`/`TimeoutError`/`ConfigurationError` を warning に変更、vc-panel・vc-recruit・bump-reminder の直接 Embed 生成も統一、`permissionGuards` の権限不足を `PermissionError`（error レベル）に修正）
 
-### 4. 新機能実装予定
+### 4. 翻訳ファイルを機能単位に再編成
 
-#### 4.1 各機能リセットコマンド
+現状の名前空間はトリガー元（`commands` / `errors` / `events` / `system`）基準だが、以下の問題がある。
+
+- パネルUIやボタン操作レスポンスなど、コマンドとイベントの両方から使われるメッセージの置き場所が曖昧
+- 同種のメッセージ（入力バリデーションエラー等）が `errors:` と `commands:` に分散
+- `errors:` 名前空間のメッセージの大半が warning レベルで表示されるため名前と実態が乖離
+- `commands.ts`（836行）が肥大化しており、機能追加のたびに膨らみ続ける
+
+#### 4.1 新しいファイル構成
+
+```
+locales/ja/
+├── common.ts              ← 共通タイトル・ラベル + 機能横断エラー
+├── system.ts              ← 機能横断の内部ログのみ（Bot起動/シャットダウン/Web/DB共通等）
+├── features/
+│   ├── index.ts           ← 全機能の re-export
+│   ├── ping.ts
+│   ├── afk.ts
+│   ├── bumpReminder.ts
+│   ├── vac.ts
+│   ├── vc.ts
+│   ├── messageDelete.ts
+│   ├── memberLog.ts
+│   ├── stickyMessage.ts
+│   └── vcRecruit.ts
+```
+
+各 `features/*.ts` はコメントで4セクションに分けて管理する：
+
+```ts
+// ── コマンド定義 ─────────────────────────────  ← description, option.description
+// ── UIラベル ──────────────────────────────────  ← パネルタイトル, ボタンラベル, モーダルラベル等
+// ── ユーザーレスポンス ────────────────────────  ← 成功/警告/エラーの Embed 本文
+// ── ログ ─────────────────────────────────────  ← 機能固有の内部ログ
+```
+
+- 機能ごとに1ファイル。その機能に関する翻訳を全て含む（ログ含む）
+- `errors.ts` / `events.ts` / `commands.ts` は全廃
+- `system.ts` には機能横断のログのみ残す（Bot起動/シャットダウン、エラーハンドリング共通、Web サーバー、DB 共通操作、スケジューラー共通、ロケール/JSON ユーティリティ）
+- 機能横断の共通メッセージ（`validation.guild_only`、`general.unexpected_*` 等）は `common.ts` に移動
+
+#### 4.2 移行手順
+
+- [ ] `features/` ディレクトリ作成、機能ごとのファイルを新規作成（ja/en 両方）
+- [ ] `commands.ts` の各機能セクションを対応する `features/*.ts` に移動
+- [ ] `errors.ts` の機能固有キーを対応する `features/*.ts` に移動
+- [ ] `errors.ts` の機能横断キー（`validation.*`, `general.*`, `permission.*`, `interaction.*`, `database.*`）を `common.ts` に移動
+- [ ] `events.ts` の全キーを対応する `features/*.ts` に移動
+- [ ] `system.ts` の機能固有ログを対応する `features/*.ts` に移動、機能横断ログのみ `system.ts` に残す
+- [ ] i18next のリソース登録（`resources.ts`）を新構成に合わせて更新
+- [ ] 全ソースファイルの翻訳キー参照（名前空間プレフィックス）を更新
+- [ ] テスト内のモック・アサーションを更新
+- [ ] warning レベルなのに `error` を含むキー名をリネーム（以下対象）
+  - `title_input_error` → 「入力不備」等に変更
+  - `title_channel_error` → 「チャンネル不正」等に変更
+  - `title_config_error` → `title_config_required` との統合を検討
+  - `bump-reminder.panel.error` → warning 用のキー名に変更
+- [ ] `commands.ts` / `errors.ts` / `events.ts` を削除
+
+#### 4.3 現状の不整合（具体例）
+
+| メッセージ | 現在の名前空間 | 問題 |
+|-----------|---------------|------|
+| `vac.limit_out_of_range` | `errors:` | warning レベルで表示される |
+| `message-delete.errors.after_invalid_format` | `commands:` | 同種の入力エラーなのに `errors:` と `commands:` に分散 |
+| `bump-reminder.panel.button_mention_on` | `events:` | ボタンUIラベルなのに `events:` にある |
+| `vac.panel.title` | `commands:` | イベント起点でも使われるが `commands:` にある |
+| `title_input_error` | `common:` | warning レベルで表示されるのにキー名が `error` |
+| `title_channel_error` | `common:` | 同上 |
+
+### 5. 新機能実装予定
+
+#### 5.1 各機能リセットコマンド
 
 - [ ] 機能ごとの設定リセットコマンドを各featureに追加
 
-#### 4.2 プロフィール機能
+#### 5.2 プロフィール機能
 
 - [ ] 仕様書作成（`/user-info` をプロフィール情報と統合して実装予定）
 
-#### 4.3 サポートチャンネル機能（チケット型）
+#### 5.3 サポートチャンネル機能（チケット型）
 
 - [ ] 仕様書作成
 
-#### 4.4 ボタンリアクションロール機能
+#### 5.4 ボタンリアクションロール機能
 
 - [ ] 仕様書作成
 
