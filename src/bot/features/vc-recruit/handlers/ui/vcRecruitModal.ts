@@ -21,8 +21,8 @@ import type { ModalHandler } from "../../../../handlers/interactionCreate/ui/typ
 import { getBotVcRecruitRepository } from "../../../../services/botCompositionRoot";
 import { safeReply } from "../../../../utils/interaction";
 import {
-  createErrorEmbed,
   createSuccessEmbed,
+  createWarningEmbed,
 } from "../../../../utils/messageResponse";
 import { VC_RECRUIT_PANEL_COLOR } from "../../commands/vcRecruitConfigCommand.constants";
 import { sendVcControlPanel } from "../../../vc-panel/vcControlPanel";
@@ -112,7 +112,7 @@ export const vcRecruitModalHandler: ModalHandler = {
     if (!session) {
       await safeReply(interaction, {
         embeds: [
-          createErrorEmbed(
+          createWarningEmbed(
             tInteraction(interaction.locale, "errors:interaction.timeout"),
             { title: tInteraction(interaction.locale, "common:title_timeout") },
           ),
@@ -139,7 +139,7 @@ export const vcRecruitModalHandler: ModalHandler = {
     if (!setup) {
       await safeReply(interaction, {
         embeds: [
-          createErrorEmbed(
+          createWarningEmbed(
             tInteraction(interaction.locale, "errors:vcRecruit.not_setup"),
             {
               title: tInteraction(
@@ -175,7 +175,7 @@ export const vcRecruitModalHandler: ModalHandler = {
         ) {
           await interaction.editReply({
             embeds: [
-              createErrorEmbed(
+              createWarningEmbed(
                 tInteraction(
                   interaction.locale,
                   "errors:vcRecruit.category_full",
@@ -222,7 +222,7 @@ export const vcRecruitModalHandler: ModalHandler = {
       if (!existing || existing.type !== ChannelType.GuildVoice) {
         await interaction.editReply({
           embeds: [
-            createErrorEmbed(
+            createWarningEmbed(
               tInteraction(interaction.locale, "errors:vcRecruit.vc_deleted"),
               {
                 title: tInteraction(

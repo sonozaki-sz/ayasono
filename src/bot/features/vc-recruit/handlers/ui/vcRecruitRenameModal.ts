@@ -10,8 +10,8 @@ import { tInteraction } from "../../../../../shared/locale/localeManager";
 import type { ModalHandler } from "../../../../handlers/interactionCreate/ui/types";
 import { safeReply } from "../../../../utils/interaction";
 import {
-  createErrorEmbed,
   createSuccessEmbed,
+  createWarningEmbed,
 } from "../../../../utils/messageResponse";
 import { VC_RECRUIT_POST_CUSTOM_ID } from "../../commands/vcRecruitConfigCommand.constants";
 
@@ -48,7 +48,7 @@ export const vcRecruitRenameModalHandler: ModalHandler = {
     if (!vc || vc.type !== ChannelType.GuildVoice) {
       await safeReply(interaction, {
         embeds: [
-          createErrorEmbed(
+          createWarningEmbed(
             tInteraction(
               interaction.locale,
               "errors:vcRecruit.vc_already_deleted",

@@ -33,7 +33,7 @@ vi.mock("@/bot/utils/interaction", () => ({
 }));
 
 vi.mock("@/bot/utils/messageResponse", () => ({
-  createErrorEmbed: vi.fn((message: string) => ({ message })),
+  createWarningEmbed: vi.fn((message: string) => ({ message })),
   createSuccessEmbed: vi.fn((message: string) => ({ message })),
 }));
 

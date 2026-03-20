@@ -1,6 +1,6 @@
 // tests/unit/bot/features/vc-recruit/commands/vcRecruitConfigCommand.execute.test.ts
 import { executeVcRecruitConfigCommand } from "@/bot/features/vc-recruit/commands/vcRecruitConfigCommand.execute";
-import { ValidationError } from "@/shared/errors/customErrors";
+import { PermissionError, ValidationError } from "@/shared/errors/customErrors";
 import { PermissionFlagsBits } from "discord.js";
 
 // ---- モック定義 ----
@@ -111,13 +111,13 @@ describe("bot/features/vc-recruit/commands/vcRecruitConfigCommand.execute", () =
     );
   });
 
-  it("ManageGuild 権限がない場合は ValidationError が handleCommandError に渡される", async () => {
+  it("ManageGuild 権限がない場合は PermissionError が handleCommandError に渡される", async () => {
     const interaction = makeInteraction({ hasManageGuild: false });
     await executeVcRecruitConfigCommand(interaction as never);
 
     expect(handleCommandErrorMock).toHaveBeenCalledWith(
       expect.anything(),
-      expect.any(ValidationError),
+      expect.any(PermissionError),
     );
   });
 

@@ -17,7 +17,7 @@ vi.mock("@/bot/utils/interaction", () => ({
   safeReply: (...args: unknown[]) => safeReplyMock(...args),
 }));
 vi.mock("@/bot/utils/messageResponse", () => ({
-  createErrorEmbed: vi.fn((msg: string) => ({ error: msg })),
+  createWarningEmbed: vi.fn((msg: string) => ({ warning: msg })),
   createSuccessEmbed: vi.fn((msg: string) => ({ success: msg })),
 }));
 vi.mock("@/shared/locale/localeManager", () => ({
@@ -241,7 +241,7 @@ describe("vcRecruitPostButtonHandler / handleRenameVc", () => {
     expect(safeReplyMock).toHaveBeenCalledWith(
       interaction,
       expect.objectContaining({
-        embeds: [{ error: "errors:vcRecruit.no_permission" }],
+        embeds: [{ warning: "errors:vcRecruit.no_permission" }],
         flags: MessageFlags.Ephemeral,
       }),
     );
@@ -286,7 +286,7 @@ describe("vcRecruitPostButtonHandler / handleRenameVc", () => {
     expect(safeReplyMock).toHaveBeenCalledWith(
       interaction,
       expect.objectContaining({
-        embeds: [{ error: "errors:vcRecruit.vc_already_deleted" }],
+        embeds: [{ warning: "errors:vcRecruit.vc_already_deleted" }],
         flags: MessageFlags.Ephemeral,
       }),
     );
@@ -332,7 +332,7 @@ describe("vcRecruitPostButtonHandler / handleEndVc", () => {
     expect(safeReplyMock).toHaveBeenCalledWith(
       interaction,
       expect.objectContaining({
-        embeds: [{ error: "errors:vcRecruit.no_permission" }],
+        embeds: [{ warning: "errors:vcRecruit.no_permission" }],
         flags: MessageFlags.Ephemeral,
       }),
     );
@@ -400,7 +400,7 @@ describe("vcRecruitPostButtonHandler / handleDeletePost", () => {
     expect(safeReplyMock).toHaveBeenCalledWith(
       interaction,
       expect.objectContaining({
-        embeds: [{ error: "errors:vcRecruit.no_permission" }],
+        embeds: [{ warning: "errors:vcRecruit.no_permission" }],
         flags: MessageFlags.Ephemeral,
       }),
     );
@@ -827,7 +827,7 @@ describe("vcRecruitPostButtonHandler / handleRenameVc パース失敗", () => {
     expect(safeReplyMock).toHaveBeenCalledWith(
       interaction,
       expect.objectContaining({
-        embeds: [{ error: "errors:vcRecruit.vc_already_deleted" }],
+        embeds: [{ warning: "errors:vcRecruit.vc_already_deleted" }],
         flags: MessageFlags.Ephemeral,
       }),
     );

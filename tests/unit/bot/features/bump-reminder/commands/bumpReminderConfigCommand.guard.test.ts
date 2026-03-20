@@ -1,6 +1,6 @@
 // tests/unit/bot/features/bump-reminder/commands/bumpReminderConfigCommand.guard.test.ts
 import { ensureManageGuildPermission } from "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.guard";
-import { ValidationError } from "@/shared/errors/customErrors";
+import { PermissionError } from "@/shared/errors/customErrors";
 import { PermissionFlagsBits } from "discord.js";
 
 vi.mock("@/shared/locale/localeManager", () => ({
@@ -30,7 +30,7 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.guard", 
     );
   });
 
-  it("権限がない場合は ValidationError をスローする", () => {
+  it("権限がない場合は PermissionError をスローする", () => {
     const interaction = {
       locale: "ja",
       memberPermissions: {
@@ -40,6 +40,6 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.guard", 
 
     expect(() =>
       ensureManageGuildPermission(interaction as never, "guild-1"),
-    ).toThrow(ValidationError);
+    ).toThrow(PermissionError);
   });
 });

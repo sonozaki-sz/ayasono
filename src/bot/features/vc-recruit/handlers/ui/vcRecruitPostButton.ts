@@ -23,8 +23,8 @@ import type { ButtonHandler } from "../../../../handlers/interactionCreate/ui/ty
 import { getBotVcRecruitRepository } from "../../../../services/botCompositionRoot";
 import { safeReply } from "../../../../utils/interaction";
 import {
-  createErrorEmbed,
   createSuccessEmbed,
+  createWarningEmbed,
 } from "../../../../utils/messageResponse";
 import { VC_RECRUIT_POST_CUSTOM_ID } from "../../commands/vcRecruitConfigCommand.constants";
 
@@ -239,7 +239,7 @@ async function handleRenameVc(interaction: ButtonInteraction): Promise<void> {
   if (!hasPostPermission(interaction, parsed.recruiterId)) {
     await safeReply(interaction, {
       embeds: [
-        createErrorEmbed(
+        createWarningEmbed(
           tInteraction(interaction.locale, "errors:vcRecruit.no_permission"),
           {
             title: tInteraction(
@@ -261,7 +261,7 @@ async function handleRenameVc(interaction: ButtonInteraction): Promise<void> {
   if (!vc || vc.type !== ChannelType.GuildVoice) {
     await safeReply(interaction, {
       embeds: [
-        createErrorEmbed(
+        createWarningEmbed(
           tInteraction(
             interaction.locale,
             "errors:vcRecruit.vc_already_deleted",
@@ -331,7 +331,7 @@ async function handleEndVc(interaction: ButtonInteraction): Promise<void> {
   if (!hasPostPermission(interaction, parsed.recruiterId)) {
     await safeReply(interaction, {
       embeds: [
-        createErrorEmbed(
+        createWarningEmbed(
           tInteraction(interaction.locale, "errors:vcRecruit.no_permission"),
           {
             title: tInteraction(
@@ -417,7 +417,7 @@ async function handleDeletePost(interaction: ButtonInteraction): Promise<void> {
   if (!hasPostPermission(interaction, parsed.recruiterId)) {
     await safeReply(interaction, {
       embeds: [
-        createErrorEmbed(
+        createWarningEmbed(
           tInteraction(interaction.locale, "errors:vcRecruit.no_permission"),
           {
             title: tInteraction(

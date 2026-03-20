@@ -11,8 +11,8 @@ import { tInteraction } from "../../../../../shared/locale/localeManager";
 import type { ModalHandler } from "../../../../handlers/interactionCreate/ui/types";
 import { safeReply } from "../../../../utils/interaction";
 import {
-  createErrorEmbed,
   createSuccessEmbed,
+  createWarningEmbed,
 } from "../../../../utils/messageResponse";
 import {
   getVacPanelChannelId,
@@ -62,7 +62,7 @@ export const vcPanelModalHandler: ModalHandler = {
     if (!channel || channel.type !== ChannelType.GuildVoice) {
       await safeReply(interaction, {
         embeds: [
-          createErrorEmbed(
+          createWarningEmbed(
             tInteraction(interaction.locale, "errors:vac.not_vac_channel"),
             {
               title: tInteraction(
@@ -81,7 +81,7 @@ export const vcPanelModalHandler: ModalHandler = {
     if (!(await isVcPanelManagedChannel(guild.id, channel.id))) {
       await safeReply(interaction, {
         embeds: [
-          createErrorEmbed(
+          createWarningEmbed(
             tInteraction(interaction.locale, "errors:vac.not_vac_channel"),
             {
               title: tInteraction(
@@ -103,7 +103,7 @@ export const vcPanelModalHandler: ModalHandler = {
     if (!member || member.voice.channelId !== channel.id) {
       await safeReply(interaction, {
         embeds: [
-          createErrorEmbed(
+          createWarningEmbed(
             tInteraction(interaction.locale, "errors:vac.not_in_vc"),
             {
               title: tInteraction(interaction.locale, "common:title_not_in_vc"),
@@ -122,7 +122,7 @@ export const vcPanelModalHandler: ModalHandler = {
       if (!newName) {
         await safeReply(interaction, {
           embeds: [
-            createErrorEmbed(
+            createWarningEmbed(
               tInteraction(interaction.locale, "errors:vac.not_vac_channel"),
               {
                 title: tInteraction(
@@ -159,7 +159,7 @@ export const vcPanelModalHandler: ModalHandler = {
     if (!Number.isInteger(limit) || limit < LIMIT_MIN || limit > LIMIT_MAX) {
       await safeReply(interaction, {
         embeds: [
-          createErrorEmbed(
+          createWarningEmbed(
             tInteraction(interaction.locale, "errors:vac.limit_out_of_range"),
             {
               title: tInteraction(

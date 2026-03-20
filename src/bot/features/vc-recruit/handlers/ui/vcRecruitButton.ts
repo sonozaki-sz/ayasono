@@ -27,8 +27,8 @@ import {
 import { safeReply } from "../../../../utils/interaction";
 import {
   STATUS_COLORS,
-  createErrorEmbed,
   createSuccessEmbed,
+  createWarningEmbed,
 } from "../../../../utils/messageResponse";
 import { buildTeardownSelectOptions } from "../../commands/usecases/vcRecruitConfigTeardown";
 import {
@@ -92,7 +92,7 @@ export const vcRecruitButtonHandler: ButtonHandler = {
       if (!panelChannel) {
         await safeReply(interaction, {
           embeds: [
-            createErrorEmbed(
+            createWarningEmbed(
               tInteraction(
                 interaction.locale,
                 "errors:vcRecruit.panel_channel_not_found",
@@ -118,7 +118,7 @@ export const vcRecruitButtonHandler: ButtonHandler = {
       if (!setup) {
         await safeReply(interaction, {
           embeds: [
-            createErrorEmbed(
+            createWarningEmbed(
               tInteraction(interaction.locale, "errors:vcRecruit.not_setup"),
               {
                 title: tInteraction(
@@ -290,7 +290,7 @@ export const vcRecruitButtonHandler: ButtonHandler = {
       if (!session) {
         await safeReply(interaction, {
           embeds: [
-            createErrorEmbed(
+            createWarningEmbed(
               tInteraction(interaction.locale, "errors:interaction.timeout"),
               {
                 title: tInteraction(interaction.locale, "common:title_timeout"),
@@ -452,7 +452,7 @@ export const vcRecruitButtonHandler: ButtonHandler = {
       if (!session) {
         await safeReply(interaction, {
           embeds: [
-            createErrorEmbed(
+            createWarningEmbed(
               tInteraction(interaction.locale, "errors:interaction.timeout"),
               {
                 title: tInteraction(interaction.locale, "common:title_timeout"),

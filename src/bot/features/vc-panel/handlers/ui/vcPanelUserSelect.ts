@@ -12,8 +12,8 @@ import { tInteraction } from "../../../../../shared/locale/localeManager";
 import type { StringSelectHandler } from "../../../../handlers/interactionCreate/ui/types";
 import { safeReply } from "../../../../utils/interaction";
 import {
-  createErrorEmbed,
   createSuccessEmbed,
+  createWarningEmbed,
 } from "../../../../utils/messageResponse";
 import {
   getVacPanelChannelId,
@@ -51,7 +51,7 @@ export const vcPanelUserSelectHandler: StringSelectHandler = {
     if (!channel || channel.type !== ChannelType.GuildVoice) {
       await safeReply(interaction, {
         embeds: [
-          createErrorEmbed(
+          createWarningEmbed(
             tInteraction(interaction.locale, "errors:vac.not_vac_channel"),
             {
               title: tInteraction(
@@ -70,7 +70,7 @@ export const vcPanelUserSelectHandler: StringSelectHandler = {
     if (!(await isVcPanelManagedChannel(guild.id, channel.id))) {
       await safeReply(interaction, {
         embeds: [
-          createErrorEmbed(
+          createWarningEmbed(
             tInteraction(interaction.locale, "errors:vac.not_vac_channel"),
             {
               title: tInteraction(
@@ -92,7 +92,7 @@ export const vcPanelUserSelectHandler: StringSelectHandler = {
     if (!operator || operator.voice.channelId !== channel.id) {
       await safeReply(interaction, {
         embeds: [
-          createErrorEmbed(
+          createWarningEmbed(
             tInteraction(interaction.locale, "errors:vac.not_in_vc"),
             {
               title: tInteraction(interaction.locale, "common:title_not_in_vc"),
@@ -108,7 +108,7 @@ export const vcPanelUserSelectHandler: StringSelectHandler = {
     if (!afkConfig || !afkConfig.enabled || !afkConfig.channelId) {
       await safeReply(interaction, {
         embeds: [
-          createErrorEmbed(
+          createWarningEmbed(
             tInteraction(interaction.locale, "errors:afk.not_configured"),
             {
               title: tInteraction(
@@ -130,7 +130,7 @@ export const vcPanelUserSelectHandler: StringSelectHandler = {
     if (!afkChannel || afkChannel.type !== ChannelType.GuildVoice) {
       await safeReply(interaction, {
         embeds: [
-          createErrorEmbed(
+          createWarningEmbed(
             tInteraction(interaction.locale, "errors:afk.channel_not_found"),
             {
               title: tInteraction(
@@ -164,7 +164,7 @@ export const vcPanelUserSelectHandler: StringSelectHandler = {
     if (movedCount === 0) {
       await safeReply(interaction, {
         embeds: [
-          createErrorEmbed(
+          createWarningEmbed(
             tInteraction(interaction.locale, "errors:vac.afk_move_failed"),
             {
               title: tInteraction(

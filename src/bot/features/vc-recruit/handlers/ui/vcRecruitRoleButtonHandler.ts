@@ -7,9 +7,9 @@ import { tInteraction } from "../../../../../shared/locale/localeManager";
 import type { ButtonHandler } from "../../../../handlers/interactionCreate/ui/types";
 import { getBotVcRecruitConfigService } from "../../../../services/botCompositionRoot";
 import {
-  createErrorEmbed,
   createInfoEmbed,
   createSuccessEmbed,
+  createWarningEmbed,
 } from "../../../../utils/messageResponse";
 import {
   DISCORD_SELECT_MAX_OPTIONS,
@@ -155,7 +155,7 @@ export const vcRecruitRoleButtonHandler: ButtonHandler = {
       if (failedRoles.length > 0) {
         const failedMentions = failedRoles.map((id) => `<@&${id}>`).join(", ");
         embeds.push(
-          createErrorEmbed(
+          createWarningEmbed(
             tInteraction(
               interaction.locale,
               "commands:vc-recruit-config.embed.add_role_limit_desc",

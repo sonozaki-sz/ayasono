@@ -1,6 +1,6 @@
 // tests/unit/bot/features/member-log/commands/memberLogConfigCommand.guard.test.ts
 import { ensureMemberLogManageGuildPermission } from "@/bot/features/member-log/commands/memberLogConfigCommand.guard";
-import { ValidationError } from "@/shared/errors/customErrors";
+import { PermissionError } from "@/shared/errors/customErrors";
 
 // ---- モック定義 ----
 const tGuildMock = vi.fn(async (_guildId: string, key: string) => key);
@@ -37,20 +37,20 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.guard", () => 
     ).resolves.toBeUndefined();
   });
 
-  it("ManageGuild 権限がない場合に ValidationError を投げることを確認", async () => {
+  it("ManageGuild 権限がない場合に PermissionError を投げることを確認", async () => {
     const interaction = makeInteraction(false);
 
     await expect(
       ensureMemberLogManageGuildPermission(interaction as never, "guild-1"),
-    ).rejects.toBeInstanceOf(ValidationError);
+    ).rejects.toBeInstanceOf(PermissionError);
   });
 
-  it("memberPermissions が null の場合に ValidationError を投げることを確認", async () => {
+  it("memberPermissions が null の場合に PermissionError を投げることを確認", async () => {
     const interaction = makeInteraction(null);
 
     await expect(
       ensureMemberLogManageGuildPermission(interaction as never, "guild-1"),
-    ).rejects.toBeInstanceOf(ValidationError);
+    ).rejects.toBeInstanceOf(PermissionError);
   });
 
 });

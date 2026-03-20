@@ -17,8 +17,8 @@ import { tInteraction } from "../../../../../shared/locale/localeManager";
 import type { ButtonHandler } from "../../../../handlers/interactionCreate/ui/types";
 import { safeReply } from "../../../../utils/interaction";
 import {
-  createErrorEmbed,
   createSuccessEmbed,
+  createWarningEmbed,
 } from "../../../../utils/messageResponse";
 import {
   getVacPanelChannelId,
@@ -62,7 +62,7 @@ export const vcPanelButtonHandler: ButtonHandler = {
     if (!channel || channel.type !== ChannelType.GuildVoice) {
       await safeReply(interaction, {
         embeds: [
-          createErrorEmbed(
+          createWarningEmbed(
             tInteraction(interaction.locale, "errors:vac.not_vac_channel"),
             {
               title: tInteraction(
@@ -81,7 +81,7 @@ export const vcPanelButtonHandler: ButtonHandler = {
     if (!(await isVcPanelManagedChannel(guild.id, channel.id))) {
       await safeReply(interaction, {
         embeds: [
-          createErrorEmbed(
+          createWarningEmbed(
             tInteraction(interaction.locale, "errors:vac.not_vac_channel"),
             {
               title: tInteraction(
@@ -103,7 +103,7 @@ export const vcPanelButtonHandler: ButtonHandler = {
     if (!member || member.voice.channelId !== channel.id) {
       await safeReply(interaction, {
         embeds: [
-          createErrorEmbed(
+          createWarningEmbed(
             tInteraction(interaction.locale, "errors:vac.not_in_vc"),
             {
               title: tInteraction(interaction.locale, "common:title_not_in_vc"),
@@ -179,7 +179,7 @@ export const vcPanelButtonHandler: ButtonHandler = {
       if (vcMembers.length === 0) {
         await safeReply(interaction, {
           embeds: [
-            createErrorEmbed(
+            createWarningEmbed(
               tInteraction(interaction.locale, "errors:vac.not_in_vc"),
               {
                 title: tInteraction(

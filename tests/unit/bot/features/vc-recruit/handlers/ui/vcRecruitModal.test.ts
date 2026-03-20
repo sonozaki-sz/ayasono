@@ -36,7 +36,7 @@ vi.mock("@/bot/utils/interaction", () => ({
   safeReply: (...args: unknown[]) => safeReplyMock(...args),
 }));
 vi.mock("@/bot/utils/messageResponse", () => ({
-  createErrorEmbed: vi.fn((msg: string) => ({ error: msg })),
+  createWarningEmbed: vi.fn((msg: string) => ({ warning: msg })),
   createSuccessEmbed: vi.fn((msg: string) => ({ success: msg })),
   createInfoEmbed: vi.fn((msg: string) => ({ info: msg })),
   STATUS_COLORS: { success: 0x57f287, info: 0x3498db, warning: 0xfee75c, error: 0xed4245 },

@@ -5,7 +5,7 @@ import {
   type ChatInputCommandInteraction,
   PermissionFlagsBits,
 } from "discord.js";
-import { ValidationError } from "../../shared/errors/customErrors";
+import { PermissionError } from "../../shared/errors/customErrors";
 import { tInteraction } from "../../shared/locale/localeManager";
 import { COMMON_I18N_KEYS } from "./i18nKeys";
 
@@ -21,7 +21,7 @@ export function ensureManageGuildPermission(
 ): void {
   // Discord UI 側の権限制御だけに依存せず、実行時にも明示的に確認する
   if (!interaction.memberPermissions?.has(PermissionFlagsBits.ManageGuild)) {
-    throw new ValidationError(
+    throw new PermissionError(
       tInteraction(interaction.locale, COMMON_I18N_KEYS.MANAGE_GUILD_REQUIRED),
     );
   }

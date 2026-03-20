@@ -28,7 +28,12 @@ import {
   tInteraction,
 } from "../../shared/locale/localeManager";
 import { logger } from "../../shared/utils/logger";
-import { createErrorEmbed } from "../utils/messageResponse";
+import { createErrorEmbed, createWarningEmbed } from "../utils/messageResponse";
+
+/** ユーザー操作で回復可能なエラー（warning レベルで表示） */
+const WARNING_ERROR_CLASSES: ReadonlyArray<
+  new (...args: never[]) => BaseError
+> = [ValidationError, NotFoundError, TimeoutError, ConfigurationError];
 
 /** エラークラスと common タイトルキーの対応 */
 const ERROR_TITLE_MAP = [
@@ -84,7 +89,12 @@ const replyWithError = async (
 
   const message = getUserFriendlyMessage(err);
   const title = getErrorTitle(interaction, err);
-  const embed = createErrorEmbed(message, { title });
+  const isWarning =
+    err instanceof BaseError &&
+    WARNING_ERROR_CLASSES.some((cls) => err instanceof cls);
+  const embed = isWarning
+    ? createWarningEmbed(message, { title })
+    : createErrorEmbed(message, { title });
 
   try {
     if (interaction.deferred || interaction.replied) {
