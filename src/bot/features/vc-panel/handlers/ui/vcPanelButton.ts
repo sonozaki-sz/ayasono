@@ -64,6 +64,12 @@ export const vcPanelButtonHandler: ButtonHandler = {
         embeds: [
           createErrorEmbed(
             tInteraction(interaction.locale, "errors:vac.not_vac_channel"),
+            {
+              title: tInteraction(
+                interaction.locale,
+                "common:title_channel_error",
+              ),
+            },
           ),
         ],
         flags: MessageFlags.Ephemeral,
@@ -77,6 +83,12 @@ export const vcPanelButtonHandler: ButtonHandler = {
         embeds: [
           createErrorEmbed(
             tInteraction(interaction.locale, "errors:vac.not_vac_channel"),
+            {
+              title: tInteraction(
+                interaction.locale,
+                "common:title_channel_error",
+              ),
+            },
           ),
         ],
         flags: MessageFlags.Ephemeral,
@@ -93,6 +105,9 @@ export const vcPanelButtonHandler: ButtonHandler = {
         embeds: [
           createErrorEmbed(
             tInteraction(interaction.locale, "errors:vac.not_in_vc"),
+            {
+              title: tInteraction(interaction.locale, "common:title_not_in_vc"),
+            },
           ),
         ],
         flags: MessageFlags.Ephemeral,
@@ -166,6 +181,12 @@ export const vcPanelButtonHandler: ButtonHandler = {
           embeds: [
             createErrorEmbed(
               tInteraction(interaction.locale, "errors:vac.not_in_vc"),
+              {
+                title: tInteraction(
+                  interaction.locale,
+                  "common:title_not_in_vc",
+                ),
+              },
             ),
           ],
           flags: MessageFlags.Ephemeral,

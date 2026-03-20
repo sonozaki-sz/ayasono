@@ -5,6 +5,7 @@ import { ChannelType, type ChatInputCommandInteraction } from "discord.js";
 import { ValidationError } from "../../../../shared/errors/customErrors";
 import { getAfkConfig } from "../../../../shared/features/afk/afkConfigService";
 import {
+  logPrefixed,
   tDefault,
   tInteraction,
 } from "../../../../shared/locale/localeManager";
@@ -87,7 +88,7 @@ export async function executeAfkCommand(
   });
 
   logger.info(
-    tDefault(AFK_I18N_KEYS.LOG_MOVED, {
+    logPrefixed("system:log_prefix.afk", AFK_I18N_KEYS.LOG_MOVED, {
       guildId,
       userId: targetUser.id,
       channelId: config.channelId,

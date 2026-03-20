@@ -6,7 +6,7 @@ import {
   type ChatInputCommandInteraction,
   type MessageComponentInteraction,
 } from "discord.js";
-import { tDefault } from "../../../../shared/locale/localeManager";
+import { logPrefixed, tDefault } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import { handleCommandError } from "../../../errors/interactionErrorHandler";
 import { COMMON_I18N_KEYS } from "../../../shared/i18nKeys";
@@ -54,7 +54,11 @@ export async function executeMessageDeleteCommand(
 
     if (!interaction.guildId || !interaction.guild) {
       await interaction.editReply({
-        embeds: [createErrorEmbed(tDefault(COMMON_I18N_KEYS.GUILD_ONLY))],
+        embeds: [
+          createErrorEmbed(tDefault(COMMON_I18N_KEYS.GUILD_ONLY), {
+            title: tDefault("common:title_server_only"),
+          }),
+        ],
       });
       return;
     }
@@ -67,6 +71,7 @@ export async function executeMessageDeleteCommand(
         embeds: [
           createErrorEmbed(
             tDefault("commands:message-delete.errors.no_permission"),
+            { title: tDefault("common:title_permission_denied") },
           ),
         ],
       });
@@ -79,6 +84,7 @@ export async function executeMessageDeleteCommand(
         embeds: [
           createErrorEmbed(
             tDefault("commands:message-delete.errors.bot_no_permission"),
+            { title: tDefault("common:title_bot_permission_denied") },
           ),
         ],
       });
@@ -90,13 +96,22 @@ export async function executeMessageDeleteCommand(
     if (executingGuilds.has(guildId)) {
       await interaction.editReply({
         embeds: [
-          createWarningEmbed(tDefault("commands:message-delete.errors.locked")),
+          createWarningEmbed(
+            tDefault("commands:message-delete.errors.locked"),
+            { title: tDefault("common:title_already_running") },
+          ),
         ],
       });
       return;
     }
     executingGuilds.add(guildId);
-    logger.debug(tDefault("system:message-delete.lock_acquired", { guildId }));
+    logger.debug(
+      logPrefixed(
+        "system:log_prefix.msg_del",
+        "system:message-delete.lock_acquired",
+        { guildId },
+      ),
+    );
 
     try {
       // ── 条件設定フェーズ（user / channel をセレクトメニューで選択） ──
@@ -143,7 +158,11 @@ export async function executeMessageDeleteCommand(
       // 正常完了・キャンセル・タイムアウト・エラーすべての終了パスでロックを解放
       executingGuilds.delete(guildId);
       logger.debug(
-        tDefault("system:message-delete.lock_released", { guildId }),
+        logPrefixed(
+          "system:log_prefix.msg_del",
+          "system:message-delete.lock_released",
+          { guildId },
+        ),
       );
     }
   } catch (error) {

@@ -3,7 +3,7 @@
 
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
 import {
-  tDefault,
+  logPrefixed,
   tInteraction,
 } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
@@ -51,6 +51,10 @@ export async function handleBumpReminderConfigEnable(
 
   // 監査用ログ
   logger.info(
-    tDefault("system:bump-reminder.config_enabled", { guildId, channelId }),
+    logPrefixed(
+      "system:log_prefix.bump_reminder",
+      "system:bump-reminder.config_enabled",
+      { guildId, channelId },
+    ),
   );
 }

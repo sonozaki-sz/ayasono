@@ -1,7 +1,7 @@
 // src/bot/features/bump-reminder/services/usecases/clearAllBumpRemindersUsecase.ts
 // 全Bumpリマインダーのクリアユースケース
 
-import { tDefault } from "../../../../../shared/locale/localeManager";
+import { logPrefixed } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import { type ScheduledReminderRef } from "../helpers/bumpReminderScheduleHelper";
 
@@ -29,9 +29,13 @@ export async function clearAllBumpRemindersUsecase(
   results.forEach((result, index) => {
     if (result.status === "rejected") {
       logger.error(
-        tDefault("system:scheduler.bump_reminder_task_failed", {
-          guildId: reminderKeys[index],
-        }),
+        logPrefixed(
+          "system:log_prefix.bump_reminder",
+          "system:scheduler.bump_reminder_task_failed",
+          {
+            guildId: reminderKeys[index],
+          },
+        ),
         result.reason,
       );
     }

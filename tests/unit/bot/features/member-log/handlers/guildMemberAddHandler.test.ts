@@ -53,6 +53,8 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotMemberLogConfigService: () => getBotMemberLogConfigServiceMock(),
 }));
 vi.mock("@/shared/locale/localeManager", () => ({
+  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
+  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
   tDefault: (key: string, opts?: Record<string, unknown>) =>
     tDefaultMock(key, opts),
   tInteraction: (...args: unknown[]) => args[1],
@@ -178,7 +180,7 @@ describe("bot/features/member-log/handlers/guildMemberAddHandler", () => {
 
       expect(disableAndClearChannelMock).toHaveBeenCalledWith("guild-1");
       expect(loggerMock.warn).toHaveBeenCalledWith(
-        "system:member-log.channel_deleted_config_cleared",
+        expect.stringContaining("system:member-log.channel_deleted_config_cleared"),
       );
       expect(member._channel.send).not.toHaveBeenCalled();
     });
@@ -398,7 +400,7 @@ describe("bot/features/member-log/handlers/guildMemberAddHandler", () => {
       await handleGuildMemberAdd(makeGuildMember() as never);
 
       expect(loggerMock.debug).toHaveBeenCalledWith(
-        "system:member-log.join_notification_sent",
+        expect.stringContaining("system:member-log.join_notification_sent"),
       );
     });
   });
@@ -422,7 +424,7 @@ describe("bot/features/member-log/handlers/guildMemberAddHandler", () => {
         handleGuildMemberAdd(member as never),
       ).resolves.toBeUndefined();
       expect(loggerMock.error).toHaveBeenCalledWith(
-        "system:member-log.notification_failed",
+        expect.stringContaining("system:member-log.notification_failed"),
         expect.any(Object),
       );
     });

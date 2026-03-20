@@ -1,7 +1,7 @@
 // src/bot/features/bump-reminder/handlers/bumpReminderStartup.ts
 // Bump リマインダーの起動時復元処理
 
-import { tDefault } from "../../../../shared/locale/localeManager";
+import { logPrefixed } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import type { BotClient } from "../../../client";
 import {
@@ -52,7 +52,10 @@ export async function restoreBumpRemindersOnStartup(
   } catch (error) {
     // 復元失敗でも Bot 起動は継続し、障害調査用ログのみ残す
     logger.error(
-      tDefault("system:scheduler.bump_reminder_restore_failed"),
+      logPrefixed(
+        "system:log_prefix.bump_reminder",
+        "system:scheduler.bump_reminder_restore_failed",
+      ),
       error,
     );
   }

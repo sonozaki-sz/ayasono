@@ -1,7 +1,7 @@
 // src/bot/features/bump-reminder/services/usecases/setBumpReminderUsecase.ts
 // Bumpリマインダー設定のユースケース
 
-import { tDefault } from "../../../../../shared/locale/localeManager";
+import { logPrefixed } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import {
   toBumpReminderJobId,
@@ -58,7 +58,11 @@ export async function setBumpReminderUsecase(
 
   if (reminders.has(reminderKey)) {
     logger.info(
-      tDefault("system:scheduler.bump_reminder_cancelling", { guildId }),
+      logPrefixed(
+        "system:log_prefix.bump_reminder",
+        "system:scheduler.bump_reminder_cancelling",
+        { guildId },
+      ),
     );
     await cancelReminder(guildId, serviceName);
   }
@@ -84,9 +88,13 @@ export async function setBumpReminderUsecase(
   );
 
   logger.info(
-    tDefault("system:scheduler.bump_reminder_scheduled", {
-      guildId,
-      minutes: delayMinutes,
-    }),
+    logPrefixed(
+      "system:log_prefix.bump_reminder",
+      "system:scheduler.bump_reminder_scheduled",
+      {
+        guildId,
+        minutes: delayMinutes,
+      },
+    ),
   );
 }

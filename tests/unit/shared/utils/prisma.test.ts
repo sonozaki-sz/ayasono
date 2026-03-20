@@ -14,6 +14,14 @@ describe("shared/utils/prisma", () => {
 
     vi.doMock("@/shared/locale/localeManager", () => ({
       tDefault: vi.fn((key: string) => key),
+      logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => {
+        const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+        return sub ? `[${prefixKey}:${sub}] ${m}` : `[${prefixKey}] ${m}`;
+      },
+      logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => {
+        const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+        return `[${commandName}] ${m}`;
+      },
     }));
   });
 
@@ -46,7 +54,7 @@ describe("shared/utils/prisma", () => {
 
     expect(() => requirePrismaClient()).toThrow("system:database.prisma_not_available");
     expect(loggerMock.error).toHaveBeenCalledWith(
-      "system:database.prisma_not_available",
+      expect.stringContaining("system:database.prisma_not_available"),
       expect.any(Error),
     );
   });

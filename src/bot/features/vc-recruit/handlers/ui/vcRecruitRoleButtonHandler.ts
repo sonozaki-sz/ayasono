@@ -164,7 +164,7 @@ export const vcRecruitRoleButtonHandler: ButtonHandler = {
             {
               title: tInteraction(
                 interaction.locale,
-                "commands:vc-recruit-config.embed.add_role_limit_title",
+                "common:title_role_limit_exceeded",
               ),
               fields: [
                 {

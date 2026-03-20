@@ -8,7 +8,7 @@ import type {
   PartialMessage,
 } from "discord.js";
 import { PermissionFlagsBits } from "discord.js";
-import { tDefault } from "../../../../shared/locale/localeManager";
+import { logPrefixed, tDefault } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import {
   DISCORD_EPOCH,
@@ -166,12 +166,16 @@ export async function scanMessages(
   const report = createThrottledReporter(onProgress);
 
   logger.debug(
-    tDefault("system:message-delete.svc_scan_start", {
-      channelCount: channels.length,
-      count,
-      targetUserIds:
-        targetUserIds.length > 0 ? targetUserIds.join(",") : "none",
-    }),
+    logPrefixed(
+      "system:log_prefix.msg_del",
+      "system:message-delete.svc_scan_start",
+      {
+        channelCount: channels.length,
+        count,
+        targetUserIds:
+          targetUserIds.length > 0 ? targetUserIds.join(",") : "none",
+      },
+    ),
   );
 
   // コマンド層でフィルタ済みのチャンネルが渡されるが、
@@ -189,9 +193,13 @@ export async function scanMessages(
         ])
     ) {
       logger.debug(
-        tDefault("system:message-delete.svc_channel_no_access", {
-          channelId: channel.id,
-        }),
+        logPrefixed(
+          "system:log_prefix.msg_del",
+          "system:message-delete.svc_channel_no_access",
+          {
+            channelId: channel.id,
+          },
+        ),
       );
       return false;
     }
@@ -240,9 +248,13 @@ export async function scanMessages(
   const cursors: ChannelCursor[] = await Promise.all(
     accessibleChannels.map(async (channel) => {
       logger.debug(
-        tDefault("system:message-delete.svc_initial_fetch", {
-          channelId: channel.id,
-        }),
+        logPrefixed(
+          "system:log_prefix.msg_del",
+          "system:message-delete.svc_initial_fetch",
+          {
+            channelId: channel.id,
+          },
+        ),
       );
       const cursor: ChannelCursor = {
         channel,
@@ -270,10 +282,14 @@ export async function scanMessages(
     for (const cursor of cursors) {
       if (cursor.buffer.length === 0 && !cursor.exhausted) {
         logger.debug(
-          tDefault("system:message-delete.svc_refill", {
-            channelId: cursor.channel.id,
-            lastId: cursor.lastId ?? "none",
-          }),
+          logPrefixed(
+            "system:log_prefix.msg_del",
+            "system:message-delete.svc_refill",
+            {
+              channelId: cursor.channel.id,
+              lastId: cursor.lastId ?? "none",
+            },
+          ),
         );
         const batch: Collection<string, Message> =
           await cursor.channel.messages.fetch({
@@ -330,9 +346,13 @@ export async function scanMessages(
   }
 
   logger.debug(
-    tDefault("system:message-delete.svc_scan_complete", {
-      count: scanned.length,
-    }),
+    logPrefixed(
+      "system:log_prefix.msg_del",
+      "system:message-delete.svc_scan_complete",
+      {
+        count: scanned.length,
+      },
+    ),
   );
   return scanned;
 }
@@ -415,9 +435,13 @@ export async function deleteScannedMessages(
         if (signal?.aborted) break;
         const chunk = newMsgs.slice(i, i + MSG_DEL_BULK_BATCH_SIZE);
         logger.debug(
-          tDefault("system:message-delete.svc_bulk_delete_chunk", {
-            size: chunk.length,
-          }),
+          logPrefixed(
+            "system:log_prefix.msg_del",
+            "system:message-delete.svc_bulk_delete_chunk",
+            {
+              size: chunk.length,
+            },
+          ),
         );
         const deleted = await rawChannel.bulkDelete(
           chunk.map((m) => m.messageId),
@@ -445,10 +469,14 @@ export async function deleteScannedMessages(
         channelStatus.deleted++;
       } catch (err) {
         logger.warn(
-          tDefault("system:message-delete.svc_message_delete_failed", {
-            messageId: scanned.messageId,
-            error: String(err),
-          }),
+          logPrefixed(
+            "system:log_prefix.msg_del",
+            "system:message-delete.svc_message_delete_failed",
+            {
+              messageId: scanned.messageId,
+              error: String(err),
+            },
+          ),
         );
       }
       await report({ totalDeleted, total: messages.length, channelStatuses });

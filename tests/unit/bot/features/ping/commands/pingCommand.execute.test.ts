@@ -3,6 +3,8 @@ import { executePingCommand } from "@/bot/features/ping/commands/pingCommand.exe
 import { createSuccessEmbed } from "@/bot/utils/messageResponse";
 
 vi.mock("@/shared/locale/localeManager", () => ({
+  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
+  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
   tGuild: vi.fn(),
   tInteraction: vi.fn((_locale: string, key: string) => key),
 }));

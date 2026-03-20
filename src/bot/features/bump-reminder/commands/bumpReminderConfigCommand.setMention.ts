@@ -5,7 +5,7 @@ import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
 import { ValidationError } from "../../../../shared/errors/customErrors";
 import { BUMP_REMINDER_MENTION_ROLE_RESULT } from "../../../../shared/features/bump-reminder/bumpReminderConfigService";
 import {
-  tDefault,
+  logPrefixed,
   tInteraction,
 } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
@@ -67,10 +67,14 @@ export async function handleBumpReminderConfigSetMention(
 
   // 監査用ログ
   logger.info(
-    tDefault("system:bump-reminder.config_mention_set", {
-      guildId,
-      roleId: role.id,
-      userIds: "none",
-    }),
+    logPrefixed(
+      "system:log_prefix.bump_reminder",
+      "system:bump-reminder.config_mention_set",
+      {
+        guildId,
+        roleId: role.id,
+        userIds: "none",
+      },
+    ),
   );
 }

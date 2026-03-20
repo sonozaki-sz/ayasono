@@ -69,6 +69,7 @@ export async function showFinalConfirmDialog(
           embeds: [
             createWarningEmbed(
               tDefault("commands:message-delete.errors.not_authorized"),
+              { title: tDefault("common:title_permission_denied") },
             ),
           ],
           flags: MessageFlags.Ephemeral,
@@ -139,6 +140,7 @@ export async function showFinalConfirmDialog(
                   tDefault("commands:message-delete.errors.jump_invalid_page", {
                     total: totalPages,
                   }),
+                  { title: tDefault("common:title_input_error") },
                 ),
               ],
               flags: MessageFlags.Ephemeral,
@@ -168,6 +170,7 @@ export async function showFinalConfirmDialog(
           embeds: [
             createWarningEmbed(
               tDefault("commands:message-delete.confirm.timed_out"),
+              { title: tDefault("common:title_timeout") },
             ),
           ],
           components: [],

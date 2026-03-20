@@ -52,6 +52,8 @@ vi.mock("@/shared/locale/helpers", () => ({
   getGuildTranslator: vi.fn(async () => (key: string) => key),
 }));
 vi.mock("@/shared/locale/localeManager", () => ({
+  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
+  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
   tDefault: vi.fn((key: string) => key),
   tInteraction: (...args: unknown[]) => args[1],
 }));
@@ -246,13 +248,13 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
       await bumpPanelButtonHandler.execute(interaction as never);
 
       expect(logger.error).toHaveBeenCalledWith(
-        "system:bump-reminder.panel_handle_failed",
+        expect.stringContaining("system:bump-reminder.panel_handle_failed"),
         expect.any(Error),
       );
-      expect(tDefault).toHaveBeenCalledWith("errors:general.error_title");
+      expect(tDefault).toHaveBeenCalledWith("common:title_operation_error");
       expect(createErrorEmbed).toHaveBeenCalledWith(
         "events:bump-reminder.panel.error",
-        { title: "errors:general.error_title" },
+        { title: "common:title_operation_error" },
       );
       expect(safeReplyMock).toHaveBeenCalledWith(interaction, {
         embeds: [{ message: "events:bump-reminder.panel.error" }],
@@ -268,11 +270,11 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
       await bumpPanelButtonHandler.execute(interaction as never);
 
       expect(logger.error).toHaveBeenCalledWith(
-        "system:bump-reminder.panel_handle_failed",
+        expect.stringContaining("system:bump-reminder.panel_handle_failed"),
         expect.any(Error),
       );
       expect(logger.error).toHaveBeenCalledWith(
-        "system:bump-reminder.panel_reply_failed",
+        expect.stringContaining("system:bump-reminder.panel_reply_failed"),
         expect.any(Error),
       );
     });

@@ -2,7 +2,7 @@
 // clientReady 時のBot共通ハンドラー
 
 import { ActivityType, PresenceUpdateStatus } from "discord.js";
-import { tDefault } from "../../shared/locale/localeManager";
+import { logPrefixed, tDefault } from "../../shared/locale/localeManager";
 import { logger } from "../../shared/utils/logger";
 import type { BotClient } from "../client";
 import { restoreBumpRemindersOnStartup } from "../features/bump-reminder/handlers/bumpReminderStartup";
@@ -15,16 +15,22 @@ import { cleanupVacOnStartup } from "../features/vac/handlers/vacStartupCleanup"
 export async function handleClientReady(client: BotClient): Promise<void> {
   // 起動直後の基本メトリクスをログ出力
   logger.info(
-    tDefault("system:ready.bot_ready", { tag: client.user?.username }),
+    logPrefixed("system:log_prefix.ready", "system:ready.bot_ready", {
+      tag: client.user?.username,
+    }),
   );
   logger.info(
-    tDefault("system:ready.servers", { count: client.guilds.cache.size }),
+    logPrefixed("system:log_prefix.ready", "system:ready.servers", {
+      count: client.guilds.cache.size,
+    }),
   );
   logger.info(
-    tDefault("system:ready.users", { count: client.users.cache.size }),
+    logPrefixed("system:log_prefix.ready", "system:ready.users", {
+      count: client.users.cache.size,
+    }),
   );
   logger.info(
-    tDefault("system:ready.commands", {
+    logPrefixed("system:log_prefix.ready", "system:ready.commands", {
       count: client.commands.size,
     }),
   );

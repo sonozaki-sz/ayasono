@@ -2,7 +2,7 @@
 // VC募集で作成したVCの空検知・自動削除ハンドラー
 
 import { ChannelType, type VoiceState } from "discord.js";
-import { tDefault } from "../../../../shared/locale/localeManager";
+import { logPrefixed } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import { getBotVcRecruitRepository } from "../../../services/botCompositionRoot";
 
@@ -46,13 +46,23 @@ export async function handleVcRecruitVoiceStateUpdate(
     await repo.removeCreatedVoiceChannelId(guildId, channel.id);
 
     logger.info(
-      tDefault(VC_RECRUIT_LOG_KEYS.EMPTY_VC_DELETED, {
-        guildId,
-        channelId: channel.id,
-        channelName: channel.name,
-      }),
+      logPrefixed(
+        "system:log_prefix.vc_recruit",
+        VC_RECRUIT_LOG_KEYS.EMPTY_VC_DELETED,
+        {
+          guildId,
+          channelId: channel.id,
+          channelName: channel.name,
+        },
+      ),
     );
   } catch (error) {
-    logger.error(tDefault(VC_RECRUIT_LOG_KEYS.VOICE_STATE_UPDATE_ERROR), error);
+    logger.error(
+      logPrefixed(
+        "system:log_prefix.vc_recruit",
+        VC_RECRUIT_LOG_KEYS.VOICE_STATE_UPDATE_ERROR,
+      ),
+      error,
+    );
   }
 }

@@ -3,7 +3,7 @@
 
 import { MessageFlags, type ModalSubmitInteraction } from "discord.js";
 import {
-  tDefault,
+  logPrefixed,
   tInteraction,
 } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
@@ -43,7 +43,11 @@ export const memberLogSetLeaveMessageModalHandler: ModalHandler = {
     });
 
     logger.info(
-      tDefault("system:member-log.config_leave_message_set", { guildId }),
+      logPrefixed(
+        "system:log_prefix.member_log",
+        "system:member-log.config_leave_message_set",
+        { guildId },
+      ),
     );
   },
 };

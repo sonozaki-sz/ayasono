@@ -3,7 +3,7 @@
 
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
 import {
-  tDefault,
+  logPrefixed,
   tInteraction,
 } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
@@ -43,6 +43,10 @@ export async function handleMemberLogConfigClearJoinMessage(
 
   // 監査用ログ
   logger.info(
-    tDefault("system:member-log.config_join_message_cleared", { guildId }),
+    logPrefixed(
+      "system:log_prefix.member_log",
+      "system:member-log.config_join_message_cleared",
+      { guildId },
+    ),
   );
 }

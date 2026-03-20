@@ -9,7 +9,7 @@ import {
 } from "discord.js";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
 import {
-  tDefault,
+  logPrefixed,
   tInteraction,
 } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
@@ -64,6 +64,12 @@ export const stickyMessageSetModalHandler: ModalHandler = {
               interaction.locale,
               "commands:sticky-message.errors.emptyMessage",
             ),
+            {
+              title: tInteraction(
+                interaction.locale,
+                "common:title_input_error",
+              ),
+            },
           ),
         ],
         flags: MessageFlags.Ephemeral,
@@ -86,7 +92,7 @@ export const stickyMessageSetModalHandler: ModalHandler = {
             {
               title: tInteraction(
                 interaction.locale,
-                "commands:sticky-message.set.alreadyExists.title",
+                "common:title_already_registered",
               ),
             },
           ),
@@ -149,7 +155,11 @@ export const stickyMessageSetModalHandler: ModalHandler = {
       });
     } catch (err) {
       logger.error(
-        tDefault("system:sticky-message.set_failed", { channelId, guildId }),
+        logPrefixed(
+          "system:log_prefix.sticky_message",
+          "system:sticky-message.set_failed",
+          { channelId, guildId },
+        ),
         { channelId, guildId, err },
       );
       throw err;

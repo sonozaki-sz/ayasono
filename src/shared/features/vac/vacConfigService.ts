@@ -9,7 +9,7 @@ import {
   type VacChannelPair,
   type VacConfig,
 } from "../../database/types";
-import { tDefault } from "../../locale/localeManager";
+import { logPrefixed, tDefault } from "../../locale/localeManager";
 import { executeWithDatabaseError } from "../../utils/errorHandling";
 import { logger } from "../../utils/logger";
 import {
@@ -96,10 +96,14 @@ export class VacConfigService {
           // return config に到達するのは保存成功時のみ
           await this.saveVacConfig(guildId, config);
           logger.debug(
-            tDefault("system:database.vac_trigger_added", {
-              guildId,
-              channelId,
-            }),
+            logPrefixed(
+              "system:log_prefix.database",
+              "system:database.vac_trigger_added",
+              {
+                guildId,
+                channelId,
+              },
+            ),
           );
         }
 
@@ -134,10 +138,14 @@ export class VacConfigService {
           // return config に到達するのは保存成功時のみ
           await this.saveVacConfig(guildId, config);
           logger.debug(
-            tDefault("system:database.vac_trigger_removed", {
-              guildId,
-              channelId,
-            }),
+            logPrefixed(
+              "system:log_prefix.database",
+              "system:database.vac_trigger_removed",
+              {
+                guildId,
+                channelId,
+              },
+            ),
           );
         }
 
@@ -169,10 +177,14 @@ export class VacConfigService {
           // return config に到達するのは保存成功時のみ
           await this.saveVacConfig(guildId, config);
           logger.debug(
-            tDefault("system:database.vac_channel_registered", {
-              guildId,
-              voiceChannelId: channel.voiceChannelId,
-            }),
+            logPrefixed(
+              "system:log_prefix.database",
+              "system:database.vac_channel_registered",
+              {
+                guildId,
+                voiceChannelId: channel.voiceChannelId,
+              },
+            ),
           );
         }
         // 変更不要だった場合も保存成功後も、DB と一致した最新の config を返す
@@ -206,10 +218,14 @@ export class VacConfigService {
           // return config に到達するのは保存成功時のみ
           await this.saveVacConfig(guildId, config);
           logger.debug(
-            tDefault("system:database.vac_channel_unregistered", {
-              guildId,
-              voiceChannelId,
-            }),
+            logPrefixed(
+              "system:log_prefix.database",
+              "system:database.vac_channel_unregistered",
+              {
+                guildId,
+                voiceChannelId,
+              },
+            ),
           );
         }
 

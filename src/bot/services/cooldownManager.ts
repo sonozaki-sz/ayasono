@@ -1,7 +1,7 @@
 // src/bot/services/cooldownManager.ts
 // コマンドクールダウン管理
 
-import { tDefault } from "../../shared/locale/localeManager";
+import { logPrefixed } from "../../shared/locale/localeManager";
 import { logger } from "../../shared/utils/logger";
 
 /**
@@ -101,7 +101,12 @@ export class CooldownManager {
         this.timers.delete(commandName);
       }
     }
-    logger.debug(tDefault("system:cooldown.reset", { commandName, userId }));
+    logger.debug(
+      logPrefixed("system:log_prefix.cooldown", "system:cooldown.reset", {
+        commandName,
+        userId,
+      }),
+    );
   }
 
   /**
@@ -119,7 +124,11 @@ export class CooldownManager {
       this.timers.delete(commandName);
     }
     logger.debug(
-      tDefault("system:cooldown.cleared_for_command", { commandName }),
+      logPrefixed(
+        "system:log_prefix.cooldown",
+        "system:cooldown.cleared_for_command",
+        { commandName },
+      ),
     );
   }
 
@@ -136,7 +145,9 @@ export class CooldownManager {
       }
     }
     this.timers.clear();
-    logger.debug(tDefault("system:cooldown.cleared_all"));
+    logger.debug(
+      logPrefixed("system:log_prefix.cooldown", "system:cooldown.cleared_all"),
+    );
   }
 
   /**
@@ -161,7 +172,9 @@ export class CooldownManager {
 
     if (removedCount > 0) {
       logger.debug(
-        tDefault("system:cooldown.cleanup", { count: removedCount }),
+        logPrefixed("system:log_prefix.cooldown", "system:cooldown.cleanup", {
+          count: removedCount,
+        }),
       );
     }
   }
@@ -196,6 +209,8 @@ export class CooldownManager {
     }
     // タイマーマップも空にして完全破棄
     this.timers.clear();
-    logger.info(tDefault("system:cooldown.destroyed"));
+    logger.info(
+      logPrefixed("system:log_prefix.cooldown", "system:cooldown.destroyed"),
+    );
   }
 }

@@ -6,7 +6,7 @@ import fastifyStatic from "@fastify/static";
 import Fastify, { type FastifyInstance } from "fastify";
 import { join } from "path";
 import { NODE_ENV, env } from "../shared/config/env";
-import { tDefault } from "../shared/locale/localeManager";
+import { logPrefixed, tDefault } from "../shared/locale/localeManager";
 import { logger } from "../shared/utils/logger";
 import { apiRoutes } from "./routes/api/apiRoutes";
 import { healthRoute } from "./routes/health";
@@ -53,7 +53,7 @@ export async function buildWebApp(baseDir: string): Promise<FastifyInstance> {
   // 共通エラーハンドラ（ログ + API レスポンス整形）
   fastify.setErrorHandler((error, request, reply) => {
     const err = error as Error & { statusCode?: number };
-    logger.error(tDefault("system:web.api_error"), {
+    logger.error(logPrefixed("system:log_prefix.web", "system:web.api_error"), {
       error: err.message,
       stack: err.stack,
       url: request.url,

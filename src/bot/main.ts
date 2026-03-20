@@ -10,7 +10,11 @@ import {
   setupGlobalErrorHandlers,
   setupGracefulShutdown,
 } from "../shared/errors/errorHandler";
-import { localeManager, tDefault } from "../shared/locale/localeManager";
+import {
+  localeManager,
+  logPrefixed,
+  tDefault,
+} from "../shared/locale/localeManager";
 import { logger } from "../shared/utils/logger";
 import { setPrismaClient } from "../shared/utils/prisma";
 import { createBotClient } from "./client";
@@ -51,7 +55,7 @@ async function startBot() {
   // LocaleManagerを初期化
   await localeManager.initialize();
 
-  logger.info(tDefault("system:bot.starting"));
+  logger.info(logPrefixed("system:log_prefix.bot", "system:bot.starting"));
 
   // Discord クライアント生成（command/cooldown など含む）
   const client = createBotClient();
@@ -79,7 +83,9 @@ async function startBot() {
 
     // ローカルレジストリへコマンド登録
     logger.info(
-      tDefault("system:bot.commands.registering", { count: commands.length }),
+      logPrefixed("system:log_prefix.bot", "system:bot.commands.registering", {
+        count: commands.length,
+      }),
     );
 
     for (const command of commands) {
@@ -108,7 +114,7 @@ async function startBot() {
         );
       }
       logger.info(
-        `${tDefault("system:bot.commands.registered")} (${COMMAND_REGISTRATION_SCOPE.GUILD})`,
+        `${logPrefixed("system:log_prefix.bot", "system:bot.commands.registered")} (${COMMAND_REGISTRATION_SCOPE.GUILD})`,
       );
     } else {
       // グローバルコマンドとして登録（本番用）
@@ -124,7 +130,7 @@ async function startBot() {
         );
       }
       logger.info(
-        `${tDefault("system:bot.commands.registered")} (${COMMAND_REGISTRATION_SCOPE.GLOBAL})`,
+        `${logPrefixed("system:log_prefix.bot", "system:bot.commands.registered")} (${COMMAND_REGISTRATION_SCOPE.GLOBAL})`,
       );
     }
 
@@ -135,7 +141,10 @@ async function startBot() {
     await client.login(env.DISCORD_TOKEN);
   } catch (error) {
     // 起動途中エラー時は DB 接続を閉じて非0終了
-    logger.error(tDefault("system:bot.startup.error"), error);
+    logger.error(
+      logPrefixed("system:log_prefix.bot", "system:bot.startup.error"),
+      error,
+    );
     await prisma.$disconnect();
     process.exit(PROCESS_EXIT_CODE.FAILURE);
   }
@@ -147,6 +156,9 @@ setupGlobalErrorHandlers();
 // 起動
 startBot().catch((error) => {
   // 予期しない起動例外の最終防波堤
-  logger.error(tDefault("system:bot.startup.failed"), error);
+  logger.error(
+    logPrefixed("system:log_prefix.bot", "system:bot.startup.failed"),
+    error,
+  );
   process.exit(PROCESS_EXIT_CODE.FAILURE);
 });

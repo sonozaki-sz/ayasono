@@ -7,7 +7,7 @@ import {
   type GuildMember,
   type VoiceState,
 } from "discord.js";
-import { tDefault } from "../../../../../shared/locale/localeManager";
+import { logPrefixed } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import { sendVcControlPanel } from "../../../vc-panel/vcControlPanel";
 import type { VacConfigService } from "../../../../../shared/features/vac/vacConfigService";
@@ -67,7 +67,7 @@ export async function handleVacCreateUseCase(
     parentCategory.children.cache.size >= VAC_EVENT.CATEGORY_CHANNEL_LIMIT
   ) {
     logger.warn(
-      tDefault("system:vac.category_full", {
+      logPrefixed("system:log_prefix.vac", "system:vac.category_full", {
         guildId: member.guild.id,
         categoryId: parentCategory.id,
       }),
@@ -97,7 +97,10 @@ export async function handleVacCreateUseCase(
   }
 
   await sendVcControlPanel(voiceChannel).catch((error) => {
-    logger.error(tDefault("system:vac.panel_send_failed"), error);
+    logger.error(
+      logPrefixed("system:log_prefix.vac", "system:vac.panel_send_failed"),
+      error,
+    );
   });
 
   try {
@@ -115,7 +118,7 @@ export async function handleVacCreateUseCase(
   });
 
   logger.info(
-    tDefault("system:vac.channel_created", {
+    logPrefixed("system:log_prefix.vac", "system:vac.channel_created", {
       guildId: member.guild.id,
       channelId: voiceChannel.id,
       ownerId: member.id,

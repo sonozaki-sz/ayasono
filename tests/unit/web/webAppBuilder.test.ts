@@ -35,7 +35,13 @@ describe("web/webAppBuilder", () => {
     }));
     vi.doMock("@/web/routes/api/apiRoutes", () => ({ apiRoutes }));
     vi.doMock("@/web/routes/health", () => ({ healthRoute }));
-    vi.doMock("@/shared/locale/localeManager", () => ({ tDefault }));
+    vi.doMock("@/shared/locale/localeManager", () => ({
+      tDefault,
+      logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => {
+        const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+        return sub ? `[${prefixKey}:${sub}] ${m}` : `[${prefixKey}] ${m}`;
+      },
+    }));
     vi.doMock("@/shared/utils/logger", () => ({ logger }));
     vi.doMock("@/shared/config/env", () => ({
       NODE_ENV: {
@@ -125,7 +131,7 @@ describe("web/webAppBuilder", () => {
       { status },
     );
 
-    expect(logger.error).toHaveBeenCalledWith("tr:system:web.api_error", {
+    expect(logger.error).toHaveBeenCalledWith("[system:log_prefix.web] system:web.api_error", {
       error: "internal details",
       stack: expect.any(String),
       url: "/api/test",
@@ -136,7 +142,7 @@ describe("web/webAppBuilder", () => {
       error: "tr:system:web.internal_server_error",
       message: undefined,
     });
-    expect(tDefault).toHaveBeenCalledWith("system:web.api_error");
+    expect(tDefault).toHaveBeenCalledWith("system:web.internal_server_error");
   });
 
   it("開発環境ではエラーハンドラーが message をそのままレスポンスに含めてデバッグしやすくすること", async () => {

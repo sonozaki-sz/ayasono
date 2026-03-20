@@ -3,7 +3,7 @@
 
 import type { FastifyPluginAsync, FastifyReply, FastifyRequest } from "fastify";
 import { env } from "../../shared/config/env";
-import { tDefault } from "../../shared/locale/localeManager";
+import { logPrefixed, tDefault } from "../../shared/locale/localeManager";
 import { logger } from "../../shared/utils/logger";
 
 /**
@@ -32,7 +32,7 @@ export const apiAuthPlugin: FastifyPluginAsync = async (fastify) => {
 
       if (!authHeader || !authHeader.startsWith("Bearer ")) {
         logger.warn(
-          tDefault("system:web.auth_unauthorized", {
+          logPrefixed("system:log_prefix.web", "system:web.auth_unauthorized", {
             method: request.method,
             url: request.url,
           }),
@@ -51,10 +51,14 @@ export const apiAuthPlugin: FastifyPluginAsync = async (fastify) => {
       // 本格的なJWT検証が必要な場合はここを差し替える
       if (token !== env.JWT_SECRET) {
         logger.warn(
-          tDefault("system:web.auth_invalid_token", {
-            method: request.method,
-            url: request.url,
-          }),
+          logPrefixed(
+            "system:log_prefix.web",
+            "system:web.auth_invalid_token",
+            {
+              method: request.method,
+              url: request.url,
+            },
+          ),
         );
         await reply.status(403).send({
           error: tDefault("system:web.auth_forbidden_error"),

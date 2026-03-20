@@ -27,6 +27,8 @@ vi.mock(
   }),
 );
 vi.mock("@/shared/locale/localeManager", () => ({
+  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
+  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
   tGuild: tGuildMock,
   tDefault: vi.fn((key: string) => key),
   tInteraction: (...args: unknown[]) => args[1],
@@ -239,7 +241,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalH
     await stickyMessageUpdateEmbedModalHandler.execute(interaction as never);
 
     expect(loggerMock.error).toHaveBeenCalledWith(
-      "system:sticky-message.resend_after_embed_update_failed",
+      expect.stringContaining("system:sticky-message.resend_after_embed_update_failed"),
       expect.any(Object),
     );
     expect(interaction._replyMock).toHaveBeenCalled();

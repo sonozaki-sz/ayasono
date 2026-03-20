@@ -7,6 +7,7 @@ import {
   BUMP_REMINDER_MENTION_USER_REMOVE_RESULT,
 } from "../../../../../shared/features/bump-reminder/bumpReminderConfigService";
 import {
+  logPrefixed,
   tDefault,
   tInteraction,
 } from "../../../../../shared/locale/localeManager";
@@ -109,11 +110,15 @@ export const bumpPanelButtonHandler: ButtonHandler = {
         });
 
         logger.debug(
-          tDefault("system:bump-reminder.panel_mention_updated", {
-            action: "on",
-            userId,
-            guildId,
-          }),
+          logPrefixed(
+            "system:log_prefix.bump_reminder",
+            "system:bump-reminder.panel_mention_updated",
+            {
+              action: "on",
+              userId,
+              guildId,
+            },
+          ),
         );
       } else {
         // OFF ボタン: 削除を試み、冪等に成功応答を返す
@@ -150,28 +155,41 @@ export const bumpPanelButtonHandler: ButtonHandler = {
         });
 
         logger.debug(
-          tDefault("system:bump-reminder.panel_mention_updated", {
-            action: "off",
-            userId,
-            guildId,
-          }),
+          logPrefixed(
+            "system:log_prefix.bump_reminder",
+            "system:bump-reminder.panel_mention_updated",
+            {
+              action: "off",
+              userId,
+              guildId,
+            },
+          ),
         );
       }
     } catch (error) {
       // 想定外エラーはログ化し、ユーザーには汎用エラーを返す
-      logger.error(tDefault("system:bump-reminder.panel_handle_failed"), error);
+      logger.error(
+        logPrefixed(
+          "system:log_prefix.bump_reminder",
+          "system:bump-reminder.panel_handle_failed",
+        ),
+        error,
+      );
       try {
         await safeReply(interaction, {
           embeds: [
             createErrorEmbed(tDefault("events:bump-reminder.panel.error"), {
-              title: tDefault("errors:general.error_title"),
+              title: tDefault("common:title_operation_error"),
             }),
           ],
           flags: MessageFlags.Ephemeral,
         });
       } catch (replyError) {
         logger.error(
-          tDefault("system:bump-reminder.panel_reply_failed"),
+          logPrefixed(
+            "system:log_prefix.bump_reminder",
+            "system:bump-reminder.panel_reply_failed",
+          ),
           replyError,
         );
       }

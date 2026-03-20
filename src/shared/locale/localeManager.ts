@@ -97,7 +97,9 @@ export class LocaleManager {
 
     // 初期化完了フラグを立てる
     this.initialized = true;
-    logger.info(tDefault("system:locale.manager_initialized"));
+    logger.info(
+      logPrefixed("system:log_prefix.bot", "system:locale.manager_initialized"),
+    );
   }
 
   /**
@@ -173,7 +175,11 @@ export class LocaleManager {
       return (i18next.t as unknown as FlexibleT)(key, options);
     } catch (error) {
       logger.error(
-        tDefault("system:locale.translation_failed", { key }),
+        logPrefixed(
+          "system:log_prefix.bot",
+          "system:locale.translation_failed",
+          { key },
+        ),
         error,
       );
       // 失敗時はキー文字列を返して UI 崩壊を避ける
@@ -271,4 +277,40 @@ export const tDefault = (
     ? { lng: localeManager.getDefaultLocale(), ...params }
     : { lng: localeManager.getDefaultLocale() };
   return (i18next.t as unknown as FlexibleT)(key, options);
+};
+
+/**
+ * プレフィックス付きログメッセージを生成する
+ * @param prefixKey ログプレフィックスの i18n キー（例: "system:log_prefix.bump_reminder"）
+ * @param messageKey ログメッセージの i18n キー（例: "system:bump-reminder.detected"）
+ * @param params メッセージの補間パラメータ
+ * @param sub サブプレフィックス（例: "command"）— "[interactionCreate:command]" の形式になる
+ * @returns "[プレフィックス] メッセージ" 形式の文字列
+ */
+export const logPrefixed = (
+  prefixKey: AllParseKeys,
+  messageKey: AllParseKeys,
+  params?: Record<string, unknown>,
+  sub?: string,
+): string => {
+  const prefix = tDefault(prefixKey);
+  const message = tDefault(messageKey, params);
+  const tag = sub ? `[${prefix}:${sub}]` : `[${prefix}]`;
+  return `${tag} ${message}`;
+};
+
+/**
+ * コマンド名プレフィックス付きログメッセージを生成する
+ * @param commandName スラッシュコマンド名（例: "/message-delete"）
+ * @param messageKey ログメッセージの i18n キー
+ * @param params メッセージの補間パラメータ
+ * @returns "[/command-name] メッセージ" 形式の文字列
+ */
+export const logCommand = (
+  commandName: string,
+  messageKey: AllParseKeys,
+  params?: Record<string, unknown>,
+): string => {
+  const message = tDefault(messageKey, params);
+  return `[${commandName}] ${message}`;
 };

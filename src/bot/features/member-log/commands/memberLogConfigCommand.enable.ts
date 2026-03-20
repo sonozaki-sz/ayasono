@@ -3,7 +3,7 @@
 
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
 import {
-  tDefault,
+  logPrefixed,
   tInteraction,
 } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
@@ -38,7 +38,9 @@ export async function handleMemberLogConfigEnable(
       interaction.locale,
       "commands:member-log-config.embed.enable_error_no_channel",
     );
-    const embed = createWarningEmbed(description);
+    const embed = createWarningEmbed(description, {
+      title: tInteraction(interaction.locale, "common:title_config_required"),
+    });
     await interaction.reply({
       embeds: [embed],
       flags: MessageFlags.Ephemeral,
@@ -64,5 +66,11 @@ export async function handleMemberLogConfigEnable(
   });
 
   // 監査用ログ
-  logger.info(tDefault("system:member-log.config_enabled", { guildId }));
+  logger.info(
+    logPrefixed(
+      "system:log_prefix.member_log",
+      "system:member-log.config_enabled",
+      { guildId },
+    ),
+  );
 }

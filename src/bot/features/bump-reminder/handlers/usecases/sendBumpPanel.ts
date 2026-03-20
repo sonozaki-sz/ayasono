@@ -11,7 +11,7 @@ import {
   getGuildTranslator,
   type GuildTFunction,
 } from "../../../../../shared/locale/helpers";
-import { tDefault } from "../../../../../shared/locale/localeManager";
+import { logPrefixed } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import { createInfoEmbed } from "../../../../utils/messageResponse";
 import {
@@ -76,7 +76,10 @@ export async function sendBumpPanel(
     // パネル送信失敗時は undefined を返し、呼び出し側で継続可能にする
     // パネル失敗はリマインダー登録全体を即中断しない設計
     logger.error(
-      tDefault("system:scheduler.bump_reminder_panel_send_failed"),
+      logPrefixed(
+        "system:log_prefix.bump_reminder",
+        "system:scheduler.bump_reminder_panel_send_failed",
+      ),
       error,
     );
     return undefined;

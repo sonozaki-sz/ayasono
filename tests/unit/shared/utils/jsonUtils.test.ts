@@ -3,6 +3,8 @@ import { vi, beforeEach } from "vitest";
 import { parseJsonArray } from "@/shared/utils/jsonUtils";
 
 vi.mock("@/shared/locale/localeManager", () => ({
+  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
+  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
   tDefault: (_key: string, params?: Record<string, unknown>) =>
     `parse_failed:${params?.error ?? "unknown"}`,
 }));
@@ -63,7 +65,7 @@ describe("shared/utils/jsonUtils - parseJsonArray", () => {
     });
     expect(parseJsonArray<string>("[1,2]")).toEqual([]);
     expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining("parse_failed:string error"),
+      expect.stringContaining("system:json.parse_array_failed"),
     );
     spy.mockRestore();
   });

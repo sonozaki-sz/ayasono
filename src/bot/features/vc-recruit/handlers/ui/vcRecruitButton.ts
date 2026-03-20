@@ -97,6 +97,12 @@ export const vcRecruitButtonHandler: ButtonHandler = {
                 interaction.locale,
                 "errors:vcRecruit.panel_channel_not_found",
               ),
+              {
+                title: tInteraction(
+                  interaction.locale,
+                  "common:title_channel_not_found",
+                ),
+              },
             ),
           ],
           flags: MessageFlags.Ephemeral,
@@ -114,6 +120,12 @@ export const vcRecruitButtonHandler: ButtonHandler = {
           embeds: [
             createErrorEmbed(
               tInteraction(interaction.locale, "errors:vcRecruit.not_setup"),
+              {
+                title: tInteraction(
+                  interaction.locale,
+                  "common:title_config_required",
+                ),
+              },
             ),
           ],
           flags: MessageFlags.Ephemeral,
@@ -280,6 +292,9 @@ export const vcRecruitButtonHandler: ButtonHandler = {
           embeds: [
             createErrorEmbed(
               tInteraction(interaction.locale, "errors:interaction.timeout"),
+              {
+                title: tInteraction(interaction.locale, "common:title_timeout"),
+              },
             ),
           ],
           flags: MessageFlags.Ephemeral,
@@ -439,6 +454,9 @@ export const vcRecruitButtonHandler: ButtonHandler = {
           embeds: [
             createErrorEmbed(
               tInteraction(interaction.locale, "errors:interaction.timeout"),
+              {
+                title: tInteraction(interaction.locale, "common:title_timeout"),
+              },
             ),
           ],
           flags: MessageFlags.Ephemeral,

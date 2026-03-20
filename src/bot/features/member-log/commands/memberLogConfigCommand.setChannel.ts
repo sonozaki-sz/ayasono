@@ -8,7 +8,7 @@ import {
 } from "discord.js";
 import { ValidationError } from "../../../../shared/errors/customErrors";
 import {
-  tDefault,
+  logPrefixed,
   tInteraction,
 } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
@@ -66,9 +66,13 @@ export async function handleMemberLogConfigSetChannel(
 
   // 監査用ログ
   logger.info(
-    tDefault("system:member-log.config_set_channel", {
-      guildId,
-      channelId: channel.id,
-    }),
+    logPrefixed(
+      "system:log_prefix.member_log",
+      "system:member-log.config_set_channel",
+      {
+        guildId,
+        channelId: channel.id,
+      },
+    ),
   );
 }

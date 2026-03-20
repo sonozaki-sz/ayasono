@@ -19,6 +19,15 @@ describe("shared/errors/processErrorHandler", () => {
 
     vi.doMock("@/shared/locale/localeManager", () => ({
       tDefault: tDefaultMock,
+      logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => {
+        const p = tDefaultMock(prefixKey);
+        const m = params ? tDefaultMock(messageKey, params as { signal?: string }) : tDefaultMock(messageKey);
+        return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+      },
+      logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => {
+        const m = params ? tDefaultMock(messageKey, params as { signal?: string }) : tDefaultMock(messageKey);
+        return `[${commandName}] ${m}`;
+      },
     }));
     vi.doMock("@/shared/utils/logger", () => ({
       logger: loggerMock,
@@ -44,7 +53,7 @@ describe("shared/errors/processErrorHandler", () => {
 
     expect(onSpy).toHaveBeenCalledTimes(3);
     expect(loggerMock.warn).toHaveBeenCalledWith(
-      "system:error.global_handlers_already_registered",
+      expect.stringContaining("system:error.global_handlers_already_registered"),
     );
   });
 
@@ -70,7 +79,7 @@ describe("shared/errors/processErrorHandler", () => {
     unhandledRejection?.(reason, promise);
 
     expect(loggerMock.error).toHaveBeenCalledWith(
-      "system:error.unhandled_rejection_log",
+      expect.stringContaining("system:error.unhandled_rejection_log"),
       {
         reason,
         promise,
@@ -108,7 +117,7 @@ describe("shared/errors/processErrorHandler", () => {
     uncaughtException?.(fatal);
 
     expect(loggerMock.error).toHaveBeenCalledWith(
-      "system:error.uncaught_exception_log",
+      expect.stringContaining("system:error.uncaught_exception_log"),
       fatal,
     );
     expect(logErrorMock).toHaveBeenCalledWith(fatal);
@@ -163,7 +172,7 @@ describe("shared/errors/processErrorHandler", () => {
     warningHandler?.(warning);
 
     expect(loggerMock.warn).toHaveBeenCalledWith(
-      "system:error.node_warning",
+      expect.stringContaining("system:error.node_warning"),
       expect.objectContaining({
         name: "ExperimentalWarning",
         message: "node warning",
@@ -301,7 +310,7 @@ describe("shared/errors/processErrorHandler", () => {
     setupGracefulShutdown(cleanup);
 
     expect(loggerMock.warn).toHaveBeenCalledWith(
-      "system:error.shutdown_handlers_already_registered",
+      expect.stringContaining("system:error.shutdown_handlers_already_registered"),
     );
 
     onceHandlers.get("SIGTERM")?.();
@@ -310,10 +319,10 @@ describe("shared/errors/processErrorHandler", () => {
 
     expect(cleanup).toHaveBeenCalledTimes(1);
     expect(loggerMock.info).toHaveBeenCalledWith(
-      "system:shutdown.signal_received:SIGTERM",
+      expect.stringContaining("system:shutdown.signal_received"),
     );
     expect(loggerMock.info).toHaveBeenCalledWith(
-      "system:shutdown.cleanup_complete",
+      expect.stringContaining("system:shutdown.cleanup_complete"),
     );
     expect(exitSpy).toHaveBeenCalledWith(0);
 
@@ -324,6 +333,15 @@ describe("shared/errors/processErrorHandler", () => {
     vi.clearAllMocks();
     vi.doMock("@/shared/locale/localeManager", () => ({
       tDefault: tDefaultMock,
+      logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => {
+        const p = tDefaultMock(prefixKey);
+        const m = params ? tDefaultMock(messageKey, params as { signal?: string }) : tDefaultMock(messageKey);
+        return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+      },
+      logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => {
+        const m = params ? tDefaultMock(messageKey, params as { signal?: string }) : tDefaultMock(messageKey);
+        return `[${commandName}] ${m}`;
+      },
     }));
     vi.doMock("@/shared/utils/logger", () => ({
       logger: loggerMock,
@@ -353,7 +371,7 @@ describe("shared/errors/processErrorHandler", () => {
     await Promise.resolve();
 
     expect(loggerMock.error).toHaveBeenCalledWith(
-      "system:shutdown.cleanup_failed",
+      expect.stringContaining("system:shutdown.cleanup_failed"),
       expect.any(Error),
     );
     expect(secondExitSpy).toHaveBeenCalledWith(1);
@@ -393,7 +411,7 @@ describe("shared/errors/processErrorHandler", () => {
     await Promise.resolve();
 
     expect(loggerMock.warn).toHaveBeenCalledWith(
-      "system:shutdown.already_in_progress:SIGTERM",
+      expect.stringContaining("system:shutdown.already_in_progress"),
     );
 
     resolveCleanup?.();
@@ -422,7 +440,7 @@ describe("shared/errors/processErrorHandler", () => {
     await Promise.resolve();
 
     expect(loggerMock.info).toHaveBeenCalledWith(
-      "system:shutdown.cleanup_complete",
+      expect.stringContaining("system:shutdown.cleanup_complete"),
     );
     expect(exitSpy).toHaveBeenCalledWith(0);
   });

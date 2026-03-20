@@ -9,7 +9,10 @@ import {
   type GuildTextBasedChannel,
   type MessageComponentInteraction,
 } from "discord.js";
-import { tDefault } from "../../../../../shared/locale/localeManager";
+import {
+  logPrefixed,
+  tDefault,
+} from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import {
   createErrorEmbed,
@@ -92,12 +95,21 @@ export async function runScanPhase(
       // "user" 以外（messageDelete / channelDelete 等）でメッセージが削除された場合は
       // スキャンを即座に中断する。"user" は finally の cancelCollector.stop() による通常停止。
       logger.debug(
-        tDefault("system:message-delete.cancel_collector_ended", {
-          reason: String(reason),
-        }),
+        logPrefixed(
+          "system:log_prefix.msg_del",
+          "system:message-delete.cancel_collector_ended",
+          {
+            reason: String(reason),
+          },
+        ),
       );
       if (reason !== "user") {
-        logger.debug(tDefault("system:message-delete.aborting_non_user_end"));
+        logger.debug(
+          logPrefixed(
+            "system:log_prefix.msg_del",
+            "system:message-delete.aborting_non_user_end",
+          ),
+        );
         controller.abort();
       }
       resolve();
@@ -123,12 +135,17 @@ export async function runScanPhase(
     });
   } catch (error) {
     logger.error(
-      tDefault("system:message-delete.scan_error", { error: String(error) }),
+      logPrefixed(
+        "system:log_prefix.msg_del",
+        "system:message-delete.scan_error",
+        { error: String(error) },
+      ),
     );
     await interaction.editReply({
       embeds: [
         createErrorEmbed(
           tDefault("commands:message-delete.errors.scan_failed"),
+          { title: tDefault("common:title_scan_error") },
         ),
       ],
       content: "",

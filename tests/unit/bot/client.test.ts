@@ -4,6 +4,8 @@ import { logger } from "@/shared/utils/logger";
 import { Collection, GatewayIntentBits } from "discord.js";
 
 vi.mock("@/shared/locale/localeManager", () => ({
+  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
+  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
   tDefault: vi.fn((key: string) => key),
   tInteraction: (...args: unknown[]) => args[1],
 }));
@@ -43,7 +45,7 @@ describe("bot/client", () => {
     const client = createBotClient();
 
     expect(client).toBeInstanceOf(BotClient);
-    expect(logger.info).toHaveBeenCalledWith("system:bot.client.initialized");
+    expect(logger.info).toHaveBeenCalledWith("[system:log_prefix.bot] system:bot.client.initialized");
   });
 
   it("shutdown が cooldown manager とクライアントを破棄してログを出力することを確認", async () => {
@@ -59,13 +61,13 @@ describe("bot/client", () => {
 
     expect(logger.info).toHaveBeenNthCalledWith(
       1,
-      "system:bot.client.shutting_down",
+      "[system:log_prefix.bot] system:bot.client.shutting_down",
     );
     expect(destroyCooldownSpy).toHaveBeenCalledTimes(1);
     expect(destroyClientMock).toHaveBeenCalledTimes(1);
     expect(logger.info).toHaveBeenNthCalledWith(
       2,
-      "system:bot.client.shutdown_complete",
+      "[system:log_prefix.bot] system:bot.client.shutdown_complete",
     );
   });
 });

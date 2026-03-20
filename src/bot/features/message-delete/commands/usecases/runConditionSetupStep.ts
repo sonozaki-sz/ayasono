@@ -186,6 +186,7 @@ export async function runConditionSetupStep(
                 tDefault(
                   "commands:message-delete.errors.webhook_invalid_format",
                 ),
+                { title: tDefault("common:title_input_error") },
               ),
             ],
             ephemeral: true,
@@ -211,6 +212,7 @@ export async function runConditionSetupStep(
             embeds: [
               createWarningEmbed(
                 tDefault("commands:message-delete.condition-step.no_filter"),
+                { title: tDefault("common:title_filter_required") },
               ),
             ],
             ephemeral: true,
@@ -261,6 +263,7 @@ export async function runConditionSetupStep(
           embeds: [
             createWarningEmbed(
               tDefault("commands:message-delete.condition-step.timeout"),
+              { title: tDefault("common:title_timeout") },
             ),
           ],
           components: [],

@@ -241,6 +241,12 @@ async function handleRenameVc(interaction: ButtonInteraction): Promise<void> {
       embeds: [
         createErrorEmbed(
           tInteraction(interaction.locale, "errors:vcRecruit.no_permission"),
+          {
+            title: tInteraction(
+              interaction.locale,
+              "common:title_permission_denied",
+            ),
+          },
         ),
       ],
       flags: MessageFlags.Ephemeral,
@@ -260,6 +266,12 @@ async function handleRenameVc(interaction: ButtonInteraction): Promise<void> {
             interaction.locale,
             "errors:vcRecruit.vc_already_deleted",
           ),
+          {
+            title: tInteraction(
+              interaction.locale,
+              "common:title_resource_not_found",
+            ),
+          },
         ),
       ],
       flags: MessageFlags.Ephemeral,
@@ -321,6 +333,12 @@ async function handleEndVc(interaction: ButtonInteraction): Promise<void> {
       embeds: [
         createErrorEmbed(
           tInteraction(interaction.locale, "errors:vcRecruit.no_permission"),
+          {
+            title: tInteraction(
+              interaction.locale,
+              "common:title_permission_denied",
+            ),
+          },
         ),
       ],
       flags: MessageFlags.Ephemeral,
@@ -401,6 +419,12 @@ async function handleDeletePost(interaction: ButtonInteraction): Promise<void> {
       embeds: [
         createErrorEmbed(
           tInteraction(interaction.locale, "errors:vcRecruit.no_permission"),
+          {
+            title: tInteraction(
+              interaction.locale,
+              "common:title_permission_denied",
+            ),
+          },
         ),
       ],
       flags: MessageFlags.Ephemeral,

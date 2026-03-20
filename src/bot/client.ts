@@ -2,7 +2,7 @@
 // Discord Client初期化
 
 import { Client, Collection, GatewayIntentBits } from "discord.js";
-import { tDefault } from "../shared/locale/localeManager";
+import { logPrefixed } from "../shared/locale/localeManager";
 import { logger } from "../shared/utils/logger";
 import { CooldownManager } from "./services/cooldownManager";
 import type { Command } from "./types/discord";
@@ -37,11 +37,18 @@ export class BotClient extends Client {
    */
   async shutdown(): Promise<void> {
     // 先にクールダウン用タイマーを停止
-    logger.info(tDefault("system:bot.client.shutting_down"));
+    logger.info(
+      logPrefixed("system:log_prefix.bot", "system:bot.client.shutting_down"),
+    );
     this.cooldownManager.destroy();
     // Discord Client を破棄して Gateway 接続を閉じる
     await this.destroy();
-    logger.info(tDefault("system:bot.client.shutdown_complete"));
+    logger.info(
+      logPrefixed(
+        "system:log_prefix.bot",
+        "system:bot.client.shutdown_complete",
+      ),
+    );
   }
 }
 
@@ -52,7 +59,9 @@ export const createBotClient = (): BotClient => {
   // 生成直後に初期化ログを出力
   const client = new BotClient();
 
-  logger.info(tDefault("system:bot.client.initialized"));
+  logger.info(
+    logPrefixed("system:log_prefix.bot", "system:bot.client.initialized"),
+  );
 
   return client;
 };

@@ -52,7 +52,7 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
             {
               title: tInteraction(
                 interaction.locale,
-                "commands:sticky-message.view.notFound.title",
+                "common:title_not_configured",
               ),
             },
           ),

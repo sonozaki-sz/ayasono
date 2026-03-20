@@ -1,7 +1,7 @@
 // src/bot/services/botEventRegistration.ts
 // Botイベント登録の責務を集約
 
-import { tDefault } from "../../shared/locale/localeManager";
+import { logPrefixed, tDefault } from "../../shared/locale/localeManager";
 import { logger } from "../../shared/utils/logger";
 import type { BotClient } from "../client";
 import { registerBotEvent, type BotEvent } from "../types/discord";
@@ -15,7 +15,9 @@ export function registerBotEvents(
   events: readonly BotEvent<any>[],
 ): void {
   logger.info(
-    tDefault("system:bot.events.registering", { count: events.length }),
+    logPrefixed("system:log_prefix.bot", "system:bot.events.registering", {
+      count: events.length,
+    }),
   );
 
   // 受け取ったイベント定義を順に Client へ登録
@@ -27,5 +29,7 @@ export function registerBotEvents(
   }
 
   // 一括登録完了ログ
-  logger.info(tDefault("system:bot.events.registered"));
+  logger.info(
+    logPrefixed("system:log_prefix.bot", "system:bot.events.registered"),
+  );
 }

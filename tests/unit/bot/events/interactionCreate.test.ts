@@ -17,6 +17,8 @@ vi.mock("@/bot/errors/interactionErrorHandler", () => ({
 
 // ローカライズは固定文字列化してアサーションを簡潔にする
 vi.mock("@/shared/locale/localeManager", () => ({
+  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
+  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
   tDefault: vi.fn((key: string) => `default:${key}`),
   tInteraction: vi.fn((_locale: string, key: string) => `interaction:${key}`),
 }));
@@ -259,7 +261,7 @@ describe("bot/events/interactionCreate", () => {
     await interactionCreateEvent.execute(interaction as never);
 
     expect(logger.warn).toHaveBeenCalledWith(
-      "default:system:interaction.unknown_command",
+      expect.stringContaining("[system:log_prefix.interaction_create:command] system:interaction.unknown_command"),
     );
     expect(interaction.reply).not.toHaveBeenCalled();
   });
@@ -304,7 +306,7 @@ describe("bot/events/interactionCreate", () => {
 
     expect(command.execute).toHaveBeenCalledWith(interaction);
     expect(logger.debug).toHaveBeenCalledWith(
-      "default:system:interaction.command_executed",
+      expect.stringContaining("[system:log_prefix.interaction_create:command] system:interaction.command_executed"),
     );
   });
 
@@ -340,7 +342,7 @@ describe("bot/events/interactionCreate", () => {
     await interactionCreateEvent.execute(interaction as never);
 
     expect(logger.error).not.toHaveBeenCalledWith(
-      "default:system:interaction.autocomplete_error",
+      expect.stringContaining("system:interaction.autocomplete_error"),
       expect.anything(),
     );
   });
@@ -360,7 +362,7 @@ describe("bot/events/interactionCreate", () => {
     await interactionCreateEvent.execute(interaction as never);
 
     expect(logger.error).toHaveBeenCalledWith(
-      "default:system:interaction.autocomplete_error",
+      expect.stringContaining("[system:log_prefix.interaction_create:command] system:interaction.autocomplete_error"),
       autocompleteError,
     );
   });
@@ -386,7 +388,7 @@ describe("bot/events/interactionCreate", () => {
 
     expect(modalExecute).not.toHaveBeenCalled();
     expect(logger.warn).toHaveBeenCalledWith(
-      "default:system:interaction.unknown_modal",
+      expect.stringContaining("[system:log_prefix.interaction_create:modal] system:interaction.unknown_modal"),
     );
   });
 
@@ -408,7 +410,7 @@ describe("bot/events/interactionCreate", () => {
     await interactionCreateEvent.execute(interaction as never);
 
     expect(logger.warn).toHaveBeenCalledWith(
-      "default:system:interaction.unknown_modal",
+      expect.stringContaining("[system:log_prefix.interaction_create:modal] system:interaction.unknown_modal"),
     );
   });
 
