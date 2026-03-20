@@ -13,6 +13,8 @@ const loggerDebugMock = vi.fn();
 const loggerErrorMock = vi.fn();
 
 vi.mock("@/shared/locale/localeManager", () => ({
+  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
+  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
   tDefault: (key: string, _params?: Record<string, unknown>) =>
     tDefaultMock(key),
   tGuild: (guildId: string, key: string, params?: Record<string, unknown>) =>

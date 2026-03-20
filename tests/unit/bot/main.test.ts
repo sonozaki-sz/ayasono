@@ -114,6 +114,8 @@ vi.mock("@/shared/errors/errorHandler", () => ({
 }));
 
 vi.mock("@/shared/locale/localeManager", () => ({
+  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
+  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
   localeManager: {
     initialize: vi.fn().mockResolvedValue(undefined),
     setRepository: vi.fn(),
@@ -283,7 +285,7 @@ describe("bot/main", () => {
     const boot = await bootMain({ guildId: "guild-1", restPutReject: true });
 
     expect(boot.logger.error).toHaveBeenCalledWith(
-      "system:bot.startup.error",
+      "[system:log_prefix.bot] system:bot.startup.error",
       expect.any(Error),
     );
     expect(boot.prisma.$disconnect).toHaveBeenCalled();
@@ -294,7 +296,7 @@ describe("bot/main", () => {
     const boot = await bootMain({ connectReject: true });
 
     expect(boot.logger.error).toHaveBeenCalledWith(
-      "system:bot.startup.failed",
+      "[system:log_prefix.bot] system:bot.startup.failed",
       expect.any(Error),
     );
     expect(boot.processExitSpy).toHaveBeenCalledWith(1);

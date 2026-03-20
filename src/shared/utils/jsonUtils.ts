@@ -1,7 +1,7 @@
 // src/shared/utils/jsonUtils.ts
 // JSON パース共通ユーティリティ
 
-import { tDefault } from "../locale/localeManager";
+import { logPrefixed } from "../locale/localeManager";
 import { logger } from "./logger";
 
 /**
@@ -14,7 +14,7 @@ export function parseJsonArray<T>(json: string): T[] {
     return Array.isArray(parsed) ? (parsed as T[]) : [];
   } catch (e) {
     logger.warn(
-      tDefault("system:json.parse_array_failed", {
+      logPrefixed("system:log_prefix.json", "system:json.parse_array_failed", {
         value: json,
         error: e instanceof Error ? e.message : String(e),
       }),

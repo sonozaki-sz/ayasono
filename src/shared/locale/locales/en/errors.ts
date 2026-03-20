@@ -20,7 +20,7 @@ export const errors = {
   // Validation errors
   // Invalid command input or execution context
   "validation.error_title":
-    "Validation Error",
+    "Invalid Input",
   "validation.guild_only":
     "This command can only be used within a server",
   "validation.invalid_subcommand":
@@ -81,7 +81,7 @@ export const errors = {
   // General errors
   // Final fallback for unexpected exceptions
   "general.error_title":
-    "An Error Occurred",
+    "Error",
   "general.unexpected_production":
     "An unexpected error occurred. Please try again later.",
   "general.unexpected_with_message":

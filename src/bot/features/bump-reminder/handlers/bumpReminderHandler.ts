@@ -2,7 +2,7 @@
 // Bump検知ユースケースのオーケストレーション
 
 import type { Client } from "discord.js";
-import { tDefault } from "../../../../shared/locale/localeManager";
+import { logPrefixed } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import {
   getBotBumpReminderConfigService,
@@ -37,7 +37,11 @@ export async function handleBumpDetected(
     if (!config.enabled) {
       // 機能無効ギルドでは検知のみ行い何もしない
       logger.debug(
-        tDefault("system:scheduler.bump_reminder_disabled", { guildId }),
+        logPrefixed(
+          "system:log_prefix.bump_reminder",
+          "system:scheduler.bump_reminder_disabled",
+          { guildId },
+        ),
       );
       return;
     }
@@ -46,11 +50,15 @@ export async function handleBumpDetected(
     if (config.channelId && config.channelId !== channelId) {
       // 設定チャンネル外の検知はノイズとしてスキップ
       logger.debug(
-        tDefault("system:scheduler.bump_reminder_unregistered_channel", {
-          channelId,
-          expectedChannelId: config.channelId,
-          guildId,
-        }),
+        logPrefixed(
+          "system:log_prefix.bump_reminder",
+          "system:scheduler.bump_reminder_unregistered_channel",
+          {
+            channelId,
+            expectedChannelId: config.channelId,
+            guildId,
+          },
+        ),
       );
       return;
     }
@@ -82,16 +90,24 @@ export async function handleBumpDetected(
 
     // 登録完了時点で検知ログを残す
     logger.info(
-      tDefault("system:bump-reminder.detected", {
-        guildId,
-        service: serviceName,
-      }),
+      logPrefixed(
+        "system:log_prefix.bump_reminder",
+        "system:bump-reminder.detected",
+        {
+          guildId,
+          service: serviceName,
+        },
+      ),
     );
   } catch (error) {
     logger.error(
-      tDefault("system:bump-reminder.detection_failed", {
-        guildId,
-      }),
+      logPrefixed(
+        "system:log_prefix.bump_reminder",
+        "system:bump-reminder.detection_failed",
+        {
+          guildId,
+        },
+      ),
       error,
     );
   }
@@ -134,19 +150,27 @@ async function deleteOldPanel(
       if (panelMessage) {
         await panelMessage.delete();
         logger.debug(
-          tDefault("system:scheduler.bump_reminder_panel_deleted", {
-            panelMessageId: pendingReminder.panelMessageId,
-            guildId,
-          }),
+          logPrefixed(
+            "system:log_prefix.bump_reminder",
+            "system:scheduler.bump_reminder_panel_deleted",
+            {
+              panelMessageId: pendingReminder.panelMessageId,
+              guildId,
+            },
+          ),
         );
       }
     }
   } catch (error) {
     // 旧パネル削除の失敗は新パネル送信を妨げない
     logger.debug(
-      tDefault("system:scheduler.bump_reminder_panel_delete_failed", {
-        panelMessageId: "unknown",
-      }),
+      logPrefixed(
+        "system:log_prefix.bump_reminder",
+        "system:scheduler.bump_reminder_panel_delete_failed",
+        {
+          panelMessageId: "unknown",
+        },
+      ),
       error,
     );
   }

@@ -35,6 +35,8 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
 }));
 
 vi.mock("@/shared/locale/localeManager", () => ({
+  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
+  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
   tInteraction: (locale: string, key: string, params?: Record<string, unknown>) =>
     tInteractionMock(locale, key, params),
   tDefault: (key: string, opts?: Record<string, unknown>) =>
@@ -143,7 +145,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.enable", () =>
     await handleMemberLogConfigEnable(makeInteraction() as never, "guild-1");
 
     expect(loggerInfoMock).toHaveBeenCalledWith(
-      "system:member-log.config_enabled",
+      expect.stringContaining("system:member-log.config_enabled"),
     );
   });
 });

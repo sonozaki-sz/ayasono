@@ -12,7 +12,12 @@ vi.mock(
   }),
 );
 vi.mock("@/shared/utils/logger", () => ({ logger: loggerMock }));
-vi.mock("@/shared/locale/localeManager", () => ({ tDefault: vi.fn((key: string) => key) , tInteraction: vi.fn((_locale: string, key: string) => key) }));
+vi.mock("@/shared/locale/localeManager", () => ({
+  tDefault: vi.fn((key: string) => key),
+  tInteraction: vi.fn((_locale: string, key: string) => key),
+  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
+  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+}));
 
 function createChannelMock(
   overrides: Partial<{
@@ -191,7 +196,7 @@ describe("bot/features/sticky-message/services/stickyMessageResendService", () =
     await vi.runAllTimersAsync();
 
     expect(loggerMock.error).toHaveBeenCalledWith(
-      "system:sticky-message.send_failed",
+      expect.stringContaining("system:sticky-message.send_failed"),
       expect.objectContaining({ channelId: "channel-5" }),
     );
   });
@@ -279,7 +284,7 @@ describe("bot/features/sticky-message/services/stickyMessageResendService", () =
     await vi.runAllTimersAsync();
 
     expect(loggerMock.error).toHaveBeenCalledWith(
-      "system:sticky-message.resend_scheduled_error",
+      expect.stringContaining("system:sticky-message.resend_scheduled_error"),
       expect.any(Error),
     );
   });

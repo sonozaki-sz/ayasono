@@ -6,15 +6,41 @@ import {
   MessageFlags,
   type RepliableInteraction,
 } from "discord.js";
-import { BaseError, ValidationError } from "../../shared/errors/customErrors";
+import {
+  BaseError,
+  ConfigurationError,
+  DatabaseError,
+  DiscordApiError,
+  NotFoundError,
+  PermissionError,
+  RateLimitError,
+  TimeoutError,
+  ValidationError,
+} from "../../shared/errors/customErrors";
 import {
   getUserFriendlyMessage,
   logError,
   toError,
 } from "../../shared/errors/errorHandler";
-import { tDefault, tInteraction } from "../../shared/locale/localeManager";
+import {
+  logPrefixed,
+  tDefault,
+  tInteraction,
+} from "../../shared/locale/localeManager";
 import { logger } from "../../shared/utils/logger";
 import { createErrorEmbed } from "../utils/messageResponse";
+
+/** エラークラスと common タイトルキーの対応 */
+const ERROR_TITLE_MAP = [
+  [ValidationError, "common:title_input_error"],
+  [PermissionError, "common:title_permission_denied"],
+  [NotFoundError, "common:title_resource_not_found"],
+  [TimeoutError, "common:title_timeout"],
+  [ConfigurationError, "common:title_config_error"],
+  [DatabaseError, "common:title_operation_error"],
+  [DiscordApiError, "common:title_operation_error"],
+  [RateLimitError, "common:title_rate_limited"],
+] as const;
 
 /**
  * エラーの種別に応じたEmbedタイトル文字列を取得する
@@ -26,19 +52,20 @@ const getErrorTitle = (
   interaction: RepliableInteraction,
   err: Error | BaseError,
 ): string => {
+  // embedTitle が明示的に設定されている場合は最優先
   if (err instanceof BaseError && err.embedTitle) {
     return err.embedTitle;
   }
 
-  if (err instanceof ValidationError) {
-    return tInteraction(interaction.locale, "errors:validation.error_title");
+  // エラークラスごとの標準タイトルを検索
+  for (const [ErrorClass, titleKey] of ERROR_TITLE_MAP) {
+    if (err instanceof ErrorClass) {
+      return tInteraction(interaction.locale, titleKey);
+    }
   }
 
-  if (err instanceof BaseError && err.name) {
-    return err.name;
-  }
-
-  return tDefault("errors:general.error_title");
+  // フォールバック
+  return tDefault("common:error");
 };
 
 /**
@@ -70,7 +97,10 @@ const replyWithError = async (
       flags: MessageFlags.Ephemeral,
     });
   } catch (replyError) {
-    logger.error(tDefault("system:error.reply_failed"), replyError);
+    logger.error(
+      logPrefixed("system:log_prefix.bot", "system:error.reply_failed"),
+      replyError,
+    );
   }
 };
 

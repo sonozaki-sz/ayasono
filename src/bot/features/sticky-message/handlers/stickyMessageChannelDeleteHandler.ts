@@ -2,7 +2,7 @@
 // スティッキーメッセージ channelDelete ハンドラー
 
 import { ChannelType, type Channel } from "discord.js";
-import { tDefault } from "../../../../shared/locale/localeManager";
+import { logPrefixed } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import {
   getBotStickyMessageConfigService,
@@ -31,14 +31,22 @@ export async function handleStickyMessageChannelDelete(
       await getBotStickyMessageConfigService().deleteByChannel(channelId);
     if (deleted > 0) {
       logger.debug(
-        tDefault("system:sticky-message.channel_delete_cleanup", { channelId }),
+        logPrefixed(
+          "system:log_prefix.sticky_message",
+          "system:sticky-message.channel_delete_cleanup",
+          { channelId },
+        ),
       );
     }
   } catch (err) {
     logger.error(
-      tDefault("system:sticky-message.channel_delete_cleanup_failed", {
-        channelId,
-      }),
+      logPrefixed(
+        "system:log_prefix.sticky_message",
+        "system:sticky-message.channel_delete_cleanup_failed",
+        {
+          channelId,
+        },
+      ),
       { channelId, err },
     );
   }

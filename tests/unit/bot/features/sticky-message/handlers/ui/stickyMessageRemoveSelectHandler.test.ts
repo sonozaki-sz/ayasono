@@ -1,7 +1,11 @@
 // tests/unit/bot/features/sticky-message/handlers/ui/stickyMessageRemoveSelectHandler.test.ts
 
 vi.mock("@/bot/services/botCompositionRoot", () => ({ tInteraction: vi.fn((_l: string, k: string) => k) }));
-vi.mock("@/shared/locale/localeManager", () => ({ tInteraction: vi.fn((_l: string, k: string) => k) }));
+vi.mock("@/shared/locale/localeManager", () => ({
+  tInteraction: vi.fn((_l: string, k: string) => k),
+  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
+  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+}));
 
 // stickyMessageRemoveSelectHandler のテスト
 describe("bot/features/sticky-message/handlers/ui/stickyMessageRemoveSelectHandler", () => {

@@ -114,6 +114,7 @@ export const vcRecruitModalHandler: ModalHandler = {
         embeds: [
           createErrorEmbed(
             tInteraction(interaction.locale, "errors:interaction.timeout"),
+            { title: tInteraction(interaction.locale, "common:title_timeout") },
           ),
         ],
         flags: MessageFlags.Ephemeral,
@@ -140,6 +141,12 @@ export const vcRecruitModalHandler: ModalHandler = {
         embeds: [
           createErrorEmbed(
             tInteraction(interaction.locale, "errors:vcRecruit.not_setup"),
+            {
+              title: tInteraction(
+                interaction.locale,
+                "common:title_config_required",
+              ),
+            },
           ),
         ],
         flags: MessageFlags.Ephemeral,
@@ -173,6 +180,12 @@ export const vcRecruitModalHandler: ModalHandler = {
                   interaction.locale,
                   "errors:vcRecruit.category_full",
                 ),
+                {
+                  title: tInteraction(
+                    interaction.locale,
+                    "common:title_limit_exceeded",
+                  ),
+                },
               ),
             ],
           });
@@ -211,6 +224,12 @@ export const vcRecruitModalHandler: ModalHandler = {
           embeds: [
             createErrorEmbed(
               tInteraction(interaction.locale, "errors:vcRecruit.vc_deleted"),
+              {
+                title: tInteraction(
+                  interaction.locale,
+                  "common:title_resource_not_found",
+                ),
+              },
             ),
           ],
         });

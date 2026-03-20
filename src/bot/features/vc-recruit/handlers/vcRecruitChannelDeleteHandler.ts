@@ -9,7 +9,7 @@ import {
   type Channel,
   type TextChannel,
 } from "discord.js";
-import { tDefault, tGuild } from "../../../../shared/locale/localeManager";
+import { logPrefixed, tGuild } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import { getBotVcRecruitRepository } from "../../../services/botCompositionRoot";
 import { VC_RECRUIT_POST_CUSTOM_ID } from "../commands/vcRecruitConfigCommand.constants";
@@ -48,10 +48,14 @@ export async function handleVcRecruitChannelDelete(
   );
   if (setupByPanel) {
     logger.info(
-      tDefault(VC_RECRUIT_LOG_KEYS.PANEL_CHANNEL_DELETE_DETECTED, {
-        guildId,
-        panelChannelId: channel.id,
-      }),
+      logPrefixed(
+        "system:log_prefix.vc_recruit",
+        VC_RECRUIT_LOG_KEYS.PANEL_CHANNEL_DELETE_DETECTED,
+        {
+          guildId,
+          panelChannelId: channel.id,
+        },
+      ),
     );
     // 投稿チャンネルを削除
     const postChannel = await channel.guild.channels
@@ -60,10 +64,14 @@ export async function handleVcRecruitChannelDelete(
     if (postChannel)
       await postChannel.delete().catch((err: unknown) => {
         logger.error(
-          tDefault(VC_RECRUIT_LOG_KEYS.POST_CHANNEL_DELETE_FAILED, {
-            guildId,
-            postChannelId: setupByPanel.postChannelId,
-          }),
+          logPrefixed(
+            "system:log_prefix.vc_recruit",
+            VC_RECRUIT_LOG_KEYS.POST_CHANNEL_DELETE_FAILED,
+            {
+              guildId,
+              postChannelId: setupByPanel.postChannelId,
+            },
+          ),
           { error: err },
         );
       });
@@ -76,10 +84,14 @@ export async function handleVcRecruitChannelDelete(
   const setupByPost = await repo.findSetupByPostChannelId(guildId, channel.id);
   if (setupByPost) {
     logger.info(
-      tDefault(VC_RECRUIT_LOG_KEYS.POST_CHANNEL_DELETE_DETECTED, {
-        guildId,
-        postChannelId: channel.id,
-      }),
+      logPrefixed(
+        "system:log_prefix.vc_recruit",
+        VC_RECRUIT_LOG_KEYS.POST_CHANNEL_DELETE_DETECTED,
+        {
+          guildId,
+          postChannelId: channel.id,
+        },
+      ),
     );
     // パネルチャンネルを削除
     const panelChannel = await channel.guild.channels
@@ -88,10 +100,14 @@ export async function handleVcRecruitChannelDelete(
     if (panelChannel)
       await panelChannel.delete().catch((err: unknown) => {
         logger.error(
-          tDefault(VC_RECRUIT_LOG_KEYS.PANEL_CHANNEL_CLEANUP_FAILED, {
-            guildId,
-            panelChannelId: setupByPost.panelChannelId,
-          }),
+          logPrefixed(
+            "system:log_prefix.vc_recruit",
+            VC_RECRUIT_LOG_KEYS.PANEL_CHANNEL_CLEANUP_FAILED,
+            {
+              guildId,
+              panelChannelId: setupByPost.panelChannelId,
+            },
+          ),
           { error: err },
         );
       });
@@ -107,10 +123,14 @@ export async function handleVcRecruitChannelDelete(
   );
   if (setupByCreatedVc) {
     logger.info(
-      tDefault(VC_RECRUIT_LOG_KEYS.CREATED_VC_MANUAL_DELETE_DETECTED, {
-        guildId,
-        vcId: channel.id,
-      }),
+      logPrefixed(
+        "system:log_prefix.vc_recruit",
+        VC_RECRUIT_LOG_KEYS.CREATED_VC_MANUAL_DELETE_DETECTED,
+        {
+          guildId,
+          vcId: channel.id,
+        },
+      ),
     );
 
     // DB から該当VCのIDを削除

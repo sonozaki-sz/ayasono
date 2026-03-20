@@ -64,6 +64,12 @@ export const vcPanelModalHandler: ModalHandler = {
         embeds: [
           createErrorEmbed(
             tInteraction(interaction.locale, "errors:vac.not_vac_channel"),
+            {
+              title: tInteraction(
+                interaction.locale,
+                "common:title_channel_error",
+              ),
+            },
           ),
         ],
         flags: MessageFlags.Ephemeral,
@@ -77,6 +83,12 @@ export const vcPanelModalHandler: ModalHandler = {
         embeds: [
           createErrorEmbed(
             tInteraction(interaction.locale, "errors:vac.not_vac_channel"),
+            {
+              title: tInteraction(
+                interaction.locale,
+                "common:title_channel_error",
+              ),
+            },
           ),
         ],
         flags: MessageFlags.Ephemeral,
@@ -93,6 +105,9 @@ export const vcPanelModalHandler: ModalHandler = {
         embeds: [
           createErrorEmbed(
             tInteraction(interaction.locale, "errors:vac.not_in_vc"),
+            {
+              title: tInteraction(interaction.locale, "common:title_not_in_vc"),
+            },
           ),
         ],
         flags: MessageFlags.Ephemeral,
@@ -109,6 +124,12 @@ export const vcPanelModalHandler: ModalHandler = {
           embeds: [
             createErrorEmbed(
               tInteraction(interaction.locale, "errors:vac.not_vac_channel"),
+              {
+                title: tInteraction(
+                  interaction.locale,
+                  "common:title_channel_error",
+                ),
+              },
             ),
           ],
           flags: MessageFlags.Ephemeral,
@@ -140,6 +161,12 @@ export const vcPanelModalHandler: ModalHandler = {
         embeds: [
           createErrorEmbed(
             tInteraction(interaction.locale, "errors:vac.limit_out_of_range"),
+            {
+              title: tInteraction(
+                interaction.locale,
+                "common:title_input_error",
+              ),
+            },
           ),
         ],
         flags: MessageFlags.Ephemeral,

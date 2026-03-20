@@ -44,6 +44,12 @@ export async function handleStickyMessageSet(
             interaction.locale,
             "commands:sticky-message.errors.text_channel_only",
           ),
+          {
+            title: tInteraction(
+              interaction.locale,
+              "common:title_channel_error",
+            ),
+          },
         ),
       ],
       flags: MessageFlags.Ephemeral,
@@ -66,7 +72,7 @@ export async function handleStickyMessageSet(
           {
             title: tInteraction(
               interaction.locale,
-              "commands:sticky-message.set.alreadyExists.title",
+              "common:title_already_registered",
             ),
           },
         ),

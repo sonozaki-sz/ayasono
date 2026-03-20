@@ -6,7 +6,7 @@ import type { ParseKeys } from "i18next";
 import type { BumpReminderConfigService } from "../../../../../shared/features/bump-reminder/bumpReminderConfigService";
 import type { AllNamespaces } from "../../../../../shared/locale/i18n";
 import { getGuildTranslator } from "../../../../../shared/locale/helpers";
-import { tDefault } from "../../../../../shared/locale/localeManager";
+import { logPrefixed } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import type { BumpServiceName } from "../../constants/bumpReminderConstants";
 
@@ -37,10 +37,14 @@ export async function sendBumpReminder(
     if (!channel?.isTextBased()) {
       // 削除済み/型不一致チャンネルでは通知不能
       logger.warn(
-        tDefault("system:scheduler.bump_reminder_channel_not_found", {
-          channelId,
-          guildId,
-        }),
+        logPrefixed(
+          "system:log_prefix.bump_reminder",
+          "system:scheduler.bump_reminder_channel_not_found",
+          {
+            channelId,
+            guildId,
+          },
+        ),
       );
       return;
     }
@@ -51,9 +55,13 @@ export async function sendBumpReminder(
     if (!currentConfig.enabled) {
       // 予約後に無効化されていた場合は送信を抑止
       logger.debug(
-        tDefault("system:scheduler.bump_reminder_disabled", {
-          guildId,
-        }),
+        logPrefixed(
+          "system:log_prefix.bump_reminder",
+          "system:scheduler.bump_reminder_disabled",
+          {
+            guildId,
+          },
+        ),
       );
       return;
     }
@@ -111,20 +119,28 @@ export async function sendBumpReminder(
     // send 不可チャンネルでは通知を行わず、後段 cleanup のみ実行する
 
     logger.info(
-      tDefault("system:scheduler.bump_reminder_sent", {
-        guildId,
-        channelId,
-      }),
+      logPrefixed(
+        "system:log_prefix.bump_reminder",
+        "system:scheduler.bump_reminder_sent",
+        {
+          guildId,
+          channelId,
+        },
+      ),
     );
 
     // リマインド完了後にパネルメッセージを削除する
     await deletePanelMessage(client, channelId, panelMessageId, guildId);
   } catch (error) {
     logger.error(
-      tDefault("system:scheduler.bump_reminder_send_failed", {
-        guildId,
-        channelId,
-      }),
+      logPrefixed(
+        "system:log_prefix.bump_reminder",
+        "system:scheduler.bump_reminder_send_failed",
+        {
+          guildId,
+          channelId,
+        },
+      ),
       error,
     );
   }
@@ -156,19 +172,27 @@ async function deletePanelMessage(
       if (panelMessage) {
         await panelMessage.delete();
         logger.debug(
-          tDefault("system:scheduler.bump_reminder_panel_deleted", {
-            panelMessageId,
-            guildId,
-          }),
+          logPrefixed(
+            "system:log_prefix.bump_reminder",
+            "system:scheduler.bump_reminder_panel_deleted",
+            {
+              panelMessageId,
+              guildId,
+            },
+          ),
         );
       }
     }
   } catch (error) {
     // パネル削除失敗はリマインド送信の成功に影響しない
     logger.debug(
-      tDefault("system:scheduler.bump_reminder_panel_delete_failed", {
-        panelMessageId,
-      }),
+      logPrefixed(
+        "system:log_prefix.bump_reminder",
+        "system:scheduler.bump_reminder_panel_delete_failed",
+        {
+          panelMessageId,
+        },
+      ),
       error,
     );
   }

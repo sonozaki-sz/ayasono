@@ -13,6 +13,7 @@ import {
   setAfkChannel,
 } from "../../../../shared/features/afk/afkConfigService";
 import {
+  logPrefixed,
   tDefault,
   tInteraction,
 } from "../../../../shared/locale/localeManager";
@@ -100,7 +101,10 @@ async function handleSetChannel(
   });
 
   logger.info(
-    tDefault("system:afk.configured", { guildId, channelId: channel.id }),
+    logPrefixed("system:log_prefix.afk", "system:afk.configured", {
+      guildId,
+      channelId: channel.id,
+    }),
   );
 }
 

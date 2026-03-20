@@ -1,7 +1,7 @@
 // src/shared/errors/processErrorHandler.ts
 // プロセス全体の未処理例外とシャットダウン制御
 
-import { tDefault } from "../locale/localeManager";
+import { logPrefixed } from "../locale/localeManager";
 import { logger } from "../utils/logger";
 import { BaseError } from "./customErrors";
 import { logError } from "./errorUtils";
@@ -45,7 +45,12 @@ let _shutdownInProgress = false;
 export const setupGlobalErrorHandlers = (): void => {
   // 多重登録を防止
   if (_globalHandlersRegistered) {
-    logger.warn(tDefault("system:error.global_handlers_already_registered"));
+    logger.warn(
+      logPrefixed(
+        "system:log_prefix.bot",
+        "system:error.global_handlers_already_registered",
+      ),
+    );
     return;
   }
   _globalHandlersRegistered = true;
@@ -54,10 +59,16 @@ export const setupGlobalErrorHandlers = (): void => {
   process.on(
     PROCESS_ERROR_CONSTANTS.PROCESS_EVENT.UNHANDLED_REJECTION,
     (reason: unknown, promise: Promise<unknown>) => {
-      logger.error(tDefault("system:error.unhandled_rejection_log"), {
-        reason,
-        promise,
-      });
+      logger.error(
+        logPrefixed(
+          "system:log_prefix.bot",
+          "system:error.unhandled_rejection_log",
+        ),
+        {
+          reason,
+          promise,
+        },
+      );
 
       // reason が Error の場合は共通ログ形式へ流す
       if (reason instanceof Error) {
@@ -70,7 +81,13 @@ export const setupGlobalErrorHandlers = (): void => {
   process.on(
     PROCESS_ERROR_CONSTANTS.PROCESS_EVENT.UNCAUGHT_EXCEPTION,
     (error: Error) => {
-      logger.error(tDefault("system:error.uncaught_exception_log"), error);
+      logger.error(
+        logPrefixed(
+          "system:log_prefix.bot",
+          "system:error.uncaught_exception_log",
+        ),
+        error,
+      );
       logError(error);
 
       // 非運用系 BaseError はプロセス終了で早期遮断
@@ -92,11 +109,14 @@ export const setupGlobalErrorHandlers = (): void => {
         return;
       }
       /* c8 ignore stop */
-      logger.warn(tDefault("system:error.node_warning"), {
-        name: warning.name,
-        message: warning.message,
-        stack: warning.stack,
-      });
+      logger.warn(
+        logPrefixed("system:log_prefix.bot", "system:error.node_warning"),
+        {
+          name: warning.name,
+          message: warning.message,
+          stack: warning.stack,
+        },
+      );
     },
   );
 };
@@ -107,7 +127,12 @@ export const setupGlobalErrorHandlers = (): void => {
 export const setupGracefulShutdown = (cleanup?: () => Promise<void>): void => {
   // 多重登録を防止
   if (_gracefulShutdownRegistered) {
-    logger.warn(tDefault("system:error.shutdown_handlers_already_registered"));
+    logger.warn(
+      logPrefixed(
+        "system:log_prefix.bot",
+        "system:error.shutdown_handlers_already_registered",
+      ),
+    );
     return;
   }
   _gracefulShutdownRegistered = true;
@@ -115,24 +140,42 @@ export const setupGracefulShutdown = (cleanup?: () => Promise<void>): void => {
   const shutdown = async (signal: string) => {
     // 多重実行を防止
     if (_shutdownInProgress) {
-      logger.warn(tDefault("system:shutdown.already_in_progress", { signal }));
+      logger.warn(
+        logPrefixed(
+          "system:log_prefix.bot",
+          "system:shutdown.already_in_progress",
+          { signal },
+        ),
+      );
       return;
     }
     _shutdownInProgress = true;
 
-    logger.info(tDefault("system:shutdown.signal_received", { signal }));
+    logger.info(
+      logPrefixed("system:log_prefix.bot", "system:shutdown.signal_received", {
+        signal,
+      }),
+    );
 
     // 任意のクリーンアップを実行して正常終了
     try {
       if (cleanup) {
         await cleanup();
       }
-      logger.info(tDefault("system:shutdown.cleanup_complete"));
+      logger.info(
+        logPrefixed(
+          "system:log_prefix.bot",
+          "system:shutdown.cleanup_complete",
+        ),
+      );
       // 正常クリーンアップ完了として 0 終了
       process.exit(PROCESS_ERROR_CONSTANTS.EXIT_CODE.SUCCESS);
     } catch (error) {
       // クリーンアップ失敗時は異常終了
-      logger.error(tDefault("system:shutdown.cleanup_failed"), error);
+      logger.error(
+        logPrefixed("system:log_prefix.bot", "system:shutdown.cleanup_failed"),
+        error,
+      );
       process.exit(PROCESS_ERROR_CONSTANTS.EXIT_CODE.FAILURE);
     }
   };

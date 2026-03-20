@@ -12,7 +12,12 @@ import {
 import { NODE_ENV, env } from "@/shared/config/env";
 import {
   BaseError,
+  ConfigurationError,
   DatabaseError,
+  NotFoundError,
+  PermissionError,
+  RateLimitError,
+  TimeoutError,
   ValidationError,
 } from "@/shared/errors/customErrors";
 import { getUserFriendlyMessage, logError } from "@/shared/errors/errorHandler";
@@ -30,18 +35,20 @@ vi.mock("@/shared/utils/logger", () => ({
 }));
 
 // i18n のモック
+const mockTDefault = (key: string, params?: Record<string, unknown>) => {
+  const translations: Record<string, string> = {
+    "errors:general.unexpected_production": "予期しないエラーが発生しました。",
+    "errors:general.unexpected_with_message": `予期しないエラー: ${params?.message || ""}`,
+    "system:error.reply_failed": "返信に失敗しました",
+    "system:error.base_error_log": `[${params?.errorName || ""}] ${params?.message || ""}`,
+    "system:error.unhandled_error_log": `[UnhandledError] ${params?.message || ""}`,
+  };
+  return translations[key] || key;
+};
+
 vi.mock("@/shared/locale/localeManager", () => ({
-  tDefault: (key: string, params?: Record<string, unknown>) => {
-    const translations: Record<string, string> = {
-      "errors:general.unexpected_production":
-        "予期しないエラーが発生しました。",
-      "errors:general.unexpected_with_message": `予期しないエラー: ${params?.message || ""}`,
-      "system:error.reply_failed": "返信に失敗しました",
-      "system:error.base_error_log": `[${params?.errorName || ""}] ${params?.message || ""}`,
-      "system:error.unhandled_error_log": `[UnhandledError] ${params?.message || ""}`,
-    };
-    return translations[key] || key;
-  },
+  tDefault: (key: string, params?: Record<string, unknown>) =>
+    mockTDefault(key, params),
   tGuild: async (_guildId: string, key: string) => {
     if (key === "errors:validation.error_title") {
       return "サーバー検証エラー";
@@ -49,6 +56,17 @@ vi.mock("@/shared/locale/localeManager", () => ({
     return key;
   },
   tInteraction: (...args: unknown[]) => args[1],
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const prefix = mockTDefault(prefixKey);
+    const message = mockTDefault(messageKey, params);
+    const tag = sub ? `[${prefix}:${sub}]` : `[${prefix}]`;
+    return `${tag} ${message}`;
+  },
 }));
 
 describe("ErrorHandler", () => {
@@ -249,7 +267,7 @@ describe("ErrorHandler", () => {
       await handleCommandError(mockInteraction, error);
 
       expect(logger.error).toHaveBeenCalledWith(
-        "返信に失敗しました",
+        "[system:log_prefix.bot] 返信に失敗しました",
         expect.any(Error),
       );
     });
@@ -306,6 +324,138 @@ describe("ErrorHandler", () => {
       expect(embed.data?.title ?? embed.title).toMatch(/^❌/);
     });
 
+    it("PermissionError には common:title_permission_denied タイトルキーが使われることを確認", async () => {
+      const interaction: any = {
+        replied: false,
+        deferred: false,
+        guildId: null,
+        locale: "ja",
+        reply: vi.fn().mockResolvedValue(undefined),
+        editReply: vi.fn().mockResolvedValue(undefined),
+      };
+
+      await handleInteractionError(
+        interaction,
+        new PermissionError("forbidden"),
+      );
+
+      const payload = interaction.reply.mock.calls[0][0];
+      const embed = payload.embeds[0];
+      expect(embed.data?.title ?? embed.title).toContain(
+        "common:title_permission_denied",
+      );
+    });
+
+    it("NotFoundError には common:title_resource_not_found タイトルキーが使われることを確認", async () => {
+      const interaction: any = {
+        replied: false,
+        deferred: false,
+        guildId: null,
+        locale: "ja",
+        reply: vi.fn().mockResolvedValue(undefined),
+        editReply: vi.fn().mockResolvedValue(undefined),
+      };
+
+      await handleInteractionError(
+        interaction,
+        new NotFoundError("not found"),
+      );
+
+      const payload = interaction.reply.mock.calls[0][0];
+      const embed = payload.embeds[0];
+      expect(embed.data?.title ?? embed.title).toContain(
+        "common:title_resource_not_found",
+      );
+    });
+
+    it("TimeoutError には common:title_timeout タイトルキーが使われることを確認", async () => {
+      const interaction: any = {
+        replied: false,
+        deferred: false,
+        guildId: null,
+        locale: "ja",
+        reply: vi.fn().mockResolvedValue(undefined),
+        editReply: vi.fn().mockResolvedValue(undefined),
+      };
+
+      await handleInteractionError(
+        interaction,
+        new TimeoutError("timed out"),
+      );
+
+      const payload = interaction.reply.mock.calls[0][0];
+      const embed = payload.embeds[0];
+      expect(embed.data?.title ?? embed.title).toContain(
+        "common:title_timeout",
+      );
+    });
+
+    it("ConfigurationError には common:title_config_error タイトルキーが使われることを確認", async () => {
+      const interaction: any = {
+        replied: false,
+        deferred: false,
+        guildId: null,
+        locale: "ja",
+        reply: vi.fn().mockResolvedValue(undefined),
+        editReply: vi.fn().mockResolvedValue(undefined),
+      };
+
+      await handleInteractionError(
+        interaction,
+        new ConfigurationError("bad config"),
+      );
+
+      const payload = interaction.reply.mock.calls[0][0];
+      const embed = payload.embeds[0];
+      expect(embed.data?.title ?? embed.title).toContain(
+        "common:title_config_error",
+      );
+    });
+
+    it("DatabaseError には common:title_operation_error タイトルキーが使われることを確認", async () => {
+      const interaction: any = {
+        replied: false,
+        deferred: false,
+        guildId: null,
+        locale: "ja",
+        reply: vi.fn().mockResolvedValue(undefined),
+        editReply: vi.fn().mockResolvedValue(undefined),
+      };
+
+      await handleInteractionError(
+        interaction,
+        new DatabaseError("db failure"),
+      );
+
+      const payload = interaction.reply.mock.calls[0][0];
+      const embed = payload.embeds[0];
+      expect(embed.data?.title ?? embed.title).toContain(
+        "common:title_operation_error",
+      );
+    });
+
+    it("RateLimitError には common:title_rate_limited タイトルキーが使われることを確認", async () => {
+      const interaction: any = {
+        replied: false,
+        deferred: false,
+        guildId: null,
+        locale: "ja",
+        reply: vi.fn().mockResolvedValue(undefined),
+        editReply: vi.fn().mockResolvedValue(undefined),
+      };
+
+      await handleInteractionError(
+        interaction,
+        new RateLimitError("too many requests"),
+      );
+
+      const payload = interaction.reply.mock.calls[0][0];
+      const embed = payload.embeds[0];
+      expect(embed.data?.title ?? embed.title).toContain(
+        "common:title_rate_limited",
+      );
+    });
+
     it("通常の Error にはフォールバックの汎用タイトルが使われることを確認", async () => {
       const interaction: any = {
         replied: false,
@@ -321,9 +471,7 @@ describe("ErrorHandler", () => {
       expect(interaction.reply).toHaveBeenCalledTimes(1);
       const payload = interaction.reply.mock.calls[0][0];
       const embed = payload.embeds[0];
-      expect(embed.data?.title ?? embed.title).toContain(
-        "errors:general.error_title",
-      );
+      expect(embed.data?.title ?? embed.title).toContain("common:error");
     });
   });
 

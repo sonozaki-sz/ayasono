@@ -2,7 +2,7 @@
 // VC募集パネルメッセージ削除の自己修復ハンドラー
 
 import { type Message, type PartialMessage } from "discord.js";
-import { tDefault } from "../../../../shared/locale/localeManager";
+import { logPrefixed } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import { getBotVcRecruitRepository } from "../../../services/botCompositionRoot";
 import { buildVcRecruitPanelComponents } from "../commands/vcRecruitPanelEmbed";
@@ -30,11 +30,15 @@ export async function handleVcRecruitMessageDelete(
   if (setup.panelMessageId !== message.id) return;
 
   logger.info(
-    tDefault("system:vc-recruit.panel_delete_detected", {
-      guildId,
-      panelChannelId: message.channelId,
-      messageId: message.id,
-    }),
+    logPrefixed(
+      "system:log_prefix.vc_recruit",
+      "system:vc-recruit.panel_delete_detected",
+      {
+        guildId,
+        panelChannelId: message.channelId,
+        messageId: message.id,
+      },
+    ),
   );
 
   // パネルチャンネルを取得
@@ -61,10 +65,14 @@ export async function handleVcRecruitMessageDelete(
   await repo.updatePanelMessageId(guildId, setup.panelChannelId, newMessage.id);
 
   logger.info(
-    tDefault("system:vc-recruit.panel_resent", {
-      guildId,
-      panelChannelId: setup.panelChannelId,
-      newMessageId: newMessage.id,
-    }),
+    logPrefixed(
+      "system:log_prefix.vc_recruit",
+      "system:vc-recruit.panel_resent",
+      {
+        guildId,
+        panelChannelId: setup.panelChannelId,
+        newMessageId: newMessage.id,
+      },
+    ),
   );
 }

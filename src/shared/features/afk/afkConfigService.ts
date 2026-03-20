@@ -8,7 +8,7 @@ import {
   type IGuildConfigRepository,
 } from "../../database/types";
 import { createServiceGetter } from "../../utils/serviceFactory";
-import { tDefault } from "../../locale/localeManager";
+import { logPrefixed, tDefault } from "../../locale/localeManager";
 import { executeWithDatabaseError } from "../../utils/errorHandling";
 import { logger } from "../../utils/logger";
 import {
@@ -67,7 +67,13 @@ export class AfkConfigService {
           guildId,
           normalizeAfkConfig(config),
         );
-        logger.debug(tDefault("system:database.afk_config_saved", { guildId }));
+        logger.debug(
+          logPrefixed(
+            "system:log_prefix.database",
+            "system:database.afk_config_saved",
+            { guildId },
+          ),
+        );
       },
       tDefault("system:database.afk_config_save_failed", { guildId }),
     );
@@ -82,7 +88,11 @@ export class AfkConfigService {
         // チャンネル設定とAFK有効化は repository 実装へ委譲
         await this.guildConfigRepository.setAfkChannel(guildId, channelId);
         logger.debug(
-          tDefault("system:database.afk_channel_set", { guildId, channelId }),
+          logPrefixed(
+            "system:log_prefix.database",
+            "system:database.afk_channel_set",
+            { guildId, channelId },
+          ),
         );
       },
       tDefault("system:database.afk_channel_set_failed", {

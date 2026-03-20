@@ -36,6 +36,8 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
 }));
 
 vi.mock("@/shared/locale/localeManager", () => ({
+  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
+  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
   tGuild: (guildId: string, key: string, opts?: Record<string, unknown>) =>
     tGuildMock(guildId, key, opts),
   tInteraction: vi.fn((_locale: string, key: string) => key),
@@ -120,7 +122,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.setChannel", (
     await handleMemberLogConfigSetChannel(interaction as never, "guild-1");
 
     expect(loggerInfoMock).toHaveBeenCalledWith(
-      "system:member-log.config_set_channel",
+      expect.stringContaining("system:member-log.config_set_channel"),
     );
   });
 

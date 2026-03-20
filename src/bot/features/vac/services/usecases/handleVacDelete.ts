@@ -2,7 +2,7 @@
 // VAC自動削除ユースケース
 
 import { ChannelType, type VoiceState } from "discord.js";
-import { tDefault } from "../../../../../shared/locale/localeManager";
+import { logPrefixed } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import type { VacConfigService } from "../../../../../shared/features/vac/vacConfigService";
 
@@ -37,7 +37,7 @@ export async function handleVacDeleteUseCase(
   );
 
   logger.info(
-    tDefault("system:vac.channel_deleted", {
+    logPrefixed("system:log_prefix.vac", "system:vac.channel_deleted", {
       guildId: oldChannel.guild.id,
       channelId: oldChannel.id,
     }),

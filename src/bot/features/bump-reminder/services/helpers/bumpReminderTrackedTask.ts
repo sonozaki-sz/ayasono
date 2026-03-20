@@ -1,7 +1,7 @@
 // src/bot/features/bump-reminder/services/helpers/bumpReminderTrackedTask.ts
 // Bumpリマインダータスクの実行結果をDBステータスへ反映するヘルパー
 
-import { tDefault } from "../../../../../shared/locale/localeManager";
+import { logPrefixed } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import { BUMP_REMINDER_STATUS } from "../../constants/bumpReminderConstants";
 import { type IBumpReminderRepository } from "../../repositories/types";
@@ -27,9 +27,13 @@ export function createTrackedReminderTask(
       await repository.updateStatus(reminderId, BUMP_REMINDER_STATUS.SENT);
     } catch (error) {
       logger.error(
-        tDefault("system:scheduler.bump_reminder_task_failed", {
-          guildId,
-        }),
+        logPrefixed(
+          "system:log_prefix.bump_reminder",
+          "system:scheduler.bump_reminder_task_failed",
+          {
+            guildId,
+          },
+        ),
         error,
       );
 
@@ -40,9 +44,13 @@ export function createTrackedReminderTask(
         );
       } catch (statusError) {
         logger.error(
-          tDefault("system:scheduler.bump_reminder_task_failed", {
-            guildId,
-          }),
+          logPrefixed(
+            "system:log_prefix.bump_reminder",
+            "system:scheduler.bump_reminder_task_failed",
+            {
+              guildId,
+            },
+          ),
           statusError,
         );
       }

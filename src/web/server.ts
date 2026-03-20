@@ -8,7 +8,7 @@ import {
   setupGlobalErrorHandlers,
   setupGracefulShutdown,
 } from "../shared/errors/errorHandler";
-import { localeManager, tDefault } from "../shared/locale/localeManager";
+import { localeManager, logPrefixed } from "../shared/locale/localeManager";
 import { logger } from "../shared/utils/logger";
 import { buildWebApp } from "./webAppBuilder";
 
@@ -60,13 +60,16 @@ async function startWebServer() {
 
     // 起動完了ログ
     logger.info(
-      tDefault("system:web.server_started", {
+      logPrefixed("system:log_prefix.web", "system:web.server_started", {
         url: `${WEB_SERVER_CONSTANTS.URL_SCHEME_HTTP}${env.WEB_HOST}:${env.WEB_PORT}`,
       }),
     );
   } catch (error) {
     // 起動失敗時はログ出力して非0終了
-    logger.error(tDefault("system:web.startup_error"), error);
+    logger.error(
+      logPrefixed("system:log_prefix.web", "system:web.startup_error"),
+      error,
+    );
     process.exit(PROCESS_EXIT_CODE.FAILURE);
   }
 }
@@ -77,6 +80,9 @@ setupGlobalErrorHandlers();
 // 起動
 startWebServer().catch((error) => {
   // 予期しない起動例外の最終防波堤
-  logger.error(tDefault("system:web.startup_failed"), error);
+  logger.error(
+    logPrefixed("system:log_prefix.web", "system:web.startup_failed"),
+    error,
+  );
   process.exit(PROCESS_EXIT_CODE.FAILURE);
 });

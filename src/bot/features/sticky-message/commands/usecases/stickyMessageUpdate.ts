@@ -48,6 +48,12 @@ export async function handleStickyMessageUpdate(
             interaction.locale,
             "commands:sticky-message.errors.text_channel_only",
           ),
+          {
+            title: tInteraction(
+              interaction.locale,
+              "common:title_channel_error",
+            ),
+          },
         ),
       ],
       flags: MessageFlags.Ephemeral,

@@ -8,6 +8,8 @@ import { createInfoEmbed } from "@/bot/utils/messageResponse";
 import { tGuild } from "@/shared/locale/localeManager";
 
 vi.mock("@/shared/locale/localeManager", () => ({
+  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
+  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
   tGuild: vi.fn(async (_guildId: string, key: string) => key),
   tInteraction: vi.fn((_locale: string, key: string) => key),
 }));

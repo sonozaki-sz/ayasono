@@ -12,6 +12,8 @@ vi.mock("node-cron", () => ({
 }));
 
 vi.mock("@/shared/locale/localeManager", () => ({
+  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
+  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
   tDefault: (key: string) => key,
   tInteraction: (...args: unknown[]) => args[1],
 }));
@@ -61,7 +63,7 @@ describe("shared/scheduler/jobScheduler", () => {
     );
     expect(start).toHaveBeenCalledTimes(1);
     expect(scheduler.hasJob("job-1")).toBe(true);
-    expect(logger.info).toHaveBeenCalledWith("system:scheduler.job_scheduled");
+    expect(logger.info).toHaveBeenCalledWith(expect.stringContaining("system:scheduler.job_scheduled"));
   });
 
   // 同一IDの再登録時に既存ジョブを停止して置き換えることを検証
@@ -81,7 +83,7 @@ describe("shared/scheduler/jobScheduler", () => {
       task: vi.fn(),
     });
 
-    expect(logger.warn).toHaveBeenCalledWith("system:scheduler.job_exists");
+    expect(logger.warn).toHaveBeenCalledWith(expect.stringContaining("system:scheduler.job_exists"));
     expect(first.stop).toHaveBeenCalledTimes(1);
     expect(second.start).toHaveBeenCalledTimes(1);
     expect(scheduler.getJobCount()).toBe(1);
@@ -102,7 +104,7 @@ describe("shared/scheduler/jobScheduler", () => {
     ).toThrow("schedule failed");
 
     expect(logger.error).toHaveBeenCalledWith(
-      "system:scheduler.schedule_failed",
+      expect.stringContaining("system:scheduler.schedule_failed"),
       expect.any(Error),
     );
   });
@@ -125,8 +127,8 @@ describe("shared/scheduler/jobScheduler", () => {
     await callback();
 
     expect(okTask).toHaveBeenCalledTimes(1);
-    expect(logger.debug).toHaveBeenCalledWith("system:scheduler.executing_job");
-    expect(logger.debug).toHaveBeenCalledWith("system:scheduler.job_completed");
+    expect(logger.debug).toHaveBeenCalledWith(expect.stringContaining("system:scheduler.executing_job"));
+    expect(logger.debug).toHaveBeenCalledWith(expect.stringContaining("system:scheduler.job_completed"));
 
     const failTask = vi.fn().mockRejectedValue(new Error("task failed"));
     cronScheduleMock.mockReturnValueOnce({
@@ -145,7 +147,7 @@ describe("shared/scheduler/jobScheduler", () => {
     await failCallback();
 
     expect(logger.error).toHaveBeenCalledWith(
-      "system:scheduler.job_error",
+      expect.stringContaining("system:scheduler.job_error"),
       expect.any(Error),
     );
   });
@@ -162,8 +164,8 @@ describe("shared/scheduler/jobScheduler", () => {
 
     expect(task).toHaveBeenCalledTimes(1);
     expect(scheduler.hasJob("once-1")).toBe(false);
-    expect(logger.debug).toHaveBeenCalledWith("system:scheduler.executing_job");
-    expect(logger.debug).toHaveBeenCalledWith("system:scheduler.job_completed");
+    expect(logger.debug).toHaveBeenCalledWith(expect.stringContaining("system:scheduler.executing_job"));
+    expect(logger.debug).toHaveBeenCalledWith(expect.stringContaining("system:scheduler.job_completed"));
   });
 
   // one-timeタスク例外時は落とさずログ出力することを検証
@@ -177,7 +179,7 @@ describe("shared/scheduler/jobScheduler", () => {
 
     expect(task).toHaveBeenCalledTimes(1);
     expect(logger.error).toHaveBeenCalledWith(
-      "system:scheduler.job_error",
+      expect.stringContaining("system:scheduler.job_error"),
       expect.any(Error),
     );
   });
@@ -190,7 +192,7 @@ describe("shared/scheduler/jobScheduler", () => {
     scheduler.addOneTimeJob("once-dup", 1_000, oldTask);
     scheduler.addOneTimeJob("once-dup", 1_000, newTask);
 
-    expect(logger.warn).toHaveBeenCalledWith("system:scheduler.job_exists");
+    expect(logger.warn).toHaveBeenCalledWith(expect.stringContaining("system:scheduler.job_exists"));
     expect(scheduler.getJobIds()).toEqual(["once-dup"]);
 
     vi.runOnlyPendingTimers();

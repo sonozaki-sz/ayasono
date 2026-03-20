@@ -3,7 +3,7 @@
 
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
 import {
-  tDefault,
+  logPrefixed,
   tInteraction,
 } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
@@ -42,5 +42,11 @@ export async function handleMemberLogConfigDisable(
   });
 
   // 監査用ログ
-  logger.info(tDefault("system:member-log.config_disabled", { guildId }));
+  logger.info(
+    logPrefixed(
+      "system:log_prefix.member_log",
+      "system:member-log.config_disabled",
+      { guildId },
+    ),
+  );
 }

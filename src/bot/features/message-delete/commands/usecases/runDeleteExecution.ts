@@ -2,7 +2,10 @@
 // 削除実行フェーズ
 
 import { type MessageComponentInteraction } from "discord.js";
-import { tDefault } from "../../../../../shared/locale/localeManager";
+import {
+  logPrefixed,
+  tDefault,
+} from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import {
   createErrorEmbed,
@@ -97,15 +100,19 @@ export async function executeDelete(
             .filter(Boolean)
             .join(" ");
       logger.info(
-        tDefault("system:message-delete.deleted", {
-          userId: interaction.user.id,
-          count: result.totalDeleted,
-          countPart,
-          targetPart,
-          keywordPart,
-          periodPart: periodPart ? ` ${periodPart}` : "",
-          channels: Object.keys(result.channelBreakdown).join(", "),
-        }),
+        logPrefixed(
+          "system:log_prefix.msg_del",
+          "system:message-delete.deleted",
+          {
+            userId: interaction.user.id,
+            count: result.totalDeleted,
+            countPart,
+            targetPart,
+            keywordPart,
+            periodPart: periodPart ? ` ${periodPart}` : "",
+            channels: Object.keys(result.channelBreakdown).join(", "),
+          },
+        ),
       );
       return;
     }
@@ -118,6 +125,7 @@ export async function executeDelete(
           tDefault("commands:message-delete.confirm.delete_timed_out", {
             count: deletedCount,
           }),
+          { title: tDefault("common:title_timeout") },
         ),
       ],
       components: [],
@@ -125,13 +133,18 @@ export async function executeDelete(
     });
   } catch (error) {
     logger.error(
-      tDefault("system:message-delete.delete_error", { error: String(error) }),
+      logPrefixed(
+        "system:log_prefix.msg_del",
+        "system:message-delete.delete_error",
+        { error: String(error) },
+      ),
     );
     await interaction
       .editReply({
         embeds: [
           createErrorEmbed(
             tDefault("commands:message-delete.errors.delete_failed"),
+            { title: tDefault("common:title_delete_error") },
           ),
         ],
         content: "",

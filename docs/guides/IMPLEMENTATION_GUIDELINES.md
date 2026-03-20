@@ -219,6 +219,44 @@ async function getGuildConfig(guildId: string): Promise<GuildConfig | null> { ..
 
 > **注意**: `create*Embed` はタイトルに絵文字を自動プレフィックスするため、description やロケール文字列に絵文字を含めないこと。
 
+##### Embed タイトル命名ルール
+
+`create*Embed` の `options.title` は以下のルールに従う。
+
+- **体言止め** にする（文章にしない）
+- description で詳細を説明し、タイトルはカテゴリを示す短い名詞句にする
+- 英語のクラス名（`PermissionError` 等）をそのまま表示しない
+
+| タイトル | 用途 |
+| --- | --- |
+| 権限不足 | ユーザーの権限が不足している場合 |
+| Bot権限不足 | Botの権限が不足している場合 |
+| 入力エラー | ユーザー入力の形式不正・範囲外 |
+| オプション競合 | 同時指定不可のオプションが競合した場合 |
+| フィルタ不足 | 必須のフィルタ条件が未指定 |
+| チャンネルエラー | チャンネル種別の不一致（非対象チャンネル） |
+| チャンネル不在 | 対象チャンネルが見つからない・削除済み |
+| VC未参加 | VC参加が必要な操作でVC未参加 |
+| 設定不足 | 事前設定が完了していない |
+| リソース不在 | 対象リソースが削除済み・見つからない |
+| 上限超過 | チャンネル数等の上限に達した場合 |
+| タイムアウト | 操作・処理がタイムアウトした場合 |
+| 実行中 | 同一処理が既に実行中（ロック） |
+| 登録済み | 重複登録を検出した場合 |
+| 未設定 | リソースが未設定の状態 |
+| サーバー専用 | ギルド外での実行を拒否する場合 |
+| 操作エラー | DB操作・API呼び出し等の処理失敗 |
+| 収集エラー | メッセージ収集等のスキャン処理失敗 |
+| 削除エラー | メッセージ削除等の削除処理失敗 |
+| 移動失敗 | ユーザー移動等の操作失敗 |
+| ロール上限超過 | ロール登録数の上限に達した場合 |
+| 設定エラー | 設定値の不整合・不正 |
+| レート制限 | レート制限に到達した場合 |
+| エラー | 上記に該当しない汎用フォールバック |
+
+新しい Embed を追加する際は、上記テーブルから該当するタイトルを選択する。
+該当するものがない場合はテーブルに追加してから使用する。
+
 カスタムレイアウトが必要な機能固有の Embed（パネル・サマリー等）は `new EmbedBuilder()` を直接使用してよい。
 その場合のカラーは feature の `*.constants.ts` にブランドカラー定数を定義して使う（例: `VC_RECRUIT_PANEL_COLOR = 0x24b9b8`）。
 
@@ -240,11 +278,45 @@ async function getGuildConfig(guildId: string): Promise<GuildConfig | null> { ..
 | 対象 | 経由 | キー定義先 |
 | --- | --- | --- |
 | ユーザー向け応答（`editReply` / `followUp` / ボタンラベル / セレクトメニュー / モーダル / Embed） | `tDefault("commands:...")` | `ja/commands.ts`, `en/commands.ts` |
-| ログメッセージ（`logger.*()` の引数） | `tDefault("system:...")` | `ja/system.ts`, `en/system.ts` |
+| ログメッセージ（`logger.*()` の引数） | `logPrefixed()` / `logCommand()` | `ja/system.ts`, `en/system.ts` |
 | エラーメッセージ | `tDefault("errors:...")` | `ja/errors.ts`, `en/errors.ts` |
 
 - ロケールキーは **ja/en 両方に同時追加** する
 - DB操作は `executeWithDatabaseError` でラップし、成功時は `logger.debug`、失敗時はキー付きエラーメッセージを渡す
+
+##### ログプレフィックスルール
+
+ログメッセージには `logPrefixed()` / `logCommand()` ヘルパー（`localeManager.ts`）でプレフィックスを付与する。
+i18n メッセージ文字列に `[xxx]` を直書きすることを **禁止** する。
+
+```ts
+// ❌ メッセージ内にプレフィックスをハードコード
+logger.info(tDefault("system:bump-reminder.detected", { guildId }));
+// i18n: "[Bumpリマインダー] Bumpを検知..."
+
+// ✅ logPrefixed でプレフィックスを自動付与
+logger.info(logPrefixed("system:log_prefix.bump_reminder", "system:bump-reminder.detected", { guildId }));
+// i18n: "Bumpを検知..."  →  出力: "[Bumpリマインダー] Bumpを検知..."
+```
+
+**プレフィックス種別:**
+
+| 種別 | ヘルパー | プレフィックス例 | 用途 |
+| --- | --- | --- | --- |
+| 機能 | `logPrefixed("system:log_prefix.xxx", ...)` | `[Bumpリマインダー]` | feature 層の処理ログ（ローカライズ対応） |
+| イベント | `logPrefixed("system:log_prefix.xxx", ..., sub)` | `[interactionCreate:command]` | Discord.js イベント名＋サブプレフィックス |
+| コマンド | `logCommand("/command-name", ...)` | `[/message-delete]` | スラッシュコマンドの受付・完了・失敗 |
+
+**サブプレフィックス:** 同一イベントで複数 flow がある場合、第4引数 `sub` でサブカテゴリを付与する。
+
+```ts
+// [interactionCreate:command] コマンド実行 CommandName: /afk
+logger.debug(
+  logPrefixed("system:log_prefix.interaction_create", "system:interaction.command_executed", { commandName, userId }, "command"),
+);
+```
+
+**新しいプレフィックスを追加する場合:** `system.ts`（ja/en）の `log_prefix.*` セクションにキーを追加する。
 
 #### マジックナンバー禁止
 
@@ -313,9 +385,10 @@ disableComponentsAfterTimeout(interaction, [selectRow, buttonRow], TIMEOUT_MS);
 ### コーディング
 
 - [ ] ステータス通知は `create*Embed` ユーティリティで返している（プレーンテキスト返しがない）
+- [ ] Embed タイトルは命名ルールテーブルから選択している（体言止め、英語クラス名禁止）
 - [ ] `create*Embed` に渡すロケール文字列に絵文字を含めていない
 - [ ] ユーザー向け文字列は `tDefault()` 経由で i18n 化されている（ロケールキーは ja/en 両方に追加）
-- [ ] ログメッセージは `tDefault("system:...")` 経由になっている
+- [ ] ログメッセージは `logPrefixed()` / `logCommand()` 経由でプレフィックスが付与されている（i18n 文字列に `[xxx]` 直書き禁止）
 - [ ] マジックナンバーを使わず名前付き定数を `*.constants.ts` に定義している
 - [ ] 同一・類似ロジックの重複がない（共通関数に抽出済み）
 - [ ] UI セッション状態に `TtlMap` を使用している（生 Map を使っていない）

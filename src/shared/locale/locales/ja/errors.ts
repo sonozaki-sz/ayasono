@@ -20,7 +20,7 @@ export const errors = {
   // バリデーションエラー
   // コマンド入力・実行コンテキストの不正
   "validation.error_title":
-    "バリデーションエラー",
+    "入力エラー",
   "validation.guild_only":
     "このコマンドはサーバー内でのみ使用できます。",
   "validation.invalid_subcommand":
@@ -81,7 +81,7 @@ export const errors = {
   // 一般的なエラー
   // 予期しない例外の最終フォールバック
   "general.error_title":
-    "エラーが発生しました。",
+    "エラー",
   "general.unexpected_production":
     "予期しないエラーが発生しました。後ほど再度お試しください。",
   "general.unexpected_with_message":

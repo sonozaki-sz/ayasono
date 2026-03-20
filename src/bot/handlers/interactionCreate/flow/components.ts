@@ -8,7 +8,7 @@ import type {
   StringSelectMenuInteraction,
   UserSelectMenuInteraction,
 } from "discord.js";
-import { tDefault } from "../../../../shared/locale/localeManager";
+import { logPrefixed } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import { handleInteractionError } from "../../../errors/interactionErrorHandler";
 import { buttonHandlers } from "../ui/buttons";
@@ -24,13 +24,15 @@ import type { InteractionHandler } from "../ui/types";
  * @param interaction 対象インタラクション
  * @param handlers ハンドラレジストリ
  * @param errorKey エラーログ用 i18n キー
+ * @param sub ログプレフィックスのサブカテゴリ
  */
 async function dispatchByCustomId<
   T extends RepliableInteraction & { customId: string },
 >(
   interaction: T,
   handlers: readonly InteractionHandler<T>[],
-  errorKey: string,
+  errorKey: Parameters<typeof logPrefixed>[1],
+  sub: string,
 ): Promise<void> {
   for (const handler of handlers) {
     if (handler.matches(interaction.customId)) {
@@ -38,9 +40,12 @@ async function dispatchByCustomId<
         await handler.execute(interaction);
       } catch (error) {
         logger.error(
-          tDefault(errorKey as Parameters<typeof tDefault>[0], {
-            customId: interaction.customId,
-          }),
+          logPrefixed(
+            "system:log_prefix.interaction_create",
+            errorKey,
+            { customId: interaction.customId },
+            sub,
+          ),
           error,
         );
         await handleInteractionError(interaction, error);
@@ -60,6 +65,7 @@ export function handleButton(interaction: ButtonInteraction): Promise<void> {
     interaction,
     buttonHandlers,
     "system:interaction.button_error",
+    "button",
   );
 }
 
@@ -74,6 +80,7 @@ export function handleUserSelectMenu(
     interaction,
     userSelectHandlers,
     "system:interaction.select_menu_error",
+    "selectMenu",
   );
 }
 
@@ -88,6 +95,7 @@ export function handleRoleSelectMenu(
     interaction,
     roleSelectHandlers,
     "system:interaction.select_menu_error",
+    "selectMenu",
   );
 }
 
@@ -102,5 +110,6 @@ export function handleStringSelectMenu(
     interaction,
     stringSelectHandlers,
     "system:interaction.select_menu_error",
+    "selectMenu",
   );
 }

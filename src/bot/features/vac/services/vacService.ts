@@ -2,7 +2,7 @@
 // VAC機能のビジネスロジックサービス
 
 import { ChannelType, type Channel, type VoiceState } from "discord.js";
-import { tDefault } from "../../../../shared/locale/localeManager";
+import { logPrefixed, tDefault } from "../../../../shared/locale/localeManager";
 import { executeWithLoggedError } from "../../../../shared/utils/errorHandling";
 import { logger } from "../../../../shared/utils/logger";
 import type { BotClient } from "../../../client";
@@ -71,10 +71,14 @@ export class VacService {
           channel.id,
         );
         logger.info(
-          tDefault("system:vac.trigger_removed_by_delete", {
-            guildId: channel.guildId,
-            channelId: channel.id,
-          }),
+          logPrefixed(
+            "system:log_prefix.vac",
+            "system:vac.trigger_removed_by_delete",
+            {
+              guildId: channel.guildId,
+              channelId: channel.id,
+            },
+          ),
         );
       }
 

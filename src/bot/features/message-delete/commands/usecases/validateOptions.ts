@@ -82,6 +82,7 @@ export async function parseAndValidateOptions(
       embeds: [
         createWarningEmbed(
           tDefault("commands:message-delete.errors.days_and_date_conflict"),
+          { title: tDefault("common:title_option_conflict") },
         ),
       ],
     });
@@ -103,6 +104,7 @@ export async function parseAndValidateOptions(
           embeds: [
             createWarningEmbed(
               tDefault("commands:message-delete.errors.after_invalid_format"),
+              { title: tDefault("common:title_input_error") },
             ),
           ],
         });
@@ -114,6 +116,7 @@ export async function parseAndValidateOptions(
           embeds: [
             createWarningEmbed(
               tDefault("commands:message-delete.errors.after_future"),
+              { title: tDefault("common:title_input_error") },
             ),
           ],
         });
@@ -127,6 +130,7 @@ export async function parseAndValidateOptions(
           embeds: [
             createWarningEmbed(
               tDefault("commands:message-delete.errors.before_invalid_format"),
+              { title: tDefault("common:title_input_error") },
             ),
           ],
         });
@@ -143,6 +147,7 @@ export async function parseAndValidateOptions(
           embeds: [
             createWarningEmbed(
               tDefault("commands:message-delete.errors.before_future"),
+              { title: tDefault("common:title_input_error") },
             ),
           ],
         });
@@ -154,6 +159,7 @@ export async function parseAndValidateOptions(
         embeds: [
           createWarningEmbed(
             tDefault("commands:message-delete.errors.date_range_invalid"),
+            { title: tDefault("common:title_input_error") },
           ),
         ],
       });

@@ -53,6 +53,12 @@ export const vcPanelUserSelectHandler: StringSelectHandler = {
         embeds: [
           createErrorEmbed(
             tInteraction(interaction.locale, "errors:vac.not_vac_channel"),
+            {
+              title: tInteraction(
+                interaction.locale,
+                "common:title_channel_error",
+              ),
+            },
           ),
         ],
         flags: MessageFlags.Ephemeral,
@@ -66,6 +72,12 @@ export const vcPanelUserSelectHandler: StringSelectHandler = {
         embeds: [
           createErrorEmbed(
             tInteraction(interaction.locale, "errors:vac.not_vac_channel"),
+            {
+              title: tInteraction(
+                interaction.locale,
+                "common:title_channel_error",
+              ),
+            },
           ),
         ],
         flags: MessageFlags.Ephemeral,
@@ -82,6 +94,9 @@ export const vcPanelUserSelectHandler: StringSelectHandler = {
         embeds: [
           createErrorEmbed(
             tInteraction(interaction.locale, "errors:vac.not_in_vc"),
+            {
+              title: tInteraction(interaction.locale, "common:title_not_in_vc"),
+            },
           ),
         ],
         flags: MessageFlags.Ephemeral,
@@ -95,6 +110,12 @@ export const vcPanelUserSelectHandler: StringSelectHandler = {
         embeds: [
           createErrorEmbed(
             tInteraction(interaction.locale, "errors:afk.not_configured"),
+            {
+              title: tInteraction(
+                interaction.locale,
+                "common:title_config_required",
+              ),
+            },
           ),
         ],
         flags: MessageFlags.Ephemeral,
@@ -111,6 +132,12 @@ export const vcPanelUserSelectHandler: StringSelectHandler = {
         embeds: [
           createErrorEmbed(
             tInteraction(interaction.locale, "errors:afk.channel_not_found"),
+            {
+              title: tInteraction(
+                interaction.locale,
+                "common:title_channel_not_found",
+              ),
+            },
           ),
         ],
         flags: MessageFlags.Ephemeral,
@@ -139,6 +166,12 @@ export const vcPanelUserSelectHandler: StringSelectHandler = {
         embeds: [
           createErrorEmbed(
             tInteraction(interaction.locale, "errors:vac.afk_move_failed"),
+            {
+              title: tInteraction(
+                interaction.locale,
+                "common:title_move_failed",
+              ),
+            },
           ),
         ],
         flags: MessageFlags.Ephemeral,

@@ -2,7 +2,7 @@
 // タイマー処理（node-cron + setTimeout）
 
 import cron, { type ScheduledTask } from "node-cron";
-import { tDefault } from "../locale/localeManager";
+import { logPrefixed } from "../locale/localeManager";
 import { logger } from "../utils/logger";
 
 interface ScheduledJob {
@@ -26,7 +26,13 @@ export class JobScheduler {
   public addJob(job: ScheduledJob): void {
     // 同IDの既存ジョブは置き換え（多重実行を防止）
     if (this.jobs.has(job.id)) {
-      logger.warn(tDefault("system:scheduler.job_exists", { jobId: job.id }));
+      logger.warn(
+        logPrefixed(
+          "system:log_prefix.scheduler",
+          "system:scheduler.job_exists",
+          { jobId: job.id },
+        ),
+      );
       this.removeJob(job.id);
     }
 
@@ -35,15 +41,27 @@ export class JobScheduler {
       const scheduledTask = cron.schedule(job.schedule, async () => {
         try {
           logger.debug(
-            tDefault("system:scheduler.executing_job", { jobId: job.id }),
+            logPrefixed(
+              "system:log_prefix.scheduler",
+              "system:scheduler.executing_job",
+              { jobId: job.id },
+            ),
           );
           await job.task();
           logger.debug(
-            tDefault("system:scheduler.job_completed", { jobId: job.id }),
+            logPrefixed(
+              "system:log_prefix.scheduler",
+              "system:scheduler.job_completed",
+              { jobId: job.id },
+            ),
           );
         } catch (error) {
           logger.error(
-            tDefault("system:scheduler.job_error", { jobId: job.id }),
+            logPrefixed(
+              "system:log_prefix.scheduler",
+              "system:scheduler.job_error",
+              { jobId: job.id },
+            ),
             error,
           );
         }
@@ -54,11 +72,19 @@ export class JobScheduler {
       scheduledTask.start();
 
       logger.info(
-        tDefault("system:scheduler.job_scheduled", { jobId: job.id }),
+        logPrefixed(
+          "system:log_prefix.scheduler",
+          "system:scheduler.job_scheduled",
+          { jobId: job.id },
+        ),
       );
     } catch (error) {
       logger.error(
-        tDefault("system:scheduler.schedule_failed", { jobId: job.id }),
+        logPrefixed(
+          "system:log_prefix.scheduler",
+          "system:scheduler.schedule_failed",
+          { jobId: job.id },
+        ),
         error,
       );
       throw error;
@@ -79,7 +105,13 @@ export class JobScheduler {
   ): void {
     // 既存の同IDジョブをキャンセル
     if (this.oneTimeJobs.has(id) || this.jobs.has(id)) {
-      logger.warn(tDefault("system:scheduler.job_exists", { jobId: id }));
+      logger.warn(
+        logPrefixed(
+          "system:log_prefix.scheduler",
+          "system:scheduler.job_exists",
+          { jobId: id },
+        ),
+      );
       this.removeJob(id);
     }
 
@@ -91,12 +123,28 @@ export class JobScheduler {
       // 実行開始時点で管理マップから除去
       this.oneTimeJobs.delete(id);
       try {
-        logger.debug(tDefault("system:scheduler.executing_job", { jobId: id }));
+        logger.debug(
+          logPrefixed(
+            "system:log_prefix.scheduler",
+            "system:scheduler.executing_job",
+            { jobId: id },
+          ),
+        );
         await task();
-        logger.debug(tDefault("system:scheduler.job_completed", { jobId: id }));
+        logger.debug(
+          logPrefixed(
+            "system:log_prefix.scheduler",
+            "system:scheduler.job_completed",
+            { jobId: id },
+          ),
+        );
       } catch (error) {
         logger.error(
-          tDefault("system:scheduler.job_error", { jobId: id }),
+          logPrefixed(
+            "system:log_prefix.scheduler",
+            "system:scheduler.job_error",
+            { jobId: id },
+          ),
           error,
         );
       }
@@ -107,7 +155,13 @@ export class JobScheduler {
 
     // 管理マップへ保存
     this.oneTimeJobs.set(id, handle);
-    logger.info(tDefault("system:scheduler.job_scheduled", { jobId: id }));
+    logger.info(
+      logPrefixed(
+        "system:log_prefix.scheduler",
+        "system:scheduler.job_scheduled",
+        { jobId: id },
+      ),
+    );
   }
 
   /**
@@ -119,7 +173,13 @@ export class JobScheduler {
     if (cronJob) {
       cronJob.stop();
       this.jobs.delete(id);
-      logger.info(tDefault("system:scheduler.job_removed", { jobId: id }));
+      logger.info(
+        logPrefixed(
+          "system:log_prefix.scheduler",
+          "system:scheduler.job_removed",
+          { jobId: id },
+        ),
+      );
       return true;
     }
 
@@ -128,7 +188,13 @@ export class JobScheduler {
     if (timeoutHandle) {
       clearTimeout(timeoutHandle);
       this.oneTimeJobs.delete(id);
-      logger.info(tDefault("system:scheduler.job_removed", { jobId: id }));
+      logger.info(
+        logPrefixed(
+          "system:log_prefix.scheduler",
+          "system:scheduler.job_removed",
+          { jobId: id },
+        ),
+      );
       return true;
     }
 
@@ -139,18 +205,32 @@ export class JobScheduler {
    * すべてのジョブを停止
    */
   public stopAll(): void {
-    logger.info(tDefault("system:scheduler.stopping"));
+    logger.info(
+      logPrefixed("system:log_prefix.scheduler", "system:scheduler.stopping"),
+    );
     // cron ジョブを全停止
     for (const [id, job] of this.jobs.entries()) {
       job.stop();
-      logger.debug(tDefault("system:scheduler.job_stopped", { jobId: id }));
+      logger.debug(
+        logPrefixed(
+          "system:log_prefix.scheduler",
+          "system:scheduler.job_stopped",
+          { jobId: id },
+        ),
+      );
     }
     this.jobs.clear();
 
     // one-time ジョブを全停止
     for (const [id, handle] of this.oneTimeJobs.entries()) {
       clearTimeout(handle);
-      logger.debug(tDefault("system:scheduler.job_stopped", { jobId: id }));
+      logger.debug(
+        logPrefixed(
+          "system:log_prefix.scheduler",
+          "system:scheduler.job_stopped",
+          { jobId: id },
+        ),
+      );
     }
     this.oneTimeJobs.clear();
   }

@@ -2,7 +2,7 @@
 // VAC起動時クリーンアップユースケース
 
 import { ChannelType } from "discord.js";
-import { tDefault } from "../../../../../shared/locale/localeManager";
+import { logPrefixed } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import type { BotClient } from "../../../../client";
 import type { VacConfigService } from "../../../../../shared/features/vac/vacConfigService";
@@ -31,10 +31,14 @@ export async function cleanupVacOnStartupUseCase(
       if (!triggerChannel || triggerChannel.type !== ChannelType.GuildVoice) {
         await vacRepository.removeTriggerChannel(guild.id, triggerChannelId);
         logger.info(
-          tDefault("system:vac.startup_cleanup_stale_trigger_removed", {
-            guildId: guild.id,
-            channelId: triggerChannelId,
-          }),
+          logPrefixed(
+            "system:log_prefix.vac",
+            "system:vac.startup_cleanup_stale_trigger_removed",
+            {
+              guildId: guild.id,
+              channelId: triggerChannelId,
+            },
+          ),
         );
         removedTriggers++;
       }
@@ -51,10 +55,14 @@ export async function cleanupVacOnStartupUseCase(
           channelInfo.voiceChannelId,
         );
         logger.info(
-          tDefault("system:vac.startup_cleanup_orphaned_channel_removed", {
-            guildId: guild.id,
-            channelId: channelInfo.voiceChannelId,
-          }),
+          logPrefixed(
+            "system:log_prefix.vac",
+            "system:vac.startup_cleanup_orphaned_channel_removed",
+            {
+              guildId: guild.id,
+              channelId: channelInfo.voiceChannelId,
+            },
+          ),
         );
         removedChannels++;
         continue;
@@ -66,10 +74,14 @@ export async function cleanupVacOnStartupUseCase(
           channelInfo.voiceChannelId,
         );
         logger.info(
-          tDefault("system:vac.startup_cleanup_orphaned_channel_removed", {
-            guildId: guild.id,
-            channelId: channelInfo.voiceChannelId,
-          }),
+          logPrefixed(
+            "system:log_prefix.vac",
+            "system:vac.startup_cleanup_orphaned_channel_removed",
+            {
+              guildId: guild.id,
+              channelId: channelInfo.voiceChannelId,
+            },
+          ),
         );
         removedChannels++;
         continue;
@@ -82,10 +94,14 @@ export async function cleanupVacOnStartupUseCase(
           channelInfo.voiceChannelId,
         );
         logger.info(
-          tDefault("system:vac.startup_cleanup_empty_channel_deleted", {
-            guildId: guild.id,
-            channelId: channelInfo.voiceChannelId,
-          }),
+          logPrefixed(
+            "system:log_prefix.vac",
+            "system:vac.startup_cleanup_empty_channel_deleted",
+            {
+              guildId: guild.id,
+              channelId: channelInfo.voiceChannelId,
+            },
+          ),
         );
         removedChannels++;
       }
@@ -94,7 +110,8 @@ export async function cleanupVacOnStartupUseCase(
 
   const hasChanges = removedTriggers > 0 || removedChannels > 0;
   logger.info(
-    tDefault(
+    logPrefixed(
+      "system:log_prefix.vac",
       hasChanges
         ? "system:vac.startup_cleanup_done"
         : "system:vac.startup_cleanup_done_none",

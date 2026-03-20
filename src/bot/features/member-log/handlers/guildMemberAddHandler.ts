@@ -3,7 +3,7 @@
 
 import { ChannelType, EmbedBuilder, type GuildMember } from "discord.js";
 import { getGuildTranslator } from "../../../../shared/locale/helpers";
-import { tDefault } from "../../../../shared/locale/localeManager";
+import { logPrefixed } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import { getBotMemberLogConfigService } from "../../../services/botCompositionRoot";
 import { calcDuration } from "./accountAge";
@@ -37,10 +37,14 @@ export async function handleGuildMemberAdd(member: GuildMember): Promise<void> {
       // チャンネルが存在しない場合：設定をリセットしてシステムチャンネルへ通知
       await getBotMemberLogConfigService().disableAndClearChannel(guildId);
       logger.warn(
-        tDefault("system:member-log.channel_deleted_config_cleared", {
-          guildId,
-          channelId: config.channelId,
-        }),
+        logPrefixed(
+          "system:log_prefix.member_log",
+          "system:member-log.channel_deleted_config_cleared",
+          {
+            guildId,
+            channelId: config.channelId,
+          },
+        ),
       );
       const t = await getGuildTranslator(guildId);
       await member.guild.systemChannel
@@ -138,15 +142,23 @@ export async function handleGuildMemberAdd(member: GuildMember): Promise<void> {
 
     // 送信完了ログ
     logger.debug(
-      tDefault("system:member-log.join_notification_sent", {
-        guildId,
-        userId,
-      }),
+      logPrefixed(
+        "system:log_prefix.member_log",
+        "system:member-log.join_notification_sent",
+        {
+          guildId,
+          userId,
+        },
+      ),
     );
   } catch (err) {
     // エラーが発生しても Bot のクラッシュを防ぐ
     logger.error(
-      tDefault("system:member-log.notification_failed", { guildId }),
+      logPrefixed(
+        "system:log_prefix.member_log",
+        "system:member-log.notification_failed",
+        { guildId },
+      ),
       { err },
     );
   }

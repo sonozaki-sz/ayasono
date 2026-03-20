@@ -2,289 +2,313 @@
 // System message translations (English)
 
 export const system = {
+  // Log prefixes
+  // Feature/event names auto-prepended by logPrefixed() helper
+  "log_prefix.bot": "Bot",
+  "log_prefix.bump_reminder": "BumpReminder",
+  "log_prefix.sticky_message": "StickyMessage",
+  "log_prefix.member_log": "MemberLog",
+  "log_prefix.vac": "VAC",
+  "log_prefix.vc_recruit": "VcRecruit",
+  "log_prefix.msg_del": "MsgDel",
+  "log_prefix.afk": "AFK",
+  "log_prefix.database": "DB",
+  "log_prefix.cooldown": "Cooldown",
+  "log_prefix.scheduler": "Scheduler",
+  "log_prefix.web": "Web",
+  "log_prefix.json": "JSON",
+  "log_prefix.interaction_create": "interactionCreate",
+  "log_prefix.guild_member_add": "guildMemberAdd",
+  "log_prefix.guild_member_remove": "guildMemberRemove",
+  "log_prefix.message_create": "messageCreate",
+  "log_prefix.message_delete": "messageDelete",
+  "log_prefix.voice_state_update": "voiceStateUpdate",
+  "log_prefix.channel_delete": "channelDelete",
+  "log_prefix.ready": "ready",
+
   // Bot startup & shutdown
   // High-level lifecycle logs emitted from process startup/teardown paths
   "bot.starting":
-    "[Bot] Starting Discord Bot...",
+    "Starting Discord Bot...",
   "bot.commands.registering":
-    "[Bot] Registering {{count}} commands...",
+    "Registering {{count}} commands...",
   "bot.commands.registered":
-    "[Bot] Commands registered",
+    "Commands registered",
   "bot.commands.command_registered":
     "  ✓ /{{name}}",
   "bot.events.registering":
-    "[Bot] Registering {{count}} events...",
+    "Registering {{count}} events...",
   "bot.events.registered":
-    "[Bot] Events registered",
+    "Events registered",
   "bot.startup.error":
-    "[Bot] Error during bot startup:",
+    "Error during bot startup:",
   "bot.startup.failed":
-    "[Bot] Bot startup failed:",
+    "Bot startup failed:",
   "bot.client.initialized":
-    "[Bot] Discord Bot client initialized",
+    "Discord Bot client initialized",
   "bot.client.shutting_down":
-    "[Bot] Shutting down bot client...",
+    "Shutting down bot client...",
   "bot.client.shutdown_complete":
-    "[Bot] Bot client shut down successfully",
+    "Bot client shut down successfully",
   "bot.presence_activity":
     "growin' up~ | {{count}} servers | by sonozaki",
 
   // BumpReminder feature logs
   "bump-reminder.detected":
-    "[BumpReminder] bump detected GuildId: {{guildId}} Service: {{service}}",
+    "bump detected GuildId: {{guildId}} Service: {{service}}",
   "bump-reminder.detection_failed":
-    "[BumpReminder] failed to handle bump detection GuildId: {{guildId}}",
+    "failed to handle bump detection GuildId: {{guildId}}",
   // Bump panel button operation logs
   "bump-reminder.panel_mention_updated":
-    "[BumpReminder] mention {{action}} UserId: {{userId}} GuildId: {{guildId}}",
+    "mention {{action}} UserId: {{userId}} GuildId: {{guildId}}",
   "bump-reminder.panel_handle_failed":
-    "[BumpReminder] Failed to handle panel button",
+    "Failed to handle panel button",
   "bump-reminder.panel_reply_failed":
-    "[BumpReminder] Failed to send error reply for panel button",
+    "Failed to send error reply for panel button",
   // BumpReminder admin command operation logs
   "bump-reminder.config_enabled":
-    "[BumpReminder] enabled GuildId: {{guildId}} ChannelId: {{channelId}}",
+    "enabled GuildId: {{guildId}} ChannelId: {{channelId}}",
   "bump-reminder.config_disabled":
-    "[BumpReminder] disabled GuildId: {{guildId}}",
+    "disabled GuildId: {{guildId}}",
   "bump-reminder.config_mention_set":
-    "[BumpReminder] mention role set GuildId: {{guildId}} RoleId: {{roleId}}",
+    "mention role set GuildId: {{guildId}} RoleId: {{roleId}}",
   "bump-reminder.config_mention_removed":
-    "[BumpReminder] mention settings removed GuildId: {{guildId}} Target: {{target}}",
+    "mention settings removed GuildId: {{guildId}} Target: {{target}}",
   "bump-reminder.config_users_removed":
-    "[BumpReminder] mention users removed GuildId: {{guildId}} UserIds: {{userIds}}",
+    "mention users removed GuildId: {{guildId}} UserIds: {{userIds}}",
 
   // Error handling
   // Generic process-level failure and cleanup traces
   "error.reply_failed":
-    "[Bot] Failed to send error message",
+    "Failed to send error message",
   "error.unhandled_rejection":
-    "[Bot] Unhandled Promise rejection:",
+    "Unhandled Promise rejection:",
   "error.uncaught_exception":
-    "[Bot] Uncaught exception:",
+    "Uncaught exception:",
   "error.unhandled_rejection_log":
-    "[Bot] Unhandled Promise Rejection:",
+    "Unhandled Promise Rejection:",
   "error.uncaught_exception_log":
-    "[Bot] Uncaught Exception:",
+    "Uncaught Exception:",
   "error.node_warning":
-    "[Bot] Node Warning:",
+    "Node Warning:",
   "error.global_handlers_already_registered":
-    "[Bot] Global error handlers already registered, skipping.",
+    "Global error handlers already registered, skipping.",
   "error.shutdown_handlers_already_registered":
-    "[Bot] Graceful shutdown handlers already registered, skipping.",
+    "Graceful shutdown handlers already registered, skipping.",
 
   // Locale
   "locale.manager_initialized":
-    "[Bot] LocaleManager initialized with i18next",
+    "LocaleManager initialized with i18next",
 
   // Cooldown manager
   "cooldown.cleared_all":
-    "[Cooldown] All cooldowns cleared",
+    "All cooldowns cleared",
   "cooldown.destroyed":
-    "[Cooldown] CooldownManager destroyed",
+    "CooldownManager destroyed",
   "cooldown.reset":
-    "[Cooldown] Reset CommandName: {{commandName}} UserId: {{userId}}",
+    "Reset CommandName: {{commandName}} UserId: {{userId}}",
   "cooldown.cleared_for_command":
-    "[Cooldown] Cleared all for command CommandName: {{commandName}}",
+    "Cleared all for command CommandName: {{commandName}}",
   "cooldown.cleanup":
-    "[Cooldown] Removed {{count}} expired cooldowns",
+    "Removed {{count}} expired cooldowns",
 
   // Scheduler
   // Generic job lifecycle logs
   // Common scheduler traces shared by reminder and other jobs
   // `scheduler.*` is consumed across both runtime scheduler and startup restoration
   "scheduler.stopping":
-    "[Scheduler] Stopping all scheduled jobs...",
+    "Stopping all scheduled jobs...",
   "scheduler.job_exists":
-    "[Scheduler] Job already exists, removing old job JobId: {{jobId}}",
+    "Job already exists, removing old job JobId: {{jobId}}",
   "scheduler.executing_job":
-    "[Scheduler] Executing job JobId: {{jobId}}",
+    "Executing job JobId: {{jobId}}",
   "scheduler.job_completed":
-    "[Scheduler] Job completed JobId: {{jobId}}",
+    "Job completed JobId: {{jobId}}",
   "scheduler.job_error":
-    "[Scheduler] Job error JobId: {{jobId}}",
+    "Job error JobId: {{jobId}}",
   "scheduler.schedule_failed":
-    "[Scheduler] Failed to schedule job JobId: {{jobId}}",
+    "Failed to schedule job JobId: {{jobId}}",
   "scheduler.job_removed":
-    "[Scheduler] Job removed JobId: {{jobId}}",
+    "Job removed JobId: {{jobId}}",
   "scheduler.job_stopped":
-    "[Scheduler] Job stopped JobId: {{jobId}}",
+    "Job stopped JobId: {{jobId}}",
   "scheduler.job_scheduled":
-    "[Scheduler] Job scheduled JobId: {{jobId}}",
+    "Job scheduled JobId: {{jobId}}",
   // Bump reminder scheduling / restoration logs
   // Keys below are intentionally split by lifecycle: schedule / execute / restore / panel-cleanup
   "scheduler.bump_reminder_task_failed":
-    "[BumpReminder] Task failed GuildId: {{guildId}}",
+    "Task failed GuildId: {{guildId}}",
   "scheduler.bump_reminder_description":
-    "[BumpReminder] GuildId: {{guildId}} ExecuteAt: {{executeAt}}",
+    "GuildId: {{guildId}} ExecuteAt: {{executeAt}}",
   "scheduler.bump_reminder_scheduled":
-    "[BumpReminder] Scheduled reminder in {{minutes}} minutes GuildId: {{guildId}}",
+    "Scheduled reminder in {{minutes}} minutes GuildId: {{guildId}}",
   "scheduler.bump_reminder_cancelling":
-    "[BumpReminder] Cancelling existing reminder GuildId: {{guildId}}",
+    "Cancelling existing reminder GuildId: {{guildId}}",
   "scheduler.bump_reminder_cancelled":
-    "[BumpReminder] Reminder cancelled GuildId: {{guildId}}",
+    "Reminder cancelled GuildId: {{guildId}}",
   "scheduler.bump_reminder_executing_immediately":
-    "[BumpReminder] Executing overdue reminder immediately GuildId: {{guildId}}",
+    "Executing overdue reminder immediately GuildId: {{guildId}}",
   "scheduler.bump_reminders_restored":
-    "[BumpReminder] Restored {{count}} pending reminders",
+    "Restored {{count}} pending reminders",
   "scheduler.bump_reminders_restored_none":
-    "[BumpReminder] No pending reminders to restore",
+    "No pending reminders to restore",
   "scheduler.bump_reminder_sent":
-    "[BumpReminder] Reminder sent GuildId: {{guildId}} ChannelId: {{channelId}}",
+    "Reminder sent GuildId: {{guildId}} ChannelId: {{channelId}}",
   "scheduler.bump_reminder_send_failed":
-    "[BumpReminder] Reminder send failed GuildId: {{guildId}} ChannelId: {{channelId}}",
+    "Reminder send failed GuildId: {{guildId}} ChannelId: {{channelId}}",
   "scheduler.bump_reminder_channel_not_found":
-    "[BumpReminder] Channel not found GuildId: {{guildId}} ChannelId: {{channelId}}",
+    "Channel not found GuildId: {{guildId}} ChannelId: {{channelId}}",
   "scheduler.bump_reminder_disabled":
-    "[BumpReminder] Disabled GuildId: {{guildId}}",
+    "Disabled GuildId: {{guildId}}",
   "scheduler.bump_reminder_restore_failed":
-    "[BumpReminder] Failed to restore:",
+    "Failed to restore:",
   "scheduler.bump_reminder_duplicates_cancelled":
-    "[BumpReminder] Cancelled {{count}} duplicate reminders",
+    "Cancelled {{count}} duplicate reminders",
   "scheduler.bump_reminder_duplicates_none":
-    "[BumpReminder] No duplicate reminders to cancel",
+    "No duplicate reminders to cancel",
   // Panel synchronization and channel consistency logs
   // Keep panel-related keys contiguous to simplify grep-based incident review
   "scheduler.bump_reminder_unregistered_channel":
-    "[BumpReminder] Skipping unregistered channel GuildId: {{guildId}} ChannelId: {{channelId}} ExpectedChannelId: {{expectedChannelId}}",
+    "Skipping unregistered channel GuildId: {{guildId}} ChannelId: {{channelId}} ExpectedChannelId: {{expectedChannelId}}",
   "scheduler.bump_reminder_orphaned_panel_delete_failed":
-    "[BumpReminder] Failed to delete orphaned panel message PanelMessageId: {{panelMessageId}}",
+    "Failed to delete orphaned panel message PanelMessageId: {{panelMessageId}}",
   "scheduler.bump_reminder_panel_deleted":
-    "[BumpReminder] Deleted panel message GuildId: {{guildId}} PanelMessageId: {{panelMessageId}}",
+    "Deleted panel message GuildId: {{guildId}} PanelMessageId: {{panelMessageId}}",
   "scheduler.bump_reminder_panel_delete_failed":
-    "[BumpReminder] Failed to delete panel message PanelMessageId: {{panelMessageId}}",
+    "Failed to delete panel message PanelMessageId: {{panelMessageId}}",
   "scheduler.bump_reminder_panel_send_failed":
-    "[BumpReminder] Failed to send panel",
+    "Failed to send panel",
 
   // Shutdown
   "shutdown.signal_received":
-    "[Bot] {{signal}} received, shutting down gracefully...",
+    "{{signal}} received, shutting down gracefully...",
   "shutdown.already_in_progress":
-    "[Bot] {{signal}} received, but shutdown is already in progress.",
+    "{{signal}} received, but shutdown is already in progress.",
   "shutdown.cleanup_complete":
-    "[Bot] Cleanup completed",
+    "Cleanup completed",
   "shutdown.cleanup_failed":
-    "[Bot] Error during cleanup:",
+    "Error during cleanup:",
   "shutdown.gracefully":
-    "[Bot] Shutting down gracefully...",
+    "Shutting down gracefully...",
   "shutdown.sigterm":
-    "[Bot] Received SIGTERM, shutting down...",
+    "Received SIGTERM, shutting down...",
 
   // Database operation logs
   // Prisma client availability
   "database.prisma_not_available":
-    "[Database] Prisma client is not available",
+    "Prisma client is not available",
   // GuildConfig operation logs
   // Key-value style persistence logs for guild-scoped config
   "database.get_config_log":
-    "[Database] Failed to get config GuildId: {{guildId}}",
+    "Failed to get config GuildId: {{guildId}}",
   "database.save_config_log":
-    "[Database] Failed to save config GuildId: {{guildId}}",
+    "Failed to save config GuildId: {{guildId}}",
   "database.saved_config":
-    "[Database] Config saved GuildId: {{guildId}}",
+    "Config saved GuildId: {{guildId}}",
   "database.update_config_log":
-    "[Database] Failed to update config GuildId: {{guildId}}",
+    "Failed to update config GuildId: {{guildId}}",
   "database.updated_config":
-    "[Database] Config updated GuildId: {{guildId}}",
+    "Config updated GuildId: {{guildId}}",
   "database.delete_config_log":
-    "[Database] Failed to delete config GuildId: {{guildId}}",
+    "Failed to delete config GuildId: {{guildId}}",
   "database.deleted_config":
-    "[Database] Config deleted GuildId: {{guildId}}",
+    "Config deleted GuildId: {{guildId}}",
   "database.check_existence_log":
-    "[Database] Failed to check existence GuildId: {{guildId}}",
+    "Failed to check existence GuildId: {{guildId}}",
 
   // Bump Reminder database operations
   // BumpReminder table operation logs
   // Persistence lifecycle logs for reminder records
   "database.bump_reminder_created":
-    "[Database] Bump reminder created Id: {{id}} GuildId: {{guildId}}",
+    "Bump reminder created Id: {{id}} GuildId: {{guildId}}",
   "database.bump_reminder_create_failed":
-    "[Database] Failed to create bump reminder GuildId: {{guildId}}",
+    "Failed to create bump reminder GuildId: {{guildId}}",
   "database.bump_reminder_find_failed":
-    "[Database] Failed to find bump reminder Id: {{id}}",
+    "Failed to find bump reminder Id: {{id}}",
   "database.bump_reminder_find_all_failed":
-    "[Database] Failed to find pending bump reminders",
+    "Failed to find pending bump reminders",
   "database.bump_reminder_status_updated":
-    "[Database] Bump reminder status updated Id: {{id}} Status: {{status}}",
+    "Bump reminder status updated Id: {{id}} Status: {{status}}",
   "database.bump_reminder_update_failed":
-    "[Database] Failed to update bump reminder Id: {{id}}",
+    "Failed to update bump reminder Id: {{id}}",
   "database.bump_reminder_deleted":
-    "[Database] Bump reminder deleted Id: {{id}}",
+    "Bump reminder deleted Id: {{id}}",
   "database.bump_reminder_delete_failed":
-    "[Database] Failed to delete bump reminder Id: {{id}}",
+    "Failed to delete bump reminder Id: {{id}}",
   "database.bump_reminder_cancelled_by_guild":
-    "[Database] Cancelled pending bump reminders GuildId: {{guildId}}",
+    "Cancelled pending bump reminders GuildId: {{guildId}}",
   "database.bump_reminder_cancelled_by_channel":
-    "[Database] Cancelled pending bump reminders GuildId: {{guildId}} ChannelId: {{channelId}}",
+    "Cancelled pending bump reminders GuildId: {{guildId}} ChannelId: {{channelId}}",
   "database.bump_reminder_cancel_failed":
-    "[Database] Failed to cancel bump reminders GuildId: {{guildId}}",
+    "Failed to cancel bump reminders GuildId: {{guildId}}",
   "database.bump_reminder_cleanup_completed":
-    "[Database] Cleaned up {{count}} old bump reminders older than {{days}} days",
+    "Cleaned up {{count}} old bump reminders older than {{days}} days",
   "database.bump_reminder_cleanup_failed":
-    "[Database] Failed to cleanup old bump reminders:",
+    "Failed to cleanup old bump reminders:",
 
   // Sticky message database operations
   // StickyMessage table operation logs
   "database.sticky_message_find_by_channel_failed":
-    "[Database] Failed to find sticky message ChannelId: {{channelId}}",
+    "Failed to find sticky message ChannelId: {{channelId}}",
   "database.sticky_message_find_all_by_guild_failed":
-    "[Database] Failed to find all sticky messages GuildId: {{guildId}}",
+    "Failed to find all sticky messages GuildId: {{guildId}}",
   "database.sticky_message_create_failed":
-    "[Database] Failed to create sticky message GuildId: {{guildId}} ChannelId: {{channelId}}",
+    "Failed to create sticky message GuildId: {{guildId}} ChannelId: {{channelId}}",
   "database.sticky_message_update_last_message_id_failed":
-    "[Database] Failed to update sticky message lastMessageId Id: {{id}}",
+    "Failed to update sticky message lastMessageId Id: {{id}}",
   "database.sticky_message_update_content_failed":
-    "[Database] Failed to update sticky message content Id: {{id}}",
+    "Failed to update sticky message content Id: {{id}}",
   "database.sticky_message_delete_failed":
-    "[Database] Failed to delete sticky message Id: {{id}}",
+    "Failed to delete sticky message Id: {{id}}",
   "database.sticky_message_delete_by_channel_failed":
-    "[Database] Failed to delete sticky message by channel ChannelId: {{channelId}}",
+    "Failed to delete sticky message by channel ChannelId: {{channelId}}",
 
   // UserSetting DB operations
   // user_settings table operation logs
   "database.user_setting_find_failed":
-    "[Database] Failed to find user setting UserId: {{userId}} GuildId: {{guildId}}",
+    "Failed to find user setting UserId: {{userId}} GuildId: {{guildId}}",
   "database.user_setting_upsert_failed":
-    "[Database] Failed to upsert user setting UserId: {{userId}} GuildId: {{guildId}}",
+    "Failed to upsert user setting UserId: {{userId}} GuildId: {{guildId}}",
 
   // VAC database operation logs
   "database.vac_trigger_added":
-    "[Database] VAC trigger channel added GuildId: {{guildId}} ChannelId: {{channelId}}",
+    "VAC trigger channel added GuildId: {{guildId}} ChannelId: {{channelId}}",
   "database.vac_trigger_add_failed":
-    "[Database] Failed to add VAC trigger channel GuildId: {{guildId}} ChannelId: {{channelId}}",
+    "Failed to add VAC trigger channel GuildId: {{guildId}} ChannelId: {{channelId}}",
   "database.vac_trigger_removed":
-    "[Database] VAC trigger channel removed GuildId: {{guildId}} ChannelId: {{channelId}}",
+    "VAC trigger channel removed GuildId: {{guildId}} ChannelId: {{channelId}}",
   "database.vac_trigger_remove_failed":
-    "[Database] Failed to remove VAC trigger channel GuildId: {{guildId}} ChannelId: {{channelId}}",
+    "Failed to remove VAC trigger channel GuildId: {{guildId}} ChannelId: {{channelId}}",
   "database.vac_channel_registered":
-    "[Database] VAC managed channel registered GuildId: {{guildId}} ChannelId: {{voiceChannelId}}",
+    "VAC managed channel registered GuildId: {{guildId}} ChannelId: {{voiceChannelId}}",
   "database.vac_channel_register_failed":
-    "[Database] Failed to register VAC managed channel GuildId: {{guildId}} ChannelId: {{voiceChannelId}}",
+    "Failed to register VAC managed channel GuildId: {{guildId}} ChannelId: {{voiceChannelId}}",
   "database.vac_channel_unregistered":
-    "[Database] VAC managed channel unregistered GuildId: {{guildId}} ChannelId: {{voiceChannelId}}",
+    "VAC managed channel unregistered GuildId: {{guildId}} ChannelId: {{voiceChannelId}}",
   "database.vac_channel_unregister_failed":
-    "[Database] Failed to unregister VAC managed channel GuildId: {{guildId}} ChannelId: {{voiceChannelId}}",
+    "Failed to unregister VAC managed channel GuildId: {{guildId}} ChannelId: {{voiceChannelId}}",
 
   // AFK database operation logs
   "database.afk_channel_set":
-    "[Database] AFK channel set GuildId: {{guildId}} ChannelId: {{channelId}}",
+    "AFK channel set GuildId: {{guildId}} ChannelId: {{channelId}}",
   "database.afk_channel_set_failed":
-    "[Database] Failed to set AFK channel GuildId: {{guildId}} ChannelId: {{channelId}}",
+    "Failed to set AFK channel GuildId: {{guildId}} ChannelId: {{channelId}}",
   "database.afk_config_saved":
-    "[Database] AFK config saved GuildId: {{guildId}}",
+    "AFK config saved GuildId: {{guildId}}",
   "database.afk_config_save_failed":
-    "[Database] Failed to save AFK config GuildId: {{guildId}}",
+    "Failed to save AFK config GuildId: {{guildId}}",
 
   // Bot startup event logs
   // Human-readable startup summary logs
   // These are mostly operator-facing summary lines on ready
   "ready.bot_ready":
-    "[Bot] ✅ Bot is ready! Logged in as {{tag}}",
+    "✅ Bot is ready! Logged in as {{tag}}",
   "ready.servers":
-    "[Bot] 📊 Servers: {{count}}",
+    "📊 Servers: {{count}}",
   "ready.users":
-    "[Bot] 👥 Users: {{count}}",
+    "👥 Users: {{count}}",
   "ready.commands":
-    "[Bot] 💬 Commands: {{count}}",
+    "💬 Commands: {{count}}",
   "ready.event_registered":
     "  ✓ {{name}}",
 
@@ -293,111 +317,111 @@ export const system = {
   // Unified interaction execution and failure logs
   // Keep interaction keys contiguous because handlers share common error paths
   "interaction.unknown_command":
-    "[Interaction] Unknown command CommandName: {{commandName}}",
+    "Unknown command CommandName: {{commandName}}",
   "interaction.command_executed":
-    "[Interaction] Command executed CommandName: {{commandName}} UserId: {{userId}}",
+    "Command executed CommandName: {{commandName}} UserId: {{userId}}",
   "interaction.command_error":
-    "[Interaction] Command error CommandName: {{commandName}}",
+    "Command error CommandName: {{commandName}}",
   "interaction.autocomplete_error":
-    "[Interaction] Autocomplete error CommandName: {{commandName}}",
+    "Autocomplete error CommandName: {{commandName}}",
   "interaction.unknown_modal":
-    "[Interaction] Unknown modal CustomId: {{customId}}",
+    "Unknown modal CustomId: {{customId}}",
   "interaction.modal_submitted":
-    "[Interaction] Modal submitted CustomId: {{customId}} UserId: {{userId}}",
+    "Modal submitted CustomId: {{customId}} UserId: {{userId}}",
   "interaction.modal_error":
-    "[Interaction] Modal error CustomId: {{customId}}",
+    "Modal error CustomId: {{customId}}",
   "interaction.button_error":
-    "[Interaction] Button error CustomId: {{customId}}",
+    "Button error CustomId: {{customId}}",
   "interaction.select_menu_error":
-    "[Interaction] Select menu error CustomId: {{customId}}",
+    "Select menu error CustomId: {{customId}}",
 
   // Sticky message feature logs
   // Runtime logs from handler and service layers
   "sticky-message.channel_delete_cleanup":
-    "[StickyMessage] Cleaned up on channel delete ChannelId: {{channelId}}",
+    "Cleaned up on channel delete ChannelId: {{channelId}}",
   "sticky-message.channel_delete_cleanup_failed":
-    "[StickyMessage] Failed to delete record on channel delete ChannelId: {{channelId}}",
+    "Failed to delete record on channel delete ChannelId: {{channelId}}",
   "sticky-message.create_handler_error":
-    "[StickyMessage] messageCreate handler error ChannelId: {{channelId}} GuildId: {{guildId}}",
+    "messageCreate handler error ChannelId: {{channelId}} GuildId: {{guildId}}",
   "sticky-message.resend_scheduled_error":
-    "[StickyMessage] Resend scheduled error",
+    "Resend scheduled error",
   "sticky-message.send_failed":
-    "[StickyMessage] Failed to send message ChannelId: {{channelId}} GuildId: {{guildId}}",
+    "Failed to send message ChannelId: {{channelId}} GuildId: {{guildId}}",
   "sticky-message.previous_deleted_or_not_found":
-    "[StickyMessage] Previous message already deleted or not found ChannelId: {{channelId}}",
+    "Previous message already deleted or not found ChannelId: {{channelId}}",
   "sticky-message.set_failed":
-    "[StickyMessage] Failed to set via modal ChannelId: {{channelId}} GuildId: {{guildId}}",
+    "Failed to set via modal ChannelId: {{channelId}} GuildId: {{guildId}}",
   "sticky-message.set_embed_failed":
-    "[StickyMessage] Failed to set via embed modal ChannelId: {{channelId}} GuildId: {{guildId}}",
+    "Failed to set via embed modal ChannelId: {{channelId}} GuildId: {{guildId}}",
   "sticky-message.update_failed":
-    "[StickyMessage] Failed to update via modal ChannelId: {{channelId}} GuildId: {{guildId}}",
+    "Failed to update via modal ChannelId: {{channelId}} GuildId: {{guildId}}",
   "sticky-message.update_embed_failed":
-    "[StickyMessage] Failed to update via embed modal ChannelId: {{channelId}} GuildId: {{guildId}}",
+    "Failed to update via embed modal ChannelId: {{channelId}} GuildId: {{guildId}}",
   "sticky-message.resend_after_update_failed":
-    "[StickyMessage] Failed to resend after update ChannelId: {{channelId}}",
+    "Failed to resend after update ChannelId: {{channelId}}",
   "sticky-message.resend_after_embed_update_failed":
-    "[StickyMessage] Failed to resend after embed update ChannelId: {{channelId}}",
+    "Failed to resend after embed update ChannelId: {{channelId}}",
 
   // AFK command logs
   "afk.moved":
-    "[AFK] moved user to AFK channel GuildId: {{guildId}} UserId: {{userId}} ChannelId: {{channelId}}",
+    "moved user to AFK channel GuildId: {{guildId}} UserId: {{userId}} ChannelId: {{channelId}}",
   "afk.configured":
-    "[AFK] channel configured GuildId: {{guildId}} ChannelId: {{channelId}}",
+    "channel configured GuildId: {{guildId}} ChannelId: {{channelId}}",
 
   // VAC logs
   // Voice-state / channel lifecycle / panel operation logs
   // Keep VAC runtime keys grouped for easier operator triage during incidents
   // VAC startup cleanup logs
   "vac.startup_cleanup_stale_trigger_removed":
-    "[VAC] Startup cleanup: removed stale trigger channel GuildId: {{guildId}} ChannelId: {{channelId}}",
+    "Startup cleanup: removed stale trigger channel GuildId: {{guildId}} ChannelId: {{channelId}}",
   "vac.startup_cleanup_orphaned_channel_removed":
-    "[VAC] Startup cleanup: removed orphaned VAC channel from DB GuildId: {{guildId}} ChannelId: {{channelId}}",
+    "Startup cleanup: removed orphaned VAC channel from DB GuildId: {{guildId}} ChannelId: {{channelId}}",
   "vac.startup_cleanup_empty_channel_deleted":
-    "[VAC] Startup cleanup: deleted empty VAC channel GuildId: {{guildId}} ChannelId: {{channelId}}",
+    "Startup cleanup: deleted empty VAC channel GuildId: {{guildId}} ChannelId: {{channelId}}",
   "vac.startup_cleanup_done":
-    "[VAC] Startup cleanup done: removed {{removedTriggers}} triggers and {{removedChannels}} channels",
+    "Startup cleanup done: removed {{removedTriggers}} triggers and {{removedChannels}} channels",
   "vac.startup_cleanup_done_none":
-    "[VAC] Startup cleanup done No inconsistencies found",
+    "Startup cleanup done No inconsistencies found",
   "vac.voice_state_update_failed":
-    "[VAC] Failed to process voiceStateUpdate",
+    "Failed to process voiceStateUpdate",
   "vac.channel_created":
-    "[VAC] channel created GuildId: {{guildId}} ChannelId: {{channelId}} OwnerId: {{ownerId}}",
+    "channel created GuildId: {{guildId}} ChannelId: {{channelId}} OwnerId: {{ownerId}}",
   "vac.channel_deleted":
-    "[VAC] channel deleted GuildId: {{guildId}} ChannelId: {{channelId}}",
+    "channel deleted GuildId: {{guildId}} ChannelId: {{channelId}}",
   "vac.category_full":
-    "[VAC] category reached channel limit GuildId: {{guildId}} CategoryId: {{categoryId}}",
+    "category reached channel limit GuildId: {{guildId}} CategoryId: {{categoryId}}",
   "vac.trigger_removed_by_delete":
-    "[VAC] removed deleted trigger channel from config GuildId: {{guildId}} ChannelId: {{channelId}}",
+    "removed deleted trigger channel from config GuildId: {{guildId}} ChannelId: {{channelId}}",
   "vac.channel_delete_sync_failed":
-    "[VAC] Failed to sync config on channelDelete",
+    "Failed to sync config on channelDelete",
   "vac.panel_send_failed":
-    "[VAC] Failed to send control panel",
+    "Failed to send control panel",
   "vac.startup_cleanup_failed":
-    "[VAC] Startup cleanup failed",
+    "Startup cleanup failed",
 
   // Web server
   // Startup and exception handling
   // HTTP process and request pipeline logs for the web module
   "web.server_started":
-    "[WebServer] Started URL: {{url}}",
+    "Started URL: {{url}}",
   "web.startup_error":
-    "[WebServer] Startup error:",
+    "Startup error:",
   "web.unhandled_rejection":
-    "[WebServer] Unhandled Promise rejection:",
+    "Unhandled Promise rejection:",
   "web.uncaught_exception":
-    "[WebServer] Uncaught exception:",
+    "Uncaught exception:",
   "web.startup_failed":
-    "[WebServer] Startup failed:",
+    "Startup failed:",
   "web.api_error":
-    "[WebServer] API Error:",
+    "API Error:",
   "web.internal_server_error":
-    "[WebServer] Internal Server Error",
+    "Internal Server Error",
   // API authentication (Bearer API key)
   // Request-level auth result logs and user-facing messages
   "web.auth_unauthorized":
-    "[WebServer] [Auth] Unauthorized request Method: {{method}} URL: {{url}}",
+    "[Auth] Unauthorized request Method: {{method}} URL: {{url}}",
   "web.auth_invalid_token":
-    "[WebServer] [Auth] Invalid token Method: {{method}} URL: {{url}}",
+    "[Auth] Invalid token Method: {{method}} URL: {{url}}",
   "web.auth_unauthorized_error":
     "Unauthorized",
   "web.auth_forbidden_error":
@@ -415,34 +439,34 @@ export const system = {
   // Member log feature logs
   // guildMemberAdd/Remove event processing outcome logs
   "member-log.join_notification_sent":
-    "[MemberLog] join notification sent GuildId: {{guildId}} UserId: {{userId}}",
+    "join notification sent GuildId: {{guildId}} UserId: {{userId}}",
   "member-log.leave_notification_sent":
-    "[MemberLog] leave notification sent GuildId: {{guildId}} UserId: {{userId}}",
+    "leave notification sent GuildId: {{guildId}} UserId: {{userId}}",
   "member-log.notification_failed":
-    "[MemberLog] failed to send notification GuildId: {{guildId}}",
+    "failed to send notification GuildId: {{guildId}}",
   "member-log.channel_not_found":
-    "[MemberLog] channel not found GuildId: {{guildId}} ChannelId: {{channelId}}",
+    "channel not found GuildId: {{guildId}} ChannelId: {{channelId}}",
   "member-log.channel_deleted_config_cleared":
-    "[MemberLog] channel deleted, config cleared GuildId: {{guildId}} ChannelId: {{channelId}}",
+    "channel deleted, config cleared GuildId: {{guildId}} ChannelId: {{channelId}}",
   // Config command operation logs
   "member-log.config_set_channel":
-    "[MemberLog] channel configured GuildId: {{guildId}} ChannelId: {{channelId}}",
+    "channel configured GuildId: {{guildId}} ChannelId: {{channelId}}",
   "member-log.config_enabled":
-    "[MemberLog] enabled GuildId: {{guildId}}",
+    "enabled GuildId: {{guildId}}",
   "member-log.config_disabled":
-    "[MemberLog] disabled GuildId: {{guildId}}",
+    "disabled GuildId: {{guildId}}",
   "member-log.config_join_message_set":
-    "[MemberLog] join message set GuildId: {{guildId}}",
+    "join message set GuildId: {{guildId}}",
   "member-log.config_leave_message_set":
-    "[MemberLog] leave message set GuildId: {{guildId}}",
+    "leave message set GuildId: {{guildId}}",
   "member-log.config_join_message_cleared":
-    "[MemberLog] join message cleared GuildId: {{guildId}}",
+    "join message cleared GuildId: {{guildId}}",
   "member-log.config_leave_message_cleared":
-    "[MemberLog] leave message cleared GuildId: {{guildId}}",
+    "leave message cleared GuildId: {{guildId}}",
 
   // Translation system
   "locale.translation_failed":
-    "[Bot] Translation failed for key: {{key}}",
+    "Translation failed for key: {{key}}",
 
   // Error utilities
   "error.base_error_log":
@@ -452,73 +476,73 @@ export const system = {
 
   // JSON utilities
   "json.parse_array_failed":
-    "[JSON] parseJsonArray: failed to parse, returning empty array. value=\"{{value}}\" error=\"{{error}}\"",
+    "parseJsonArray: failed to parse, returning empty array. value=\"{{value}}\" error=\"{{error}}\"",
 
   // VC Recruit feature logs
   "vc-recruit.voice_state_update_failed":
-    "[VcRecruit] Failed to process voiceStateUpdate",
+    "Failed to process voiceStateUpdate",
   "vc-recruit.empty_vc_deleted":
-    "[VcRecruit] Deleted empty VC GuildId: {{guildId}} ChannelId: {{channelId}} ChannelName: {{channelName}}",
+    "Deleted empty VC GuildId: {{guildId}} ChannelId: {{channelId}} ChannelName: {{channelName}}",
   "vc-recruit.voice_state_update_error":
-    "[VcRecruit] voiceStateUpdate processing error",
+    "voiceStateUpdate processing error",
   "vc-recruit.panel_channel_delete_detected":
-    "[VcRecruit] Panel channel deletion detected, deleting post channel and setup GuildId: {{guildId}} PanelChannelId: {{panelChannelId}}",
+    "Panel channel deletion detected, deleting post channel and setup GuildId: {{guildId}} PanelChannelId: {{panelChannelId}}",
   "vc-recruit.post_channel_delete_failed":
-    "[VcRecruit] Failed to delete post channel GuildId: {{guildId}} PostChannelId: {{postChannelId}}",
+    "Failed to delete post channel GuildId: {{guildId}} PostChannelId: {{postChannelId}}",
   "vc-recruit.post_channel_delete_detected":
-    "[VcRecruit] Post channel deletion detected, deleting panel channel and setup GuildId: {{guildId}} PostChannelId: {{postChannelId}}",
+    "Post channel deletion detected, deleting panel channel and setup GuildId: {{guildId}} PostChannelId: {{postChannelId}}",
   "vc-recruit.panel_channel_cleanup_failed":
-    "[VcRecruit] Failed to delete panel channel GuildId: {{guildId}} PanelChannelId: {{panelChannelId}}",
+    "Failed to delete panel channel GuildId: {{guildId}} PanelChannelId: {{panelChannelId}}",
   "vc-recruit.created_vc_manual_delete_detected":
-    "[VcRecruit] Created VC manual deletion detected, updating DB and marking post button as ended GuildId: {{guildId}} VcId: {{vcId}}",
+    "Created VC manual deletion detected, updating DB and marking post button as ended GuildId: {{guildId}} VcId: {{vcId}}",
   "vc-recruit.channel_created":
-    "[VcRecruit] new VC created GuildId: {{guildId}} ChannelId: {{channelId}}",
+    "new VC created GuildId: {{guildId}} ChannelId: {{channelId}}",
   "vc-recruit.channel_deleted":
-    "[VcRecruit] VC deleted GuildId: {{guildId}} ChannelId: {{channelId}}",
+    "VC deleted GuildId: {{guildId}} ChannelId: {{channelId}}",
   "vc-recruit.recruit_posted":
-    "[VcRecruit] recruit message posted GuildId: {{guildId}} UserId: {{userId}}",
+    "recruit message posted GuildId: {{guildId}} UserId: {{userId}}",
   "vc-recruit.setup_created":
-    "[VcRecruit] setup created GuildId: {{guildId}} CategoryId: {{categoryId}}",
+    "setup created GuildId: {{guildId}} CategoryId: {{categoryId}}",
   "vc-recruit.setup_removed":
-    "[VcRecruit] setup removed GuildId: {{guildId}} CategoryId: {{categoryId}}",
+    "setup removed GuildId: {{guildId}} CategoryId: {{categoryId}}",
   "vc-recruit.panel_delete_detected":
-    "[VcRecruit] panel message deletion detected, resending panel GuildId: {{guildId}} PanelChannelId: {{panelChannelId}} MessageId: {{messageId}}",
+    "panel message deletion detected, resending panel GuildId: {{guildId}} PanelChannelId: {{panelChannelId}} MessageId: {{messageId}}",
   "vc-recruit.panel_resent":
-    "[VcRecruit] panel message resent GuildId: {{guildId}} PanelChannelId: {{panelChannelId}} NewMessageId: {{newMessageId}}",
+    "panel message resent GuildId: {{guildId}} PanelChannelId: {{panelChannelId}} NewMessageId: {{newMessageId}}",
 
   // Message Delete feature logs
   "message-delete.cmd_all_channels_start":
-    "[MsgDel][CMD] fetching all channels",
+    "fetching all channels",
   "message-delete.cmd_channel_count":
-    "[MsgDel][CMD] channel count={{count}}",
+    "channel count={{count}}",
   "message-delete.svc_scan_start":
-    "[MsgDel][SVC] scan start channels={{channelCount}} count={{count}} targetUserIds={{targetUserIds}}",
+    "scan start channels={{channelCount}} count={{count}} targetUserIds={{targetUserIds}}",
   "message-delete.svc_initial_fetch":
-    "[MsgDel][SVC] initial fetch ch={{channelId}}",
+    "initial fetch ch={{channelId}}",
   "message-delete.svc_refill":
-    "[MsgDel][SVC] refill ch={{channelId}} before={{lastId}}",
+    "refill ch={{channelId}} before={{lastId}}",
   "message-delete.svc_scan_complete":
-    "[MsgDel][SVC] scan complete total={{count}}",
+    "scan complete total={{count}}",
   "message-delete.svc_channel_no_access":
-    "[MsgDel] channel {{channelId}} skipped (no access)",
+    "channel {{channelId}} skipped (no access)",
   "message-delete.svc_bulk_delete_chunk":
-    "[MsgDel][SVC] bulkDelete chunk size={{size}}",
+    "bulkDelete chunk size={{size}}",
   "message-delete.svc_message_delete_failed":
-    "[MsgDel] failed to delete messageId={{messageId}}: {{error}}",
+    "failed to delete messageId={{messageId}}: {{error}}",
   "message-delete.scan_error":
-    "[MsgDel] scan error: {{error}}",
+    "scan error: {{error}}",
   "message-delete.delete_error":
-    "[MsgDel] delete error: {{error}}",
+    "delete error: {{error}}",
   "message-delete.deleted":
-    "[MsgDel] {{userId}} deleted {{count}} messages{{countPart}}{{targetPart}}{{keywordPart}}{{periodPart}} channels=[{{channels}}]",
+    "{{userId}} deleted {{count}} messages{{countPart}}{{targetPart}}{{keywordPart}}{{periodPart}} channels=[{{channels}}]",
   "message-delete.lock_acquired":
-    "[MsgDel] lock acquired: guild={{guildId}}",
+    "lock acquired: guild={{guildId}}",
   "message-delete.lock_released":
-    "[MsgDel] lock released: guild={{guildId}}",
+    "lock released: guild={{guildId}}",
   "message-delete.cancel_collector_ended":
-    "[MsgDel] Scan cancelCollector ended: reason={{reason}}",
+    "Scan cancelCollector ended: reason={{reason}}",
   "message-delete.aborting_non_user_end":
-    "[MsgDel] Aborting scan due to non-user end",
+    "Aborting scan due to non-user end",
 } as const;
 
 export type SystemTranslations = typeof system;

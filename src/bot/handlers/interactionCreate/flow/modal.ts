@@ -2,7 +2,7 @@
 // モーダル送信処理
 
 import type { ModalSubmitInteraction } from "discord.js";
-import { tDefault } from "../../../../shared/locale/localeManager";
+import { logPrefixed } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import { handleInteractionError } from "../../../errors/interactionErrorHandler";
 import { modalHandlers } from "../ui/modals";
@@ -19,9 +19,12 @@ export async function handleModalSubmit(
   );
   if (!registryHandler) {
     logger.warn(
-      tDefault("system:interaction.unknown_modal", {
-        customId: interaction.customId,
-      }),
+      logPrefixed(
+        "system:log_prefix.interaction_create",
+        "system:interaction.unknown_modal",
+        { customId: interaction.customId },
+        "modal",
+      ),
     );
     return;
   }
@@ -29,17 +32,22 @@ export async function handleModalSubmit(
   try {
     await registryHandler.execute(interaction);
     logger.debug(
-      tDefault("system:interaction.modal_submitted", {
-        customId: interaction.customId,
-        userId: interaction.user.id,
-      }),
+      logPrefixed(
+        "system:log_prefix.interaction_create",
+        "system:interaction.modal_submitted",
+        { customId: interaction.customId, userId: interaction.user.id },
+        "modal",
+      ),
     );
   } catch (error) {
     // モーダル処理失敗は同じエラーハンドラに集約
     logger.error(
-      tDefault("system:interaction.modal_error", {
-        customId: interaction.customId,
-      }),
+      logPrefixed(
+        "system:log_prefix.interaction_create",
+        "system:interaction.modal_error",
+        { customId: interaction.customId },
+        "modal",
+      ),
       error,
     );
     await handleInteractionError(interaction, error);

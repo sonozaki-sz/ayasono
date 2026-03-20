@@ -12,7 +12,12 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
 }));
 
 vi.mock("@/shared/utils/logger", () => ({ logger: loggerMock }));
-vi.mock("@/shared/locale/localeManager", () => ({ tDefault: vi.fn((key: string) => key) , tInteraction: vi.fn((_locale: string, key: string) => key) }));
+vi.mock("@/shared/locale/localeManager", () => ({
+  tDefault: vi.fn((key: string) => key),
+  tInteraction: vi.fn((_locale: string, key: string) => key),
+  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
+  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+}));
 
 function createMessageMock(
   overrides: Partial<{
@@ -94,7 +99,7 @@ describe("bot/features/sticky-message/handlers/stickyMessageCreateHandler", () =
     await handleStickyMessageCreate(message as never);
 
     expect(loggerMock.error).toHaveBeenCalledWith(
-      "system:sticky-message.create_handler_error",
+      expect.stringContaining("system:sticky-message.create_handler_error"),
       expect.objectContaining({ channelId: "channel-1" }),
     );
   });

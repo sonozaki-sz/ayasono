@@ -8,7 +8,10 @@ import {
   type GuildTextBasedChannel,
   type MessageComponentInteraction,
 } from "discord.js";
-import { tDefault } from "../../../../../shared/locale/localeManager";
+import {
+  logPrefixed,
+  tDefault,
+} from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import {
   createErrorEmbed,
@@ -82,6 +85,7 @@ export async function buildTargetChannels(
               tDefault("commands:message-delete.errors.channel_partial_skip", {
                 channels: channelMentions,
               }),
+              { title: tDefault("common:title_bot_permission_denied") },
             ),
           ],
           ephemeral: true,
@@ -95,6 +99,7 @@ export async function buildTargetChannels(
         embeds: [
           createErrorEmbed(
             tDefault("commands:message-delete.errors.channel_all_no_access"),
+            { title: tDefault("common:title_bot_permission_denied") },
           ),
         ],
         components: [],
@@ -107,12 +112,21 @@ export async function buildTargetChannels(
   }
 
   // チャンネル未指定: サーバー内の全テキストチャンネルを対象
-  logger.debug(tDefault("system:message-delete.cmd_all_channels_start"));
+  logger.debug(
+    logPrefixed(
+      "system:log_prefix.msg_del",
+      "system:message-delete.cmd_all_channels_start",
+    ),
+  );
   const allChannels = await guild.channels.fetch();
   logger.debug(
-    tDefault("system:message-delete.cmd_channel_count", {
-      count: allChannels.size,
-    }),
+    logPrefixed(
+      "system:log_prefix.msg_del",
+      "system:message-delete.cmd_channel_count",
+      {
+        count: allChannels.size,
+      },
+    ),
   );
 
   if (!me) {

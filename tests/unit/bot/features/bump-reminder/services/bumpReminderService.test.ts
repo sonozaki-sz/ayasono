@@ -14,6 +14,8 @@ const repositoryMock = {
 };
 
 vi.mock("@/shared/locale/localeManager", () => ({
+  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
+  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
   tDefault: (key: string) => key,
   tInteraction: (...args: unknown[]) => args[1],
 }));
@@ -125,7 +127,7 @@ describe("shared/features/bump-reminder/manager", () => {
       "cancelled",
     );
     expect(logger.error).toHaveBeenCalledWith(
-      "system:scheduler.bump_reminder_task_failed",
+      expect.stringContaining("system:scheduler.bump_reminder_task_failed"),
       expect.any(Error),
     );
   });
@@ -179,7 +181,7 @@ describe("shared/features/bump-reminder/manager", () => {
       "cancelled",
     );
     expect(logger.info).toHaveBeenCalledWith(
-      "system:scheduler.bump_reminder_cancelling",
+      expect.stringContaining("system:scheduler.bump_reminder_cancelling"),
     );
   });
 
@@ -340,7 +342,7 @@ describe("shared/features/bump-reminder/manager", () => {
 
     expect(cancelSpy).toHaveBeenCalledWith("g-x");
     expect(logger.error).toHaveBeenCalledWith(
-      "system:scheduler.bump_reminder_task_failed",
+      expect.stringContaining("system:scheduler.bump_reminder_task_failed"),
       expect.any(Error),
     );
   });
@@ -374,7 +376,7 @@ describe("shared/features/bump-reminder/manager", () => {
       undefined,
     );
     expect(logger.info).not.toHaveBeenCalledWith(
-      "system:scheduler.bump_reminder_duplicates_cancelled",
+      expect.stringContaining("system:scheduler.bump_reminder_duplicates_cancelled"),
     );
   });
 
@@ -393,7 +395,7 @@ describe("shared/features/bump-reminder/manager", () => {
 
     expect(cancelSpy).toHaveBeenCalledWith("g-ok");
     expect(logger.error).not.toHaveBeenCalledWith(
-      "system:scheduler.bump_reminder_task_failed",
+      expect.stringContaining("system:scheduler.bump_reminder_task_failed"),
       expect.anything(),
     );
   });

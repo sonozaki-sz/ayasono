@@ -8,7 +8,7 @@ import {
   type TextChannel,
 } from "discord.js";
 import {
-  tDefault,
+  logPrefixed,
   tInteraction,
 } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
@@ -79,6 +79,12 @@ export const stickyMessageUpdateEmbedModalHandler: ModalHandler = {
               interaction.locale,
               "commands:sticky-message.errors.emptyMessage",
             ),
+            {
+              title: tInteraction(
+                interaction.locale,
+                "common:title_input_error",
+              ),
+            },
           ),
         ],
         flags: MessageFlags.Ephemeral,
@@ -154,9 +160,13 @@ export const stickyMessageUpdateEmbedModalHandler: ModalHandler = {
           await service.updateLastMessageId(updated.id, sent.id);
         } catch (err) {
           logger.error(
-            tDefault("system:sticky-message.resend_after_embed_update_failed", {
-              channelId,
-            }),
+            logPrefixed(
+              "system:log_prefix.sticky_message",
+              "system:sticky-message.resend_after_embed_update_failed",
+              {
+                channelId,
+              },
+            ),
             { channelId, err },
           );
         }
@@ -181,10 +191,14 @@ export const stickyMessageUpdateEmbedModalHandler: ModalHandler = {
       });
     } catch (err) {
       logger.error(
-        tDefault("system:sticky-message.update_embed_failed", {
-          channelId,
-          guildId,
-        }),
+        logPrefixed(
+          "system:log_prefix.sticky_message",
+          "system:sticky-message.update_embed_failed",
+          {
+            channelId,
+            guildId,
+          },
+        ),
         { channelId, guildId, err },
       );
       throw err;

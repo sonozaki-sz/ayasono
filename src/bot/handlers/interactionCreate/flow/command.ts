@@ -7,7 +7,7 @@ import {
   type ChatInputCommandInteraction,
 } from "discord.js";
 import {
-  tDefault,
+  logPrefixed,
   tInteraction,
 } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
@@ -32,9 +32,12 @@ export async function handleChatInputCommand(
   if (!command) {
     // 未登録コマンドは警告のみ出して安全に終了
     logger.warn(
-      tDefault("system:interaction.unknown_command", {
-        commandName: interaction.commandName,
-      }),
+      logPrefixed(
+        "system:log_prefix.interaction_create",
+        "system:interaction.unknown_command",
+        { commandName: interaction.commandName },
+        "command",
+      ),
     );
     return;
   }
@@ -69,17 +72,22 @@ export async function handleChatInputCommand(
     // コマンド本体を実行
     await command.execute(interaction);
     logger.debug(
-      tDefault("system:interaction.command_executed", {
-        commandName: command.data.name,
-        userId: interaction.user.id,
-      }),
+      logPrefixed(
+        "system:log_prefix.interaction_create",
+        "system:interaction.command_executed",
+        { commandName: command.data.name, userId: interaction.user.id },
+        "command",
+      ),
     );
   } catch (error) {
     // 実行例外は共通エラーハンドラへ委譲
     logger.error(
-      tDefault("system:interaction.command_error", {
-        commandName: command.data.name,
-      }),
+      logPrefixed(
+        "system:log_prefix.interaction_create",
+        "system:interaction.command_error",
+        { commandName: command.data.name },
+        "command",
+      ),
       error,
     );
     await handleCommandError(interaction, error);
@@ -107,9 +115,12 @@ export async function handleAutocomplete(
     await command.autocomplete(interaction);
   } catch (error) {
     logger.error(
-      tDefault("system:interaction.autocomplete_error", {
-        commandName: interaction.commandName,
-      }),
+      logPrefixed(
+        "system:log_prefix.interaction_create",
+        "system:interaction.autocomplete_error",
+        { commandName: interaction.commandName },
+        "command",
+      ),
       error,
     );
   }

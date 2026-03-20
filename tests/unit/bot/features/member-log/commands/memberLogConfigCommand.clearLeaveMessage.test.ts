@@ -32,6 +32,8 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
 }));
 
 vi.mock("@/shared/locale/localeManager", () => ({
+  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
+  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
   tGuild: (guildId: string, key: string) => tGuildMock(guildId, key),
   tInteraction: vi.fn((_locale: string, key: string) => key),
   tDefault: (key: string, opts?: Record<string, unknown>) =>
@@ -107,7 +109,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.clearLeaveMess
     );
 
     expect(loggerInfoMock).toHaveBeenCalledWith(
-      "system:member-log.config_leave_message_cleared",
+      expect.stringContaining("system:member-log.config_leave_message_cleared"),
     );
   });
 });

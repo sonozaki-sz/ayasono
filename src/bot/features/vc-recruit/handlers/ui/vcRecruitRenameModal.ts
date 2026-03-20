@@ -53,6 +53,12 @@ export const vcRecruitRenameModalHandler: ModalHandler = {
               interaction.locale,
               "errors:vcRecruit.vc_already_deleted",
             ),
+            {
+              title: tInteraction(
+                interaction.locale,
+                "common:title_resource_not_found",
+              ),
+            },
           ),
         ],
         flags: MessageFlags.Ephemeral,

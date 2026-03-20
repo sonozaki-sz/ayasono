@@ -1,7 +1,7 @@
 // src/bot/features/bump-reminder/services/usecases/restorePendingBumpRemindersUsecase.ts
 // pending Bumpリマインダー復元のユースケース
 
-import { tDefault } from "../../../../../shared/locale/localeManager";
+import { logPrefixed } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import {
   BUMP_REMINDER_STATUS,
@@ -45,7 +45,8 @@ export async function restorePendingBumpRemindersUsecase(
   );
 
   logger.info(
-    tDefault(
+    logPrefixed(
+      "system:log_prefix.bump_reminder",
       restorePlan.staleReminders.length > 0
         ? "system:scheduler.bump_reminder_duplicates_cancelled"
         : "system:scheduler.bump_reminder_duplicates_none",
@@ -70,9 +71,13 @@ export async function restorePendingBumpRemindersUsecase(
 
     if (reminder.scheduledAt <= now) {
       logger.info(
-        tDefault("system:scheduler.bump_reminder_executing_immediately", {
-          guildId: reminder.guildId,
-        }),
+        logPrefixed(
+          "system:log_prefix.bump_reminder",
+          "system:scheduler.bump_reminder_executing_immediately",
+          {
+            guildId: reminder.guildId,
+          },
+        ),
       );
       await createTrackedReminderTask(
         repository,
@@ -104,7 +109,8 @@ export async function restorePendingBumpRemindersUsecase(
   }
 
   logger.info(
-    tDefault(
+    logPrefixed(
+      "system:log_prefix.bump_reminder",
       restoredCount > 0
         ? "system:scheduler.bump_reminders_restored"
         : "system:scheduler.bump_reminders_restored_none",
