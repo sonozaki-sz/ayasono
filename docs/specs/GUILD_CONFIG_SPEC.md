@@ -108,10 +108,8 @@
 **ビジネスルール:**
 
 - 各ページの内容は `buildPage(pageIndex, config)` のような純粋関数で生成し、インタラクション受信時に再生成する（メモリ保持不要）
-- ページ番号は `custom_id` のサフィックスや `interaction.message` の既存 Embed footer から復元する
+- ページ番号はページジャンプボタンのラベル（`{{page}}/{{total}}ページ`）で表示する
 - ページ 2 以降は各機能の `*-config view` が使っている Embed 生成ロジック（`buildViewEmbed` 相当の関数）をそのまま呼び出して再利用する（設定を持たない機能はページに含めない）
-- `guild-config view` 側では Embed のフッターにページ番号を追記するだけにとどめる
-- インタラクション発火元は `/guild-config view` を実行したユーザーのみ応答する（他ユーザーには ephemeral でエラー返却）
 
 ### UI
 
@@ -119,21 +117,21 @@
 
 | 項目 | 内容 |
 | --- | --- |
-| タイトル | ギルド設定 |
+| タイトル | 🛡️ ギルド設定 |
 | フィールド | 言語: 日本語 (ja) |
 | フィールド | エラー通知チャンネル: #channel / 未設定 |
 
 **ページ一覧:**
 
-| ページ番号 | emoji | タイトル | 内容 |
-| --- | --- | --- | --- |
-| 1 | 🔧 | ギルド設定 | 言語 + エラー通知チャンネル + 全機能の有効/無効一覧 |
-| 2 | 😴 | AFK | AFK の詳細設定 |
-| 3 | ⚙️ | VAC | VAC の詳細設定 |
-| 4 | 🎤 | VC募集 | VC募集の詳細設定 |
-| 5 | 📌 | メッセージ固定 | スティッキーメッセージの詳細設定 |
-| 6 | 👋 | メンバーログ | メンバーログの詳細設定 |
-| 7 | 🔔 | Bumpリマインダー | Bumpリマインダーの詳細設定 |
+| ページ番号 | タイトル | 内容 |
+| --- | --- | --- |
+| 1 | 🛡️ ギルド設定 | 言語 + エラー通知チャンネル |
+| 2 | 😴 AFK | AFK の詳細設定 |
+| 3 | 🔊 VAC | VAC の詳細設定 |
+| 4 | 📢 VC募集 | VC募集の詳細設定 |
+| 5 | 📌 メッセージ固定 | スティッキーメッセージの詳細設定 |
+| 6 | 👋 メンバーログ | メンバーログの詳細設定 |
+| 7 | 🔔 Bumpリマインダー | Bumpリマインダーの詳細設定 |
 
 > ページ数は設定を持つ機能数に応じて増減する。
 > ページ 2 以降は対応する `*-config view` コマンドが生成する Embed をそのまま再利用する。
@@ -145,29 +143,29 @@
 
 | コンポーネント | emoji | ラベル | スタイル | 動作 |
 | --- | --- | --- | --- | --- |
-| `guild-config:view:first` | ⏮ | ― | Secondary | 最初のページ（1ページ目は `disabled`） |
-| `guild-config:view:prev` | ◀ | ― | Secondary | 前のページ（1ページ目は `disabled`） |
-| `guild-config:view:jump` | ― | {{page}}/{{total}}ページ | Secondary | 押下でモーダル表示、番号入力でページジャンプ |
-| `guild-config:view:next` | ▶ | ― | Secondary | 次のページ（最終ページは `disabled`） |
-| `guild-config:view:last` | ⏭ | ― | Secondary | 最後のページ（最終ページは `disabled`） |
+| `guild-config:page-first` | ⏮ | ― | Secondary | 最初のページ（1ページ目は `disabled`） |
+| `guild-config:page-prev` | ◀ | ― | Secondary | 前のページ（1ページ目は `disabled`） |
+| `guild-config:page-jump` | ― | {{page}}/{{total}}ページ | Secondary | 押下でモーダル表示、番号入力でページジャンプ |
+| `guild-config:page-next` | ▶ | ― | Secondary | 次のページ（最終ページは `disabled`） |
+| `guild-config:page-last` | ⏭ | ― | Secondary | 最後のページ（最終ページは `disabled`） |
 
 **Row 2 - 機能セレクトメニュー:**
 
 | コンポーネント | プレースホルダー | 種別 | 動作 |
 | --- | --- | --- | --- |
-| `guild-config:view:select` | ページを選択... | StringSelect | 選択したページへ直接移動 |
+| `guild-config:page-select` | ページを選択... | StringSelect | 選択したページへ直接移動 |
 
 **セレクトメニュー選択肢:**
 
-| emoji | ラベル | value |
-| --- | --- | --- |
-| 🔧 | 1. ギルド設定 | `guild_config` |
-| 😴 | 2. AFK | `afk` |
-| ⚙️ | 3. VAC | `vac` |
-| 🎤 | 4. VC募集 | `vc_recruit` |
-| 📌 | 5. メッセージ固定 | `sticky` |
-| 👋 | 6. メンバーログ | `member_log` |
-| 🔔 | 7. Bumpリマインダー | `bump` |
+| ラベル | value |
+| --- | --- |
+| 1. 🛡️ ギルド設定 | `guild_config` |
+| 2. 😴 AFK | `afk` |
+| 3. 🔊 VAC | `vac` |
+| 4. 📢 VC募集 | `vc_recruit` |
+| 5. 📌 メッセージ固定 | `sticky` |
+| 6. 👋 メンバーログ | `member_log` |
+| 7. 🔔 Bumpリマインダー | `bump` |
 
 ---
 
@@ -203,10 +201,10 @@
 
 **ボタン:**
 
-| コンポーネント | ラベル | emoji | スタイル | 動作 |
+| コンポーネント | emoji | ラベル | スタイル | 動作 |
 | --- | --- | --- | --- | --- |
-| `guild_config_reset_confirm` | リセットする | 🗑️ | Danger | 設定をリセットして完了メッセージに更新 |
-| `guild_config_reset_cancel` | キャンセル | ❌ | Secondary | キャンセルメッセージに更新 |
+| `guild-config:reset-confirm` | 🗑️ | リセットする | Danger | 設定をリセットして完了メッセージに更新 |
+| `guild-config:reset-cancel` | ❌ | キャンセル | Secondary | キャンセルメッセージに更新 |
 
 ---
 
@@ -243,10 +241,10 @@
 
 **ボタン:**
 
-| コンポーネント | ラベル | emoji | スタイル | 動作 |
+| コンポーネント | emoji | ラベル | スタイル | 動作 |
 | --- | --- | --- | --- | --- |
-| `guild_config_reset_all_confirm` | リセットする | 🗑️ | Danger | 全設定を削除して完了メッセージに更新 |
-| `guild_config_reset_all_cancel` | キャンセル | ❌ | Secondary | キャンセルメッセージに更新 |
+| `guild-config:reset-all-confirm` | 🗑️ | リセットする | Danger | 全設定を削除して完了メッセージに更新 |
+| `guild-config:reset-all-cancel` | ❌ | キャンセル | Secondary | キャンセルメッセージに更新 |
 
 ---
 
@@ -346,10 +344,10 @@
 
 **ボタン:**
 
-| コンポーネント | ラベル | emoji | スタイル | 動作 |
+| コンポーネント | emoji | ラベル | スタイル | 動作 |
 | --- | --- | --- | --- | --- |
-| `guild_config_import_confirm` | インポートする | ✅ | Danger | 設定を上書きインポートして完了メッセージに更新 |
-| `guild_config_import_cancel` | キャンセル | ❌ | Secondary | キャンセルメッセージに更新 |
+| `guild-config:import-confirm` | ✅ | インポートする | Danger | 設定を上書きインポートして完了メッセージに更新 |
+| `guild-config:import-cancel` | ❌ | キャンセル | Secondary | キャンセルメッセージに更新 |
 
 **バリデーションエラー:**
 
@@ -392,7 +390,6 @@
 - view のページ操作タイムアウト: 5分（タイムアウト後はコンポーネントを `disabled` 化）
 - reset / reset-all / import の確認ダイアログタイムアウト: 60秒
 - import は同一サーバーの設定ファイルのみ対応（異サーバー間のコピーは非対応）
-- view のインタラクションはコマンド実行者のみ操作可能
 
 ---
 
@@ -402,87 +399,87 @@
 
 ### コマンド定義
 
-| キー | ja | en |
-| --- | --- | --- |
-| `guild-config.description` | ギルド設定を管理（サーバー管理権限が必要） | Manage guild settings (requires Manage Server) |
-| `guild-config.set-locale.description` | Botの応答言語を設定 | Set bot response language |
-| `guild-config.set-locale.locale.description` | 設定する言語を選択 | Select a language |
-| `guild-config.set-error-channel.description` | エラー通知チャンネルを設定 | Set error notification channel |
-| `guild-config.set-error-channel.channel.description` | エラー通知先テキストチャンネル | Text channel for error notifications |
-| `guild-config.view.description` | 現在のギルド設定を表示 | View current guild settings |
-| `guild-config.reset.description` | ギルド設定をリセット | Reset guild settings |
-| `guild-config.reset-all.description` | 全機能の設定を一括リセット | Reset all feature settings |
-| `guild-config.export.description` | ギルド設定をエクスポート | Export guild settings |
-| `guild-config.import.description` | JSONファイルからギルド設定をインポート | Import guild settings from JSON file |
-| `guild-config.import.file.description` | エクスポートしたJSONファイル | Exported JSON file |
+| キー | 用途 | ja | en |
+| --- | --- | --- | --- |
+| `guild-config.description` | コマンド説明 | ギルド設定を管理（サーバー管理権限が必要） | Manage guild settings (requires Manage Server) |
+| `guild-config.set-locale.description` | サブコマンド説明 | Botの応答言語を設定 | Set bot response language |
+| `guild-config.set-locale.locale.description` | オプション説明 | 設定する言語を選択 | Select a language |
+| `guild-config.set-error-channel.description` | サブコマンド説明 | エラー通知チャンネルを設定 | Set error notification channel |
+| `guild-config.set-error-channel.channel.description` | オプション説明 | エラー通知先テキストチャンネル | Text channel for error notifications |
+| `guild-config.view.description` | サブコマンド説明 | 現在のギルド設定を表示 | View current guild settings |
+| `guild-config.reset.description` | サブコマンド説明 | ギルド設定をリセット | Reset guild settings |
+| `guild-config.reset-all.description` | サブコマンド説明 | 全機能の設定を一括リセット | Reset all feature settings |
+| `guild-config.export.description` | サブコマンド説明 | ギルド設定をエクスポート | Export guild settings |
+| `guild-config.import.description` | サブコマンド説明 | JSONファイルからギルド設定をインポート | Import guild settings from JSON file |
+| `guild-config.import.file.description` | オプション説明 | エクスポートしたJSONファイル | Exported JSON file |
 
 ### ユーザーレスポンス
 
-| キー | ja | en |
-| --- | --- | --- |
-| `user-response.set_locale_success` | サーバーの言語を「{{locale}}」に設定しました。 | Server language has been set to "{{locale}}". |
-| `user-response.set_error_channel_success` | エラー通知チャンネルを {{channel}} に設定しました。 | Error notification channel has been set to {{channel}}. |
-| `user-response.invalid_channel_type` | テキストチャンネルを指定してください。 | Please specify a text channel. |
-| `user-response.reset_success` | ギルド設定をリセットしました。 | Guild settings have been reset. |
-| `user-response.reset_cancelled` | リセットをキャンセルしました。 | Reset has been cancelled. |
-| `user-response.reset_all_success` | 全機能の設定をリセットしました。 | All feature settings have been reset. |
-| `user-response.reset_all_cancelled` | リセットをキャンセルしました。 | Reset has been cancelled. |
-| `user-response.export_success` | ギルド設定をエクスポートしました。 | Guild settings have been exported. |
-| `user-response.export_empty` | エクスポートする設定がありません。 | No settings to export. |
-| `user-response.import_success` | ギルド設定をインポートしました。 | Guild settings have been imported. |
-| `user-response.import_cancelled` | インポートをキャンセルしました。 | Import has been cancelled. |
-| `user-response.import_invalid_json` | ファイルの形式が正しくありません。エクスポートしたJSONファイルを添付してください。 | Invalid file format. Please attach an exported JSON file. |
-| `user-response.import_unsupported_version` | このファイルのバージョンには対応していません。 | This file version is not supported. |
-| `user-response.import_guild_mismatch` | このファイルは別のサーバーの設定です。同じサーバーでエクスポートしたファイルを使用してください。 | This file belongs to a different server. Please use a file exported from the same server. |
-| `user-response.import_missing_channels` | 一部のチャンネルまたはロールが見つかりません。設定を確認してください。 | Some channels or roles were not found. Please review the settings. |
-| `user-response.other_user_error` | このパネルを操作できるのは実行者のみです。 | Only the command executor can interact with this panel. |
+| キー | 用途 | ja | en |
+| --- | --- | --- | --- |
+| `user-response.set_locale_success` | 言語設定成功 | サーバーの言語を「{{locale}}」に設定しました。 | Server language has been set to "{{locale}}". |
+| `user-response.set_error_channel_success` | エラーチャンネル設定成功 | エラー通知チャンネルを {{channel}} に設定しました。 | Error notification channel has been set to {{channel}}. |
+| `user-response.invalid_channel_type` | チャンネル型エラー | テキストチャンネルを指定してください。 | Please specify a text channel. |
+| `user-response.reset_success` | リセット成功 | ギルド設定をリセットしました。 | Guild settings have been reset. |
+| `user-response.reset_cancelled` | リセットキャンセル | リセットをキャンセルしました。 | Reset has been cancelled. |
+| `user-response.reset_all_success` | 全リセット成功 | 全機能の設定をリセットしました。 | All feature settings have been reset. |
+| `user-response.reset_all_cancelled` | 全リセットキャンセル | リセットをキャンセルしました。 | Reset has been cancelled. |
+| `user-response.export_success` | エクスポート成功 | ギルド設定をエクスポートしました。 | Guild settings have been exported. |
+| `user-response.export_empty` | エクスポート対象なし | エクスポートする設定がありません。 | No settings to export. |
+| `user-response.import_success` | インポート成功 | ギルド設定をインポートしました。 | Guild settings have been imported. |
+| `user-response.import_cancelled` | インポートキャンセル | インポートをキャンセルしました。 | Import has been cancelled. |
+| `user-response.import_invalid_json` | JSONパースエラー | ファイルの形式が正しくありません。エクスポートしたJSONファイルを添付してください。 | Invalid file format. Please attach an exported JSON file. |
+| `user-response.import_unsupported_version` | バージョン非対応エラー | このファイルのバージョンには対応していません。 | This file version is not supported. |
+| `user-response.import_guild_mismatch` | ギルドID不一致エラー | このファイルは別のサーバーの設定です。同じサーバーでエクスポートしたファイルを使用してください。 | This file belongs to a different server. Please use a file exported from the same server. |
+| `user-response.import_missing_channels` | チャンネル/ロール不在警告 | 一部のチャンネルまたはロールが見つかりません。設定を確認してください。 | Some channels or roles were not found. Please review the settings. |
+
 
 ### Embed
 
-| キー | ja | en |
-| --- | --- | --- |
-| `embed.title.view` | ギルド設定 | Guild Settings |
-| `embed.field.name.locale` | 言語 | Language |
-| `embed.field.name.error_channel` | エラー通知チャンネル | Error Notification Channel |
-| `embed.field.value.not_configured` | 未設定 | Not configured |
-| `embed.title.reset_confirm` | ギルド設定リセット確認 | Guild Settings Reset |
-| `embed.description.reset_confirm` | ギルド設定（言語・エラー通知チャンネル）をリセットしますか？\nこの操作は元に戻せません。 | Reset guild settings (language, error channel)?\nThis action cannot be undone. |
-| `embed.title.reset_all_confirm` | 全設定リセット確認 | Reset All Settings |
-| `embed.description.reset_all_confirm` | 全機能の設定をリセットしますか？\n以下の設定がすべて削除されます。この操作は元に戻せません。 | Reset all feature settings?\nAll settings below will be deleted. This action cannot be undone. |
-| `embed.field.name.reset_all_target` | 削除対象 | Targets |
-| `embed.field.value.reset_all_target` | 言語設定 / エラー通知チャンネル / AFK / VAC / VC募集 / メッセージ固定 / メンバーログ / Bumpリマインダー | Language / Error Channel / AFK / VAC / VC Recruit / Sticky Message / Member Log / Bump Reminder |
-| `embed.title.import_confirm` | ギルド設定インポート確認 | Import Guild Settings |
-| `embed.description.import_confirm` | 現在の設定が上書きされます。この操作は元に戻せません。 | Current settings will be overwritten. This action cannot be undone. |
+| キー | 用途 | ja | en |
+| --- | --- | --- | --- |
+| `embed.title.view` | 設定表示タイトル | 🛡️ ギルド設定 | 🛡️ Guild Settings |
+| `embed.field.name.locale` | 言語フィールド名 | 言語 | Language |
+| `embed.field.name.error_channel` | エラーチャンネルフィールド名 | エラー通知チャンネル | Error Notification Channel |
+| `embed.field.value.not_configured` | 未設定値 | 未設定 | Not configured |
+| `embed.title.reset_confirm` | リセット確認タイトル | ギルド設定リセット確認 | Guild Settings Reset |
+| `embed.description.reset_confirm` | リセット確認説明 | ギルド設定（言語・エラー通知チャンネル）をリセットしますか？\nこの操作は元に戻せません。 | Reset guild settings (language, error channel)?\nThis action cannot be undone. |
+| `embed.title.reset_all_confirm` | 全リセット確認タイトル | 全設定リセット確認 | Reset All Settings |
+| `embed.description.reset_all_confirm` | 全リセット確認説明 | 全機能の設定をリセットしますか？\n以下の設定がすべて削除されます。この操作は元に戻せません。 | Reset all feature settings?\nAll settings below will be deleted. This action cannot be undone. |
+| `embed.field.name.reset_all_target` | 削除対象フィールド名 | 削除対象 | Targets |
+| `embed.field.value.reset_all_target` | 削除対象フィールド値 | 言語設定 / エラー通知チャンネル / AFK / VAC / VC募集 / メッセージ固定 / メンバーログ / Bumpリマインダー | Language / Error Channel / AFK / VAC / VC Recruit / Sticky Message / Member Log / Bump Reminder |
+| `embed.title.import_confirm` | インポート確認タイトル | ギルド設定インポート確認 | Import Guild Settings |
+| `embed.description.import_confirm` | インポート確認説明 | 現在の設定が上書きされます。この操作は元に戻せません。 | Current settings will be overwritten. This action cannot be undone. |
 
 ### UIラベル
 
-| キー | ja | en |
-| --- | --- | --- |
-| `ui.select.view_placeholder` | ページを選択... | Select a page... |
-| `ui.select.guild_config` | ギルド設定 | Guild Settings |
-| `ui.select.afk` | AFK | AFK |
-| `ui.select.vac` | VAC | VAC |
-| `ui.select.vc_recruit` | VC募集 | VC Recruit |
-| `ui.select.sticky` | メッセージ固定 | Sticky Message |
-| `ui.select.member_log` | メンバーログ | Member Log |
-| `ui.select.bump` | Bumpリマインダー | Bump Reminder |
-| `ui.button.reset_confirm` | リセットする | Reset |
-| `ui.button.reset_cancel` | キャンセル | Cancel |
-| `ui.button.reset_all_confirm` | リセットする | Reset |
-| `ui.button.reset_all_cancel` | キャンセル | Cancel |
-| `ui.button.import_confirm` | インポートする | Import |
-| `ui.button.import_cancel` | キャンセル | Cancel |
+| キー | 用途 | ja | en |
+| --- | --- | --- | --- |
+| `ui.select.view_placeholder` | ページセレクトプレースホルダー | ページを選択... | Select a page... |
+| `ui.select.guild_config` | セレクト選択肢 | ギルド設定 | Guild Settings |
+| `ui.select.afk` | セレクト選択肢 | AFK | AFK |
+| `ui.select.vac` | セレクト選択肢 | VAC | VAC |
+| `ui.select.vc_recruit` | セレクト選択肢 | VC募集 | VC Recruit |
+| `ui.select.sticky` | セレクト選択肢 | メッセージ固定 | Sticky Message |
+| `ui.select.member_log` | セレクト選択肢 | メンバーログ | Member Log |
+| `ui.select.bump` | セレクト選択肢 | Bumpリマインダー | Bump Reminder |
+| `ui.button.reset_confirm` | リセット確認ボタン | リセットする | Reset |
+| `ui.button.reset_cancel` | リセットキャンセルボタン | キャンセル | Cancel |
+| `ui.button.reset_all_confirm` | 全リセット確認ボタン | リセットする | Reset |
+| `ui.button.reset_all_cancel` | 全リセットキャンセルボタン | キャンセル | Cancel |
+| `ui.button.import_confirm` | インポート確認ボタン | インポートする | Import |
+| `ui.button.import_cancel` | インポートキャンセルボタン | キャンセル | Cancel |
 
 ### ログ
 
-| キー | ja | en |
-| --- | --- | --- |
-| `log.locale_set` | 言語設定 GuildId: {{guildId}} Locale: {{locale}} | Language set GuildId: {{guildId}} Locale: {{locale}} |
-| `log.error_channel_set` | エラー通知チャンネル設定 GuildId: {{guildId}} ChannelId: {{channelId}} | Error channel set GuildId: {{guildId}} ChannelId: {{channelId}} |
-| `log.reset` | ギルド設定リセット GuildId: {{guildId}} | Guild settings reset GuildId: {{guildId}} |
-| `log.reset_all` | 全設定リセット GuildId: {{guildId}} | All settings reset GuildId: {{guildId}} |
-| `log.exported` | ギルド設定エクスポート GuildId: {{guildId}} | Guild settings exported GuildId: {{guildId}} |
-| `log.imported` | ギルド設定インポート GuildId: {{guildId}} | Guild settings imported GuildId: {{guildId}} |
+| キー | 用途 | ja | en |
+| --- | --- | --- | --- |
+| `log.locale_set` | 言語設定ログ | 言語設定 GuildId: {{guildId}} Locale: {{locale}} | Language set GuildId: {{guildId}} Locale: {{locale}} |
+| `log.error_channel_set` | エラーチャンネル設定ログ | エラー通知チャンネル設定 GuildId: {{guildId}} ChannelId: {{channelId}} | Error channel set GuildId: {{guildId}} ChannelId: {{channelId}} |
+| `log.reset` | リセットログ | ギルド設定リセット GuildId: {{guildId}} | Guild settings reset GuildId: {{guildId}} |
+| `log.reset_all` | 全リセットログ | 全設定リセット GuildId: {{guildId}} | All settings reset GuildId: {{guildId}} |
+| `log.exported` | エクスポートログ | ギルド設定エクスポート GuildId: {{guildId}} | Guild settings exported GuildId: {{guildId}} |
+| `log.imported` | インポートログ | ギルド設定インポート GuildId: {{guildId}} | Guild settings imported GuildId: {{guildId}} |
 
 ※ ページネーション関連キー（`page_jump.label`, `page_jump_modal.title`, `page_jump_modal.input.label`）は `common.ts` で共通定義
 

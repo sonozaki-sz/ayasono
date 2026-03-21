@@ -141,36 +141,36 @@
 
 ### コマンド定義
 
-| キー | ja | en |
-| --- | --- | --- |
-| `{コマンド名}.description` | {日本語} | {English} |
+| キー | 用途 | ja | en |
+| --- | --- | --- | --- |
+| `{コマンド名}.description` | {用途} | {日本語} | {English} |
 
 ### ユーザーレスポンス
 
-| キー | ja | en |
-| --- | --- | --- |
-| `user-response.{アクション名}` | {日本語} | {English} |
+| キー | 用途 | ja | en |
+| --- | --- | --- | --- |
+| `user-response.{アクション名}` | {用途} | {日本語} | {English} |
 
 ### Embed
 
-| キー | ja | en |
-| --- | --- | --- |
-| `embed.title.{コンテキスト}` | {日本語} | {English} |
-| `embed.description.{コンテキスト}` | {日本語} | {English} |
-| `embed.field.name.{フィールド}` | {日本語} | {English} |
-| `embed.field.value.{フィールド}` | {日本語} | {English} |
+| キー | 用途 | ja | en |
+| --- | --- | --- | --- |
+| `embed.title.{コンテキスト}` | {用途} | {日本語} | {English} |
+| `embed.description.{コンテキスト}` | {用途} | {日本語} | {English} |
+| `embed.field.name.{フィールド}` | {用途} | {日本語} | {English} |
+| `embed.field.value.{フィールド}` | {用途} | {日本語} | {English} |
 
 ### UIラベル
 
-| キー | ja | en |
-| --- | --- | --- |
-| `ui.{UI種類}.{ID}` | {日本語} | {English} |
+| キー | 用途 | ja | en |
+| --- | --- | --- | --- |
+| `ui.{UI種類}.{ID}` | {用途} | {日本語} | {English} |
 
 ### ログ
 
-| キー | ja | en |
-| --- | --- | --- |
-| `log.{アクション名}` | {日本語} | {English} |
+| キー | 用途 | ja | en |
+| --- | --- | --- | --- |
+| `log.{アクション名}` | {用途} | {日本語} | {English} |
 
 ---
 

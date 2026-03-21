@@ -2,7 +2,7 @@
 
 > タスク管理・進捗状況・残件リスト
 
-最終更新: 2026年3月21日
+最終更新: 2026年3月22日
 
 ---
 
@@ -10,9 +10,9 @@
 
 | 対象 | ファイル数 | 行数 |
 | --- | ---: | ---: |
-| src | 243 | 26,840 |
-| tests | 196 | 38,318 |
-| **合計** | **439** | **65,158** |
+| src | 257 | 27,363 |
+| tests | 196 | 38,341 |
+| **合計** | **453** | **65,704** |
 
 ---
 
@@ -38,134 +38,51 @@
 
 **凡例**: ✅ 完了 | 🚧 進行中 | ⬜ 未着手
 
-**次のマイルストーン**: 各機能リセットコマンド
+**次のマイルストーン**: インテグレーションテスト拡充
 
 ---
 
-## 残タスク
+## 完了済みタスク
 
-### 1. 主要機能実装
+- ✅ 1.1 ロケール対応（interaction.locale 導入）
+- ✅ 3. メッセージフォーマット改善
+- ✅ 4. 翻訳ファイルを機能単位に再編成（カスタムID統一・翻訳キー命名規則・管理者表記統一を含む）
+- ✅ 5. ユーザー向け翻訳の `tDefault` → `tGuild` / `tInteraction` 置換
 
-#### 1.1 ロケール対応（interaction.locale 導入） - ✅完了
+---
 
-コマンド応答のロケールを `tGuild`（ギルド設定）から `interaction.locale`（ユーザーのDiscordクライアント言語）に切り替え済み。
+## 残タスク サマリー
 
-**実装内容**:
+| セクション | タスク | 残件 |
+| --- | --- | ---: |
+| 1. ギルド設定機能 | コマンド実装 + テスト | 7 |
+| 2. 基本コマンド追加 | `/help` 実装 | 1 |
+| 3. インテグレーションテスト拡充 | 各機能のインテグレーションテスト | 7 |
+| 4. 各機能リセットコマンド実装 | 共通基盤 + AFK + Bump + メンバーログ + VAC | 12 |
+| 5. 新機能実装予定 | プロフィール / サポートチャンネル / リアクションロール | 3 |
+| **合計** | | **30** |
 
-- `tInteraction`（sync）ヘルパー関数を `localeManager.ts` に追加（`"ja"` → 日本語、それ以外 → 英語）
-- `getInteractionTranslator` を `helpers.ts` に追加
-- 全コマンドハンドラ・UIハンドラのユーザー応答を `tGuild` → `tInteraction` に置き換え
-- ハードコードログ（info/warn/error）を `tDefault` + i18n キーに移行
-- テスト更新（モックに `tInteraction` 追加、`locale: "ja"` 追加、アサーション修正）
+---
 
-**対象外（tGuild を維持）**: Bumpリマインダー通知 / Bump検知パネル / メンバーログ / スティッキーメッセージ再送信 / VC募集投稿・パネル / VACパネルラベル
-
-#### 1.2 ギルド設定機能 - 残5件
+### 1. ギルド設定機能
 
 - [ ] `/guild-config set-locale` コマンド実装（ja / en 切り替え）
-- [ ] `/guild-config view` コマンド実装（概要 + 各機能詳細のページネーション）
-- [ ] `/guild-config reset` コマンド実装（確認ダイアログ付き）
-- [ ] `/guild-config export` / `/guild-config import` コマンド実装（JSON形式の設定バックアップ/リストア、同一サーバー向け）
+- [ ] `/guild-config set-error-channel` コマンド実装（エラー通知チャンネル設定）
+- [ ] `/guild-config view` コマンド実装（共通ページネーション + 機能セレクトメニュー）
+- [ ] `/guild-config reset` コマンド実装（ギルド設定のみリセット、確認ダイアログ付き）
+- [ ] `/guild-config reset-all` コマンド実装（全機能一括リセット、確認ダイアログ付き）
+- [ ] `/guild-config export` / `import` コマンド実装（JSON形式の設定バックアップ/リストア）
 - [ ] テスト実装
 
 仕様書: [GUILD_CONFIG_SPEC.md](docs/specs/GUILD_CONFIG_SPEC.md)
 
-### 2. 基本コマンド追加 - 残1件
+### 2. 基本コマンド追加
 
 - [ ] `/help` — コマンド一覧＋ユーザーマニュアルリンク表示
 
 仕様書: [BASIC_COMMANDS_SPEC.md](docs/specs/BASIC_COMMANDS_SPEC.md)
 
-### 3. メッセージフォーマット改善 - ✅完了
-
-- [x] エラー・警告Embedのタイトルを原因名詞に統一（`common:title_*` キー24種を `common.ts` に定義、全Embed呼び出しに適用、`interactionErrorHandler` のエラークラス別タイトルも日本語化）
-- [x] ログフォーマット統一（`logPrefixed()` / `logCommand()` ヘルパーを導入、`log_prefix.*` キーで機能名をi18n管理、イベント名は Discord.js 準拠、サブプレフィックス `[interactionCreate:command]` 形式対応）
-- [x] ユーザーレスポンスの warning / error レベル整理（基準: ユーザーが修正可能 → warning、システム的に不可 → error。`interactionErrorHandler` で `ValidationError`/`NotFoundError`/`TimeoutError`/`ConfigurationError` を warning に変更、vc-panel・vc-recruit・bump-reminder の直接 Embed 生成も統一、`permissionGuards` の権限不足を `PermissionError`（error レベル）に修正）
-
-### 4. 翻訳ファイルを機能単位に再編成
-
-現状の名前空間はトリガー元（`commands` / `errors` / `events` / `system`）基準だが、以下の問題がある。
-
-- パネルUIやボタン操作レスポンスなど、コマンドとイベントの両方から使われるメッセージの置き場所が曖昧
-- 同種のメッセージ（入力バリデーションエラー等）が `errors:` と `commands:` に分散
-- `errors:` 名前空間のメッセージの大半が warning レベルで表示されるため名前と実態が乖離
-- `commands.ts`（836行）が肥大化しており、機能追加のたびに膨らみ続ける
-
-#### 4.1 新しいファイル構成
-
-```
-locales/ja/
-├── common.ts              ← 共通タイトル・ラベル + 機能横断エラー
-├── system.ts              ← 機能横断の内部ログのみ（Bot起動/シャットダウン/Web/DB共通等）
-├── features/
-│   ├── index.ts           ← 全機能の re-export
-│   ├── ping.ts
-│   ├── afk.ts
-│   ├── bumpReminder.ts
-│   ├── vac.ts
-│   ├── vc.ts
-│   ├── messageDelete.ts
-│   ├── memberLog.ts
-│   ├── stickyMessage.ts
-│   └── vcRecruit.ts
-```
-
-各 `features/*.ts` はコメントで4セクションに分けて管理する：
-
-```ts
-// ── コマンド定義 ─────────────────────────────  ← description, option.description
-// ── UIラベル ──────────────────────────────────  ← パネルタイトル, ボタンラベル, モーダルラベル等
-// ── ユーザーレスポンス ────────────────────────  ← 成功/警告/エラーの Embed 本文
-// ── ログ ─────────────────────────────────────  ← 機能固有の内部ログ
-```
-
-- 機能ごとに1ファイル。その機能に関する翻訳を全て含む（ログ含む）
-- `errors.ts` / `events.ts` / `commands.ts` は全廃
-- `system.ts` には機能横断のログのみ残す（Bot起動/シャットダウン、エラーハンドリング共通、Web サーバー、DB 共通操作、スケジューラー共通、ロケール/JSON ユーティリティ）
-- 機能横断の共通メッセージ（`validation.guild_only`、`general.unexpected_*` 等）は `common.ts` に移動
-
-#### 4.2 移行手順
-
-- [ ] `features/` ディレクトリ作成、機能ごとのファイルを新規作成（ja/en 両方）
-- [ ] `commands.ts` の各機能セクションを対応する `features/*.ts` に移動
-- [ ] `errors.ts` の機能固有キーを対応する `features/*.ts` に移動
-- [ ] `errors.ts` の機能横断キー（`validation.*`, `general.*`, `permission.*`, `interaction.*`, `database.*`）を `common.ts` に移動
-- [ ] `events.ts` の全キーを対応する `features/*.ts` に移動
-- [ ] `system.ts` の機能固有ログを対応する `features/*.ts` に移動、機能横断ログのみ `system.ts` に残す
-- [ ] i18next のリソース登録（`resources.ts`）を新構成に合わせて更新
-- [ ] 全ソースファイルの翻訳キー参照（名前空間プレフィックス）を更新
-- [ ] テスト内のモック・アサーションを更新
-- [ ] warning レベルなのに `error` を含むキー名をリネーム（以下対象）
-  - `title_input_error` → 「入力不備」等に変更
-  - `title_channel_error` → 「チャンネル不正」等に変更
-  - `title_config_error` → `title_config_required` との統合を検討
-  - `bump-reminder.panel.error` → warning 用のキー名に変更
-- [ ] `commands.ts` / `errors.ts` / `events.ts` を削除
-
-#### 4.3 現状の不整合（具体例）
-
-| メッセージ | 現在の名前空間 | 問題 |
-|-----------|---------------|------|
-| `vac.limit_out_of_range` | `errors:` | warning レベルで表示される |
-| `message-delete.errors.after_invalid_format` | `commands:` | 同種の入力エラーなのに `errors:` と `commands:` に分散 |
-| `bump-reminder.panel.button_mention_on` | `events:` | ボタンUIラベルなのに `events:` にある |
-| `vac.panel.title` | `commands:` | イベント起点でも使われるが `commands:` にある |
-| `title_input_error` | `common:` | warning レベルで表示されるのにキー名が `error` |
-| `title_channel_error` | `common:` | 同上 |
-
-### 5. ユーザー向け翻訳の `tDefault` → `tGuild` / `tInteraction` 置換
-
-ユーザーに表示するEmbed・ボタン・セレクト等で `tDefault`（デフォルト言語固定）を使用している箇所があり、ギルドロケール設定が反映されない。
-
-**対象箇所:**
-
-- [x] `message-delete` 機能全体（`messageDeleteEmbedBuilder.ts`, `messageDeleteCommand.execute.ts`, `validateOptions.ts`, `runPreviewDialog.ts`, `runFinalConfirmDialog.ts`, `runDeleteExecution.ts`, `runConditionSetupStep.ts`, `runScanPhase.ts`, `buildTargetChannels.ts`, `dialogUtils.ts`, `messageDeleteService.ts`）— 約100箇所
-- [x] `bumpPanelButtonHandler.ts` — パネル操作応答（約8箇所）
-- [x] `stickyMessageSet.ts`, `stickyMessageUpdate.ts` — モーダル構築
-- [x] `memberLogConfigCommand.setJoinMessage.ts`, `memberLogConfigCommand.setLeaveMessage.ts` — モーダル構築
-- [ ] `ValidationError` に渡すメッセージ（各 `*Command.execute.ts`）— `interactionErrorHandler` で catch されユーザーに表示されるが、throw 時点で `tDefault` により言語固定される。設計レベルの検討が必要
-
-### 6. インテグレーションテスト拡充
+### 3. インテグレーションテスト拡充
 
 ※ 現状Bumpリマインダーのみインテグレーションテストが存在
 
@@ -177,21 +94,52 @@ locales/ja/
 - [ ] VC募集機能のインテグレーションテスト追加
 - [ ] VC操作コマンドのインテグレーションテスト追加
 
-### 6. 新機能実装予定
+### 7. 各機能リセットコマンド実装
 
-#### 6.1 各機能リセットコマンド
+仕様書作成済み。以下のタスクをまとめて対応する。
 
-- [ ] 機能ごとの設定リセットコマンドを各featureに追加
+#### 7.1 共通基盤
 
-#### 6.2 プロフィール機能
+- [ ] ページネーション共通関数の実装（ボタン行 + ジャンプモーダル）
+- [ ] メッセージ削除プレビュー・最終確認のタイトルからページ情報を除去（ページネーションボタンに移行）
+- [ ] メッセージ削除のEmbed を `createInfoEmbed` に統一
+
+#### 7.2 AFK リセット
+
+- [ ] `/afk-config reset` サブコマンド実装
+- [ ] `/afk-config view` を未設定時にもエラーにせず状態表示に変更（`createWarningEmbed` 使用）
+- [ ] テスト実装
+
+#### 7.3 Bumpリマインダー リセット + 通知ユーザー削除
+
+- [ ] `/bump-reminder-config reset` サブコマンド実装
+- [ ] `/bump-reminder-config remove-mention-users` サブコマンド実装（セレクトメニュー + ページネーション + 全員選択/サーバー非在籍のみ選択）
+- [ ] 各サブコマンドの権限チェックを execute 入口に集約
+- [ ] テスト実装
+
+#### 7.4 メンバーログ リセット
+
+- [ ] `/member-log-config reset` サブコマンド実装
+- [ ] 滞在期間の表示を日数のみから年・月・日形式に変更
+- [ ] テスト実装
+
+#### 7.5 VAC トリガーチャンネル削除の複数選択化
+
+- [ ] `/vac-config remove-trigger-vc` をセレクトメニュー（複数選択可）+ 削除ボタン形式に変更
+- [ ] テスト実装
+
+
+### 8. 新機能実装予定
+
+#### 8.1 プロフィール機能
 
 - [ ] 仕様書作成（`/user-info` をプロフィール情報と統合して実装予定）
 
-#### 6.3 サポートチャンネル機能（チケット型）
+#### 8.2 サポートチャンネル機能（チケット型）
 
 - [ ] 仕様書作成
 
-#### 6.4 ボタンリアクションロール機能
+#### 8.3 ボタンリアクションロール機能
 
 - [ ] 仕様書作成
 
@@ -227,5 +175,4 @@ locales/ja/
 
 - 自動翻訳機能（DeepL API等）
 - 投票システム（Discord標準投票との差別化: グラフ化・レポート集計）
-- ギルド管理者向けエラー通知チャンネル（複数サーバー公開時）
 - メトリクス収集 / アラート設定（運用規模拡大時）

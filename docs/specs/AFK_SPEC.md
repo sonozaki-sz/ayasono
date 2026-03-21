@@ -169,8 +169,8 @@
 
 | コンポーネント | emoji | ラベル | スタイル | 動作 |
 | --- | --- | --- | --- | --- |
-| `afk-config:reset:confirm` | 🗑️ | リセットする | Danger | 設定をクリアして完了メッセージに更新 |
-| `afk-config:reset:cancel` | ❌ | キャンセル | Secondary | キャンセルメッセージに更新 |
+| `afk-config:reset-confirm` | 🗑️ | リセットする | Danger | 設定をクリアして完了メッセージに更新 |
+| `afk-config:reset-cancel` | ❌ | キャンセル | Secondary | キャンセルメッセージに更新 |
 
 ---
 
@@ -196,33 +196,33 @@
 
 **翻訳ファイル:** `src/shared/locale/locales/{ja,en}/features/afk.ts`
 
-### 実装済みキー（新規約に移行予定）
+### 実装済みキー
 
-| キー | ja | en |
-| --- | --- | --- |
-| `afk.description` | AFKチャンネルにユーザーを移動 | Move user to AFK channel |
-| `afk.user.description` | 移動するユーザー（省略で自分） | User to move (default: yourself) |
-| `afk-config.description` | AFK機能の設定（サーバー管理権限が必要） | Configure AFK feature (requires Manage Server) |
-| `afk-config.set-channel.description` | AFKチャンネルを設定 | Configure AFK channel |
-| `afk-config.set-channel.channel.description` | AFKチャンネル（ボイスチャンネル） | AFK channel (voice channel) |
-| `afk-config.view.description` | 現在の設定を表示 | Show current settings |
-| `user-response.moved` | {{user}} を {{channel}} に移動しました。 | Moved {{user}} to {{channel}} |
-| `user-response.set_channel_success` | AFKチャンネルを {{channel}} に設定しました。 | AFK channel configured: {{channel}} |
-| `user-response.not_configured` | AFKチャンネルが設定されていません。\n`/afk-config set-channel` でチャンネルを設定してください。（管理者用） | AFK channel is not configured.\nPlease configure a channel with `/afk-config set-channel` (administrator only). |
-| `user-response.member_not_found` | ユーザーが見つかりませんでした。 | User not found. |
-| `user-response.user_not_in_voice` | 指定されたユーザーはボイスチャンネルにいません。 | The specified user is not in a voice channel. |
-| `user-response.channel_not_found` | AFKチャンネルが見つかりませんでした。\nチャンネルが削除されている可能性があります。 | AFK channel not found.\nThe channel may have been deleted. |
-| `user-response.invalid_channel_type` | ボイスチャンネルを指定してください。 | Please specify a voice channel. |
-| `embed.title.success` | 設定完了 | Settings Updated |
-| `embed.title.config_view` | AFK機能 | AFK |
-| `embed.field.name.channel` | AFKチャンネル | AFK Channel |
-| `embed.field.value.not_configured` | AFKチャンネルが設定されていません。 | AFK channel is not configured |
-| `log.moved` | ユーザーをAFKチャンネルに移動 GuildId: {{guildId}} UserId: {{userId}} ChannelId: {{channelId}} | moved user to AFK channel GuildId: {{guildId}} UserId: {{userId}} ChannelId: {{channelId}} |
-| `log.configured` | AFKチャンネル設定 GuildId: {{guildId}} ChannelId: {{channelId}} | channel configured GuildId: {{guildId}} ChannelId: {{channelId}} |
-| `log.database_channel_set` | AFKチャンネルを設定 GuildId: {{guildId}} ChannelId: {{channelId}} | AFK channel set GuildId: {{guildId}} ChannelId: {{channelId}} |
-| `log.database_channel_set_failed` | AFKチャンネル設定に失敗 GuildId: {{guildId}} ChannelId: {{channelId}} | Failed to set AFK channel GuildId: {{guildId}} ChannelId: {{channelId}} |
-| `log.database_config_saved` | AFK設定を保存 GuildId: {{guildId}} | AFK config saved GuildId: {{guildId}} |
-| `log.database_config_save_failed` | AFK設定保存に失敗 GuildId: {{guildId}} | Failed to save AFK config GuildId: {{guildId}} |
+| キー | 用途 | ja | en |
+| --- | --- | --- | --- |
+| `afk.description` | コマンド説明 | AFKチャンネルにユーザーを移動 | Move user to AFK channel |
+| `afk.user.description` | オプション説明 | 移動するユーザー（省略で自分） | User to move (default: yourself) |
+| `afk-config.description` | コマンド説明 | AFK機能の設定（サーバー管理権限が必要） | Configure AFK feature (requires Manage Server) |
+| `afk-config.set-channel.description` | サブコマンド説明 | AFKチャンネルを設定 | Configure AFK channel |
+| `afk-config.set-channel.channel.description` | オプション説明 | AFKチャンネル（ボイスチャンネル） | AFK channel (voice channel) |
+| `afk-config.view.description` | サブコマンド説明 | 現在の設定を表示 | Show current settings |
+| `user-response.moved` | 移動成功 | {{user}} を {{channel}} に移動しました。 | Moved {{user}} to {{channel}} |
+| `user-response.set_channel_success` | チャンネル設定成功 | AFKチャンネルを {{channel}} に設定しました。 | AFK channel configured: {{channel}} |
+| `user-response.not_configured` | 未設定エラー | AFKチャンネルが設定されていません。\n`/afk-config set-channel` でチャンネルを設定してください。（管理者用） | AFK channel is not configured.\nPlease configure a channel with `/afk-config set-channel` (administrator only). |
+| `user-response.member_not_found` | ユーザー不在エラー | ユーザーが見つかりませんでした。 | User not found. |
+| `user-response.user_not_in_voice` | VC未参加エラー | 指定されたユーザーはボイスチャンネルにいません。 | The specified user is not in a voice channel. |
+| `user-response.channel_not_found` | チャンネル不在エラー | AFKチャンネルが見つかりませんでした。\nチャンネルが削除されている可能性があります。 | AFK channel not found.\nThe channel may have been deleted. |
+| `user-response.invalid_channel_type` | チャンネル種別エラー | ボイスチャンネルを指定してください。 | Please specify a voice channel. |
+| `embed.title.success` | 設定完了タイトル | 設定完了 | Settings Updated |
+| `embed.title.config_view` | 設定表示タイトル | AFK機能 | AFK |
+| `embed.field.name.channel` | チャンネルフィールド名 | AFKチャンネル | AFK Channel |
+| `embed.field.value.not_configured` | 未設定フィールド値 | AFKチャンネルが設定されていません。 | AFK channel is not configured |
+| `log.moved` | コマンド実行ログ | ユーザーをAFKチャンネルに移動 GuildId: {{guildId}} UserId: {{userId}} ChannelId: {{channelId}} | moved user to AFK channel GuildId: {{guildId}} UserId: {{userId}} ChannelId: {{channelId}} |
+| `log.configured` | コマンド実行ログ | AFKチャンネル設定 GuildId: {{guildId}} ChannelId: {{channelId}} | channel configured GuildId: {{guildId}} ChannelId: {{channelId}} |
+| `log.database_channel_set` | DB操作ログ | AFKチャンネルを設定 GuildId: {{guildId}} ChannelId: {{channelId}} | AFK channel set GuildId: {{guildId}} ChannelId: {{channelId}} |
+| `log.database_channel_set_failed` | DB操作エラーログ | AFKチャンネル設定に失敗 GuildId: {{guildId}} ChannelId: {{channelId}} | Failed to set AFK channel GuildId: {{guildId}} ChannelId: {{channelId}} |
+| `log.database_config_saved` | DB操作ログ | AFK設定を保存 GuildId: {{guildId}} | AFK config saved GuildId: {{guildId}} |
+| `log.database_config_save_failed` | DB操作エラーログ | AFK設定保存に失敗 GuildId: {{guildId}} | Failed to save AFK config GuildId: {{guildId}} |
 
 ### reset 新規追加分
 

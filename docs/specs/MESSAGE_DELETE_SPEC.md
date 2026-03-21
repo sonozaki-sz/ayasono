@@ -124,9 +124,9 @@ stateDiagram-v2
 
 | 行  | コンポーネント    | customId                                                                                    | 動作                                                                  |
 | --- | ----------------- | ------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| 1   | UserSelectMenu    | `message-delete:select-user`                                                                | 最大25人、複数選択可。`minValues: 0`、`maxValues: 25`                 |
-| 2   | ChannelSelectMenu | `message-delete:select-channel`                                                             | 最大25チャンネル、テキストベースのみ。`minValues: 0`、`maxValues: 25` |
-| 3   | ボタン×3          | `message-delete:start-scan` / `message-delete:webhook-input` / `message-delete:cond-cancel` | スキャン開始 / Webhook ID 入力モーダル / キャンセル                   |
+| 1   | UserSelectMenu    | `message-delete:user-select`                                                                | 最大25人、複数選択可。`minValues: 0`、`maxValues: 25`                 |
+| 2   | ChannelSelectMenu | `message-delete:channel-select`                                                             | 最大25チャンネル、テキストベースのみ。`minValues: 0`、`maxValues: 25` |
+| 3   | ボタン×3          | `message-delete:scan-start` / `message-delete:webhook-input` / `message-delete:condition-cancel` | スキャン開始 / Webhook ID 入力モーダル / キャンセル                   |
 
 **Webhook ID 入力モーダル:**
 
@@ -244,17 +244,17 @@ flowchart TD
 
 | コンポーネント | emoji | ラベル | スタイル | 動作 |
 | --- | --- | --- | --- | --- |
-| `message-delete:first` | ⏮ | ― | Secondary | 最初のページ（1ページ目は `disabled`） |
-| `message-delete:prev` | ◀ | ― | Secondary | 前のページ（1ページ目は `disabled`） |
-| `message-delete:jump` | ― | {{page}}/{{total}}ページ | Secondary | 押下でモーダル表示、番号入力でページジャンプ |
-| `message-delete:next` | ▶ | ― | Secondary | 次のページ（最終ページは `disabled`） |
-| `message-delete:last` | ⏭ | ― | Secondary | 最後のページ（最終ページは `disabled`） |
+| `message-delete:page-first` | ⏮ | ― | Secondary | 最初のページ（1ページ目は `disabled`） |
+| `message-delete:page-prev` | ◀ | ― | Secondary | 前のページ（1ページ目は `disabled`） |
+| `message-delete:page-jump` | ― | {{page}}/{{total}}ページ | Secondary | 押下でモーダル表示、番号入力でページジャンプ |
+| `message-delete:page-next` | ▶ | ― | Secondary | 次のページ（最終ページは `disabled`） |
+| `message-delete:page-last` | ⏭ | ― | Secondary | 最後のページ（最終ページは `disabled`） |
 
 **Row 2 - 投稿者フィルター:**
 
 | コンポーネント | 種別 | 設定 |
 | --- | --- | --- |
-| `message-delete:filter-author` | StringSelect | 投稿者フィルター。選択肢はスキャン全体から収集（フィルター状態に依存しない） |
+| `message-delete:author-filter` | StringSelect | 投稿者フィルター。選択肢はスキャン全体から収集（フィルター状態に依存しない） |
 
 **Row 3 - フィルターボタン:**
 
@@ -262,24 +262,24 @@ flowchart TD
 
 | コンポーネント | emoji | ラベル | スタイル | 動作 |
 | --- | --- | --- | --- | --- |
-| `message-delete:filter-days` | ― | 日数 / 入力値 | Secondary or Primary | モーダル入力で日数フィルター設定 |
-| `message-delete:filter-after` | 📅 | after / 入力値 | Secondary or Primary | モーダル入力で開始日時フィルター設定 |
-| `message-delete:filter-before` | 📅 | before / 入力値 | Secondary or Primary | モーダル入力で終了日時フィルター設定 |
-| `message-delete:filter-keyword` | 🔍 | キーワード / 入力値 | Secondary or Primary | モーダル入力でキーワードフィルター設定 |
+| `message-delete:days-filter` | ― | 日数 / 入力値 | Secondary or Primary | モーダル入力で日数フィルター設定 |
+| `message-delete:after-date-filter` | 📅 | after / 入力値 | Secondary or Primary | モーダル入力で開始日時フィルター設定 |
+| `message-delete:before-date-filter` | 📅 | before / 入力値 | Secondary or Primary | モーダル入力で終了日時フィルター設定 |
+| `message-delete:keyword-filter` | 🔍 | キーワード / 入力値 | Secondary or Primary | モーダル入力でキーワードフィルター設定 |
 | `message-delete:filter-reset` | ✖️ | フィルターリセット | Secondary | 全フィルターをクリア |
 
 **Row 4 - 除外セレクト:**
 
 | コンポーネント | 種別 | 設定 |
 | --- | --- | --- |
-| `message-delete:confirm-exclude` | StringSelect | 現在ページの件を表示。トグルで除外追加/解除。`minValues: 0`、`maxValues: ページ件数` |
+| `message-delete:preview-exclude` | StringSelect | 現在ページの件を表示。トグルで除外追加/解除。`minValues: 0`、`maxValues: ページ件数` |
 
 **Row 5 - アクションボタン:**
 
 | コンポーネント | emoji | ラベル | スタイル | 動作 |
 | --- | --- | --- | --- | --- |
-| `message-delete:confirm-yes` | 🗑️ | 削除する（N件） | Danger | 最終確認へ |
-| `message-delete:confirm-no` | ❌ | キャンセル | Secondary | キャンセル → 終了 |
+| `message-delete:preview-confirm` | 🗑️ | 削除する（N件） | Danger | 最終確認へ |
+| `message-delete:preview-cancel` | ❌ | キャンセル | Secondary | キャンセル → 終了 |
 
 **除外の仕様:**
 
@@ -319,19 +319,19 @@ flowchart TD
 
 | コンポーネント | emoji | ラベル | スタイル | 動作 |
 | --- | --- | --- | --- | --- |
-| `message-delete:first` | ⏮ | ― | Secondary | 最初のページ（1ページ目は `disabled`） |
-| `message-delete:prev` | ◀ | ― | Secondary | 前のページ（1ページ目は `disabled`） |
-| `message-delete:jump` | ― | {{page}}/{{total}}ページ | Secondary | 押下でモーダル表示、番号入力でページジャンプ |
-| `message-delete:next` | ▶ | ― | Secondary | 次のページ（最終ページは `disabled`） |
-| `message-delete:last` | ⏭ | ― | Secondary | 最後のページ（最終ページは `disabled`） |
+| `message-delete:page-first` | ⏮ | ― | Secondary | 最初のページ（1ページ目は `disabled`） |
+| `message-delete:page-prev` | ◀ | ― | Secondary | 前のページ（1ページ目は `disabled`） |
+| `message-delete:page-jump` | ― | {{page}}/{{total}}ページ | Secondary | 押下でモーダル表示、番号入力でページジャンプ |
+| `message-delete:page-next` | ▶ | ― | Secondary | 次のページ（最終ページは `disabled`） |
+| `message-delete:page-last` | ⏭ | ― | Secondary | 最後のページ（最終ページは `disabled`） |
 
 **Row 2 - アクションボタン:**
 
 | コンポーネント | emoji | ラベル | スタイル | 動作 |
 | --- | --- | --- | --- | --- |
-| `message-delete:final-yes` | 🗑️ | 削除する | Danger | 削除実行 |
-| `message-delete:final-back` | ◀ | 設定し直す | Secondary | プレビューに戻る（除外セット・フィルター状態は保持） |
-| `message-delete:final-no` | ❌ | キャンセル | Secondary | 終了 |
+| `message-delete:deletion-confirm` | 🗑️ | 削除する | Danger | 削除実行 |
+| `message-delete:deletion-back` | ◀ | 設定し直す | Secondary | プレビューに戻る（除外セット・フィルター状態は保持） |
+| `message-delete:deletion-cancel` | ❌ | キャンセル | Secondary | 終了 |
 
 - フィルター・除外操作なし（読み取り専用の確認画面）
 - プレビューで適用していたフィルターは最終確認には引き継がれない
@@ -404,7 +404,7 @@ flowchart TD
 
 ---
 
-## ローカライズ (新規約に移行予定)
+## ローカライズ
 
 **翻訳ファイル:** `src/shared/locale/locales/{ja,en}/features/messageDelete.ts`
 
@@ -468,15 +468,15 @@ flowchart TD
 | `ui.button.cancel` | キャンセル | Cancel |
 | `ui.select.exclude_placeholder` | このページから除外するメッセージを選択 | Select messages to exclude from this page |
 | `ui.select.exclude_no_messages` | (メッセージなし) | (no messages) |
-| `ui.button.final_yes` | 削除する（{{count}}件） | Delete ({{count}}) |
-| `ui.button.final_back` | 設定し直す | Go back |
-| `ui.button.final_cancel` | キャンセル | Cancel |
+| `ui.button.deletion_confirm` | 削除する（{{count}}件） | Delete ({{count}}) |
+| `ui.button.deletion_back` | 設定し直す | Go back |
+| `ui.button.deletion_cancel` | キャンセル | Cancel |
 | `ui.button.days_set` | 過去{{days}}日間 | Past {{days}} days |
 | `ui.button.days_empty` | 過去N日間を入力 | Enter past N days |
-| `ui.button.after_set` | after: {{date}} | after: {{date}} |
-| `ui.button.after_empty` | after（開始日時）を入力 | Enter after date |
-| `ui.button.before_set` | before: {{date}} | before: {{date}} |
-| `ui.button.before_empty` | before（終了日時）を入力 | Enter before date |
+| `ui.button.after_date_set` | after: {{date}} | after: {{date}} |
+| `ui.button.after_date_empty` | after（開始日時）を入力 | Enter after date |
+| `ui.button.before_date_set` | before: {{date}} | before: {{date}} |
+| `ui.button.before_date_empty` | before（終了日時）を入力 | Enter before date |
 | `ui.button.keyword` | 内容で検索 | Search by content |
 | `ui.button.keyword_set` | {{keyword}} | {{keyword}} |
 | `ui.button.reset` | リセット | Reset |
@@ -511,9 +511,9 @@ flowchart TD
 | キー | ja | en |
 | --- | --- | --- |
 | `embed.title.confirm` | 📋 削除対象メッセージ（{{page}} / {{total}} ページ） | 📋 Messages to Delete ({{page}} / {{total}}) |
-| `embed.title.final_confirm` | 🗑️ 本当に削除しますか？（{{page}} / {{total}} ページ） | 🗑️ Are you sure? ({{page}} / {{total}}) |
-| `embed.description.final_warning` | ⚠️ **この操作は取り消せません** | ⚠️ **This action cannot be undone** |
-| `embed.description.final_confirm` | 以下のメッセージを削除します（合計 {{count}}件） | The following messages will be deleted (total: {{count}}) |
+| `embed.title.deletion_confirm` | 🗑️ 本当に削除しますか？（{{page}} / {{total}} ページ） | 🗑️ Are you sure? ({{page}} / {{total}}) |
+| `embed.description.deletion_warning` | ⚠️ **この操作は取り消せません** | ⚠️ **This action cannot be undone** |
+| `embed.description.deletion_confirm` | 以下のメッセージを削除します（合計 {{count}}件） | The following messages will be deleted (total: {{count}}) |
 | `embed.title.summary` | ✅ 削除完了 | ✅ Deletion Complete |
 | `embed.field.name.total_deleted` | 合計削除件数 | Total Deleted |
 | `embed.field.value.total_deleted` | {{count}}件 | {{count}} |
