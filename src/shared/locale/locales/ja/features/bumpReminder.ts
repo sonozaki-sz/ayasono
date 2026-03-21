@@ -4,7 +4,7 @@
 export const bumpReminder = {
   // ── コマンド定義 ─────────────────────────────
   "bump-reminder-config.description":
-    "Bumpリマインダーの設定（管理者専用）",
+    "Bumpリマインダーの設定（サーバー管理権限が必要）",
   "bump-reminder-config.enable.description":
     "Bumpリマインダー機能を有効化",
   "bump-reminder-config.disable.description":

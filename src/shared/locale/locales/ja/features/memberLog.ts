@@ -4,7 +4,7 @@
 export const memberLog = {
   // ── コマンド定義 ─────────────────────────────
   "member-log-config.description":
-    "メンバーログ機能の設定（管理者専用）",
+    "メンバーログ機能の設定（サーバー管理権限が必要）",
   "member-log-config.set-channel.description":
     "通知チャンネルを設定",
   "member-log-config.set-channel.channel.description":

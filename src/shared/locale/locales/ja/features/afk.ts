@@ -8,7 +8,7 @@ export const afk = {
   "afk.user.description":
     "移動するユーザー（省略で自分）",
   "afk-config.description":
-    "AFK機能の設定（管理者専用）",
+    "AFK機能の設定（サーバー管理権限が必要）",
   "afk-config.set-channel.description":
     "AFKチャンネルを設定",
   "afk-config.set-channel.channel.description":
@@ -22,7 +22,7 @@ export const afk = {
   "user-response.set_channel_success":
     "AFKチャンネルを {{channel}} に設定しました。",
   "user-response.not_configured":
-    "AFKチャンネルが設定されていません。\n`/afk-config set-channel` でチャンネルを設定してください。（管理者用）",
+    "AFKチャンネルが設定されていません。\n`/afk-config set-channel` でチャンネルを設定してください。（サーバー管理権限が必要）",
   "user-response.member_not_found":
     "ユーザーが見つかりませんでした。",
   "user-response.user_not_in_voice":

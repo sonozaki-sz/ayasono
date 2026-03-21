@@ -4,7 +4,7 @@
 export const bumpReminder = {
   // ── Command definitions ──────────────────────
   "bump-reminder-config.description":
-    "Configure bump reminder (administrators only)",
+    "Configure bump reminder (requires Manage Server)",
   "bump-reminder-config.enable.description":
     "Enable bump reminder feature",
   "bump-reminder-config.disable.description":

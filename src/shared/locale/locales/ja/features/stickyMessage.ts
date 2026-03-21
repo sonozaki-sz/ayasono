@@ -4,7 +4,7 @@
 export const stickyMessage = {
   // ── コマンド定義 ─────────────────────────────
   "sticky-message.description":
-    "スティッキーメッセージ（チャンネル最下部固定）の管理（チャンネル管理者専用）",
+    "スティッキーメッセージ（チャンネル最下部固定）の管理（チャンネル管理権限が必要）",
   "sticky-message.set.description":
     "スティッキーメッセージを設定（モーダル入力）",
   "sticky-message.set.channel.description":

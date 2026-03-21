@@ -4,7 +4,7 @@
 export const vac = {
   // ── コマンド定義 ─────────────────────────────
   "vac-config.description":
-    "VC自動作成機能の設定（サーバー管理者向け）",
+    "VC自動作成機能の設定（サーバー管理権限が必要）",
   "vac-config.create-trigger-vc.description":
     "トリガーチャンネルを作成",
   "vac-config.create-trigger-vc.category.description":

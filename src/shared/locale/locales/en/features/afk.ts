@@ -8,7 +8,7 @@ export const afk = {
   "afk.user.description":
     "User to move (default: yourself)",
   "afk-config.description":
-    "Configure AFK feature (administrators only)",
+    "Configure AFK feature (requires Manage Server)",
   "afk-config.set-channel.description":
     "Configure AFK channel",
   "afk-config.set-channel.channel.description":
@@ -22,7 +22,7 @@ export const afk = {
   "user-response.set_channel_success":
     "AFK channel configured: {{channel}}",
   "user-response.not_configured":
-    "AFK channel is not configured.\nPlease configure a channel with `/afk-config set-channel` (administrator only).",
+    "AFK channel is not configured.\nPlease configure a channel with `/afk-config set-channel` (requires Manage Server).",
   "user-response.member_not_found":
     "User not found.",
   "user-response.user_not_in_voice":

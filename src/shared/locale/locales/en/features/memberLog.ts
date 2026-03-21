@@ -4,7 +4,7 @@
 export const memberLog = {
   // ── Command definitions ──────────────────────
   "member-log-config.description":
-    "Configure member log feature (administrators only)",
+    "Configure member log feature (requires Manage Server)",
   "member-log-config.set-channel.description":
     "Set the notification channel",
   "member-log-config.set-channel.channel.description":

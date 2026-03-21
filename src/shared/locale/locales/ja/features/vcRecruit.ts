@@ -4,7 +4,7 @@
 export const vcRecruit = {
   // ── コマンド定義 ─────────────────────────────
   "vc-recruit-config.description":
-    "VC募集機能の設定（サーバー管理者向け）",
+    "VC募集機能の設定（サーバー管理権限が必要）",
   "vc-recruit-config.setup.description":
     "VC募集チャンネルをセットアップ",
   "vc-recruit-config.setup.category.description":
@@ -215,7 +215,7 @@ export const vcRecruit = {
   "user-response.voice_state_update_failed":
     "[VC募集機能] voiceStateUpdate処理失敗",
   "user-response.no_permission":
-    "この操作は投稿者または管理者のみ実行できます。",
+    "この操作は投稿者またはサーバー管理権限保持者のみ実行できます。",
   "user-response.vc_already_deleted":
     "対象のVCは既に削除されています。",
   "user-response.no_roles_registered":

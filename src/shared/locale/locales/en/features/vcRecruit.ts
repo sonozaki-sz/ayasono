@@ -4,7 +4,7 @@
 export const vcRecruit = {
   // ── Command definitions ──────────────────────
   "vc-recruit-config.description":
-    "VC recruit feature settings (server administrators only)",
+    "VC recruit feature settings (requires Manage Server)",
   "vc-recruit-config.setup.description":
     "Set up VC recruit channels",
   "vc-recruit-config.setup.category.description":
@@ -216,7 +216,7 @@ export const vcRecruit = {
   "user-response.voice_state_update_failed":
     "[VcRecruit] Failed to process voiceStateUpdate",
   "user-response.no_permission":
-    "Only the recruiter or a channel manager can perform this action.",
+    "Only the recruiter or a user with Manage Server permission can perform this action.",
   "user-response.vc_already_deleted":
     "The target VC has already been deleted.",
   "user-response.no_roles_registered":
