@@ -64,7 +64,7 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.disable"
       embeds: [
         {
           description:
-            "commands:bump-reminder-config.embed.disable_success",
+            "bumpReminder:user-response.disable_success",
         },
       ],
       flags: 64,

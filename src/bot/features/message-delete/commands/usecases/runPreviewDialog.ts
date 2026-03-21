@@ -7,7 +7,7 @@ import {
   type MessageComponentInteraction,
 } from "discord.js";
 import { getTimezoneOffsetForLocale } from "../../../../../shared/locale/helpers";
-import { tDefault } from "../../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import { createWarningEmbed } from "../../../../utils/messageResponse";
 import {
@@ -55,7 +55,8 @@ export async function showPreviewDialog(
   let filter = { ...initialFilter };
   let excludedIds = new Set(initialExcludedIds);
   let currentPage = 0;
-  const timezoneOffset = getTimezoneOffsetForLocale(baseInteraction.locale);
+  const locale = baseInteraction.locale;
+  const timezoneOffset = getTimezoneOffsetForLocale(locale);
 
   const getFiltered = () => buildFilteredMessages(allMessages, filter);
 
@@ -69,10 +70,11 @@ export async function showPreviewDialog(
     ).length;
     return {
       embeds: [
-        buildCommandConditionsEmbed(options),
-        buildPreviewEmbed(filtered, safePage, totalPages, excludedIds),
+        buildCommandConditionsEmbed(locale, options),
+        buildPreviewEmbed(locale, filtered, safePage, totalPages, excludedIds),
       ],
       components: buildPreviewComponents(
+        locale,
         allMessages, // allMessagesForAuthorSelect: 投稿者フィルターセレクト用
         filtered,
         safePage,
@@ -104,8 +106,16 @@ export async function showPreviewDialog(
         await i.reply({
           embeds: [
             createWarningEmbed(
-              tDefault("commands:message-delete.errors.not_authorized"),
-              { title: tDefault("common:title_permission_denied") },
+              tInteraction(
+                baseInteraction.locale,
+                "messageDelete:user-response.not_authorized",
+              ),
+              {
+                title: tInteraction(
+                  baseInteraction.locale,
+                  "common:title_permission_denied",
+                ),
+              },
             ),
           ],
           flags: MessageFlags.Ephemeral,
@@ -198,10 +208,19 @@ export async function showPreviewDialog(
             .followUp({
               embeds: [
                 createWarningEmbed(
-                  tDefault("commands:message-delete.errors.jump_invalid_page", {
-                    total: totalPages,
-                  }),
-                  { title: tDefault("common:title_input_error") },
+                  tInteraction(
+                    baseInteraction.locale,
+                    "messageDelete:user-response.jump_invalid_page",
+                    {
+                      total: totalPages,
+                    },
+                  ),
+                  {
+                    title: tInteraction(
+                      baseInteraction.locale,
+                      "common:title_invalid_input",
+                    ),
+                  },
                 ),
               ],
               flags: MessageFlags.Ephemeral,
@@ -257,7 +276,11 @@ export async function showPreviewDialog(
         if (result.errorKey) {
           await baseInteraction
             .followUp({
-              embeds: [createWarningEmbed(tDefault(result.errorKey))],
+              embeds: [
+                createWarningEmbed(
+                  tInteraction(baseInteraction.locale, result.errorKey),
+                ),
+              ],
               flags: MessageFlags.Ephemeral,
             })
             .catch(() => {});
@@ -284,8 +307,16 @@ export async function showPreviewDialog(
         .editReply({
           embeds: [
             createWarningEmbed(
-              tDefault("commands:message-delete.confirm.timed_out"),
-              { title: tDefault("common:title_timeout") },
+              tInteraction(
+                baseInteraction.locale,
+                "messageDelete:user-response.timed_out",
+              ),
+              {
+                title: tInteraction(
+                  baseInteraction.locale,
+                  "common:title_timeout",
+                ),
+              },
             ),
           ],
           components: [],

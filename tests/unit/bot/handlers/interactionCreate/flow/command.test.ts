@@ -74,7 +74,7 @@ describe("bot/handlers/interactionCreate/flow/command", () => {
     await handleChatInputCommand(interaction as never, client as never);
 
     expect(interaction.reply).toHaveBeenCalledWith({
-      content: "commands:cooldown.wait",
+      content: "common:cooldown.wait",
       flags: 64,
     });
     expect(command.execute).not.toHaveBeenCalled();

@@ -101,11 +101,11 @@ describe("shared/errors/errorUtils", () => {
     const prodModule = await loadModule("production");
     expect(
       prodModule.errorUtils.getUserFriendlyMessage(new Error("secret")),
-    ).toBe("errors:general.unexpected_production");
+    ).toBe("common:general.unexpected_production");
 
     const devModule = await loadModule("development");
     expect(
       devModule.errorUtils.getUserFriendlyMessage(new Error("detail")),
-    ).toBe("errors:general.unexpected_with_message:detail");
+    ).toBe("common:general.unexpected_with_message:detail");
   });
 });

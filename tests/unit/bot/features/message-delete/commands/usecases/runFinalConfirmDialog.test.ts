@@ -30,6 +30,8 @@ vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: vi.fn((key: string, params?: Record<string, unknown>) =>
     params ? `${key}:${JSON.stringify(params)}` : key,
   ),
+  tInteraction: (_locale: string, key: string, params?: Record<string, unknown>) =>
+    params ? `${key}:${JSON.stringify(params)}` : key,
 }));
 
 vi.mock("@/shared/utils/logger", () => ({
@@ -82,14 +84,14 @@ function makeComponentInteraction(customId: string, userId = "user-1") {
 }
 
 const MSG_DEL_CUSTOM_ID = {
-  FINAL_YES: "message-delete:final-yes",
-  FINAL_NO: "message-delete:final-no",
-  FINAL_BACK: "message-delete:final-back",
-  FIRST: "message-delete:first",
-  PREV: "message-delete:prev",
-  NEXT: "message-delete:next",
-  LAST: "message-delete:last",
-  JUMP: "message-delete:jump",
+  FINAL_YES: "message-delete:deletion-confirm",
+  FINAL_NO: "message-delete:deletion-cancel",
+  FINAL_BACK: "message-delete:deletion-back",
+  FIRST: "message-delete:page-first",
+  PREV: "message-delete:page-prev",
+  NEXT: "message-delete:page-next",
+  LAST: "message-delete:page-last",
+  JUMP: "message-delete:page-jump",
 };
 
 describe("bot/features/message-delete/commands/usecases/runFinalConfirmDialog", () => {

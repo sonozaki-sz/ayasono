@@ -87,7 +87,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageRemoveButtonHandl
       "@/bot/features/sticky-message/handlers/ui/stickyMessageRemoveButtonHandler"
     );
     expect(
-      stickyMessageRemoveButtonHandler.matches("sticky-message:remove-button"),
+      stickyMessageRemoveButtonHandler.matches("sticky-message:remove-confirm"),
     ).toBe(true);
     expect(
       stickyMessageRemoveButtonHandler.matches("sticky-message:remove-select"),

@@ -40,11 +40,11 @@ export async function handleBumpReminderConfigDisable(
 
   const description = tInteraction(
     interaction.locale,
-    "commands:bump-reminder-config.embed.disable_success",
+    "bumpReminder:user-response.disable_success",
   );
   const successTitle = tInteraction(
     interaction.locale,
-    "commands:bump-reminder-config.embed.success_title",
+    "bumpReminder:embed.title.success",
   );
   const embed = createSuccessEmbed(description, { title: successTitle });
   await interaction.reply({
@@ -56,7 +56,7 @@ export async function handleBumpReminderConfigDisable(
   logger.info(
     logPrefixed(
       "system:log_prefix.bump_reminder",
-      "system:bump-reminder.config_disabled",
+      "bumpReminder:log.config_disabled",
       { guildId },
     ),
   );

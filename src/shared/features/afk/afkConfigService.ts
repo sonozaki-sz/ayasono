@@ -70,12 +70,12 @@ export class AfkConfigService {
         logger.debug(
           logPrefixed(
             "system:log_prefix.database",
-            "system:database.afk_config_saved",
+            "afk:log.database_config_saved",
             { guildId },
           ),
         );
       },
-      tDefault("system:database.afk_config_save_failed", { guildId }),
+      tDefault("afk:log.database_config_save_failed", { guildId }),
     );
   }
 
@@ -90,12 +90,12 @@ export class AfkConfigService {
         logger.debug(
           logPrefixed(
             "system:log_prefix.database",
-            "system:database.afk_channel_set",
+            "afk:log.database_channel_set",
             { guildId, channelId },
           ),
         );
       },
-      tDefault("system:database.afk_channel_set_failed", {
+      tDefault("afk:log.database_channel_set_failed", {
         guildId,
         channelId,
       }),

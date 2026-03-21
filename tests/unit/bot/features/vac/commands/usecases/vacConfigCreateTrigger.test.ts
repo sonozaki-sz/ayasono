@@ -140,11 +140,11 @@ describe("bot/features/vac/commands/usecases/vacConfigCreateTrigger", () => {
     });
     expect(addTriggerChannel).toHaveBeenCalledWith("guild-1", "trigger-new");
     expect(createSuccessEmbed).toHaveBeenCalledWith(
-      "commands:vac-config.embed.trigger_created",
-      { title: "commands:vac-config.embed.success_title" },
+      "vac:user-response.trigger_created",
+      { title: "vac:embed.title.success" },
     );
     expect(reply).toHaveBeenCalledWith({
-      embeds: [{ description: "commands:vac-config.embed.trigger_created" }],
+      embeds: [{ description: "vac:user-response.trigger_created" }],
       flags: MessageFlags.Ephemeral,
     });
   });

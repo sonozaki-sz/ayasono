@@ -22,17 +22,18 @@ import {
   logError,
   toError,
 } from "../../shared/errors/errorHandler";
-import {
-  logPrefixed,
-  tDefault,
-  tInteraction,
-} from "../../shared/locale/localeManager";
+import { logPrefixed, tInteraction } from "../../shared/locale/localeManager";
 import { logger } from "../../shared/utils/logger";
-import { createErrorEmbed } from "../utils/messageResponse";
+import { createErrorEmbed, createWarningEmbed } from "../utils/messageResponse";
+
+/** ユーザー操作で回復可能なエラー（warning レベルで表示） */
+const WARNING_ERROR_CLASSES: ReadonlyArray<
+  new (...args: never[]) => BaseError
+> = [ValidationError, NotFoundError, TimeoutError, ConfigurationError];
 
 /** エラークラスと common タイトルキーの対応 */
 const ERROR_TITLE_MAP = [
-  [ValidationError, "common:title_input_error"],
+  [ValidationError, "common:title_invalid_input"],
   [PermissionError, "common:title_permission_denied"],
   [NotFoundError, "common:title_resource_not_found"],
   [TimeoutError, "common:title_timeout"],
@@ -65,7 +66,7 @@ const getErrorTitle = (
   }
 
   // フォールバック
-  return tDefault("common:error");
+  return tInteraction(interaction.locale, "common:error");
 };
 
 /**
@@ -82,9 +83,22 @@ const replyWithError = async (
   const err = toError(error);
   logError(err);
 
-  const message = getUserFriendlyMessage(err);
+  // messageKey が設定されている場合は interaction.locale で遅延翻訳する
+  const message =
+    err instanceof BaseError && err.messageKey
+      ? tInteraction(
+          interaction.locale,
+          err.messageKey as Parameters<typeof tInteraction>[1],
+          err.messageParams,
+        )
+      : getUserFriendlyMessage(err);
   const title = getErrorTitle(interaction, err);
-  const embed = createErrorEmbed(message, { title });
+  const isWarning =
+    err instanceof BaseError &&
+    WARNING_ERROR_CLASSES.some((cls) => err instanceof cls);
+  const embed = isWarning
+    ? createWarningEmbed(message, { title })
+    : createErrorEmbed(message, { title });
 
   try {
     if (interaction.deferred || interaction.replied) {

@@ -11,7 +11,7 @@ import {
 } from "discord.js";
 import {
   logPrefixed,
-  tDefault,
+  tInteraction,
 } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import {
@@ -52,16 +52,22 @@ export async function runScanPhase(
   const cancelState = { reason: "user" as "user" | "timeout" };
 
   const buildProgressContent = (totalScanned: number, collected: number) =>
-    tDefault("commands:message-delete.confirm.scan_progress", {
-      totalScanned,
-      collected,
-      limit: count,
-    });
+    tInteraction(
+      interaction.locale,
+      "messageDelete:user-response.scan_progress",
+      {
+        totalScanned,
+        collected,
+        limit: count,
+      },
+    );
 
   const cancelRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
       .setCustomId(MSG_DEL_CUSTOM_ID.SCAN_CANCEL)
-      .setLabel(tDefault("commands:message-delete.confirm.btn_scan_cancel"))
+      .setLabel(
+        tInteraction(interaction.locale, "messageDelete:ui.button.scan_cancel"),
+      )
       .setStyle(ButtonStyle.Secondary),
   );
 
@@ -97,7 +103,7 @@ export async function runScanPhase(
       logger.debug(
         logPrefixed(
           "system:log_prefix.msg_del",
-          "system:message-delete.cancel_collector_ended",
+          "messageDelete:log.cancel_collector_ended",
           {
             reason: String(reason),
           },
@@ -107,7 +113,7 @@ export async function runScanPhase(
         logger.debug(
           logPrefixed(
             "system:log_prefix.msg_del",
-            "system:message-delete.aborting_non_user_end",
+            "messageDelete:log.aborting_non_user_end",
           ),
         );
         controller.abort();
@@ -119,6 +125,7 @@ export async function runScanPhase(
   let scannedMessages: ScannedMessageWithChannel[];
   try {
     scannedMessages = await scanMessages(channels, {
+      locale: interaction.locale,
       count,
       targetUserIds,
       keyword,
@@ -135,17 +142,20 @@ export async function runScanPhase(
     });
   } catch (error) {
     logger.error(
-      logPrefixed(
-        "system:log_prefix.msg_del",
-        "system:message-delete.scan_error",
-        { error: String(error) },
-      ),
+      logPrefixed("system:log_prefix.msg_del", "messageDelete:log.scan_error", {
+        error: String(error),
+      }),
     );
     await interaction.editReply({
       embeds: [
         createErrorEmbed(
-          tDefault("commands:message-delete.errors.scan_failed"),
-          { title: tDefault("common:title_scan_error") },
+          tInteraction(
+            interaction.locale,
+            "messageDelete:user-response.scan_failed",
+          ),
+          {
+            title: tInteraction(interaction.locale, "common:title_scan_error"),
+          },
         ),
       ],
       content: "",
@@ -164,10 +174,10 @@ export async function runScanPhase(
       // 収集0件: タイムアウトとユーザー中断で別メッセージを表示して終了
       const msgKey =
         cancelState.reason === "timeout"
-          ? ("commands:message-delete.confirm.scan_timed_out_empty" as const)
-          : ("commands:message-delete.confirm.cancelled" as const);
+          ? ("messageDelete:user-response.scan_timed_out_empty" as const)
+          : ("messageDelete:user-response.cancelled" as const);
       await interaction.editReply({
-        embeds: [createInfoEmbed(tDefault(msgKey))],
+        embeds: [createInfoEmbed(tInteraction(interaction.locale, msgKey))],
         content: "",
         components: [],
       });
@@ -179,7 +189,10 @@ export async function runScanPhase(
       await interaction.editReply({
         embeds: [
           createInfoEmbed(
-            tDefault("commands:message-delete.confirm.scan_timed_out"),
+            tInteraction(
+              interaction.locale,
+              "messageDelete:user-response.scan_timed_out",
+            ),
           ),
         ],
         content: "",

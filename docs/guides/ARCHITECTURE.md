@@ -466,4 +466,4 @@ export function getReminderDelayMinutes(): number {
 - [DEPLOYMENT.md](DEPLOYMENT.md) - GitHub Actions デプロイフロー
 - [I18N_GUIDE.md](I18N_GUIDE.md) - 多言語対応
 - [TESTING_GUIDELINES.md](TESTING_GUIDELINES.md) - テスト方針
-- [COMMANDS.md](COMMANDS.md) - コマンドリファレンス
+

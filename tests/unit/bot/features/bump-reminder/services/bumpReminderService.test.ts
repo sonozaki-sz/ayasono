@@ -127,7 +127,7 @@ describe("shared/features/bump-reminder/manager", () => {
       "cancelled",
     );
     expect(logger.error).toHaveBeenCalledWith(
-      expect.stringContaining("system:scheduler.bump_reminder_task_failed"),
+      expect.stringContaining("bumpReminder:log.scheduler_task_failed"),
       expect.any(Error),
     );
   });
@@ -181,7 +181,7 @@ describe("shared/features/bump-reminder/manager", () => {
       "cancelled",
     );
     expect(logger.info).toHaveBeenCalledWith(
-      expect.stringContaining("system:scheduler.bump_reminder_cancelling"),
+      expect.stringContaining("bumpReminder:log.scheduler_cancelling"),
     );
   });
 
@@ -342,7 +342,7 @@ describe("shared/features/bump-reminder/manager", () => {
 
     expect(cancelSpy).toHaveBeenCalledWith("g-x");
     expect(logger.error).toHaveBeenCalledWith(
-      expect.stringContaining("system:scheduler.bump_reminder_task_failed"),
+      expect.stringContaining("bumpReminder:log.scheduler_task_failed"),
       expect.any(Error),
     );
   });
@@ -376,7 +376,7 @@ describe("shared/features/bump-reminder/manager", () => {
       undefined,
     );
     expect(logger.info).not.toHaveBeenCalledWith(
-      expect.stringContaining("system:scheduler.bump_reminder_duplicates_cancelled"),
+      expect.stringContaining("bumpReminder:log.scheduler_duplicates_cancelled"),
     );
   });
 
@@ -395,7 +395,7 @@ describe("shared/features/bump-reminder/manager", () => {
 
     expect(cancelSpy).toHaveBeenCalledWith("g-ok");
     expect(logger.error).not.toHaveBeenCalledWith(
-      expect.stringContaining("system:scheduler.bump_reminder_task_failed"),
+      expect.stringContaining("bumpReminder:log.scheduler_task_failed"),
       expect.anything(),
     );
   });

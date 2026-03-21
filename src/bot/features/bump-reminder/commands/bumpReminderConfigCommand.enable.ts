@@ -37,11 +37,11 @@ export async function handleBumpReminderConfigEnable(
 
   const description = tInteraction(
     interaction.locale,
-    "commands:bump-reminder-config.embed.enable_success",
+    "bumpReminder:user-response.enable_success",
   );
   const successTitle = tInteraction(
     interaction.locale,
-    "commands:bump-reminder-config.embed.success_title",
+    "bumpReminder:embed.title.success",
   );
   const embed = createSuccessEmbed(description, { title: successTitle });
   await interaction.reply({
@@ -53,7 +53,7 @@ export async function handleBumpReminderConfigEnable(
   logger.info(
     logPrefixed(
       "system:log_prefix.bump_reminder",
-      "system:bump-reminder.config_enabled",
+      "bumpReminder:log.config_enabled",
       { guildId, channelId },
     ),
   );

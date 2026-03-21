@@ -196,7 +196,7 @@ describe("bot/features/sticky-message/services/stickyMessageResendService", () =
     await vi.runAllTimersAsync();
 
     expect(loggerMock.error).toHaveBeenCalledWith(
-      expect.stringContaining("system:sticky-message.send_failed"),
+      expect.stringContaining("stickyMessage:log.send_failed"),
       expect.objectContaining({ channelId: "channel-5" }),
     );
   });
@@ -284,7 +284,7 @@ describe("bot/features/sticky-message/services/stickyMessageResendService", () =
     await vi.runAllTimersAsync();
 
     expect(loggerMock.error).toHaveBeenCalledWith(
-      expect.stringContaining("system:sticky-message.resend_scheduled_error"),
+      expect.stringContaining("stickyMessage:log.resend_scheduled_error"),
       expect.any(Error),
     );
   });

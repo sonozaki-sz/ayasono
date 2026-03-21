@@ -31,11 +31,11 @@ export const memberLogSetJoinMessageModalHandler: ModalHandler = {
 
     const description = tInteraction(
       interaction.locale,
-      "commands:member-log-config.embed.set_join_message_success",
+      "memberLog:user-response.set_join_message_success",
     );
     const successTitle = tInteraction(
       interaction.locale,
-      "commands:member-log-config.embed.success_title",
+      "memberLog:embed.title.success",
     );
     await interaction.reply({
       embeds: [createSuccessEmbed(description, { title: successTitle })],
@@ -45,7 +45,7 @@ export const memberLogSetJoinMessageModalHandler: ModalHandler = {
     logger.info(
       logPrefixed(
         "system:log_prefix.member_log",
-        "system:member-log.config_join_message_set",
+        "memberLog:log.config_join_message_set",
         { guildId },
       ),
     );

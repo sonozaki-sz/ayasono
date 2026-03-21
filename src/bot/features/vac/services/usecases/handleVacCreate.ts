@@ -67,7 +67,7 @@ export async function handleVacCreateUseCase(
     parentCategory.children.cache.size >= VAC_EVENT.CATEGORY_CHANNEL_LIMIT
   ) {
     logger.warn(
-      logPrefixed("system:log_prefix.vac", "system:vac.category_full", {
+      logPrefixed("system:log_prefix.vac", "vac:log.category_full", {
         guildId: member.guild.id,
         categoryId: parentCategory.id,
       }),
@@ -98,7 +98,7 @@ export async function handleVacCreateUseCase(
 
   await sendVcControlPanel(voiceChannel).catch((error) => {
     logger.error(
-      logPrefixed("system:log_prefix.vac", "system:vac.panel_send_failed"),
+      logPrefixed("system:log_prefix.vac", "vac:log.panel_send_failed"),
       error,
     );
   });
@@ -118,7 +118,7 @@ export async function handleVacCreateUseCase(
   });
 
   logger.info(
-    logPrefixed("system:log_prefix.vac", "system:vac.channel_created", {
+    logPrefixed("system:log_prefix.vac", "vac:log.channel_created", {
       guildId: member.guild.id,
       channelId: voiceChannel.id,
       ownerId: member.id,

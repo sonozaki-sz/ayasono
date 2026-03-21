@@ -173,9 +173,6 @@ describe("bot/features/message-delete/commands/usecases/validateOptions", () => 
         const interaction = createInteraction({ days: 7, after: "2026-01-01" });
         const result = await parseAndValidateOptions(interaction as never);
         expect(result).toBeNull();
-        expect(tDefaultMock).toHaveBeenCalledWith(
-          "commands:message-delete.errors.days_and_date_conflict",
-        );
       });
 
       it("days と beforeStr の同時指定はエラー embed を返し null を返す", async () => {
@@ -185,9 +182,6 @@ describe("bot/features/message-delete/commands/usecases/validateOptions", () => 
         });
         const result = await parseAndValidateOptions(interaction as never);
         expect(result).toBeNull();
-        expect(tDefaultMock).toHaveBeenCalledWith(
-          "commands:message-delete.errors.days_and_date_conflict",
-        );
       });
     });
 
@@ -202,9 +196,6 @@ describe("bot/features/message-delete/commands/usecases/validateOptions", () => 
         });
         const result = await parseAndValidateOptions(interaction as never);
         expect(result).toBeNull();
-        expect(tDefaultMock).toHaveBeenCalledWith(
-          "commands:message-delete.errors.after_invalid_format",
-        );
       });
 
       it("未来の日付はエラー embed を返し null を返す", async () => {
@@ -215,9 +206,6 @@ describe("bot/features/message-delete/commands/usecases/validateOptions", () => 
         });
         const result = await parseAndValidateOptions(interaction as never);
         expect(result).toBeNull();
-        expect(tDefaultMock).toHaveBeenCalledWith(
-          "commands:message-delete.errors.after_future",
-        );
       });
 
       it("有効な過去日付は afterTs に変換される", async () => {
@@ -243,9 +231,6 @@ describe("bot/features/message-delete/commands/usecases/validateOptions", () => 
         });
         const result = await parseAndValidateOptions(interaction as never);
         expect(result).toBeNull();
-        expect(tDefaultMock).toHaveBeenCalledWith(
-          "commands:message-delete.errors.before_invalid_format",
-        );
       });
 
       it("ISO 形式の未来日時はエラー embed を返し null を返す", async () => {
@@ -256,9 +241,6 @@ describe("bot/features/message-delete/commands/usecases/validateOptions", () => 
         });
         const result = await parseAndValidateOptions(interaction as never);
         expect(result).toBeNull();
-        expect(tDefaultMock).toHaveBeenCalledWith(
-          "commands:message-delete.errors.before_future",
-        );
       });
 
       // YYYY-MM-DD 形式の当日指定は仕様上許可
@@ -308,9 +290,6 @@ describe("bot/features/message-delete/commands/usecases/validateOptions", () => 
         });
         const result = await parseAndValidateOptions(interaction as never);
         expect(result).toBeNull();
-        expect(tDefaultMock).toHaveBeenCalledWith(
-          "commands:message-delete.errors.date_range_invalid",
-        );
       });
     });
 

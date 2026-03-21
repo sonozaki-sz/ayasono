@@ -21,10 +21,16 @@ export const DEFAULT_LOCALE: SupportedLocale = "ja";
  */
 export type AllNamespaces = [
   "common",
-  "commands",
-  "errors",
-  "events",
   "system",
+  "ping",
+  "afk",
+  "bumpReminder",
+  "vac",
+  "vc",
+  "messageDelete",
+  "memberLog",
+  "stickyMessage",
+  "vcRecruit",
 ];
 
 /**
@@ -55,7 +61,19 @@ export const initI18n = async (): Promise<I18nInstance> => {
     keySeparator: false,
 
     // 名前空間設定
-    ns: ["common", "commands", "errors", "events", "system"],
+    ns: [
+      "common",
+      "system",
+      "ping",
+      "afk",
+      "bumpReminder",
+      "vac",
+      "vc",
+      "messageDelete",
+      "memberLog",
+      "stickyMessage",
+      "vcRecruit",
+    ],
     defaultNS: "common",
   });
 

@@ -47,7 +47,7 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
           createWarningEmbed(
             tInteraction(
               interaction.locale,
-              "commands:sticky-message.remove.notFound.description",
+              "stickyMessage:user-response.remove_not_found",
             ),
             {
               title: tInteraction(
@@ -66,11 +66,11 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
     const format = sticky.embedData
       ? tInteraction(
           interaction.locale,
-          "commands:sticky-message.view.field.format_embed",
+          "stickyMessage:embed.field.value.format_embed",
         )
       : tInteraction(
           interaction.locale,
-          "commands:sticky-message.view.field.format_plain",
+          "stickyMessage:embed.field.value.format_plain",
         );
 
     // フィールド構築: 1段目（チャンネル/形式/更新日）→ 2段目（Embedメタ）→ 3段目（内容）
@@ -78,7 +78,7 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
       {
         name: tInteraction(
           interaction.locale,
-          "commands:sticky-message.view.field.channel",
+          "stickyMessage:embed.field.name.channel",
         ),
         value: `<#${sticky.channelId}>`,
         inline: true,
@@ -86,7 +86,7 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
       {
         name: tInteraction(
           interaction.locale,
-          "commands:sticky-message.view.field.format",
+          "stickyMessage:embed.field.name.format",
         ),
         value: format,
         inline: true,
@@ -94,7 +94,7 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
       {
         name: tInteraction(
           interaction.locale,
-          "commands:sticky-message.view.field.updated_at",
+          "stickyMessage:embed.field.name.updated_at",
         ),
         value: `<t:${Math.floor(sticky.updatedAt.getTime() / 1000)}:f>`,
         inline: true,
@@ -113,7 +113,7 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
           fields.push({
             name: tInteraction(
               interaction.locale,
-              "commands:sticky-message.view.field.embed_title",
+              "stickyMessage:embed.field.name.embed_title",
             ),
             value: parsed.title,
             inline: true,
@@ -124,7 +124,7 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
           fields.push({
             name: tInteraction(
               interaction.locale,
-              "commands:sticky-message.view.field.embed_color",
+              "stickyMessage:embed.field.name.embed_color",
             ),
             // カラーコードを色付きサムネイルとして表示（hex文字列）
             value: `#${parsed.color.toString(16).toUpperCase().padStart(6, "0")}`,
@@ -141,7 +141,7 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
       fields.push({
         name: tInteraction(
           interaction.locale,
-          "commands:sticky-message.view.field.updated_by",
+          "stickyMessage:embed.field.name.updated_by",
         ),
         value: `<@${sticky.updatedBy}>`,
         inline: true,
@@ -156,7 +156,7 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
     fields.push({
       name: tInteraction(
         interaction.locale,
-        "commands:sticky-message.view.field.content",
+        "stickyMessage:embed.field.name.content",
       ),
       value: `\`\`\`\n${preview}\n\`\`\``,
       inline: false,
@@ -164,10 +164,7 @@ export const stickyMessageViewSelectHandler: StringSelectHandler = {
 
     // createInfoEmbed で構築し、スティッキーの Embed カラーがあればそれで上書き
     const embed = createInfoEmbed("", {
-      title: tInteraction(
-        interaction.locale,
-        "commands:sticky-message.view.title",
-      ),
+      title: tInteraction(interaction.locale, "stickyMessage:embed.title.view"),
       timestamp: true,
       fields,
     });

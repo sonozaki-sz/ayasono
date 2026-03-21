@@ -60,7 +60,7 @@ export async function setBumpReminderUsecase(
     logger.info(
       logPrefixed(
         "system:log_prefix.bump_reminder",
-        "system:scheduler.bump_reminder_cancelling",
+        "bumpReminder:log.scheduler_cancelling",
         { guildId },
       ),
     );
@@ -90,7 +90,7 @@ export async function setBumpReminderUsecase(
   logger.info(
     logPrefixed(
       "system:log_prefix.bump_reminder",
-      "system:scheduler.bump_reminder_scheduled",
+      "bumpReminder:log.scheduler_scheduled",
       {
         guildId,
         minutes: delayMinutes,

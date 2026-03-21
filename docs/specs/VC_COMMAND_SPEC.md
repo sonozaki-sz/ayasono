@@ -2,7 +2,7 @@
 
 > 参加中のボイスチャンネルの名前変更・人数制限変更を行う汎用コマンド
 
-最終更新: 2026年3月19日
+最終更新: 2026年3月21日
 
 ---
 
@@ -131,27 +131,28 @@
 
 ## ローカライズ
 
-### ja
+**翻訳ファイル:** `src/shared/locale/locales/{ja,en}/features/vc.ts`
 
-| キー | 用途 | メッセージ |
-| --- | --- | --- |
-| commands:vc.embed.renamed | レスポンス(success) | VC名を {{name}} に変更しました |
-| commands:vc.embed.limit_changed | レスポンス(success) | 人数制限を {{limit}} に設定しました |
-| commands:vc.embed.unlimited | レスポンス(success) | 無制限 |
-| errors:vc.not_in_any_vc | レスポンス(error) | このコマンドはVC参加中にのみ使用できます |
-| errors:vc.not_managed_channel | レスポンス(error) | このVCはBot管理のチャンネルではありません |
-| errors:vc.limit_out_of_range | レスポンス(error) | 人数制限は0〜99の範囲で指定してください |
+### コマンド定義
 
-### en
+| キー | 用途 | ja | en |
+| --- | --- | --- | --- |
+| `vc.description` | コマンド説明 | VCの設定を変更 | Change VC settings |
+| `vc.rename.description` | サブコマンド説明 | 参加中のVC名を変更 | Rename your current VC |
+| `vc.rename.name.description` | オプション説明 | 新しいVC名 | New VC name |
+| `vc.limit.description` | サブコマンド説明 | 参加中VCの人数制限を変更 | Change user limit of your current VC |
+| `vc.limit.limit.description` | オプション説明 | 人数制限（0=無制限、0~99） | User limit (0=unlimited, max 99) |
 
-| キー | 用途 | メッセージ |
-| --- | --- | --- |
-| commands:vc.embed.renamed | レスポンス(success) | Renamed VC to {{name}} |
-| commands:vc.embed.limit_changed | レスポンス(success) | Set user limit to {{limit}} |
-| commands:vc.embed.unlimited | レスポンス(success) | Unlimited |
-| errors:vc.not_in_any_vc | レスポンス(error) | You must be in a voice channel to use this command |
-| errors:vc.not_managed_channel | レスポンス(error) | This voice channel is not managed by the Bot |
-| errors:vc.limit_out_of_range | レスポンス(error) | User limit must be between 0 and 99 |
+### ユーザーレスポンス
+
+| キー | 用途 | ja | en |
+| --- | --- | --- | --- |
+| `user-response.renamed` | VC名変更成功 | VC名を {{name}} に変更しました。 | VC name has been changed to {{name}} |
+| `user-response.limit_changed` | 人数制限変更成功 | 人数制限を {{limit}} に設定しました。 | User limit has been set to {{limit}} |
+| `user-response.unlimited` | 無制限表示 | 無制限 | unlimited |
+| `user-response.not_in_any_vc` | VC未参加エラー | このコマンドはVC参加中にのみ使用できます。 | You must be in a voice channel to use this command. |
+| `user-response.not_managed_channel` | 管理対象外エラー | このVCはBot管理のチャンネルではありません。 | This voice channel is not managed by the Bot. |
+| `user-response.limit_out_of_range` | 人数制限範囲エラー | 人数制限は0〜99の範囲で指定してください。 | User limit must be between 0 and 99. |
 
 ---
 

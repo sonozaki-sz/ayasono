@@ -59,7 +59,7 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.enable",
       embeds: [
         {
           description:
-            "commands:bump-reminder-config.embed.enable_success",
+            "bumpReminder:user-response.enable_success",
         },
       ],
       flags: 64,

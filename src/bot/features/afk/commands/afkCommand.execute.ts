@@ -6,7 +6,6 @@ import { ValidationError } from "../../../../shared/errors/customErrors";
 import { getAfkConfig } from "../../../../shared/features/afk/afkConfigService";
 import {
   logPrefixed,
-  tDefault,
   tInteraction,
 } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
@@ -15,12 +14,12 @@ import { COMMON_I18N_KEYS } from "../../../shared/i18nKeys";
 
 const AFK_I18N_KEYS = {
   ERROR_GUILD_ONLY: COMMON_I18N_KEYS.GUILD_ONLY,
-  ERROR_NOT_CONFIGURED: "errors:afk.not_configured",
-  ERROR_MEMBER_NOT_FOUND: "errors:afk.member_not_found",
-  ERROR_USER_NOT_IN_VOICE: "errors:afk.user_not_in_voice",
-  ERROR_CHANNEL_NOT_FOUND: "errors:afk.channel_not_found",
-  EMBED_MOVED: "commands:afk.embed.moved",
-  LOG_MOVED: "system:afk.moved",
+  ERROR_NOT_CONFIGURED: "afk:user-response.not_configured",
+  ERROR_MEMBER_NOT_FOUND: "afk:user-response.member_not_found",
+  ERROR_USER_NOT_IN_VOICE: "afk:user-response.user_not_in_voice",
+  ERROR_CHANNEL_NOT_FOUND: "afk:user-response.channel_not_found",
+  EMBED_MOVED: "afk:user-response.moved",
+  LOG_MOVED: "afk:log.moved",
 } as const;
 
 /**
@@ -31,7 +30,7 @@ export async function executeAfkCommand(
 ): Promise<void> {
   const guildId = interaction.guildId;
   if (!guildId) {
-    throw new ValidationError(tDefault(AFK_I18N_KEYS.ERROR_GUILD_ONLY));
+    throw ValidationError.fromKey(AFK_I18N_KEYS.ERROR_GUILD_ONLY);
   }
 
   const config = await getAfkConfig(guildId);

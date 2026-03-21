@@ -3,7 +3,6 @@
 
 import { type ChatInputCommandInteraction, MessageFlags } from "discord.js";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
-import { tDefault } from "../../../../../shared/locale/localeManager";
 import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
 import { getBotVacConfigService } from "../../../../services/botCompositionRoot";
 import { createInfoEmbed } from "../../../../utils/messageResponse";
@@ -22,7 +21,7 @@ export async function handleVacConfigView(
   // 最新設定を読み込み、表示用の文字列へ整形
   const guild = interaction.guild;
   if (!guild) {
-    throw new ValidationError(tDefault(COMMON_I18N_KEYS.GUILD_ONLY));
+    throw ValidationError.fromKey(COMMON_I18N_KEYS.GUILD_ONLY);
   }
 
   const config = await getBotVacConfigService().getVacConfigOrDefault(guildId);

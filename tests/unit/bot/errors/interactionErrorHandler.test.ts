@@ -37,8 +37,8 @@ vi.mock("@/shared/utils/logger", () => ({
 // i18n のモック
 const mockTDefault = (key: string, params?: Record<string, unknown>) => {
   const translations: Record<string, string> = {
-    "errors:general.unexpected_production": "予期しないエラーが発生しました。",
-    "errors:general.unexpected_with_message": `予期しないエラー: ${params?.message || ""}`,
+    "common:general.unexpected_production": "予期しないエラーが発生しました。",
+    "common:general.unexpected_with_message": `予期しないエラー: ${params?.message || ""}`,
     "system:error.reply_failed": "返信に失敗しました",
     "system:error.base_error_log": `[${params?.errorName || ""}] ${params?.message || ""}`,
     "system:error.unhandled_error_log": `[UnhandledError] ${params?.message || ""}`,
@@ -50,7 +50,7 @@ vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string, params?: Record<string, unknown>) =>
     mockTDefault(key, params),
   tGuild: async (_guildId: string, key: string) => {
-    if (key === "errors:validation.error_title") {
+    if (key === "common:validation.error_title") {
       return "サーバー検証エラー";
     }
     return key;
@@ -199,7 +199,7 @@ describe("ErrorHandler", () => {
           embeds: expect.arrayContaining([
             expect.objectContaining({
               data: expect.objectContaining({
-                title: expect.stringContaining("❌"),
+                title: expect.stringContaining("⚠️"),
                 description: "Invalid command",
               }),
             }),
@@ -221,7 +221,7 @@ describe("ErrorHandler", () => {
           embeds: expect.arrayContaining([
             expect.objectContaining({
               data: expect.objectContaining({
-                title: expect.stringContaining("❌"),
+                title: expect.stringContaining("⚠️"),
                 description: "Invalid command",
               }),
             }),
@@ -291,7 +291,7 @@ describe("ErrorHandler", () => {
       expect(payload.flags).toBe(MessageFlags.Ephemeral);
       const embed = payload.embeds[0];
       expect(embed.data?.description ?? embed.description).toBe("invalid");
-      expect(embed.data?.title ?? embed.title).toMatch(/^❌/);
+      expect(embed.data?.title ?? embed.title).toMatch(/^⚠️/);
     });
 
     it("BaseError.embedTitle がデフォルトタイトルより優先されることを確認", async () => {
@@ -476,7 +476,7 @@ describe("ErrorHandler", () => {
   });
 
   describe("Error Message Formatting", () => {
-    it("エラーメッセージのタイトルに ❌ プレフィックスが付くことを確認", async () => {
+    it("warning レベルのエラーは ⚠️、error レベルは ❌ プレフィックスが付くことを確認", async () => {
       // テストごとに独立した Interaction モックを用意
       const mockInteraction = {
         replied: false,
@@ -486,11 +486,36 @@ describe("ErrorHandler", () => {
         editReply: vi.fn().mockResolvedValue(undefined),
       } as unknown as Mocked<ChatInputCommandInteraction>;
 
-      const error = new ValidationError("Test");
-
-      await handleCommandError(mockInteraction, error);
+      // ValidationError は warning レベル → ⚠️
+      await handleCommandError(mockInteraction, new ValidationError("Test"));
 
       expect(mockInteraction.reply).toHaveBeenCalledWith(
+        expect.objectContaining({
+          embeds: expect.arrayContaining([
+            expect.objectContaining({
+              data: expect.objectContaining({
+                title: expect.stringMatching(/^⚠️/),
+              }),
+            }),
+          ]),
+        }),
+      );
+
+      // DatabaseError は error レベル → ❌
+      const mockInteraction2 = {
+        replied: false,
+        deferred: false,
+        locale: "ja",
+        reply: vi.fn().mockResolvedValue(undefined),
+        editReply: vi.fn().mockResolvedValue(undefined),
+      } as unknown as Mocked<ChatInputCommandInteraction>;
+
+      await handleCommandError(
+        mockInteraction2,
+        new DatabaseError("DB failure"),
+      );
+
+      expect(mockInteraction2.reply).toHaveBeenCalledWith(
         expect.objectContaining({
           embeds: expect.arrayContaining([
             expect.objectContaining({

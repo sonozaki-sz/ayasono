@@ -54,10 +54,10 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpPanel", () => {
     getGuildTranslatorMock.mockResolvedValue(
       (key: string) =>
         ({
-          "events:bump-reminder.panel.scheduled_at": "scheduled",
-          "events:bump-reminder.panel.title": "title",
-          "events:bump-reminder.panel.button_mention_on": "on",
-          "events:bump-reminder.panel.button_mention_off": "off",
+          "bumpReminder:user-response.panel_scheduled_at": "scheduled",
+          "bumpReminder:embed.title.panel": "title",
+          "bumpReminder:ui.button.mention_on": "on",
+          "bumpReminder:ui.button.mention_off": "off",
         })[key] ?? key,
     );
     createInfoEmbedMock.mockReturnValue({

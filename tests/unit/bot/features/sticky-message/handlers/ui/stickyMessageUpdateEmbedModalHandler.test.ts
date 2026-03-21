@@ -74,9 +74,9 @@ function createInteractionMock({
       }
     : null;
   const inputValues: Record<string, string> = {
-    "sticky-message:modal:embed-title": embedTitle,
-    "sticky-message:modal:embed-description": embedDescription,
-    "sticky-message:modal:embed-color": embedColor,
+    "sticky-message:embed-title-modal-input": embedTitle,
+    "sticky-message:embed-description-modal-input": embedDescription,
+    "sticky-message:embed-color-modal-input": embedColor,
   };
   return {
     customId,
@@ -241,7 +241,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalH
     await stickyMessageUpdateEmbedModalHandler.execute(interaction as never);
 
     expect(loggerMock.error).toHaveBeenCalledWith(
-      expect.stringContaining("system:sticky-message.resend_after_embed_update_failed"),
+      expect.stringContaining("stickyMessage:log.resend_after_embed_update_failed"),
       expect.any(Object),
     );
     expect(interaction._replyMock).toHaveBeenCalled();

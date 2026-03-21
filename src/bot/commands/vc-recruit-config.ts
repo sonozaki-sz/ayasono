@@ -20,26 +20,36 @@ import type { Command } from "../types/discord";
  */
 export const vcRecruitConfigCommand: Command = {
   data: (() => {
-    const cmdDesc = getCommandLocalizations("vc-recruit-config.description");
+    const cmdDesc = getCommandLocalizations(
+      "vcRecruit",
+      "vc-recruit-config.description",
+    );
     const setupDesc = getCommandLocalizations(
+      "vcRecruit",
       "vc-recruit-config.setup.description",
     );
     const setupCategoryDesc = getCommandLocalizations(
+      "vcRecruit",
       "vc-recruit-config.setup.category.description",
     );
     const setupThreadArchiveDesc = getCommandLocalizations(
+      "vcRecruit",
       "vc-recruit-config.setup.thread-archive.description",
     );
     const teardownDesc = getCommandLocalizations(
+      "vcRecruit",
       "vc-recruit-config.teardown.description",
     );
     const addRoleDesc = getCommandLocalizations(
+      "vcRecruit",
       "vc-recruit-config.add-role.description",
     );
     const removeRoleDesc = getCommandLocalizations(
+      "vcRecruit",
       "vc-recruit-config.remove-role.description",
     );
     const viewDesc = getCommandLocalizations(
+      "vcRecruit",
       "vc-recruit-config.view.description",
     );
 

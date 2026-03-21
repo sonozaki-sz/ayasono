@@ -149,11 +149,11 @@ describe("bot/events/interactionCreate", () => {
 
     await interactionCreateEvent.execute(interaction as never);
 
-    expect(tInteraction).toHaveBeenCalledWith("ja", "commands:cooldown.wait", {
+    expect(tInteraction).toHaveBeenCalledWith("ja", "common:cooldown.wait", {
       seconds: 2,
     });
     expect(interaction.reply).toHaveBeenCalledWith({
-      content: "interaction:commands:cooldown.wait",
+      content: "interaction:common:cooldown.wait",
       flags: MessageFlags.Ephemeral,
     });
     expect(command.execute).not.toHaveBeenCalled();
@@ -281,11 +281,11 @@ describe("bot/events/interactionCreate", () => {
 
     await interactionCreateEvent.execute(interaction as never);
 
-    expect(tInteraction).toHaveBeenCalledWith("ja", "commands:cooldown.wait", {
+    expect(tInteraction).toHaveBeenCalledWith("ja", "common:cooldown.wait", {
       seconds: 1,
     });
     expect(interaction.reply).toHaveBeenCalledWith({
-      content: "interaction:commands:cooldown.wait",
+      content: "interaction:common:cooldown.wait",
       flags: MessageFlags.Ephemeral,
     });
   });

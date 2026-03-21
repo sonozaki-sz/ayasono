@@ -23,7 +23,10 @@ const PING_I18N_KEYS = {
  */
 export const pingCommand: Command = {
   data: (() => {
-    const desc = getCommandLocalizations(PING_I18N_KEYS.COMMAND_DESCRIPTION);
+    const desc = getCommandLocalizations(
+      "ping",
+      PING_I18N_KEYS.COMMAND_DESCRIPTION,
+    );
     return new SlashCommandBuilder()
       .setName(PING_COMMAND.NAME)
       .setDescription(desc.ja)

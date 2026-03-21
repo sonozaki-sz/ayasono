@@ -46,7 +46,7 @@ export async function cancelBumpReminderUsecase(
     logger.error(
       logPrefixed(
         "system:log_prefix.bump_reminder",
-        "system:scheduler.bump_reminder_task_failed",
+        "bumpReminder:log.scheduler_task_failed",
         { guildId },
       ),
       error,
@@ -56,7 +56,7 @@ export async function cancelBumpReminderUsecase(
   logger.info(
     logPrefixed(
       "system:log_prefix.bump_reminder",
-      "system:scheduler.bump_reminder_cancelled",
+      "bumpReminder:log.scheduler_cancelled",
       { guildId },
     ),
   );

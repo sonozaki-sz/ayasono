@@ -11,10 +11,7 @@ import {
 } from "discord.js";
 import type { VcRecruitSetup } from "../../../../../shared/database/types";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
-import {
-  tDefault,
-  tInteraction,
-} from "../../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../../shared/locale/localeManager";
 import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
 import { getBotVcRecruitConfigService } from "../../../../services/botCompositionRoot";
 import { disableComponentsAfterTimeout } from "../../../../shared/disableComponentsAfterTimeout";
@@ -39,10 +36,7 @@ export function buildTeardownSelectOptions(
   return setups.map((setup) => {
     let label: string;
     if (setup.categoryId === null) {
-      label = tInteraction(
-        locale,
-        "commands:vc-recruit-config.teardown.select.top",
-      );
+      label = tInteraction(locale, "vcRecruit:ui.select.teardown_top");
     } else {
       const cat = guild.channels.cache.get(setup.categoryId);
       if (cat) {
@@ -50,7 +44,7 @@ export function buildTeardownSelectOptions(
       } else {
         label = tInteraction(
           locale,
-          "commands:vc-recruit-config.teardown.select.unknown_category",
+          "vcRecruit:ui.select.teardown_unknown_category",
           { id: setup.categoryId },
         );
       }
@@ -72,7 +66,7 @@ export async function handleVcRecruitConfigTeardown(
 ): Promise<void> {
   const guild = interaction.guild;
   if (!guild) {
-    throw new ValidationError(tDefault(COMMON_I18N_KEYS.GUILD_ONLY));
+    throw ValidationError.fromKey(COMMON_I18N_KEYS.GUILD_ONLY);
   }
 
   const repo = getBotVcRecruitConfigService();
@@ -80,7 +74,7 @@ export async function handleVcRecruitConfigTeardown(
 
   if (config.setups.length === 0) {
     throw new ValidationError(
-      tInteraction(interaction.locale, "errors:vcRecruit.not_setup"),
+      tInteraction(interaction.locale, "vcRecruit:user-response.not_setup"),
     );
   }
 
@@ -93,7 +87,7 @@ export async function handleVcRecruitConfigTeardown(
 
   const placeholder = tInteraction(
     interaction.locale,
-    "commands:vc-recruit-config.teardown.select.placeholder",
+    "vcRecruit:ui.select.teardown_placeholder",
   );
 
   const selectMenu = new StringSelectMenuBuilder()

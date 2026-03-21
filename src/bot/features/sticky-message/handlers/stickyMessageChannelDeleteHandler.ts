@@ -33,7 +33,7 @@ export async function handleStickyMessageChannelDelete(
       logger.debug(
         logPrefixed(
           "system:log_prefix.sticky_message",
-          "system:sticky-message.channel_delete_cleanup",
+          "stickyMessage:log.channel_delete_cleanup",
           { channelId },
         ),
       );
@@ -42,7 +42,7 @@ export async function handleStickyMessageChannelDelete(
     logger.error(
       logPrefixed(
         "system:log_prefix.sticky_message",
-        "system:sticky-message.channel_delete_cleanup_failed",
+        "stickyMessage:log.channel_delete_cleanup_failed",
         {
           channelId,
         },

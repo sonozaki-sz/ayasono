@@ -146,20 +146,88 @@ src/shared/features/<feature-name>/
 
 #### Custom ID（ボタン・セレクト・モーダル）
 
-フォーマット: `<feature>:<action>[:<id>]`（コロン区切り、lowercase・kebab-case）
+フォーマット: `<feature>:<subject>-<qualifier>[:<dynamic-param>]`（コロン区切り、kebab-case）
 
-- 動的パラメータは末尾に付加する
-- 定数は `src/bot/features/<feature>/constants/*.constants.ts` に集約する
+| セグメント | 必須 | 説明 | 例 |
+| --- | --- | --- | --- |
+| `<feature>` | ✅ | 機能名（コマンド名と一致） | `guild-config`, `bump-reminder`, `vc-recruit` |
+| `<subject>-<qualifier>` | ✅ | 「対象-修飾子」の形式。対象が何で、何をするか/何であるかを表す | `reset-confirm`, `page-next`, `webhook-modal` |
+| `<dynamic-param>` | ❌ | 動的パラメータ（チャンネルID等、実行時に決まる値） | `{channelId}`, `{panelChannelId}` |
+
+**subject の命名規則:**
+
+- 名詞を使う: `page`, `reset`, `mention`, `webhook`, `user`, `deletion`
+- 形容詞・前置詞を単独で subject にしない: ❌ `final-confirm` → ✅ `deletion-confirm`、❌ `after-filter` → ✅ `after-date-filter`
+
+**qualifier の種類:**
+
+| 種類 | qualifier 例 | 用途 |
+| --- | --- | --- |
+| アクション | confirm, cancel, start, delete, reset, submit, exclude | ボタン操作 |
+| ナビゲーション | first, prev, next, last, jump, back | ページ遷移 |
+| UI種別 | modal, select, input | UI要素の識別 |
+| 状態 | on, off | トグル |
+
+**ネスト規則（モーダル内の入力フィールド）:**
+
+モーダルの入力フィールドは `<subject>-modal-input` で表す:
 
 ```ts
-// ✅
-"vc-recruit:create:{panelChannelId}"
-"sticky-message:set-modal:{channelId}"
-
-// ❌
-"vcRecruit_create"
-"stickyMessage-setModal"
+"message-delete:webhook-modal"        // モーダル本体
+"message-delete:webhook-modal-input"  // モーダル内の入力フィールド
 ```
+
+**命名ルール:**
+
+- `<subject>-<qualifier>` は必ず「対象-修飾子」の順序にする（修飾子から始めない）
+- 複合語もkebab-caseで統一（`reset-all-confirm`、`after-date-filter`）
+- 動的パラメータがない場合は2セグメントで完結する
+
+```ts
+// ✅ アクション
+"guild-config:reset-confirm"              // リセットの確認ボタン
+"guild-config:reset-cancel"               // リセットのキャンセルボタン
+"guild-config:reset-all-confirm"          // 全設定リセットの確認ボタン
+"guild-config:import-confirm"             // インポートの確認ボタン
+"message-delete:deletion-confirm"         // 削除の最終確認ボタン
+"message-delete:preview-confirm"          // プレビューの確認ボタン
+
+// ✅ ナビゲーション
+"guild-config:page-first"                 // 最初のページへ
+"guild-config:page-prev"                  // 前のページへ
+"guild-config:page-next"                  // 次のページへ
+"guild-config:page-last"                  // 最後のページへ
+"guild-config:page-jump"                  // ページジャンプ
+"message-delete:deletion-back"            // プレビューに戻る
+
+// ✅ UI種別
+"message-delete:webhook-modal"            // Webhook入力モーダル
+"message-delete:webhook-modal-input"      // モーダル内の入力フィールド
+"guild-config:page-select"               // ページセレクトメニュー
+"message-delete:user-select"             // ユーザーセレクトメニュー
+
+// ✅ 状態
+"bump-reminder:mention-on:{guildId}"     // メンション通知ON
+"bump-reminder:mention-off:{guildId}"    // メンション通知OFF
+
+// ✅ 動的パラメータ付き
+"vc-recruit:panel-create:{channelId}"    // パネル作成
+"sticky-message:set-modal:{channelId}"   // 設定モーダル
+
+// ❌ 修飾子から始めている
+"guild-config:confirm-reset"
+"guild-config:cancel-import"
+
+// ❌ subject が形容詞・前置詞のみ
+"message-delete:final-confirm"            // → deletion-confirm
+"message-delete:after-filter"             // → after-date-filter
+
+// ❌ アンダースコアやcamelCase
+"guild_config_reset_confirm"
+"vcRecruit:createPanel"
+```
+
+- 定数は `src/bot/features/<feature>/constants/*.constants.ts` に集約する
 
 ### コメント規約
 
@@ -275,14 +343,66 @@ async function getGuildConfig(guildId: string): Promise<GuildConfig | null> { ..
 
 ユーザー向け応答文字列・ログメッセージともに生文字列を **禁止** し、すべて `tDefault()` 経由にする。
 
-| 対象 | 経由 | キー定義先 |
+**翻訳ファイル構成:**
+
+```
+locales/{ja,en}/
+├── common.ts              ← 共通タイトル・ラベル + 機能横断エラー
+├── system.ts              ← 機能横断の内部ログのみ（Bot起動/シャットダウン/Web/DB共通等）
+├── features/
+│   ├── index.ts           ← 全機能の re-export
+│   ├── afk.ts
+│   ├── bumpReminder.ts
+│   └── ...
+```
+
+**翻訳キー命名規則:**
+
+| 種別 | キーパターン | 例 |
 | --- | --- | --- |
-| ユーザー向け応答（`editReply` / `followUp` / ボタンラベル / セレクトメニュー / モーダル / Embed） | `tDefault("commands:...")` | `ja/commands.ts`, `en/commands.ts` |
-| ログメッセージ（`logger.*()` の引数） | `logPrefixed()` / `logCommand()` | `ja/system.ts`, `en/system.ts` |
-| エラーメッセージ | `tDefault("errors:...")` | `ja/errors.ts`, `en/errors.ts` |
+| コマンド定義 | `{コマンド名}.description` | `afk-config.set-channel.description` |
+| ユーザーレスポンス | `user-response.{アクション名}` | `user-response.set_channel_success` |
+| UIラベル（ボタン・セレクト・モーダル） | `ui.{UI種類}.{ID}` | `ui.button.reset_confirm` |
+| Embedタイトル | `embed.title.{コンテキスト}` | `embed.title.reset_confirm` |
+| Embed説明 | `embed.description.{コンテキスト}` | `embed.description.reset_confirm` |
+| Embedフィールド名 | `embed.field.name.{フィールド}` | `embed.field.name.channel` |
+| Embedフィールド値 | `embed.field.value.{フィールド}` | `embed.field.value.not_configured` |
+| ログ | `log.{アクション名}` | `log.config_enabled` |
+
+**ファイル内の記述順:**
+
+```ts
+export const afk = {
+  // ── コマンド定義 ──
+  "afk.description": "...",
+  "afk-config.description": "...",
+
+  // ── ユーザーレスポンス ──
+  "user-response.moved": "...",
+  "user-response.set_channel_success": "...",
+
+  // ── embed: config_view ──
+  "embed.title.config_view": "...",
+  "embed.field.name.channel": "...",
+
+  // ── embed: reset_confirm ──
+  "embed.title.reset_confirm": "...",
+  "embed.description.reset_confirm": "...",
+
+  // ── UIラベル ──
+  "ui.button.reset_confirm": "...",
+  "ui.button.reset_cancel": "...",
+
+  // ── ログ ──
+  "log.moved": "...",
+  "log.database_channel_set": "...",
+} as const;
+```
 
 - ロケールキーは **ja/en 両方に同時追加** する
 - DB操作は `executeWithDatabaseError` でラップし、成功時は `logger.debug`、失敗時はキー付きエラーメッセージを渡す
+- コマンド定義キーにはコマンド名を含める（`config.description` は不可。どのコマンドか不明なため）
+- ログキーに機能名プレフィックスは不要（ファイルの名前空間で機能が特定されるため）
 
 ##### ログプレフィックスルール
 

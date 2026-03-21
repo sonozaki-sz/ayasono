@@ -28,7 +28,7 @@ export async function handleStickyMessageCreate(
     logger.error(
       logPrefixed(
         "system:log_prefix.sticky_message",
-        "system:sticky-message.create_handler_error",
+        "stickyMessage:log.create_handler_error",
         {
           channelId: message.channelId,
           guildId: message.guildId,

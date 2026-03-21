@@ -22,7 +22,8 @@ vi.mock("@/shared/locale/localeManager", () => ({
   logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
   tDefault: (key: string, opts?: Record<string, unknown>) =>
     tDefaultMock(key, opts),
-  tInteraction: (...args: unknown[]) => args[1],
+  tInteraction: (_locale: string, key: string, opts?: Record<string, unknown>) =>
+    tDefaultMock(key, opts),
 }));
 
 // ---- ヘルパー ----

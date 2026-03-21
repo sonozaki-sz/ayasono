@@ -6,7 +6,7 @@ import {
   type ChatInputCommandInteraction,
 } from "discord.js";
 import { getTimezoneOffsetForLocale } from "../../../../../shared/locale/helpers";
-import { tDefault } from "../../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../../shared/locale/localeManager";
 import { createWarningEmbed } from "../../../../utils/messageResponse";
 import {
   MSG_DEL_COMMAND,
@@ -81,8 +81,16 @@ export async function parseAndValidateOptions(
     await interaction.editReply({
       embeds: [
         createWarningEmbed(
-          tDefault("commands:message-delete.errors.days_and_date_conflict"),
-          { title: tDefault("common:title_option_conflict") },
+          tInteraction(
+            interaction.locale,
+            "messageDelete:user-response.days_and_date_conflict",
+          ),
+          {
+            title: tInteraction(
+              interaction.locale,
+              "common:title_option_conflict",
+            ),
+          },
         ),
       ],
     });
@@ -103,8 +111,16 @@ export async function parseAndValidateOptions(
         await interaction.editReply({
           embeds: [
             createWarningEmbed(
-              tDefault("commands:message-delete.errors.after_invalid_format"),
-              { title: tDefault("common:title_input_error") },
+              tInteraction(
+                interaction.locale,
+                "messageDelete:user-response.after_invalid_format",
+              ),
+              {
+                title: tInteraction(
+                  interaction.locale,
+                  "common:title_invalid_input",
+                ),
+              },
             ),
           ],
         });
@@ -115,8 +131,16 @@ export async function parseAndValidateOptions(
         await interaction.editReply({
           embeds: [
             createWarningEmbed(
-              tDefault("commands:message-delete.errors.after_future"),
-              { title: tDefault("common:title_input_error") },
+              tInteraction(
+                interaction.locale,
+                "messageDelete:user-response.after_future",
+              ),
+              {
+                title: tInteraction(
+                  interaction.locale,
+                  "common:title_invalid_input",
+                ),
+              },
             ),
           ],
         });
@@ -129,8 +153,16 @@ export async function parseAndValidateOptions(
         await interaction.editReply({
           embeds: [
             createWarningEmbed(
-              tDefault("commands:message-delete.errors.before_invalid_format"),
-              { title: tDefault("common:title_input_error") },
+              tInteraction(
+                interaction.locale,
+                "messageDelete:user-response.before_invalid_format",
+              ),
+              {
+                title: tInteraction(
+                  interaction.locale,
+                  "common:title_invalid_input",
+                ),
+              },
             ),
           ],
         });
@@ -146,8 +178,16 @@ export async function parseAndValidateOptions(
         await interaction.editReply({
           embeds: [
             createWarningEmbed(
-              tDefault("commands:message-delete.errors.before_future"),
-              { title: tDefault("common:title_input_error") },
+              tInteraction(
+                interaction.locale,
+                "messageDelete:user-response.before_future",
+              ),
+              {
+                title: tInteraction(
+                  interaction.locale,
+                  "common:title_invalid_input",
+                ),
+              },
             ),
           ],
         });
@@ -158,8 +198,16 @@ export async function parseAndValidateOptions(
       await interaction.editReply({
         embeds: [
           createWarningEmbed(
-            tDefault("commands:message-delete.errors.date_range_invalid"),
-            { title: tDefault("common:title_input_error") },
+            tInteraction(
+              interaction.locale,
+              "messageDelete:user-response.date_range_invalid",
+            ),
+            {
+              title: tInteraction(
+                interaction.locale,
+                "common:title_invalid_input",
+              ),
+            },
           ),
         ],
       });

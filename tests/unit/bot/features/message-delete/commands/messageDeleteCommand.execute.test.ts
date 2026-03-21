@@ -47,6 +47,7 @@ vi.mock("@/shared/locale/localeManager", () => ({
   logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
   logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
   tDefault: vi.fn((key: string) => `t:${key}`),
+  tInteraction: (_locale: string, key: string) => `t:${key}`,
 }));
 
 vi.mock("@/shared/utils/logger", () => ({
@@ -116,7 +117,7 @@ function makeScanInteraction(userId: string, guildId: string) {
     guild: { members: { me } },
     messages: { fetch: vi.fn().mockResolvedValue(new Map()) },
   };
-  const base = makeComponentInteraction("message-delete:start-scan", userId);
+  const base = makeComponentInteraction("message-delete:scan-start", userId);
   return {
     ...base,
     guildId,
@@ -392,7 +393,7 @@ describe("executeMessageDeleteCommand", () => {
       await executeMessageDeleteCommand(interaction2 as never);
 
       expect(createWarningEmbedMock).toHaveBeenCalledWith(
-        expect.stringContaining("t:commands:message-delete.errors.locked"),
+        expect.stringContaining("t:messageDelete:user-response.locked"),
       );
     });
 

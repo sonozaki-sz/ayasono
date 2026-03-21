@@ -2,7 +2,7 @@
 // Stage 2: 最終確認ダイアログ処理
 
 import { MessageFlags, type MessageComponentInteraction } from "discord.js";
-import { tDefault } from "../../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import { createWarningEmbed } from "../../../../utils/messageResponse";
 import {
@@ -31,11 +31,13 @@ export async function showFinalConfirmDialog(
   timeoutMs: number,
 ): Promise<FinalResult> {
   let currentPage = 0;
+  const locale = baseInteraction.locale;
   const totalPages = Math.ceil(targetMessages.length / MSG_DEL_PAGE_SIZE);
 
   const buildReplyPayload = (page: number) => ({
     embeds: [
       buildFinalConfirmEmbed(
+        locale,
         targetMessages,
         page,
         totalPages,
@@ -43,6 +45,7 @@ export async function showFinalConfirmDialog(
       ),
     ],
     components: buildFinalConfirmComponents(
+      locale,
       page,
       totalPages,
       targetMessages.length,
@@ -68,8 +71,16 @@ export async function showFinalConfirmDialog(
         await i.reply({
           embeds: [
             createWarningEmbed(
-              tDefault("commands:message-delete.errors.not_authorized"),
-              { title: tDefault("common:title_permission_denied") },
+              tInteraction(
+                baseInteraction.locale,
+                "messageDelete:user-response.not_authorized",
+              ),
+              {
+                title: tInteraction(
+                  baseInteraction.locale,
+                  "common:title_permission_denied",
+                ),
+              },
             ),
           ],
           flags: MessageFlags.Ephemeral,
@@ -137,10 +148,19 @@ export async function showFinalConfirmDialog(
             .followUp({
               embeds: [
                 createWarningEmbed(
-                  tDefault("commands:message-delete.errors.jump_invalid_page", {
-                    total: totalPages,
-                  }),
-                  { title: tDefault("common:title_input_error") },
+                  tInteraction(
+                    baseInteraction.locale,
+                    "messageDelete:user-response.jump_invalid_page",
+                    {
+                      total: totalPages,
+                    },
+                  ),
+                  {
+                    title: tInteraction(
+                      baseInteraction.locale,
+                      "common:title_invalid_input",
+                    ),
+                  },
                 ),
               ],
               flags: MessageFlags.Ephemeral,
@@ -169,8 +189,16 @@ export async function showFinalConfirmDialog(
         .editReply({
           embeds: [
             createWarningEmbed(
-              tDefault("commands:message-delete.confirm.timed_out"),
-              { title: tDefault("common:title_timeout") },
+              tInteraction(
+                baseInteraction.locale,
+                "messageDelete:user-response.timed_out",
+              ),
+              {
+                title: tInteraction(
+                  baseInteraction.locale,
+                  "common:title_timeout",
+                ),
+              },
             ),
           ],
           components: [],

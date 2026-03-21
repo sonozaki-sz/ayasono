@@ -25,7 +25,7 @@ export async function getManagedVoiceChannel(
 
   if (!voiceChannel || voiceChannel.type !== ChannelType.GuildVoice) {
     throw new ValidationError(
-      tInteraction(interaction.locale, "errors:vc.not_in_any_vc"),
+      tInteraction(interaction.locale, "vc:user-response.not_in_any_vc"),
     );
   }
 
@@ -49,6 +49,6 @@ export async function getManagedVoiceChannel(
   }
 
   throw new ValidationError(
-    tInteraction(interaction.locale, "errors:vc.not_managed_channel"),
+    tInteraction(interaction.locale, "vc:user-response.not_managed_channel"),
   );
 }

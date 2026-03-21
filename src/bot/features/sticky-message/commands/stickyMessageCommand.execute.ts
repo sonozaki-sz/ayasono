@@ -6,10 +6,7 @@ import {
   PermissionFlagsBits,
 } from "discord.js";
 import { ValidationError } from "../../../../shared/errors/customErrors";
-import {
-  tDefault,
-  tInteraction,
-} from "../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../shared/locale/localeManager";
 import { handleCommandError } from "../../../errors/interactionErrorHandler";
 import { COMMON_I18N_KEYS } from "../../../shared/i18nKeys";
 import { STICKY_MESSAGE_COMMAND } from "./stickyMessageCommand.constants";
@@ -30,7 +27,7 @@ export async function executeStickyMessageCommand(
     // ギルドIDを取得し、サーバー内コマンドであることを確認する
     const guildId = interaction.guildId;
     if (!guildId) {
-      throw new ValidationError(tDefault(COMMON_I18N_KEYS.GUILD_ONLY));
+      throw ValidationError.fromKey(COMMON_I18N_KEYS.GUILD_ONLY);
     }
 
     // MANAGE_CHANNELS 権限チェック
@@ -41,7 +38,7 @@ export async function executeStickyMessageCommand(
       throw new ValidationError(
         tInteraction(
           interaction.locale,
-          "commands:sticky-message.errors.permissionDenied",
+          "stickyMessage:user-response.permission_denied",
         ),
       );
     }

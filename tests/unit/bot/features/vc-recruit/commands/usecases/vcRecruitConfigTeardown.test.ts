@@ -95,7 +95,7 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigTeardown", ()
   it("categoryId が null の場合は TOP ラベルを使用する", async () => {
     const topLabel = "TOP（カテゴリーなし）";
     tInteractionMock.mockImplementation((_locale: string, key: string) => {
-      if (key === "commands:vc-recruit-config.teardown.select.top")
+      if (key === "vcRecruit:ui.select.teardown_top")
         return topLabel;
       return key;
     });
@@ -146,7 +146,7 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigTeardown", ()
     tInteractionMock.mockImplementation(
       (_locale: string, key: string, opts?: Record<string, unknown>) => {
         if (
-          key === "commands:vc-recruit-config.teardown.select.unknown_category"
+          key === "vcRecruit:ui.select.teardown_unknown_category"
         )
           return `不明なカテゴリー（ID: ${opts?.id}）`;
         return key;

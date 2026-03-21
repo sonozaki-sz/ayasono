@@ -99,7 +99,7 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.removeMe
       embeds: [
         {
           description:
-            "commands:bump-reminder-config.embed.remove_mention_role",
+            "bumpReminder:user-response.remove_mention_role",
         },
       ],
       flags: 64,

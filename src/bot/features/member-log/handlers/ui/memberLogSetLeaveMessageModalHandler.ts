@@ -31,11 +31,11 @@ export const memberLogSetLeaveMessageModalHandler: ModalHandler = {
 
     const description = tInteraction(
       interaction.locale,
-      "commands:member-log-config.embed.set_leave_message_success",
+      "memberLog:user-response.set_leave_message_success",
     );
     const successTitle = tInteraction(
       interaction.locale,
-      "commands:member-log-config.embed.success_title",
+      "memberLog:embed.title.success",
     );
     await interaction.reply({
       embeds: [createSuccessEmbed(description, { title: successTitle })],
@@ -45,7 +45,7 @@ export const memberLogSetLeaveMessageModalHandler: ModalHandler = {
     logger.info(
       logPrefixed(
         "system:log_prefix.member_log",
-        "system:member-log.config_leave_message_set",
+        "memberLog:log.config_leave_message_set",
         { guildId },
       ),
     );

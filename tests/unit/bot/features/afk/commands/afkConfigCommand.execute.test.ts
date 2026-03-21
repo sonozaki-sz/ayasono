@@ -92,7 +92,7 @@ describe("bot/features/afk/commands/afkConfigCommand.execute", () => {
 
     expect(setAfkChannelMock).toHaveBeenCalledWith("guild-1", "afk-channel");
     expect(interaction.reply).toHaveBeenCalledWith({
-      embeds: [{ description: "commands:afk-config.embed.set_ch_success", kind: "success" }],
+      embeds: [{ description: "afk:user-response.set_channel_success", kind: "success" }],
       flags: 64,
     });
   });

@@ -17,13 +17,15 @@ import type { Command } from "../types/discord";
  */
 export const vcCommand: Command = {
   data: (() => {
-    const cmdDesc = getCommandLocalizations("vc.description");
-    const renameDesc = getCommandLocalizations("vc.rename.description");
+    const cmdDesc = getCommandLocalizations("vc", "vc.description");
+    const renameDesc = getCommandLocalizations("vc", "vc.rename.description");
     const renameNameDesc = getCommandLocalizations(
+      "vc",
       "vc.rename.name.description",
     );
-    const limitDesc = getCommandLocalizations("vc.limit.description");
+    const limitDesc = getCommandLocalizations("vc", "vc.limit.description");
     const limitValueDesc = getCommandLocalizations(
+      "vc",
       "vc.limit.limit.description",
     );
 

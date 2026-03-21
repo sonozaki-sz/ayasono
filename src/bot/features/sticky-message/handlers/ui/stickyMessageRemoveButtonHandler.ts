@@ -35,7 +35,7 @@ export const stickyMessageRemoveButtonHandler: ButtonHandler = {
           createInfoEmbed(
             tInteraction(
               interaction.locale,
-              "commands:sticky-message.remove.noSelection.description",
+              "stickyMessage:user-response.remove_no_selection",
             ),
           ),
         ],
@@ -87,13 +87,13 @@ export const stickyMessageRemoveButtonHandler: ButtonHandler = {
         createSuccessEmbed(
           tInteraction(
             interaction.locale,
-            "commands:sticky-message.remove.success.description",
+            "stickyMessage:user-response.remove_success",
             { count: deletedChannels.length },
           ),
           {
             title: tInteraction(
               interaction.locale,
-              "commands:sticky-message.remove.success.title",
+              "stickyMessage:embed.title.remove_success",
             ),
             fields:
               deletedChannels.length > 0
@@ -101,7 +101,7 @@ export const stickyMessageRemoveButtonHandler: ButtonHandler = {
                     {
                       name: tInteraction(
                         interaction.locale,
-                        "commands:sticky-message.remove.success.channels",
+                        "stickyMessage:embed.field.name.removed_channels",
                       ),
                       value: channelMentions,
                       inline: false,

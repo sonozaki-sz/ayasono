@@ -24,7 +24,7 @@ export class StickyMessageRepository implements IStickyMessageRepository {
         this.prisma.stickyMessage.findUnique({
           where: { channelId },
         }),
-      tDefault("system:database.sticky_message_find_by_channel_failed", {
+      tDefault("stickyMessage:log.database_find_by_channel_failed", {
         channelId,
       }),
     );
@@ -37,7 +37,7 @@ export class StickyMessageRepository implements IStickyMessageRepository {
           where: { guildId },
           orderBy: { createdAt: "asc" },
         }),
-      tDefault("system:database.sticky_message_find_all_by_guild_failed", {
+      tDefault("stickyMessage:log.database_find_all_by_guild_failed", {
         guildId,
       }),
     );
@@ -61,7 +61,7 @@ export class StickyMessageRepository implements IStickyMessageRepository {
             updatedBy: updatedBy ?? null,
           },
         }),
-      tDefault("system:database.sticky_message_create_failed", {
+      tDefault("stickyMessage:log.database_create_failed", {
         guildId,
         channelId,
       }),
@@ -75,7 +75,7 @@ export class StickyMessageRepository implements IStickyMessageRepository {
           where: { id },
           data: { lastMessageId },
         }),
-      tDefault("system:database.sticky_message_update_last_message_id_failed", {
+      tDefault("stickyMessage:log.database_update_last_message_id_failed", {
         id,
       }),
     );
@@ -98,7 +98,9 @@ export class StickyMessageRepository implements IStickyMessageRepository {
             ...(updatedBy !== undefined && { updatedBy }),
           },
         }),
-      tDefault("system:database.sticky_message_update_content_failed", { id }),
+      tDefault("stickyMessage:log.database_update_content_failed", {
+        id,
+      }),
     );
   }
 
@@ -108,7 +110,7 @@ export class StickyMessageRepository implements IStickyMessageRepository {
         this.prisma.stickyMessage.delete({
           where: { id },
         }),
-      tDefault("system:database.sticky_message_delete_failed", { id }),
+      tDefault("stickyMessage:log.database_delete_failed", { id }),
     );
   }
 
@@ -118,7 +120,7 @@ export class StickyMessageRepository implements IStickyMessageRepository {
         this.prisma.stickyMessage.deleteMany({
           where: { channelId },
         }),
-      tDefault("system:database.sticky_message_delete_by_channel_failed", {
+      tDefault("stickyMessage:log.database_delete_by_channel_failed", {
         channelId,
       }),
     );

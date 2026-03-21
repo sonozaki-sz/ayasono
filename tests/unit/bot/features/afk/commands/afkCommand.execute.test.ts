@@ -95,9 +95,9 @@ describe("bot/features/afk/commands/afkCommand.execute", () => {
       id: "afk-channel",
       type: 2,
     });
-    expect(createSuccessEmbedMock).toHaveBeenCalledWith("commands:afk.embed.moved");
+    expect(createSuccessEmbedMock).toHaveBeenCalledWith("afk:user-response.moved");
     expect(interaction.reply).toHaveBeenCalledWith({
-      embeds: [{ description: "commands:afk.embed.moved" }],
+      embeds: [{ description: "afk:user-response.moved" }],
     });
     expect(loggerInfoMock).toHaveBeenCalledTimes(1);
   });

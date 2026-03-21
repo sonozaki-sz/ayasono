@@ -17,7 +17,7 @@ vi.mock("@/shared/locale/localeManager", () => ({
   logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
   tGuild: tGuildMock,
   tDefault: tDefaultMock,
-  tInteraction: (...args: unknown[]) => args[1],
+  tInteraction: (_locale: string, _key: string) => "mock text",
 }));
 vi.mock("@/bot/utils/messageResponse", () => ({
   createWarningEmbed: vi.fn((msg: string) => ({

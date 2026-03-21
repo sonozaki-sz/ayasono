@@ -3,7 +3,6 @@
 
 import { ChatInputCommandInteraction } from "discord.js";
 import { ValidationError } from "../../../../shared/errors/customErrors";
-import { tDefault } from "../../../../shared/locale/localeManager";
 import { handleCommandError } from "../../../errors/interactionErrorHandler";
 import { COMMON_I18N_KEYS } from "../../../shared/i18nKeys";
 import { ensureManageGuildPermission } from "../../../shared/permissionGuards";
@@ -24,7 +23,7 @@ export async function executeVacConfigCommand(
     // Guild 外実行は設定変更対象外
     const guildId = interaction.guildId;
     if (!guildId) {
-      throw new ValidationError(tDefault(COMMON_I18N_KEYS.GUILD_ONLY));
+      throw ValidationError.fromKey(COMMON_I18N_KEYS.GUILD_ONLY);
     }
 
     // 実行前に管理権限を検証
@@ -43,9 +42,7 @@ export async function executeVacConfigCommand(
         await handleVacConfigView(interaction, guildId);
         break;
       default:
-        throw new ValidationError(
-          tDefault(COMMON_I18N_KEYS.INVALID_SUBCOMMAND),
-        );
+        throw ValidationError.fromKey(COMMON_I18N_KEYS.INVALID_SUBCOMMAND);
     }
   } catch (error) {
     await handleCommandError(interaction, error);

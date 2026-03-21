@@ -54,7 +54,7 @@ export async function restoreBumpRemindersOnStartup(
     logger.error(
       logPrefixed(
         "system:log_prefix.bump_reminder",
-        "system:scheduler.bump_reminder_restore_failed",
+        "bumpReminder:log.scheduler_restore_failed",
       ),
       error,
     );

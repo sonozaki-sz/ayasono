@@ -15,23 +15,32 @@ import type { Command } from "../types/discord";
 export const bumpReminderConfigCommand: Command = {
   data: (() => {
     // 各ロケール文言を先に解決して SlashCommandBuilder へ流し込む
-    const cmdDesc = getCommandLocalizations("bump-reminder-config.description");
+    const cmdDesc = getCommandLocalizations(
+      "bumpReminder",
+      "bump-reminder-config.description",
+    );
     const enableDesc = getCommandLocalizations(
+      "bumpReminder",
       "bump-reminder-config.enable.description",
     );
     const disableDesc = getCommandLocalizations(
+      "bumpReminder",
       "bump-reminder-config.disable.description",
     );
     const setMentionDesc = getCommandLocalizations(
+      "bumpReminder",
       "bump-reminder-config.set-mention.description",
     );
     const roleDesc = getCommandLocalizations(
+      "bumpReminder",
       "bump-reminder-config.set-mention.role.description",
     );
     const removeMentionDesc = getCommandLocalizations(
+      "bumpReminder",
       "bump-reminder-config.remove-mention.description",
     );
     const viewDesc = getCommandLocalizations(
+      "bumpReminder",
       "bump-reminder-config.view.description",
     );
 

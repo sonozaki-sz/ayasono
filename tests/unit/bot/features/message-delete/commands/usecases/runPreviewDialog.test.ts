@@ -47,6 +47,8 @@ vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: vi.fn((key: string, params?: Record<string, unknown>) =>
     params ? `${key}:${JSON.stringify(params)}` : key,
   ),
+  tInteraction: (_locale: string, key: string, params?: Record<string, unknown>) =>
+    params ? `${key}:${JSON.stringify(params)}` : key,
 }));
 
 vi.mock("@/shared/utils/logger", () => ({
@@ -126,20 +128,20 @@ function makeComponentInteraction(
 }
 
 const MSG_DEL_CUSTOM_ID = {
-  CONFIRM_YES: "message-delete:confirm-yes",
-  CONFIRM_NO: "message-delete:confirm-no",
-  CONFIRM_EXCLUDE: "message-delete:confirm-exclude",
-  FIRST: "message-delete:first",
-  PREV: "message-delete:prev",
-  NEXT: "message-delete:next",
-  LAST: "message-delete:last",
-  JUMP: "message-delete:jump",
-  FILTER_AUTHOR: "message-delete:filter-author",
+  CONFIRM_YES: "message-delete:preview-confirm",
+  CONFIRM_NO: "message-delete:preview-cancel",
+  CONFIRM_EXCLUDE: "message-delete:preview-exclude",
+  FIRST: "message-delete:page-first",
+  PREV: "message-delete:page-prev",
+  NEXT: "message-delete:page-next",
+  LAST: "message-delete:page-last",
+  JUMP: "message-delete:page-jump",
+  FILTER_AUTHOR: "message-delete:author-filter",
   FILTER_RESET: "message-delete:filter-reset",
-  FILTER_DAYS: "message-delete:filter-days",
-  FILTER_AFTER: "message-delete:filter-after",
-  FILTER_BEFORE: "message-delete:filter-before",
-  FILTER_KEYWORD: "message-delete:filter-keyword",
+  FILTER_DAYS: "message-delete:days-filter",
+  FILTER_AFTER: "message-delete:after-date-filter",
+  FILTER_BEFORE: "message-delete:before-date-filter",
+  FILTER_KEYWORD: "message-delete:keyword-filter",
 };
 
 const DUMMY_OPTIONS = {
@@ -839,7 +841,7 @@ describe("bot/features/message-delete/commands/usecases/runPreviewDialog", () =>
     showFilterModalMock.mockResolvedValue("invalid-value");
     applyModalFilterValueMock.mockReturnValue({
       filter: {},
-      errorKey: "commands:message-delete.errors.after_invalid_format" as const,
+      errorKey: "messageDelete:user-response.after_invalid_format" as const,
     });
 
     const collector = makeMockCollector();

@@ -28,7 +28,7 @@ export async function handleBumpReminderConfigRemoveMention(
   const bumpReminderConfigService = getBotBumpReminderConfigService();
   const successTitle = tInteraction(
     interaction.locale,
-    "commands:bump-reminder-config.embed.success_title",
+    "bumpReminder:embed.title.success",
   );
 
   // メンションロール設定を削除
@@ -40,14 +40,14 @@ export async function handleBumpReminderConfigRemoveMention(
     throw new ValidationError(
       tInteraction(
         interaction.locale,
-        "commands:bump-reminder-config.embed.not_configured",
+        "bumpReminder:embed.description.not_configured",
       ),
     );
   }
 
   const roleDescription = tInteraction(
     interaction.locale,
-    "commands:bump-reminder-config.embed.remove_mention_role",
+    "bumpReminder:user-response.remove_mention_role",
   );
   const roleEmbed = createSuccessEmbed(roleDescription, {
     title: successTitle,
@@ -60,7 +60,7 @@ export async function handleBumpReminderConfigRemoveMention(
   logger.info(
     logPrefixed(
       "system:log_prefix.bump_reminder",
-      "system:bump-reminder.config_mention_removed",
+      "bumpReminder:log.config_mention_removed",
       {
         guildId,
         target: "role",

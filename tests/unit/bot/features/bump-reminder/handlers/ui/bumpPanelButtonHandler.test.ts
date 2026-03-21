@@ -5,7 +5,7 @@ import {
   createErrorEmbed,
   createSuccessEmbed,
 } from "@/bot/utils/messageResponse";
-import { tDefault } from "@/shared/locale/localeManager";
+import { tInteraction } from "@/shared/locale/localeManager";
 import { logger } from "@/shared/utils/logger";
 import { MessageFlags } from "discord.js";
 
@@ -54,8 +54,8 @@ vi.mock("@/shared/locale/helpers", () => ({
 vi.mock("@/shared/locale/localeManager", () => ({
   logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
   logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
-  tDefault: vi.fn((key: string) => key),
-  tInteraction: (...args: unknown[]) => args[1],
+  tDefault: (key: string) => key,
+  tInteraction: vi.fn((...args: unknown[]) => args[1]),
 }));
 
 // interaction 応答は safeReply 経由のみ検証する
@@ -70,6 +70,7 @@ vi.mock("@/shared/utils/logger", () => ({
 vi.mock("@/bot/utils/messageResponse", () => ({
   createErrorEmbed: vi.fn((message: string) => ({ message })),
   createSuccessEmbed: vi.fn((message: string) => ({ message })),
+  createWarningEmbed: vi.fn((message: string) => ({ message })),
 }));
 
 type ButtonInteractionLike = {
@@ -111,7 +112,7 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
     expect(bumpPanelButtonHandler.matches("other:guild-1")).toBe(false);
   });
 
-  it("ギルド不一致時にエラー応答して終了することを検証", async () => {
+  it("ギルド不一致時にwarning応答して終了することを検証", async () => {
     const interaction = createInteraction({
       customId: "bump-reminder:mention-on:guild-1",
       guild: { id: "guild-x" },
@@ -120,18 +121,18 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
     await bumpPanelButtonHandler.execute(interaction as never);
 
     expect(safeReplyMock).toHaveBeenCalledWith(interaction, {
-      content: "events:bump-reminder.panel.error",
+      embeds: [{ message: "bumpReminder:user-response.panel_update_failed" }],
       flags: MessageFlags.Ephemeral,
     });
   });
 
-  it("guild が存在しない場合はエラー応答する", async () => {
+  it("guild が存在しない場合はwarning応答する", async () => {
     const interaction = createInteraction({ guild: null });
 
     await bumpPanelButtonHandler.execute(interaction as never);
 
     expect(safeReplyMock).toHaveBeenCalledWith(interaction, {
-      content: "events:bump-reminder.panel.error",
+      embeds: [{ message: "bumpReminder:user-response.panel_update_failed" }],
       flags: MessageFlags.Ephemeral,
     });
   });
@@ -146,12 +147,12 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
       expect(getBotBumpReminderConfigService).toHaveBeenCalledTimes(1);
       expect(addMentionUserMock).toHaveBeenCalledWith("guild-1", "user-1");
       expect(createSuccessEmbed).toHaveBeenCalledWith(
-        "events:bump-reminder.panel.mention_toggled_on",
-        { title: "events:bump-reminder.panel.success_title" },
+        "bumpReminder:user-response.panel_mention_toggled_on",
+        { title: "bumpReminder:embed.title.success" },
       );
       expect(safeReplyMock).toHaveBeenCalledWith(interaction, {
         embeds: [
-          { message: "events:bump-reminder.panel.mention_toggled_on" },
+          { message: "bumpReminder:user-response.panel_mention_toggled_on" },
         ],
         flags: MessageFlags.Ephemeral,
       });
@@ -167,19 +168,19 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
       // 削除は呼ばれない（冪等動作）
       expect(removeMentionUserMock).not.toHaveBeenCalled();
       expect(createSuccessEmbed).toHaveBeenCalledWith(
-        "events:bump-reminder.panel.mention_toggled_on",
-        { title: "events:bump-reminder.panel.success_title" },
+        "bumpReminder:user-response.panel_mention_toggled_on",
+        { title: "bumpReminder:embed.title.success" },
       );
     });
 
-    it("NOT_CONFIGURED の場合はエラー応答する", async () => {
+    it("NOT_CONFIGURED の場合はwarning応答する", async () => {
       addMentionUserMock.mockResolvedValueOnce("not_configured");
       const interaction = createInteraction();
 
       await bumpPanelButtonHandler.execute(interaction as never);
 
       expect(safeReplyMock).toHaveBeenCalledWith(interaction, {
-        content: "events:bump-reminder.panel.error",
+        embeds: [{ message: "bumpReminder:user-response.panel_update_failed" }],
         flags: MessageFlags.Ephemeral,
       });
     });
@@ -196,12 +197,12 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
 
       expect(removeMentionUserMock).toHaveBeenCalledWith("guild-1", "user-1");
       expect(createSuccessEmbed).toHaveBeenCalledWith(
-        "events:bump-reminder.panel.mention_toggled_off",
-        { title: "events:bump-reminder.panel.success_title" },
+        "bumpReminder:user-response.panel_mention_toggled_off",
+        { title: "bumpReminder:embed.title.success" },
       );
       expect(safeReplyMock).toHaveBeenCalledWith(interaction, {
         embeds: [
-          { message: "events:bump-reminder.panel.mention_toggled_off" },
+          { message: "bumpReminder:user-response.panel_mention_toggled_off" },
         ],
         flags: MessageFlags.Ephemeral,
       });
@@ -219,12 +220,12 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
       // 追加は呼ばれない（冪等動作）
       expect(addMentionUserMock).not.toHaveBeenCalled();
       expect(createSuccessEmbed).toHaveBeenCalledWith(
-        "events:bump-reminder.panel.mention_toggled_off",
-        { title: "events:bump-reminder.panel.success_title" },
+        "bumpReminder:user-response.panel_mention_toggled_off",
+        { title: "bumpReminder:embed.title.success" },
       );
     });
 
-    it("NOT_CONFIGURED の場合はエラー応答する", async () => {
+    it("NOT_CONFIGURED の場合はwarning応答する", async () => {
       removeMentionUserMock.mockResolvedValueOnce("not_configured");
       const interaction = createInteraction({
         customId: "bump-reminder:mention-off:guild-1",
@@ -233,7 +234,7 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
       await bumpPanelButtonHandler.execute(interaction as never);
 
       expect(safeReplyMock).toHaveBeenCalledWith(interaction, {
-        content: "events:bump-reminder.panel.error",
+        embeds: [{ message: "bumpReminder:user-response.panel_update_failed" }],
         flags: MessageFlags.Ephemeral,
       });
     });
@@ -248,16 +249,16 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
       await bumpPanelButtonHandler.execute(interaction as never);
 
       expect(logger.error).toHaveBeenCalledWith(
-        expect.stringContaining("system:bump-reminder.panel_handle_failed"),
+        expect.stringContaining("bumpReminder:log.panel_handle_failed"),
         expect.any(Error),
       );
-      expect(tDefault).toHaveBeenCalledWith("common:title_operation_error");
+      expect(tInteraction).toHaveBeenCalledWith("ja", "common:title_operation_error");
       expect(createErrorEmbed).toHaveBeenCalledWith(
-        "events:bump-reminder.panel.error",
+        "bumpReminder:user-response.panel_update_failed",
         { title: "common:title_operation_error" },
       );
       expect(safeReplyMock).toHaveBeenCalledWith(interaction, {
-        embeds: [{ message: "events:bump-reminder.panel.error" }],
+        embeds: [{ message: "bumpReminder:user-response.panel_update_failed" }],
         flags: MessageFlags.Ephemeral,
       });
     });
@@ -270,11 +271,11 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
       await bumpPanelButtonHandler.execute(interaction as never);
 
       expect(logger.error).toHaveBeenCalledWith(
-        expect.stringContaining("system:bump-reminder.panel_handle_failed"),
+        expect.stringContaining("bumpReminder:log.panel_handle_failed"),
         expect.any(Error),
       );
       expect(logger.error).toHaveBeenCalledWith(
-        expect.stringContaining("system:bump-reminder.panel_reply_failed"),
+        expect.stringContaining("bumpReminder:log.panel_reply_failed"),
         expect.any(Error),
       );
     });

@@ -161,9 +161,9 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
 
       expect(result).toBe("panel-1");
       expect(createInfoEmbedMock).toHaveBeenCalledWith(
-        "events:bump-reminder.panel.scheduled_at",
+        "bumpReminder:user-response.panel_scheduled_at",
         {
-          title: "events:bump-reminder.panel.title",
+          title: "bumpReminder:embed.title.panel",
         },
       );
       expect(sendMock).toHaveBeenCalledWith(
@@ -192,7 +192,7 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
 
       expect(result).toBeUndefined();
       expect(loggerMock.error).toHaveBeenCalledWith(
-        expect.stringContaining("system:scheduler.bump_reminder_panel_send_failed"),
+        expect.stringContaining("bumpReminder:log.scheduler_panel_send_failed"),
         expect.any(Error),
       );
     });
@@ -222,7 +222,7 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
       );
 
       expect(loggerMock.warn).toHaveBeenCalledWith(
-        expect.stringContaining("system:scheduler.bump_reminder_channel_not_found"),
+        expect.stringContaining("bumpReminder:log.scheduler_channel_not_found"),
       );
     });
 
@@ -252,7 +252,7 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
       );
 
       expect(loggerMock.debug).toHaveBeenCalledWith(
-        expect.stringContaining("system:scheduler.bump_reminder_disabled"),
+        expect.stringContaining("bumpReminder:log.scheduler_disabled"),
       );
     });
 
@@ -291,7 +291,7 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
 
       expect(sendMock).toHaveBeenCalledWith({
         content:
-          "<@&role-1> <@u-1> <@u-2>\nevents:bump-reminder.reminder_message.disboard",
+          "<@&role-1> <@u-1> <@u-2>\nbumpReminder:user-response.reminder_message_disboard",
         reply: { messageReference: "msg-1" },
       });
     });
@@ -330,7 +330,7 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
       );
 
       expect(sendMock).toHaveBeenCalledWith(
-        "events:bump-reminder.reminder_message",
+        "bumpReminder:user-response.reminder_message",
       );
     });
 
@@ -368,7 +368,7 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
       );
 
       expect(sendMock).toHaveBeenCalledWith(
-        "events:bump-reminder.reminder_message.dissoku",
+        "bumpReminder:user-response.reminder_message_dissoku",
       );
     });
 
@@ -408,7 +408,7 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
 
       // サービス名が小文字化されてキーに組み込まれる
       expect(sendMock).toHaveBeenCalledWith(
-        "events:bump-reminder.reminder_message.newservice",
+        "bumpReminder:user-response.reminder_message_newservice",
       );
     });
 
@@ -447,7 +447,7 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
 
       expect(sendMock).not.toHaveBeenCalled();
       expect(loggerMock.info).toHaveBeenCalledWith(
-        expect.stringContaining("system:scheduler.bump_reminder_sent"),
+        expect.stringContaining("bumpReminder:log.scheduler_sent"),
       );
     });
 
@@ -564,7 +564,7 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
 
       // リマインド送信自体は成功
       expect(loggerMock.info).toHaveBeenCalledWith(
-        expect.stringContaining("system:scheduler.bump_reminder_sent"),
+        expect.stringContaining("bumpReminder:log.scheduler_sent"),
       );
     });
   });
@@ -587,7 +587,7 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
       );
 
       expect(loggerMock.debug).toHaveBeenCalledWith(
-        expect.stringContaining("system:scheduler.bump_reminder_disabled"),
+        expect.stringContaining("bumpReminder:log.scheduler_disabled"),
       );
       expect(scheduleBumpReminderMock).not.toHaveBeenCalled();
     });
@@ -610,7 +610,7 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
       );
 
       expect(loggerMock.debug).toHaveBeenCalledWith(
-        expect.stringContaining("system:scheduler.bump_reminder_unregistered_channel"),
+        expect.stringContaining("bumpReminder:log.scheduler_unregistered_channel"),
       );
       expect(scheduleBumpReminderMock).not.toHaveBeenCalled();
     });
@@ -844,7 +844,7 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
         "panel-1",
       );
       expect(loggerMock.info).toHaveBeenCalledWith(
-        expect.stringContaining("system:bump-reminder.detected"),
+        expect.stringContaining("bumpReminder:log.detected"),
       );
     });
 
@@ -917,7 +917,7 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
       );
 
       expect(loggerMock.error).toHaveBeenCalledWith(
-        expect.stringContaining("system:bump-reminder.detection_failed"),
+        expect.stringContaining("bumpReminder:log.detection_failed"),
         expect.any(Error),
       );
     });

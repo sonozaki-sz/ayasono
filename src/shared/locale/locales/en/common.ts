@@ -18,10 +18,10 @@ export const common = {
   // Standard titles used in status notification Embed options.title
   title_permission_denied: "Insufficient Permissions",
   title_bot_permission_denied: "Bot Permissions Required",
-  title_input_error: "Invalid Input",
+  title_invalid_input: "Invalid Input",
   title_option_conflict: "Option Conflict",
   title_filter_required: "Filter Required",
-  title_channel_error: "Channel Error",
+  title_channel_invalid: "Channel Error",
   title_channel_not_found: "Channel Not Found",
   title_not_in_vc: "Not in Voice Channel",
   title_config_required: "Configuration Required",
@@ -39,6 +39,65 @@ export const common = {
   title_move_failed: "Move Failed",
   title_rate_limited: "Rate Limited",
   title_config_error: "Configuration Error",
+
+  // Cross-feature errors (absorbed from errors.ts)
+  // Database errors
+  "database.get_config_failed":
+    "Failed to get config",
+  "database.save_config_failed":
+    "Failed to save config",
+  "database.update_config_failed":
+    "Failed to update config",
+  "database.delete_config_failed":
+    "Failed to delete config",
+  "database.check_existence_failed":
+    "Failed to check existence",
+  "database.unknown_error":
+    "unknown error",
+
+  // Validation errors
+  "validation.error_title":
+    "Invalid Input",
+  "validation.guild_only":
+    "This command can only be used within a server",
+  "validation.invalid_subcommand":
+    "Invalid subcommand",
+
+  // Permission errors
+  "permission.manage_guild_required":
+    "Manage Server (MANAGE_GUILD) permission is required to execute this command.",
+
+  // Interaction errors
+  "interaction.timeout":
+    "Operation timed out.",
+
+  // General errors
+  "general.error_title":
+    "Error",
+  "general.unexpected_production":
+    "An unexpected error occurred. Please try again later.",
+  "general.unexpected_with_message":
+    "Error: {{message}}",
+
+  // Cooldown (absorbed from commands.ts)
+  "cooldown.wait":
+    "⏱️ You can use this command in **{{seconds}} seconds**",
+
+  // Pagination (cross-feature UI components)
+  "ui.button.page_first":
+    "First",
+  "ui.button.page_prev":
+    "Prev",
+  "ui.button.page_next":
+    "Next",
+  "ui.button.page_last":
+    "Last",
+  "ui.button.page_jump":
+    "Page {{page}}/{{total}}",
+
+  // Common cancel
+  cancelled:
+    "Cancelled.",
 } as const;
 
 export type CommonTranslations = typeof common;

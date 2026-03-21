@@ -20,7 +20,7 @@ describe("bot/features/vac/commands/vacConfigCommand.autocomplete", () => {
         VAC_CONFIG_COMMAND.SUBCOMMAND.CREATE_TRIGGER,
         VAC_CONFIG_COMMAND.SUBCOMMAND.REMOVE_TRIGGER,
       ],
-      topLocaleKey: "commands:vac-config.remove-trigger-vc.category.top",
+      topLocaleKey: "vac:vac-config.remove-trigger-vc.category.top",
       topValue: VAC_CONFIG_COMMAND.TARGET.TOP,
     });
   });

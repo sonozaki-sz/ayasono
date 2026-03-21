@@ -50,10 +50,10 @@ export async function sendBumpPanel(
     const unixTimestamp = Math.floor(scheduledAt.getTime() / 1000);
 
     const embed = createInfoEmbed(
-      tGuild("events:bump-reminder.panel.scheduled_at", {
+      tGuild("bumpReminder:user-response.panel_scheduled_at", {
         timestamp: unixTimestamp,
       }),
-      { title: tGuild("events:bump-reminder.panel.title") },
+      { title: tGuild("bumpReminder:embed.title.panel") },
     );
 
     // トグルボタン行を構築して元メッセージへの返信として送信
@@ -78,7 +78,7 @@ export async function sendBumpPanel(
     logger.error(
       logPrefixed(
         "system:log_prefix.bump_reminder",
-        "system:scheduler.bump_reminder_panel_send_failed",
+        "bumpReminder:log.scheduler_panel_send_failed",
       ),
       error,
     );
@@ -102,12 +102,12 @@ function createBumpPanelButtons(
   return new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
       .setCustomId(`${BUMP_CONSTANTS.CUSTOM_ID_PREFIX.MENTION_ON}${guildId}`)
-      .setLabel(tGuild("events:bump-reminder.panel.button_mention_on"))
+      .setLabel(tGuild("bumpReminder:ui.button.mention_on"))
       .setStyle(ButtonStyle.Primary)
       .setEmoji("🔔"),
     new ButtonBuilder()
       .setCustomId(`${BUMP_CONSTANTS.CUSTOM_ID_PREFIX.MENTION_OFF}${guildId}`)
-      .setLabel(tGuild("events:bump-reminder.panel.button_mention_off"))
+      .setLabel(tGuild("bumpReminder:ui.button.mention_off"))
       .setStyle(ButtonStyle.Secondary)
       .setEmoji("🔕"),
   );

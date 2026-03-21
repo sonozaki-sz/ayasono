@@ -32,7 +32,7 @@ export async function handleVcRecruitMessageDelete(
   logger.info(
     logPrefixed(
       "system:log_prefix.vc_recruit",
-      "system:vc-recruit.panel_delete_detected",
+      "vcRecruit:log.panel_delete_detected",
       {
         guildId,
         panelChannelId: message.channelId,
@@ -65,14 +65,10 @@ export async function handleVcRecruitMessageDelete(
   await repo.updatePanelMessageId(guildId, setup.panelChannelId, newMessage.id);
 
   logger.info(
-    logPrefixed(
-      "system:log_prefix.vc_recruit",
-      "system:vc-recruit.panel_resent",
-      {
-        guildId,
-        panelChannelId: setup.panelChannelId,
-        newMessageId: newMessage.id,
-      },
-    ),
+    logPrefixed("system:log_prefix.vc_recruit", "vcRecruit:log.panel_resent", {
+      guildId,
+      panelChannelId: setup.panelChannelId,
+      newMessageId: newMessage.id,
+    }),
   );
 }

@@ -2,7 +2,7 @@
 
 > トリガーチャンネル参加時に専用ボイスチャンネルを自動作成・管理する機能
 
-最終更新: 2026年3月19日
+最終更新: 2026年3月21日
 
 ---
 
@@ -10,486 +10,368 @@
 
 ユーザーがトリガーチャンネル（CreateVC）に参加すると、自動的にそのユーザー専用のボイスチャンネルを作成する機能です。作成されたVCは参加者が全員退出すると自動的に削除されます。
 
-### 主な用途
-
-- ユーザーが自由に使えるプライベートVC空間の提供
-- VC作成の手間を省く自動化
-- 使用されていないVCの自動クリーンアップ
-
-### 特徴
-
-- **自動作成**: トリガーチャンネル参加で即座にVC作成
-- **操作パネル**: VCのチャットに設置されたパネルでVC参加中のユーザーが名前・人数制限を変更可能
-- **管理権限付与**: 作成者にのみチャンネルスコープの `ManageChannels` 権限を付与（Discord標準UI経由での詳細設定用。なおサーバーレベルで `ManageChannels` / `Administrator` を持つユーザーは元来全チャンネルを操作可能）
-- **自動削除**: VCが空になると自動削除
-
 > **VC操作コマンド（名前変更・人数制限変更）について**: `/vc rename` および `/vc limit` コマンドとして独立機能に切り出されています。詳細は [VC_COMMAND_SPEC.md](VC_COMMAND_SPEC.md) を参照してください。
 
+### 機能一覧
+
+| 機能 | 概要 |
+| --- | --- |
+| VC自動作成 | トリガーチャンネル参加で専用VCを作成・ユーザーを自動移動 |
+| 操作パネル | 作成VCのチャットにパネル設置（名前変更・人数制限・AFK移動・パネル再送信） |
+| VC自動削除 | VCが空になると自動削除 |
+| create-trigger-vc | トリガーチャンネルを作成 |
+| remove-trigger-vc | トリガーチャンネルを削除 |
+| view | 現在の設定を表示 |
+
+### 権限モデル
+
+| 対象 | 権限 | 用途 |
+| --- | --- | --- |
+| 実行者 | ManageGuild | `/vac-config` 全サブコマンドの実行（コマンドレベルで制御） |
+| Bot | ManageChannels | VCの作成・削除・権限設定 |
+| Bot | MoveMembers | ユーザーの自動移動（作成VC・AFK移動） |
+
 ---
 
-## 主要機能
+## VC自動作成
 
-### 1. 自動チャンネル作成
+### トリガー
 
-**トリガー**: `voiceStateUpdate` イベント - 指定されたトリガーチャンネルへの参加
+**イベント**: `voiceStateUpdate`
 
-**作成されるチャンネル:**
+**発火条件:**
 
-- **ボイスチャンネル**: `{ユーザー名}'s Room`
-- **権限**: 作成者に `ManageChannels` 権限を付与
-- **デフォルト設定**: 人数制限 99、トリガーチャンネルと同じカテゴリ
+- ユーザーがトリガーチャンネル（CreateVC）に参加
+- VAC機能が有効
 
-**処理フロー:**
+### 動作フロー
 
-```
-1. ユーザーがトリガーチャンネル（CreateVC）に参加
-   ↓
-2. voiceStateUpdateイベントで検知
-   ↓
-3. 新しいVCを作成
-   - 名前: {ユーザー名}'s Room
-   - カテゴリ: トリガーチャンネルと同じ
-   - 人数制限: 99（デフォルト）
-   - 作成者にManageChannels権限を付与
-   ↓
-4. VCのチャットチャンネルに操作パネルを設置
-   ↓
-5. ユーザーを新しいVCに自動移動
-   ↓
-6. データベースに作成したVCのIDを保存
-```
+1. トリガーチャンネルへの参加を確認
+2. 同一ユーザーが既に所有VCを持つ場合はそちらに移動
+3. 新規VCを作成（名前: `{ユーザー名}'s Room`、カテゴリ: トリガーチャンネルと同じ、人数制限: 99）
+4. 作成者に `ManageChannels` 権限を付与
+5. VCのチャットに操作パネルを送信
+6. ユーザーを新しいVCに自動移動
+7. データベースに作成したVCのIDを保存
 
-### 2. 操作パネル
+**ビジネスルール:**
 
-**配置場所**: 作成されたボイスチャンネルのチャット
+- 同名のチャンネルが既に存在する場合は末尾に連番を付加（例: `しゅん's Room (2)`）
+- カテゴリのチャンネル数が上限（50）に達している場合はVC作成をスキップしてエラーを返す
+- 作成者にはチャンネルスコープの `ManageChannels` 権限を付与（Discord標準UI経由での詳細設定用）
+- `@everyone` への `ManageChannels` 付与は行わない（チャンネル削除・権限上書きも含まれるため）
 
-**パネルUI:**
+### UI
 
-<table border="1" cellpadding="8" width="360">
-<tr><th align="left">🎤 ボイスチャンネル操作パネル</th></tr>
-<tr><td>このパネルからVCの設定を変更できます。</td></tr>
-<tr><td>
-<kbd>✏️ VC名を変更</kbd><br>
-<kbd>👥 人数制限を変更</kbd><br>
-<kbd>🔇 メンバーをAFKに移動</kbd><br>
-<kbd>🔄 パネルを最下部に移動</kbd>
-</td></tr>
-</table>
+**操作パネルEmbed:**
 
-**ボタン機能:**
+| 項目 | 内容 |
+| --- | --- |
+| タイトル | 🎤 ボイスチャンネル操作パネル |
+| 説明 | このパネルからVCの設定を変更できます。 |
 
-| ボタン                  | 機能             | 実行権限                | 説明                                        |
-| ----------------------- | ---------------- | ----------------------- | ------------------------------------------- |
-| ✏️ VC名を変更           | Modal表示        | VC参加中の ユーザーのみ | テキスト入力でVC名を変更                    |
-| 👥 人数制限を変更       | Modal表示        | VC参加中の ユーザーのみ | 0-99の数値入力で人数制限を変更 （0=無制限） |
-| 🔇 メンバーをAFKに移動  | User Select Menu | VC参加中の ユーザーのみ | 複数メンバーを選択して AFKチャンネルに移動  |
-| 🔄 パネルを最下部に移動 | パネル再送信     | VC参加中の ユーザーのみ | チャットが流れた際に パネルを最下部に移動   |
+**パネルボタン:**
 
-**パネル操作時の応答例:**
+| コンポーネント | emoji | ラベル | スタイル | 動作 |
+| --- | --- | --- | --- | --- |
+| `vac:rename:{channelId}` | ✏️ | VC名を変更 | Primary | モーダルでVC名を入力 |
+| `vac:limit:{channelId}` | 👥 | 人数制限を変更 | Primary | モーダルで人数を入力（0-99、0=無制限） |
+| `vac:afk:{channelId}` | 🔇 | メンバーをAFKに移動 | Primary | ユーザーセレクトメニューで選択・移動 |
+| `vac:refresh:{channelId}` | 🔄 | パネルを最下部に移動 | Secondary | 既存パネル削除→新規送信 |
 
-```
-✏️ VC名を変更
-✅ VC名を みんなのたまり場 に変更しました
+**パネル操作の権限:**
 
-👥 人数制限を変更
-✅ 人数制限を 5 に設定しました
-✅ 人数制限を 無制限 に設定しました
+| ユーザー種別 | パネル操作 | Discord UI操作 |
+| --- | --- | --- |
+| VC参加中のユーザー | 名前変更・人数制限・AFK移動・パネル再送信 | 不可（作成者を除く） |
+| 作成者 | 上記すべて | チャンネルスコープ `ManageChannels` により編集・削除可能 |
+| サーバー管理者 | 上記すべて（VC参加が必要） | 全チャンネルの編集・削除が可能 |
+| VC未参加ユーザー | 不可（エラーメッセージ） | 不可 |
 
-🔇 メンバーをAFKに移動
-✅ 2人を AFK に移動しました
+**モーダル:**
 
-🔄 パネルを最下部に移動
-✅ パネルを最下部に移動しました
+| コンポーネント | フィールド | ラベル | スタイル | 制約 |
+| --- | --- | --- | --- | --- |
+| `vac:rename-modal:{channelId}` | `vac:rename-vc-name-modal-input` | VC名 | Short | ― |
+| `vac:limit-modal:{channelId}` | `vac:limit-modal-input` | 人数制限 | Short | 0-99（0=無制限） |
 
-エラー（VC未参加）
-❌ このVCに参加しているユーザーのみ操作できます
-```
+---
 
-> **権限設計の方針**: パネルボタン経由の操作はBotが代理実行するため、ユーザー側に `ManageChannels` 権限は不要です。ボタンハンドラーでは**VC参加チェック**を行い、そのVCに現在参加しているユーザーのみ実行できます。
+## VC自動削除
 
-**Discord標準設定:**
+### トリガー
 
-Discord標準UIからの操作権限は以下の通りです：
+**イベント**: `voiceStateUpdate`
 
-| ユーザー種別                                                     | Discord UI での操作範囲                                                                   |
-| ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| **作成者**                                                       | チャンネルスコープの `ManageChannels` 付与により、 そのVCの編集・削除が可能               |
-| **サーバーレベルで `ManageChannels` / `Administrator` ユーザー** | Discordの仕様上、全チャンネルの 編集・削除が可能 （VAC管理チャンネルも含む）              |
-| **一般ユーザー**                                                 | Discord UIからは操作不可。 パネル・`/vc` コマンド経由（VC参加中のみ）で名前・人数制限のみ変更可 |
+**発火条件:**
 
-> **セキュリティ上の注意**: `@everyone` への `ManageChannels` 付与は行いません。この権限にはチャンネル削除・権限上書きも含まれるためです。名前変更・人数制限変更はパネルボタン経由（Bot代理実行）でVC参加中のユーザーが行えます。
+- VAC管理下のVCからユーザーが退出
+- VCが完全に空になった
 
-### 3. 自動削除機能
+### 動作フロー
 
-**削除条件**: VCが完全に空になったとき
+1. 退出後にVCが空であることを確認
+2. VAC管理下のVCであればチャンネルを削除
+3. データベースから削除
 
-**処理フロー:**
+---
 
-```
-1. voiceStateUpdateイベントで退出を検知
-   ↓
-2. VCが空かチェック
-   ↓
-3. 空の場合
-   - VCを削除
-   - データベースから削除
-```
+## /vac-config create-trigger-vc
 
-### 4. 設定コマンド
+### コマンド定義
 
-**コマンド**: `/vac-config`
+**コマンド**: `/vac-config create-trigger-vc`
 
-**実行権限**: サーバー管理権限（`ManageGuild`）
+**コマンドオプション:**
 
-#### サブコマンド: `create-trigger-vc`
+| オプション名 | 型 | 必須 | 説明 |
+| --- | --- | --- | --- |
+| `category` | String（autocomplete） | ❌ | 作成先カテゴリ（`TOP` またはカテゴリ名）。未指定時はコマンド実行チャンネルのカテゴリ（なければTOP） |
 
-トリガーチャンネルを自動作成します。
+### 動作フロー
 
-**引数:**
+1. 作成先カテゴリを決定（`category` 指定 or 実行チャンネルのカテゴリ or TOP）
+2. 同一カテゴリ内に既存トリガーチャンネルがある場合はエラー
+3. 「CreateVC」ボイスチャンネルを作成
+4. トリガーチャンネルとしてデータベースに登録
+5. 完了メッセージを返信（ephemeral）
 
-| 引数名   | 型     | 必須 | 説明                                                                                                |
-| -------- | ------ | ---- | --------------------------------------------------------------------------------------------------- |
-| category | String | ❌   | 作成先カテゴリ（`TOP` またはカテゴリ）。 未指定時はコマンド実行チャンネルのカテゴリ （なければTOP） |
+**ビジネスルール:**
 
-**動作:**
+- トリガーチャンネルはカテゴリごとに1個まで
+- 別カテゴリなら複数トリガーチャンネルを作成可能（カテゴリA、カテゴリB、TOP に各1個ずつ等）
 
-1. `category` が指定されていれば、その対象（`TOP` またはカテゴリ）に「CreateVC」を作成
-2. `category` が未指定なら、コマンド実行チャンネルのカテゴリーを作成先にする（カテゴリなしならTOP）
-3. 同一カテゴリー内に既存トリガーチャンネルがある場合は作成しない
-4. 別カテゴリーなら複数トリガーチャンネルを作成可能
-5. 作成したチャンネルを自動的にトリガーチャンネルとして登録
-6. データベースに保存
+### UI
 
-> **トリガー作成制約**: トリガーチャンネルは「カテゴリーごとに1個まで」。
->
-> - カテゴリーAに1個、カテゴリーBに1個、トップレベル（カテゴリーなし）に1個、のように併存可能
-> - 同一カテゴリーに2個目は作成不可
+**レスポンス（成功）:** `createSuccessEmbed` でトリガーチャンネル作成完了を通知
 
-**実行例:**
+---
 
-```
-/vac-config create-trigger-vc category:TOP
-/vac-config create-trigger-vc category:カテゴリA
-/vac-config create-trigger-vc
-```
+## /vac-config remove-trigger-vc
 
-**成功時の応答:**
+### コマンド定義
 
-```
-✅ トリガーチャンネル #CreateVC を作成しました
-```
+**コマンド**: `/vac-config remove-trigger-vc`
 
-#### サブコマンド: `remove-trigger-vc`
+**コマンドオプション:** なし
 
-トリガーチャンネルを削除します。
+### 動作フロー
 
-**引数:**
+1. データベースから現在のギルドのすべてのトリガーチャンネルを取得
+2. カテゴリ名付きのセレクトメニュー（複数選択可）を ephemeral で返信
+3. 「削除する」ボタン押下時:
+   - 選択された各トリガーチャンネルを削除（Discord側チャンネル + DB登録解除）
+   - 削除完了メッセージを ephemeral で返信
 
-| 引数名   | 型     | 必須 | 説明                                                     |
-| -------- | ------ | ---- | -------------------------------------------------------- |
-| category | String | ❌   | 削除対象（`TOP` またはカテゴリ）。未指定時は実行カテゴリ |
+**ビジネスルール:**
 
-**動作:**
+- Discord側チャンネルが既に削除されている場合はエラーを無視してDB登録のみ解除
+- 全選択すれば一括削除（リセット相当）が可能
 
-1. `category` が指定されていれば、その対象を選択（`TOP`=カテゴリーなし、またはカテゴリ）
-2. `category` が未指定なら、コマンド実行チャンネルのカテゴリを対象にする（カテゴリなしならTOP）
-3. 指定カテゴリ（またはTOP）に紐づくトリガーチャンネルを特定
-4. チャンネルを削除
-5. データベースから登録解除
+### UI
 
-**実行例:**
+**セレクトメニュー:**
 
-```
-/vac-config remove-trigger-vc category:TOP
-/vac-config remove-trigger-vc category:カテゴリA
-/vac-config remove-trigger-vc
-```
+| コンポーネント | プレースホルダー | 種別 | 設定 |
+| --- | --- | --- | --- |
+| `vac-config:trigger-remove-select` | 削除するトリガーチャンネルを選択（複数選択可） | StringSelect | `minValues: 1`, `maxValues: 設定数` |
 
-**成功時の応答:**
+選択肢: `#CreateVC (カテゴリ名)` 形式で表示
 
-```
-✅ トリガーチャンネル #CreateVC を削除しました
-```
+**ボタン:**
 
-#### サブコマンド: `view`
+| コンポーネント | emoji | ラベル | スタイル | 動作 |
+| --- | --- | --- | --- | --- |
+| `vac-config:trigger-remove-confirm` | 🗑️ | 削除する | Danger | 選択トリガーチャンネルを削除 |
 
-現在のVC自動作成機能の設定を表示します。
+**エラーケース:**
 
-**引数:** なし
+| 状況 | メッセージ |
+| --- | --- |
+| トリガーチャンネル未設定 | トリガーチャンネルが設定されていません。 |
 
-**動作:**
+---
+
+## /vac-config view
+
+### コマンド定義
+
+**コマンド**: `/vac-config view`
+
+**コマンドオプション:** なし
+
+### 動作フロー
 
 1. 現在のVC自動作成機能の設定を取得
-2. トリガーチャンネル一覧と作成されたVC一覧を表示
+2. トリガーチャンネル一覧と作成されたVC一覧を ephemeral で表示
 
-**実行例:**
+### UI
 
-```
-/vac-config view
-```
+**Embed:**
 
-**応答例:**
-
-```
-【ℹ️ VC自動作成機能】
-トリガーチャンネル
-- #CreateVC (TOP)
-- #CreateVC (カテゴリA)
-作成されたVC
-- #しゅん's Room(@shun)
-- #作業VC(@alice)
-```
-
-未作成時:
-
-```
-【ℹ️ VC自動作成機能】
-トリガーチャンネル
-未設定
-作成されたVC
-なし
-```
+| 項目 | 内容 |
+| --- | --- |
+| タイトル | VC自動作成機能 |
+| フィールド: トリガーチャンネル | `#CreateVC (カテゴリ名)` の一覧 / 未設定 |
+| フィールド: 作成されたVC | `#ユーザー名's Room (@ユーザー名)` の一覧 / なし |
 
 ---
 
-## データベース設計
+## データモデル
 
-### GuildVacConfig テーブル
+### GuildVacConfig
 
-VC自動作成機能の設定は`guild_vac_configs`テーブルに保存されます。
+| フィールド | 型 | 説明 |
+| --- | --- | --- |
+| `guildId` | String | ギルドID（主キー） |
+| `enabled` | Boolean | 機能の有効/無効（デフォルト: false） |
+| `triggerChannelIds` | String[] | トリガーチャンネルIDのリスト（JSON配列保存） |
+| `createdChannels` | VacChannelPair[] | 作成済みチャンネル情報のリスト（JSON配列保存） |
 
-**フィールド（GuildVacConfig）:**
+### VacChannelPair
 
-| フィールド          | 型       | 説明                                         |
-| ------------------- | -------- | -------------------------------------------- |
-| `guildId`           | String   | ギルドID（主キー）                           |
-| `enabled`           | Boolean  | 機能の有効/無効（デフォルト: false）          |
-| `triggerChannelIds` | String[] | トリガーチャンネルIDのリスト（JSON配列保存）  |
-| `createdChannels`   | 配列     | 作成済みチャンネル情報のリスト（JSON配列保存）|
-
-**作成済みチャンネル情報（VacChannelPair）:**
-
-| フィールド       | 型     | 説明                            |
-| ---------------- | ------ | ------------------------------- |
-| `voiceChannelId` | String | 作成されたボイスチャンネルID    |
-| `ownerId`        | String | 作成者（所有者）のユーザーID    |
-| `createdAt`      | Number | 作成日時（Unixタイムスタンプ）  |
+| フィールド | 型 | 説明 |
+| --- | --- | --- |
+| `voiceChannelId` | String | 作成されたボイスチャンネルID |
+| `ownerId` | String | 作成者（所有者）のユーザーID |
+| `createdAt` | Number | 作成日時（Unixタイムスタンプ） |
 
 ---
 
-## 実装詳細
+## 制約・制限事項
 
-### イベントハンドラー
-
-#### voiceStateUpdate - VC作成・削除
-
-トリガーチャンネルへの参加を検知してVC作成、退出によるVC空室を検知して自動削除を行います。
-
-**VC作成の主な処理:**
-
-- トリガーチャンネルへの参加を確認
-- 同一ユーザーが既に所有VCを持つ場合はそちらに移動
-- 新規VCを作成し、作成者に `ManageChannels` 権限を付与
-- 操作パネルをVCのチャットに送信
-- ユーザーを新規VCに移動してDBに保存
-
-**VC削除の主な処理:**
-
-- 退出後にVCが空であることを確認
-- VAC管理下のVCであればチャンネルを削除してDBから除去
-
-#### channelDelete - トリガーチャンネル削除検知
-
-ボイスチャンネルが削除された際に、トリガーチャンネル登録または作成済みVCリストからそのIDを自動除去します。
-
-### コマンド実装
-
-#### `/vac-config` コマンド
-
-`ManageGuild` 権限を要求。各サブコマンドの動作は主要機能セクションを参照。
-
-### 操作パネル
-
-**ファイル**: `src/bot/features/vc-panel/vcControlPanel.ts`
-
-作成されたVCのチャットにEmbedとボタン4つ（VC名変更・人数制限変更・AFK移動・パネル再送信）を送信します。各ボタンハンドラーでは、インタラクションを発行したユーザーが**そのVCに現在参加しているか**を確認します。BotがAPI呼び出しを代理実行するため、ユーザー側の `ManageChannels` 権限は不要です。
+- トリガーチャンネルはカテゴリごとに1個まで
+- カテゴリのチャンネル数上限: 50（Discord制限）
+- デフォルト人数制限: 99
+- Bot再起動時に全ギルドを確認し、DBに残っているが存在しないトリガーチャンネルや作成済みVCを自動除去。空のまま残っているVCがあれば削除する
+- `channelDelete` イベントでトリガーチャンネル・作成済みVCの自動登録解除
+- リセットコマンドは不要（`/vac-config remove-trigger-vc` で全選択により一括削除可能。作成済みVCは空室時に自動削除される）
 
 ---
 
-## 多言語対応（i18next）
+## ローカライズ
 
-### メッセージ一覧
+**翻訳ファイル:** `src/shared/locale/locales/{ja,en}/features/vac.ts`
 
-| 種別                   | 内容                                             |
-| ---------------------- | ------------------------------------------------ |
-| AFK移動成功            | `{{count}}人を AFK に移動しました`               |
-| パネル再送信成功       | `パネルを最下部に移動しました`                   |
-| 未設定エラー           | `VC自動作成機能が設定されていません`             |
-| トリガー不明エラー     | `トリガーチャンネルが見つかりません`             |
-| トリガー重複エラー     | `トリガーチャンネルが既に存在します`             |
-| カテゴリ満杯エラー     | `カテゴリがチャンネル数の上限に達しています`     |
-| 権限不足エラー         | `チャンネルを作成する権限がありません`           |
-| VC未参加エラー（操作） | `このVCに参加しているユーザーのみ操作できます`   |
+キー命名規則は [IMPLEMENTATION_GUIDELINES.md](../guides/IMPLEMENTATION_GUIDELINES.md) の「翻訳キー命名規則」を参照。
 
-> VC操作コマンド関連のメッセージ（VC名変更成功・人数制限変更成功・VC未参加エラー（コマンド）・VAC管理外VCエラー・人数制限範囲エラー）は [VC_COMMAND_SPEC.md](VC_COMMAND_SPEC.md) に移動しました。
+### コマンド定義
+
+| キー | 用途 | ja | en |
+| --- | --- | --- | --- |
+| `vac-config.description` | コマンド説明 | VC自動作成機能の設定（サーバー管理権限が必要） | Configure voice auto-create feature (Manage Server) |
+| `vac-config.create-trigger-vc.description` | サブコマンド説明 | トリガーチャンネルを作成 | Create trigger channel |
+| `vac-config.create-trigger-vc.category.description` | オプション説明 | 作成先カテゴリ（TOP またはカテゴリ。未指定時は実行カテゴリ） | Destination category (TOP or category; defaults to current category) |
+| `vac-config.remove-trigger-vc.description` | サブコマンド説明 | トリガーチャンネルを削除 | Remove trigger channel |
+| `vac-config.remove-trigger-vc.category.description` | オプション説明 | 削除対象（TOP またはカテゴリ。未指定時は実行カテゴリ） | Target category (TOP or category; defaults to current category) |
+| `vac-config.remove-trigger-vc.category.top` | カテゴリ選択肢 | TOP（カテゴリなし） | TOP (no category) |
+| `vac-config.view.description` | サブコマンド説明 | 現在の設定を表示 | Show current settings |
+
+### ユーザーレスポンス
+
+| キー | 用途 | ja | en |
+| --- | --- | --- | --- |
+| `user-response.trigger_created` | トリガー作成成功 | トリガーチャンネル {{channel}} を作成しました。 | Created trigger channel {{channel}} |
+| `user-response.trigger_removed` | トリガー削除成功 | トリガーチャンネル {{channel}} を削除しました。 | Removed trigger channel {{channel}} |
+| `user-response.renamed` | VC名変更成功 | VC名を {{name}} に変更しました。 | VC name has been changed to {{name}} |
+| `user-response.limit_changed` | 人数制限変更成功 | 人数制限を {{limit}} に設定しました。 | User limit has been set to {{limit}} |
+| `user-response.members_moved` | AFK移動成功 | {{channel}} へ移動しました。 | Moved to {{channel}}. |
+| `user-response.panel_refreshed` | パネル再送信成功 | パネルを最下部に移動しました。 | Panel moved to the bottom |
+| `user-response.unlimited` | 無制限表示 | 無制限 | unlimited |
+| `user-response.not_configured` | 未設定エラー | VC自動作成機能が設定されていません。 | Voice auto-create feature is not configured. |
+| `user-response.trigger_not_found` | トリガー不在エラー | 指定されたカテゴリーにはトリガーチャンネルはありません。 | There is no trigger channel in the specified category. |
+| `user-response.already_exists` | トリガー重複エラー | トリガーチャンネルが既に存在します。 | A trigger channel already exists. |
+| `user-response.category_full` | カテゴリ満杯エラー | カテゴリ内のチャンネル数が上限に達しています。 | The category has reached the channel limit. |
+| `user-response.no_permission` | 権限不足エラー | チャンネルを作成または編集する権限がありません。 | Missing permission to create or edit channels. |
+| `user-response.not_in_vc` | VC未参加エラー（パネル） | このVCに参加しているユーザーのみ操作できます。 | Only users currently in this VC can use this action. |
+| `user-response.not_in_any_vc` | VC未参加エラー（コマンド） | このコマンドはVC参加中にのみ使用できます。 | This command can only be used while in a VC. |
+| `user-response.not_vac_channel` | VAC管理外エラー | このVCは自動作成チャンネルではありません。 | This VC is not managed by auto-create feature. |
+| `user-response.limit_out_of_range` | 人数制限範囲エラー | 人数制限は0〜99の範囲で指定してください。 | User limit must be between 0 and 99. |
+| `user-response.afk_move_failed` | AFK移動失敗 | AFK チャンネルへの移動に失敗しました。対象ユーザーがVCから退出した可能性があります。 | Failed to move to AFK channel. The target user(s) may have left the VC. |
+
+### Embed
+
+| キー | 用途 | ja | en |
+| --- | --- | --- | --- |
+| `embed.title.success` | 設定成功タイトル | 設定完了 | Settings Updated |
+| `embed.title.remove_error` | 削除エラータイトル | 削除エラー | Removal Error |
+| `embed.title.config_view` | 設定表示タイトル | VC自動作成機能 | Voice Auto-Create |
+| `embed.field.name.trigger_channels` | トリガーチャンネルフィールド名 | トリガーチャンネル | Trigger channels |
+| `embed.field.name.created_vcs` | 作成VC数フィールド名 | 作成されたVC数 | Created VC count |
+| `embed.field.name.created_vc_details` | 作成VC詳細フィールド名 | 作成されたVC | Created VCs |
+| `embed.field.value.not_configured` | 未設定値 | 未設定 | Not configured |
+| `embed.field.value.no_created_vcs` | 作成VCなし値 | なし | None |
+| `embed.field.value.top` | TOPカテゴリ値 | TOP | TOP |
+| `embed.title.panel` | 操作パネルタイトル | ボイスチャンネル操作パネル | Voice Channel Control Panel |
+| `embed.description.panel` | 操作パネル説明 | このパネルからVCの設定を変更できます。 | You can change VC settings from this panel. |
+
+### UIラベル
+
+| キー | 用途 | ja | en |
+| --- | --- | --- | --- |
+| `ui.button.rename` | VC名変更ボタン | VC名を変更 | Change VC Name |
+| `ui.button.limit` | 人数制限ボタン | 人数制限を変更 | Change User Limit |
+| `ui.modal.limit_placeholder` | 人数制限プレースホルダー | 0〜99（0: 無制限） | 0–99 (0: unlimited) |
+| `ui.button.afk` | AFK移動ボタン | メンバーをAFKに移動 | Move Members to AFK |
+| `ui.button.refresh` | パネル再送信ボタン | パネルを最下部に移動 | Move Panel to Bottom |
+
+### ログ
+
+| キー | 用途 | ja | en |
+| --- | --- | --- | --- |
+| `log.startup_cleanup_stale_trigger_removed` | 起動クリーンアップ: 不正トリガー除去 | 起動クリーンアップ: 不正トリガーチャンネルを除去 GuildId: {{guildId}} ChannelId: {{channelId}} | Startup cleanup: removed stale trigger channel GuildId: {{guildId}} ChannelId: {{channelId}} |
+| `log.startup_cleanup_orphaned_channel_removed` | 起動クリーンアップ: 孤立チャンネル除去 | 起動クリーンアップ: 存在しないVACチャンネルをDB削除 GuildId: {{guildId}} ChannelId: {{channelId}} | Startup cleanup: removed orphaned VAC channel from DB GuildId: {{guildId}} ChannelId: {{channelId}} |
+| `log.startup_cleanup_empty_channel_deleted` | 起動クリーンアップ: 空VC削除 | 起動クリーンアップ: 空VACチャンネルを削除 GuildId: {{guildId}} ChannelId: {{channelId}} | Startup cleanup: deleted empty VAC channel GuildId: {{guildId}} ChannelId: {{channelId}} |
+| `log.startup_cleanup_done` | 起動クリーンアップ完了 | 起動クリーンアップ完了 トリガー {{removedTriggers}} 件・チャンネル {{removedChannels}} 件を削除 | Startup cleanup done: removed {{removedTriggers}} triggers and {{removedChannels}} channels |
+| `log.startup_cleanup_done_none` | 起動クリーンアップ完了（不整合なし） | 起動クリーンアップ完了 不整合なし | Startup cleanup done No inconsistencies found |
+| `log.voice_state_update_failed` | voiceStateUpdate処理失敗 | voiceStateUpdate処理失敗 | Failed to process voiceStateUpdate |
+| `log.channel_created` | VC作成ログ | VCチャンネル作成 GuildId: {{guildId}} ChannelId: {{channelId}} OwnerId: {{ownerId}} | channel created GuildId: {{guildId}} ChannelId: {{channelId}} OwnerId: {{ownerId}} |
+| `log.channel_deleted` | VC削除ログ | VCチャンネル削除 GuildId: {{guildId}} ChannelId: {{channelId}} | channel deleted GuildId: {{guildId}} ChannelId: {{channelId}} |
+| `log.category_full` | カテゴリ満杯ログ | カテゴリがチャンネル上限に達しました。 GuildId: {{guildId}} CategoryId: {{categoryId}} | category reached channel limit GuildId: {{guildId}} CategoryId: {{categoryId}} |
+| `log.trigger_removed_by_delete` | トリガー削除検知ログ | 削除されたトリガーチャンネルを設定から除外 GuildId: {{guildId}} ChannelId: {{channelId}} | removed deleted trigger channel from config GuildId: {{guildId}} ChannelId: {{channelId}} |
+| `log.channel_delete_sync_failed` | channelDelete同期失敗 | channelDelete同期処理失敗 | Failed to sync config on channelDelete |
+| `log.panel_send_failed` | パネル送信失敗 | 操作パネル送信失敗 | Failed to send control panel |
+| `log.startup_cleanup_failed` | 起動クリーンアップ失敗 | 起動時クリーンアップ失敗 | Startup cleanup failed |
+| `log.database_trigger_added` | DBトリガー追加ログ | VACトリガーチャンネルを追加 GuildId: {{guildId}} ChannelId: {{channelId}} | VAC trigger channel added GuildId: {{guildId}} ChannelId: {{channelId}} |
+| `log.database_trigger_add_failed` | DBトリガー追加失敗 | VACトリガーチャンネル追加に失敗 GuildId: {{guildId}} ChannelId: {{channelId}} | Failed to add VAC trigger channel GuildId: {{guildId}} ChannelId: {{channelId}} |
+| `log.database_trigger_removed` | DBトリガー削除ログ | VACトリガーチャンネルを削除 GuildId: {{guildId}} ChannelId: {{channelId}} | VAC trigger channel removed GuildId: {{guildId}} ChannelId: {{channelId}} |
+| `log.database_trigger_remove_failed` | DBトリガー削除失敗 | VACトリガーチャンネル削除に失敗 GuildId: {{guildId}} ChannelId: {{channelId}} | Failed to remove VAC trigger channel GuildId: {{guildId}} ChannelId: {{channelId}} |
+| `log.database_channel_registered` | DB管理チャンネル登録ログ | VAC管理チャンネルを登録 GuildId: {{guildId}} ChannelId: {{voiceChannelId}} | VAC managed channel registered GuildId: {{guildId}} ChannelId: {{voiceChannelId}} |
+| `log.database_channel_register_failed` | DB管理チャンネル登録失敗 | VAC管理チャンネル登録に失敗 GuildId: {{guildId}} ChannelId: {{voiceChannelId}} | Failed to register VAC managed channel GuildId: {{guildId}} ChannelId: {{voiceChannelId}} |
+| `log.database_channel_unregistered` | DB管理チャンネル削除ログ | VAC管理チャンネルを削除 GuildId: {{guildId}} ChannelId: {{voiceChannelId}} | VAC managed channel unregistered GuildId: {{guildId}} ChannelId: {{voiceChannelId}} |
+| `log.database_channel_unregister_failed` | DB管理チャンネル削除失敗 | VAC管理チャンネル削除に失敗 GuildId: {{guildId}} ChannelId: {{voiceChannelId}} | Failed to unregister VAC managed channel GuildId: {{guildId}} ChannelId: {{voiceChannelId}} |
 
 ---
 
-## エラーハンドリング
+## 依存関係
 
-### 想定されるエラー
-
-**1. 権限不足**
-
-`ManageGuild` 権限がない場合はエラーを返します。
-
-**2. カテゴリが満杯**
-
-カテゴリのチャンネル数が上限（50）に達している場合はVC作成をスキップしてエラーを返します。
-
-**3. 名前の重複**
-
-同名のチャンネルが既に存在する場合は末尾に連番を付加してユニーク名を生成します（例: `しゅん's Room (2)`）。
-
-**4. Bot再起動時のクリーンアップ**
-
-起動時に全ギルドを確認し、DBに残っているが実際には存在しないトリガーチャンネルや作成済みVCを自動除去します。空のまま残っているVCがあれば削除します。
-
-**5. トリガーチャンネル削除検知**
-
-`channelDelete` イベントで自動的にデータベースから削除（実装詳細セクション参照）。
+| 依存先 | 内容 |
+| --- | --- |
+| GuildConfigRepository | VAC設定の取得・更新 |
+| AFK機能 | 操作パネルのAFK移動ボタンでAFKチャンネルを参照 |
 
 ---
 
 ## テストケース
 
-### `/vac-config create-trigger-vc` コマンド
+### ユニットテスト
 
-#### 正常系
+- [ ] create-trigger-vc: カテゴリ指定・TOP指定・未指定、カテゴリ単位制約、成功メッセージ
+- [ ] remove-trigger-vc: カテゴリ指定・TOP指定・未指定、対象不在時の処理
+- [ ] view: 設定表示、未設定表示
+- [ ] VC自動作成: トリガー検知、VC作成、権限付与、パネル設置、自動移動、DB保存
+- [ ] VC自動削除: 空室検知、VC削除、DB削除
+- [ ] 操作パネル: VC名変更、人数制限変更、AFK移動、パネル再送信、VC未参加拒否
+- [ ] channelDelete: トリガー削除検知、自動登録解除
+- [ ] Bot再起動: 空VC検知・クリーンアップ、DB同期、トリガー同期
 
-- [ ] **トリガーチャンネル作成**: コマンド実行チャンネルと同じカテゴリに「CreateVC」が作成される
-- [ ] **カテゴリ指定作成**: `category` 指定時に指定カテゴリへトリガーチャンネルが作成される
-- [ ] **TOP指定作成**: `category:TOP` 指定時にカテゴリなし（TOP）へトリガーチャンネルが作成される
-- [ ] **カテゴリ未指定作成**: `category` 未指定時にコマンド実行チャンネルのカテゴリ（なければTOP）へ作成される
-- [ ] **カテゴリ単位制約**: 同一カテゴリに2個目のトリガーチャンネルは作成できない
-- [ ] **複数カテゴリ許可**: 別カテゴリにはそれぞれトリガーチャンネルを作成できる
-- [ ] **自動登録**: 作成されたチャンネルが自動的にトリガーチャンネルとして登録される
-- [ ] **成功メッセージ**: 作成成功時に適切なメッセージが表示される
+### インテグレーションテスト
 
-#### 異常系
-
-- [ ] **サーバー管理権限なし**: 権限不足で実行した場合、エラーメッセージが表示される
-- [ ] **同一カテゴリ重複作成**: 同一カテゴリに既存トリガーがある場合、エラーメッセージが表示される
-- [ ] **カテゴリ満杯**: カテゴリのチャンネル数が上限の場合、エラーメッセージが表示される
-
-### `/vac-config remove-trigger-vc` コマンド
-
-#### 正常系
-
-- [ ] **カテゴリ指定削除**: 指定カテゴリのトリガーチャンネルが削除される
-- [ ] **TOP指定削除**: `TOP` 選択でカテゴリなしトリガーチャンネルが削除される
-- [ ] **カテゴリ未指定削除**: `category` 未指定時にコマンド実行チャンネルのカテゴリ（なければTOP）が対象になる
-- [ ] **登録解除**: データベースからトリガーチャンネル登録が解除される
-- [ ] **成功メッセージ**: 削除成功時に適切なメッセージが表示される
-
-#### 異常系
-
-- [ ] **サーバー管理権限なし**: 権限不足で実行した場合、エラーメッセージが表示される
-- [ ] **対象不在**: 指定カテゴリ（またはTOP）にトリガーチャンネルがない場合、適切に処理される
-
-### `/vac-config view` コマンド
-
-#### 正常系
-
-- [ ] **設定表示**: 現在のトリガーチャンネルと作成されたVC一覧が表示される
-- [ ] **未設定表示**: VAC設定がない場合、未設定メッセージが表示される
-
-#### 異常系
-
-- [ ] **サーバー管理権限なし**: 権限不足で実行した場合、エラーメッセージが表示される
-
-### VC自動作成
-
-#### 正常系
-
-- [ ] **トリガー検知**: トリガーチャンネルへの参加を正しく検知
-- [ ] **VC作成**: ユーザー名を含む適切な名前でVCが作成される
-- [ ] **権限付与**: 作成者にManageChannels権限が付与される
-- [ ] **操作パネル設置**: VCのチャットに操作パネルが送信される
-- [ ] **自動移動**: ユーザーが作成されたVCに自動移動される
-- [ ] **DB保存**: 作成されたVCの情報がデータベースに保存される
-
-#### 異常系
-
-- [ ] **権限不足**: Botにチャンネル作成権限がない場合、適切なエラーが表示される
-- [ ] **名前重複**: 同名のチャンネルが存在する場合、数字サフィックスが追加される
-- [ ] **カテゴリ満杯**: カテゴリが満杯の場合、エラーメッセージが表示される
-
-### VC自動削除
-
-#### 正常系
-
-- [ ] **空室検知**: VCが完全に空になったことを正しく検知
-- [ ] **VC削除**: 空になったVCが自動的に削除される
-- [ ] **DB削除**: データベースから該当VCの情報が削除される
-
-#### 異常系
-
-- [ ] **削除失敗**: VCの削除に失敗した場合、適切にログ記録される
-
-### 操作パネル
-
-#### VC名変更
-
-- [ ] **Modal表示**: ボタンクリックでModalが表示される
-- [ ] **名前変更**: 入力された名前でVCの名前が変更される
-- [ ] **成功通知**: 変更成功時に確認メッセージが表示される
-- [ ] **VC参加者のみ**: そのVCに参加中のユーザーのみボタンから名前変更できる
-- [ ] **非参加者拒否**: VCに参加していないユーザーが操作するとエラーメッセージが表示される（MessageFlags.Ephemeral）
-- [ ] **既存チャンネル非対象**: VAC管理外の通常チャンネルでは動作しない
-
-#### 人数制限変更
-
-- [ ] **Modal表示**: ボタンクリックでModalが表示される
-- [ ] **バリデーション**: 0-99の範囲外の値が入力された場合、エラーが表示される
-- [ ] **制限変更**: 入力された数値でVCの人数制限が変更される
-- [ ] **無制限設定**: 0を入力すると無制限に設定される
-- [ ] **VC参加者のみ**: そのVCに参加中のユーザーのみボタンから人数制限を変更できる
-- [ ] **非参加者拒否**: VCに参加していないユーザーが操作するとエラーメッセージが表示される（MessageFlags.Ephemeral）
-- [ ] **既存チャンネル非対象**: VAC管理外の通常チャンネルでは動作しない
-
-#### AFK移動
-
-- [ ] **User Select表示**: ボタンクリックでUser Select Menuが表示される
-- [ ] **メンバー移動**: 選択されたメンバーがAFKチャンネルに移動される
-- [ ] **複数選択**: 複数メンバーを選択して一括移動できる
-
-#### パネル再送信
-
-- [ ] **既存削除**: 既存のパネルメッセージが削除される
-- [ ] **新規送信**: 新しいパネルが最下部に送信される
-
-### channelDeleteイベント
-
-#### 正常系
-
-- [ ] **トリガー削除検知**: トリガーチャンネルの削除を正しく検知
-- [ ] **自動登録解除**: データベースから削除されたトリガーチャンネルのIDが除去される
-- [ ] **ログ記録**: 削除イベントが適切にログ記録される
-
-### Bot再起動時のクリーンアップ
-
-- [ ] **空VC検知**: Bot再起動時に空のVCを検出
-- [ ] **クリーンアップ**: 空のVCが削除される
-- [ ] **DB同期**: データベースと実際のチャンネル状態が同期される
-- [ ] **トリガー同期**: Bot停止中に削除されたトリガーチャンネルIDが起動時に除去される
+- [ ] データベース連携（VAC設定の保存・取得・更新・削除）
 
 ---
 
-## 関連ドキュメント
+## 参考リソース
 
-- [TODO.md](../TODO.md) - 開発タスクと進捗
 - [VC_COMMAND_SPEC.md](VC_COMMAND_SPEC.md) - VC操作コマンド仕様（名前変更・人数制限変更）
 - [AFK_SPEC.md](AFK_SPEC.md) - AFK機能仕様（AFK移動機能で使用）
-- [I18N_GUIDE.md](I18N_GUIDE.md) - 多言語対応ガイド
-- [TESTING_GUIDELINES.md](TESTING_GUIDELINES.md) - テスト方針とガイドライン

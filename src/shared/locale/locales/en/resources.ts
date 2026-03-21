@@ -1,24 +1,44 @@
 // src/shared/locale/locales/en/resources.ts
 // English translation resources export
 
-import { commands } from "./commands";
 import { common } from "./common";
-import { errors } from "./errors";
-import { events } from "./events";
+import {
+  afk,
+  bumpReminder,
+  memberLog,
+  messageDelete,
+  ping,
+  stickyMessage,
+  vac,
+  vc,
+  vcRecruit,
+} from "./features";
 import { system } from "./system";
 
 export const en: {
   common: typeof common;
-  commands: typeof commands;
-  errors: typeof errors;
-  events: typeof events;
   system: typeof system;
+  ping: typeof ping;
+  afk: typeof afk;
+  bumpReminder: typeof bumpReminder;
+  vac: typeof vac;
+  vc: typeof vc;
+  messageDelete: typeof messageDelete;
+  memberLog: typeof memberLog;
+  stickyMessage: typeof stickyMessage;
+  vcRecruit: typeof vcRecruit;
 } = {
   common,
-  commands,
-  errors,
-  events,
   system,
+  ping,
+  afk,
+  bumpReminder,
+  vac,
+  vc,
+  messageDelete,
+  memberLog,
+  stickyMessage,
+  vcRecruit,
 };
 
 export type EnglishTranslations = typeof en;

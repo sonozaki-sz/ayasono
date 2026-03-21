@@ -17,6 +17,8 @@ vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: vi.fn((key: string, params?: Record<string, unknown>) =>
     params ? `${key}:${JSON.stringify(params)}` : key,
   ),
+  tInteraction: (_locale: string, key: string, params?: Record<string, unknown>) =>
+    params ? `${key}:${JSON.stringify(params)}` : key,
 }));
 
 vi.mock("discord.js", async (importOriginal) => {
@@ -128,7 +130,7 @@ describe("bot/features/message-delete/commands/usecases/runConditionSetupStep", 
 
       // ユーザー選択
       const userSelectInteraction = makeComponentInteraction(
-        "message-delete:select-user",
+        "message-delete:user-select",
         {
           componentType: ComponentType.UserSelect,
           values: ["user-a", "user-b"],
@@ -137,7 +139,7 @@ describe("bot/features/message-delete/commands/usecases/runConditionSetupStep", 
       await collector._trigger("collect", userSelectInteraction);
 
       // スキャン開始ボタン
-      const startScanInteraction = makeComponentInteraction("message-delete:start-scan");
+      const startScanInteraction = makeComponentInteraction("message-delete:scan-start");
       await collector._trigger("collect", startScanInteraction);
 
       const result = await promise;
@@ -163,7 +165,7 @@ describe("bot/features/message-delete/commands/usecases/runConditionSetupStep", 
 
       // チャンネル選択
       const channelSelectInteraction = makeComponentInteraction(
-        "message-delete:select-channel",
+        "message-delete:channel-select",
         {
           componentType: ComponentType.ChannelSelect,
           values: ["ch-1", "ch-2"],
@@ -172,7 +174,7 @@ describe("bot/features/message-delete/commands/usecases/runConditionSetupStep", 
       await collector._trigger("collect", channelSelectInteraction);
 
       // スキャン開始ボタン
-      const startScanInteraction = makeComponentInteraction("message-delete:start-scan");
+      const startScanInteraction = makeComponentInteraction("message-delete:scan-start");
       await collector._trigger("collect", startScanInteraction);
 
       const result = await promise;
@@ -213,7 +215,7 @@ describe("bot/features/message-delete/commands/usecases/runConditionSetupStep", 
       await collector._trigger("collect", webhookButtonInteraction);
 
       // スキャン開始ボタン
-      const startScanInteraction = makeComponentInteraction("message-delete:start-scan");
+      const startScanInteraction = makeComponentInteraction("message-delete:scan-start");
       await collector._trigger("collect", startScanInteraction);
 
       const result = await promise;
@@ -257,11 +259,11 @@ describe("bot/features/message-delete/commands/usecases/runConditionSetupStep", 
         expect.objectContaining({ ephemeral: true }),
       );
       expect(createWarningEmbedMock).toHaveBeenCalledWith(
-        "commands:message-delete.errors.webhook_invalid_format",
+        "messageDelete:user-response.webhook_invalid_format",
       );
 
       // スキャン開始ボタンで終了（hasSlashCommandFilter=true なのでフィルタ条件は満たされる）
-      const startScanInteraction = makeComponentInteraction("message-delete:start-scan");
+      const startScanInteraction = makeComponentInteraction("message-delete:scan-start");
       await collector._trigger("collect", startScanInteraction);
 
       const result = await promise;
@@ -284,7 +286,7 @@ describe("bot/features/message-delete/commands/usecases/runConditionSetupStep", 
       await flushMicrotasks();
 
       // フィルタなしでスキャン開始ボタン押下
-      const startScanInteraction = makeComponentInteraction("message-delete:start-scan");
+      const startScanInteraction = makeComponentInteraction("message-delete:scan-start");
       await collector._trigger("collect", startScanInteraction);
 
       // 警告が表示されること
@@ -292,11 +294,11 @@ describe("bot/features/message-delete/commands/usecases/runConditionSetupStep", 
         expect.objectContaining({ ephemeral: true }),
       );
       expect(createWarningEmbedMock).toHaveBeenCalledWith(
-        "commands:message-delete.condition-step.no_filter",
+        "messageDelete:user-response.condition_step_no_filter",
       );
 
       // resolve されていないため、キャンセルで終了
-      const cancelInteraction = makeComponentInteraction("message-delete:cond-cancel");
+      const cancelInteraction = makeComponentInteraction("message-delete:condition-cancel");
       await collector._trigger("collect", cancelInteraction);
 
       const result = await promise;
@@ -315,7 +317,7 @@ describe("bot/features/message-delete/commands/usecases/runConditionSetupStep", 
       const promise = runConditionSetupStep(interaction as never, false);
       await flushMicrotasks();
 
-      const cancelInteraction = makeComponentInteraction("message-delete:cond-cancel");
+      const cancelInteraction = makeComponentInteraction("message-delete:condition-cancel");
       await collector._trigger("collect", cancelInteraction);
 
       const result = await promise;
@@ -363,7 +365,7 @@ describe("bot/features/message-delete/commands/usecases/runConditionSetupStep", 
 
       // 別のユーザーがスキャン開始ボタンを押す
       const wrongUserInteraction = makeComponentInteraction(
-        "message-delete:start-scan",
+        "message-delete:scan-start",
         { user: { id: "wrong-user" } },
       );
       await collector._trigger("collect", wrongUserInteraction);
@@ -372,7 +374,7 @@ describe("bot/features/message-delete/commands/usecases/runConditionSetupStep", 
       expect(wrongUserInteraction.deferUpdate).toHaveBeenCalled();
 
       // 正しいユーザーがスキャン開始ボタンを押して終了
-      const rightUserInteraction = makeComponentInteraction("message-delete:start-scan");
+      const rightUserInteraction = makeComponentInteraction("message-delete:scan-start");
       await collector._trigger("collect", rightUserInteraction);
 
       const result = await promise;

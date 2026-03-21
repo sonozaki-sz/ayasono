@@ -33,7 +33,7 @@ export async function cleanupVacOnStartupUseCase(
         logger.info(
           logPrefixed(
             "system:log_prefix.vac",
-            "system:vac.startup_cleanup_stale_trigger_removed",
+            "vac:log.startup_cleanup_stale_trigger_removed",
             {
               guildId: guild.id,
               channelId: triggerChannelId,
@@ -57,7 +57,7 @@ export async function cleanupVacOnStartupUseCase(
         logger.info(
           logPrefixed(
             "system:log_prefix.vac",
-            "system:vac.startup_cleanup_orphaned_channel_removed",
+            "vac:log.startup_cleanup_orphaned_channel_removed",
             {
               guildId: guild.id,
               channelId: channelInfo.voiceChannelId,
@@ -76,7 +76,7 @@ export async function cleanupVacOnStartupUseCase(
         logger.info(
           logPrefixed(
             "system:log_prefix.vac",
-            "system:vac.startup_cleanup_orphaned_channel_removed",
+            "vac:log.startup_cleanup_orphaned_channel_removed",
             {
               guildId: guild.id,
               channelId: channelInfo.voiceChannelId,
@@ -96,7 +96,7 @@ export async function cleanupVacOnStartupUseCase(
         logger.info(
           logPrefixed(
             "system:log_prefix.vac",
-            "system:vac.startup_cleanup_empty_channel_deleted",
+            "vac:log.startup_cleanup_empty_channel_deleted",
             {
               guildId: guild.id,
               channelId: channelInfo.voiceChannelId,
@@ -113,8 +113,8 @@ export async function cleanupVacOnStartupUseCase(
     logPrefixed(
       "system:log_prefix.vac",
       hasChanges
-        ? "system:vac.startup_cleanup_done"
-        : "system:vac.startup_cleanup_done_none",
+        ? "vac:log.startup_cleanup_done"
+        : "vac:log.startup_cleanup_done_none",
       { removedTriggers, removedChannels },
     ),
   );

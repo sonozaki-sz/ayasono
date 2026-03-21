@@ -2,7 +2,7 @@
 
 > 疎通確認・ヘルプ表示などユーティリティ系のシンプルなコマンド群
 
-最終更新: 2026年3月19日
+最終更新: 2026年3月21日
 
 ---
 
@@ -24,7 +24,7 @@
 
 ---
 
-## `/ping`（実装済み）
+## /ping
 
 ### コマンド定義
 
@@ -36,9 +36,9 @@
 
 ### 動作フロー
 
-1. `🏓 計測中...` を即時返信（`fetchReply: true`）
-2. 返信メッセージのタイムスタンプから API レイテンシーを算出
-3. `interaction.client.ws.ping` で WebSocket Ping を取得
+1. 計測中メッセージを即時返信
+2. 返信タイムスタンプから API レイテンシーを算出
+3. WebSocket Ping を取得
 4. Embed 形式で返信を更新
 
 ### UI
@@ -52,7 +52,7 @@
 
 ---
 
-## `/help`
+## /help
 
 ### コマンド定義
 
@@ -71,7 +71,7 @@
 **ビジネスルール:**
 
 - ユーザーマニュアルリンクは環境変数 `USER_MANUAL_URL` で管理し、未設定時はリンク行を省略する
-- コマンド一覧はヘルプ専用の定義テーブルで管理する（`commandLoader.ts` の自動スキャンとは別に、表示順・カテゴリ分けを制御）
+- コマンド一覧はヘルプ専用の定義テーブルで管理し、表示順・カテゴリ分けを制御する
 
 ### UI
 
@@ -113,39 +113,34 @@
 
 ## ローカライズ
 
-### ja
+**翻訳ファイル:** `src/shared/locale/locales/{ja,en}/features/ping.ts`
 
-| キー                          | 用途           | メッセージ                                                   |
-| ----------------------------- | -------------- | ------------------------------------------------------------ |
-| `commands:ping.description`   | コマンド説明   | Botの応答速度を確認                                          |
-| `commands:ping.embed.measuring` | レスポンス   | 🏓 計測中...                                                |
-| `commands:ping.embed.response`  | レスポンス   | 📡 API レイテンシー: {{apiLatency}}ms / 💓 WebSocket Ping: {{wsLatency}}ms |
-| `commands:help.description`   | コマンド説明   | コマンド一覧を表示                                           |
-| `commands:help.embed.title`   | Embed タイトル | 📖 ayasono コマンド一覧                                     |
-| `commands:help.embed.section.basic`  | Embed フィールド名 | 🔧 基本                                              |
-| `commands:help.embed.section.config` | Embed フィールド名 | ⚙️ 設定（管理者）                                   |
-| `commands:help.embed.section.action` | Embed フィールド名 | 🛠️ 操作                                            |
-| `commands:help.embed.description`    | Embed 説明         | 📚 詳しい使い方: {{url}}                            |
-| `commands:help.embed.section.basic.content`  | Embed フィールド値 | `/ping` — Bot の応答速度を確認（改行）`/help` — このヘルプを表示 |
-| `commands:help.embed.section.config.content` | Embed フィールド値 | `/guild-config` — ギルド全体の設定（改行）...       |
-| `commands:help.embed.section.action.content` | Embed フィールド値 | `/afk` — AFK チャンネルへ移動（改行）...            |
+### コマンド定義
 
-### en
+| キー | 用途 | ja | en |
+| --- | --- | --- | --- |
+| `ping.description` | コマンド説明 | Botの応答速度を確認 | Check bot response speed |
+| `help.description` | コマンド説明 | コマンド一覧を表示 | Show command list |
 
-| キー                          | 用途           | メッセージ                                                   |
-| ----------------------------- | -------------- | ------------------------------------------------------------ |
-| `commands:ping.description`   | コマンド説明   | Check bot response speed                                     |
-| `commands:ping.embed.measuring` | レスポンス   | 🏓 Measuring...                                             |
-| `commands:ping.embed.response`  | レスポンス   | 📡 API Latency: {{apiLatency}}ms / 💓 WebSocket Ping: {{wsLatency}}ms |
-| `commands:help.description`   | コマンド説明   | Show command list                                            |
-| `commands:help.embed.title`   | Embed タイトル | 📖 ayasono Commands                                         |
-| `commands:help.embed.section.basic`  | Embed フィールド名 | 🔧 Basic                                             |
-| `commands:help.embed.section.config` | Embed フィールド名 | ⚙️ Settings (Admin)                                 |
-| `commands:help.embed.section.action` | Embed フィールド名 | 🛠️ Actions                                         |
-| `commands:help.embed.description`    | Embed 説明         | 📚 Learn more: {{url}}                              |
-| `commands:help.embed.section.basic.content`  | Embed フィールド値 | `/ping` — Check bot response speed（改行）`/help` — Show this help |
-| `commands:help.embed.section.config.content` | Embed フィールド値 | `/guild-config` — Guild settings（改行）...          |
-| `commands:help.embed.section.action.content` | Embed フィールド値 | `/afk` — Move to AFK channel（改行）...              |
+### ユーザーレスポンス
+
+| キー | 用途 | ja | en |
+| --- | --- | --- | --- |
+| `user-response.measuring` | 計測中メッセージ | 🏓 計測中... | 🏓 Measuring... |
+
+### Embed
+
+| キー | 用途 | ja | en |
+| --- | --- | --- | --- |
+| `embed.description.ping_result` | ping結果 | 📡 API レイテンシー: {{apiLatency}}ms / 💓 WebSocket Ping: {{wsLatency}}ms | 📡 API Latency: {{apiLatency}}ms / 💓 WebSocket Ping: {{wsLatency}}ms |
+| `embed.title.help` | ヘルプタイトル | 📖 ayasono コマンド一覧 | 📖 ayasono Commands |
+| `embed.description.help` | マニュアルリンク | 📚 詳しい使い方: {{url}} | 📚 Learn more: {{url}} |
+| `embed.field.name.basic` | 基本カテゴリ名 | 🔧 基本 | 🔧 Basic |
+| `embed.field.name.config` | 設定カテゴリ名 | ⚙️ 設定（管理者） | ⚙️ Settings (Admin) |
+| `embed.field.name.action` | 操作カテゴリ名 | 🛠️ 操作 | 🛠️ Actions |
+| `embed.field.value.basic` | 基本コマンド一覧 | `/ping` — Bot の応答速度を確認（改行）`/help` — このヘルプを表示 | `/ping` — Check bot response speed（改行）`/help` — Show this help |
+| `embed.field.value.config` | 設定コマンド一覧 | `/guild-config` — ギルド全体の設定（改行）... | `/guild-config` — Guild settings（改行）... |
+| `embed.field.value.action` | 操作コマンド一覧 | `/afk` — AFK チャンネルへ移動（改行）... | `/afk` — Move to AFK channel（改行）... |
 
 ---
 

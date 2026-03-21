@@ -27,8 +27,8 @@ import {
 import { safeReply } from "../../../../utils/interaction";
 import {
   STATUS_COLORS,
-  createErrorEmbed,
   createSuccessEmbed,
+  createWarningEmbed,
 } from "../../../../utils/messageResponse";
 import { buildTeardownSelectOptions } from "../../commands/usecases/vcRecruitConfigTeardown";
 import {
@@ -92,10 +92,10 @@ export const vcRecruitButtonHandler: ButtonHandler = {
       if (!panelChannel) {
         await safeReply(interaction, {
           embeds: [
-            createErrorEmbed(
+            createWarningEmbed(
               tInteraction(
                 interaction.locale,
-                "errors:vcRecruit.panel_channel_not_found",
+                "vcRecruit:user-response.panel_channel_not_found",
               ),
               {
                 title: tInteraction(
@@ -118,8 +118,11 @@ export const vcRecruitButtonHandler: ButtonHandler = {
       if (!setup) {
         await safeReply(interaction, {
           embeds: [
-            createErrorEmbed(
-              tInteraction(interaction.locale, "errors:vcRecruit.not_setup"),
+            createWarningEmbed(
+              tInteraction(
+                interaction.locale,
+                "vcRecruit:user-response.not_setup",
+              ),
               {
                 title: tInteraction(
                   interaction.locale,
@@ -159,7 +162,7 @@ export const vcRecruitButtonHandler: ButtonHandler = {
           .setPlaceholder(
             tInteraction(
               interaction.locale,
-              "commands:vcRecruit.select.mention_placeholder",
+              "vcRecruit:ui.select.mention_placeholder",
             ),
           )
           .setMinValues(0)
@@ -185,7 +188,7 @@ export const vcRecruitButtonHandler: ButtonHandler = {
 
       const newVcLabel = tInteraction(
         interaction.locale,
-        "commands:vcRecruit.select.new_vc_label",
+        "vcRecruit:ui.select.new_vc",
       );
 
       const vcOptions: StringSelectMenuOptionBuilder[] = [
@@ -209,7 +212,7 @@ export const vcRecruitButtonHandler: ButtonHandler = {
         .setPlaceholder(
           tInteraction(
             interaction.locale,
-            "commands:vcRecruit.select.vc_placeholder",
+            "vcRecruit:ui.select.vc_placeholder",
           ),
         )
         .setMinValues(1)
@@ -219,7 +222,7 @@ export const vcRecruitButtonHandler: ButtonHandler = {
       // ── 「次へ（詳細入力）」ボタンを構築 ──────────────────────────
       const openModalLabel = tInteraction(
         interaction.locale,
-        "commands:vcRecruit.select.open_modal_button",
+        "vcRecruit:ui.button.open_modal",
       );
       const openModalButton = new ButtonBuilder()
         .setCustomId(
@@ -239,11 +242,11 @@ export const vcRecruitButtonHandler: ButtonHandler = {
       // ── ステップ1 エフェメラルを送信 ──────────────────────────
       const step1Title = tInteraction(
         interaction.locale,
-        "commands:vcRecruit.select.title",
+        "vcRecruit:embed.title.select_step",
       );
       const step1Description = tInteraction(
         interaction.locale,
-        "commands:vcRecruit.select.description",
+        "vcRecruit:embed.description.select_step",
       );
 
       const components: (
@@ -290,8 +293,8 @@ export const vcRecruitButtonHandler: ButtonHandler = {
       if (!session) {
         await safeReply(interaction, {
           embeds: [
-            createErrorEmbed(
-              tInteraction(interaction.locale, "errors:interaction.timeout"),
+            createWarningEmbed(
+              tInteraction(interaction.locale, "common:interaction.timeout"),
               {
                 title: tInteraction(interaction.locale, "common:title_timeout"),
               },
@@ -304,15 +307,15 @@ export const vcRecruitButtonHandler: ButtonHandler = {
 
       const modalTitle = tInteraction(
         interaction.locale,
-        "commands:vcRecruit.modal.title",
+        "vcRecruit:ui.modal.create_title",
       );
       const contentLabel = tInteraction(
         interaction.locale,
-        "commands:vcRecruit.modal.content_label",
+        "vcRecruit:ui.modal.content_label",
       );
       const contentPlaceholder = tInteraction(
         interaction.locale,
-        "commands:vcRecruit.modal.content_placeholder",
+        "vcRecruit:ui.modal.content_placeholder",
       );
 
       const modal = new ModalBuilder()
@@ -321,7 +324,7 @@ export const vcRecruitButtonHandler: ButtonHandler = {
         .addComponents(
           new ActionRowBuilder<TextInputBuilder>().addComponents(
             new TextInputBuilder()
-              .setCustomId("vc-recruit:content")
+              .setCustomId("vc-recruit:content-modal-input")
               .setLabel(contentLabel)
               .setPlaceholder(contentPlaceholder)
               .setStyle(TextInputStyle.Paragraph)
@@ -334,16 +337,16 @@ export const vcRecruitButtonHandler: ButtonHandler = {
       if (session.selectedVcId === NEW_VC_VALUE) {
         const vcNameLabel = tInteraction(
           interaction.locale,
-          "commands:vcRecruit.modal.vc_name_label",
+          "vcRecruit:ui.modal.vc_name_label",
         );
         const vcNamePlaceholder = tInteraction(
           interaction.locale,
-          "commands:vcRecruit.modal.vc_name_placeholder",
+          "vcRecruit:ui.modal.vc_name_placeholder",
         );
         modal.addComponents(
           new ActionRowBuilder<TextInputBuilder>().addComponents(
             new TextInputBuilder()
-              .setCustomId("vc-recruit:vc-name")
+              .setCustomId("vc-recruit:vc-name-modal-input")
               .setLabel(vcNameLabel)
               .setPlaceholder(vcNamePlaceholder)
               .setStyle(TextInputStyle.Short)
@@ -377,7 +380,7 @@ export const vcRecruitButtonHandler: ButtonHandler = {
 
       const placeholder = tInteraction(
         interaction.locale,
-        "commands:vc-recruit-config.teardown.select.placeholder",
+        "vcRecruit:ui.select.teardown_placeholder",
       );
 
       const selectMenu = new StringSelectMenuBuilder()
@@ -429,7 +432,7 @@ export const vcRecruitButtonHandler: ButtonHandler = {
 
       const cancelledText = tInteraction(
         interaction.locale,
-        "commands:vc-recruit-config.embed.teardown_cancelled",
+        "vcRecruit:user-response.teardown_cancelled",
       );
       await interaction.update({
         embeds: [createSuccessEmbed(cancelledText)],
@@ -452,8 +455,8 @@ export const vcRecruitButtonHandler: ButtonHandler = {
       if (!session) {
         await safeReply(interaction, {
           embeds: [
-            createErrorEmbed(
-              tInteraction(interaction.locale, "errors:interaction.timeout"),
+            createWarningEmbed(
+              tInteraction(interaction.locale, "common:interaction.timeout"),
               {
                 title: tInteraction(interaction.locale, "common:title_timeout"),
               },
@@ -528,7 +531,7 @@ export const vcRecruitButtonHandler: ButtonHandler = {
 
           const itemText = tInteraction(
             interaction.locale,
-            "commands:vc-recruit-config.embed.teardown_category_item",
+            "vcRecruit:user-response.teardown_category_item",
             { category: entry.categoryLabel },
           );
           successLines.push(itemText);
@@ -541,7 +544,7 @@ export const vcRecruitButtonHandler: ButtonHandler = {
       // 完了メッセージを構築
       const successHeader = tInteraction(
         interaction.locale,
-        "commands:vc-recruit-config.embed.teardown_success",
+        "vcRecruit:user-response.teardown_success",
       );
 
       let description = successLines.join("\n");
@@ -549,7 +552,7 @@ export const vcRecruitButtonHandler: ButtonHandler = {
       if (errorLines.length > 0) {
         const errorHeader = tInteraction(
           interaction.locale,
-          "commands:vc-recruit-config.embed.teardown_partial_error",
+          "vcRecruit:user-response.teardown_partial_error",
         );
         description += "\n\n" + errorHeader + "\n" + errorLines.join("\n");
       }

@@ -28,11 +28,11 @@ export async function handleMemberLogConfigView(
   if (!config) {
     const title = tInteraction(
       interaction.locale,
-      "commands:member-log-config.embed.title",
+      "memberLog:embed.title.config_view",
     );
     const message = tInteraction(
       interaction.locale,
-      "commands:member-log-config.embed.not_configured",
+      "memberLog:embed.description.not_configured",
     );
     const embed = createInfoEmbed(message, { title });
     await interaction.reply({
@@ -45,23 +45,23 @@ export async function handleMemberLogConfigView(
   // 表示用のローカライズ文字列を解決
   const viewTitle = tInteraction(
     interaction.locale,
-    "commands:member-log-config.embed.title",
+    "memberLog:embed.title.config_view",
   );
   const fieldStatus = tInteraction(
     interaction.locale,
-    "commands:member-log-config.embed.field.status",
+    "memberLog:embed.field.name.status",
   );
   const fieldChannel = tInteraction(
     interaction.locale,
-    "commands:member-log-config.embed.field.channel",
+    "memberLog:embed.field.name.channel",
   );
   const fieldJoinMessage = tInteraction(
     interaction.locale,
-    "commands:member-log-config.embed.field.join_message",
+    "memberLog:embed.field.name.join_message",
   );
   const fieldLeaveMessage = tInteraction(
     interaction.locale,
-    "commands:member-log-config.embed.field.leave_message",
+    "memberLog:embed.field.name.leave_message",
   );
   const labelEnabled = tInteraction(interaction.locale, "common:enabled");
   const labelDisabled = tInteraction(interaction.locale, "common:disabled");

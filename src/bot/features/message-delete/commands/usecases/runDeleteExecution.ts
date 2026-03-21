@@ -4,7 +4,7 @@
 import { type MessageComponentInteraction } from "discord.js";
 import {
   logPrefixed,
-  tDefault,
+  tInteraction,
 } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import {
@@ -51,15 +51,24 @@ export async function executeDelete(
       targetMessages,
       async (data: DeleteProgressData) => {
         progressRef.data = data;
-        const header = tDefault(
-          "commands:message-delete.confirm.delete_progress",
-          { totalDeleted: data.totalDeleted, total: data.total },
+        const header = tInteraction(
+          interaction.locale,
+          "messageDelete:user-response.delete_progress",
+          {
+            totalDeleted: data.totalDeleted,
+            total: data.total,
+          },
         );
         const lines = data.channelStatuses
           .map(({ channelId, deleted, total }) =>
-            tDefault(
-              "commands:message-delete.confirm.delete_progress_channel",
-              { channelId, deleted, total },
+            tInteraction(
+              interaction.locale,
+              "messageDelete:user-response.delete_progress_channel",
+              {
+                channelId,
+                deleted,
+                total,
+              },
             ),
           )
           .join("\n");
@@ -76,7 +85,11 @@ export async function executeDelete(
     if (!deleteController.signal.aborted) {
       await interaction.editReply({
         embeds: [
-          buildCompletionEmbed(result.totalDeleted, result.channelBreakdown),
+          buildCompletionEmbed(
+            interaction.locale,
+            result.totalDeleted,
+            result.channelBreakdown,
+          ),
         ],
         components: [],
         content: "",
@@ -100,19 +113,15 @@ export async function executeDelete(
             .filter(Boolean)
             .join(" ");
       logger.info(
-        logPrefixed(
-          "system:log_prefix.msg_del",
-          "system:message-delete.deleted",
-          {
-            userId: interaction.user.id,
-            count: result.totalDeleted,
-            countPart,
-            targetPart,
-            keywordPart,
-            periodPart: periodPart ? ` ${periodPart}` : "",
-            channels: Object.keys(result.channelBreakdown).join(", "),
-          },
-        ),
+        logPrefixed("system:log_prefix.msg_del", "messageDelete:log.deleted", {
+          userId: interaction.user.id,
+          count: result.totalDeleted,
+          countPart,
+          targetPart,
+          keywordPart,
+          periodPart: periodPart ? ` ${periodPart}` : "",
+          channels: Object.keys(result.channelBreakdown).join(", "),
+        }),
       );
       return;
     }
@@ -122,10 +131,14 @@ export async function executeDelete(
     await interaction.editReply({
       embeds: [
         createWarningEmbed(
-          tDefault("commands:message-delete.confirm.delete_timed_out", {
-            count: deletedCount,
-          }),
-          { title: tDefault("common:title_timeout") },
+          tInteraction(
+            interaction.locale,
+            "messageDelete:user-response.delete_timed_out",
+            {
+              count: deletedCount,
+            },
+          ),
+          { title: tInteraction(interaction.locale, "common:title_timeout") },
         ),
       ],
       components: [],
@@ -135,7 +148,7 @@ export async function executeDelete(
     logger.error(
       logPrefixed(
         "system:log_prefix.msg_del",
-        "system:message-delete.delete_error",
+        "messageDelete:log.delete_error",
         { error: String(error) },
       ),
     );
@@ -143,8 +156,16 @@ export async function executeDelete(
       .editReply({
         embeds: [
           createErrorEmbed(
-            tDefault("commands:message-delete.errors.delete_failed"),
-            { title: tDefault("common:title_delete_error") },
+            tInteraction(
+              interaction.locale,
+              "messageDelete:user-response.delete_failed",
+            ),
+            {
+              title: tInteraction(
+                interaction.locale,
+                "common:title_delete_error",
+              ),
+            },
           ),
         ],
         content: "",

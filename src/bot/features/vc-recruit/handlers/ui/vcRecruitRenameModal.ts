@@ -10,8 +10,8 @@ import { tInteraction } from "../../../../../shared/locale/localeManager";
 import type { ModalHandler } from "../../../../handlers/interactionCreate/ui/types";
 import { safeReply } from "../../../../utils/interaction";
 import {
-  createErrorEmbed,
   createSuccessEmbed,
+  createWarningEmbed,
 } from "../../../../utils/messageResponse";
 import { VC_RECRUIT_POST_CUSTOM_ID } from "../../commands/vcRecruitConfigCommand.constants";
 
@@ -40,7 +40,7 @@ export const vcRecruitRenameModalHandler: ModalHandler = {
     );
 
     const newName = interaction.fields.getTextInputValue(
-      "vc-recruit:rename-vc-name",
+      "vc-recruit:rename-vc-name-modal-input",
     );
 
     // VCの存在確認
@@ -48,10 +48,10 @@ export const vcRecruitRenameModalHandler: ModalHandler = {
     if (!vc || vc.type !== ChannelType.GuildVoice) {
       await safeReply(interaction, {
         embeds: [
-          createErrorEmbed(
+          createWarningEmbed(
             tInteraction(
               interaction.locale,
-              "errors:vcRecruit.vc_already_deleted",
+              "vcRecruit:user-response.vc_already_deleted",
             ),
             {
               title: tInteraction(
@@ -72,7 +72,7 @@ export const vcRecruitRenameModalHandler: ModalHandler = {
     // 成功通知
     const successText = tInteraction(
       interaction.locale,
-      "commands:vcRecruit.rename.success",
+      "vcRecruit:user-response.rename_success",
     );
     await safeReply(interaction, {
       embeds: [createSuccessEmbed(successText)],

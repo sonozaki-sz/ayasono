@@ -8,7 +8,6 @@ import {
 } from "../../../../../shared/features/bump-reminder/bumpReminderConfigService";
 import {
   logPrefixed,
-  tDefault,
   tInteraction,
 } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
@@ -18,6 +17,7 @@ import { safeReply } from "../../../../utils/interaction";
 import {
   createErrorEmbed,
   createSuccessEmbed,
+  createWarningEmbed,
 } from "../../../../utils/messageResponse";
 import { BUMP_CONSTANTS } from "../../constants/bumpReminderConstants";
 
@@ -62,7 +62,20 @@ export const bumpPanelButtonHandler: ButtonHandler = {
       if (!interaction.guild || interaction.guild.id !== guildId) {
         // customId の guild と実行 guild が一致しない操作は拒否
         await safeReply(interaction, {
-          content: tDefault("events:bump-reminder.panel.error"),
+          embeds: [
+            createWarningEmbed(
+              tInteraction(
+                interaction.locale,
+                "bumpReminder:user-response.panel_update_failed",
+              ),
+              {
+                title: tInteraction(
+                  interaction.locale,
+                  "common:title_operation_error",
+                ),
+              },
+            ),
+          ],
           flags: MessageFlags.Ephemeral,
         });
         return;
@@ -73,7 +86,7 @@ export const bumpPanelButtonHandler: ButtonHandler = {
       // 成功系レスポンスで使う共通タイトル
       const successTitle = tInteraction(
         interaction.locale,
-        "events:bump-reminder.panel.success_title",
+        "bumpReminder:embed.title.success",
       );
 
       if (isOnButton) {
@@ -87,9 +100,22 @@ export const bumpPanelButtonHandler: ButtonHandler = {
         if (
           addResult === BUMP_REMINDER_MENTION_USER_ADD_RESULT.NOT_CONFIGURED
         ) {
-          // 設定未初期化時は詳細を返さず汎用エラーで統一
+          // 設定未初期化時はwarningで通知
           await safeReply(interaction, {
-            content: tDefault("events:bump-reminder.panel.error"),
+            embeds: [
+              createWarningEmbed(
+                tInteraction(
+                  interaction.locale,
+                  "bumpReminder:user-response.panel_update_failed",
+                ),
+                {
+                  title: tInteraction(
+                    interaction.locale,
+                    "common:title_not_configured",
+                  ),
+                },
+              ),
+            ],
             flags: MessageFlags.Ephemeral,
           });
           return;
@@ -101,7 +127,7 @@ export const bumpPanelButtonHandler: ButtonHandler = {
             createSuccessEmbed(
               tInteraction(
                 interaction.locale,
-                "events:bump-reminder.panel.mention_toggled_on",
+                "bumpReminder:user-response.panel_mention_toggled_on",
               ),
               { title: successTitle },
             ),
@@ -112,7 +138,7 @@ export const bumpPanelButtonHandler: ButtonHandler = {
         logger.debug(
           logPrefixed(
             "system:log_prefix.bump_reminder",
-            "system:bump-reminder.panel_mention_updated",
+            "bumpReminder:log.panel_mention_updated",
             {
               action: "on",
               userId,
@@ -132,9 +158,22 @@ export const bumpPanelButtonHandler: ButtonHandler = {
           removeResult ===
           BUMP_REMINDER_MENTION_USER_REMOVE_RESULT.NOT_CONFIGURED
         ) {
-          // 設定未初期化時は詳細を返さず汎用エラーで統一
+          // 設定未初期化時はwarningで通知
           await safeReply(interaction, {
-            content: tDefault("events:bump-reminder.panel.error"),
+            embeds: [
+              createWarningEmbed(
+                tInteraction(
+                  interaction.locale,
+                  "bumpReminder:user-response.panel_update_failed",
+                ),
+                {
+                  title: tInteraction(
+                    interaction.locale,
+                    "common:title_not_configured",
+                  ),
+                },
+              ),
+            ],
             flags: MessageFlags.Ephemeral,
           });
           return;
@@ -146,7 +185,7 @@ export const bumpPanelButtonHandler: ButtonHandler = {
             createSuccessEmbed(
               tInteraction(
                 interaction.locale,
-                "events:bump-reminder.panel.mention_toggled_off",
+                "bumpReminder:user-response.panel_mention_toggled_off",
               ),
               { title: successTitle },
             ),
@@ -157,7 +196,7 @@ export const bumpPanelButtonHandler: ButtonHandler = {
         logger.debug(
           logPrefixed(
             "system:log_prefix.bump_reminder",
-            "system:bump-reminder.panel_mention_updated",
+            "bumpReminder:log.panel_mention_updated",
             {
               action: "off",
               userId,
@@ -171,16 +210,25 @@ export const bumpPanelButtonHandler: ButtonHandler = {
       logger.error(
         logPrefixed(
           "system:log_prefix.bump_reminder",
-          "system:bump-reminder.panel_handle_failed",
+          "bumpReminder:log.panel_handle_failed",
         ),
         error,
       );
       try {
         await safeReply(interaction, {
           embeds: [
-            createErrorEmbed(tDefault("events:bump-reminder.panel.error"), {
-              title: tDefault("common:title_operation_error"),
-            }),
+            createErrorEmbed(
+              tInteraction(
+                interaction.locale,
+                "bumpReminder:user-response.panel_update_failed",
+              ),
+              {
+                title: tInteraction(
+                  interaction.locale,
+                  "common:title_operation_error",
+                ),
+              },
+            ),
           ],
           flags: MessageFlags.Ephemeral,
         });
@@ -188,7 +236,7 @@ export const bumpPanelButtonHandler: ButtonHandler = {
         logger.error(
           logPrefixed(
             "system:log_prefix.bump_reminder",
-            "system:bump-reminder.panel_reply_failed",
+            "bumpReminder:log.panel_reply_failed",
           ),
           replyError,
         );

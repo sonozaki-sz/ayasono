@@ -107,11 +107,11 @@ describe("bot/features/vac/commands/usecases/vacConfigRemoveTrigger", () => {
     expect(fetch).toHaveBeenCalledWith("trigger-1");
     expect(deleteMock).toHaveBeenCalledTimes(1);
     expect(createSuccessEmbed).toHaveBeenCalledWith(
-      "commands:vac-config.embed.trigger_removed",
-      { title: "commands:vac-config.embed.success_title" },
+      "vac:user-response.trigger_removed",
+      { title: "vac:embed.title.success" },
     );
     expect(reply).toHaveBeenCalledWith({
-      embeds: [{ description: "commands:vac-config.embed.trigger_removed" }],
+      embeds: [{ description: "vac:user-response.trigger_removed" }],
       flags: MessageFlags.Ephemeral,
     });
   });

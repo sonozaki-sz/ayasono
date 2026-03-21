@@ -36,12 +36,12 @@ export async function handleStickyMessageRemove(
         createInfoEmbed(
           tInteraction(
             interaction.locale,
-            "commands:sticky-message.remove.notFound.description",
+            "stickyMessage:user-response.remove_not_found",
           ),
           {
             title: tInteraction(
               interaction.locale,
-              "commands:sticky-message.remove.notFound.title",
+              "stickyMessage:embed.title.remove_not_found",
             ),
           },
         ),
@@ -73,7 +73,7 @@ export async function handleStickyMessageRemove(
     .setPlaceholder(
       tInteraction(
         interaction.locale,
-        "commands:sticky-message.remove.select.placeholder",
+        "stickyMessage:ui.select.remove_placeholder",
       ),
     )
     .setMinValues(1)
@@ -88,10 +88,7 @@ export async function handleStickyMessageRemove(
   const button = new ButtonBuilder()
     .setCustomId(STICKY_MESSAGE_COMMAND.REMOVE_BUTTON_CUSTOM_ID)
     .setLabel(
-      tInteraction(
-        interaction.locale,
-        "commands:sticky-message.remove.button.label",
-      ),
+      tInteraction(interaction.locale, "stickyMessage:ui.button.remove"),
     )
     .setStyle(ButtonStyle.Danger);
 

@@ -3,7 +3,6 @@
 
 import { type ChatInputCommandInteraction } from "discord.js";
 import { ValidationError } from "../../../../shared/errors/customErrors";
-import { tDefault } from "../../../../shared/locale/localeManager";
 import { handleCommandError } from "../../../errors/interactionErrorHandler";
 import { COMMON_I18N_KEYS } from "../../../shared/i18nKeys";
 import { MEMBER_LOG_CONFIG_COMMAND } from "./memberLogConfigCommand.constants";
@@ -29,7 +28,7 @@ export async function executeMemberLogConfigCommand(
     // Guild外実行は対象外
     const guildId = interaction.guildId;
     if (!guildId) {
-      throw new ValidationError(tDefault(COMMON_I18N_KEYS.GUILD_ONLY));
+      throw ValidationError.fromKey(COMMON_I18N_KEYS.GUILD_ONLY);
     }
 
     // サブコマンドごとに機能別ハンドラへ委譲
@@ -70,9 +69,7 @@ export async function executeMemberLogConfigCommand(
 
       default:
         // 定義外サブコマンドは共通バリデーションエラー
-        throw new ValidationError(
-          tDefault(COMMON_I18N_KEYS.INVALID_SUBCOMMAND),
-        );
+        throw ValidationError.fromKey(COMMON_I18N_KEYS.INVALID_SUBCOMMAND);
     }
   } catch (error) {
     // 応答整形は既存の共通ハンドラへ委譲

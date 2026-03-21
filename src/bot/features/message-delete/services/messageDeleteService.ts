@@ -8,7 +8,10 @@ import type {
   PartialMessage,
 } from "discord.js";
 import { PermissionFlagsBits } from "discord.js";
-import { logPrefixed, tDefault } from "../../../../shared/locale/localeManager";
+import {
+  logPrefixed,
+  tInteraction,
+} from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import {
   DISCORD_EPOCH,
@@ -25,6 +28,8 @@ import {
 
 /** メッセージスキャンオプション（収集のみ、削除なし） */
 export interface MessageScanOptions {
+  /** interaction.locale（ユーザー向けメッセージの翻訳に使用） */
+  locale: string;
   /** 収集するメッセージの上限件数（未指定で無限） */
   count: number;
   /** 対象ユーザーID一覧（空配列で全ユーザー） */
@@ -104,7 +109,7 @@ function createThrottledReporter<T>(
  * @param msg 対象の Discord Message オブジェクト
  * @returns 組み立てた表示用本文（MSG_DEL_CONTENT_MAX_LENGTH 超過時は末尾に `…` を付与）
  */
-function buildDisplayContent(msg: Message): string {
+function buildDisplayContent(locale: string, msg: Message): string {
   const parts: string[] = [];
 
   if (msg.content) {
@@ -113,7 +118,7 @@ function buildDisplayContent(msg: Message): string {
 
   if (msg.attachments.size > 0) {
     parts.push(
-      tDefault("commands:message-delete.result.attachments", {
+      tInteraction(locale, "messageDelete:embed.field.value.attachments", {
         count: msg.attachments.size,
       }),
     );
@@ -123,7 +128,10 @@ function buildDisplayContent(msg: Message): string {
     parts.push(
       embed.title
         ? `🔗 ${embed.title}`
-        : tDefault("commands:message-delete.result.embed_no_title"),
+        : tInteraction(
+            locale,
+            "messageDelete:embed.field.value.embed_no_title",
+          ),
     );
   }
 
@@ -145,6 +153,7 @@ export async function scanMessages(
   options: MessageScanOptions,
 ): Promise<ScannedMessageWithChannel[]> {
   const {
+    locale,
     count,
     targetUserIds,
     keyword,
@@ -168,7 +177,7 @@ export async function scanMessages(
   logger.debug(
     logPrefixed(
       "system:log_prefix.msg_del",
-      "system:message-delete.svc_scan_start",
+      "messageDelete:log.svc_scan_start",
       {
         channelCount: channels.length,
         count,
@@ -195,7 +204,7 @@ export async function scanMessages(
       logger.debug(
         logPrefixed(
           "system:log_prefix.msg_del",
-          "system:message-delete.svc_channel_no_access",
+          "messageDelete:log.svc_channel_no_access",
           {
             channelId: channel.id,
           },
@@ -250,7 +259,7 @@ export async function scanMessages(
       logger.debug(
         logPrefixed(
           "system:log_prefix.msg_del",
-          "system:message-delete.svc_initial_fetch",
+          "messageDelete:log.svc_initial_fetch",
           {
             channelId: channel.id,
           },
@@ -284,7 +293,7 @@ export async function scanMessages(
         logger.debug(
           logPrefixed(
             "system:log_prefix.msg_del",
-            "system:message-delete.svc_refill",
+            "messageDelete:log.svc_refill",
             {
               channelId: cursor.channel.id,
               lastId: cursor.lastId ?? "none",
@@ -340,7 +349,7 @@ export async function scanMessages(
       channelId: bestCursor.channel.id,
       channelName: bestCursor.channel.name,
       createdAt: msg.createdAt,
-      content: buildDisplayContent(msg),
+      content: buildDisplayContent(locale, msg),
       _channel: bestCursor.channel,
     });
   }
@@ -348,7 +357,7 @@ export async function scanMessages(
   logger.debug(
     logPrefixed(
       "system:log_prefix.msg_del",
-      "system:message-delete.svc_scan_complete",
+      "messageDelete:log.svc_scan_complete",
       {
         count: scanned.length,
       },
@@ -437,7 +446,7 @@ export async function deleteScannedMessages(
         logger.debug(
           logPrefixed(
             "system:log_prefix.msg_del",
-            "system:message-delete.svc_bulk_delete_chunk",
+            "messageDelete:log.svc_bulk_delete_chunk",
             {
               size: chunk.length,
             },
@@ -471,7 +480,7 @@ export async function deleteScannedMessages(
         logger.warn(
           logPrefixed(
             "system:log_prefix.msg_del",
-            "system:message-delete.svc_message_delete_failed",
+            "messageDelete:log.svc_message_delete_failed",
             {
               messageId: scanned.messageId,
               error: String(err),

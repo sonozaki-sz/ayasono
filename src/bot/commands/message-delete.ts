@@ -14,18 +14,28 @@ import type { Command } from "../types/discord";
  */
 export const messageDeleteCommand: Command = {
   data: (() => {
-    const desc = getCommandLocalizations("message-delete.description");
+    const desc = getCommandLocalizations(
+      "messageDelete",
+      "message-delete.description",
+    );
     const countDesc = getCommandLocalizations(
+      "messageDelete",
       "message-delete.count.description",
     );
     const keywordDesc = getCommandLocalizations(
+      "messageDelete",
       "message-delete.keyword.description",
     );
-    const daysDesc = getCommandLocalizations("message-delete.days.description");
+    const daysDesc = getCommandLocalizations(
+      "messageDelete",
+      "message-delete.days.description",
+    );
     const afterDesc = getCommandLocalizations(
+      "messageDelete",
       "message-delete.after.description",
     );
     const beforeDesc = getCommandLocalizations(
+      "messageDelete",
       "message-delete.before.description",
     );
 

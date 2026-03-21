@@ -11,7 +11,7 @@ vi.mock("@/bot/utils/interaction", () => ({
   safeReply: (...args: unknown[]) => safeReplyMock(...args),
 }));
 vi.mock("@/bot/utils/messageResponse", () => ({
-  createErrorEmbed: vi.fn((msg: string) => ({ error: msg })),
+  createWarningEmbed: vi.fn((msg: string) => ({ warning: msg })),
   createSuccessEmbed: vi.fn((msg: string) => ({ success: msg })),
 }));
 vi.mock("@/shared/locale/localeManager", () => ({
@@ -113,7 +113,7 @@ describe("vcRecruitRenameModalHandler / execute()", () => {
     expect(safeReplyMock).toHaveBeenCalledWith(
       interaction,
       expect.objectContaining({
-        embeds: [{ success: "commands:vcRecruit.rename.success" }],
+        embeds: [{ success: "vcRecruit:user-response.rename_success" }],
         flags: MessageFlags.Ephemeral,
       }),
     );
@@ -133,7 +133,7 @@ describe("vcRecruitRenameModalHandler / execute()", () => {
     expect(safeReplyMock).toHaveBeenCalledWith(
       interaction,
       expect.objectContaining({
-        embeds: [{ error: "errors:vcRecruit.vc_already_deleted" }],
+        embeds: [{ warning: "vcRecruit:user-response.vc_already_deleted" }],
         flags: MessageFlags.Ephemeral,
       }),
     );

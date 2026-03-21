@@ -7,33 +7,45 @@ type CommandLocalizationMap = Record<string, string>;
 
 /**
  * コマンド説明文のローカライゼーションを取得
- * @param key 翻訳キー（例: "ping.description"）
+ * @param namespace 翻訳名前空間（例: "ping"）
+ * @param key 翻訳キー（例: "description"）
  * @returns Discord APIのLocalizationMap形式
  */
-export function getCommandLocalizations(
-  key: keyof typeof resources.ja.commands,
+export function getCommandLocalizations<NS extends keyof typeof resources.ja>(
+  namespace: NS,
+  key: keyof (typeof resources.ja)[NS],
 ): {
   ja: string;
   localizations: CommandLocalizationMap;
 } {
   // 既定表示は日本語、その他は Discord の locale map で供給
+  const jaValue = (resources.ja[namespace] as Record<string, string>)[
+    key as string
+  ];
+  const enValue = (resources.en[namespace] as Record<string, string>)[
+    key as string
+  ];
   return {
-    ja: resources.ja.commands[key],
+    ja: jaValue,
     localizations: {
-      "en-US": resources.en.commands[key],
-      "en-GB": resources.en.commands[key],
+      "en-US": enValue,
+      "en-GB": enValue,
     },
   };
 }
 
 /**
  * コマンド説明文とローカライゼーションを一度に設定するヘルパー
+ * @param namespace 翻訳名前空間
  * @param key 翻訳キー
  * @example
  * .setName("ping")
- * ...withLocalization("ping.description")
+ * ...withLocalization("ping", "description")
  */
-export function withLocalization(key: keyof typeof resources.ja.commands): {
+export function withLocalization<NS extends keyof typeof resources.ja>(
+  namespace: NS,
+  key: keyof (typeof resources.ja)[NS],
+): {
   description: string;
   descriptionLocalizations: CommandLocalizationMap;
   apply: <
@@ -46,7 +58,7 @@ export function withLocalization(key: keyof typeof resources.ja.commands): {
   ) => T;
 } {
   // キーに対応する説明文をまとめて取得して再利用
-  const { ja, localizations } = getCommandLocalizations(key);
+  const { ja, localizations } = getCommandLocalizations(namespace, key);
   return {
     // Discord クライアント既定表示向け（ja）
     description: ja,

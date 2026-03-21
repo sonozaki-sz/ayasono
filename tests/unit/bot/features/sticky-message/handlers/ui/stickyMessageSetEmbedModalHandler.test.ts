@@ -74,11 +74,11 @@ function createInteractionMock({
       : null,
     fields: {
       getTextInputValue: vi.fn((fieldId: string) => {
-        if (fieldId === "sticky-message:modal:embed-title")
+        if (fieldId === "sticky-message:embed-title-modal-input")
           return embedTitle ?? "";
-        if (fieldId === "sticky-message:modal:embed-description")
+        if (fieldId === "sticky-message:embed-description-modal-input")
           return embedDescription ?? "";
-        if (fieldId === "sticky-message:modal:embed-color")
+        if (fieldId === "sticky-message:embed-color-modal-input")
           return embedColor ?? "";
         return "";
       }),

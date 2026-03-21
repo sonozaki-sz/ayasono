@@ -10,10 +10,7 @@ import {
   type ChatInputCommandInteraction,
 } from "discord.js";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
-import {
-  tDefault,
-  tInteraction,
-} from "../../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../../shared/locale/localeManager";
 import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
 import { disableComponentsAfterTimeout } from "../../../../shared/disableComponentsAfterTimeout";
 import {
@@ -33,7 +30,7 @@ export async function handleVcRecruitConfigAddRole(
   _guildId: string,
 ): Promise<void> {
   if (!interaction.guild) {
-    throw new ValidationError(tDefault(COMMON_I18N_KEYS.GUILD_ONLY));
+    throw ValidationError.fromKey(COMMON_I18N_KEYS.GUILD_ONLY);
   }
 
   const sessionId = interaction.id;
@@ -45,7 +42,7 @@ export async function handleVcRecruitConfigAddRole(
     .setPlaceholder(
       tInteraction(
         interaction.locale,
-        "commands:vc-recruit-config.add-role.select.placeholder",
+        "vcRecruit:ui.select.add_role_placeholder",
       ),
     )
     .setMinValues(1)
@@ -56,10 +53,7 @@ export async function handleVcRecruitConfigAddRole(
       `${VC_RECRUIT_ROLE_CUSTOM_ID.ADD_ROLE_CONFIRM_PREFIX}${sessionId}`,
     )
     .setLabel(
-      tInteraction(
-        interaction.locale,
-        "commands:vc-recruit-config.add-role.button.confirm",
-      ),
+      tInteraction(interaction.locale, "vcRecruit:ui.button.add_role_confirm"),
     )
     .setStyle(ButtonStyle.Success)
     .setEmoji("✅");
@@ -69,10 +63,7 @@ export async function handleVcRecruitConfigAddRole(
       `${VC_RECRUIT_ROLE_CUSTOM_ID.ADD_ROLE_CANCEL_PREFIX}${sessionId}`,
     )
     .setLabel(
-      tInteraction(
-        interaction.locale,
-        "commands:vc-recruit-config.add-role.button.cancel",
-      ),
+      tInteraction(interaction.locale, "vcRecruit:ui.button.add_role_cancel"),
     )
     .setStyle(ButtonStyle.Secondary)
     .setEmoji("❌");
@@ -88,7 +79,7 @@ export async function handleVcRecruitConfigAddRole(
   await interaction.reply({
     content: tInteraction(
       interaction.locale,
-      "commands:vc-recruit-config.add-role.select.title",
+      "vcRecruit:embed.title.add_role_select",
     ),
     components: [selectRow, buttonRow],
     flags: MessageFlags.Ephemeral,

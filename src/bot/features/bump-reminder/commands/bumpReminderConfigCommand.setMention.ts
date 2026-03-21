@@ -43,7 +43,7 @@ export async function handleBumpReminderConfigSetMention(
     throw new ValidationError(
       tInteraction(
         interaction.locale,
-        "commands:bump-reminder-config.embed.set_mention_error",
+        "bumpReminder:user-response.set_mention_error",
       ),
     );
   }
@@ -51,14 +51,11 @@ export async function handleBumpReminderConfigSetMention(
   // 変更内容を返信
   const roleMessage = tInteraction(
     interaction.locale,
-    "commands:bump-reminder-config.embed.set_mention_role_success",
+    "bumpReminder:user-response.set_mention_role_success",
     { role: `<@&${role.id}>` },
   );
   const embed = createSuccessEmbed(roleMessage, {
-    title: tInteraction(
-      interaction.locale,
-      "commands:bump-reminder-config.embed.success_title",
-    ),
+    title: tInteraction(interaction.locale, "bumpReminder:embed.title.success"),
   });
   await interaction.reply({
     embeds: [embed],
@@ -69,7 +66,7 @@ export async function handleBumpReminderConfigSetMention(
   logger.info(
     logPrefixed(
       "system:log_prefix.bump_reminder",
-      "system:bump-reminder.config_mention_set",
+      "bumpReminder:log.config_mention_set",
       {
         guildId,
         roleId: role.id,

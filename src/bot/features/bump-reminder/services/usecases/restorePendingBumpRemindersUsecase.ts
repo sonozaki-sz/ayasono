@@ -48,8 +48,8 @@ export async function restorePendingBumpRemindersUsecase(
     logPrefixed(
       "system:log_prefix.bump_reminder",
       restorePlan.staleReminders.length > 0
-        ? "system:scheduler.bump_reminder_duplicates_cancelled"
-        : "system:scheduler.bump_reminder_duplicates_none",
+        ? "bumpReminder:log.scheduler_duplicates_cancelled"
+        : "bumpReminder:log.scheduler_duplicates_none",
       { count: restorePlan.staleReminders.length },
     ),
   );
@@ -73,7 +73,7 @@ export async function restorePendingBumpRemindersUsecase(
       logger.info(
         logPrefixed(
           "system:log_prefix.bump_reminder",
-          "system:scheduler.bump_reminder_executing_immediately",
+          "bumpReminder:log.scheduler_executing_immediately",
           {
             guildId: reminder.guildId,
           },
@@ -112,8 +112,8 @@ export async function restorePendingBumpRemindersUsecase(
     logPrefixed(
       "system:log_prefix.bump_reminder",
       restoredCount > 0
-        ? "system:scheduler.bump_reminders_restored"
-        : "system:scheduler.bump_reminders_restored_none",
+        ? "bumpReminder:log.scheduler_restored"
+        : "bumpReminder:log.scheduler_restored_none",
       { count: restoredCount },
     ),
   );

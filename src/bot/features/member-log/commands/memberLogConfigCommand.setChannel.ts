@@ -41,7 +41,7 @@ export async function handleMemberLogConfigSetChannel(
     throw new ValidationError(
       tInteraction(
         interaction.locale,
-        "commands:member-log-config.errors.text_channel_only",
+        "memberLog:user-response.text_channel_only",
       ),
     );
   }
@@ -51,12 +51,12 @@ export async function handleMemberLogConfigSetChannel(
 
   const description = tInteraction(
     interaction.locale,
-    "commands:member-log-config.embed.set_channel_success",
+    "memberLog:user-response.set_channel_success",
     { channel: `<#${channel.id}>` },
   );
   const successTitle = tInteraction(
     interaction.locale,
-    "commands:member-log-config.embed.success_title",
+    "memberLog:embed.title.success",
   );
   const embed = createSuccessEmbed(description, { title: successTitle });
   await interaction.reply({
@@ -68,7 +68,7 @@ export async function handleMemberLogConfigSetChannel(
   logger.info(
     logPrefixed(
       "system:log_prefix.member_log",
-      "system:member-log.config_set_channel",
+      "memberLog:log.config_set_channel",
       {
         guildId,
         channelId: channel.id,

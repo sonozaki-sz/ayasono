@@ -5,8 +5,8 @@ import { ChannelType } from "discord.js";
 vi.mock("@/shared/locale/localeManager", () => ({
   logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
   logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
-  tDefault: vi.fn((_key: string) => "TOP"),
-  tInteraction: (...args: unknown[]) => args[1],
+  tDefault: (_key: string) => "TOP",
+  tInteraction: (_locale: string, _key: string) => "TOP",
 }));
 
 const COMMAND = "test-command";
@@ -14,7 +14,7 @@ const SUBCOMMANDS = ["setup", "teardown"] as const;
 const OPTS = {
   commandName: COMMAND,
   subcommands: SUBCOMMANDS,
-  topLocaleKey: "commands:vc-recruit-config.setup.category.top" as const,
+  topLocaleKey: "vcRecruit:vc-recruit-config.setup.category.top" as const,
   topValue: "TOP",
 };
 

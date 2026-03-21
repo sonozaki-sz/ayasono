@@ -135,31 +135,42 @@
 
 ## ローカライズ
 
-### ja
+**翻訳ファイル:** `src/shared/locale/locales/{ja,en}/features/{機能名}.ts`
 
-| キー | 用途 | メッセージ |
-| --- | --- | --- |
-| {namespace:key} | レスポンス(error) | {日本語} |
-| {namespace:key} | レスポンス(warning) | {日本語} |
-| {namespace:key} | レスポンス(info) | {日本語} |
-| {namespace:key} | レスポンス(success) | {日本語} |
-| {namespace:key} | パネル | {日本語} |
-| {namespace:key} | モーダル | {日本語} |
-| {namespace:key} | ボタン | {日本語} |
-| {namespace:key} | ログ | {日本語} |
+キー命名規則は [IMPLEMENTATION_GUIDELINES.md](../guides/IMPLEMENTATION_GUIDELINES.md) の「翻訳キー命名規則」を参照。
 
-### en
+### コマンド定義
 
-| キー | 用途 | メッセージ |
-| --- | --- | --- |
-| {namespace:key} | レスポンス(error) | {English} |
-| {namespace:key} | レスポンス(warning) | {English} |
-| {namespace:key} | レスポンス(info) | {English} |
-| {namespace:key} | レスポンス(success) | {English} |
-| {namespace:key} | パネル | {English} |
-| {namespace:key} | モーダル | {English} |
-| {namespace:key} | ボタン | {English} |
-| {namespace:key} | ログ | {English} |
+| キー | 用途 | ja | en |
+| --- | --- | --- | --- |
+| `{コマンド名}.description` | {用途} | {日本語} | {English} |
+
+### ユーザーレスポンス
+
+| キー | 用途 | ja | en |
+| --- | --- | --- | --- |
+| `user-response.{アクション名}` | {用途} | {日本語} | {English} |
+
+### Embed
+
+| キー | 用途 | ja | en |
+| --- | --- | --- | --- |
+| `embed.title.{コンテキスト}` | {用途} | {日本語} | {English} |
+| `embed.description.{コンテキスト}` | {用途} | {日本語} | {English} |
+| `embed.field.name.{フィールド}` | {用途} | {日本語} | {English} |
+| `embed.field.value.{フィールド}` | {用途} | {日本語} | {English} |
+
+### UIラベル
+
+| キー | 用途 | ja | en |
+| --- | --- | --- | --- |
+| `ui.{UI種類}.{ID}` | {用途} | {日本語} | {English} |
+
+### ログ
+
+| キー | 用途 | ja | en |
+| --- | --- | --- | --- |
+| `log.{アクション名}` | {用途} | {日本語} | {English} |
 
 ---
 
