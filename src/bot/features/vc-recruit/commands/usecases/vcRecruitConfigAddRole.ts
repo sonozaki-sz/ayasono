@@ -45,7 +45,7 @@ export async function handleVcRecruitConfigAddRole(
     .setPlaceholder(
       tInteraction(
         interaction.locale,
-        "commands:vc-recruit-config.add-role.select.placeholder",
+        "vcRecruit:ui.select.add_role_placeholder",
       ),
     )
     .setMinValues(1)
@@ -56,10 +56,7 @@ export async function handleVcRecruitConfigAddRole(
       `${VC_RECRUIT_ROLE_CUSTOM_ID.ADD_ROLE_CONFIRM_PREFIX}${sessionId}`,
     )
     .setLabel(
-      tInteraction(
-        interaction.locale,
-        "commands:vc-recruit-config.add-role.button.confirm",
-      ),
+      tInteraction(interaction.locale, "vcRecruit:ui.button.add_role_confirm"),
     )
     .setStyle(ButtonStyle.Success)
     .setEmoji("✅");
@@ -69,10 +66,7 @@ export async function handleVcRecruitConfigAddRole(
       `${VC_RECRUIT_ROLE_CUSTOM_ID.ADD_ROLE_CANCEL_PREFIX}${sessionId}`,
     )
     .setLabel(
-      tInteraction(
-        interaction.locale,
-        "commands:vc-recruit-config.add-role.button.cancel",
-      ),
+      tInteraction(interaction.locale, "vcRecruit:ui.button.add_role_cancel"),
     )
     .setStyle(ButtonStyle.Secondary)
     .setEmoji("❌");
@@ -88,7 +82,7 @@ export async function handleVcRecruitConfigAddRole(
   await interaction.reply({
     content: tInteraction(
       interaction.locale,
-      "commands:vc-recruit-config.add-role.select.title",
+      "vcRecruit:embed.title.add_role_select",
     ),
     components: [selectRow, buttonRow],
     flags: MessageFlags.Ephemeral,

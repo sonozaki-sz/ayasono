@@ -186,7 +186,7 @@ describe("bot/features/member-log/handlers/guildMemberRemoveHandler", () => {
 
       expect(disableAndClearChannelMock).toHaveBeenCalledWith("guild-1");
       expect(loggerMock.warn).toHaveBeenCalledWith(
-        expect.stringContaining("system:member-log.channel_deleted_config_cleared"),
+        expect.stringContaining("memberLog:log.channel_deleted_config_cleared"),
       );
       expect(member._channel.send).not.toHaveBeenCalled();
     });
@@ -373,7 +373,7 @@ describe("bot/features/member-log/handlers/guildMemberRemoveHandler", () => {
       await handleGuildMemberRemove(makeGuildMember() as never);
 
       expect(loggerMock.debug).toHaveBeenCalledWith(
-        expect.stringContaining("system:member-log.leave_notification_sent"),
+        expect.stringContaining("memberLog:log.leave_notification_sent"),
       );
     });
 
@@ -436,7 +436,7 @@ describe("bot/features/member-log/handlers/guildMemberRemoveHandler", () => {
         handleGuildMemberRemove(member as never),
       ).resolves.toBeUndefined();
       expect(loggerMock.error).toHaveBeenCalledWith(
-        expect.stringContaining("system:member-log.notification_failed"),
+        expect.stringContaining("memberLog:log.notification_failed"),
         expect.any(Object),
       );
     });

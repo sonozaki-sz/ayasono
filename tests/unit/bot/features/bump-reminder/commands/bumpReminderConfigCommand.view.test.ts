@@ -52,7 +52,7 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.view", (
       embeds: [
         {
           description:
-            "commands:bump-reminder-config.embed.not_configured",
+            "bumpReminder:embed.description.not_configured",
           kind: "info",
         },
       ],

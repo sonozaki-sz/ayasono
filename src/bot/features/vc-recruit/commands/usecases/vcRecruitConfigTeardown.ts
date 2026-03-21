@@ -39,10 +39,7 @@ export function buildTeardownSelectOptions(
   return setups.map((setup) => {
     let label: string;
     if (setup.categoryId === null) {
-      label = tInteraction(
-        locale,
-        "commands:vc-recruit-config.teardown.select.top",
-      );
+      label = tInteraction(locale, "vcRecruit:ui.select.teardown_top");
     } else {
       const cat = guild.channels.cache.get(setup.categoryId);
       if (cat) {
@@ -50,7 +47,7 @@ export function buildTeardownSelectOptions(
       } else {
         label = tInteraction(
           locale,
-          "commands:vc-recruit-config.teardown.select.unknown_category",
+          "vcRecruit:ui.select.teardown_unknown_category",
           { id: setup.categoryId },
         );
       }
@@ -80,7 +77,7 @@ export async function handleVcRecruitConfigTeardown(
 
   if (config.setups.length === 0) {
     throw new ValidationError(
-      tInteraction(interaction.locale, "errors:vcRecruit.not_setup"),
+      tInteraction(interaction.locale, "vcRecruit:user-response.not_setup"),
     );
   }
 
@@ -93,7 +90,7 @@ export async function handleVcRecruitConfigTeardown(
 
   const placeholder = tInteraction(
     interaction.locale,
-    "commands:vc-recruit-config.teardown.select.placeholder",
+    "vcRecruit:ui.select.teardown_placeholder",
   );
 
   const selectMenu = new StringSelectMenuBuilder()

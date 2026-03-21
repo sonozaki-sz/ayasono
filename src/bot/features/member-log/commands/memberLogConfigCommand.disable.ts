@@ -29,11 +29,11 @@ export async function handleMemberLogConfigDisable(
 
   const description = tInteraction(
     interaction.locale,
-    "commands:member-log-config.embed.disable_success",
+    "memberLog:user-response.disable_success",
   );
   const successTitle = tInteraction(
     interaction.locale,
-    "commands:member-log-config.embed.success_title",
+    "memberLog:embed.title.success",
   );
   const embed = createSuccessEmbed(description, { title: successTitle });
   await interaction.reply({
@@ -45,7 +45,7 @@ export async function handleMemberLogConfigDisable(
   logger.info(
     logPrefixed(
       "system:log_prefix.member_log",
-      "system:member-log.config_disabled",
+      "memberLog:log.config_disabled",
       { guildId },
     ),
   );

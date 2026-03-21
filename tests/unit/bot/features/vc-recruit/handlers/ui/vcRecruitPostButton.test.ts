@@ -241,7 +241,7 @@ describe("vcRecruitPostButtonHandler / handleRenameVc", () => {
     expect(safeReplyMock).toHaveBeenCalledWith(
       interaction,
       expect.objectContaining({
-        embeds: [{ warning: "errors:vcRecruit.no_permission" }],
+        embeds: [{ warning: "vcRecruit:user-response.no_permission" }],
         flags: MessageFlags.Ephemeral,
       }),
     );
@@ -286,7 +286,7 @@ describe("vcRecruitPostButtonHandler / handleRenameVc", () => {
     expect(safeReplyMock).toHaveBeenCalledWith(
       interaction,
       expect.objectContaining({
-        embeds: [{ warning: "errors:vcRecruit.vc_already_deleted" }],
+        embeds: [{ warning: "vcRecruit:user-response.vc_already_deleted" }],
         flags: MessageFlags.Ephemeral,
       }),
     );
@@ -332,7 +332,7 @@ describe("vcRecruitPostButtonHandler / handleEndVc", () => {
     expect(safeReplyMock).toHaveBeenCalledWith(
       interaction,
       expect.objectContaining({
-        embeds: [{ warning: "errors:vcRecruit.no_permission" }],
+        embeds: [{ warning: "vcRecruit:user-response.no_permission" }],
         flags: MessageFlags.Ephemeral,
       }),
     );
@@ -351,7 +351,7 @@ describe("vcRecruitPostButtonHandler / handleEndVc", () => {
     expect(safeReplyMock).toHaveBeenCalledWith(
       interaction,
       expect.objectContaining({
-        content: "commands:vcRecruit.confirm.end_vc_created",
+        content: "vcRecruit:user-response.end_vc_created",
         components: expect.any(Array),
         flags: MessageFlags.Ephemeral,
       }),
@@ -371,7 +371,7 @@ describe("vcRecruitPostButtonHandler / handleEndVc", () => {
     expect(safeReplyMock).toHaveBeenCalledWith(
       interaction,
       expect.objectContaining({
-        content: "commands:vcRecruit.confirm.end_vc_existing",
+        content: "vcRecruit:user-response.end_vc_existing",
         components: expect.any(Array),
         flags: MessageFlags.Ephemeral,
       }),
@@ -400,7 +400,7 @@ describe("vcRecruitPostButtonHandler / handleDeletePost", () => {
     expect(safeReplyMock).toHaveBeenCalledWith(
       interaction,
       expect.objectContaining({
-        embeds: [{ warning: "errors:vcRecruit.no_permission" }],
+        embeds: [{ warning: "vcRecruit:user-response.no_permission" }],
         flags: MessageFlags.Ephemeral,
       }),
     );
@@ -419,7 +419,7 @@ describe("vcRecruitPostButtonHandler / handleDeletePost", () => {
     expect(safeReplyMock).toHaveBeenCalledWith(
       interaction,
       expect.objectContaining({
-        content: "commands:vcRecruit.confirm.delete_created",
+        content: "vcRecruit:user-response.delete_created",
         components: expect.any(Array),
         flags: MessageFlags.Ephemeral,
       }),
@@ -439,7 +439,7 @@ describe("vcRecruitPostButtonHandler / handleDeletePost", () => {
     expect(safeReplyMock).toHaveBeenCalledWith(
       interaction,
       expect.objectContaining({
-        content: "commands:vcRecruit.confirm.delete_existing",
+        content: "vcRecruit:user-response.delete_existing",
         components: expect.any(Array),
         flags: MessageFlags.Ephemeral,
       }),
@@ -515,7 +515,7 @@ describe("vcRecruitPostButtonHandler / handleConfirmEndVc", () => {
     // Assert: 成功メッセージを表示
     expect(interaction.editReply).toHaveBeenCalledWith(
       expect.objectContaining({
-        embeds: [{ success: "commands:vcRecruit.confirm.end_vc_success" }],
+        embeds: [{ success: "vcRecruit:user-response.end_vc_success" }],
         components: [],
       }),
     );
@@ -549,7 +549,7 @@ describe("vcRecruitPostButtonHandler / handleConfirmEndVc", () => {
     // Assert: 成功メッセージを表示
     expect(interaction.editReply).toHaveBeenCalledWith(
       expect.objectContaining({
-        embeds: [{ success: "commands:vcRecruit.confirm.end_vc_success" }],
+        embeds: [{ success: "vcRecruit:user-response.end_vc_success" }],
         components: [],
       }),
     );
@@ -658,7 +658,7 @@ describe("vcRecruitPostButtonHandler / handleCancel", () => {
     expect(interaction.update).toHaveBeenCalledWith(
       expect.objectContaining({
         content: null,
-        embeds: [{ success: "commands:vcRecruit.confirm.cancelled" }],
+        embeds: [{ success: "vcRecruit:user-response.cancelled" }],
         components: [],
       }),
     );
@@ -675,7 +675,7 @@ describe("vcRecruitPostButtonHandler / handleCancel", () => {
     expect(interaction.update).toHaveBeenCalledWith(
       expect.objectContaining({
         content: null,
-        embeds: [{ success: "commands:vcRecruit.confirm.cancelled" }],
+        embeds: [{ success: "vcRecruit:user-response.cancelled" }],
         components: [],
       }),
     );
@@ -827,7 +827,7 @@ describe("vcRecruitPostButtonHandler / handleRenameVc パース失敗", () => {
     expect(safeReplyMock).toHaveBeenCalledWith(
       interaction,
       expect.objectContaining({
-        embeds: [{ warning: "errors:vcRecruit.vc_already_deleted" }],
+        embeds: [{ warning: "vcRecruit:user-response.vc_already_deleted" }],
         flags: MessageFlags.Ephemeral,
       }),
     );
@@ -939,7 +939,7 @@ describe("vcRecruitPostButtonHandler / handleConfirmEndVc 追加パス", () => {
     expect(interaction.deferUpdate).toHaveBeenCalled();
     expect(interaction.editReply).toHaveBeenCalledWith(
       expect.objectContaining({
-        embeds: [{ success: "commands:vcRecruit.confirm.end_vc_success" }],
+        embeds: [{ success: "vcRecruit:user-response.end_vc_success" }],
         components: [],
       }),
     );
@@ -1038,7 +1038,7 @@ describe("vcRecruitPostButtonHandler / handleConfirmDelete 追加パス", () => 
     expect(interaction.deferUpdate).toHaveBeenCalled();
     expect(interaction.editReply).toHaveBeenCalledWith(
       expect.objectContaining({
-        embeds: [{ success: "commands:vcRecruit.confirm.delete_success" }],
+        embeds: [{ success: "vcRecruit:user-response.delete_success" }],
         components: [],
       }),
     );

@@ -113,7 +113,7 @@ function buildDisplayContent(msg: Message): string {
 
   if (msg.attachments.size > 0) {
     parts.push(
-      tDefault("commands:message-delete.result.attachments", {
+      tDefault("messageDelete:embed.field.value.attachments", {
         count: msg.attachments.size,
       }),
     );
@@ -123,7 +123,7 @@ function buildDisplayContent(msg: Message): string {
     parts.push(
       embed.title
         ? `🔗 ${embed.title}`
-        : tDefault("commands:message-delete.result.embed_no_title"),
+        : tDefault("messageDelete:embed.field.value.embed_no_title"),
     );
   }
 
@@ -168,7 +168,7 @@ export async function scanMessages(
   logger.debug(
     logPrefixed(
       "system:log_prefix.msg_del",
-      "system:message-delete.svc_scan_start",
+      "messageDelete:log.svc_scan_start",
       {
         channelCount: channels.length,
         count,
@@ -195,7 +195,7 @@ export async function scanMessages(
       logger.debug(
         logPrefixed(
           "system:log_prefix.msg_del",
-          "system:message-delete.svc_channel_no_access",
+          "messageDelete:log.svc_channel_no_access",
           {
             channelId: channel.id,
           },
@@ -250,7 +250,7 @@ export async function scanMessages(
       logger.debug(
         logPrefixed(
           "system:log_prefix.msg_del",
-          "system:message-delete.svc_initial_fetch",
+          "messageDelete:log.svc_initial_fetch",
           {
             channelId: channel.id,
           },
@@ -284,7 +284,7 @@ export async function scanMessages(
         logger.debug(
           logPrefixed(
             "system:log_prefix.msg_del",
-            "system:message-delete.svc_refill",
+            "messageDelete:log.svc_refill",
             {
               channelId: cursor.channel.id,
               lastId: cursor.lastId ?? "none",
@@ -348,7 +348,7 @@ export async function scanMessages(
   logger.debug(
     logPrefixed(
       "system:log_prefix.msg_del",
-      "system:message-delete.svc_scan_complete",
+      "messageDelete:log.svc_scan_complete",
       {
         count: scanned.length,
       },
@@ -437,7 +437,7 @@ export async function deleteScannedMessages(
         logger.debug(
           logPrefixed(
             "system:log_prefix.msg_del",
-            "system:message-delete.svc_bulk_delete_chunk",
+            "messageDelete:log.svc_bulk_delete_chunk",
             {
               size: chunk.length,
             },
@@ -471,7 +471,7 @@ export async function deleteScannedMessages(
         logger.warn(
           logPrefixed(
             "system:log_prefix.msg_del",
-            "system:message-delete.svc_message_delete_failed",
+            "messageDelete:log.svc_message_delete_failed",
             {
               messageId: scanned.messageId,
               error: String(err),

@@ -241,7 +241,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalH
     await stickyMessageUpdateEmbedModalHandler.execute(interaction as never);
 
     expect(loggerMock.error).toHaveBeenCalledWith(
-      expect.stringContaining("system:sticky-message.resend_after_embed_update_failed"),
+      expect.stringContaining("stickyMessage:log.resend_after_embed_update_failed"),
       expect.any(Object),
     );
     expect(interaction._replyMock).toHaveBeenCalled();

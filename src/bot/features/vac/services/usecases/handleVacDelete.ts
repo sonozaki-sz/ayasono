@@ -37,7 +37,7 @@ export async function handleVacDeleteUseCase(
   );
 
   logger.info(
-    logPrefixed("system:log_prefix.vac", "system:vac.channel_deleted", {
+    logPrefixed("system:log_prefix.vac", "vac:log.channel_deleted", {
       guildId: oldChannel.guild.id,
       channelId: oldChannel.id,
     }),

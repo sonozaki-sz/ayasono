@@ -51,7 +51,7 @@ export async function runConditionSetupStep(
   const userSelect = new UserSelectMenuBuilder()
     .setCustomId(MSG_DEL_CUSTOM_ID.SELECT_USER)
     .setPlaceholder(
-      tDefault("commands:message-delete.condition-step.user_placeholder"),
+      tDefault("messageDelete:ui.select.condition_user_placeholder"),
     )
     .setMinValues(0)
     .setMaxValues(MSG_DEL_SELECT_MAX_OPTIONS);
@@ -60,7 +60,7 @@ export async function runConditionSetupStep(
   const channelSelect = new ChannelSelectMenuBuilder()
     .setCustomId(MSG_DEL_CUSTOM_ID.SELECT_CHANNEL)
     .setPlaceholder(
-      tDefault("commands:message-delete.condition-step.channel_placeholder"),
+      tDefault("messageDelete:ui.select.condition_channel_placeholder"),
     )
     .setMinValues(0)
     .setMaxValues(MSG_DEL_SELECT_MAX_OPTIONS)
@@ -78,28 +78,24 @@ export async function runConditionSetupStep(
     new ButtonBuilder()
       .setCustomId(MSG_DEL_CUSTOM_ID.START_SCAN)
       .setEmoji("🔍")
-      .setLabel(
-        tDefault("commands:message-delete.condition-step.btn_start_scan"),
-      )
+      .setLabel(tDefault("messageDelete:ui.button.start_scan"))
       .setStyle(ButtonStyle.Primary),
     new ButtonBuilder()
       .setCustomId(MSG_DEL_CUSTOM_ID.WEBHOOK_INPUT)
       .setEmoji("📩")
-      .setLabel(
-        tDefault("commands:message-delete.condition-step.btn_webhook_input"),
-      )
+      .setLabel(tDefault("messageDelete:ui.button.webhook_input"))
       .setStyle(ButtonStyle.Secondary),
     new ButtonBuilder()
       .setCustomId(MSG_DEL_CUSTOM_ID.COND_CANCEL)
       .setEmoji("❌")
-      .setLabel(tDefault("commands:message-delete.condition-step.btn_cancel"))
+      .setLabel(tDefault("messageDelete:ui.button.condition_cancel"))
       .setStyle(ButtonStyle.Secondary),
   );
 
   // 条件設定 UI を表示
   const message = await interaction.editReply({
     embeds: [
-      createInfoEmbed(tDefault("commands:message-delete.condition-step.title")),
+      createInfoEmbed(tDefault("messageDelete:embed.title.condition_step")),
     ],
     components: [
       new ActionRowBuilder<UserSelectMenuBuilder>().addComponents(userSelect),
@@ -152,18 +148,16 @@ export async function runConditionSetupStep(
       if (customId === MSG_DEL_CUSTOM_ID.WEBHOOK_INPUT) {
         const modal = new ModalBuilder()
           .setCustomId(MSG_DEL_CUSTOM_ID.MODAL_WEBHOOK)
-          .setTitle(tDefault("commands:message-delete.modal.webhook.title"))
+          .setTitle(tDefault("messageDelete:ui.modal.webhook_title"))
           .addComponents(
             new ActionRowBuilder<TextInputBuilder>().addComponents(
               new TextInputBuilder()
                 .setCustomId(MSG_DEL_CUSTOM_ID.MODAL_INPUT_WEBHOOK)
-                .setLabel(
-                  tDefault("commands:message-delete.modal.webhook.label"),
-                )
+                .setLabel(tDefault("messageDelete:ui.modal.webhook_label"))
                 .setStyle(TextInputStyle.Short)
                 .setRequired(true)
                 .setPlaceholder(
-                  tDefault("commands:message-delete.modal.webhook.placeholder"),
+                  tDefault("messageDelete:ui.modal.webhook_placeholder"),
                 ),
             ),
           );
@@ -183,10 +177,8 @@ export async function runConditionSetupStep(
           await submit.reply({
             embeds: [
               createWarningEmbed(
-                tDefault(
-                  "commands:message-delete.errors.webhook_invalid_format",
-                ),
-                { title: tDefault("common:title_input_error") },
+                tDefault("messageDelete:user-response.webhook_invalid_format"),
+                { title: tDefault("common:title_invalid_input") },
               ),
             ],
             ephemeral: true,
@@ -211,7 +203,9 @@ export async function runConditionSetupStep(
           await i.reply({
             embeds: [
               createWarningEmbed(
-                tDefault("commands:message-delete.condition-step.no_filter"),
+                tDefault(
+                  "messageDelete:user-response.condition_step_no_filter",
+                ),
                 { title: tDefault("common:title_filter_required") },
               ),
             ],
@@ -241,7 +235,7 @@ export async function runConditionSetupStep(
           .editReply({
             embeds: [
               createInfoEmbed(
-                tDefault("commands:message-delete.confirm.cancelled"),
+                tDefault("messageDelete:user-response.cancelled"),
               ),
             ],
             components: [],
@@ -262,7 +256,7 @@ export async function runConditionSetupStep(
         .editReply({
           embeds: [
             createWarningEmbed(
-              tDefault("commands:message-delete.condition-step.timeout"),
+              tDefault("messageDelete:user-response.condition_step_timeout"),
               { title: tDefault("common:title_timeout") },
             ),
           ],

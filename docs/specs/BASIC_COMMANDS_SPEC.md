@@ -113,39 +113,34 @@
 
 ## ローカライズ
 
-### ja
+**翻訳ファイル:** `src/shared/locale/locales/{ja,en}/features/ping.ts`
 
-| キー                          | 用途           | メッセージ                                                   |
-| ----------------------------- | -------------- | ------------------------------------------------------------ |
-| `commands:ping.description`   | コマンド説明   | Botの応答速度を確認                                          |
-| `commands:ping.embed.measuring` | レスポンス   | 🏓 計測中...                                                |
-| `commands:ping.embed.response`  | レスポンス   | 📡 API レイテンシー: {{apiLatency}}ms / 💓 WebSocket Ping: {{wsLatency}}ms |
-| `commands:help.description`   | コマンド説明   | コマンド一覧を表示                                           |
-| `commands:help.embed.title`   | Embed タイトル | 📖 ayasono コマンド一覧                                     |
-| `commands:help.embed.section.basic`  | Embed フィールド名 | 🔧 基本                                              |
-| `commands:help.embed.section.config` | Embed フィールド名 | ⚙️ 設定（管理者）                                   |
-| `commands:help.embed.section.action` | Embed フィールド名 | 🛠️ 操作                                            |
-| `commands:help.embed.description`    | Embed 説明         | 📚 詳しい使い方: {{url}}                            |
-| `commands:help.embed.section.basic.content`  | Embed フィールド値 | `/ping` — Bot の応答速度を確認（改行）`/help` — このヘルプを表示 |
-| `commands:help.embed.section.config.content` | Embed フィールド値 | `/guild-config` — ギルド全体の設定（改行）...       |
-| `commands:help.embed.section.action.content` | Embed フィールド値 | `/afk` — AFK チャンネルへ移動（改行）...            |
+### コマンド定義
 
-### en
+| キー | ja | en |
+| --- | --- | --- |
+| `ping.description` | Botの応答速度を確認 | Check bot response speed |
+| `help.description` | コマンド一覧を表示 | Show command list |
 
-| キー                          | 用途           | メッセージ                                                   |
-| ----------------------------- | -------------- | ------------------------------------------------------------ |
-| `commands:ping.description`   | コマンド説明   | Check bot response speed                                     |
-| `commands:ping.embed.measuring` | レスポンス   | 🏓 Measuring...                                             |
-| `commands:ping.embed.response`  | レスポンス   | 📡 API Latency: {{apiLatency}}ms / 💓 WebSocket Ping: {{wsLatency}}ms |
-| `commands:help.description`   | コマンド説明   | Show command list                                            |
-| `commands:help.embed.title`   | Embed タイトル | 📖 ayasono Commands                                         |
-| `commands:help.embed.section.basic`  | Embed フィールド名 | 🔧 Basic                                             |
-| `commands:help.embed.section.config` | Embed フィールド名 | ⚙️ Settings (Admin)                                 |
-| `commands:help.embed.section.action` | Embed フィールド名 | 🛠️ Actions                                         |
-| `commands:help.embed.description`    | Embed 説明         | 📚 Learn more: {{url}}                              |
-| `commands:help.embed.section.basic.content`  | Embed フィールド値 | `/ping` — Check bot response speed（改行）`/help` — Show this help |
-| `commands:help.embed.section.config.content` | Embed フィールド値 | `/guild-config` — Guild settings（改行）...          |
-| `commands:help.embed.section.action.content` | Embed フィールド値 | `/afk` — Move to AFK channel（改行）...              |
+### ユーザーレスポンス
+
+| キー | ja | en |
+| --- | --- | --- |
+| `user-response.measuring` | 🏓 計測中... | 🏓 Measuring... |
+
+### Embed
+
+| キー | ja | en |
+| --- | --- | --- |
+| `embed.description.ping-result` | 📡 API レイテンシー: {{apiLatency}}ms / 💓 WebSocket Ping: {{wsLatency}}ms | 📡 API Latency: {{apiLatency}}ms / 💓 WebSocket Ping: {{wsLatency}}ms |
+| `embed.title.help` | 📖 ayasono コマンド一覧 | 📖 ayasono Commands |
+| `embed.description.help` | 📚 詳しい使い方: {{url}} | 📚 Learn more: {{url}} |
+| `embed.field.name.basic` | 🔧 基本 | 🔧 Basic |
+| `embed.field.name.config` | ⚙️ 設定（管理者） | ⚙️ Settings (Admin) |
+| `embed.field.name.action` | 🛠️ 操作 | 🛠️ Actions |
+| `embed.field.value.basic` | `/ping` — Bot の応答速度を確認（改行）`/help` — このヘルプを表示 | `/ping` — Check bot response speed（改行）`/help` — Show this help |
+| `embed.field.value.config` | `/guild-config` — ギルド全体の設定（改行）... | `/guild-config` — Guild settings（改行）... |
+| `embed.field.value.action` | `/afk` — AFK チャンネルへ移動（改行）... | `/afk` — Move to AFK channel（改行）... |
 
 ---
 

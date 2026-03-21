@@ -98,7 +98,7 @@ export class VacConfigService {
           logger.debug(
             logPrefixed(
               "system:log_prefix.database",
-              "system:database.vac_trigger_added",
+              "vac:log.database_trigger_added",
               {
                 guildId,
                 channelId,
@@ -110,7 +110,7 @@ export class VacConfigService {
         // 変更不要だった場合も保存成功後も、DB と一致した最新の config を返す
         return config;
       },
-      tDefault("system:database.vac_trigger_add_failed", {
+      tDefault("vac:log.database_trigger_add_failed", {
         guildId,
         channelId,
       }),
@@ -140,7 +140,7 @@ export class VacConfigService {
           logger.debug(
             logPrefixed(
               "system:log_prefix.database",
-              "system:database.vac_trigger_removed",
+              "vac:log.database_trigger_removed",
               {
                 guildId,
                 channelId,
@@ -152,7 +152,7 @@ export class VacConfigService {
         // 変更不要だった場合も保存成功後も、DB と一致した最新の config を返す
         return config;
       },
-      tDefault("system:database.vac_trigger_remove_failed", {
+      tDefault("vac:log.database_trigger_remove_failed", {
         guildId,
         channelId,
       }),
@@ -179,7 +179,7 @@ export class VacConfigService {
           logger.debug(
             logPrefixed(
               "system:log_prefix.database",
-              "system:database.vac_channel_registered",
+              "vac:log.database_channel_registered",
               {
                 guildId,
                 voiceChannelId: channel.voiceChannelId,
@@ -190,7 +190,7 @@ export class VacConfigService {
         // 変更不要だった場合も保存成功後も、DB と一致した最新の config を返す
         return config;
       },
-      tDefault("system:database.vac_channel_register_failed", {
+      tDefault("vac:log.database_channel_register_failed", {
         guildId,
         voiceChannelId: channel.voiceChannelId,
       }),
@@ -220,7 +220,7 @@ export class VacConfigService {
           logger.debug(
             logPrefixed(
               "system:log_prefix.database",
-              "system:database.vac_channel_unregistered",
+              "vac:log.database_channel_unregistered",
               {
                 guildId,
                 voiceChannelId,
@@ -232,7 +232,7 @@ export class VacConfigService {
         // 変更不要だった場合も保存成功後も、DB と一致した最新の config を返す
         return config;
       },
-      tDefault("system:database.vac_channel_unregister_failed", {
+      tDefault("vac:log.database_channel_unregister_failed", {
         guildId,
         voiceChannelId,
       }),

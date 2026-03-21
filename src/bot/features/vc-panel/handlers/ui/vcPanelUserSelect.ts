@@ -52,11 +52,14 @@ export const vcPanelUserSelectHandler: StringSelectHandler = {
       await safeReply(interaction, {
         embeds: [
           createWarningEmbed(
-            tInteraction(interaction.locale, "errors:vac.not_vac_channel"),
+            tInteraction(
+              interaction.locale,
+              "vac:user-response.not_vac_channel",
+            ),
             {
               title: tInteraction(
                 interaction.locale,
-                "common:title_channel_error",
+                "common:title_channel_invalid",
               ),
             },
           ),
@@ -71,11 +74,14 @@ export const vcPanelUserSelectHandler: StringSelectHandler = {
       await safeReply(interaction, {
         embeds: [
           createWarningEmbed(
-            tInteraction(interaction.locale, "errors:vac.not_vac_channel"),
+            tInteraction(
+              interaction.locale,
+              "vac:user-response.not_vac_channel",
+            ),
             {
               title: tInteraction(
                 interaction.locale,
-                "common:title_channel_error",
+                "common:title_channel_invalid",
               ),
             },
           ),
@@ -93,7 +99,7 @@ export const vcPanelUserSelectHandler: StringSelectHandler = {
       await safeReply(interaction, {
         embeds: [
           createWarningEmbed(
-            tInteraction(interaction.locale, "errors:vac.not_in_vc"),
+            tInteraction(interaction.locale, "vac:user-response.not_in_vc"),
             {
               title: tInteraction(interaction.locale, "common:title_not_in_vc"),
             },
@@ -109,7 +115,10 @@ export const vcPanelUserSelectHandler: StringSelectHandler = {
       await safeReply(interaction, {
         embeds: [
           createWarningEmbed(
-            tInteraction(interaction.locale, "errors:afk.not_configured"),
+            tInteraction(
+              interaction.locale,
+              "afk:user-response.not_configured",
+            ),
             {
               title: tInteraction(
                 interaction.locale,
@@ -131,7 +140,10 @@ export const vcPanelUserSelectHandler: StringSelectHandler = {
       await safeReply(interaction, {
         embeds: [
           createWarningEmbed(
-            tInteraction(interaction.locale, "errors:afk.channel_not_found"),
+            tInteraction(
+              interaction.locale,
+              "afk:user-response.channel_not_found",
+            ),
             {
               title: tInteraction(
                 interaction.locale,
@@ -165,7 +177,10 @@ export const vcPanelUserSelectHandler: StringSelectHandler = {
       await safeReply(interaction, {
         embeds: [
           createWarningEmbed(
-            tInteraction(interaction.locale, "errors:vac.afk_move_failed"),
+            tInteraction(
+              interaction.locale,
+              "vac:user-response.afk_move_failed",
+            ),
             {
               title: tInteraction(
                 interaction.locale,
@@ -182,7 +197,7 @@ export const vcPanelUserSelectHandler: StringSelectHandler = {
     await safeReply(interaction, {
       embeds: [
         createSuccessEmbed(
-          tInteraction(interaction.locale, "commands:vac.embed.members_moved", {
+          tInteraction(interaction.locale, "vac:user-response.members_moved", {
             channel: afkChannel.toString(),
           }),
         ),

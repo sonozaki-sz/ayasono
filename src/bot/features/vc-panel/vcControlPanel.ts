@@ -50,16 +50,13 @@ export async function sendVcControlPanel(
 
   const guildId = voiceChannel.guild.id;
   // 表示文言は送信先 guild のロケールで都度解決
-  const title = await tGuild(guildId, "commands:vac.panel.title");
-  const description = await tGuild(guildId, "commands:vac.panel.description");
+  const title = await tGuild(guildId, "vac:embed.title.panel");
+  const description = await tGuild(guildId, "vac:embed.description.panel");
 
-  const renameLabel = await tGuild(guildId, "commands:vac.panel.rename_button");
-  const limitLabel = await tGuild(guildId, "commands:vac.panel.limit_button");
-  const afkLabel = await tGuild(guildId, "commands:vac.panel.afk_button");
-  const refreshLabel = await tGuild(
-    guildId,
-    "commands:vac.panel.refresh_button",
-  );
+  const renameLabel = await tGuild(guildId, "vac:ui.button.rename");
+  const limitLabel = await tGuild(guildId, "vac:ui.button.limit");
+  const afkLabel = await tGuild(guildId, "vac:ui.button.afk");
+  const refreshLabel = await tGuild(guildId, "vac:ui.button.refresh");
 
   const embed = createInfoEmbed(description, { title });
 

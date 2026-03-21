@@ -57,11 +57,8 @@ export async function handleVacConfigRemoveTrigger(
 
   if (!triggerChannel) {
     throw new ValidationError(
-      tInteraction(interaction.locale, "errors:vac.trigger_not_found"),
-      tInteraction(
-        interaction.locale,
-        "commands:vac-config.embed.remove_error_title",
-      ),
+      tInteraction(interaction.locale, "vac:user-response.trigger_not_found"),
+      tInteraction(interaction.locale, "vac:embed.title.remove_error"),
     );
   }
 
@@ -76,18 +73,11 @@ export async function handleVacConfigRemoveTrigger(
   }
 
   const embed = createSuccessEmbed(
-    tInteraction(
-      interaction.locale,
-      "commands:vac-config.embed.trigger_removed",
-      {
-        channel: `#${triggerChannel.name}`,
-      },
-    ),
+    tInteraction(interaction.locale, "vac:user-response.trigger_removed", {
+      channel: `#${triggerChannel.name}`,
+    }),
     {
-      title: tInteraction(
-        interaction.locale,
-        "commands:vac-config.embed.success_title",
-      ),
+      title: tInteraction(interaction.locale, "vac:embed.title.success"),
     },
   );
   // 管理系操作の結果は Ephemeral で返してチャンネルノイズを抑える

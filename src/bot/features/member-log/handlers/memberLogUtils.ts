@@ -42,10 +42,11 @@ export function formatAccountAge(
   t: GuildTFunction,
 ): string {
   const parts: string[] = [];
-  if (years > 0) parts.push(t("events:member-log.age.years", { count: years }));
+  if (years > 0)
+    parts.push(t("memberLog:embed.field.value.age_years", { count: years }));
   if (months > 0)
-    parts.push(t("events:member-log.age.months", { count: months }));
+    parts.push(t("memberLog:embed.field.value.age_months", { count: months }));
   if (days > 0 || parts.length === 0)
-    parts.push(t("events:member-log.age.days", { count: days }));
-  return parts.join(t("events:member-log.age.separator"));
+    parts.push(t("memberLog:embed.field.value.age_days", { count: days }));
+  return parts.join(t("memberLog:embed.field.value.age_separator"));
 }

@@ -18,30 +18,45 @@ import type { Command } from "../types/discord";
  */
 export const stickyMessageCommand: Command = {
   data: (() => {
-    const cmdDesc = getCommandLocalizations("sticky-message.description");
+    const cmdDesc = getCommandLocalizations(
+      "stickyMessage",
+      "sticky-message.description",
+    );
     // set サブコマンド
-    const setDesc = getCommandLocalizations("sticky-message.set.description");
+    const setDesc = getCommandLocalizations(
+      "stickyMessage",
+      "sticky-message.set.description",
+    );
     const setChannelDesc = getCommandLocalizations(
+      "stickyMessage",
       "sticky-message.set.channel.description",
     );
     const setStyleDesc = getCommandLocalizations(
+      "stickyMessage",
       "sticky-message.set.style.description",
     );
     // update サブコマンド
     const updateDesc = getCommandLocalizations(
+      "stickyMessage",
       "sticky-message.update.description",
     );
     const updateChannelDesc = getCommandLocalizations(
+      "stickyMessage",
       "sticky-message.update.channel.description",
     );
     const updateStyleDesc = getCommandLocalizations(
+      "stickyMessage",
       "sticky-message.update.style.description",
     );
     // remove / view サブコマンド
     const removeDesc = getCommandLocalizations(
+      "stickyMessage",
       "sticky-message.remove.description",
     );
-    const viewDesc = getCommandLocalizations("sticky-message.view.description");
+    const viewDesc = getCommandLocalizations(
+      "stickyMessage",
+      "sticky-message.view.description",
+    );
 
     return (
       new SlashCommandBuilder()

@@ -33,19 +33,16 @@ export async function handleVcRecruitConfigView(
   if (config.setups.length === 0) {
     setupsValue = tInteraction(
       interaction.locale,
-      "commands:vc-recruit-config.embed.no_setups",
+      "vcRecruit:embed.field.value.no_setups",
     );
   } else {
     const lines = config.setups.map((s) => {
       const categoryName = s.categoryId
         ? (guild.channels.cache.get(s.categoryId)?.name ?? s.categoryId)
-        : tInteraction(
-            interaction.locale,
-            "commands:vc-recruit-config.embed.top",
-          );
+        : tInteraction(interaction.locale, "vcRecruit:embed.field.value.top");
       return tInteraction(
         interaction.locale,
-        "commands:vc-recruit-config.embed.setup_item",
+        "vcRecruit:embed.field.value.setup_item",
         {
           category: categoryName,
           panel: `<#${s.panelChannelId}>`,
@@ -61,7 +58,7 @@ export async function handleVcRecruitConfigView(
   if (config.mentionRoleIds.length === 0) {
     rolesValue = tInteraction(
       interaction.locale,
-      "commands:vc-recruit-config.embed.no_roles",
+      "vcRecruit:embed.field.value.no_roles",
     );
   } else {
     rolesValue = config.mentionRoleIds.map((id) => `<@&${id}>`).join(", ");
@@ -69,15 +66,15 @@ export async function handleVcRecruitConfigView(
 
   const fieldSetups = tInteraction(
     interaction.locale,
-    "commands:vc-recruit-config.embed.field_setups",
+    "vcRecruit:embed.field.name.setups",
   );
   const fieldRoles = tInteraction(
     interaction.locale,
-    "commands:vc-recruit-config.embed.field_roles",
+    "vcRecruit:embed.field.name.roles",
   );
   const viewTitle = tInteraction(
     interaction.locale,
-    "commands:vc-recruit-config.embed.view_title",
+    "vcRecruit:embed.title.config_view",
   );
 
   const embed = createInfoEmbed("", {

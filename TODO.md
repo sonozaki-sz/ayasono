@@ -153,21 +153,45 @@ locales/ja/
 | `title_input_error` | `common:` | warning レベルで表示されるのにキー名が `error` |
 | `title_channel_error` | `common:` | 同上 |
 
-### 5. 新機能実装予定
+### 5. ユーザー向け翻訳の `tDefault` → `tGuild` / `tInteraction` 置換
 
-#### 5.1 各機能リセットコマンド
+ユーザーに表示するEmbed・ボタン・セレクト等で `tDefault`（デフォルト言語固定）を使用している箇所があり、ギルドロケール設定が反映されない。
+
+**対象箇所:**
+
+- [ ] `message-delete` 機能全体（`messageDeleteEmbedBuilder.ts`, `messageDeleteCommand.execute.ts`, `validateOptions.ts`, `runPreviewDialog.ts`, `runFinalConfirmDialog.ts`, `runDeleteExecution.ts`, `runConditionSetupStep.ts`, `runScanPhase.ts`, `buildTargetChannels.ts`, `dialogUtils.ts`, `messageDeleteService.ts`）— 約100箇所
+- [ ] `bumpPanelButtonHandler.ts` — パネル操作応答（約8箇所）
+- [ ] `stickyMessageSet.ts`, `stickyMessageUpdate.ts` — モーダル構築
+- [ ] `memberLogConfigCommand.setJoinMessage.ts`, `memberLogConfigCommand.setLeaveMessage.ts` — モーダル構築
+- [ ] `ValidationError` に渡すメッセージ（各 `*Command.execute.ts`）— `interactionErrorHandler` で catch されユーザーに表示されるが、throw 時点で `tDefault` により言語固定される。設計レベルの検討が必要
+
+### 6. インテグレーションテスト拡充
+
+※ 現状Bumpリマインダーのみインテグレーションテストが存在
+
+- [ ] AFK機能のインテグレーションテスト追加
+- [ ] メッセージ削除機能のインテグレーションテスト追加
+- [ ] VAC機能のインテグレーションテスト追加
+- [ ] メッセージ固定機能のインテグレーションテスト追加
+- [ ] メンバーログ機能のインテグレーションテスト追加
+- [ ] VC募集機能のインテグレーションテスト追加
+- [ ] VC操作コマンドのインテグレーションテスト追加
+
+### 6. 新機能実装予定
+
+#### 6.1 各機能リセットコマンド
 
 - [ ] 機能ごとの設定リセットコマンドを各featureに追加
 
-#### 5.2 プロフィール機能
+#### 6.2 プロフィール機能
 
 - [ ] 仕様書作成（`/user-info` をプロフィール情報と統合して実装予定）
 
-#### 5.3 サポートチャンネル機能（チケット型）
+#### 6.3 サポートチャンネル機能（チケット型）
 
 - [ ] 仕様書作成
 
-#### 5.4 ボタンリアクションロール機能
+#### 6.4 ボタンリアクションロール機能
 
 - [ ] 仕様書作成
 

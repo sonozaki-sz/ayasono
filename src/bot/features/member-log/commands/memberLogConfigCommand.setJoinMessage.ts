@@ -27,18 +27,12 @@ export async function handleMemberLogConfigSetJoinMessage(
 
   const modal = new ModalBuilder()
     .setCustomId(MEMBER_LOG_CONFIG_COMMAND.SET_JOIN_MESSAGE_MODAL_ID)
-    .setTitle(
-      tDefault("commands:member-log-config.modal.set_join_message.title"),
-    );
+    .setTitle(tDefault("memberLog:ui.modal.set_join_message_title"));
 
   const messageInput = new TextInputBuilder()
     .setCustomId(MEMBER_LOG_CONFIG_COMMAND.MODAL_INPUT_MESSAGE)
-    .setLabel(
-      tDefault("commands:member-log-config.modal.set_join_message.label"),
-    )
-    .setPlaceholder(
-      tDefault("commands:member-log-config.modal.set_join_message.placeholder"),
-    )
+    .setLabel(tDefault("memberLog:ui.modal.set_join_message_label"))
+    .setPlaceholder(tDefault("memberLog:ui.modal.set_join_message_placeholder"))
     .setStyle(TextInputStyle.Paragraph)
     .setRequired(true)
     .setMaxLength(500);

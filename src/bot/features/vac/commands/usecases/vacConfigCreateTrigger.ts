@@ -57,7 +57,7 @@ export async function handleVacConfigCreateTrigger(
   );
   if (existingTrigger) {
     throw new ValidationError(
-      tInteraction(interaction.locale, "errors:vac.already_exists"),
+      tInteraction(interaction.locale, "vac:user-response.already_exists"),
     );
   }
 
@@ -67,7 +67,7 @@ export async function handleVacConfigCreateTrigger(
     category.children.cache.size >= VAC_CONFIG_COMMAND.CATEGORY_CHANNEL_LIMIT
   ) {
     throw new ValidationError(
-      tInteraction(interaction.locale, "errors:vac.category_full"),
+      tInteraction(interaction.locale, "vac:user-response.category_full"),
     );
   }
 
@@ -82,18 +82,11 @@ export async function handleVacConfigCreateTrigger(
   await repo.addTriggerChannel(guildId, triggerChannel.id);
 
   const embed = createSuccessEmbed(
-    tInteraction(
-      interaction.locale,
-      "commands:vac-config.embed.trigger_created",
-      {
-        channel: `<#${triggerChannel.id}>`,
-      },
-    ),
+    tInteraction(interaction.locale, "vac:user-response.trigger_created", {
+      channel: `<#${triggerChannel.id}>`,
+    }),
     {
-      title: tInteraction(
-        interaction.locale,
-        "commands:vac-config.embed.success_title",
-      ),
+      title: tInteraction(interaction.locale, "vac:embed.title.success"),
     },
   );
   // 管理系操作の結果は Ephemeral で返してチャンネルノイズを抑える

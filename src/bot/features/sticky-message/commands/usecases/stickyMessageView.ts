@@ -38,7 +38,7 @@ export async function handleStickyMessageView(
         createInfoEmbed(
           tInteraction(
             interaction.locale,
-            "commands:sticky-message.view.empty",
+            "stickyMessage:user-response.view_empty",
           ),
         ),
       ],
@@ -69,7 +69,7 @@ export async function handleStickyMessageView(
     .setPlaceholder(
       tInteraction(
         interaction.locale,
-        "commands:sticky-message.view.select.placeholder",
+        "stickyMessage:ui.select.view_placeholder",
       ),
     )
     .addOptions(options);

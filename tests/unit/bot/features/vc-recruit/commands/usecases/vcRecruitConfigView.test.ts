@@ -118,7 +118,7 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigView", () => 
     expect(interaction.reply).toHaveBeenCalled();
     expect(tInteractionMock).toHaveBeenCalledWith(
       "ja",
-      "commands:vc-recruit-config.embed.top",
+      "vcRecruit:embed.field.value.top",
     );
   });
 
@@ -141,7 +141,7 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigView", () => 
     // setup_item の category 引数に categoryId そのものが渡される
     expect(tInteractionMock).toHaveBeenCalledWith(
       "ja",
-      "commands:vc-recruit-config.embed.setup_item",
+      "vcRecruit:embed.field.value.setup_item",
       expect.objectContaining({ category: "cat-missing" }),
     );
   });

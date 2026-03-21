@@ -121,7 +121,7 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
     await bumpPanelButtonHandler.execute(interaction as never);
 
     expect(safeReplyMock).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "events:bump-reminder.panel.error" }],
+      embeds: [{ message: "bumpReminder:user-response.panel_update_failed" }],
       flags: MessageFlags.Ephemeral,
     });
   });
@@ -132,7 +132,7 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
     await bumpPanelButtonHandler.execute(interaction as never);
 
     expect(safeReplyMock).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "events:bump-reminder.panel.error" }],
+      embeds: [{ message: "bumpReminder:user-response.panel_update_failed" }],
       flags: MessageFlags.Ephemeral,
     });
   });
@@ -147,12 +147,12 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
       expect(getBotBumpReminderConfigService).toHaveBeenCalledTimes(1);
       expect(addMentionUserMock).toHaveBeenCalledWith("guild-1", "user-1");
       expect(createSuccessEmbed).toHaveBeenCalledWith(
-        "events:bump-reminder.panel.mention_toggled_on",
-        { title: "events:bump-reminder.panel.success_title" },
+        "bumpReminder:user-response.panel_mention_toggled_on",
+        { title: "bumpReminder:embed.title.success" },
       );
       expect(safeReplyMock).toHaveBeenCalledWith(interaction, {
         embeds: [
-          { message: "events:bump-reminder.panel.mention_toggled_on" },
+          { message: "bumpReminder:user-response.panel_mention_toggled_on" },
         ],
         flags: MessageFlags.Ephemeral,
       });
@@ -168,8 +168,8 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
       // 削除は呼ばれない（冪等動作）
       expect(removeMentionUserMock).not.toHaveBeenCalled();
       expect(createSuccessEmbed).toHaveBeenCalledWith(
-        "events:bump-reminder.panel.mention_toggled_on",
-        { title: "events:bump-reminder.panel.success_title" },
+        "bumpReminder:user-response.panel_mention_toggled_on",
+        { title: "bumpReminder:embed.title.success" },
       );
     });
 
@@ -180,7 +180,7 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
       await bumpPanelButtonHandler.execute(interaction as never);
 
       expect(safeReplyMock).toHaveBeenCalledWith(interaction, {
-        embeds: [{ message: "events:bump-reminder.panel.error" }],
+        embeds: [{ message: "bumpReminder:user-response.panel_update_failed" }],
         flags: MessageFlags.Ephemeral,
       });
     });
@@ -197,12 +197,12 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
 
       expect(removeMentionUserMock).toHaveBeenCalledWith("guild-1", "user-1");
       expect(createSuccessEmbed).toHaveBeenCalledWith(
-        "events:bump-reminder.panel.mention_toggled_off",
-        { title: "events:bump-reminder.panel.success_title" },
+        "bumpReminder:user-response.panel_mention_toggled_off",
+        { title: "bumpReminder:embed.title.success" },
       );
       expect(safeReplyMock).toHaveBeenCalledWith(interaction, {
         embeds: [
-          { message: "events:bump-reminder.panel.mention_toggled_off" },
+          { message: "bumpReminder:user-response.panel_mention_toggled_off" },
         ],
         flags: MessageFlags.Ephemeral,
       });
@@ -220,8 +220,8 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
       // 追加は呼ばれない（冪等動作）
       expect(addMentionUserMock).not.toHaveBeenCalled();
       expect(createSuccessEmbed).toHaveBeenCalledWith(
-        "events:bump-reminder.panel.mention_toggled_off",
-        { title: "events:bump-reminder.panel.success_title" },
+        "bumpReminder:user-response.panel_mention_toggled_off",
+        { title: "bumpReminder:embed.title.success" },
       );
     });
 
@@ -234,7 +234,7 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
       await bumpPanelButtonHandler.execute(interaction as never);
 
       expect(safeReplyMock).toHaveBeenCalledWith(interaction, {
-        embeds: [{ message: "events:bump-reminder.panel.error" }],
+        embeds: [{ message: "bumpReminder:user-response.panel_update_failed" }],
         flags: MessageFlags.Ephemeral,
       });
     });
@@ -249,16 +249,16 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
       await bumpPanelButtonHandler.execute(interaction as never);
 
       expect(logger.error).toHaveBeenCalledWith(
-        expect.stringContaining("system:bump-reminder.panel_handle_failed"),
+        expect.stringContaining("bumpReminder:log.panel_handle_failed"),
         expect.any(Error),
       );
       expect(tDefault).toHaveBeenCalledWith("common:title_operation_error");
       expect(createErrorEmbed).toHaveBeenCalledWith(
-        "events:bump-reminder.panel.error",
+        "bumpReminder:user-response.panel_update_failed",
         { title: "common:title_operation_error" },
       );
       expect(safeReplyMock).toHaveBeenCalledWith(interaction, {
-        embeds: [{ message: "events:bump-reminder.panel.error" }],
+        embeds: [{ message: "bumpReminder:user-response.panel_update_failed" }],
         flags: MessageFlags.Ephemeral,
       });
     });
@@ -271,11 +271,11 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
       await bumpPanelButtonHandler.execute(interaction as never);
 
       expect(logger.error).toHaveBeenCalledWith(
-        expect.stringContaining("system:bump-reminder.panel_handle_failed"),
+        expect.stringContaining("bumpReminder:log.panel_handle_failed"),
         expect.any(Error),
       );
       expect(logger.error).toHaveBeenCalledWith(
-        expect.stringContaining("system:bump-reminder.panel_reply_failed"),
+        expect.stringContaining("bumpReminder:log.panel_reply_failed"),
         expect.any(Error),
       );
     });

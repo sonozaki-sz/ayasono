@@ -26,14 +26,14 @@ export async function buildVcRecruitPanelComponents(
   embed: EmbedBuilder;
   row: ActionRowBuilder<ButtonBuilder>;
 }> {
-  const panelTitle = await tGuild(guildId, "commands:vcRecruit.panel.title");
+  const panelTitle = await tGuild(guildId, "vcRecruit:embed.title.panel");
   const panelDescription = await tGuild(
     guildId,
-    "commands:vcRecruit.panel.description",
+    "vcRecruit:embed.description.panel",
   );
   const createButtonLabel = await tGuild(
     guildId,
-    "commands:vcRecruit.panel.create_button",
+    "vcRecruit:ui.button.create_recruit",
   );
 
   const embed = new EmbedBuilder()

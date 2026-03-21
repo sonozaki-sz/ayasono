@@ -122,7 +122,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.setChannel", (
     await handleMemberLogConfigSetChannel(interaction as never, "guild-1");
 
     expect(loggerInfoMock).toHaveBeenCalledWith(
-      expect.stringContaining("system:member-log.config_set_channel"),
+      expect.stringContaining("memberLog:log.config_set_channel"),
     );
   });
 

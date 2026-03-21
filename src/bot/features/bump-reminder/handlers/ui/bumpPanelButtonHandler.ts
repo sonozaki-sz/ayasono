@@ -64,9 +64,12 @@ export const bumpPanelButtonHandler: ButtonHandler = {
         // customId の guild と実行 guild が一致しない操作は拒否
         await safeReply(interaction, {
           embeds: [
-            createWarningEmbed(tDefault("events:bump-reminder.panel.error"), {
-              title: tDefault("common:title_operation_error"),
-            }),
+            createWarningEmbed(
+              tDefault("bumpReminder:user-response.panel_update_failed"),
+              {
+                title: tDefault("common:title_operation_error"),
+              },
+            ),
           ],
           flags: MessageFlags.Ephemeral,
         });
@@ -78,7 +81,7 @@ export const bumpPanelButtonHandler: ButtonHandler = {
       // 成功系レスポンスで使う共通タイトル
       const successTitle = tInteraction(
         interaction.locale,
-        "events:bump-reminder.panel.success_title",
+        "bumpReminder:embed.title.success",
       );
 
       if (isOnButton) {
@@ -95,9 +98,12 @@ export const bumpPanelButtonHandler: ButtonHandler = {
           // 設定未初期化時はwarningで通知
           await safeReply(interaction, {
             embeds: [
-              createWarningEmbed(tDefault("events:bump-reminder.panel.error"), {
-                title: tDefault("common:title_not_configured"),
-              }),
+              createWarningEmbed(
+                tDefault("bumpReminder:user-response.panel_update_failed"),
+                {
+                  title: tDefault("common:title_not_configured"),
+                },
+              ),
             ],
             flags: MessageFlags.Ephemeral,
           });
@@ -110,7 +116,7 @@ export const bumpPanelButtonHandler: ButtonHandler = {
             createSuccessEmbed(
               tInteraction(
                 interaction.locale,
-                "events:bump-reminder.panel.mention_toggled_on",
+                "bumpReminder:user-response.panel_mention_toggled_on",
               ),
               { title: successTitle },
             ),
@@ -121,7 +127,7 @@ export const bumpPanelButtonHandler: ButtonHandler = {
         logger.debug(
           logPrefixed(
             "system:log_prefix.bump_reminder",
-            "system:bump-reminder.panel_mention_updated",
+            "bumpReminder:log.panel_mention_updated",
             {
               action: "on",
               userId,
@@ -144,9 +150,12 @@ export const bumpPanelButtonHandler: ButtonHandler = {
           // 設定未初期化時はwarningで通知
           await safeReply(interaction, {
             embeds: [
-              createWarningEmbed(tDefault("events:bump-reminder.panel.error"), {
-                title: tDefault("common:title_not_configured"),
-              }),
+              createWarningEmbed(
+                tDefault("bumpReminder:user-response.panel_update_failed"),
+                {
+                  title: tDefault("common:title_not_configured"),
+                },
+              ),
             ],
             flags: MessageFlags.Ephemeral,
           });
@@ -159,7 +168,7 @@ export const bumpPanelButtonHandler: ButtonHandler = {
             createSuccessEmbed(
               tInteraction(
                 interaction.locale,
-                "events:bump-reminder.panel.mention_toggled_off",
+                "bumpReminder:user-response.panel_mention_toggled_off",
               ),
               { title: successTitle },
             ),
@@ -170,7 +179,7 @@ export const bumpPanelButtonHandler: ButtonHandler = {
         logger.debug(
           logPrefixed(
             "system:log_prefix.bump_reminder",
-            "system:bump-reminder.panel_mention_updated",
+            "bumpReminder:log.panel_mention_updated",
             {
               action: "off",
               userId,
@@ -184,16 +193,19 @@ export const bumpPanelButtonHandler: ButtonHandler = {
       logger.error(
         logPrefixed(
           "system:log_prefix.bump_reminder",
-          "system:bump-reminder.panel_handle_failed",
+          "bumpReminder:log.panel_handle_failed",
         ),
         error,
       );
       try {
         await safeReply(interaction, {
           embeds: [
-            createErrorEmbed(tDefault("events:bump-reminder.panel.error"), {
-              title: tDefault("common:title_operation_error"),
-            }),
+            createErrorEmbed(
+              tDefault("bumpReminder:user-response.panel_update_failed"),
+              {
+                title: tDefault("common:title_operation_error"),
+              },
+            ),
           ],
           flags: MessageFlags.Ephemeral,
         });
@@ -201,7 +213,7 @@ export const bumpPanelButtonHandler: ButtonHandler = {
         logger.error(
           logPrefixed(
             "system:log_prefix.bump_reminder",
-            "system:bump-reminder.panel_reply_failed",
+            "bumpReminder:log.panel_reply_failed",
           ),
           replyError,
         );

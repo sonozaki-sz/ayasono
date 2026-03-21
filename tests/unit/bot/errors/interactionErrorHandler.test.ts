@@ -37,8 +37,8 @@ vi.mock("@/shared/utils/logger", () => ({
 // i18n のモック
 const mockTDefault = (key: string, params?: Record<string, unknown>) => {
   const translations: Record<string, string> = {
-    "errors:general.unexpected_production": "予期しないエラーが発生しました。",
-    "errors:general.unexpected_with_message": `予期しないエラー: ${params?.message || ""}`,
+    "common:general.unexpected_production": "予期しないエラーが発生しました。",
+    "common:general.unexpected_with_message": `予期しないエラー: ${params?.message || ""}`,
     "system:error.reply_failed": "返信に失敗しました",
     "system:error.base_error_log": `[${params?.errorName || ""}] ${params?.message || ""}`,
     "system:error.unhandled_error_log": `[UnhandledError] ${params?.message || ""}`,
@@ -50,7 +50,7 @@ vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: (key: string, params?: Record<string, unknown>) =>
     mockTDefault(key, params),
   tGuild: async (_guildId: string, key: string) => {
-    if (key === "errors:validation.error_title") {
+    if (key === "common:validation.error_title") {
       return "サーバー検証エラー";
     }
     return key;

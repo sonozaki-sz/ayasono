@@ -7,8 +7,8 @@ import { logger } from "../../../../shared/utils/logger";
 import { getBotVcRecruitRepository } from "../../../services/botCompositionRoot";
 
 const VC_RECRUIT_LOG_KEYS = {
-  EMPTY_VC_DELETED: "system:vc-recruit.empty_vc_deleted",
-  VOICE_STATE_UPDATE_ERROR: "system:vc-recruit.voice_state_update_error",
+  EMPTY_VC_DELETED: "vcRecruit:log.empty_vc_deleted",
+  VOICE_STATE_UPDATE_ERROR: "vcRecruit:log.voice_state_update_error",
 } as const;
 
 /**

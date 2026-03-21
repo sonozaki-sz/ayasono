@@ -39,7 +39,7 @@ export async function sendBumpReminder(
       logger.warn(
         logPrefixed(
           "system:log_prefix.bump_reminder",
-          "system:scheduler.bump_reminder_channel_not_found",
+          "bumpReminder:log.scheduler_channel_not_found",
           {
             channelId,
             guildId,
@@ -57,7 +57,7 @@ export async function sendBumpReminder(
       logger.debug(
         logPrefixed(
           "system:log_prefix.bump_reminder",
-          "system:scheduler.bump_reminder_disabled",
+          "bumpReminder:log.scheduler_disabled",
           {
             guildId,
           },
@@ -91,8 +91,8 @@ export async function sendBumpReminder(
     const serviceKey = serviceName?.toLowerCase();
     const messageKey = (
       serviceKey
-        ? `events:bump-reminder.reminder_message.${serviceKey}`
-        : "events:bump-reminder.reminder_message"
+        ? `bumpReminder:user-response.reminder_message_${serviceKey}`
+        : "bumpReminder:user-response.reminder_message"
     ) as ParseKeys<AllNamespaces>;
     const reminderMessage = tGuild(messageKey);
 
@@ -121,7 +121,7 @@ export async function sendBumpReminder(
     logger.info(
       logPrefixed(
         "system:log_prefix.bump_reminder",
-        "system:scheduler.bump_reminder_sent",
+        "bumpReminder:log.scheduler_sent",
         {
           guildId,
           channelId,
@@ -135,7 +135,7 @@ export async function sendBumpReminder(
     logger.error(
       logPrefixed(
         "system:log_prefix.bump_reminder",
-        "system:scheduler.bump_reminder_send_failed",
+        "bumpReminder:log.scheduler_send_failed",
         {
           guildId,
           channelId,
@@ -174,7 +174,7 @@ async function deletePanelMessage(
         logger.debug(
           logPrefixed(
             "system:log_prefix.bump_reminder",
-            "system:scheduler.bump_reminder_panel_deleted",
+            "bumpReminder:log.scheduler_panel_deleted",
             {
               panelMessageId,
               guildId,
@@ -188,7 +188,7 @@ async function deletePanelMessage(
     logger.debug(
       logPrefixed(
         "system:log_prefix.bump_reminder",
-        "system:scheduler.bump_reminder_panel_delete_failed",
+        "bumpReminder:log.scheduler_panel_delete_failed",
         {
           panelMessageId,
         },

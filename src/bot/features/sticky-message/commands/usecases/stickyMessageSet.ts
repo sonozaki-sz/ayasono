@@ -42,12 +42,12 @@ export async function handleStickyMessageSet(
         createWarningEmbed(
           tInteraction(
             interaction.locale,
-            "commands:sticky-message.errors.text_channel_only",
+            "stickyMessage:user-response.text_channel_only",
           ),
           {
             title: tInteraction(
               interaction.locale,
-              "common:title_channel_error",
+              "common:title_channel_invalid",
             ),
           },
         ),
@@ -67,7 +67,7 @@ export async function handleStickyMessageSet(
         createWarningEmbed(
           tInteraction(
             interaction.locale,
-            "commands:sticky-message.set.alreadyExists.description",
+            "stickyMessage:user-response.already_exists",
           ),
           {
             title: tInteraction(
@@ -92,17 +92,13 @@ export async function handleStickyMessageSet(
       .setCustomId(
         `${STICKY_MESSAGE_COMMAND.SET_EMBED_MODAL_ID_PREFIX}${targetChannel.id}`,
       )
-      .setTitle(tDefault("commands:sticky-message.set.embed-modal.title"));
+      .setTitle(tDefault("stickyMessage:ui.modal.set_embed_title"));
 
     const titleInput = new TextInputBuilder()
       .setCustomId(STICKY_MESSAGE_COMMAND.MODAL_INPUT.EMBED_TITLE)
-      .setLabel(
-        tDefault("commands:sticky-message.set.embed-modal.embed-title.label"),
-      )
+      .setLabel(tDefault("stickyMessage:ui.modal.set_embed_title_label"))
       .setPlaceholder(
-        tDefault(
-          "commands:sticky-message.set.embed-modal.embed-title.placeholder",
-        ),
+        tDefault("stickyMessage:ui.modal.set_embed_title_placeholder"),
       )
       .setStyle(TextInputStyle.Short)
       .setRequired(false)
@@ -110,15 +106,9 @@ export async function handleStickyMessageSet(
 
     const descriptionInput = new TextInputBuilder()
       .setCustomId(STICKY_MESSAGE_COMMAND.MODAL_INPUT.EMBED_DESCRIPTION)
-      .setLabel(
-        tDefault(
-          "commands:sticky-message.set.embed-modal.embed-description.label",
-        ),
-      )
+      .setLabel(tDefault("stickyMessage:ui.modal.set_embed_description_label"))
       .setPlaceholder(
-        tDefault(
-          "commands:sticky-message.set.embed-modal.embed-description.placeholder",
-        ),
+        tDefault("stickyMessage:ui.modal.set_embed_description_placeholder"),
       )
       .setStyle(TextInputStyle.Paragraph)
       .setRequired(false)
@@ -126,13 +116,9 @@ export async function handleStickyMessageSet(
 
     const colorInput = new TextInputBuilder()
       .setCustomId(STICKY_MESSAGE_COMMAND.MODAL_INPUT.EMBED_COLOR)
-      .setLabel(
-        tDefault("commands:sticky-message.set.embed-modal.embed-color.label"),
-      )
+      .setLabel(tDefault("stickyMessage:ui.modal.set_embed_color_label"))
       .setPlaceholder(
-        tDefault(
-          "commands:sticky-message.set.embed-modal.embed-color.placeholder",
-        ),
+        tDefault("stickyMessage:ui.modal.set_embed_color_placeholder"),
       )
       .setStyle(TextInputStyle.Short)
       .setRequired(false)
@@ -151,13 +137,13 @@ export async function handleStickyMessageSet(
       .setCustomId(
         `${STICKY_MESSAGE_COMMAND.SET_MODAL_ID_PREFIX}${targetChannel.id}`,
       )
-      .setTitle(tDefault("commands:sticky-message.set.modal.title"));
+      .setTitle(tDefault("stickyMessage:ui.modal.set_title"));
 
     const messageInput = new TextInputBuilder()
       .setCustomId(STICKY_MESSAGE_COMMAND.MODAL_INPUT.MESSAGE)
-      .setLabel(tDefault("commands:sticky-message.set.modal.message.label"))
+      .setLabel(tDefault("stickyMessage:ui.modal.set_message_label"))
       .setPlaceholder(
-        tDefault("commands:sticky-message.set.modal.message.placeholder"),
+        tDefault("stickyMessage:ui.modal.set_message_placeholder"),
       )
       .setStyle(TextInputStyle.Paragraph)
       .setRequired(true)

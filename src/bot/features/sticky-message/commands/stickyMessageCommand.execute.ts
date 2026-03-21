@@ -41,7 +41,7 @@ export async function executeStickyMessageCommand(
       throw new ValidationError(
         tInteraction(
           interaction.locale,
-          "commands:sticky-message.errors.permissionDenied",
+          "stickyMessage:user-response.permission_denied",
         ),
       );
     }

@@ -99,7 +99,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.disable", () =
     await handleMemberLogConfigDisable(makeInteraction() as never, "guild-1");
 
     expect(loggerInfoMock).toHaveBeenCalledWith(
-      expect.stringContaining("system:member-log.config_disabled"),
+      expect.stringContaining("memberLog:log.config_disabled"),
     );
   });
 });

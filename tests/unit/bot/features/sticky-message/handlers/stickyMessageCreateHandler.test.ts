@@ -99,7 +99,7 @@ describe("bot/features/sticky-message/handlers/stickyMessageCreateHandler", () =
     await handleStickyMessageCreate(message as never);
 
     expect(loggerMock.error).toHaveBeenCalledWith(
-      expect.stringContaining("system:sticky-message.create_handler_error"),
+      expect.stringContaining("stickyMessage:log.create_handler_error"),
       expect.objectContaining({ channelId: "channel-1" }),
     );
   });

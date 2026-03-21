@@ -63,11 +63,14 @@ export const vcPanelButtonHandler: ButtonHandler = {
       await safeReply(interaction, {
         embeds: [
           createWarningEmbed(
-            tInteraction(interaction.locale, "errors:vac.not_vac_channel"),
+            tInteraction(
+              interaction.locale,
+              "vac:user-response.not_vac_channel",
+            ),
             {
               title: tInteraction(
                 interaction.locale,
-                "common:title_channel_error",
+                "common:title_channel_invalid",
               ),
             },
           ),
@@ -82,11 +85,14 @@ export const vcPanelButtonHandler: ButtonHandler = {
       await safeReply(interaction, {
         embeds: [
           createWarningEmbed(
-            tInteraction(interaction.locale, "errors:vac.not_vac_channel"),
+            tInteraction(
+              interaction.locale,
+              "vac:user-response.not_vac_channel",
+            ),
             {
               title: tInteraction(
                 interaction.locale,
-                "common:title_channel_error",
+                "common:title_channel_invalid",
               ),
             },
           ),
@@ -104,7 +110,7 @@ export const vcPanelButtonHandler: ButtonHandler = {
       await safeReply(interaction, {
         embeds: [
           createWarningEmbed(
-            tInteraction(interaction.locale, "errors:vac.not_in_vc"),
+            tInteraction(interaction.locale, "vac:user-response.not_in_vc"),
             {
               title: tInteraction(interaction.locale, "common:title_not_in_vc"),
             },
@@ -118,10 +124,7 @@ export const vcPanelButtonHandler: ButtonHandler = {
     if (
       interaction.customId.startsWith(VAC_PANEL_CUSTOM_ID.RENAME_BUTTON_PREFIX)
     ) {
-      const title = tInteraction(
-        interaction.locale,
-        "commands:vac.panel.rename_button",
-      );
+      const title = tInteraction(interaction.locale, "vac:ui.button.rename");
       const modal = new ModalBuilder()
         .setCustomId(`${VAC_PANEL_CUSTOM_ID.RENAME_MODAL_PREFIX}${channel.id}`)
         .setTitle(title)
@@ -143,10 +146,7 @@ export const vcPanelButtonHandler: ButtonHandler = {
     if (
       interaction.customId.startsWith(VAC_PANEL_CUSTOM_ID.LIMIT_BUTTON_PREFIX)
     ) {
-      const title = tInteraction(
-        interaction.locale,
-        "commands:vac.panel.limit_button",
-      );
+      const title = tInteraction(interaction.locale, "vac:ui.button.limit");
       const modal = new ModalBuilder()
         .setCustomId(`${VAC_PANEL_CUSTOM_ID.LIMIT_MODAL_PREFIX}${channel.id}`)
         .setTitle(title)
@@ -158,7 +158,7 @@ export const vcPanelButtonHandler: ButtonHandler = {
               .setPlaceholder(
                 tInteraction(
                   interaction.locale,
-                  "commands:vac.panel.limit_input_placeholder",
+                  "vac:ui.modal.limit_placeholder",
                 ),
               )
               .setStyle(TextInputStyle.Short)
@@ -180,7 +180,7 @@ export const vcPanelButtonHandler: ButtonHandler = {
         await safeReply(interaction, {
           embeds: [
             createWarningEmbed(
-              tInteraction(interaction.locale, "errors:vac.not_in_vc"),
+              tInteraction(interaction.locale, "vac:user-response.not_in_vc"),
               {
                 title: tInteraction(
                   interaction.locale,
@@ -204,9 +204,7 @@ export const vcPanelButtonHandler: ButtonHandler = {
 
       const selectMenu = new StringSelectMenuBuilder()
         .setCustomId(`${VAC_PANEL_CUSTOM_ID.AFK_SELECT_PREFIX}${channel.id}`)
-        .setPlaceholder(
-          tInteraction(interaction.locale, "commands:vac.panel.afk_button"),
-        )
+        .setPlaceholder(tInteraction(interaction.locale, "vac:ui.button.afk"))
         .setMinValues(1)
         .setMaxValues(Math.min(25, vcMembers.length))
         .addOptions(options);
@@ -235,7 +233,7 @@ export const vcPanelButtonHandler: ButtonHandler = {
           createSuccessEmbed(
             tInteraction(
               interaction.locale,
-              "commands:vac.embed.panel_refreshed",
+              "vac:user-response.panel_refreshed",
             ),
           ),
         ],

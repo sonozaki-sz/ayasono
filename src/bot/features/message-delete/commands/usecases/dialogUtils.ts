@@ -94,9 +94,9 @@ export const MODAL_FILTER_CONFIG: Map<string, ModalFilterConfig> = new Map<
     {
       modalId: MSG_DEL_CUSTOM_ID.MODAL_KEYWORD,
       inputId: MSG_DEL_CUSTOM_ID.MODAL_INPUT_KEYWORD,
-      titleKey: "commands:message-delete.modal.keyword.title",
-      labelKey: "commands:message-delete.modal.keyword.label",
-      placeholderKey: "commands:message-delete.modal.keyword.placeholder",
+      titleKey: "messageDelete:ui.modal.keyword_title",
+      labelKey: "messageDelete:ui.modal.keyword_label",
+      placeholderKey: "messageDelete:ui.modal.keyword_placeholder",
       apply: (value, current) => ({
         filter: { ...current, keyword: value || undefined },
       }),
@@ -107,17 +107,16 @@ export const MODAL_FILTER_CONFIG: Map<string, ModalFilterConfig> = new Map<
     {
       modalId: MSG_DEL_CUSTOM_ID.MODAL_DAYS,
       inputId: MSG_DEL_CUSTOM_ID.MODAL_INPUT_DAYS,
-      titleKey: "commands:message-delete.modal.days.title",
-      labelKey: "commands:message-delete.modal.days.label",
-      placeholderKey: "commands:message-delete.modal.days.placeholder",
+      titleKey: "messageDelete:ui.modal.days_title",
+      labelKey: "messageDelete:ui.modal.days_label",
+      placeholderKey: "messageDelete:ui.modal.days_placeholder",
       apply: (value, current) => {
         if (!value) return { filter: { ...current, days: undefined } };
         const days = parseInt(value, 10);
         if (isNaN(days) || days < 1) {
           return {
             filter: current,
-            errorKey:
-              "commands:message-delete.errors.days_invalid_value" as const,
+            errorKey: "messageDelete:user-response.days_invalid_value" as const,
           };
         }
         return {
@@ -131,9 +130,9 @@ export const MODAL_FILTER_CONFIG: Map<string, ModalFilterConfig> = new Map<
     {
       modalId: MSG_DEL_CUSTOM_ID.MODAL_AFTER,
       inputId: MSG_DEL_CUSTOM_ID.MODAL_INPUT_AFTER,
-      titleKey: "commands:message-delete.modal.after.title",
-      labelKey: "commands:message-delete.modal.after.label",
-      placeholderKey: "commands:message-delete.modal.after.placeholder",
+      titleKey: "messageDelete:ui.modal.after_title",
+      labelKey: "messageDelete:ui.modal.after_label",
+      placeholderKey: "messageDelete:ui.modal.after_placeholder",
       apply: (value, current, timezoneOffset) => {
         if (!value) return { filter: { ...current, after: undefined } };
         const afterDate = parseDateStr(value, false, timezoneOffset);
@@ -141,14 +140,13 @@ export const MODAL_FILTER_CONFIG: Map<string, ModalFilterConfig> = new Map<
           return {
             filter: current,
             errorKey:
-              "commands:message-delete.errors.after_invalid_format" as const,
+              "messageDelete:user-response.after_invalid_format" as const,
           };
         }
         if (current.before && afterDate >= current.before) {
           return {
             filter: current,
-            errorKey:
-              "commands:message-delete.errors.date_range_invalid" as const,
+            errorKey: "messageDelete:user-response.date_range_invalid" as const,
           };
         }
         // afterRaw: ボタンラベルにユーザー入力値をそのまま表示するために保存
@@ -168,9 +166,9 @@ export const MODAL_FILTER_CONFIG: Map<string, ModalFilterConfig> = new Map<
     {
       modalId: MSG_DEL_CUSTOM_ID.MODAL_BEFORE,
       inputId: MSG_DEL_CUSTOM_ID.MODAL_INPUT_BEFORE,
-      titleKey: "commands:message-delete.modal.before.title",
-      labelKey: "commands:message-delete.modal.before.label",
-      placeholderKey: "commands:message-delete.modal.before.placeholder",
+      titleKey: "messageDelete:ui.modal.before_title",
+      labelKey: "messageDelete:ui.modal.before_label",
+      placeholderKey: "messageDelete:ui.modal.before_placeholder",
       apply: (value, current, timezoneOffset) => {
         if (!value) return { filter: { ...current, before: undefined } };
         const beforeDate = parseDateStr(value, true, timezoneOffset);
@@ -178,14 +176,13 @@ export const MODAL_FILTER_CONFIG: Map<string, ModalFilterConfig> = new Map<
           return {
             filter: current,
             errorKey:
-              "commands:message-delete.errors.before_invalid_format" as const,
+              "messageDelete:user-response.before_invalid_format" as const,
           };
         }
         if (current.after && current.after >= beforeDate) {
           return {
             filter: current,
-            errorKey:
-              "commands:message-delete.errors.date_range_invalid" as const,
+            errorKey: "messageDelete:user-response.date_range_invalid" as const,
           };
         }
         // beforeRaw: ボタンラベルにユーザー入力値をそのまま表示するために保存
@@ -274,16 +271,16 @@ export async function showJumpModal(
 ): Promise<string | null> {
   const modal = new ModalBuilder()
     .setCustomId(MSG_DEL_CUSTOM_ID.MODAL_JUMP)
-    .setTitle(tDefault("commands:message-delete.modal.jump.title"))
+    .setTitle(tDefault("messageDelete:ui.modal.jump_title"))
     .addComponents(
       new ActionRowBuilder<TextInputBuilder>().addComponents(
         new TextInputBuilder()
           .setCustomId(MSG_DEL_CUSTOM_ID.MODAL_INPUT_JUMP)
-          .setLabel(tDefault("commands:message-delete.modal.jump.label"))
+          .setLabel(tDefault("messageDelete:ui.modal.jump_label"))
           .setStyle(TextInputStyle.Short)
           .setRequired(true)
           .setPlaceholder(
-            tDefault("commands:message-delete.modal.jump.placeholder", {
+            tDefault("messageDelete:ui.modal.jump_placeholder", {
               total: totalPages,
             }),
           ),

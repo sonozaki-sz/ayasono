@@ -56,7 +56,7 @@ export async function handleChatInputCommand(
   if (remaining > 0) {
     const cooldownMessage = tInteraction(
       interaction.locale,
-      "commands:cooldown.wait",
+      "common:cooldown.wait",
       {
         seconds: remaining,
       },

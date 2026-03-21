@@ -39,7 +39,7 @@ export async function handleBumpDetected(
       logger.debug(
         logPrefixed(
           "system:log_prefix.bump_reminder",
-          "system:scheduler.bump_reminder_disabled",
+          "bumpReminder:log.scheduler_disabled",
           { guildId },
         ),
       );
@@ -52,7 +52,7 @@ export async function handleBumpDetected(
       logger.debug(
         logPrefixed(
           "system:log_prefix.bump_reminder",
-          "system:scheduler.bump_reminder_unregistered_channel",
+          "bumpReminder:log.scheduler_unregistered_channel",
           {
             channelId,
             expectedChannelId: config.channelId,
@@ -92,7 +92,7 @@ export async function handleBumpDetected(
     logger.info(
       logPrefixed(
         "system:log_prefix.bump_reminder",
-        "system:bump-reminder.detected",
+        "bumpReminder:log.detected",
         {
           guildId,
           service: serviceName,
@@ -103,7 +103,7 @@ export async function handleBumpDetected(
     logger.error(
       logPrefixed(
         "system:log_prefix.bump_reminder",
-        "system:bump-reminder.detection_failed",
+        "bumpReminder:log.detection_failed",
         {
           guildId,
         },
@@ -152,7 +152,7 @@ async function deleteOldPanel(
         logger.debug(
           logPrefixed(
             "system:log_prefix.bump_reminder",
-            "system:scheduler.bump_reminder_panel_deleted",
+            "bumpReminder:log.scheduler_panel_deleted",
             {
               panelMessageId: pendingReminder.panelMessageId,
               guildId,
@@ -166,7 +166,7 @@ async function deleteOldPanel(
     logger.debug(
       logPrefixed(
         "system:log_prefix.bump_reminder",
-        "system:scheduler.bump_reminder_panel_delete_failed",
+        "bumpReminder:log.scheduler_panel_delete_failed",
         {
           panelMessageId: "unknown",
         },

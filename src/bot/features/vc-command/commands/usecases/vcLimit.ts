@@ -22,7 +22,7 @@ export async function executeVcLimit(
 
   if (limit < VC_COMMAND.LIMIT_MIN || limit > VC_COMMAND.LIMIT_MAX) {
     throw new ValidationError(
-      tInteraction(interaction.locale, "errors:vc.limit_out_of_range"),
+      tInteraction(interaction.locale, "vc:user-response.limit_out_of_range"),
     );
   }
 
@@ -32,10 +32,10 @@ export async function executeVcLimit(
 
   const limitLabel =
     limit === 0
-      ? tInteraction(interaction.locale, "commands:vc.embed.unlimited")
+      ? tInteraction(interaction.locale, "vc:user-response.unlimited")
       : String(limit);
   const embed = createSuccessEmbed(
-    tInteraction(interaction.locale, "commands:vc.embed.limit_changed", {
+    tInteraction(interaction.locale, "vc:user-response.limit_changed", {
       limit: limitLabel,
     }),
   );

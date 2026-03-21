@@ -62,12 +62,12 @@ export const stickyMessageSetModalHandler: ModalHandler = {
           createWarningEmbed(
             tInteraction(
               interaction.locale,
-              "commands:sticky-message.errors.emptyMessage",
+              "stickyMessage:user-response.empty_message",
             ),
             {
               title: tInteraction(
                 interaction.locale,
-                "common:title_input_error",
+                "common:title_invalid_input",
               ),
             },
           ),
@@ -87,7 +87,7 @@ export const stickyMessageSetModalHandler: ModalHandler = {
           createWarningEmbed(
             tInteraction(
               interaction.locale,
-              "commands:sticky-message.set.alreadyExists.description",
+              "stickyMessage:user-response.already_exists",
             ),
             {
               title: tInteraction(
@@ -114,7 +114,7 @@ export const stickyMessageSetModalHandler: ModalHandler = {
       throw new ValidationError(
         tInteraction(
           interaction.locale,
-          "commands:sticky-message.errors.text_channel_only",
+          "stickyMessage:user-response.text_channel_only",
         ),
       );
     }
@@ -141,12 +141,12 @@ export const stickyMessageSetModalHandler: ModalHandler = {
           createSuccessEmbed(
             tInteraction(
               interaction.locale,
-              "commands:sticky-message.set.success.description",
+              "stickyMessage:user-response.set_success",
             ),
             {
               title: tInteraction(
                 interaction.locale,
-                "commands:sticky-message.set.success.title",
+                "stickyMessage:embed.title.set_success",
               ),
             },
           ),
@@ -157,7 +157,7 @@ export const stickyMessageSetModalHandler: ModalHandler = {
       logger.error(
         logPrefixed(
           "system:log_prefix.sticky_message",
-          "system:sticky-message.set_failed",
+          "stickyMessage:log.set_failed",
           { channelId, guildId },
         ),
         { channelId, guildId, err },

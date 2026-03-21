@@ -90,11 +90,11 @@ describe("bot/features/vc-panel/vcControlPanel", () => {
 
     await sendVcControlPanel(voiceChannel as never);
 
-    expect(tGuild).toHaveBeenCalledWith("guild-1", "commands:vac.panel.title");
+    expect(tGuild).toHaveBeenCalledWith("guild-1", "vac:embed.title.panel");
     expect(createInfoEmbed).toHaveBeenCalledWith(
-      "commands:vac.panel.description",
+      "vac:embed.description.panel",
       {
-        title: "commands:vac.panel.title",
+        title: "vac:embed.title.panel",
       },
     );
 

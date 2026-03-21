@@ -9,7 +9,10 @@ import {
   StringSelectMenuBuilder,
 } from "discord.js";
 import { tDefault } from "../../../../shared/locale/localeManager";
-import { STATUS_COLORS } from "../../../utils/messageResponse";
+import {
+  STATUS_COLORS,
+  createSuccessEmbed,
+} from "../../../utils/messageResponse";
 import {
   MSG_DEL_CUSTOM_ID,
   MSG_DEL_DEFAULT_COUNT,
@@ -41,9 +44,9 @@ function buildMessageField(
   const header = `[${displayIndex}] <t:${Math.floor(m.createdAt.getTime() / 1000)}:f>`;
   const meta = `<@${m.authorId}> | <#${m.channelId}>`;
   const content =
-    m.content || tDefault("commands:message-delete.result.empty_content");
+    m.content || tDefault("messageDelete:embed.field.value.empty_content");
   const messageUrl = `https://discord.com/channels/${m.guildId}/${m.channelId}/${m.messageId}`;
-  const linkLabel = tDefault("commands:message-delete.result.jump_to_message");
+  const linkLabel = tDefault("messageDelete:embed.field.value.jump_to_message");
 
   if (isExcluded) {
     return {
@@ -107,19 +110,19 @@ function buildPaginationNavRow(
     new ButtonBuilder()
       .setCustomId(MSG_DEL_CUSTOM_ID.FIRST)
       .setEmoji("⏮")
-      .setLabel(tDefault("commands:message-delete.pagination.btn_first"))
+      .setLabel(tDefault("common:ui.button.page_first"))
       .setStyle(ButtonStyle.Secondary)
       .setDisabled(page === 0),
     new ButtonBuilder()
       .setCustomId(MSG_DEL_CUSTOM_ID.PREV)
       .setEmoji("◀")
-      .setLabel(tDefault("commands:message-delete.pagination.btn_prev"))
+      .setLabel(tDefault("common:ui.button.page_prev"))
       .setStyle(ButtonStyle.Secondary)
       .setDisabled(page === 0),
     new ButtonBuilder()
       .setCustomId(MSG_DEL_CUSTOM_ID.JUMP)
       .setLabel(
-        tDefault("commands:message-delete.pagination.btn_jump", {
+        tDefault("common:ui.button.page_jump", {
           page: page + 1,
           total: Math.max(1, totalPages),
         }),
@@ -129,13 +132,13 @@ function buildPaginationNavRow(
     new ButtonBuilder()
       .setCustomId(MSG_DEL_CUSTOM_ID.NEXT)
       .setEmoji("▶")
-      .setLabel(tDefault("commands:message-delete.pagination.btn_next"))
+      .setLabel(tDefault("common:ui.button.page_next"))
       .setStyle(ButtonStyle.Secondary)
       .setDisabled(page >= totalPages - 1),
     new ButtonBuilder()
       .setCustomId(MSG_DEL_CUSTOM_ID.LAST)
       .setEmoji("⏭")
-      .setLabel(tDefault("commands:message-delete.pagination.btn_last"))
+      .setLabel(tDefault("common:ui.button.page_last"))
       .setStyle(ButtonStyle.Secondary)
       .setDisabled(page >= totalPages - 1),
   );
@@ -156,7 +159,7 @@ export function buildPreviewEmbed(
   excludedIds: ReadonlySet<string>,
 ): EmbedBuilder {
   const embed = new EmbedBuilder().setColor(STATUS_COLORS.info).setTitle(
-    tDefault("commands:message-delete.confirm.embed_title", {
+    tDefault("messageDelete:embed.title.confirm", {
       page: page + 1,
       total: Math.max(1, totalPages),
     }),
@@ -166,9 +169,7 @@ export function buildPreviewEmbed(
   const slice = filteredMessages.slice(start, start + MSG_DEL_PAGE_SIZE);
 
   if (slice.length === 0) {
-    embed.setDescription(
-      tDefault("commands:message-delete.confirm.zero_targets"),
-    );
+    embed.setDescription(tDefault("messageDelete:user-response.zero_targets"));
     return embed;
   }
 
@@ -218,14 +219,12 @@ export function buildPreviewComponents(
   ];
   const authorSelect = new StringSelectMenuBuilder()
     .setCustomId(MSG_DEL_CUSTOM_ID.FILTER_AUTHOR)
-    .setPlaceholder(
-      tDefault("commands:message-delete.pagination.author_select_placeholder"),
-    )
+    .setPlaceholder(tDefault("messageDelete:ui.select.author_placeholder"))
     .setMinValues(0)
     .setMaxValues(1)
     .addOptions([
       {
-        label: tDefault("commands:message-delete.pagination.author_all"),
+        label: tDefault("messageDelete:ui.select.author_all"),
         value: "__all__",
       },
       ...uniqueAuthors
@@ -240,10 +239,10 @@ export function buildPreviewComponents(
       .setEmoji(hasDays ? "✏️" : "🔢")
       .setLabel(
         hasDays
-          ? tDefault("commands:message-delete.pagination.btn_days_set", {
+          ? tDefault("messageDelete:ui.button.days_set", {
               days: filter.days,
             })
-          : tDefault("commands:message-delete.pagination.btn_days_empty"),
+          : tDefault("messageDelete:ui.button.days_empty"),
       )
       .setStyle(hasDays ? ButtonStyle.Primary : ButtonStyle.Secondary)
       .setDisabled(hasAfterOrBefore),
@@ -253,10 +252,10 @@ export function buildPreviewComponents(
       .setLabel(
         // afterRaw はユーザーが入力した生の文字列（仕様: toLocaleString 変換は行わない）
         filter.after && filter.afterRaw
-          ? tDefault("commands:message-delete.pagination.btn_after_set", {
+          ? tDefault("messageDelete:ui.button.after_set", {
               date: filter.afterRaw,
             })
-          : tDefault("commands:message-delete.pagination.btn_after_empty"),
+          : tDefault("messageDelete:ui.button.after_empty"),
       )
       .setStyle(filter.after ? ButtonStyle.Primary : ButtonStyle.Secondary)
       .setDisabled(hasDays),
@@ -266,10 +265,10 @@ export function buildPreviewComponents(
       .setLabel(
         // beforeRaw はユーザーが入力した生の文字列（仕様: toLocaleString 変換は行わない）
         filter.before && filter.beforeRaw
-          ? tDefault("commands:message-delete.pagination.btn_before_set", {
+          ? tDefault("messageDelete:ui.button.before_set", {
               date: filter.beforeRaw,
             })
-          : tDefault("commands:message-delete.pagination.btn_before_empty"),
+          : tDefault("messageDelete:ui.button.before_empty"),
       )
       .setStyle(filter.before ? ButtonStyle.Primary : ButtonStyle.Secondary)
       .setDisabled(hasDays),
@@ -279,16 +278,16 @@ export function buildPreviewComponents(
       .setLabel(
         // keyword はユーザーが入力した生の文字列をそのまま表示（仕様: toLocaleString 変換は行わない）
         filter.keyword
-          ? tDefault("commands:message-delete.pagination.btn_keyword_set", {
+          ? tDefault("messageDelete:ui.button.keyword_set", {
               keyword: filter.keyword,
             })
-          : tDefault("commands:message-delete.pagination.btn_keyword"),
+          : tDefault("messageDelete:ui.button.keyword"),
       )
       .setStyle(filter.keyword ? ButtonStyle.Primary : ButtonStyle.Secondary),
     new ButtonBuilder()
       .setCustomId(MSG_DEL_CUSTOM_ID.FILTER_RESET)
       .setEmoji("✖️")
-      .setLabel(tDefault("commands:message-delete.pagination.btn_reset"))
+      .setLabel(tDefault("messageDelete:ui.button.reset"))
       .setStyle(ButtonStyle.Danger),
   );
 
@@ -297,9 +296,7 @@ export function buildPreviewComponents(
   const pageSlice = filteredMessages.slice(start, start + MSG_DEL_PAGE_SIZE);
   const excludeSelect = new StringSelectMenuBuilder()
     .setCustomId(MSG_DEL_CUSTOM_ID.CONFIRM_EXCLUDE)
-    .setPlaceholder(
-      tDefault("commands:message-delete.confirm.exclude_placeholder"),
-    )
+    .setPlaceholder(tDefault("messageDelete:ui.select.exclude_placeholder"))
     .setMinValues(0)
     .setMaxValues(pageSlice.length || 1)
     .addOptions(
@@ -318,7 +315,7 @@ export function buildPreviewComponents(
               );
             })(),
             description:
-              `${m.authorDisplayName} | ${m.content || tDefault("commands:message-delete.result.empty_content")}`.slice(
+              `${m.authorDisplayName} | ${m.content || tDefault("messageDelete:embed.field.value.empty_content")}`.slice(
                 0,
                 100,
               ),
@@ -327,9 +324,7 @@ export function buildPreviewComponents(
           }))
         : [
             {
-              label: tDefault(
-                "commands:message-delete.confirm.exclude_no_messages",
-              ),
+              label: tDefault("messageDelete:ui.select.exclude_no_messages"),
               value: "__none__",
             },
           ],
@@ -341,7 +336,7 @@ export function buildPreviewComponents(
       .setCustomId(MSG_DEL_CUSTOM_ID.CONFIRM_YES)
       .setEmoji("🗑️")
       .setLabel(
-        tDefault("commands:message-delete.confirm.btn_delete", {
+        tDefault("messageDelete:ui.button.delete", {
           count: deleteCount,
         }),
       )
@@ -350,7 +345,7 @@ export function buildPreviewComponents(
     new ButtonBuilder()
       .setCustomId(MSG_DEL_CUSTOM_ID.CONFIRM_NO)
       .setEmoji("❌")
-      .setLabel(tDefault("commands:message-delete.confirm.btn_no"))
+      .setLabel(tDefault("messageDelete:ui.button.cancel"))
       .setStyle(ButtonStyle.Secondary),
   );
 
@@ -382,15 +377,15 @@ export function buildFinalConfirmEmbed(
   const embed = new EmbedBuilder()
     .setColor(STATUS_COLORS.danger)
     .setTitle(
-      tDefault("commands:message-delete.final.embed_title", {
+      tDefault("messageDelete:embed.title.final_confirm", {
         page: page + 1,
         total: Math.max(1, totalPages),
       }),
     )
     .setDescription(
-      tDefault("commands:message-delete.final.embed_warning") +
+      tDefault("messageDelete:embed.description.final_warning") +
         "\n" +
-        tDefault("commands:message-delete.final.embed_desc", {
+        tDefault("messageDelete:embed.description.final_confirm", {
           count: totalDeleteCount,
         }),
     );
@@ -425,7 +420,7 @@ export function buildFinalConfirmComponents(
       .setCustomId(MSG_DEL_CUSTOM_ID.FINAL_YES)
       .setEmoji("🗑️")
       .setLabel(
-        tDefault("commands:message-delete.final.btn_yes", {
+        tDefault("messageDelete:ui.button.final_yes", {
           count: deleteCount,
         }),
       )
@@ -433,12 +428,12 @@ export function buildFinalConfirmComponents(
     new ButtonBuilder()
       .setCustomId(MSG_DEL_CUSTOM_ID.FINAL_BACK)
       .setEmoji("◀")
-      .setLabel(tDefault("commands:message-delete.final.btn_back"))
+      .setLabel(tDefault("messageDelete:ui.button.final_back"))
       .setStyle(ButtonStyle.Secondary),
     new ButtonBuilder()
       .setCustomId(MSG_DEL_CUSTOM_ID.FINAL_NO)
       .setEmoji("❌")
-      .setLabel(tDefault("commands:message-delete.final.btn_no"))
+      .setLabel(tDefault("messageDelete:ui.button.final_cancel"))
       .setStyle(ButtonStyle.Secondary),
   );
 
@@ -458,29 +453,30 @@ export function buildCompletionEmbed(
   const breakdownText =
     Object.entries(channelBreakdown)
       .map(([channelId, { count }]) =>
-        tDefault("commands:message-delete.embed.channel_breakdown_item", {
+        tDefault("messageDelete:embed.field.value.channel_breakdown_item", {
           channelId,
           count,
         }),
       )
-      .join("\n") || tDefault("commands:message-delete.embed.breakdown_empty");
+      .join("\n") ||
+    tDefault("messageDelete:embed.field.value.breakdown_empty");
 
-  return new EmbedBuilder()
-    .setColor(STATUS_COLORS.success)
-    .setTitle(tDefault("commands:message-delete.embed.summary_title"))
-    .addFields(
+  return createSuccessEmbed("", {
+    title: tDefault("messageDelete:embed.title.summary"),
+    fields: [
       {
-        name: tDefault("commands:message-delete.embed.total_deleted"),
-        value: tDefault("commands:message-delete.embed.total_deleted_value", {
+        name: tDefault("messageDelete:embed.field.name.total_deleted"),
+        value: tDefault("messageDelete:embed.field.value.total_deleted", {
           count: totalDeleted,
         }),
         inline: true,
       },
       {
-        name: tDefault("commands:message-delete.embed.channel_breakdown"),
+        name: tDefault("messageDelete:embed.field.name.channel_breakdown"),
         value: breakdownText,
       },
-    );
+    ],
+  });
 }
 
 /**
@@ -506,31 +502,33 @@ export function buildCommandConditionsEmbed(
 
   const countValue =
     count === MSG_DEL_DEFAULT_COUNT
-      ? tDefault("commands:message-delete.conditions.count_unlimited", {
+      ? tDefault("messageDelete:embed.field.value.count_unlimited", {
           count,
         })
-      : tDefault("commands:message-delete.conditions.count_limited", { count });
+      : tDefault("messageDelete:embed.field.value.count_limited", {
+          count,
+        });
 
   const userValue =
     targetUserIds.length > 0
       ? targetUserIds.map((id) => `<@${id}>`).join(" ")
-      : tDefault("commands:message-delete.conditions.user_all");
+      : tDefault("messageDelete:embed.field.value.user_all");
 
   const keywordValue = keyword
     ? `"${keyword}"`
-    : tDefault("commands:message-delete.conditions.none");
+    : tDefault("messageDelete:embed.field.value.none");
 
   const channelValue =
     channelIds.length > 0
       ? channelIds.map((id) => `<#${id}>`).join(" ")
-      : tDefault("commands:message-delete.conditions.channel_all");
+      : tDefault("messageDelete:embed.field.value.channel_all");
 
   // days と after/before は排他。指定されている方のフィールドのみ表示し、もう一方は省略する
   const periodFields: { name: string; value: string; inline: true }[] = [];
   if (hasDays) {
     periodFields.push({
       name: "days",
-      value: tDefault("commands:message-delete.conditions.days_value", {
+      value: tDefault("messageDelete:embed.field.value.days_value", {
         days: daysOption,
       }),
       inline: true,
@@ -539,7 +537,7 @@ export function buildCommandConditionsEmbed(
     if (afterStr) {
       periodFields.push({
         name: "after",
-        value: tDefault("commands:message-delete.conditions.after_value", {
+        value: tDefault("messageDelete:embed.field.value.after_value", {
           date: afterStr,
         }),
         inline: true,
@@ -548,7 +546,7 @@ export function buildCommandConditionsEmbed(
     if (beforeStr) {
       periodFields.push({
         name: "before",
-        value: tDefault("commands:message-delete.conditions.before_value", {
+        value: tDefault("messageDelete:embed.field.value.before_value", {
           date: beforeStr,
         }),
         inline: true,
@@ -558,14 +556,14 @@ export function buildCommandConditionsEmbed(
     // いずれも未指定の場合は days フィールドのみ「なし」で表示
     periodFields.push({
       name: "days",
-      value: tDefault("commands:message-delete.conditions.none"),
+      value: tDefault("messageDelete:embed.field.value.none"),
       inline: true,
     });
   }
 
   return new EmbedBuilder()
     .setColor(STATUS_COLORS.muted)
-    .setTitle(tDefault("commands:message-delete.conditions.title"))
+    .setTitle(tDefault("messageDelete:embed.title.conditions"))
     .addFields(
       { name: "count", value: countValue, inline: true },
       { name: "user", value: userValue, inline: true },

@@ -15,15 +15,12 @@ import { getBotVcRecruitRepository } from "../../../services/botCompositionRoot"
 import { VC_RECRUIT_POST_CUSTOM_ID } from "../commands/vcRecruitConfigCommand.constants";
 
 const VC_RECRUIT_LOG_KEYS = {
-  PANEL_CHANNEL_DELETE_DETECTED:
-    "system:vc-recruit.panel_channel_delete_detected",
-  POST_CHANNEL_DELETE_FAILED: "system:vc-recruit.post_channel_delete_failed",
-  POST_CHANNEL_DELETE_DETECTED:
-    "system:vc-recruit.post_channel_delete_detected",
-  PANEL_CHANNEL_CLEANUP_FAILED:
-    "system:vc-recruit.panel_channel_cleanup_failed",
+  PANEL_CHANNEL_DELETE_DETECTED: "vcRecruit:log.panel_channel_delete_detected",
+  POST_CHANNEL_DELETE_FAILED: "vcRecruit:log.post_channel_delete_failed",
+  POST_CHANNEL_DELETE_DETECTED: "vcRecruit:log.post_channel_delete_detected",
+  PANEL_CHANNEL_CLEANUP_FAILED: "vcRecruit:log.panel_channel_cleanup_failed",
   CREATED_VC_MANUAL_DELETE_DETECTED:
-    "system:vc-recruit.created_vc_manual_delete_detected",
+    "vcRecruit:log.created_vc_manual_delete_detected",
 } as const;
 
 /**
@@ -193,17 +190,14 @@ async function updatePostButtonsForDeletedVc(
     if (!hasTargetVc) continue;
 
     // ボタンを「募集終了済み」状態に更新
-    const endedLabel = await tGuild(
-      guildId,
-      "commands:vcRecruit.button.vc_ended",
-    );
+    const endedLabel = await tGuild(guildId, "vcRecruit:ui.button.vc_ended");
     const deleteLabel = await tGuild(
       guildId,
-      "commands:vcRecruit.button.delete_post",
+      "vcRecruit:ui.button.delete_post",
     );
     const endedTitle = await tGuild(
       guildId,
-      "commands:vcRecruit.embed.title_ended",
+      "vcRecruit:embed.title.recruit_post_ended",
     );
 
     // embedのタイトルを「募集終了」に更新

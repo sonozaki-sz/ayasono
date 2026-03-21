@@ -29,11 +29,11 @@ export async function handleMemberLogConfigClearJoinMessage(
 
   const description = tInteraction(
     interaction.locale,
-    "commands:member-log-config.embed.clear_join_message_success",
+    "memberLog:user-response.clear_join_message_success",
   );
   const successTitle = tInteraction(
     interaction.locale,
-    "commands:member-log-config.embed.success_title",
+    "memberLog:embed.title.success",
   );
   const embed = createSuccessEmbed(description, { title: successTitle });
   await interaction.reply({
@@ -45,7 +45,7 @@ export async function handleMemberLogConfigClearJoinMessage(
   logger.info(
     logPrefixed(
       "system:log_prefix.member_log",
-      "system:member-log.config_join_message_cleared",
+      "memberLog:log.config_join_message_cleared",
       { guildId },
     ),
   );

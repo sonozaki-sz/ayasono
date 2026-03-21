@@ -113,7 +113,7 @@ describe("vcRecruitRenameModalHandler / execute()", () => {
     expect(safeReplyMock).toHaveBeenCalledWith(
       interaction,
       expect.objectContaining({
-        embeds: [{ success: "commands:vcRecruit.rename.success" }],
+        embeds: [{ success: "vcRecruit:user-response.rename_success" }],
         flags: MessageFlags.Ephemeral,
       }),
     );
@@ -133,7 +133,7 @@ describe("vcRecruitRenameModalHandler / execute()", () => {
     expect(safeReplyMock).toHaveBeenCalledWith(
       interaction,
       expect.objectContaining({
-        embeds: [{ warning: "errors:vcRecruit.vc_already_deleted" }],
+        embeds: [{ warning: "vcRecruit:user-response.vc_already_deleted" }],
         flags: MessageFlags.Ephemeral,
       }),
     );

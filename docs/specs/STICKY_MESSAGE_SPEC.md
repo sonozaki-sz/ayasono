@@ -540,7 +540,7 @@ function hasPermission(member: GuildMember): boolean {
 
 ```typescript
 // /sticky-message コマンド（全サブコマンド共通）
-"sticky-message.description": "スティッキーメッセージ（チャンネル最下部固定）の管理（チャンネル管理者専用）"
+"sticky-message.description": "スティッキーメッセージ（チャンネル最下部固定）の管理（チャンネル管理権限が必要）"
 
 // set（スラッシュオプション）
 "sticky-message.set.description": "スティッキーメッセージを設定"

@@ -12,7 +12,7 @@ describe("logPrefixed", () => {
   it("基本形式: [prefix] message の形式で返すこと", () => {
     const result = logPrefixed(
       "system:log_prefix.bump_reminder",
-      "system:bump-reminder.detected",
+      "bumpReminder:log.detected",
       { guildId: "123", service: "disboard" },
     );
 
@@ -49,7 +49,7 @@ describe("logPrefixed", () => {
   it("サブプレフィックスとパラメータの両方が正しく動作すること", () => {
     const result = logPrefixed(
       "system:log_prefix.bump_reminder",
-      "system:bump-reminder.detected",
+      "bumpReminder:log.detected",
       { guildId: "999", service: "dissoku" },
       "check",
     );
@@ -64,7 +64,7 @@ describe("logCommand", () => {
   it("基本形式: [/command-name] message の形式で返すこと", () => {
     const result = logCommand(
       "/message-delete",
-      "system:message-delete.lock_acquired",
+      "messageDelete:log.lock_acquired",
       { guildId: "789" },
     );
 
@@ -74,7 +74,7 @@ describe("logCommand", () => {
   it("補間パラメータがメッセージに正しく展開されること", () => {
     const result = logCommand(
       "/bump-reminder",
-      "system:bump-reminder.detected",
+      "bumpReminder:log.detected",
       { guildId: "321", service: "disboard" },
     );
 

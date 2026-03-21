@@ -839,7 +839,7 @@ describe("bot/features/message-delete/commands/usecases/runPreviewDialog", () =>
     showFilterModalMock.mockResolvedValue("invalid-value");
     applyModalFilterValueMock.mockReturnValue({
       filter: {},
-      errorKey: "commands:message-delete.errors.after_invalid_format" as const,
+      errorKey: "messageDelete:user-response.after_invalid_format" as const,
     });
 
     const collector = makeMockCollector();

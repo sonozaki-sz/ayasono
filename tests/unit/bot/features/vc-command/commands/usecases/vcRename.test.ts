@@ -10,7 +10,7 @@ vi.mock("@/shared/locale/localeManager", () => ({
   logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
   tInteraction: vi.fn(
     (_locale: string, key: string, params?: Record<string, unknown>) => {
-      if (key === "commands:vc.embed.renamed") {
+      if (key === "vc:user-response.renamed") {
         return `renamed:${String(params?.name)}`;
       }
       return key;

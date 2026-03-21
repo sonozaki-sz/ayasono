@@ -40,7 +40,7 @@ export class VacService {
       // 同一イベント内で create/delete を直列に処理し、競合条件を減らす
       await handleVacCreateUseCase(this.vacRepository, newState);
       await handleVacDeleteUseCase(this.vacRepository, oldState);
-    }, tDefault("system:vac.voice_state_update_failed"));
+    }, tDefault("vac:log.voice_state_update_failed"));
   }
 
   /**
@@ -73,7 +73,7 @@ export class VacService {
         logger.info(
           logPrefixed(
             "system:log_prefix.vac",
-            "system:vac.trigger_removed_by_delete",
+            "vac:log.trigger_removed_by_delete",
             {
               guildId: channel.guildId,
               channelId: channel.id,
@@ -92,7 +92,7 @@ export class VacService {
           channel.id,
         );
       }
-    }, tDefault("system:vac.channel_delete_sync_failed"));
+    }, tDefault("vac:log.channel_delete_sync_failed"));
   }
 
   /**
@@ -101,7 +101,7 @@ export class VacService {
   async cleanupOnStartup(client: BotClient): Promise<void> {
     await executeWithLoggedError(async () => {
       await cleanupVacOnStartupUseCase(this.vacRepository, client);
-    }, tDefault("system:vac.startup_cleanup_failed"));
+    }, tDefault("vac:log.startup_cleanup_failed"));
   }
 }
 

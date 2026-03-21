@@ -45,7 +45,7 @@ export async function handleGuildMemberRemove(
       logger.warn(
         logPrefixed(
           "system:log_prefix.member_log",
-          "system:member-log.channel_deleted_config_cleared",
+          "memberLog:log.channel_deleted_config_cleared",
           {
             guildId,
             channelId: config.channelId,
@@ -54,7 +54,7 @@ export async function handleGuildMemberRemove(
       );
       const t = await getGuildTranslator(guildId);
       await member.guild.systemChannel
-        ?.send({ content: t("events:member-log.channel_deleted_notice") })
+        ?.send({ content: t("memberLog:user-response.channel_deleted_notice") })
         .catch(() => null);
       return;
     }
@@ -89,17 +89,17 @@ export async function handleGuildMemberRemove(
     // 退出通知 Embed を生成
     const embed = new EmbedBuilder()
       .setColor(LEAVE_EMBED_COLOR)
-      .setTitle(t("events:member-log.leave.title"))
+      .setTitle(t("memberLog:embed.title.leave"))
       .addFields(
         {
-          name: t("events:member-log.leave.fields.username"),
+          name: t("memberLog:embed.field.name.leave_username"),
           value: userMention,
           inline: true,
         },
         ...(createdTimestamp !== null && accountAge !== null
           ? [
               {
-                name: t("events:member-log.leave.fields.accountCreated"),
+                name: t("memberLog:embed.field.name.leave_account_created"),
                 value: `<t:${createdTimestamp}:f>(${formatAccountAge(accountAge.years, accountAge.months, accountAge.days, t)})`,
                 inline: true,
               },
@@ -108,28 +108,31 @@ export async function handleGuildMemberRemove(
         ...(joinedTimestamp !== null
           ? [
               {
-                name: t("events:member-log.leave.fields.serverJoined"),
+                name: t("memberLog:embed.field.name.leave_server_joined"),
                 value: `<t:${joinedTimestamp}:f>`,
                 inline: true,
               },
             ]
           : []),
         {
-          name: t("events:member-log.leave.fields.serverLeft"),
+          name: t("memberLog:embed.field.name.leave_server_left"),
           value: `<t:${leftTimestamp}:f>`,
           inline: true,
         },
         {
-          name: t("events:member-log.leave.fields.stayDuration"),
+          name: t("memberLog:embed.field.name.leave_stay_duration"),
           value: (() => {
-            if (stayDays === null) return t("events:member-log.unknown");
-            return t("events:member-log.days", { count: stayDays });
+            if (stayDays === null)
+              return t("memberLog:embed.field.value.unknown");
+            return t("memberLog:embed.field.value.days", { count: stayDays });
           })(),
           inline: true,
         },
         {
-          name: t("events:member-log.leave.fields.memberCount"),
-          value: t("events:member-log.member_count", { count: memberCount }),
+          name: t("memberLog:embed.field.name.leave_member_count"),
+          value: t("memberLog:embed.field.value.member_count", {
+            count: memberCount,
+          }),
           inline: true,
         },
       )
@@ -161,7 +164,7 @@ export async function handleGuildMemberRemove(
     logger.debug(
       logPrefixed(
         "system:log_prefix.member_log",
-        "system:member-log.leave_notification_sent",
+        "memberLog:log.leave_notification_sent",
         {
           guildId,
           userId,
@@ -173,7 +176,7 @@ export async function handleGuildMemberRemove(
     logger.error(
       logPrefixed(
         "system:log_prefix.member_log",
-        "system:member-log.notification_failed",
+        "memberLog:log.notification_failed",
         { guildId },
       ),
       { err },

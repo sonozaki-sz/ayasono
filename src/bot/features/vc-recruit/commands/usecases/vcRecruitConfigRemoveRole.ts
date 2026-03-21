@@ -42,7 +42,10 @@ export async function handleVcRecruitConfigRemoveRole(
 
   if (config.mentionRoleIds.length === 0) {
     throw new ValidationError(
-      tInteraction(interaction.locale, "errors:vcRecruit.no_roles_registered"),
+      tInteraction(
+        interaction.locale,
+        "vcRecruit:user-response.no_roles_registered",
+      ),
     );
   }
 
@@ -62,7 +65,7 @@ export async function handleVcRecruitConfigRemoveRole(
     .setPlaceholder(
       tInteraction(
         interaction.locale,
-        "commands:vc-recruit-config.remove-role.select.placeholder",
+        "vcRecruit:ui.select.remove_role_placeholder",
       ),
     )
     .setMinValues(1)
@@ -76,7 +79,7 @@ export async function handleVcRecruitConfigRemoveRole(
     .setLabel(
       tInteraction(
         interaction.locale,
-        "commands:vc-recruit-config.remove-role.button.confirm",
+        "vcRecruit:ui.button.remove_role_confirm",
       ),
     )
     .setStyle(ButtonStyle.Danger)
@@ -89,7 +92,7 @@ export async function handleVcRecruitConfigRemoveRole(
     .setLabel(
       tInteraction(
         interaction.locale,
-        "commands:vc-recruit-config.remove-role.button.cancel",
+        "vcRecruit:ui.button.remove_role_cancel",
       ),
     )
     .setStyle(ButtonStyle.Secondary)
@@ -105,7 +108,7 @@ export async function handleVcRecruitConfigRemoveRole(
   await interaction.reply({
     content: tInteraction(
       interaction.locale,
-      "commands:vc-recruit-config.remove-role.select.title",
+      "vcRecruit:embed.title.remove_role_select",
     ),
     components: [selectRow, buttonRow],
     flags: MessageFlags.Ephemeral,

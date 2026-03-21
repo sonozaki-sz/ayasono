@@ -392,7 +392,7 @@ describe("executeMessageDeleteCommand", () => {
       await executeMessageDeleteCommand(interaction2 as never);
 
       expect(createWarningEmbedMock).toHaveBeenCalledWith(
-        expect.stringContaining("t:commands:message-delete.errors.locked"),
+        expect.stringContaining("t:messageDelete:user-response.locked"),
       );
     });
 

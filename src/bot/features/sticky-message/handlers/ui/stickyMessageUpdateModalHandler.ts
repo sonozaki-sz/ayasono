@@ -61,12 +61,12 @@ export const stickyMessageUpdateModalHandler: ModalHandler = {
           createWarningEmbed(
             tInteraction(
               interaction.locale,
-              "commands:sticky-message.errors.emptyMessage",
+              "stickyMessage:user-response.empty_message",
             ),
             {
               title: tInteraction(
                 interaction.locale,
-                "common:title_input_error",
+                "common:title_invalid_input",
               ),
             },
           ),
@@ -86,12 +86,12 @@ export const stickyMessageUpdateModalHandler: ModalHandler = {
           createInfoEmbed(
             tInteraction(
               interaction.locale,
-              "commands:sticky-message.remove.notFound.description",
+              "stickyMessage:user-response.remove_not_found",
             ),
             {
               title: tInteraction(
                 interaction.locale,
-                "commands:sticky-message.update.notFound.title",
+                "stickyMessage:embed.title.update_not_found",
               ),
             },
           ),
@@ -135,7 +135,7 @@ export const stickyMessageUpdateModalHandler: ModalHandler = {
           logger.error(
             logPrefixed(
               "system:log_prefix.sticky_message",
-              "system:sticky-message.resend_after_update_failed",
+              "stickyMessage:log.resend_after_update_failed",
               {
                 channelId,
               },
@@ -150,12 +150,12 @@ export const stickyMessageUpdateModalHandler: ModalHandler = {
           createSuccessEmbed(
             tInteraction(
               interaction.locale,
-              "commands:sticky-message.update.success.description",
+              "stickyMessage:user-response.update_success",
             ),
             {
               title: tInteraction(
                 interaction.locale,
-                "commands:sticky-message.update.success.title",
+                "stickyMessage:embed.title.update_success",
               ),
             },
           ),
@@ -166,7 +166,7 @@ export const stickyMessageUpdateModalHandler: ModalHandler = {
       logger.error(
         logPrefixed(
           "system:log_prefix.sticky_message",
-          "system:sticky-message.update_failed",
+          "stickyMessage:log.update_failed",
           {
             channelId,
             guildId,

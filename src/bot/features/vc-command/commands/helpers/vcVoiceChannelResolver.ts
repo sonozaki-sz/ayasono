@@ -22,7 +22,7 @@ export async function resolveVoiceChannelForEdit(
   const channel = await interaction.guild?.channels.fetch(channelId);
   if (!channel || channel.type !== ChannelType.GuildVoice) {
     throw new ValidationError(
-      tInteraction(interaction.locale, "errors:vc.not_managed_channel"),
+      tInteraction(interaction.locale, "vc:user-response.not_managed_channel"),
     );
   }
 

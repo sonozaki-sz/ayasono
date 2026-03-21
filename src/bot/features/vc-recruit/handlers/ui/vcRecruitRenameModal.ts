@@ -51,7 +51,7 @@ export const vcRecruitRenameModalHandler: ModalHandler = {
           createWarningEmbed(
             tInteraction(
               interaction.locale,
-              "errors:vcRecruit.vc_already_deleted",
+              "vcRecruit:user-response.vc_already_deleted",
             ),
             {
               title: tInteraction(
@@ -72,7 +72,7 @@ export const vcRecruitRenameModalHandler: ModalHandler = {
     // 成功通知
     const successText = tInteraction(
       interaction.locale,
-      "commands:vcRecruit.rename.success",
+      "vcRecruit:user-response.rename_success",
     );
     await safeReply(interaction, {
       embeds: [createSuccessEmbed(successText)],

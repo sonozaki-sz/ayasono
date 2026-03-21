@@ -138,7 +138,7 @@ describe("bot/features/message-delete/commands/usecases/dialogUtils", () => {
         "+00:00",
       );
       expect(result.errorKey).toBe(
-        "commands:message-delete.errors.days_invalid_value",
+        "messageDelete:user-response.days_invalid_value",
       );
     });
 
@@ -203,7 +203,7 @@ describe("bot/features/message-delete/commands/usecases/dialogUtils", () => {
         "+00:00",
       );
       expect(result.errorKey).toBe(
-        "commands:message-delete.errors.after_invalid_format",
+        "messageDelete:user-response.after_invalid_format",
       );
     });
 
@@ -223,7 +223,7 @@ describe("bot/features/message-delete/commands/usecases/dialogUtils", () => {
         "+00:00",
       );
       expect(result.errorKey).toBe(
-        "commands:message-delete.errors.date_range_invalid",
+        "messageDelete:user-response.date_range_invalid",
       );
     });
 
@@ -274,7 +274,7 @@ describe("bot/features/message-delete/commands/usecases/dialogUtils", () => {
         "+00:00",
       );
       expect(result.errorKey).toBe(
-        "commands:message-delete.errors.before_invalid_format",
+        "messageDelete:user-response.before_invalid_format",
       );
     });
 
@@ -294,7 +294,7 @@ describe("bot/features/message-delete/commands/usecases/dialogUtils", () => {
         "+00:00",
       );
       expect(result.errorKey).toBe(
-        "commands:message-delete.errors.date_range_invalid",
+        "messageDelete:user-response.date_range_invalid",
       );
     });
   });

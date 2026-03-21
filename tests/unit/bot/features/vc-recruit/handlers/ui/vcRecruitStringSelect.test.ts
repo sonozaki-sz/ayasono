@@ -276,7 +276,7 @@ describe("vcRecruitStringSelectHandler / teardown select", () => {
     // tInteraction が unknown_category キーで呼ばれる
     expect(tInteractionMock).toHaveBeenCalledWith(
       expect.any(String),
-      "commands:vc-recruit-config.teardown.select.unknown_category",
+      "vcRecruit:ui.select.teardown_unknown_category",
       expect.objectContaining({ id: "cat-unknown" }),
     );
   });

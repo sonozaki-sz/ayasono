@@ -21,10 +21,10 @@ vi.mock("@/shared/locale/localeManager", () => ({
       key: string,
       params?: Record<string, unknown>,
     ) => {
-      if (key === "commands:ping.embed.measuring") {
+      if (key === "ping:user-response.measuring") {
         return "🏓 計測中...";
       }
-      if (key === "commands:ping.embed.response") {
+      if (key === "ping:user-response.result") {
         return `📡 API レイテンシー: **${String(params?.apiLatency)}ms**\n💓 WebSocket Ping: **${String(params?.wsLatency)}ms**`;
       }
       return key;

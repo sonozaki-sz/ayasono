@@ -26,8 +26,12 @@ const AFK_I18N_KEYS = {
 export const afkCommand: Command = {
   data: (() => {
     // 各ロケール文言を先に解決して SlashCommandBuilder へ流し込む
-    const cmdDesc = getCommandLocalizations(AFK_I18N_KEYS.COMMAND_DESCRIPTION);
+    const cmdDesc = getCommandLocalizations(
+      "afk",
+      AFK_I18N_KEYS.COMMAND_DESCRIPTION,
+    );
     const userDesc = getCommandLocalizations(
+      "afk",
       AFK_I18N_KEYS.USER_OPTION_DESCRIPTION,
     );
 

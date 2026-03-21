@@ -275,14 +275,66 @@ async function getGuildConfig(guildId: string): Promise<GuildConfig | null> { ..
 
 ユーザー向け応答文字列・ログメッセージともに生文字列を **禁止** し、すべて `tDefault()` 経由にする。
 
-| 対象 | 経由 | キー定義先 |
+**翻訳ファイル構成:**
+
+```
+locales/{ja,en}/
+├── common.ts              ← 共通タイトル・ラベル + 機能横断エラー
+├── system.ts              ← 機能横断の内部ログのみ（Bot起動/シャットダウン/Web/DB共通等）
+├── features/
+│   ├── index.ts           ← 全機能の re-export
+│   ├── afk.ts
+│   ├── bumpReminder.ts
+│   └── ...
+```
+
+**翻訳キー命名規則:**
+
+| 種別 | キーパターン | 例 |
 | --- | --- | --- |
-| ユーザー向け応答（`editReply` / `followUp` / ボタンラベル / セレクトメニュー / モーダル / Embed） | `tDefault("commands:...")` | `ja/commands.ts`, `en/commands.ts` |
-| ログメッセージ（`logger.*()` の引数） | `logPrefixed()` / `logCommand()` | `ja/system.ts`, `en/system.ts` |
-| エラーメッセージ | `tDefault("errors:...")` | `ja/errors.ts`, `en/errors.ts` |
+| コマンド定義 | `{コマンド名}.description` | `afk-config.set-channel.description` |
+| ユーザーレスポンス | `user-response.{アクション名}` | `user-response.set_channel_success` |
+| UIラベル（ボタン・セレクト・モーダル） | `ui.{UI種類}.{ID}` | `ui.button.reset_confirm` |
+| Embedタイトル | `embed.title.{コンテキスト}` | `embed.title.reset_confirm` |
+| Embed説明 | `embed.description.{コンテキスト}` | `embed.description.reset_confirm` |
+| Embedフィールド名 | `embed.field.name.{フィールド}` | `embed.field.name.channel` |
+| Embedフィールド値 | `embed.field.value.{フィールド}` | `embed.field.value.not_configured` |
+| ログ | `log.{アクション名}` | `log.config_enabled` |
+
+**ファイル内の記述順:**
+
+```ts
+export const afk = {
+  // ── コマンド定義 ──
+  "afk.description": "...",
+  "afk-config.description": "...",
+
+  // ── ユーザーレスポンス ──
+  "user-response.moved": "...",
+  "user-response.set_channel_success": "...",
+
+  // ── embed: config_view ──
+  "embed.title.config_view": "...",
+  "embed.field.name.channel": "...",
+
+  // ── embed: reset_confirm ──
+  "embed.title.reset_confirm": "...",
+  "embed.description.reset_confirm": "...",
+
+  // ── UIラベル ──
+  "ui.button.reset_confirm": "...",
+  "ui.button.reset_cancel": "...",
+
+  // ── ログ ──
+  "log.moved": "...",
+  "log.database_channel_set": "...",
+} as const;
+```
 
 - ロケールキーは **ja/en 両方に同時追加** する
 - DB操作は `executeWithDatabaseError` でラップし、成功時は `logger.debug`、失敗時はキー付きエラーメッセージを渡す
+- コマンド定義キーにはコマンド名を含める（`config.description` は不可。どのコマンドか不明なため）
+- ログキーに機能名プレフィックスは不要（ファイルの名前空間で機能が特定されるため）
 
 ##### ログプレフィックスルール
 

@@ -124,7 +124,7 @@ describe("bot/features/vac/ui handlers", () => {
     await vacPanelButtonHandler.execute(interaction as never);
 
     expect(safeReply).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "errors:vac.not_vac_channel" }],
+      embeds: [{ message: "vac:user-response.not_vac_channel" }],
       flags: 64,
     });
   });
@@ -168,7 +168,7 @@ describe("bot/features/vac/ui handlers", () => {
     await vacPanelButtonHandler.execute(interaction as never);
 
     expect(safeReply).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "errors:vac.not_vac_channel" }],
+      embeds: [{ message: "vac:user-response.not_vac_channel" }],
       flags: 64,
     });
   });
@@ -193,7 +193,7 @@ describe("bot/features/vac/ui handlers", () => {
     await vacPanelButtonHandler.execute(interaction as never);
 
     expect(safeReply).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "errors:vac.not_vac_channel" }],
+      embeds: [{ message: "vac:user-response.not_vac_channel" }],
       flags: 64,
     });
   });
@@ -222,7 +222,7 @@ describe("bot/features/vac/ui handlers", () => {
     await vacPanelButtonHandler.execute(interaction as never);
 
     expect(safeReply).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "errors:vac.not_in_vc" }],
+      embeds: [{ message: "vac:user-response.not_in_vc" }],
       flags: 64,
     });
   });
@@ -249,7 +249,7 @@ describe("bot/features/vac/ui handlers", () => {
     await vacPanelButtonHandler.execute(interaction as never);
 
     expect(safeReply).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "errors:vac.not_in_vc" }],
+      embeds: [{ message: "vac:user-response.not_in_vc" }],
       flags: 64,
     });
   });
@@ -422,7 +422,7 @@ describe("bot/features/vac/ui handlers", () => {
       members: { size: 3 },
     });
     expect(safeReply).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "commands:vac.embed.panel_refreshed" }],
+      embeds: [{ message: "vac:user-response.panel_refreshed" }],
       flags: 64,
     });
   });
@@ -464,7 +464,7 @@ describe("bot/features/vac/ui handlers", () => {
     expect(deleteMock).not.toHaveBeenCalled();
     expect(panelModule.sendVcControlPanel).toHaveBeenCalledTimes(1);
     expect(safeReply).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "commands:vac.embed.panel_refreshed" }],
+      embeds: [{ message: "vac:user-response.panel_refreshed" }],
       flags: 64,
     });
   });
@@ -506,7 +506,7 @@ describe("bot/features/vac/ui handlers", () => {
     expect(deleteMock).toHaveBeenCalledTimes(1);
     expect(panelModule.sendVcControlPanel).toHaveBeenCalledTimes(1);
     expect(safeReply).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "commands:vac.embed.panel_refreshed" }],
+      embeds: [{ message: "vac:user-response.panel_refreshed" }],
       flags: 64,
     });
   });
@@ -564,7 +564,7 @@ describe("bot/features/vac/ui handlers", () => {
     expect(safeReply).not.toHaveBeenCalledWith(
       interaction,
       expect.objectContaining({
-        embeds: [{ message: "commands:vac.embed.panel_refreshed" }],
+        embeds: [{ message: "vac:user-response.panel_refreshed" }],
       }),
     );
   });
@@ -598,7 +598,7 @@ describe("bot/features/vac/ui handlers", () => {
     await vacPanelModalHandler.execute(interaction as never);
 
     expect(safeReply).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "errors:vac.limit_out_of_range" }],
+      embeds: [{ message: "vac:user-response.limit_out_of_range" }],
       flags: 64,
     });
   });
@@ -622,7 +622,7 @@ describe("bot/features/vac/ui handlers", () => {
     await vacPanelModalHandler.execute(interaction as never);
 
     expect(safeReply).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "errors:vac.not_vac_channel" }],
+      embeds: [{ message: "vac:user-response.not_vac_channel" }],
       flags: 64,
     });
   });
@@ -646,7 +646,7 @@ describe("bot/features/vac/ui handlers", () => {
     await vacPanelModalHandler.execute(interaction as never);
 
     expect(safeReply).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "errors:vac.not_vac_channel" }],
+      embeds: [{ message: "vac:user-response.not_vac_channel" }],
       flags: 64,
     });
   });
@@ -681,7 +681,7 @@ describe("bot/features/vac/ui handlers", () => {
     await vacPanelModalHandler.execute(interaction as never);
 
     expect(safeReply).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "errors:vac.not_vac_channel" }],
+      embeds: [{ message: "vac:user-response.not_vac_channel" }],
       flags: 64,
     });
   });
@@ -715,7 +715,7 @@ describe("bot/features/vac/ui handlers", () => {
     await vacPanelModalHandler.execute(interaction as never);
 
     expect(safeReply).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "errors:vac.not_in_vc" }],
+      embeds: [{ message: "vac:user-response.not_in_vc" }],
       flags: 64,
     });
   });
@@ -747,7 +747,7 @@ describe("bot/features/vac/ui handlers", () => {
     await vacPanelModalHandler.execute(interaction as never);
 
     expect(safeReply).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "errors:vac.not_in_vc" }],
+      embeds: [{ message: "vac:user-response.not_in_vc" }],
       flags: 64,
     });
   });
@@ -784,7 +784,7 @@ describe("bot/features/vac/ui handlers", () => {
 
     expect(voiceChannel.edit).not.toHaveBeenCalled();
     expect(safeReply).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "errors:vac.not_vac_channel" }],
+      embeds: [{ message: "vac:user-response.not_vac_channel" }],
       flags: 64,
     });
   });
@@ -821,7 +821,7 @@ describe("bot/features/vac/ui handlers", () => {
 
     expect(voiceChannel.edit).toHaveBeenCalledWith({ name: "my-vc" });
     expect(safeReply).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "commands:vac.embed.renamed" }],
+      embeds: [{ message: "vac:user-response.renamed" }],
       flags: 64,
     });
   });
@@ -858,7 +858,7 @@ describe("bot/features/vac/ui handlers", () => {
 
     expect(voiceChannel.edit).toHaveBeenCalledWith({ userLimit: 5 });
     expect(safeReply).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "commands:vac.embed.limit_changed" }],
+      embeds: [{ message: "vac:user-response.limit_changed" }],
       flags: 64,
     });
   });
@@ -895,7 +895,7 @@ describe("bot/features/vac/ui handlers", () => {
 
     expect(voiceChannel.edit).toHaveBeenCalledWith({ userLimit: 0 });
     expect(safeReply).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "commands:vac.embed.limit_changed" }],
+      embeds: [{ message: "vac:user-response.limit_changed" }],
       flags: 64,
     });
   });
@@ -993,7 +993,7 @@ describe("bot/features/vac/ui handlers", () => {
     await vacPanelUserSelectHandler.execute(interaction as never);
 
     expect(safeReply).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "errors:vac.not_vac_channel" }],
+      embeds: [{ message: "vac:user-response.not_vac_channel" }],
       flags: 64,
     });
   });
@@ -1015,7 +1015,7 @@ describe("bot/features/vac/ui handlers", () => {
     await vacPanelUserSelectHandler.execute(interaction as never);
 
     expect(safeReply).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "errors:vac.not_vac_channel" }],
+      embeds: [{ message: "vac:user-response.not_vac_channel" }],
       flags: 64,
     });
   });
@@ -1039,7 +1039,7 @@ describe("bot/features/vac/ui handlers", () => {
     await vacPanelUserSelectHandler.execute(interaction as never);
 
     expect(safeReply).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "errors:vac.not_vac_channel" }],
+      embeds: [{ message: "vac:user-response.not_vac_channel" }],
       flags: 64,
     });
   });
@@ -1067,7 +1067,7 @@ describe("bot/features/vac/ui handlers", () => {
     await vacPanelUserSelectHandler.execute(interaction as never);
 
     expect(safeReply).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "errors:vac.not_in_vc" }],
+      embeds: [{ message: "vac:user-response.not_in_vc" }],
       flags: 64,
     });
   });
@@ -1093,7 +1093,7 @@ describe("bot/features/vac/ui handlers", () => {
     await vacPanelUserSelectHandler.execute(interaction as never);
 
     expect(safeReply).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "errors:vac.not_in_vc" }],
+      embeds: [{ message: "vac:user-response.not_in_vc" }],
       flags: 64,
     });
   });
@@ -1123,7 +1123,7 @@ describe("bot/features/vac/ui handlers", () => {
     await vacPanelUserSelectHandler.execute(interaction as never);
 
     expect(safeReply).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "errors:afk.not_configured" }],
+      embeds: [{ message: "afk:user-response.not_configured" }],
       flags: 64,
     });
   });
@@ -1166,7 +1166,7 @@ describe("bot/features/vac/ui handlers", () => {
     await vacPanelUserSelectHandler.execute(interaction as never);
 
     expect(safeReply).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "errors:afk.channel_not_found" }],
+      embeds: [{ message: "afk:user-response.channel_not_found" }],
       flags: 64,
     });
   });
@@ -1209,7 +1209,7 @@ describe("bot/features/vac/ui handlers", () => {
     await vacPanelUserSelectHandler.execute(interaction as never);
 
     expect(safeReply).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "errors:afk.channel_not_found" }],
+      embeds: [{ message: "afk:user-response.channel_not_found" }],
       flags: 64,
     });
   });
@@ -1269,7 +1269,7 @@ describe("bot/features/vac/ui handlers", () => {
       type: 2,
     });
     expect(safeReply).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "errors:vac.afk_move_failed" }],
+      embeds: [{ message: "vac:user-response.afk_move_failed" }],
       flags: 64,
     });
   });
@@ -1332,7 +1332,7 @@ describe("bot/features/vac/ui handlers", () => {
       type: 2,
     });
     expect(safeReply).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "commands:vac.embed.members_moved" }],
+      embeds: [{ message: "vac:user-response.members_moved" }],
       flags: 64,
     });
   });

@@ -61,7 +61,7 @@ export async function handleVcRecruitConfigSetup(
   const existing = await repo.findSetupByCategoryId(guildId, targetCategoryId);
   if (existing) {
     throw new ValidationError(
-      tInteraction(interaction.locale, "errors:vcRecruit.already_setup"),
+      tInteraction(interaction.locale, "vcRecruit:user-response.already_setup"),
     );
   }
 
@@ -72,7 +72,7 @@ export async function handleVcRecruitConfigSetup(
       VC_RECRUIT_CONFIG_COMMAND.CATEGORY_CHANNEL_LIMIT
   ) {
     throw new ValidationError(
-      tInteraction(interaction.locale, "errors:vcRecruit.category_full"),
+      tInteraction(interaction.locale, "vcRecruit:user-response.category_full"),
     );
   }
 
@@ -131,11 +131,11 @@ export async function handleVcRecruitConfigSetup(
   // ── チャンネル作成 ────────────────────────────────────────────────
   const panelName = tInteraction(
     interaction.locale,
-    "commands:vcRecruit.channelName.panel",
+    "vcRecruit:embed.field.value.channel_name_panel",
   );
   const postName = tInteraction(
     interaction.locale,
-    "commands:vcRecruit.channelName.post",
+    "vcRecruit:embed.field.value.channel_name_post",
   );
 
   const panelChannel = (await guild.channels.create({
@@ -173,27 +173,21 @@ export async function handleVcRecruitConfigSetup(
   // ── 成功レスポンス ────────────────────────────────────────────────
   const categoryName = category?.name ?? "TOP";
   const embed = createSuccessEmbed(
-    tInteraction(
-      interaction.locale,
-      "commands:vc-recruit-config.embed.setup_success",
-    ),
+    tInteraction(interaction.locale, "vcRecruit:user-response.setup_success"),
     {
-      title: tInteraction(
-        interaction.locale,
-        "commands:vc-recruit-config.embed.success_title",
-      ),
+      title: tInteraction(interaction.locale, "vcRecruit:embed.title.success"),
       fields: [
         {
           name: categoryName,
           value: [
             tInteraction(
               interaction.locale,
-              "commands:vc-recruit-config.embed.setup_panel_channel",
+              "vcRecruit:user-response.setup_panel_channel",
               { channel: `<#${panelChannel.id}>` },
             ),
             tInteraction(
               interaction.locale,
-              "commands:vc-recruit-config.embed.setup_post_channel",
+              "vcRecruit:user-response.setup_post_channel",
               { channel: `<#${postChannel.id}>` },
             ),
           ].join("\n"),

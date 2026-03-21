@@ -281,10 +281,10 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler
     // embed_title / embed_color キーは呼ばれない
     const tGuildKeys = tInteractionMock.mock.calls.map((c) => c[1]);
     expect(tGuildKeys).not.toContain(
-      "commands:sticky-message.view.field.embed_title",
+      "stickyMessage:embed.field.name.embed_title",
     );
     expect(tGuildKeys).not.toContain(
-      "commands:sticky-message.view.field.embed_color",
+      "stickyMessage:embed.field.name.embed_color",
     );
     expect(updateMock).toHaveBeenCalled();
   });

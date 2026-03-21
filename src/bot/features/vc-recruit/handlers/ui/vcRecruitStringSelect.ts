@@ -97,7 +97,7 @@ async function handleTeardownSelect(
     if (setup.categoryId === null) {
       categoryLabel = tInteraction(
         interaction.locale,
-        "commands:vc-recruit-config.teardown.select.top",
+        "vcRecruit:ui.select.teardown_top",
       );
     } else {
       const cat = guild.channels.cache.get(setup.categoryId);
@@ -106,7 +106,7 @@ async function handleTeardownSelect(
       } else {
         categoryLabel = tInteraction(
           interaction.locale,
-          "commands:vc-recruit-config.teardown.select.unknown_category",
+          "vcRecruit:ui.select.teardown_unknown_category",
           { id: setup.categoryId },
         );
       }
@@ -120,15 +120,15 @@ async function handleTeardownSelect(
   // 確認パネル Embed を構築
   const confirmTitle = tInteraction(
     interaction.locale,
-    "commands:vc-recruit-config.teardown.confirm.title",
+    "vcRecruit:embed.title.teardown_confirm",
   );
   const fieldCategories = tInteraction(
     interaction.locale,
-    "commands:vc-recruit-config.teardown.confirm.field_categories",
+    "vcRecruit:embed.field.name.teardown_categories",
   );
   const warning = tInteraction(
     interaction.locale,
-    "commands:vc-recruit-config.teardown.confirm.warning",
+    "vcRecruit:embed.description.teardown_warning",
   );
 
   const categoryList = selectedSetups
@@ -144,11 +144,11 @@ async function handleTeardownSelect(
   // ボタンを構築
   const confirmLabel = tInteraction(
     interaction.locale,
-    "commands:vc-recruit-config.teardown.confirm.button_confirm",
+    "vcRecruit:ui.button.teardown_confirm",
   );
   const cancelLabel = tInteraction(
     interaction.locale,
-    "commands:vc-recruit-config.teardown.confirm.button_cancel",
+    "vcRecruit:ui.button.teardown_cancel",
   );
 
   const confirmButton = new ButtonBuilder()
@@ -167,7 +167,7 @@ async function handleTeardownSelect(
 
   const redoLabel = tInteraction(
     interaction.locale,
-    "commands:vc-recruit-config.teardown.confirm.button_redo",
+    "vcRecruit:ui.button.teardown_redo",
   );
   const redoButton = new ButtonBuilder()
     .setCustomId(

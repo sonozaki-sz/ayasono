@@ -37,7 +37,7 @@ const WARNING_ERROR_CLASSES: ReadonlyArray<
 
 /** エラークラスと common タイトルキーの対応 */
 const ERROR_TITLE_MAP = [
-  [ValidationError, "common:title_input_error"],
+  [ValidationError, "common:title_invalid_input"],
   [PermissionError, "common:title_permission_denied"],
   [NotFoundError, "common:title_resource_not_found"],
   [TimeoutError, "common:title_timeout"],

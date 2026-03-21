@@ -63,11 +63,14 @@ export const vcPanelModalHandler: ModalHandler = {
       await safeReply(interaction, {
         embeds: [
           createWarningEmbed(
-            tInteraction(interaction.locale, "errors:vac.not_vac_channel"),
+            tInteraction(
+              interaction.locale,
+              "vac:user-response.not_vac_channel",
+            ),
             {
               title: tInteraction(
                 interaction.locale,
-                "common:title_channel_error",
+                "common:title_channel_invalid",
               ),
             },
           ),
@@ -82,11 +85,14 @@ export const vcPanelModalHandler: ModalHandler = {
       await safeReply(interaction, {
         embeds: [
           createWarningEmbed(
-            tInteraction(interaction.locale, "errors:vac.not_vac_channel"),
+            tInteraction(
+              interaction.locale,
+              "vac:user-response.not_vac_channel",
+            ),
             {
               title: tInteraction(
                 interaction.locale,
-                "common:title_channel_error",
+                "common:title_channel_invalid",
               ),
             },
           ),
@@ -104,7 +110,7 @@ export const vcPanelModalHandler: ModalHandler = {
       await safeReply(interaction, {
         embeds: [
           createWarningEmbed(
-            tInteraction(interaction.locale, "errors:vac.not_in_vc"),
+            tInteraction(interaction.locale, "vac:user-response.not_in_vc"),
             {
               title: tInteraction(interaction.locale, "common:title_not_in_vc"),
             },
@@ -123,11 +129,14 @@ export const vcPanelModalHandler: ModalHandler = {
         await safeReply(interaction, {
           embeds: [
             createWarningEmbed(
-              tInteraction(interaction.locale, "errors:vac.not_vac_channel"),
+              tInteraction(
+                interaction.locale,
+                "vac:user-response.not_vac_channel",
+              ),
               {
                 title: tInteraction(
                   interaction.locale,
-                  "common:title_channel_error",
+                  "common:title_channel_invalid",
                 ),
               },
             ),
@@ -141,7 +150,7 @@ export const vcPanelModalHandler: ModalHandler = {
       await safeReply(interaction, {
         embeds: [
           createSuccessEmbed(
-            tInteraction(interaction.locale, "commands:vac.embed.renamed", {
+            tInteraction(interaction.locale, "vac:user-response.renamed", {
               name: newName,
             }),
           ),
@@ -160,11 +169,14 @@ export const vcPanelModalHandler: ModalHandler = {
       await safeReply(interaction, {
         embeds: [
           createWarningEmbed(
-            tInteraction(interaction.locale, "errors:vac.limit_out_of_range"),
+            tInteraction(
+              interaction.locale,
+              "vac:user-response.limit_out_of_range",
+            ),
             {
               title: tInteraction(
                 interaction.locale,
-                "common:title_input_error",
+                "common:title_invalid_input",
               ),
             },
           ),
@@ -178,13 +190,13 @@ export const vcPanelModalHandler: ModalHandler = {
 
     const limitLabel =
       limit === 0
-        ? tInteraction(interaction.locale, "commands:vac.embed.unlimited")
+        ? tInteraction(interaction.locale, "vac:user-response.unlimited")
         : String(limit);
 
     await safeReply(interaction, {
       embeds: [
         createSuccessEmbed(
-          tInteraction(interaction.locale, "commands:vac.embed.limit_changed", {
+          tInteraction(interaction.locale, "vac:user-response.limit_changed", {
             limit: limitLabel,
           }),
         ),

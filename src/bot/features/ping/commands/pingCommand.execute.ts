@@ -6,8 +6,8 @@ import { tInteraction } from "../../../../shared/locale/localeManager";
 import { createSuccessEmbed } from "../../../utils/messageResponse";
 
 const PING_I18N_KEYS = {
-  EMBED_MEASURING: "commands:ping.embed.measuring",
-  EMBED_RESPONSE: "commands:ping.embed.response",
+  EMBED_MEASURING: "ping:user-response.measuring",
+  EMBED_RESPONSE: "ping:user-response.result",
 } as const;
 
 /**

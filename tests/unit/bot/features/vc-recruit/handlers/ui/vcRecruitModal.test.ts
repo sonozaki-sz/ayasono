@@ -281,7 +281,7 @@ describe("vcRecruitModalHandler / execute()", () => {
     // 成功メッセージ + リンクボタンで editReply
     expect(interaction.editReply).toHaveBeenCalledWith(
       expect.objectContaining({
-        embeds: [{ success: "commands:vcRecruit.embed.post_success" }],
+        embeds: [{ success: "vcRecruit:user-response.post_success" }],
         components: expect.any(Array),
       }),
     );
@@ -310,7 +310,7 @@ describe("vcRecruitModalHandler / execute()", () => {
     // editReply で成功メッセージが表示される
     expect(interaction.editReply).toHaveBeenCalledWith(
       expect.objectContaining({
-        embeds: [{ success: "commands:vcRecruit.embed.post_success" }],
+        embeds: [{ success: "vcRecruit:user-response.post_success" }],
       }),
     );
   });
@@ -360,7 +360,7 @@ describe("vcRecruitModalHandler / execute()", () => {
     // 成功メッセージで editReply が呼ばれる
     expect(interaction.editReply).toHaveBeenCalledWith(
       expect.objectContaining({
-        embeds: [{ success: "commands:vcRecruit.embed.post_success" }],
+        embeds: [{ success: "vcRecruit:user-response.post_success" }],
       }),
     );
     expect(deleteVcRecruitSessionMock).toHaveBeenCalledWith(SESSION_ID);
@@ -413,7 +413,7 @@ describe("vcRecruitModalHandler / execute()", () => {
     // 成功メッセージで editReply が呼ばれる（setChannel失敗はcatchされる）
     expect(interaction.editReply).toHaveBeenCalledWith(
       expect.objectContaining({
-        embeds: [{ success: "commands:vcRecruit.embed.post_success" }],
+        embeds: [{ success: "vcRecruit:user-response.post_success" }],
       }),
     );
   });
@@ -448,7 +448,7 @@ describe("vcRecruitModalHandler / execute()", () => {
     // postedMessageUrl が null なのでリンクボタンなしの editReply
     expect(interaction.editReply).toHaveBeenCalledWith(
       expect.objectContaining({
-        embeds: [{ success: "commands:vcRecruit.embed.post_success" }],
+        embeds: [{ success: "vcRecruit:user-response.post_success" }],
       }),
     );
     // components が含まれないことを確認
@@ -524,7 +524,7 @@ describe("vcRecruitModalHandler / execute()", () => {
     // 成功メッセージ + リンクボタンが表示される
     expect(interaction.editReply).toHaveBeenCalledWith(
       expect.objectContaining({
-        embeds: [{ success: "commands:vcRecruit.embed.post_success" }],
+        embeds: [{ success: "vcRecruit:user-response.post_success" }],
         components: expect.any(Array),
       }),
     );
@@ -739,9 +739,9 @@ describe("buildRecruitMessageButtons()", () => {
   it("tGuild がボタンラベル用に呼ばれる", async () => {
     await buildRecruitMessageButtons("guild-1", "user-1", "vc-1");
 
-    expect(tGuildMock).toHaveBeenCalledWith("guild-1", "commands:vcRecruit.button.join_vc");
-    expect(tGuildMock).toHaveBeenCalledWith("guild-1", "commands:vcRecruit.button.rename_vc");
-    expect(tGuildMock).toHaveBeenCalledWith("guild-1", "commands:vcRecruit.button.end_vc");
-    expect(tGuildMock).toHaveBeenCalledWith("guild-1", "commands:vcRecruit.button.delete_post");
+    expect(tGuildMock).toHaveBeenCalledWith("guild-1", "vcRecruit:ui.button.join_vc");
+    expect(tGuildMock).toHaveBeenCalledWith("guild-1", "vcRecruit:ui.button.rename_vc");
+    expect(tGuildMock).toHaveBeenCalledWith("guild-1", "vcRecruit:ui.button.end_vc");
+    expect(tGuildMock).toHaveBeenCalledWith("guild-1", "vcRecruit:ui.button.delete_post");
   });
 });

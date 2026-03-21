@@ -257,7 +257,7 @@ describe("bot/features/message-delete/commands/usecases/runConditionSetupStep", 
         expect.objectContaining({ ephemeral: true }),
       );
       expect(createWarningEmbedMock).toHaveBeenCalledWith(
-        "commands:message-delete.errors.webhook_invalid_format",
+        "messageDelete:user-response.webhook_invalid_format",
       );
 
       // スキャン開始ボタンで終了（hasSlashCommandFilter=true なのでフィルタ条件は満たされる）
@@ -292,7 +292,7 @@ describe("bot/features/message-delete/commands/usecases/runConditionSetupStep", 
         expect.objectContaining({ ephemeral: true }),
       );
       expect(createWarningEmbedMock).toHaveBeenCalledWith(
-        "commands:message-delete.condition-step.no_filter",
+        "messageDelete:user-response.condition_step_no_filter",
       );
 
       // resolve されていないため、キャンセルで終了

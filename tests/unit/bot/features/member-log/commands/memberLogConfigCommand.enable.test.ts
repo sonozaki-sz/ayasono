@@ -145,7 +145,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.enable", () =>
     await handleMemberLogConfigEnable(makeInteraction() as never, "guild-1");
 
     expect(loggerInfoMock).toHaveBeenCalledWith(
-      expect.stringContaining("system:member-log.config_enabled"),
+      expect.stringContaining("memberLog:log.config_enabled"),
     );
   });
 });

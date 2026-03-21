@@ -65,7 +65,7 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.setMenti
       embeds: [
         {
           description:
-            "commands:bump-reminder-config.embed.set_mention_role_success",
+            "bumpReminder:user-response.set_mention_role_success",
         },
       ],
       flags: 64,

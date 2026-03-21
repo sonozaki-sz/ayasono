@@ -19,7 +19,7 @@ describe("bot/features/vc-recruit/commands/vcRecruitConfigCommand.autocomplete",
     expect(mockRespondCategoryAutocomplete).toHaveBeenCalledWith(interaction, {
       commandName: VC_RECRUIT_CONFIG_COMMAND.NAME,
       subcommands: [VC_RECRUIT_CONFIG_COMMAND.SUBCOMMAND.SETUP],
-      topLocaleKey: "commands:vc-recruit-config.setup.category.top",
+      topLocaleKey: "vcRecruit:vc-recruit-config.setup.category.top",
       topValue: VC_RECRUIT_CONFIG_COMMAND.TARGET.TOP,
     });
   });

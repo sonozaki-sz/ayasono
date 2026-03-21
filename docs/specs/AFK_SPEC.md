@@ -2,314 +2,246 @@
 
 > ボイスチャンネルの非アクティブユーザーを手動でAFKチャンネルに移動する機能
 
-最終更新: 2026年3月14日
+最終更新: 2026年3月21日
 
 ---
 
 ## 概要
 
-`/afk` コマンドを使用して、ボイスチャンネルに参加中のメンバーを専用のAFKチャンネルに移動させる機能です。全メンバーが使用可能で、自分自身または他のユーザーを移動できます。
+### 機能一覧
 
-### 主な用途
+| 機能 | 概要 |
+| --- | --- |
+| `/afk` | ユーザーをAFKチャンネルに移動 |
+| `/afk-config set-channel` | AFKチャンネルを設定 |
+| `/afk-config view` | 現在のAFK設定を表示 |
+| `/afk-config reset` | AFK設定をリセット |
 
-- 自分が一時離席する際にAFKチャンネルへ移動
-- ボイスチャンネルで長時間応答がないメンバーの整理
-- モデレーション業務の効率化
-- ボイスチャンネルの整理整頓
+### 権限モデル
 
-### 特徴
-
-- **手動実行**: 自動的な移動は行わず、コマンド実行による手動移動
-- **権限管理**: サーバー管理権限でAFKチャンネルを設定
-- **対象指定**: 自分自身または他のユーザーを指定可能
+| 対象 | 権限 | 用途 |
+| --- | --- | --- |
+| 実行者（`/afk`） | なし | 全メンバー実行可能 |
+| 実行者（`/afk-config`） | ManageGuild | AFK設定の管理 |
+| Bot | MoveMembers | ユーザーのVC移動 |
 
 ---
 
-## 主要機能
+## /afk
 
-### 1. ユーザー移動コマンド
+### コマンド定義
 
 **コマンド**: `/afk [user]`
 
-**実行権限**: 全メンバー（AFK設定が有効な場合）
+**実行権限**: 全メンバー
 
-**引数:**
+**コマンドオプション:**
 
-| 引数名 | 型 | 必須 | 説明 |
-| -- | -- | -- | -- |
-| user | User | ❌ | 移動対象のユーザー（省略時は実行者自身） |
+| オプション名 | 型 | 必須 | 説明 |
+| --- | --- | --- | --- |
+| `user` | User | ❌ | 移動対象のユーザー（省略時は実行者自身） |
 
-**動作:**
+### 動作フロー
 
 1. AFK機能が有効か確認
 2. 対象ユーザーがボイスチャンネルに参加しているか確認
 3. 設定されたAFKチャンネルに移動
 4. 移動完了をチャンネルに通知
 
-**実行例:**
+**ビジネスルール:**
 
-```
-# 自分をAFKチャンネルに移動
-/afk
+- AFK機能が無効（`enabled=false`）または未設定（`channelId=null`）の場合はエラー
+- 対象ユーザーがVCに参加していない場合はエラー
+- AFKチャンネルが削除済み・存在しない場合はエラー
 
-# 特定ユーザーをAFKチャンネルに移動
-/afk user:@ユーザー名
-```
+### UI
 
-**成功時の応答:**
+**成功メッセージ（`createSuccessEmbed` 使用）:**
 
-```
-✅ @ユーザー名 を #AFK に移動しました
-```
+| 項目 | 内容 |
+| --- | --- |
+| 説明 | {{user}} を {{channel}} に移動しました。 |
 
 ---
 
-### 2. AFK設定コマンド
+## /afk-config set-channel
 
-**コマンド**: `/afk-config`
+### コマンド定義
 
-**実行権限**: 管理者のみ
+**コマンド**: `/afk-config set-channel`
 
-#### サブコマンド: `set-channel`
+**実行権限**: ManageGuild
 
-AFKチャンネルを設定します。
+**コマンドオプション:**
 
-**引数:**
+| オプション名 | 型 | 必須 | 説明 |
+| --- | --- | --- | --- |
+| `channel` | VoiceChannel | ✅ | AFKチャンネルとして使用するボイスチャンネル |
 
-| 引数名 | 型 | 必須 | 説明 |
-| -- | -- | -- | -- |
-| channel | VoiceChannel | ✅ | AFKチャンネルとして使用するボイスチャンネル |
+### 動作フロー
 
-**動作:**
+1. ManageGuild 権限チェック
+2. 指定されたチャンネルがボイスチャンネルか確認
+3. AFK設定を更新（`enabled: true`、`channelId` を保存）
+4. 設定完了を ephemeral で通知
 
-1. 指定されたチャンネルがボイスチャンネルか確認
-2. GuildConfigのafkConfigを更新（enabled: true）
-3. 設定完了を通知
+**ビジネスルール:**
 
-**実行例:**
+- ボイスチャンネル以外が指定された場合はエラー
+- 既存設定がある場合は上書き
 
-```
-/afk-config set-channel channel:#AFK
-```
+### UI
 
-**成功時の応答:**
+**成功メッセージ:**
 
-```
-✅ AFKチャンネルを #AFK に設定しました
-```
+`createSuccessEmbed` 使用 / ephemeral
 
-#### サブコマンド: `view`
-
-現在のAFK設定を表示します。
-
-**引数:** なし
-
-**動作:**
-
-1. 現在のAFK設定を取得
-2. 設定内容を表示（MessageFlags.Ephemeral）
-
-**実行例:**
-
-```
-/afk-config view
-```
-
-**応答例:**
-
-```
-【AFK設定】
-チャンネル: #AFK
-```
-
-**未設定時の応答:**
-
-```
-ℹ️ AFK機能が設定されていません
-```
+| 項目 | 内容 |
+| --- | --- |
+| タイトル | 設定完了 |
+| 説明 | AFKチャンネルを {{channel}} に設定しました。 |
 
 ---
 
-## データベース設計
+## /afk-config view
 
-### GuildAfkConfig テーブル
+### コマンド定義
 
-AFK設定は`guild_afk_configs`テーブルに保存されます。
+**コマンド**: `/afk-config view`
 
-**フィールド:**
+**実行権限**: ManageGuild
 
-| フィールド  | 型      | 説明                                |
-| ----------- | ------- | ----------------------------------- |
-| `guildId`   | String  | ギルドID（主キー）                  |
-| `enabled`   | Boolean | 機能の有効/無効（デフォルト: false） |
-| `channelId` | String? | AFKチャンネルID（未設定時は null）  |
+**コマンドオプション:** なし
 
----
+### 動作フロー
 
-## 実装詳細
-
-### コマンドファイル
-
-#### `/afk` コマンド
-
-**ファイル**: `src/bot/commands/afk.ts`
-
-**処理フロー:**
-
-1. Guild IDの取得・検証
-   ↓
-2. AFK設定の確認
-   - 機能が有効か
-   - チャンネルが設定済みか
-   ↓
-3. 対象ユーザーの取得
-   - user引数が指定されていればそのユーザー
-   - 未指定なら実行者自身
-   ↓
-4. ボイスチャンネル参加状態の確認
-   ↓
-5. AFKチャンネルの取得・検証
-   - チャンネルが存在するか
-   - ボイスチャンネルタイプか
-   ↓
-6. ユーザーを移動
-   ↓
-7. 成功メッセージを送信
-   ↓
-8. ログ記録
-
-**エラーケース:**
-
-| エラー | 条件 | メッセージ |
-| -- | -- | -- |
-| AFK未設定 | enabled=false または channelId=null | `errors:afk.not_configured` |
-| メンバーが見つからない | Guild内にメンバーが存在しない | `errors:afk.member_not_found` |
-| VC未参加 | ボイスチャンネルに参加していない | `errors:afk.user_not_in_voice` |
-| チャンネルが無効 | AFKチャンネルが存在しない/削除済み | `errors:afk.channel_not_found` |
-
-#### `/afk-config` コマンド
-
-**ファイル**: `src/bot/commands/afk-config.ts`
-
-**権限チェック:**
-
-- `PermissionFlagsBits.Administrator` を要求
-- SlashCommandBuilderで `setDefaultMemberPermissions()` も設定
-
-**サブコマンド: `set-channel`**
-
-1. サーバー管理権限の確認
-   ↓
-2. 指定されたチャンネルの取得
-   ↓
-3. ボイスチャンネルタイプの確認
-   ↓
-4. AFK設定を更新（有効化＋チャンネルIDを保存）
-   ↓
-5. 成功メッセージを送信（本人のみ表示）
-   ↓
-6. ログ記録
-
-**サブコマンド: `view`**
-
-1. サーバー管理権限の確認
-   ↓
+1. ManageGuild 権限チェック
 2. 現在のAFK設定を取得
-   ↓
-3. 設定が存在すればチャンネル情報を表示
-   設定がなければ未設定メッセージを表示
-   ↓
-4. 本人のみ表示で応答
+3. 設定状態（有効/無効、チャンネル）を表示
+4. ephemeral で応答
+
+### UI
+
+**Embed:**
+
+`createInfoEmbed` 使用 / ephemeral
+
+| 項目 | 内容 |
+| --- | --- |
+| タイトル | AFK機能 |
+| フィールド: 状態 | 有効 / 無効 |
+| フィールド: AFKチャンネル | `<#channelId>` / 未設定 |
 
 ---
 
-## エラーハンドリング
+## /afk-config reset
 
-### バリデーションエラー
+### コマンド定義
 
-各操作のエラー条件に対してユーザーフレンドリーなメッセージを返します。
+**コマンド**: `/afk-config reset`
 
-**共通エラー:**
+**実行権限**: ManageGuild
 
-- Guild外での実行
-- 権限不足
+**コマンドオプション:** なし
 
-**AFK固有エラー:**
+### 動作フロー
 
-- AFK機能未設定
-- 対象ユーザーがボイスチャンネル未参加
-- AFKチャンネルが見つからない
-- 無効なチャンネルタイプ（ボイスチャンネル以外を指定）
+1. ManageGuild 権限チェック
+2. 確認ダイアログ Embed + ボタンを ephemeral で送信
+3. 「リセットする」ボタン押下 → AFK設定をクリア（`enabled: false`, `channelId: null`）→ 完了メッセージに `update()`
+4. 「キャンセル」ボタン押下 / 60秒タイムアウト → キャンセルメッセージに `update()`
 
-### エラーレスポンス
+**ビジネスルール:**
 
-全てのエラーは共通のエラーハンドラーで処理され、適切なメッセージがユーザーに返されます。
+- 設定が存在しない場合でもリセット操作は成功扱い（冪等）
 
----
+### UI
 
-## 多言語対応（i18next）
+**Embed（確認ダイアログ / `createWarningEmbed` 使用）:**
 
-### メッセージ一覧
+| 項目 | 内容 |
+| --- | --- |
+| タイトル | AFK設定リセット |
+| 説明 | AFK設定をリセットしますか？\n以下の設定が削除されます。この操作は元に戻せません。 |
+| フィールド | 削除対象: AFKチャンネル設定 |
 
-| 種別                 | 内容                                                       |
-| -------------------- | ---------------------------------------------------------- |
-| 移動成功             | `{{user}} を {{channel}} に移動しました`                   |
-| チャンネル設定成功   | `AFKチャンネルを {{channel}} に設定しました`               |
-| 設定タイトル         | `【AFK設定】`                                              |
-| 未設定エラー         | `AFK機能が設定されていません。管理者に連絡してください。`   |
-| メンバー不在エラー   | `指定されたメンバーが見つかりません`                       |
-| VC未参加エラー       | `対象ユーザーはボイスチャンネルに参加していません`         |
-| チャンネル不在エラー | `AFKチャンネルが見つかりません。設定を確認してください。`   |
-| チャンネル種別エラー | `ボイスチャンネルを指定してください`                       |
+**ボタン:**
 
----
-
-## テストケース
-
-### `/afk` コマンド
-
-#### 正常系
-
-- [ ] **自分を移動**: 引数なしで実行し、実行者がAFKチャンネルに移動される
-- [ ] **他ユーザーを移動**: user引数を指定し、対象ユーザーがAFKチャンネルに移動される
-- [ ] **成功メッセージ**: 移動成功時に適切なメッセージが表示される
-
-#### 異常系
-
-- [ ] **AFK未設定**: AFK機能が設定されていない場合、エラーメッセージが表示される
-- [ ] **VC未参加**: 対象ユーザーがボイスチャンネルに参加していない場合、エラーメッセージが表示される
-- [ ] **メンバー不在**: 指定されたユーザーがサーバーに存在しない場合、エラーメッセージが表示される
-- [ ] **チャンネル削除済み**: AFKチャンネルが削除されている場合、エラーメッセージが表示される
-- [ ] **権限不足**: Botに移動権限がない場合、適切なエラーが表示される
-
-### `/afk-config set-channel` コマンド
-
-#### 正常系
-
-- [ ] **チャンネル設定**: ボイスチャンネルを指定し、AFK設定が保存される
-- [ ] **既存設定上書き**: 既にAFK設定がある場合、新しいチャンネルで上書きされる
-- [ ] **成功メッセージ**: 設定成功時にMessageFlags.Ephemeralで通知される
-
-#### 異常系
-
-- [ ] **サーバー管理権限なし**: サーバー管理権限以外が実行した場合、エラーメッセージが表示される
-- [ ] **無効なチャンネル**: テキストチャンネルなど、ボイスチャンネル以外を指定した場合、エラーメッセージが表示される
-
-### `/afk-config view` コマンド
-
-#### 正常系
-
-- [ ] **設定表示**: AFK設定が存在する場合、チャンネル情報が表示される
-- [ ] **未設定表示**: AFK設定がない場合、未設定メッセージが表示される
-
-#### 異常系
-
-- [ ] **サーバー管理権限なし**: サーバー管理権限以外が実行した場合、エラーメッセージが表示される
+| コンポーネント | emoji | ラベル | スタイル | 動作 |
+| --- | --- | --- | --- | --- |
+| `afk-config:reset:confirm` | 🗑️ | リセットする | Danger | 設定をクリアして完了メッセージに更新 |
+| `afk-config:reset:cancel` | ❌ | キャンセル | Secondary | キャンセルメッセージに更新 |
 
 ---
 
-## 関連ドキュメント
+## データモデル
 
-- [TODO.md](../TODO.md) - 開発タスクと進捗
-- [I18N_GUIDE.md](I18N_GUIDE.md) - 多言語対応ガイド
-- [TESTING_GUIDELINES.md](TESTING_GUIDELINES.md) - テスト方針とガイドライン
+### GuildAfkConfig
+
+| フィールド | 型 | 説明 |
+| --- | --- | --- |
+| `guildId` | String | ギルドID（主キー） |
+| `enabled` | Boolean | 機能の有効/無効（デフォルト: false） |
+| `channelId` | String? | AFKチャンネルID（未設定時は null） |
+
+---
+
+## 制約・制限事項
+
+- reset の確認ダイアログタイムアウト: 60秒
+
+---
+
+## ローカライズ
+
+**翻訳ファイル:** `src/shared/locale/locales/{ja,en}/features/afk.ts`
+
+### 実装済みキー（新規約に移行予定）
+
+| キー | ja | en |
+| --- | --- | --- |
+| `afk.description` | AFKチャンネルにユーザーを移動 | Move user to AFK channel |
+| `afk.user.description` | 移動するユーザー（省略で自分） | User to move (default: yourself) |
+| `afk-config.description` | AFK機能の設定（サーバー管理権限が必要） | Configure AFK feature (requires Manage Server) |
+| `afk-config.set-channel.description` | AFKチャンネルを設定 | Configure AFK channel |
+| `afk-config.set-channel.channel.description` | AFKチャンネル（ボイスチャンネル） | AFK channel (voice channel) |
+| `afk-config.view.description` | 現在の設定を表示 | Show current settings |
+| `user-response.moved` | {{user}} を {{channel}} に移動しました。 | Moved {{user}} to {{channel}} |
+| `user-response.set_channel_success` | AFKチャンネルを {{channel}} に設定しました。 | AFK channel configured: {{channel}} |
+| `user-response.not_configured` | AFKチャンネルが設定されていません。\n`/afk-config set-channel` でチャンネルを設定してください。（管理者用） | AFK channel is not configured.\nPlease configure a channel with `/afk-config set-channel` (administrator only). |
+| `user-response.member_not_found` | ユーザーが見つかりませんでした。 | User not found. |
+| `user-response.user_not_in_voice` | 指定されたユーザーはボイスチャンネルにいません。 | The specified user is not in a voice channel. |
+| `user-response.channel_not_found` | AFKチャンネルが見つかりませんでした。\nチャンネルが削除されている可能性があります。 | AFK channel not found.\nThe channel may have been deleted. |
+| `user-response.invalid_channel_type` | ボイスチャンネルを指定してください。 | Please specify a voice channel. |
+| `embed.title.success` | 設定完了 | Settings Updated |
+| `embed.title.config_view` | AFK機能 | AFK |
+| `embed.field.name.channel` | AFKチャンネル | AFK Channel |
+| `embed.field.value.not_configured` | AFKチャンネルが設定されていません。 | AFK channel is not configured |
+| `log.moved` | ユーザーをAFKチャンネルに移動 GuildId: {{guildId}} UserId: {{userId}} ChannelId: {{channelId}} | moved user to AFK channel GuildId: {{guildId}} UserId: {{userId}} ChannelId: {{channelId}} |
+| `log.configured` | AFKチャンネル設定 GuildId: {{guildId}} ChannelId: {{channelId}} | channel configured GuildId: {{guildId}} ChannelId: {{channelId}} |
+| `log.database_channel_set` | AFKチャンネルを設定 GuildId: {{guildId}} ChannelId: {{channelId}} | AFK channel set GuildId: {{guildId}} ChannelId: {{channelId}} |
+| `log.database_channel_set_failed` | AFKチャンネル設定に失敗 GuildId: {{guildId}} ChannelId: {{channelId}} | Failed to set AFK channel GuildId: {{guildId}} ChannelId: {{channelId}} |
+| `log.database_config_saved` | AFK設定を保存 GuildId: {{guildId}} | AFK config saved GuildId: {{guildId}} |
+| `log.database_config_save_failed` | AFK設定保存に失敗 GuildId: {{guildId}} | Failed to save AFK config GuildId: {{guildId}} |
+
+### reset 新規追加分
+
+| キー | 用途 | ja | en |
+| --- | --- | --- | --- |
+| `afk-config.reset.description` | サブコマンド説明 | AFK設定をリセット | Reset AFK settings |
+| `user-response.reset_success` | リセット成功レスポンス | AFK設定をリセットしました。 | AFK settings have been reset. |
+| `user-response.reset_cancelled` | キャンセルレスポンス | リセットをキャンセルしました。 | Reset has been cancelled. |
+| `embed.title.reset_confirm` | 確認ダイアログタイトル | AFK設定リセット確認 | AFK Settings Reset |
+| `embed.description.reset_confirm` | 確認ダイアログ説明 | AFK設定をリセットしますか？\n以下の設定が削除されます。この操作は元に戻せません。 | Reset AFK settings?\nThe following settings will be deleted. This action cannot be undone. |
+| `embed.field.name.reset_target` | 削除対象フィールド名 | 削除対象 | Targets |
+| `embed.field.value.reset_target` | 削除対象フィールド値 | AFKチャンネル設定 | AFK channel setting |
+| `ui.button.reset_confirm` | 確認ボタン | リセットする | Reset |
+| `ui.button.reset_cancel` | キャンセルボタン | キャンセル | Cancel |
+
+---
+
+## 依存関係
+
+| 依存先 | 内容 |
+| --- | --- |
+| GuildConfigRepository | AFK設定の取得・更新 |

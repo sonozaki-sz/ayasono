@@ -62,7 +62,7 @@ export class BumpReminderRepository implements IBumpReminderRepository {
         );
 
         logger.debug(
-          tDefault("system:database.bump_reminder_created", {
+          tDefault("bumpReminder:log.database_created", {
             id: reminder.id,
             guildId,
           }),
@@ -70,7 +70,9 @@ export class BumpReminderRepository implements IBumpReminderRepository {
 
         return reminder as BumpReminder;
       },
-      tDefault("system:database.bump_reminder_create_failed", { guildId }),
+      tDefault("bumpReminder:log.database_create_failed", {
+        guildId,
+      }),
     );
   }
 
@@ -84,7 +86,7 @@ export class BumpReminderRepository implements IBumpReminderRepository {
       async () => {
         return findBumpReminderByIdUseCase(this.prisma, id);
       },
-      tDefault("system:database.bump_reminder_find_failed", { id }),
+      tDefault("bumpReminder:log.database_find_failed", { id }),
     );
   }
 
@@ -106,7 +108,7 @@ export class BumpReminderRepository implements IBumpReminderRepository {
           serviceName,
         );
       },
-      tDefault("system:database.bump_reminder_find_failed", { guildId }),
+      tDefault("bumpReminder:log.database_find_failed", { guildId }),
     );
   }
 
@@ -119,7 +121,7 @@ export class BumpReminderRepository implements IBumpReminderRepository {
       const results = await findAllPendingUseCase(this.prisma);
       // 復元処理側で順次再登録しやすいよう昇順で返す
       return results as BumpReminder[];
-    }, tDefault("system:database.bump_reminder_find_all_failed"));
+    }, tDefault("bumpReminder:log.database_find_all_failed"));
   }
 
   /**
@@ -134,13 +136,13 @@ export class BumpReminderRepository implements IBumpReminderRepository {
         await updateReminderStatusUseCase(this.prisma, id, status);
 
         logger.debug(
-          tDefault("system:database.bump_reminder_status_updated", {
+          tDefault("bumpReminder:log.database_status_updated", {
             id,
             status,
           }),
         );
       },
-      tDefault("system:database.bump_reminder_update_failed", { id }),
+      tDefault("bumpReminder:log.database_update_failed", { id }),
     );
   }
 
@@ -155,9 +157,9 @@ export class BumpReminderRepository implements IBumpReminderRepository {
         await deleteBumpReminderUseCase(this.prisma, id);
         // 物理削除は履歴保持不要な最終状態でのみ実行される想定
 
-        logger.debug(tDefault("system:database.bump_reminder_deleted", { id }));
+        logger.debug(tDefault("bumpReminder:log.database_deleted", { id }));
       },
-      tDefault("system:database.bump_reminder_delete_failed", { id }),
+      tDefault("bumpReminder:log.database_delete_failed", { id }),
     );
   }
 
@@ -172,12 +174,14 @@ export class BumpReminderRepository implements IBumpReminderRepository {
         await cancelPendingByGuildUseCase(this.prisma, guildId);
 
         logger.debug(
-          tDefault("system:database.bump_reminder_cancelled_by_guild", {
+          tDefault("bumpReminder:log.database_cancelled_by_guild", {
             guildId,
           }),
         );
       },
-      tDefault("system:database.bump_reminder_cancel_failed", { guildId }),
+      tDefault("bumpReminder:log.database_cancel_failed", {
+        guildId,
+      }),
     );
   }
 
@@ -200,13 +204,13 @@ export class BumpReminderRepository implements IBumpReminderRepository {
         );
 
         logger.debug(
-          tDefault("system:database.bump_reminder_cancelled_by_channel", {
+          tDefault("bumpReminder:log.database_cancelled_by_channel", {
             guildId,
             channelId,
           }),
         );
       },
-      tDefault("system:database.bump_reminder_cancel_failed", {
+      tDefault("bumpReminder:log.database_cancel_failed", {
         guildId,
         channelId,
       }),
@@ -224,14 +228,14 @@ export class BumpReminderRepository implements IBumpReminderRepository {
       // PENDING は削除対象外にし、未実行タスクの痕跡を保持する
 
       logger.info(
-        tDefault("system:database.bump_reminder_cleanup_completed", {
+        tDefault("bumpReminder:log.database_cleanup_completed", {
           count,
           days: daysOld,
         }),
       );
 
       return count;
-    }, tDefault("system:database.bump_reminder_cleanup_failed"));
+    }, tDefault("bumpReminder:log.database_cleanup_failed"));
   }
 }
 

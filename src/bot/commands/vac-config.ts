@@ -20,20 +20,27 @@ import type { Command } from "../types/discord";
  */
 export const vacConfigCommand: Command = {
   data: (() => {
-    const cmdDesc = getCommandLocalizations("vac-config.description");
+    const cmdDesc = getCommandLocalizations("vac", "vac-config.description");
     const createDesc = getCommandLocalizations(
+      "vac",
       "vac-config.create-trigger-vc.description",
     );
     const removeDesc = getCommandLocalizations(
+      "vac",
       "vac-config.remove-trigger-vc.description",
     );
     const createCategoryDesc = getCommandLocalizations(
+      "vac",
       "vac-config.create-trigger-vc.category.description",
     );
     const removeCategoryDesc = getCommandLocalizations(
+      "vac",
       "vac-config.remove-trigger-vc.category.description",
     );
-    const viewDesc = getCommandLocalizations("vac-config.view.description");
+    const viewDesc = getCommandLocalizations(
+      "vac",
+      "vac-config.view.description",
+    );
 
     return new SlashCommandBuilder()
       .setName(VAC_CONFIG_COMMAND.NAME)

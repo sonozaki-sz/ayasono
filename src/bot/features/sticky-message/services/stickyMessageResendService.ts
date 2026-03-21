@@ -51,7 +51,7 @@ export class StickyMessageResendService {
         logger.error(
           logPrefixed(
             "system:log_prefix.sticky_message",
-            "system:sticky-message.resend_scheduled_error",
+            "stickyMessage:log.resend_scheduled_error",
           ),
           err,
         );
@@ -86,7 +86,7 @@ export class StickyMessageResendService {
       logger.error(
         logPrefixed(
           "system:log_prefix.sticky_message",
-          "system:sticky-message.send_failed",
+          "stickyMessage:log.send_failed",
           {
             channelId: channel.id,
             guildId,
@@ -115,7 +115,7 @@ export class StickyMessageResendService {
       logger.debug(
         logPrefixed(
           "system:log_prefix.sticky_message",
-          "system:sticky-message.previous_deleted_or_not_found",
+          "stickyMessage:log.previous_deleted_or_not_found",
           {
             channelId: channel.id,
           },

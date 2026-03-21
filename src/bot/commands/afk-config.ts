@@ -30,14 +30,19 @@ const AFK_CONFIG_COMMAND = {
 export const afkConfigCommand: Command = {
   data: (() => {
     // 各ロケール文言を先に解決して SlashCommandBuilder へ流し込む
-    const cmdDesc = getCommandLocalizations("afk-config.description");
+    const cmdDesc = getCommandLocalizations("afk", "afk-config.description");
     const setChannelDesc = getCommandLocalizations(
+      "afk",
       "afk-config.set-channel.description",
     );
     const channelDesc = getCommandLocalizations(
+      "afk",
       "afk-config.set-channel.channel.description",
     );
-    const viewDesc = getCommandLocalizations("afk-config.view.description");
+    const viewDesc = getCommandLocalizations(
+      "afk",
+      "afk-config.view.description",
+    );
 
     return (
       new SlashCommandBuilder()

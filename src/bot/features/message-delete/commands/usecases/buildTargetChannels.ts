@@ -82,7 +82,7 @@ export async function buildTargetChannels(
         .followUp({
           embeds: [
             createWarningEmbed(
-              tDefault("commands:message-delete.errors.channel_partial_skip", {
+              tDefault("messageDelete:user-response.channel_partial_skip", {
                 channels: channelMentions,
               }),
               { title: tDefault("common:title_bot_permission_denied") },
@@ -98,7 +98,7 @@ export async function buildTargetChannels(
       await interaction.editReply({
         embeds: [
           createErrorEmbed(
-            tDefault("commands:message-delete.errors.channel_all_no_access"),
+            tDefault("messageDelete:user-response.channel_all_no_access"),
             { title: tDefault("common:title_bot_permission_denied") },
           ),
         ],
@@ -115,14 +115,14 @@ export async function buildTargetChannels(
   logger.debug(
     logPrefixed(
       "system:log_prefix.msg_del",
-      "system:message-delete.cmd_all_channels_start",
+      "messageDelete:log.cmd_all_channels_start",
     ),
   );
   const allChannels = await guild.channels.fetch();
   logger.debug(
     logPrefixed(
       "system:log_prefix.msg_del",
-      "system:message-delete.cmd_channel_count",
+      "messageDelete:log.cmd_channel_count",
       {
         count: allChannels.size,
       },

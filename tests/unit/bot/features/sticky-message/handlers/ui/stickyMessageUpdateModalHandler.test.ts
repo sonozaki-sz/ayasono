@@ -204,7 +204,7 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandle
     await stickyMessageUpdateModalHandler.execute(interaction as never);
 
     expect(loggerMock.error).toHaveBeenCalledWith(
-      expect.stringContaining("system:sticky-message.resend_after_update_failed"),
+      expect.stringContaining("stickyMessage:log.resend_after_update_failed"),
       expect.any(Object),
     );
   });

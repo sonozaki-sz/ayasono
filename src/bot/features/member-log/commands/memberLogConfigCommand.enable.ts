@@ -36,7 +36,7 @@ export async function handleMemberLogConfigEnable(
   if (!config?.channelId) {
     const description = tInteraction(
       interaction.locale,
-      "commands:member-log-config.embed.enable_error_no_channel",
+      "memberLog:user-response.enable_error_no_channel",
     );
     const embed = createWarningEmbed(description, {
       title: tInteraction(interaction.locale, "common:title_config_required"),
@@ -53,11 +53,11 @@ export async function handleMemberLogConfigEnable(
 
   const description = tInteraction(
     interaction.locale,
-    "commands:member-log-config.embed.enable_success",
+    "memberLog:user-response.enable_success",
   );
   const successTitle = tInteraction(
     interaction.locale,
-    "commands:member-log-config.embed.success_title",
+    "memberLog:embed.title.success",
   );
   const embed = createSuccessEmbed(description, { title: successTitle });
   await interaction.reply({
@@ -69,7 +69,7 @@ export async function handleMemberLogConfigEnable(
   logger.info(
     logPrefixed(
       "system:log_prefix.member_log",
-      "system:member-log.config_enabled",
+      "memberLog:log.config_enabled",
       { guildId },
     ),
   );

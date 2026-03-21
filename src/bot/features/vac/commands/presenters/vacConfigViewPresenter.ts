@@ -21,7 +21,7 @@ export async function presentVacConfigView(
   locale: string,
   config: VacConfig,
 ): Promise<VacConfigViewPresentation> {
-  const topLabel = tInteraction(locale, "commands:vac-config.embed.top");
+  const topLabel = tInteraction(locale, "vac:embed.field.value.top");
 
   const triggerChannels =
     config.triggerChannelIds.length > 0
@@ -37,23 +37,23 @@ export async function presentVacConfigView(
             }),
           )
         ).join("\n")
-      : tInteraction(locale, "commands:vac-config.embed.not_configured");
+      : tInteraction(locale, "vac:embed.field.value.not_configured");
 
   const createdVcDetails =
     config.createdChannels.length > 0
       ? config.createdChannels
           .map((item) => `<#${item.voiceChannelId}>(<@${item.ownerId}>)`)
           .join("\n")
-      : tInteraction(locale, "commands:vac-config.embed.no_created_vcs");
+      : tInteraction(locale, "vac:embed.field.value.no_created_vcs");
 
-  const title = tInteraction(locale, "commands:vac-config.embed.title");
+  const title = tInteraction(locale, "vac:embed.title.config_view");
   const fieldTrigger = tInteraction(
     locale,
-    "commands:vac-config.embed.field.trigger_channels",
+    "vac:embed.field.name.trigger_channels",
   );
   const fieldCreatedDetails = tInteraction(
     locale,
-    "commands:vac-config.embed.field.created_vc_details",
+    "vac:embed.field.name.created_vc_details",
   );
 
   return {

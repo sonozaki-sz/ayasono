@@ -28,11 +28,11 @@ export async function handleBumpReminderConfigView(
   if (!config) {
     const title = tInteraction(
       interaction.locale,
-      "commands:bump-reminder-config.embed.title",
+      "bumpReminder:embed.title.config_view",
     );
     const message = tInteraction(
       interaction.locale,
-      "commands:bump-reminder-config.embed.not_configured",
+      "bumpReminder:embed.description.not_configured",
     );
     const embed = createInfoEmbed(message, { title });
     await interaction.reply({
@@ -45,19 +45,19 @@ export async function handleBumpReminderConfigView(
   // 表示用のローカライズ文字列を解決
   const viewTitle = tInteraction(
     interaction.locale,
-    "commands:bump-reminder-config.embed.title",
+    "bumpReminder:embed.title.config_view",
   );
   const fieldStatus = tInteraction(
     interaction.locale,
-    "commands:bump-reminder-config.embed.field.status",
+    "bumpReminder:embed.field.name.status",
   );
   const fieldMentionRole = tInteraction(
     interaction.locale,
-    "commands:bump-reminder-config.embed.field.mention_role",
+    "bumpReminder:embed.field.name.mention_role",
   );
   const fieldMentionUsers = tInteraction(
     interaction.locale,
-    "commands:bump-reminder-config.embed.field.mention_users",
+    "bumpReminder:embed.field.name.mention_users",
   );
   const labelEnabled = tInteraction(interaction.locale, "common:enabled");
   const labelDisabled = tInteraction(interaction.locale, "common:disabled");

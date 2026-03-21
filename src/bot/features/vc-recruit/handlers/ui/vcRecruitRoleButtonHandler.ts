@@ -75,9 +75,7 @@ export const vcRecruitRoleButtonHandler: ButtonHandler = {
 
       await interaction.update({
         embeds: [
-          createInfoEmbed(
-            tInteraction(interaction.locale, "commands:common.cancelled"),
-          ),
+          createInfoEmbed(tInteraction(interaction.locale, "common:cancelled")),
         ],
         components: [],
       });
@@ -99,7 +97,7 @@ export const vcRecruitRoleButtonHandler: ButtonHandler = {
             createInfoEmbed(
               tInteraction(
                 interaction.locale,
-                "commands:vc-recruit-config.add-role.noSelection",
+                "vcRecruit:user-response.add_role_no_selection",
               ),
             ),
           ],
@@ -136,13 +134,13 @@ export const vcRecruitRoleButtonHandler: ButtonHandler = {
           createSuccessEmbed("", {
             title: tInteraction(
               interaction.locale,
-              "commands:vc-recruit-config.embed.add_role_success_title",
+              "vcRecruit:embed.title.add_role_success",
             ),
             fields: [
               {
                 name: tInteraction(
                   interaction.locale,
-                  "commands:vc-recruit-config.embed.add_role_success_field",
+                  "vcRecruit:embed.field.name.add_role_success",
                 ),
                 value: roleMentions,
               },
@@ -158,7 +156,7 @@ export const vcRecruitRoleButtonHandler: ButtonHandler = {
           createWarningEmbed(
             tInteraction(
               interaction.locale,
-              "commands:vc-recruit-config.embed.add_role_limit_desc",
+              "vcRecruit:embed.description.add_role_limit",
               { limit: DISCORD_SELECT_MAX_OPTIONS },
             ),
             {
@@ -170,7 +168,7 @@ export const vcRecruitRoleButtonHandler: ButtonHandler = {
                 {
                   name: tInteraction(
                     interaction.locale,
-                    "commands:vc-recruit-config.embed.add_role_limit_field",
+                    "vcRecruit:embed.field.name.add_role_limit",
                   ),
                   value: failedMentions,
                 },
@@ -202,7 +200,7 @@ export const vcRecruitRoleButtonHandler: ButtonHandler = {
             createInfoEmbed(
               tInteraction(
                 interaction.locale,
-                "commands:vc-recruit-config.remove-role.noSelection",
+                "vcRecruit:user-response.remove_role_no_selection",
               ),
             ),
           ],
@@ -227,13 +225,13 @@ export const vcRecruitRoleButtonHandler: ButtonHandler = {
           createSuccessEmbed("", {
             title: tInteraction(
               interaction.locale,
-              "commands:vc-recruit-config.embed.remove_role_success_title",
+              "vcRecruit:embed.title.remove_role_success",
             ),
             fields: [
               {
                 name: tInteraction(
                   interaction.locale,
-                  "commands:vc-recruit-config.embed.remove_role_success_field",
+                  "vcRecruit:embed.field.name.remove_role_success",
                 ),
                 value: roleMentions,
               },

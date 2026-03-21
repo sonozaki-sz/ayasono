@@ -109,7 +109,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.clearJoinMessa
     );
 
     expect(loggerInfoMock).toHaveBeenCalledWith(
-      expect.stringContaining("system:member-log.config_join_message_cleared"),
+      expect.stringContaining("memberLog:log.config_join_message_cleared"),
     );
   });
 });

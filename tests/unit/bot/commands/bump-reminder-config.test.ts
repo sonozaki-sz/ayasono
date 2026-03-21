@@ -171,7 +171,7 @@ describe("bot/commands/bump-reminder-config", () => {
       embeds: [
         {
           description:
-            "commands:bump-reminder-config.embed.enable_success",
+            "bumpReminder:user-response.enable_success",
         },
       ],
       flags: MessageFlags.Ephemeral,
@@ -196,7 +196,7 @@ describe("bot/commands/bump-reminder-config", () => {
       embeds: [
         {
           description:
-            "commands:bump-reminder-config.embed.disable_success",
+            "bumpReminder:user-response.disable_success",
         },
       ],
       flags: MessageFlags.Ephemeral,
@@ -260,7 +260,7 @@ describe("bot/commands/bump-reminder-config", () => {
       embeds: [
         {
           description:
-            "commands:bump-reminder-config.embed.set_mention_role_success",
+            "bumpReminder:user-response.set_mention_role_success",
         },
       ],
       flags: MessageFlags.Ephemeral,
@@ -300,7 +300,7 @@ describe("bot/commands/bump-reminder-config", () => {
       embeds: [
         {
           message:
-            "commands:bump-reminder-config.embed.not_configured",
+            "bumpReminder:embed.description.not_configured",
         },
       ],
       flags: MessageFlags.Ephemeral,
@@ -383,7 +383,7 @@ describe("bot/commands/bump-reminder-config", () => {
       embeds: [
         {
           description:
-            "commands:bump-reminder-config.embed.remove_mention_role",
+            "bumpReminder:user-response.remove_mention_role",
         },
       ],
       flags: MessageFlags.Ephemeral,

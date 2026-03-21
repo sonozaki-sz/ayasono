@@ -174,7 +174,7 @@ describe("bot/features/message-delete/commands/usecases/validateOptions", () => 
         const result = await parseAndValidateOptions(interaction as never);
         expect(result).toBeNull();
         expect(tDefaultMock).toHaveBeenCalledWith(
-          "commands:message-delete.errors.days_and_date_conflict",
+          "messageDelete:user-response.days_and_date_conflict",
         );
       });
 
@@ -186,7 +186,7 @@ describe("bot/features/message-delete/commands/usecases/validateOptions", () => 
         const result = await parseAndValidateOptions(interaction as never);
         expect(result).toBeNull();
         expect(tDefaultMock).toHaveBeenCalledWith(
-          "commands:message-delete.errors.days_and_date_conflict",
+          "messageDelete:user-response.days_and_date_conflict",
         );
       });
     });
@@ -203,7 +203,7 @@ describe("bot/features/message-delete/commands/usecases/validateOptions", () => 
         const result = await parseAndValidateOptions(interaction as never);
         expect(result).toBeNull();
         expect(tDefaultMock).toHaveBeenCalledWith(
-          "commands:message-delete.errors.after_invalid_format",
+          "messageDelete:user-response.after_invalid_format",
         );
       });
 
@@ -216,7 +216,7 @@ describe("bot/features/message-delete/commands/usecases/validateOptions", () => 
         const result = await parseAndValidateOptions(interaction as never);
         expect(result).toBeNull();
         expect(tDefaultMock).toHaveBeenCalledWith(
-          "commands:message-delete.errors.after_future",
+          "messageDelete:user-response.after_future",
         );
       });
 
@@ -244,7 +244,7 @@ describe("bot/features/message-delete/commands/usecases/validateOptions", () => 
         const result = await parseAndValidateOptions(interaction as never);
         expect(result).toBeNull();
         expect(tDefaultMock).toHaveBeenCalledWith(
-          "commands:message-delete.errors.before_invalid_format",
+          "messageDelete:user-response.before_invalid_format",
         );
       });
 
@@ -257,7 +257,7 @@ describe("bot/features/message-delete/commands/usecases/validateOptions", () => 
         const result = await parseAndValidateOptions(interaction as never);
         expect(result).toBeNull();
         expect(tDefaultMock).toHaveBeenCalledWith(
-          "commands:message-delete.errors.before_future",
+          "messageDelete:user-response.before_future",
         );
       });
 
@@ -309,7 +309,7 @@ describe("bot/features/message-delete/commands/usecases/validateOptions", () => 
         const result = await parseAndValidateOptions(interaction as never);
         expect(result).toBeNull();
         expect(tDefaultMock).toHaveBeenCalledWith(
-          "commands:message-delete.errors.date_range_invalid",
+          "messageDelete:user-response.date_range_invalid",
         );
       });
     });

@@ -23,7 +23,7 @@ export async function executeVcRename(
   await channel.edit({ name: newName });
 
   const embed = createSuccessEmbed(
-    tInteraction(interaction.locale, "commands:vc.embed.renamed", {
+    tInteraction(interaction.locale, "vc:user-response.renamed", {
       name: newName,
     }),
   );

@@ -53,26 +53,26 @@ async function buildRecruitMessageButtons(
 
   // 「VCに参加」リンクボタン
   const joinButton = new ButtonBuilder()
-    .setLabel(await tGuild(guildId, "commands:vcRecruit.button.join_vc"))
+    .setLabel(await tGuild(guildId, "vcRecruit:ui.button.join_vc"))
     .setStyle(ButtonStyle.Link)
     .setURL(`https://discord.com/channels/${guildId}/${voiceChannelId}`);
 
   // 「VC名を変更」ボタン
   const renameButton = new ButtonBuilder()
     .setCustomId(`${VC_RECRUIT_POST_CUSTOM_ID.RENAME_VC_PREFIX}${idSuffix}`)
-    .setLabel(await tGuild(guildId, "commands:vcRecruit.button.rename_vc"))
+    .setLabel(await tGuild(guildId, "vcRecruit:ui.button.rename_vc"))
     .setStyle(ButtonStyle.Secondary);
 
   // 「VCを終了」ボタン
   const endButton = new ButtonBuilder()
     .setCustomId(`${VC_RECRUIT_POST_CUSTOM_ID.END_VC_PREFIX}${idSuffix}`)
-    .setLabel(await tGuild(guildId, "commands:vcRecruit.button.end_vc"))
+    .setLabel(await tGuild(guildId, "vcRecruit:ui.button.end_vc"))
     .setStyle(ButtonStyle.Secondary);
 
   // 「募集を削除」ボタン
   const deleteButton = new ButtonBuilder()
     .setCustomId(`${VC_RECRUIT_POST_CUSTOM_ID.DELETE_POST_PREFIX}${idSuffix}`)
-    .setLabel(await tGuild(guildId, "commands:vcRecruit.button.delete_post"))
+    .setLabel(await tGuild(guildId, "vcRecruit:ui.button.delete_post"))
     .setStyle(ButtonStyle.Danger);
 
   return [
@@ -113,7 +113,7 @@ export const vcRecruitModalHandler: ModalHandler = {
       await safeReply(interaction, {
         embeds: [
           createWarningEmbed(
-            tInteraction(interaction.locale, "errors:interaction.timeout"),
+            tInteraction(interaction.locale, "common:interaction.timeout"),
             { title: tInteraction(interaction.locale, "common:title_timeout") },
           ),
         ],
@@ -140,7 +140,10 @@ export const vcRecruitModalHandler: ModalHandler = {
       await safeReply(interaction, {
         embeds: [
           createWarningEmbed(
-            tInteraction(interaction.locale, "errors:vcRecruit.not_setup"),
+            tInteraction(
+              interaction.locale,
+              "vcRecruit:user-response.not_setup",
+            ),
             {
               title: tInteraction(
                 interaction.locale,
@@ -178,7 +181,7 @@ export const vcRecruitModalHandler: ModalHandler = {
               createWarningEmbed(
                 tInteraction(
                   interaction.locale,
-                  "errors:vcRecruit.category_full",
+                  "vcRecruit:user-response.category_full",
                 ),
                 {
                   title: tInteraction(
@@ -223,7 +226,10 @@ export const vcRecruitModalHandler: ModalHandler = {
         await interaction.editReply({
           embeds: [
             createWarningEmbed(
-              tInteraction(interaction.locale, "errors:vcRecruit.vc_deleted"),
+              tInteraction(
+                interaction.locale,
+                "vcRecruit:user-response.vc_deleted",
+              ),
               {
                 title: tInteraction(
                   interaction.locale,
@@ -254,19 +260,19 @@ export const vcRecruitModalHandler: ModalHandler = {
 
       const embedTitle = tInteraction(
         interaction.locale,
-        "commands:vcRecruit.embed.title",
+        "vcRecruit:embed.title.recruit_post",
       );
       const fieldContent = tInteraction(
         interaction.locale,
-        "commands:vcRecruit.embed.field_content",
+        "vcRecruit:embed.field.name.content",
       );
       const fieldVc = tInteraction(
         interaction.locale,
-        "commands:vcRecruit.embed.field_vc",
+        "vcRecruit:embed.field.name.vc",
       );
       const fieldRecruiter = tInteraction(
         interaction.locale,
-        "commands:vcRecruit.embed.field_recruiter",
+        "vcRecruit:embed.field.name.recruiter",
       );
 
       const recruitEmbed = new EmbedBuilder()
@@ -300,7 +306,7 @@ export const vcRecruitModalHandler: ModalHandler = {
       // スレッドを作成
       const threadName = tInteraction(
         interaction.locale,
-        "commands:vcRecruit.thread_name",
+        "vcRecruit:embed.field.value.thread_name",
         { recruiter: member?.displayName ?? interaction.user.displayName },
       );
       await message
@@ -323,13 +329,13 @@ export const vcRecruitModalHandler: ModalHandler = {
     // エフェメラルメッセージで成功通知＋投稿リンク
     const successText = tInteraction(
       interaction.locale,
-      "commands:vcRecruit.embed.post_success",
+      "vcRecruit:user-response.post_success",
     );
 
     if (postedMessageUrl) {
       const linkLabel = tInteraction(
         interaction.locale,
-        "commands:vcRecruit.embed.post_success_link",
+        "vcRecruit:user-response.post_success_link",
       );
       const linkButton = new ButtonBuilder()
         .setLabel(linkLabel)

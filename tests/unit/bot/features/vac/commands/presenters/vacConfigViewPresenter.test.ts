@@ -8,12 +8,12 @@ vi.mock("@/shared/locale/localeManager", () => ({
   logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
   tInteraction: vi.fn((_locale: string, key: string) => {
     const labels: Record<string, string> = {
-      "commands:vac-config.embed.top": "TOP",
-      "commands:vac-config.embed.not_configured": "未設定",
-      "commands:vac-config.embed.no_created_vcs": "作成済みVCなし",
-      "commands:vac-config.embed.title": "VAC設定",
-      "commands:vac-config.embed.field.trigger_channels": "トリガー",
-      "commands:vac-config.embed.field.created_vc_details": "作成済みVC",
+      "vac:embed.field.value.top": "TOP",
+      "vac:embed.field.value.not_configured": "未設定",
+      "vac:embed.field.value.no_created_vcs": "作成済みVCなし",
+      "vac:embed.title.config_view": "VAC設定",
+      "vac:embed.field.name.trigger_channels": "トリガー",
+      "vac:embed.field.name.created_vc_details": "作成済みVC",
     };
     return labels[key] ?? key;
   }),

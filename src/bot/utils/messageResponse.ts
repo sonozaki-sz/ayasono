@@ -21,7 +21,7 @@ export const STATUS_COLORS: Record<MessageStatus, number> & {
   muted: 0x95a5a6,
 };
 
-const STATUS_EMOJIS: Record<MessageStatus, string> = {
+export const STATUS_EMOJIS: Record<MessageStatus, string> = {
   success: "✅",
   info: "ℹ️",
   warning: "⚠️",

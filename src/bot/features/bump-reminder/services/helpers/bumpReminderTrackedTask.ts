@@ -29,7 +29,7 @@ export function createTrackedReminderTask(
       logger.error(
         logPrefixed(
           "system:log_prefix.bump_reminder",
-          "system:scheduler.bump_reminder_task_failed",
+          "bumpReminder:log.scheduler_task_failed",
           {
             guildId,
           },
@@ -46,7 +46,7 @@ export function createTrackedReminderTask(
         logger.error(
           logPrefixed(
             "system:log_prefix.bump_reminder",
-            "system:scheduler.bump_reminder_task_failed",
+            "bumpReminder:log.scheduler_task_failed",
             {
               guildId,
             },

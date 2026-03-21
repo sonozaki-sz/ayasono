@@ -66,10 +66,10 @@ export const getUserFriendlyMessage = (error: Error | BaseError): string => {
   }
 
   if (env.NODE_ENV === NODE_ENV.PRODUCTION) {
-    return tDefault("errors:general.unexpected_production");
+    return tDefault("common:general.unexpected_production");
   }
 
-  return tDefault("errors:general.unexpected_with_message", {
+  return tDefault("common:general.unexpected_with_message", {
     message: error.message,
   });
 };

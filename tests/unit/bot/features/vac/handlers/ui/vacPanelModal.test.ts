@@ -9,13 +9,13 @@ vi.mock("@/shared/locale/localeManager", () => ({
   logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
   tInteraction: vi.fn(
     (_locale: string, key: string, params?: Record<string, unknown>) => {
-      if (key === "commands:vac.embed.renamed") {
+      if (key === "vac:user-response.renamed") {
         return `renamed:${String(params?.name)}`;
       }
-      if (key === "commands:vac.embed.limit_changed") {
+      if (key === "vac:user-response.limit_changed") {
         return `limit:${String(params?.limit)}`;
       }
-      if (key === "commands:vac.embed.unlimited") {
+      if (key === "vac:user-response.unlimited") {
         return "unlimited";
       }
       return key;
@@ -107,7 +107,7 @@ describe("bot/features/vac/handlers/ui/vacPanelModal", () => {
     await vcPanelModalHandler.execute(interaction as never);
 
     expect(safeReply).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "errors:vac.not_vac_channel" }],
+      embeds: [{ message: "vac:user-response.not_vac_channel" }],
       flags: 64,
     });
   });
@@ -141,7 +141,7 @@ describe("bot/features/vac/handlers/ui/vacPanelModal", () => {
 
     expect(editMock).not.toHaveBeenCalled();
     expect(safeReply).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "errors:vac.limit_out_of_range" }],
+      embeds: [{ message: "vac:user-response.limit_out_of_range" }],
       flags: 64,
     });
   });

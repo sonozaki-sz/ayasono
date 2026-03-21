@@ -121,7 +121,7 @@ describe("bot/commands/afk-config", () => {
     );
     expect(setAfkChannelMock).toHaveBeenCalledWith("guild-1", "afk-channel");
     expect(interaction.reply).toHaveBeenCalledWith({
-      embeds: [{ kind: "success", description: "commands:afk-config.embed.set_ch_success" }],
+      embeds: [{ kind: "success", description: "afk:user-response.set_channel_success" }],
       flags: 64,
     });
   });
@@ -161,7 +161,7 @@ describe("bot/commands/afk-config", () => {
     expect(getAfkConfigMock).toHaveBeenCalledWith("guild-1");
     expect(createInfoEmbedMock).toHaveBeenCalled();
     expect(interaction.reply).toHaveBeenCalledWith({
-      embeds: [{ kind: "info", description: "commands:afk-config.embed.not_configured" }],
+      embeds: [{ kind: "info", description: "afk:embed.field.value.not_configured" }],
       flags: 64,
     });
   });
@@ -183,8 +183,8 @@ describe("bot/commands/afk-config", () => {
       interaction as unknown as ChatInputCommandInteraction,
     );
 
-    expect(createInfoEmbedMock).toHaveBeenCalledWith("commands:afk-config.embed.not_configured", {
-      title: "commands:afk-config.embed.title",
+    expect(createInfoEmbedMock).toHaveBeenCalledWith("afk:embed.field.value.not_configured", {
+      title: "afk:embed.title.config_view",
     });
   });
 
@@ -205,8 +205,8 @@ describe("bot/commands/afk-config", () => {
     );
 
     expect(createInfoEmbedMock).toHaveBeenCalledWith("", {
-      title: "commands:afk-config.embed.title",
-      fields: [{ name: "commands:afk-config.embed.field.channel", value: "<#afk-channel>", inline: true }],
+      title: "afk:embed.title.config_view",
+      fields: [{ name: "afk:embed.field.name.channel", value: "<#afk-channel>", inline: true }],
     });
     expect(interaction.reply).toHaveBeenCalledWith({
       embeds: [{ kind: "info", description: "" }],

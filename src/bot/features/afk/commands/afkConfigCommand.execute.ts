@@ -75,7 +75,10 @@ async function handleSetChannel(
 
   if (channel.type !== ChannelType.GuildVoice) {
     throw new ValidationError(
-      tInteraction(interaction.locale, "errors:afk.invalid_channel_type"),
+      tInteraction(
+        interaction.locale,
+        "afk:user-response.invalid_channel_type",
+      ),
     );
   }
 
@@ -83,7 +86,7 @@ async function handleSetChannel(
 
   const description = tInteraction(
     interaction.locale,
-    "commands:afk-config.embed.set_ch_success",
+    "afk:user-response.set_channel_success",
     {
       channel: `<#${channel.id}>`,
     },
@@ -91,7 +94,7 @@ async function handleSetChannel(
 
   const successTitle = tInteraction(
     interaction.locale,
-    "commands:afk-config.embed.success_title",
+    "afk:embed.title.success",
   );
   const embed = createSuccessEmbed(description, { title: successTitle });
 
@@ -101,7 +104,7 @@ async function handleSetChannel(
   });
 
   logger.info(
-    logPrefixed("system:log_prefix.afk", "system:afk.configured", {
+    logPrefixed("system:log_prefix.afk", "afk:log.configured", {
       guildId,
       channelId: channel.id,
     }),
@@ -120,15 +123,12 @@ async function handleViewSetting(
 ): Promise<void> {
   const config = await getAfkConfig(guildId);
 
-  const title = tInteraction(
-    interaction.locale,
-    "commands:afk-config.embed.title",
-  );
+  const title = tInteraction(interaction.locale, "afk:embed.title.config_view");
 
   if (!config || !config.enabled || !config.channelId) {
     const description = tInteraction(
       interaction.locale,
-      "commands:afk-config.embed.not_configured",
+      "afk:embed.field.value.not_configured",
     );
     const embed = createInfoEmbed(description, { title });
     await interaction.reply({
@@ -140,7 +140,7 @@ async function handleViewSetting(
 
   const fieldChannel = tInteraction(
     interaction.locale,
-    "commands:afk-config.embed.field.channel",
+    "afk:embed.field.name.channel",
   );
 
   const embed = createInfoEmbed("", {

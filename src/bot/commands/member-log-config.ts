@@ -19,32 +19,44 @@ import type { Command } from "../types/discord";
 export const memberLogConfigCommand: Command = {
   data: (() => {
     // 各ロケール文言を先に解決して SlashCommandBuilder へ流し込む
-    const cmdDesc = getCommandLocalizations("member-log-config.description");
+    const cmdDesc = getCommandLocalizations(
+      "memberLog",
+      "member-log-config.description",
+    );
     const setChannelDesc = getCommandLocalizations(
+      "memberLog",
       "member-log-config.set-channel.description",
     );
     const setChannelChannelDesc = getCommandLocalizations(
+      "memberLog",
       "member-log-config.set-channel.channel.description",
     );
     const enableDesc = getCommandLocalizations(
+      "memberLog",
       "member-log-config.enable.description",
     );
     const disableDesc = getCommandLocalizations(
+      "memberLog",
       "member-log-config.disable.description",
     );
     const setJoinMessageDesc = getCommandLocalizations(
+      "memberLog",
       "member-log-config.set-join-message.description",
     );
     const setLeaveMessageDesc = getCommandLocalizations(
+      "memberLog",
       "member-log-config.set-leave-message.description",
     );
     const clearJoinMessageDesc = getCommandLocalizations(
+      "memberLog",
       "member-log-config.clear-join-message.description",
     );
     const clearLeaveMessageDesc = getCommandLocalizations(
+      "memberLog",
       "member-log-config.clear-leave-message.description",
     );
     const viewDesc = getCommandLocalizations(
+      "memberLog",
       "member-log-config.view.description",
     );
 
