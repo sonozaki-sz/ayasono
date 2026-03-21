@@ -83,7 +83,15 @@ const replyWithError = async (
   const err = toError(error);
   logError(err);
 
-  const message = getUserFriendlyMessage(err);
+  // messageKey が設定されている場合は interaction.locale で遅延翻訳する
+  const message =
+    err instanceof BaseError && err.messageKey
+      ? tInteraction(
+          interaction.locale,
+          err.messageKey as Parameters<typeof tInteraction>[1],
+          err.messageParams,
+        )
+      : getUserFriendlyMessage(err);
   const title = getErrorTitle(interaction, err);
   const isWarning =
     err instanceof BaseError &&

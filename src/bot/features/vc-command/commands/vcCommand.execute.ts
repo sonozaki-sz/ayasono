@@ -3,7 +3,6 @@
 
 import { ChatInputCommandInteraction } from "discord.js";
 import { ValidationError } from "../../../../shared/errors/customErrors";
-import { tDefault } from "../../../../shared/locale/localeManager";
 import { handleCommandError } from "../../../errors/interactionErrorHandler";
 import { COMMON_I18N_KEYS } from "../../../shared/i18nKeys";
 import { executeVcLimit } from "./usecases/vcLimit";
@@ -22,7 +21,7 @@ export async function executeVcCommand(
   try {
     const guildId = interaction.guildId;
     if (!guildId) {
-      throw new ValidationError(tDefault(COMMON_I18N_KEYS.GUILD_ONLY));
+      throw ValidationError.fromKey(COMMON_I18N_KEYS.GUILD_ONLY);
     }
 
     const voiceChannel = await getManagedVoiceChannel(interaction, guildId);
@@ -36,9 +35,7 @@ export async function executeVcCommand(
         await executeVcLimit(interaction, voiceChannel.id);
         break;
       default:
-        throw new ValidationError(
-          tDefault(COMMON_I18N_KEYS.INVALID_SUBCOMMAND),
-        );
+        throw ValidationError.fromKey(COMMON_I18N_KEYS.INVALID_SUBCOMMAND);
     }
   } catch (error) {
     await handleCommandError(interaction, error);

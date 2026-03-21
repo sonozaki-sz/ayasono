@@ -13,6 +13,13 @@ export class BaseError extends Error {
   public readonly statusCode?: number;
   // Embed応答時のタイトル上書き
   public readonly embedTitle?: string;
+  /**
+   * 遅延翻訳用の i18n キー
+   * 設定されている場合、interactionErrorHandler が interaction.locale で翻訳する
+   */
+  public messageKey?: string;
+  /** 遅延翻訳用の補間パラメータ */
+  public messageParams?: Record<string, unknown>;
 
   constructor(
     name: string,
@@ -42,6 +49,27 @@ export class ValidationError extends BaseError {
   constructor(message: string, embedTitle?: string) {
     // 入力不正は運用系エラーとして 400 を付与
     super("ValidationError", message, true, 400, embedTitle);
+  }
+
+  /**
+   * 翻訳キーから ValidationError を生成する（遅延翻訳パターン）
+   * interactionErrorHandler が interaction.locale で翻訳するため、
+   * throw 時点で言語が固定されない
+   * @param messageKey i18n 翻訳キー
+   * @param messageParams 補間パラメータ
+   * @param embedTitle Embed タイトル上書き
+   * @returns 遅延翻訳用の ValidationError
+   */
+  static fromKey(
+    messageKey: string,
+    messageParams?: Record<string, unknown>,
+    embedTitle?: string,
+  ): ValidationError {
+    // message にはキーをそのまま格納（ログ出力用フォールバック）
+    const err = new ValidationError(messageKey, embedTitle);
+    err.messageKey = messageKey;
+    err.messageParams = messageParams;
+    return err;
   }
 }
 

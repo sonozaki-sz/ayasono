@@ -3,10 +3,7 @@
 
 import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
-import {
-  tDefault,
-  tInteraction,
-} from "../../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../../shared/locale/localeManager";
 import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
 import { getBotVcRecruitRepository } from "../../../../services/botCompositionRoot";
 import { createInfoEmbed } from "../../../../utils/messageResponse";
@@ -22,7 +19,7 @@ export async function handleVcRecruitConfigView(
 ): Promise<void> {
   const guild = interaction.guild;
   if (!guild) {
-    throw new ValidationError(tDefault(COMMON_I18N_KEYS.GUILD_ONLY));
+    throw ValidationError.fromKey(COMMON_I18N_KEYS.GUILD_ONLY);
   }
 
   const config =

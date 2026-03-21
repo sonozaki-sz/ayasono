@@ -6,7 +6,6 @@ import { ValidationError } from "../../../../shared/errors/customErrors";
 import { getAfkConfig } from "../../../../shared/features/afk/afkConfigService";
 import {
   logPrefixed,
-  tDefault,
   tInteraction,
 } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
@@ -31,7 +30,7 @@ export async function executeAfkCommand(
 ): Promise<void> {
   const guildId = interaction.guildId;
   if (!guildId) {
-    throw new ValidationError(tDefault(AFK_I18N_KEYS.ERROR_GUILD_ONLY));
+    throw ValidationError.fromKey(AFK_I18N_KEYS.ERROR_GUILD_ONLY);
   }
 
   const config = await getAfkConfig(guildId);

@@ -11,10 +11,7 @@ import {
 } from "discord.js";
 import type { VcRecruitSetup } from "../../../../../shared/database/types";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
-import {
-  tDefault,
-  tInteraction,
-} from "../../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../../shared/locale/localeManager";
 import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
 import { getBotVcRecruitConfigService } from "../../../../services/botCompositionRoot";
 import { disableComponentsAfterTimeout } from "../../../../shared/disableComponentsAfterTimeout";
@@ -69,7 +66,7 @@ export async function handleVcRecruitConfigTeardown(
 ): Promise<void> {
   const guild = interaction.guild;
   if (!guild) {
-    throw new ValidationError(tDefault(COMMON_I18N_KEYS.GUILD_ONLY));
+    throw ValidationError.fromKey(COMMON_I18N_KEYS.GUILD_ONLY);
   }
 
   const repo = getBotVcRecruitConfigService();

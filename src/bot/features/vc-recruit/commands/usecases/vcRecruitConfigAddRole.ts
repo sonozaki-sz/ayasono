@@ -10,10 +10,7 @@ import {
   type ChatInputCommandInteraction,
 } from "discord.js";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
-import {
-  tDefault,
-  tInteraction,
-} from "../../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../../shared/locale/localeManager";
 import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
 import { disableComponentsAfterTimeout } from "../../../../shared/disableComponentsAfterTimeout";
 import {
@@ -33,7 +30,7 @@ export async function handleVcRecruitConfigAddRole(
   _guildId: string,
 ): Promise<void> {
   if (!interaction.guild) {
-    throw new ValidationError(tDefault(COMMON_I18N_KEYS.GUILD_ONLY));
+    throw ValidationError.fromKey(COMMON_I18N_KEYS.GUILD_ONLY);
   }
 
   const sessionId = interaction.id;

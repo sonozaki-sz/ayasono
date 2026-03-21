@@ -14,7 +14,6 @@ import {
 } from "../../../../shared/features/afk/afkConfigService";
 import {
   logPrefixed,
-  tDefault,
   tInteraction,
 } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
@@ -37,7 +36,7 @@ export async function executeAfkConfigCommand(
 ): Promise<void> {
   const guildId = interaction.guildId;
   if (!guildId) {
-    throw new ValidationError(tDefault(COMMON_I18N_KEYS.GUILD_ONLY));
+    throw ValidationError.fromKey(COMMON_I18N_KEYS.GUILD_ONLY);
   }
 
   if (!interaction.memberPermissions?.has(PermissionFlagsBits.ManageGuild)) {
@@ -56,7 +55,7 @@ export async function executeAfkConfigCommand(
       await handleViewSetting(interaction, guildId);
       break;
     default:
-      throw new ValidationError(tDefault(COMMON_I18N_KEYS.INVALID_SUBCOMMAND));
+      throw ValidationError.fromKey(COMMON_I18N_KEYS.INVALID_SUBCOMMAND);
   }
 }
 

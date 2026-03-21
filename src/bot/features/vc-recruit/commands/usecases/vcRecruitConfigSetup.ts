@@ -10,10 +10,7 @@ import {
   type TextChannel,
 } from "discord.js";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
-import {
-  tDefault,
-  tInteraction,
-} from "../../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../../shared/locale/localeManager";
 import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
 import { getBotVcRecruitRepository } from "../../../../services/botCompositionRoot";
 import { createSuccessEmbed } from "../../../../utils/messageResponse";
@@ -35,7 +32,7 @@ export async function handleVcRecruitConfigSetup(
 ): Promise<void> {
   const guild = interaction.guild;
   if (!guild) {
-    throw new ValidationError(tDefault(COMMON_I18N_KEYS.GUILD_ONLY));
+    throw ValidationError.fromKey(COMMON_I18N_KEYS.GUILD_ONLY);
   }
 
   const categoryOption = interaction.options.getString(

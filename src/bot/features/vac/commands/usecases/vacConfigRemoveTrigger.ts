@@ -7,10 +7,7 @@ import {
   MessageFlags,
 } from "discord.js";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
-import {
-  tDefault,
-  tInteraction,
-} from "../../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../../shared/locale/localeManager";
 import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
 import { getBotVacConfigService } from "../../../../services/botCompositionRoot";
 import { createSuccessEmbed } from "../../../../utils/messageResponse";
@@ -33,7 +30,7 @@ export async function handleVacConfigRemoveTrigger(
   // 実行コンテキストから対象カテゴリを解決
   const guild = interaction.guild;
   if (!guild) {
-    throw new ValidationError(tDefault(COMMON_I18N_KEYS.GUILD_ONLY));
+    throw ValidationError.fromKey(COMMON_I18N_KEYS.GUILD_ONLY);
   }
 
   const categoryOption = interaction.options.getString(
