@@ -74,9 +74,9 @@ function createInteractionMock({
       }
     : null;
   const inputValues: Record<string, string> = {
-    "sticky-message:modal:embed-title": embedTitle,
-    "sticky-message:modal:embed-description": embedDescription,
-    "sticky-message:modal:embed-color": embedColor,
+    "sticky-message:embed-title-modal-input": embedTitle,
+    "sticky-message:embed-description-modal-input": embedDescription,
+    "sticky-message:embed-color-modal-input": embedColor,
   };
   return {
     customId,

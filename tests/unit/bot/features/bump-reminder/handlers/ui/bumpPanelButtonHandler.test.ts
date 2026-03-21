@@ -5,7 +5,7 @@ import {
   createErrorEmbed,
   createSuccessEmbed,
 } from "@/bot/utils/messageResponse";
-import { tDefault } from "@/shared/locale/localeManager";
+import { tInteraction } from "@/shared/locale/localeManager";
 import { logger } from "@/shared/utils/logger";
 import { MessageFlags } from "discord.js";
 
@@ -54,8 +54,8 @@ vi.mock("@/shared/locale/helpers", () => ({
 vi.mock("@/shared/locale/localeManager", () => ({
   logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
   logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
-  tDefault: vi.fn((key: string) => key),
-  tInteraction: (...args: unknown[]) => args[1],
+  tDefault: (key: string) => key,
+  tInteraction: vi.fn((...args: unknown[]) => args[1]),
 }));
 
 // interaction 応答は safeReply 経由のみ検証する
@@ -252,7 +252,7 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
         expect.stringContaining("bumpReminder:log.panel_handle_failed"),
         expect.any(Error),
       );
-      expect(tDefault).toHaveBeenCalledWith("common:title_operation_error");
+      expect(tInteraction).toHaveBeenCalledWith("ja", "common:title_operation_error");
       expect(createErrorEmbed).toHaveBeenCalledWith(
         "bumpReminder:user-response.panel_update_failed",
         { title: "common:title_operation_error" },

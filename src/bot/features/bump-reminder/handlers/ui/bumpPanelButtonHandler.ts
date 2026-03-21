@@ -8,7 +8,6 @@ import {
 } from "../../../../../shared/features/bump-reminder/bumpReminderConfigService";
 import {
   logPrefixed,
-  tDefault,
   tInteraction,
 } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
@@ -65,9 +64,15 @@ export const bumpPanelButtonHandler: ButtonHandler = {
         await safeReply(interaction, {
           embeds: [
             createWarningEmbed(
-              tDefault("bumpReminder:user-response.panel_update_failed"),
+              tInteraction(
+                interaction.locale,
+                "bumpReminder:user-response.panel_update_failed",
+              ),
               {
-                title: tDefault("common:title_operation_error"),
+                title: tInteraction(
+                  interaction.locale,
+                  "common:title_operation_error",
+                ),
               },
             ),
           ],
@@ -99,9 +104,15 @@ export const bumpPanelButtonHandler: ButtonHandler = {
           await safeReply(interaction, {
             embeds: [
               createWarningEmbed(
-                tDefault("bumpReminder:user-response.panel_update_failed"),
+                tInteraction(
+                  interaction.locale,
+                  "bumpReminder:user-response.panel_update_failed",
+                ),
                 {
-                  title: tDefault("common:title_not_configured"),
+                  title: tInteraction(
+                    interaction.locale,
+                    "common:title_not_configured",
+                  ),
                 },
               ),
             ],
@@ -151,9 +162,15 @@ export const bumpPanelButtonHandler: ButtonHandler = {
           await safeReply(interaction, {
             embeds: [
               createWarningEmbed(
-                tDefault("bumpReminder:user-response.panel_update_failed"),
+                tInteraction(
+                  interaction.locale,
+                  "bumpReminder:user-response.panel_update_failed",
+                ),
                 {
-                  title: tDefault("common:title_not_configured"),
+                  title: tInteraction(
+                    interaction.locale,
+                    "common:title_not_configured",
+                  ),
                 },
               ),
             ],
@@ -201,9 +218,15 @@ export const bumpPanelButtonHandler: ButtonHandler = {
         await safeReply(interaction, {
           embeds: [
             createErrorEmbed(
-              tDefault("bumpReminder:user-response.panel_update_failed"),
+              tInteraction(
+                interaction.locale,
+                "bumpReminder:user-response.panel_update_failed",
+              ),
               {
-                title: tDefault("common:title_operation_error"),
+                title: tInteraction(
+                  interaction.locale,
+                  "common:title_operation_error",
+                ),
               },
             ),
           ],

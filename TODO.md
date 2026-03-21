@@ -159,10 +159,10 @@ locales/ja/
 
 **対象箇所:**
 
-- [ ] `message-delete` 機能全体（`messageDeleteEmbedBuilder.ts`, `messageDeleteCommand.execute.ts`, `validateOptions.ts`, `runPreviewDialog.ts`, `runFinalConfirmDialog.ts`, `runDeleteExecution.ts`, `runConditionSetupStep.ts`, `runScanPhase.ts`, `buildTargetChannels.ts`, `dialogUtils.ts`, `messageDeleteService.ts`）— 約100箇所
-- [ ] `bumpPanelButtonHandler.ts` — パネル操作応答（約8箇所）
-- [ ] `stickyMessageSet.ts`, `stickyMessageUpdate.ts` — モーダル構築
-- [ ] `memberLogConfigCommand.setJoinMessage.ts`, `memberLogConfigCommand.setLeaveMessage.ts` — モーダル構築
+- [x] `message-delete` 機能全体（`messageDeleteEmbedBuilder.ts`, `messageDeleteCommand.execute.ts`, `validateOptions.ts`, `runPreviewDialog.ts`, `runFinalConfirmDialog.ts`, `runDeleteExecution.ts`, `runConditionSetupStep.ts`, `runScanPhase.ts`, `buildTargetChannels.ts`, `dialogUtils.ts`, `messageDeleteService.ts`）— 約100箇所
+- [x] `bumpPanelButtonHandler.ts` — パネル操作応答（約8箇所）
+- [x] `stickyMessageSet.ts`, `stickyMessageUpdate.ts` — モーダル構築
+- [x] `memberLogConfigCommand.setJoinMessage.ts`, `memberLogConfigCommand.setLeaveMessage.ts` — モーダル構築
 - [ ] `ValidationError` に渡すメッセージ（各 `*Command.execute.ts`）— `interactionErrorHandler` で catch されユーザーに表示されるが、throw 時点で `tDefault` により言語固定される。設計レベルの検討が必要
 
 ### 6. インテグレーションテスト拡充

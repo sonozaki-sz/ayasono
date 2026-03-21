@@ -10,7 +10,7 @@ import {
 } from "discord.js";
 import {
   logPrefixed,
-  tDefault,
+  tInteraction,
 } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import {
@@ -82,10 +82,19 @@ export async function buildTargetChannels(
         .followUp({
           embeds: [
             createWarningEmbed(
-              tDefault("messageDelete:user-response.channel_partial_skip", {
-                channels: channelMentions,
-              }),
-              { title: tDefault("common:title_bot_permission_denied") },
+              tInteraction(
+                interaction.locale,
+                "messageDelete:user-response.channel_partial_skip",
+                {
+                  channels: channelMentions,
+                },
+              ),
+              {
+                title: tInteraction(
+                  interaction.locale,
+                  "common:title_bot_permission_denied",
+                ),
+              },
             ),
           ],
           ephemeral: true,
@@ -98,8 +107,16 @@ export async function buildTargetChannels(
       await interaction.editReply({
         embeds: [
           createErrorEmbed(
-            tDefault("messageDelete:user-response.channel_all_no_access"),
-            { title: tDefault("common:title_bot_permission_denied") },
+            tInteraction(
+              interaction.locale,
+              "messageDelete:user-response.channel_all_no_access",
+            ),
+            {
+              title: tInteraction(
+                interaction.locale,
+                "common:title_bot_permission_denied",
+              ),
+            },
           ),
         ],
         components: [],

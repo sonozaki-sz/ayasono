@@ -152,8 +152,8 @@ function makeInteraction(
     user: { id: "user-1", username: "testuser", displayName: "testuser" },
     fields: {
       getTextInputValue: (key: string) => {
-        if (key === "vc-recruit:content") return content;
-        if (key === "vc-recruit:vc-name") return vcName;
+        if (key === "vc-recruit:content-modal-input") return content;
+        if (key === "vc-recruit:vc-name-modal-input") return vcName;
         return "";
       },
     },

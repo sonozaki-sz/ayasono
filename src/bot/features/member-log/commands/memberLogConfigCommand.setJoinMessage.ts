@@ -8,7 +8,7 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
-import { tDefault } from "../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../shared/locale/localeManager";
 import { MEMBER_LOG_CONFIG_COMMAND } from "./memberLogConfigCommand.constants";
 import { ensureMemberLogManageGuildPermission } from "./memberLogConfigCommand.guard";
 
@@ -27,12 +27,27 @@ export async function handleMemberLogConfigSetJoinMessage(
 
   const modal = new ModalBuilder()
     .setCustomId(MEMBER_LOG_CONFIG_COMMAND.SET_JOIN_MESSAGE_MODAL_ID)
-    .setTitle(tDefault("memberLog:ui.modal.set_join_message_title"));
+    .setTitle(
+      tInteraction(
+        interaction.locale,
+        "memberLog:ui.modal.set_join_message_title",
+      ),
+    );
 
   const messageInput = new TextInputBuilder()
     .setCustomId(MEMBER_LOG_CONFIG_COMMAND.MODAL_INPUT_MESSAGE)
-    .setLabel(tDefault("memberLog:ui.modal.set_join_message_label"))
-    .setPlaceholder(tDefault("memberLog:ui.modal.set_join_message_placeholder"))
+    .setLabel(
+      tInteraction(
+        interaction.locale,
+        "memberLog:ui.modal.set_join_message_label",
+      ),
+    )
+    .setPlaceholder(
+      tInteraction(
+        interaction.locale,
+        "memberLog:ui.modal.set_join_message_placeholder",
+      ),
+    )
     .setStyle(TextInputStyle.Paragraph)
     .setRequired(true)
     .setMaxLength(500);

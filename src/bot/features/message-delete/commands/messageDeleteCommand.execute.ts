@@ -6,7 +6,10 @@ import {
   type ChatInputCommandInteraction,
   type MessageComponentInteraction,
 } from "discord.js";
-import { logPrefixed, tDefault } from "../../../../shared/locale/localeManager";
+import {
+  logPrefixed,
+  tInteraction,
+} from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import { handleCommandError } from "../../../errors/interactionErrorHandler";
 import { COMMON_I18N_KEYS } from "../../../shared/i18nKeys";
@@ -55,9 +58,15 @@ export async function executeMessageDeleteCommand(
     if (!interaction.guildId || !interaction.guild) {
       await interaction.editReply({
         embeds: [
-          createErrorEmbed(tDefault(COMMON_I18N_KEYS.GUILD_ONLY), {
-            title: tDefault("common:title_server_only"),
-          }),
+          createErrorEmbed(
+            tInteraction(interaction.locale, COMMON_I18N_KEYS.GUILD_ONLY),
+            {
+              title: tInteraction(
+                interaction.locale,
+                "common:title_server_only",
+              ),
+            },
+          ),
         ],
       });
       return;
@@ -70,9 +79,15 @@ export async function executeMessageDeleteCommand(
       await interaction.editReply({
         embeds: [
           createErrorEmbed(
-            tDefault("messageDelete:user-response.no_permission"),
+            tInteraction(
+              interaction.locale,
+              "messageDelete:user-response.no_permission",
+            ),
             {
-              title: tDefault("common:title_permission_denied"),
+              title: tInteraction(
+                interaction.locale,
+                "common:title_permission_denied",
+              ),
             },
           ),
         ],
@@ -85,9 +100,15 @@ export async function executeMessageDeleteCommand(
       await interaction.editReply({
         embeds: [
           createErrorEmbed(
-            tDefault("messageDelete:user-response.bot_no_permission"),
+            tInteraction(
+              interaction.locale,
+              "messageDelete:user-response.bot_no_permission",
+            ),
             {
-              title: tDefault("common:title_bot_permission_denied"),
+              title: tInteraction(
+                interaction.locale,
+                "common:title_bot_permission_denied",
+              ),
             },
           ),
         ],
@@ -100,9 +121,18 @@ export async function executeMessageDeleteCommand(
     if (executingGuilds.has(guildId)) {
       await interaction.editReply({
         embeds: [
-          createWarningEmbed(tDefault("messageDelete:user-response.locked"), {
-            title: tDefault("common:title_already_running"),
-          }),
+          createWarningEmbed(
+            tInteraction(
+              interaction.locale,
+              "messageDelete:user-response.locked",
+            ),
+            {
+              title: tInteraction(
+                interaction.locale,
+                "common:title_already_running",
+              ),
+            },
+          ),
         ],
       });
       return;
@@ -148,7 +178,10 @@ export async function executeMessageDeleteCommand(
         await scanInteraction.editReply({
           embeds: [
             createInfoEmbed(
-              tDefault("messageDelete:user-response.no_messages_found"),
+              tInteraction(
+                interaction.locale,
+                "messageDelete:user-response.no_messages_found",
+              ),
             ),
           ],
           content: "",
@@ -255,7 +288,12 @@ async function replyAsCancelled(
   await interaction
     .editReply({
       embeds: [
-        createInfoEmbed(tDefault("messageDelete:user-response.cancelled")),
+        createInfoEmbed(
+          tInteraction(
+            interaction.locale,
+            "messageDelete:user-response.cancelled",
+          ),
+        ),
       ],
       components: [],
       content: "",

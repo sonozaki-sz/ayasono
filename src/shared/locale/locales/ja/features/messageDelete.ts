@@ -31,23 +31,23 @@ export const messageDelete = {
     "このページから除外するメッセージを選択",
   "ui.select.exclude_no_messages":
     "(メッセージなし)",
-  "ui.button.final_yes":
+  "ui.button.deletion_confirm":
     "削除する（{{count}}件）",
-  "ui.button.final_back":
+  "ui.button.deletion_back":
     "設定し直す",
-  "ui.button.final_cancel":
+  "ui.button.deletion_cancel":
     "キャンセル",
   "ui.button.days_set":
     "過去{{days}}日間",
   "ui.button.days_empty":
     "過去N日間を入力",
-  "ui.button.after_set":
+  "ui.button.after_date_set":
     "after: {{date}}",
-  "ui.button.after_empty":
+  "ui.button.after_date_empty":
     "after（開始日時）を入力",
-  "ui.button.before_set":
+  "ui.button.before_date_set":
     "before: {{date}}",
-  "ui.button.before_empty":
+  "ui.button.before_date_empty":
     "before（終了日時）を入力",
   "ui.button.keyword":
     "内容で検索",
@@ -109,11 +109,11 @@ export const messageDelete = {
   // ── Embed ─────────────────────────────────────
   "embed.title.confirm":
     "📋 削除対象メッセージ（{{page}} / {{total}} ページ）",
-  "embed.title.final_confirm":
+  "embed.title.deletion_confirm":
     "🗑️ 本当に削除しますか？（{{page}} / {{total}} ページ）",
-  "embed.description.final_warning":
+  "embed.description.deletion_warning":
     "⚠️ **この操作は取り消せません**",
-  "embed.description.final_confirm":
+  "embed.description.deletion_confirm":
     "以下のメッセージを削除します（合計 {{count}}件）",
   "embed.title.summary":
     "削除完了",

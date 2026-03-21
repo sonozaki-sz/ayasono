@@ -8,7 +8,7 @@ import {
   EmbedBuilder,
   StringSelectMenuBuilder,
 } from "discord.js";
-import { tDefault } from "../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../shared/locale/localeManager";
 import {
   STATUS_COLORS,
   createSuccessEmbed,
@@ -30,12 +30,14 @@ import {
  * - ヘッダー: `[番号] <t:unix秒:f>`（Discord タイムスタンプ形式）
  * - value: `<@著者ID> | <#チャンネル>` + 本文 + メッセージリンク
  *
+ * @param locale interaction.locale
  * @param m 対象メッセージ
  * @param displayIndex 表示番号（1-indexed）
  * @param isExcluded 除外済みの場合は打ち消し線を付与する
  * @returns Embed フィールドの name/value オブジェクト
  */
 function buildMessageField(
+  locale: string,
   m: ScannedMessage,
   displayIndex: number,
   isExcluded: boolean,
@@ -44,9 +46,13 @@ function buildMessageField(
   const header = `[${displayIndex}] <t:${Math.floor(m.createdAt.getTime() / 1000)}:f>`;
   const meta = `<@${m.authorId}> | <#${m.channelId}>`;
   const content =
-    m.content || tDefault("messageDelete:embed.field.value.empty_content");
+    m.content ||
+    tInteraction(locale, "messageDelete:embed.field.value.empty_content");
   const messageUrl = `https://discord.com/channels/${m.guildId}/${m.channelId}/${m.messageId}`;
-  const linkLabel = tDefault("messageDelete:embed.field.value.jump_to_message");
+  const linkLabel = tInteraction(
+    locale,
+    "messageDelete:embed.field.value.jump_to_message",
+  );
 
   if (isExcluded) {
     return {
@@ -98,11 +104,13 @@ export function buildFilteredMessages<T extends ScannedMessage>(
 
 /**
  * ページネーション用ナビゲーションボタン行を生成する
+ * @param locale interaction.locale
  * @param page 現在のページ番号（0-indexed）
  * @param totalPages 総ページ数
  * @returns ナビゲーション用 ActionRow
  */
 function buildPaginationNavRow(
+  locale: string,
   page: number,
   totalPages: number,
 ): ActionRowBuilder<ButtonBuilder> {
@@ -110,19 +118,19 @@ function buildPaginationNavRow(
     new ButtonBuilder()
       .setCustomId(MSG_DEL_CUSTOM_ID.FIRST)
       .setEmoji("⏮")
-      .setLabel(tDefault("common:ui.button.page_first"))
+      .setLabel(tInteraction(locale, "common:ui.button.page_first"))
       .setStyle(ButtonStyle.Secondary)
       .setDisabled(page === 0),
     new ButtonBuilder()
       .setCustomId(MSG_DEL_CUSTOM_ID.PREV)
       .setEmoji("◀")
-      .setLabel(tDefault("common:ui.button.page_prev"))
+      .setLabel(tInteraction(locale, "common:ui.button.page_prev"))
       .setStyle(ButtonStyle.Secondary)
       .setDisabled(page === 0),
     new ButtonBuilder()
       .setCustomId(MSG_DEL_CUSTOM_ID.JUMP)
       .setLabel(
-        tDefault("common:ui.button.page_jump", {
+        tInteraction(locale, "common:ui.button.page_jump", {
           page: page + 1,
           total: Math.max(1, totalPages),
         }),
@@ -132,13 +140,13 @@ function buildPaginationNavRow(
     new ButtonBuilder()
       .setCustomId(MSG_DEL_CUSTOM_ID.NEXT)
       .setEmoji("▶")
-      .setLabel(tDefault("common:ui.button.page_next"))
+      .setLabel(tInteraction(locale, "common:ui.button.page_next"))
       .setStyle(ButtonStyle.Secondary)
       .setDisabled(page >= totalPages - 1),
     new ButtonBuilder()
       .setCustomId(MSG_DEL_CUSTOM_ID.LAST)
       .setEmoji("⏭")
-      .setLabel(tDefault("common:ui.button.page_last"))
+      .setLabel(tInteraction(locale, "common:ui.button.page_last"))
       .setStyle(ButtonStyle.Secondary)
       .setDisabled(page >= totalPages - 1),
   );
@@ -146,6 +154,7 @@ function buildPaginationNavRow(
 
 /**
  * プレビュー Embed（Stage 1）を生成する
+ * @param locale interaction.locale
  * @param filteredMessages フィルター適用済みのスキャン済みメッセージ
  * @param page 現在のページ番号（0-indexed）
  * @param totalPages 総ページ数
@@ -153,13 +162,14 @@ function buildPaginationNavRow(
  * @returns プレビュー EmbedBuilder
  */
 export function buildPreviewEmbed(
+  locale: string,
   filteredMessages: ScannedMessage[],
   page: number,
   totalPages: number,
   excludedIds: ReadonlySet<string>,
 ): EmbedBuilder {
   const embed = new EmbedBuilder().setColor(STATUS_COLORS.info).setTitle(
-    tDefault("messageDelete:embed.title.confirm", {
+    tInteraction(locale, "messageDelete:embed.title.confirm", {
       page: page + 1,
       total: Math.max(1, totalPages),
     }),
@@ -169,14 +179,16 @@ export function buildPreviewEmbed(
   const slice = filteredMessages.slice(start, start + MSG_DEL_PAGE_SIZE);
 
   if (slice.length === 0) {
-    embed.setDescription(tDefault("messageDelete:user-response.zero_targets"));
+    embed.setDescription(
+      tInteraction(locale, "messageDelete:user-response.zero_targets"),
+    );
     return embed;
   }
 
   for (let i = 0; i < slice.length; i++) {
     const m = slice[i];
     embed.addFields(
-      buildMessageField(m, start + i + 1, excludedIds.has(m.messageId)),
+      buildMessageField(locale, m, start + i + 1, excludedIds.has(m.messageId)),
     );
   }
 
@@ -185,6 +197,7 @@ export function buildPreviewEmbed(
 
 /**
  * プレビューダイアログ コンポーネント（Stage 1）を生成する
+ * @param locale interaction.locale
  * @param allMessagesForAuthorSelect 投稿者フィルターセレクトの選択肢構築に使用する全スキャン済みメッセージ
  * @param filteredMessages フィルター適用済みメッセージ
  * @param page 現在のページ番号（0-indexed）
@@ -196,6 +209,7 @@ export function buildPreviewEmbed(
  * @returns 5行の ActionRow 配列
  */
 export function buildPreviewComponents(
+  locale: string,
   allMessagesForAuthorSelect: ScannedMessage[],
   filteredMessages: ScannedMessage[],
   page: number,
@@ -209,7 +223,7 @@ export function buildPreviewComponents(
   const hasAfterOrBefore = !!(filter.after || filter.before);
 
   // Row 1: ページ移動ボタン（⏮ 前へ ページ数 次へ ⏭）
-  const navRow = buildPaginationNavRow(page, totalPages);
+  const navRow = buildPaginationNavRow(locale, page, totalPages);
 
   // Row 2: 投稿者フィルターセレクト
   const uniqueAuthors = [
@@ -219,12 +233,14 @@ export function buildPreviewComponents(
   ];
   const authorSelect = new StringSelectMenuBuilder()
     .setCustomId(MSG_DEL_CUSTOM_ID.FILTER_AUTHOR)
-    .setPlaceholder(tDefault("messageDelete:ui.select.author_placeholder"))
+    .setPlaceholder(
+      tInteraction(locale, "messageDelete:ui.select.author_placeholder"),
+    )
     .setMinValues(0)
     .setMaxValues(1)
     .addOptions([
       {
-        label: tDefault("messageDelete:ui.select.author_all"),
+        label: tInteraction(locale, "messageDelete:ui.select.author_all"),
         value: "__all__",
       },
       ...uniqueAuthors
@@ -239,10 +255,10 @@ export function buildPreviewComponents(
       .setEmoji(hasDays ? "✏️" : "🔢")
       .setLabel(
         hasDays
-          ? tDefault("messageDelete:ui.button.days_set", {
+          ? tInteraction(locale, "messageDelete:ui.button.days_set", {
               days: filter.days,
             })
-          : tDefault("messageDelete:ui.button.days_empty"),
+          : tInteraction(locale, "messageDelete:ui.button.days_empty"),
       )
       .setStyle(hasDays ? ButtonStyle.Primary : ButtonStyle.Secondary)
       .setDisabled(hasAfterOrBefore),
@@ -252,10 +268,10 @@ export function buildPreviewComponents(
       .setLabel(
         // afterRaw はユーザーが入力した生の文字列（仕様: toLocaleString 変換は行わない）
         filter.after && filter.afterRaw
-          ? tDefault("messageDelete:ui.button.after_set", {
+          ? tInteraction(locale, "messageDelete:ui.button.after_date_set", {
               date: filter.afterRaw,
             })
-          : tDefault("messageDelete:ui.button.after_empty"),
+          : tInteraction(locale, "messageDelete:ui.button.after_date_empty"),
       )
       .setStyle(filter.after ? ButtonStyle.Primary : ButtonStyle.Secondary)
       .setDisabled(hasDays),
@@ -265,10 +281,10 @@ export function buildPreviewComponents(
       .setLabel(
         // beforeRaw はユーザーが入力した生の文字列（仕様: toLocaleString 変換は行わない）
         filter.before && filter.beforeRaw
-          ? tDefault("messageDelete:ui.button.before_set", {
+          ? tInteraction(locale, "messageDelete:ui.button.before_date_set", {
               date: filter.beforeRaw,
             })
-          : tDefault("messageDelete:ui.button.before_empty"),
+          : tInteraction(locale, "messageDelete:ui.button.before_date_empty"),
       )
       .setStyle(filter.before ? ButtonStyle.Primary : ButtonStyle.Secondary)
       .setDisabled(hasDays),
@@ -278,16 +294,16 @@ export function buildPreviewComponents(
       .setLabel(
         // keyword はユーザーが入力した生の文字列をそのまま表示（仕様: toLocaleString 変換は行わない）
         filter.keyword
-          ? tDefault("messageDelete:ui.button.keyword_set", {
+          ? tInteraction(locale, "messageDelete:ui.button.keyword_set", {
               keyword: filter.keyword,
             })
-          : tDefault("messageDelete:ui.button.keyword"),
+          : tInteraction(locale, "messageDelete:ui.button.keyword"),
       )
       .setStyle(filter.keyword ? ButtonStyle.Primary : ButtonStyle.Secondary),
     new ButtonBuilder()
       .setCustomId(MSG_DEL_CUSTOM_ID.FILTER_RESET)
       .setEmoji("✖️")
-      .setLabel(tDefault("messageDelete:ui.button.reset"))
+      .setLabel(tInteraction(locale, "messageDelete:ui.button.reset"))
       .setStyle(ButtonStyle.Danger),
   );
 
@@ -296,7 +312,9 @@ export function buildPreviewComponents(
   const pageSlice = filteredMessages.slice(start, start + MSG_DEL_PAGE_SIZE);
   const excludeSelect = new StringSelectMenuBuilder()
     .setCustomId(MSG_DEL_CUSTOM_ID.CONFIRM_EXCLUDE)
-    .setPlaceholder(tDefault("messageDelete:ui.select.exclude_placeholder"))
+    .setPlaceholder(
+      tInteraction(locale, "messageDelete:ui.select.exclude_placeholder"),
+    )
     .setMinValues(0)
     .setMaxValues(pageSlice.length || 1)
     .addOptions(
@@ -315,7 +333,7 @@ export function buildPreviewComponents(
               );
             })(),
             description:
-              `${m.authorDisplayName} | ${m.content || tDefault("messageDelete:embed.field.value.empty_content")}`.slice(
+              `${m.authorDisplayName} | ${m.content || tInteraction(locale, "messageDelete:embed.field.value.empty_content")}`.slice(
                 0,
                 100,
               ),
@@ -324,7 +342,10 @@ export function buildPreviewComponents(
           }))
         : [
             {
-              label: tDefault("messageDelete:ui.select.exclude_no_messages"),
+              label: tInteraction(
+                locale,
+                "messageDelete:ui.select.exclude_no_messages",
+              ),
               value: "__none__",
             },
           ],
@@ -336,7 +357,7 @@ export function buildPreviewComponents(
       .setCustomId(MSG_DEL_CUSTOM_ID.CONFIRM_YES)
       .setEmoji("🗑️")
       .setLabel(
-        tDefault("messageDelete:ui.button.delete", {
+        tInteraction(locale, "messageDelete:ui.button.delete", {
           count: deleteCount,
         }),
       )
@@ -345,7 +366,7 @@ export function buildPreviewComponents(
     new ButtonBuilder()
       .setCustomId(MSG_DEL_CUSTOM_ID.CONFIRM_NO)
       .setEmoji("❌")
-      .setLabel(tDefault("messageDelete:ui.button.cancel"))
+      .setLabel(tInteraction(locale, "messageDelete:ui.button.cancel"))
       .setStyle(ButtonStyle.Secondary),
   );
 
@@ -362,6 +383,7 @@ export function buildPreviewComponents(
 
 /**
  * 最終確認 Embed（Stage 2）を生成する
+ * @param locale interaction.locale
  * @param targetMessages 削除対象のメッセージ（除外済みを含まない）
  * @param page 現在のページ番号（0-indexed）
  * @param totalPages 総ページ数
@@ -369,6 +391,7 @@ export function buildPreviewComponents(
  * @returns 最終確認 EmbedBuilder
  */
 export function buildFinalConfirmEmbed(
+  locale: string,
   targetMessages: ScannedMessage[],
   page: number,
   totalPages: number,
@@ -377,24 +400,28 @@ export function buildFinalConfirmEmbed(
   const embed = new EmbedBuilder()
     .setColor(STATUS_COLORS.danger)
     .setTitle(
-      tDefault("messageDelete:embed.title.final_confirm", {
+      tInteraction(locale, "messageDelete:embed.title.deletion_confirm", {
         page: page + 1,
         total: Math.max(1, totalPages),
       }),
     )
     .setDescription(
-      tDefault("messageDelete:embed.description.final_warning") +
+      tInteraction(locale, "messageDelete:embed.description.deletion_warning") +
         "\n" +
-        tDefault("messageDelete:embed.description.final_confirm", {
-          count: totalDeleteCount,
-        }),
+        tInteraction(
+          locale,
+          "messageDelete:embed.description.deletion_confirm",
+          {
+            count: totalDeleteCount,
+          },
+        ),
     );
 
   const start = page * MSG_DEL_PAGE_SIZE;
   const slice = targetMessages.slice(start, start + MSG_DEL_PAGE_SIZE);
 
   for (let i = 0; i < slice.length; i++) {
-    embed.addFields(buildMessageField(slice[i], start + i + 1, false));
+    embed.addFields(buildMessageField(locale, slice[i], start + i + 1, false));
   }
 
   return embed;
@@ -402,25 +429,27 @@ export function buildFinalConfirmEmbed(
 
 /**
  * 最終確認ダイアログ コンポーネント（Stage 2）を生成する
+ * @param locale interaction.locale
  * @param page 現在のページ番号（0-indexed）
  * @param totalPages 総ページ数
  * @param deleteCount 削除予定件数
  * @returns 2行の ActionRow 配列
  */
 export function buildFinalConfirmComponents(
+  locale: string,
   page: number,
   totalPages: number,
   deleteCount: number,
 ): ActionRowBuilder<ButtonBuilder>[] {
   // 仕様: 最終確認のナビゲーションはプレビューと同一 customId（⏮ 前へ 1/N 次へ ⏭）
-  const navRow = buildPaginationNavRow(page, totalPages);
+  const navRow = buildPaginationNavRow(locale, page, totalPages);
 
   const actionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
       .setCustomId(MSG_DEL_CUSTOM_ID.FINAL_YES)
       .setEmoji("🗑️")
       .setLabel(
-        tDefault("messageDelete:ui.button.final_yes", {
+        tInteraction(locale, "messageDelete:ui.button.deletion_confirm", {
           count: deleteCount,
         }),
       )
@@ -428,12 +457,12 @@ export function buildFinalConfirmComponents(
     new ButtonBuilder()
       .setCustomId(MSG_DEL_CUSTOM_ID.FINAL_BACK)
       .setEmoji("◀")
-      .setLabel(tDefault("messageDelete:ui.button.final_back"))
+      .setLabel(tInteraction(locale, "messageDelete:ui.button.deletion_back"))
       .setStyle(ButtonStyle.Secondary),
     new ButtonBuilder()
       .setCustomId(MSG_DEL_CUSTOM_ID.FINAL_NO)
       .setEmoji("❌")
-      .setLabel(tDefault("messageDelete:ui.button.final_cancel"))
+      .setLabel(tInteraction(locale, "messageDelete:ui.button.deletion_cancel"))
       .setStyle(ButtonStyle.Secondary),
   );
 
@@ -442,37 +471,53 @@ export function buildFinalConfirmComponents(
 
 /**
  * 削除完了 Embed を生成する
+ * @param locale interaction.locale
  * @param totalDeleted 合計削除件数
  * @param channelBreakdown チャンネル別削除件数のマップ
  * @returns 削除完了 EmbedBuilder
  */
 export function buildCompletionEmbed(
+  locale: string,
   totalDeleted: number,
   channelBreakdown: Record<string, { name: string; count: number }>,
 ): EmbedBuilder {
   const breakdownText =
     Object.entries(channelBreakdown)
       .map(([channelId, { count }]) =>
-        tDefault("messageDelete:embed.field.value.channel_breakdown_item", {
-          channelId,
-          count,
-        }),
+        tInteraction(
+          locale,
+          "messageDelete:embed.field.value.channel_breakdown_item",
+          {
+            channelId,
+            count,
+          },
+        ),
       )
       .join("\n") ||
-    tDefault("messageDelete:embed.field.value.breakdown_empty");
+    tInteraction(locale, "messageDelete:embed.field.value.breakdown_empty");
 
   return createSuccessEmbed("", {
-    title: tDefault("messageDelete:embed.title.summary"),
+    title: tInteraction(locale, "messageDelete:embed.title.summary"),
     fields: [
       {
-        name: tDefault("messageDelete:embed.field.name.total_deleted"),
-        value: tDefault("messageDelete:embed.field.value.total_deleted", {
-          count: totalDeleted,
-        }),
+        name: tInteraction(
+          locale,
+          "messageDelete:embed.field.name.total_deleted",
+        ),
+        value: tInteraction(
+          locale,
+          "messageDelete:embed.field.value.total_deleted",
+          {
+            count: totalDeleted,
+          },
+        ),
         inline: true,
       },
       {
-        name: tDefault("messageDelete:embed.field.name.channel_breakdown"),
+        name: tInteraction(
+          locale,
+          "messageDelete:embed.field.name.channel_breakdown",
+        ),
         value: breakdownText,
       },
     ],
@@ -481,10 +526,12 @@ export function buildCompletionEmbed(
 
 /**
  * コマンド条件 Embed（プレビューダイアログの上層に常に表示）を生成する
+ * @param locale interaction.locale
  * @param conditions コマンド実行時のオプション情報
  * @returns コマンド条件 EmbedBuilder
  */
 export function buildCommandConditionsEmbed(
+  locale: string,
   conditions: CommandConditionsDisplay,
 ): EmbedBuilder {
   const {
@@ -502,53 +549,69 @@ export function buildCommandConditionsEmbed(
 
   const countValue =
     count === MSG_DEL_DEFAULT_COUNT
-      ? tDefault("messageDelete:embed.field.value.count_unlimited", {
-          count,
-        })
-      : tDefault("messageDelete:embed.field.value.count_limited", {
+      ? tInteraction(
+          locale,
+          "messageDelete:embed.field.value.count_unlimited",
+          {
+            count,
+          },
+        )
+      : tInteraction(locale, "messageDelete:embed.field.value.count_limited", {
           count,
         });
 
   const userValue =
     targetUserIds.length > 0
       ? targetUserIds.map((id) => `<@${id}>`).join(" ")
-      : tDefault("messageDelete:embed.field.value.user_all");
+      : tInteraction(locale, "messageDelete:embed.field.value.user_all");
 
   const keywordValue = keyword
     ? `"${keyword}"`
-    : tDefault("messageDelete:embed.field.value.none");
+    : tInteraction(locale, "messageDelete:embed.field.value.none");
 
   const channelValue =
     channelIds.length > 0
       ? channelIds.map((id) => `<#${id}>`).join(" ")
-      : tDefault("messageDelete:embed.field.value.channel_all");
+      : tInteraction(locale, "messageDelete:embed.field.value.channel_all");
 
   // days と after/before は排他。指定されている方のフィールドのみ表示し、もう一方は省略する
   const periodFields: { name: string; value: string; inline: true }[] = [];
   if (hasDays) {
     periodFields.push({
       name: "days",
-      value: tDefault("messageDelete:embed.field.value.days_value", {
-        days: daysOption,
-      }),
+      value: tInteraction(
+        locale,
+        "messageDelete:embed.field.value.days_value",
+        {
+          days: daysOption,
+        },
+      ),
       inline: true,
     });
   } else if (hasDateRange) {
     if (afterStr) {
       periodFields.push({
         name: "after",
-        value: tDefault("messageDelete:embed.field.value.after_value", {
-          date: afterStr,
-        }),
+        value: tInteraction(
+          locale,
+          "messageDelete:embed.field.value.after_value",
+          {
+            date: afterStr,
+          },
+        ),
         inline: true,
       });
     }
     if (beforeStr) {
       periodFields.push({
         name: "before",
-        value: tDefault("messageDelete:embed.field.value.before_value", {
-          date: beforeStr,
-        }),
+        value: tInteraction(
+          locale,
+          "messageDelete:embed.field.value.before_value",
+          {
+            date: beforeStr,
+          },
+        ),
         inline: true,
       });
     }
@@ -556,14 +619,14 @@ export function buildCommandConditionsEmbed(
     // いずれも未指定の場合は days フィールドのみ「なし」で表示
     periodFields.push({
       name: "days",
-      value: tDefault("messageDelete:embed.field.value.none"),
+      value: tInteraction(locale, "messageDelete:embed.field.value.none"),
       inline: true,
     });
   }
 
   return new EmbedBuilder()
     .setColor(STATUS_COLORS.muted)
-    .setTitle(tDefault("messageDelete:embed.title.conditions"))
+    .setTitle(tInteraction(locale, "messageDelete:embed.title.conditions"))
     .addFields(
       { name: "count", value: countValue, inline: true },
       { name: "user", value: userValue, inline: true },

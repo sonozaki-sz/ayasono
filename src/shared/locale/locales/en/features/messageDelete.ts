@@ -31,23 +31,23 @@ export const messageDelete = {
     "Select messages to exclude from this page",
   "ui.select.exclude_no_messages":
     "(no messages)",
-  "ui.button.final_yes":
+  "ui.button.deletion_confirm":
     "Delete ({{count}})",
-  "ui.button.final_back":
+  "ui.button.deletion_back":
     "Go back",
-  "ui.button.final_cancel":
+  "ui.button.deletion_cancel":
     "Cancel",
   "ui.button.days_set":
     "Past {{days}} days",
   "ui.button.days_empty":
     "Enter past N days",
-  "ui.button.after_set":
+  "ui.button.after_date_set":
     "after: {{date}}",
-  "ui.button.after_empty":
+  "ui.button.after_date_empty":
     "Enter after date",
-  "ui.button.before_set":
+  "ui.button.before_date_set":
     "before: {{date}}",
-  "ui.button.before_empty":
+  "ui.button.before_date_empty":
     "Enter before date",
   "ui.button.keyword":
     "Search by content",
@@ -109,11 +109,11 @@ export const messageDelete = {
   // ── Embed ─────────────────────────────────────
   "embed.title.confirm":
     "📋 Messages to Delete ({{page}} / {{total}})",
-  "embed.title.final_confirm":
+  "embed.title.deletion_confirm":
     "🗑️ Are you sure? ({{page}} / {{total}})",
-  "embed.description.final_warning":
+  "embed.description.deletion_warning":
     "⚠️ **This action cannot be undone**",
-  "embed.description.final_confirm":
+  "embed.description.deletion_confirm":
     "The following messages will be deleted (total: {{count}})",
   "embed.title.summary":
     "Deletion Complete",

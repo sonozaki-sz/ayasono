@@ -4,7 +4,7 @@
 import { type MessageComponentInteraction } from "discord.js";
 import {
   logPrefixed,
-  tDefault,
+  tInteraction,
 } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import {
@@ -51,17 +51,25 @@ export async function executeDelete(
       targetMessages,
       async (data: DeleteProgressData) => {
         progressRef.data = data;
-        const header = tDefault("messageDelete:user-response.delete_progress", {
-          totalDeleted: data.totalDeleted,
-          total: data.total,
-        });
+        const header = tInteraction(
+          interaction.locale,
+          "messageDelete:user-response.delete_progress",
+          {
+            totalDeleted: data.totalDeleted,
+            total: data.total,
+          },
+        );
         const lines = data.channelStatuses
           .map(({ channelId, deleted, total }) =>
-            tDefault("messageDelete:user-response.delete_progress_channel", {
-              channelId,
-              deleted,
-              total,
-            }),
+            tInteraction(
+              interaction.locale,
+              "messageDelete:user-response.delete_progress_channel",
+              {
+                channelId,
+                deleted,
+                total,
+              },
+            ),
           )
           .join("\n");
         await interaction.editReply({
@@ -77,7 +85,11 @@ export async function executeDelete(
     if (!deleteController.signal.aborted) {
       await interaction.editReply({
         embeds: [
-          buildCompletionEmbed(result.totalDeleted, result.channelBreakdown),
+          buildCompletionEmbed(
+            interaction.locale,
+            result.totalDeleted,
+            result.channelBreakdown,
+          ),
         ],
         components: [],
         content: "",
@@ -119,10 +131,14 @@ export async function executeDelete(
     await interaction.editReply({
       embeds: [
         createWarningEmbed(
-          tDefault("messageDelete:user-response.delete_timed_out", {
-            count: deletedCount,
-          }),
-          { title: tDefault("common:title_timeout") },
+          tInteraction(
+            interaction.locale,
+            "messageDelete:user-response.delete_timed_out",
+            {
+              count: deletedCount,
+            },
+          ),
+          { title: tInteraction(interaction.locale, "common:title_timeout") },
         ),
       ],
       components: [],
@@ -140,9 +156,15 @@ export async function executeDelete(
       .editReply({
         embeds: [
           createErrorEmbed(
-            tDefault("messageDelete:user-response.delete_failed"),
+            tInteraction(
+              interaction.locale,
+              "messageDelete:user-response.delete_failed",
+            ),
             {
-              title: tDefault("common:title_delete_error"),
+              title: tInteraction(
+                interaction.locale,
+                "common:title_delete_error",
+              ),
             },
           ),
         ],

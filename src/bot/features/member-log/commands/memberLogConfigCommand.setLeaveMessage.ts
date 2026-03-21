@@ -8,7 +8,7 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
-import { tDefault } from "../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../shared/locale/localeManager";
 import { MEMBER_LOG_CONFIG_COMMAND } from "./memberLogConfigCommand.constants";
 import { ensureMemberLogManageGuildPermission } from "./memberLogConfigCommand.guard";
 
@@ -27,13 +27,26 @@ export async function handleMemberLogConfigSetLeaveMessage(
 
   const modal = new ModalBuilder()
     .setCustomId(MEMBER_LOG_CONFIG_COMMAND.SET_LEAVE_MESSAGE_MODAL_ID)
-    .setTitle(tDefault("memberLog:ui.modal.set_leave_message_title"));
+    .setTitle(
+      tInteraction(
+        interaction.locale,
+        "memberLog:ui.modal.set_leave_message_title",
+      ),
+    );
 
   const messageInput = new TextInputBuilder()
     .setCustomId(MEMBER_LOG_CONFIG_COMMAND.MODAL_INPUT_MESSAGE)
-    .setLabel(tDefault("memberLog:ui.modal.set_leave_message_label"))
+    .setLabel(
+      tInteraction(
+        interaction.locale,
+        "memberLog:ui.modal.set_leave_message_label",
+      ),
+    )
     .setPlaceholder(
-      tDefault("memberLog:ui.modal.set_leave_message_placeholder"),
+      tInteraction(
+        interaction.locale,
+        "memberLog:ui.modal.set_leave_message_placeholder",
+      ),
     )
     .setStyle(TextInputStyle.Paragraph)
     .setRequired(true)

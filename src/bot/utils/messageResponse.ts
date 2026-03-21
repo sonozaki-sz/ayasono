@@ -2,7 +2,7 @@
 // Discord向けステータスEmbed生成ユーティリティ
 
 import { EmbedBuilder } from "discord.js";
-import { tDefault } from "../../shared/locale/localeManager";
+import { tDefault, tInteraction } from "../../shared/locale/localeManager";
 
 export type MessageStatus = "success" | "info" | "warning" | "error";
 
@@ -30,6 +30,8 @@ export const STATUS_EMOJIS: Record<MessageStatus, string> = {
 
 export interface EmbedOptions {
   title?: string;
+  /** interaction.locale を渡すと、title 未指定時のフォールバックタイトルがロケール対応になる */
+  locale?: string;
   timestamp?: boolean;
   fields?: { name: string; value: string; inline?: boolean }[];
 }
@@ -87,7 +89,10 @@ export function createSuccessEmbed(
 ): EmbedBuilder {
   return createStatusEmbed(
     "success",
-    options?.title ?? tDefault("common:success"),
+    options?.title ??
+      (options?.locale
+        ? tInteraction(options.locale, "common:success")
+        : tDefault("common:success")),
     description,
     options,
   );
@@ -105,7 +110,10 @@ export function createInfoEmbed(
 ): EmbedBuilder {
   return createStatusEmbed(
     "info",
-    options?.title ?? tDefault("common:info"),
+    options?.title ??
+      (options?.locale
+        ? tInteraction(options.locale, "common:info")
+        : tDefault("common:info")),
     description,
     options,
   );
@@ -123,7 +131,10 @@ export function createWarningEmbed(
 ): EmbedBuilder {
   return createStatusEmbed(
     "warning",
-    options?.title ?? tDefault("common:warning"),
+    options?.title ??
+      (options?.locale
+        ? tInteraction(options.locale, "common:warning")
+        : tDefault("common:warning")),
     description,
     options,
   );
@@ -141,7 +152,10 @@ export function createErrorEmbed(
 ): EmbedBuilder {
   return createStatusEmbed(
     "error",
-    options?.title ?? tDefault("common:error"),
+    options?.title ??
+      (options?.locale
+        ? tInteraction(options.locale, "common:error")
+        : tDefault("common:error")),
     description,
     options,
   );

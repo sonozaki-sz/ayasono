@@ -298,7 +298,7 @@ async function handleRenameVc(interaction: ButtonInteraction): Promise<void> {
     .addComponents(
       new ActionRowBuilder<TextInputBuilder>().addComponents(
         new TextInputBuilder()
-          .setCustomId("vc-recruit:rename-vc-name")
+          .setCustomId("vc-recruit:rename-vc-name-modal-input")
           .setLabel(vcNameLabel)
           .setPlaceholder(vcNamePlaceholder)
           .setStyle(TextInputStyle.Short)

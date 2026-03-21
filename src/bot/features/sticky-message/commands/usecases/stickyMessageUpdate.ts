@@ -10,10 +10,7 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
-import {
-  tDefault,
-  tInteraction,
-} from "../../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../../shared/locale/localeManager";
 import { getBotStickyMessageConfigService } from "../../../../services/botCompositionRoot";
 import {
   createInfoEmbed,
@@ -97,9 +94,17 @@ export async function handleStickyMessageUpdate(
 
     const titleInput = new TextInputBuilder()
       .setCustomId(STICKY_MESSAGE_COMMAND.MODAL_INPUT.EMBED_TITLE)
-      .setLabel(tDefault("stickyMessage:ui.modal.set_embed_title_label"))
+      .setLabel(
+        tInteraction(
+          interaction.locale,
+          "stickyMessage:ui.modal.set_embed_title_label",
+        ),
+      )
       .setPlaceholder(
-        tDefault("stickyMessage:ui.modal.set_embed_title_placeholder"),
+        tInteraction(
+          interaction.locale,
+          "stickyMessage:ui.modal.set_embed_title_placeholder",
+        ),
       )
       .setStyle(TextInputStyle.Short)
       .setRequired(false)
@@ -108,9 +113,17 @@ export async function handleStickyMessageUpdate(
 
     const descriptionInput = new TextInputBuilder()
       .setCustomId(STICKY_MESSAGE_COMMAND.MODAL_INPUT.EMBED_DESCRIPTION)
-      .setLabel(tDefault("stickyMessage:ui.modal.set_embed_description_label"))
+      .setLabel(
+        tInteraction(
+          interaction.locale,
+          "stickyMessage:ui.modal.set_embed_description_label",
+        ),
+      )
       .setPlaceholder(
-        tDefault("stickyMessage:ui.modal.set_embed_description_placeholder"),
+        tInteraction(
+          interaction.locale,
+          "stickyMessage:ui.modal.set_embed_description_placeholder",
+        ),
       )
       .setStyle(TextInputStyle.Paragraph)
       .setRequired(false)
@@ -119,9 +132,17 @@ export async function handleStickyMessageUpdate(
 
     const colorInput = new TextInputBuilder()
       .setCustomId(STICKY_MESSAGE_COMMAND.MODAL_INPUT.EMBED_COLOR)
-      .setLabel(tDefault("stickyMessage:ui.modal.set_embed_color_label"))
+      .setLabel(
+        tInteraction(
+          interaction.locale,
+          "stickyMessage:ui.modal.set_embed_color_label",
+        ),
+      )
       .setPlaceholder(
-        tDefault("stickyMessage:ui.modal.set_embed_color_placeholder"),
+        tInteraction(
+          interaction.locale,
+          "stickyMessage:ui.modal.set_embed_color_placeholder",
+        ),
       )
       .setStyle(TextInputStyle.Short)
       .setRequired(false)
@@ -135,7 +156,12 @@ export async function handleStickyMessageUpdate(
       .setCustomId(
         `${STICKY_MESSAGE_COMMAND.UPDATE_EMBED_MODAL_ID_PREFIX}${targetChannel.id}`,
       )
-      .setTitle(tDefault("stickyMessage:ui.modal.update_embed_title"))
+      .setTitle(
+        tInteraction(
+          interaction.locale,
+          "stickyMessage:ui.modal.update_embed_title",
+        ),
+      )
       .addComponents(
         new ActionRowBuilder<TextInputBuilder>().addComponents(titleInput),
         new ActionRowBuilder<TextInputBuilder>().addComponents(colorInput),
@@ -149,9 +175,17 @@ export async function handleStickyMessageUpdate(
     // 既存のテキスト内容を事前入力してプレーンテキストモーダルを表示する
     const messageInput = new TextInputBuilder()
       .setCustomId(STICKY_MESSAGE_COMMAND.MODAL_INPUT.MESSAGE)
-      .setLabel(tDefault("stickyMessage:ui.modal.update_message_label"))
+      .setLabel(
+        tInteraction(
+          interaction.locale,
+          "stickyMessage:ui.modal.update_message_label",
+        ),
+      )
       .setPlaceholder(
-        tDefault("stickyMessage:ui.modal.update_message_placeholder"),
+        tInteraction(
+          interaction.locale,
+          "stickyMessage:ui.modal.update_message_placeholder",
+        ),
       )
       .setStyle(TextInputStyle.Paragraph)
       .setRequired(true)
@@ -162,7 +196,9 @@ export async function handleStickyMessageUpdate(
       .setCustomId(
         `${STICKY_MESSAGE_COMMAND.UPDATE_MODAL_ID_PREFIX}${targetChannel.id}`,
       )
-      .setTitle(tDefault("stickyMessage:ui.modal.update_title"))
+      .setTitle(
+        tInteraction(interaction.locale, "stickyMessage:ui.modal.update_title"),
+      )
       .addComponents(
         new ActionRowBuilder<TextInputBuilder>().addComponents(messageInput),
       );

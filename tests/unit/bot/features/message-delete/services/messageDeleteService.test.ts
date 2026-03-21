@@ -164,6 +164,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
         targetUserIds: [],
         afterTs: 0,
         beforeTs: Infinity,
+        locale: "ja",
       });
       expect(result).toEqual([]);
     });
@@ -185,6 +186,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
         targetUserIds: [],
         afterTs: 0,
         beforeTs: Infinity,
+        locale: "ja",
       });
 
       expect(result).toHaveLength(2);
@@ -207,6 +209,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
         targetUserIds: ["user-1"],
         afterTs: 0,
         beforeTs: Infinity,
+        locale: "ja",
       });
 
       expect(result).toHaveLength(1);
@@ -231,6 +234,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
         keyword: "hello",
         afterTs: 0,
         beforeTs: Infinity,
+        locale: "ja",
       });
 
       expect(result).toHaveLength(1);
@@ -254,6 +258,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
         targetUserIds: [],
         afterTs: 0,
         beforeTs: Infinity,
+        locale: "ja",
       });
 
       expect(result).toHaveLength(3);
@@ -274,6 +279,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
         afterTs: 0,
         beforeTs: Infinity,
         signal: controller.signal,
+        locale: "ja",
       });
 
       expect(result).toEqual([]);
@@ -297,6 +303,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
         targetUserIds: [],
         afterTs: 0,
         beforeTs: Infinity,
+        locale: "ja",
       });
 
       expect(result).toHaveLength(1);
@@ -320,6 +327,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
         targetUserIds: [],
         afterTs: 0,
         beforeTs: Infinity,
+        locale: "ja",
       });
 
       expect(result).toHaveLength(1);
@@ -338,6 +346,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
         afterTs: 0,
         beforeTs: Infinity,
         onProgress,
+        locale: "ja",
       });
 
       expect(onProgress).toHaveBeenCalled();
@@ -359,6 +368,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
         targetUserIds: [],
         afterTs: 0,
         beforeTs: Infinity,
+        locale: "ja",
       });
 
       expect(result).toHaveLength(1);
@@ -381,6 +391,7 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
         targetUserIds: [],
         afterTs: 0,
         beforeTs: Infinity,
+        locale: "ja",
       });
 
       expect(result[0].content.length).toBeLessThanOrEqual(201); // 200 chars + "…"

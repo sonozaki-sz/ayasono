@@ -20,9 +20,9 @@ export const MEMBER_LOG_CONFIG_COMMAND = {
     CHANNEL: "channel",
   },
   /** 参加メッセージ設定モーダルの customId */
-  SET_JOIN_MESSAGE_MODAL_ID: "member-log-config:set-join-message-modal",
+  SET_JOIN_MESSAGE_MODAL_ID: "member-log-config:join-message-modal",
   /** 退出メッセージ設定モーダルの customId */
-  SET_LEAVE_MESSAGE_MODAL_ID: "member-log-config:set-leave-message-modal",
+  SET_LEAVE_MESSAGE_MODAL_ID: "member-log-config:leave-message-modal",
   /** モーダル内テキスト入力欄の customId */
-  MODAL_INPUT_MESSAGE: "member-log-config:modal:message",
+  MODAL_INPUT_MESSAGE: "member-log-config:message-modal-input",
 } as const;

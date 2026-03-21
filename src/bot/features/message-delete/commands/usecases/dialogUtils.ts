@@ -10,7 +10,7 @@ import {
   type MessageComponentInteraction,
 } from "discord.js";
 import type { AllParseKeys } from "../../../../../shared/locale/i18n";
-import { tDefault } from "../../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../../shared/locale/localeManager";
 import {
   MSG_DEL_CUSTOM_ID,
   MSG_DEL_MODAL_TIMEOUT_MS,
@@ -213,15 +213,15 @@ export async function showFilterModal(
 ): Promise<string | null> {
   const modal = new ModalBuilder()
     .setCustomId(config.modalId)
-    .setTitle(tDefault(config.titleKey))
+    .setTitle(tInteraction(i.locale, config.titleKey))
     .addComponents(
       new ActionRowBuilder<TextInputBuilder>().addComponents(
         new TextInputBuilder()
           .setCustomId(config.inputId)
-          .setLabel(tDefault(config.labelKey))
+          .setLabel(tInteraction(i.locale, config.labelKey))
           .setStyle(TextInputStyle.Short)
           .setRequired(false)
-          .setPlaceholder(tDefault(config.placeholderKey)),
+          .setPlaceholder(tInteraction(i.locale, config.placeholderKey)),
       ),
     );
 
@@ -271,16 +271,16 @@ export async function showJumpModal(
 ): Promise<string | null> {
   const modal = new ModalBuilder()
     .setCustomId(MSG_DEL_CUSTOM_ID.MODAL_JUMP)
-    .setTitle(tDefault("messageDelete:ui.modal.jump_title"))
+    .setTitle(tInteraction(i.locale, "messageDelete:ui.modal.jump_title"))
     .addComponents(
       new ActionRowBuilder<TextInputBuilder>().addComponents(
         new TextInputBuilder()
           .setCustomId(MSG_DEL_CUSTOM_ID.MODAL_INPUT_JUMP)
-          .setLabel(tDefault("messageDelete:ui.modal.jump_label"))
+          .setLabel(tInteraction(i.locale, "messageDelete:ui.modal.jump_label"))
           .setStyle(TextInputStyle.Short)
           .setRequired(true)
           .setPlaceholder(
-            tDefault("messageDelete:ui.modal.jump_placeholder", {
+            tInteraction(i.locale, "messageDelete:ui.modal.jump_placeholder", {
               total: totalPages,
             }),
           ),

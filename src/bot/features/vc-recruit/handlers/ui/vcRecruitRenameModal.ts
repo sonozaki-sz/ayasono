@@ -40,7 +40,7 @@ export const vcRecruitRenameModalHandler: ModalHandler = {
     );
 
     const newName = interaction.fields.getTextInputValue(
-      "vc-recruit:rename-vc-name",
+      "vc-recruit:rename-vc-name-modal-input",
     );
 
     // VCの存在確認

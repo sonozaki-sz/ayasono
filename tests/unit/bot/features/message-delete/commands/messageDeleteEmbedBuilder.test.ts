@@ -140,7 +140,7 @@ describe("bot/features/message-delete/commands/messageDeleteEmbedBuilder", () =>
     it("指定ページのメッセージを含む embed を構築する", async () => {
       const { buildPreviewEmbed } = await loadModule();
       const msgs = [makeMsg("msg-1"), makeMsg("msg-2")];
-      const embed = buildPreviewEmbed(msgs, 0, 1, new Set());
+      const embed = buildPreviewEmbed("ja", msgs, 0, 1, new Set());
       expect(embed).toBeDefined();
       // Embed should have fields
       expect(embed.data.fields?.length).toBeGreaterThan(0);
@@ -149,7 +149,7 @@ describe("bot/features/message-delete/commands/messageDeleteEmbedBuilder", () =>
     it("除外メッセージに取り消し線を付けて embed を構築する", async () => {
       const { buildPreviewEmbed } = await loadModule();
       const msgs = [makeMsg("msg-1"), makeMsg("msg-2")];
-      const embed = buildPreviewEmbed(msgs, 0, 1, new Set(["msg-1"]));
+      const embed = buildPreviewEmbed("ja", msgs, 0, 1, new Set(["msg-1"]));
       expect(embed).toBeDefined();
       // First field should have strikethrough
       const firstField = embed.data.fields?.[0];
@@ -158,7 +158,7 @@ describe("bot/features/message-delete/commands/messageDeleteEmbedBuilder", () =>
 
     it("ページにメッセージがない場合に対象ゼロの説明を表示する", async () => {
       const { buildPreviewEmbed } = await loadModule();
-      const embed = buildPreviewEmbed([], 0, 0, new Set());
+      const embed = buildPreviewEmbed("ja", [], 0, 0, new Set());
       expect(embed.data.description).toBeTruthy();
     });
   });
@@ -172,14 +172,14 @@ describe("bot/features/message-delete/commands/messageDeleteEmbedBuilder", () =>
     it("メッセージを含む最終確認 embed を構築する", async () => {
       const { buildFinalConfirmEmbed } = await loadModule();
       const msgs = [makeMsg("msg-1"), makeMsg("msg-2")];
-      const embed = buildFinalConfirmEmbed(msgs, 0, 1, 2);
+      const embed = buildFinalConfirmEmbed("ja", msgs, 0, 1, 2);
       expect(embed).toBeDefined();
       expect(embed.data.fields?.length).toBeGreaterThan(0);
     });
 
     it("空の最終確認 embed を構築する", async () => {
       const { buildFinalConfirmEmbed } = await loadModule();
-      const embed = buildFinalConfirmEmbed([], 0, 0, 0);
+      const embed = buildFinalConfirmEmbed("ja", [], 0, 0, 0);
       expect(embed).toBeDefined();
     });
   });
@@ -192,7 +192,7 @@ describe("bot/features/message-delete/commands/messageDeleteEmbedBuilder", () =>
   describe("buildCompletionEmbed", () => {
     it("チャンネル別内訳を含む完了 embed を構築する", async () => {
       const { buildCompletionEmbed } = await loadModule();
-      const embed = buildCompletionEmbed(5, {
+      const embed = buildCompletionEmbed("ja", 5, {
         "ch-1": { name: "general", count: 3 },
         "ch-2": { name: "random", count: 2 },
       });
@@ -202,7 +202,7 @@ describe("bot/features/message-delete/commands/messageDeleteEmbedBuilder", () =>
 
     it("削除されたチャンネルがない場合は空の内訳テキストを表示する", async () => {
       const { buildCompletionEmbed } = await loadModule();
-      const embed = buildCompletionEmbed(0, {});
+      const embed = buildCompletionEmbed("ja", 0, {});
       expect(embed).toBeDefined();
     });
   });
@@ -215,7 +215,7 @@ describe("bot/features/message-delete/commands/messageDeleteEmbedBuilder", () =>
   describe("buildCommandConditionsEmbed", () => {
     it("days オプション付きのコマンド条件 embed を構築する", async () => {
       const { buildCommandConditionsEmbed } = await loadModule();
-      const embed = buildCommandConditionsEmbed({
+      const embed = buildCommandConditionsEmbed("ja", {
         count: 100,
         targetUserIds: ["user-1"],
         keyword: "hello",
@@ -228,7 +228,7 @@ describe("bot/features/message-delete/commands/messageDeleteEmbedBuilder", () =>
 
     it("after/before オプション付きのコマンド条件 embed を構築する", async () => {
       const { buildCommandConditionsEmbed } = await loadModule();
-      const embed = buildCommandConditionsEmbed({
+      const embed = buildCommandConditionsEmbed("ja", {
         count: 1000,
         targetUserIds: [],
         channelIds: [],
@@ -240,7 +240,7 @@ describe("bot/features/message-delete/commands/messageDeleteEmbedBuilder", () =>
 
     it("期間オプションなしのコマンド条件 embed を構築する（なし表示）", async () => {
       const { buildCommandConditionsEmbed } = await loadModule();
-      const embed = buildCommandConditionsEmbed({
+      const embed = buildCommandConditionsEmbed("ja", {
         count: 1000,
         targetUserIds: [],
         channelIds: [],
@@ -250,7 +250,7 @@ describe("bot/features/message-delete/commands/messageDeleteEmbedBuilder", () =>
 
     it("after オプションのみのコマンド条件 embed を構築する", async () => {
       const { buildCommandConditionsEmbed } = await loadModule();
-      const embed = buildCommandConditionsEmbed({
+      const embed = buildCommandConditionsEmbed("ja", {
         count: 1000,
         targetUserIds: [],
         channelIds: [],
@@ -261,7 +261,7 @@ describe("bot/features/message-delete/commands/messageDeleteEmbedBuilder", () =>
 
     it("before オプションのみのコマンド条件 embed を構築する", async () => {
       const { buildCommandConditionsEmbed } = await loadModule();
-      const embed = buildCommandConditionsEmbed({
+      const embed = buildCommandConditionsEmbed("ja", {
         count: 1000,
         targetUserIds: [],
         channelIds: [],
@@ -281,7 +281,7 @@ describe("bot/features/message-delete/commands/messageDeleteEmbedBuilder", () =>
       const { buildPreviewComponents } = await loadModule();
       const msgs = [makeMsg("msg-1"), makeMsg("msg-2")];
       const filter: MessageDeleteFilter = {};
-      const rows = buildPreviewComponents(msgs, msgs, 0, 1, filter, 2);
+      const rows = buildPreviewComponents("ja", msgs, msgs, 0, 1, filter, 2);
       expect(rows).toHaveLength(5);
     });
 
@@ -289,7 +289,7 @@ describe("bot/features/message-delete/commands/messageDeleteEmbedBuilder", () =>
       const { buildPreviewComponents } = await loadModule();
       const msgs = [makeMsg("msg-1")];
       const filter: MessageDeleteFilter = { days: 7 };
-      const rows = buildPreviewComponents(msgs, msgs, 0, 1, filter, 1);
+      const rows = buildPreviewComponents("ja", msgs, msgs, 0, 1, filter, 1);
       expect(rows).toHaveLength(5);
     });
 
@@ -302,7 +302,7 @@ describe("bot/features/message-delete/commands/messageDeleteEmbedBuilder", () =>
         before: new Date("2024-01-31"),
         beforeRaw: "2024-01-31",
       };
-      const rows = buildPreviewComponents(msgs, msgs, 0, 1, filter, 1);
+      const rows = buildPreviewComponents("ja", msgs, msgs, 0, 1, filter, 1);
       expect(rows).toHaveLength(5);
     });
 
@@ -310,14 +310,14 @@ describe("bot/features/message-delete/commands/messageDeleteEmbedBuilder", () =>
       const { buildPreviewComponents } = await loadModule();
       const msgs = [makeMsg("msg-1")];
       const filter: MessageDeleteFilter = { keyword: "test" };
-      const rows = buildPreviewComponents(msgs, msgs, 0, 1, filter, 1);
+      const rows = buildPreviewComponents("ja", msgs, msgs, 0, 1, filter, 1);
       expect(rows).toHaveLength(5);
     });
 
     it("ページが空の場合のコンポーネントを構築する", async () => {
       const { buildPreviewComponents } = await loadModule();
       const filter: MessageDeleteFilter = {};
-      const rows = buildPreviewComponents([], [], 0, 0, filter, 0);
+      const rows = buildPreviewComponents("ja", [], [], 0, 0, filter, 0);
       expect(rows).toHaveLength(5);
     });
 
@@ -326,6 +326,7 @@ describe("bot/features/message-delete/commands/messageDeleteEmbedBuilder", () =>
       const msgs = [makeMsg("msg-1"), makeMsg("msg-2")];
       const filter: MessageDeleteFilter = {};
       const rows = buildPreviewComponents(
+        "ja",
         msgs,
         msgs,
         0,
@@ -346,7 +347,7 @@ describe("bot/features/message-delete/commands/messageDeleteEmbedBuilder", () =>
   describe("buildFinalConfirmComponents", () => {
     it("2 つのアクション行を構築する", async () => {
       const { buildFinalConfirmComponents } = await loadModule();
-      const rows = buildFinalConfirmComponents(0, 3, 5);
+      const rows = buildFinalConfirmComponents("ja", 0, 3, 5);
       expect(rows).toHaveLength(2);
     });
   });

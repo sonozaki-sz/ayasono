@@ -22,11 +22,7 @@ import {
   logError,
   toError,
 } from "../../shared/errors/errorHandler";
-import {
-  logPrefixed,
-  tDefault,
-  tInteraction,
-} from "../../shared/locale/localeManager";
+import { logPrefixed, tInteraction } from "../../shared/locale/localeManager";
 import { logger } from "../../shared/utils/logger";
 import { createErrorEmbed, createWarningEmbed } from "../utils/messageResponse";
 
@@ -70,7 +66,7 @@ const getErrorTitle = (
   }
 
   // フォールバック
-  return tDefault("common:error");
+  return tInteraction(interaction.locale, "common:error");
 };
 
 /**

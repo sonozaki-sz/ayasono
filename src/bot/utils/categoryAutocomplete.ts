@@ -3,7 +3,7 @@
 
 import { AutocompleteInteraction, ChannelType } from "discord.js";
 import type { AllParseKeys } from "../../shared/locale/i18n";
-import { tDefault } from "../../shared/locale/localeManager";
+import { tInteraction } from "../../shared/locale/localeManager";
 
 export interface CategoryAutocompleteOptions {
   /** 対象コマンド名 */
@@ -21,7 +21,7 @@ export interface CategoryAutocompleteOptions {
  *
  * - 対象外コマンド・サブコマンドのときは空配列を返す
  * - Discord の3秒タイムアウト制約があるため、DB を参照する tGuild ではなく
- *   同期的な tDefault を使用する
+ *   同期的な tInteraction を使用する
  * @param interaction オートコンプリートインタラクション
  * @param opts コマンド固有のオプション
  */
@@ -46,7 +46,7 @@ export async function respondCategoryAutocomplete(
     return;
   }
 
-  const topLabel = tDefault(opts.topLocaleKey);
+  const topLabel = tInteraction(interaction.locale, opts.topLocaleKey);
 
   const categoryChoices = guild.channels.cache
     .filter((ch) => ch.type === ChannelType.GuildCategory)

@@ -56,6 +56,7 @@ const mockOptions: import("@/bot/features/message-delete/commands/usecases/dialo
 function makeInteraction() {
   return {
     user: { id: "user-1" },
+    locale: "ja",
     editReply: vi.fn().mockResolvedValue(undefined) as Mock,
   };
 }
@@ -85,7 +86,7 @@ describe("bot/features/message-delete/commands/usecases/runDeleteExecution", () 
     await executeDelete(interaction as never, [] as never, mockOptions);
 
     expect(deleteScannedMessagesMock).toHaveBeenCalled();
-    expect(buildCompletionEmbedMock).toHaveBeenCalledWith(5, {
+    expect(buildCompletionEmbedMock).toHaveBeenCalledWith("ja", 5, {
       "ch-1": { name: "general", count: 5 },
     });
     expect(interaction.editReply).toHaveBeenCalledWith(

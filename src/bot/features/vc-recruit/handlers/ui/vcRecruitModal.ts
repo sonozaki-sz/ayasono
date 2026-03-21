@@ -123,10 +123,12 @@ export const vcRecruitModalHandler: ModalHandler = {
     }
 
     // モーダル入力値を取得
-    const content = interaction.fields.getTextInputValue("vc-recruit:content");
+    const content = interaction.fields.getTextInputValue(
+      "vc-recruit:content-modal-input",
+    );
     const vcName =
       session.selectedVcId === NEW_VC_VALUE
-        ? interaction.fields.getTextInputValue("vc-recruit:vc-name")
+        ? interaction.fields.getTextInputValue("vc-recruit:vc-name-modal-input")
         : "";
 
     const repo = getBotVcRecruitRepository();

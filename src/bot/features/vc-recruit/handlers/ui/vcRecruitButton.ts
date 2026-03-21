@@ -324,7 +324,7 @@ export const vcRecruitButtonHandler: ButtonHandler = {
         .addComponents(
           new ActionRowBuilder<TextInputBuilder>().addComponents(
             new TextInputBuilder()
-              .setCustomId("vc-recruit:content")
+              .setCustomId("vc-recruit:content-modal-input")
               .setLabel(contentLabel)
               .setPlaceholder(contentPlaceholder)
               .setStyle(TextInputStyle.Paragraph)
@@ -346,7 +346,7 @@ export const vcRecruitButtonHandler: ButtonHandler = {
         modal.addComponents(
           new ActionRowBuilder<TextInputBuilder>().addComponents(
             new TextInputBuilder()
-              .setCustomId("vc-recruit:vc-name")
+              .setCustomId("vc-recruit:vc-name-modal-input")
               .setLabel(vcNameLabel)
               .setPlaceholder(vcNamePlaceholder)
               .setStyle(TextInputStyle.Short)

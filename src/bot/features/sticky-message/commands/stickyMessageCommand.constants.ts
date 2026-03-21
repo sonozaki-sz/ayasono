@@ -17,7 +17,7 @@ export const STICKY_MESSAGE_COMMAND = {
   /** remove コマンドが送信する StringSelectMenu の customId */
   REMOVE_SELECT_CUSTOM_ID: "sticky-message:remove-select",
   /** remove コマンドの「削除する」ボタンの customId */
-  REMOVE_BUTTON_CUSTOM_ID: "sticky-message:remove-button",
+  REMOVE_BUTTON_CUSTOM_ID: "sticky-message:remove-confirm",
   /** set プレーンテキストモーダル customId プレフィックス（後ろに channelId を付加） */
   SET_MODAL_ID_PREFIX: "sticky-message:set-modal:",
   /** set Embed モーダル customId プレフィックス（後ろに channelId を付加） */
@@ -28,10 +28,10 @@ export const STICKY_MESSAGE_COMMAND = {
   UPDATE_EMBED_MODAL_ID_PREFIX: "sticky-message:update-embed-modal:",
   /** 各モーダル内の入力欄 customId */
   MODAL_INPUT: {
-    MESSAGE: "sticky-message:modal:message",
-    EMBED_TITLE: "sticky-message:modal:embed-title",
-    EMBED_DESCRIPTION: "sticky-message:modal:embed-description",
-    EMBED_COLOR: "sticky-message:modal:embed-color",
+    MESSAGE: "sticky-message:message-modal-input",
+    EMBED_TITLE: "sticky-message:embed-title-modal-input",
+    EMBED_DESCRIPTION: "sticky-message:embed-description-modal-input",
+    EMBED_COLOR: "sticky-message:embed-color-modal-input",
   },
   OPTION: {
     CHANNEL: "channel",

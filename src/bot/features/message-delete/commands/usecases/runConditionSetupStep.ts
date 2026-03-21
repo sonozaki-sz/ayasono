@@ -14,7 +14,7 @@ import {
   UserSelectMenuBuilder,
   type ChatInputCommandInteraction,
 } from "discord.js";
-import { tDefault } from "../../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../../shared/locale/localeManager";
 import {
   createInfoEmbed,
   createWarningEmbed,
@@ -51,7 +51,10 @@ export async function runConditionSetupStep(
   const userSelect = new UserSelectMenuBuilder()
     .setCustomId(MSG_DEL_CUSTOM_ID.SELECT_USER)
     .setPlaceholder(
-      tDefault("messageDelete:ui.select.condition_user_placeholder"),
+      tInteraction(
+        interaction.locale,
+        "messageDelete:ui.select.condition_user_placeholder",
+      ),
     )
     .setMinValues(0)
     .setMaxValues(MSG_DEL_SELECT_MAX_OPTIONS);
@@ -60,7 +63,10 @@ export async function runConditionSetupStep(
   const channelSelect = new ChannelSelectMenuBuilder()
     .setCustomId(MSG_DEL_CUSTOM_ID.SELECT_CHANNEL)
     .setPlaceholder(
-      tDefault("messageDelete:ui.select.condition_channel_placeholder"),
+      tInteraction(
+        interaction.locale,
+        "messageDelete:ui.select.condition_channel_placeholder",
+      ),
     )
     .setMinValues(0)
     .setMaxValues(MSG_DEL_SELECT_MAX_OPTIONS)
@@ -78,24 +84,41 @@ export async function runConditionSetupStep(
     new ButtonBuilder()
       .setCustomId(MSG_DEL_CUSTOM_ID.START_SCAN)
       .setEmoji("🔍")
-      .setLabel(tDefault("messageDelete:ui.button.start_scan"))
+      .setLabel(
+        tInteraction(interaction.locale, "messageDelete:ui.button.start_scan"),
+      )
       .setStyle(ButtonStyle.Primary),
     new ButtonBuilder()
       .setCustomId(MSG_DEL_CUSTOM_ID.WEBHOOK_INPUT)
       .setEmoji("📩")
-      .setLabel(tDefault("messageDelete:ui.button.webhook_input"))
+      .setLabel(
+        tInteraction(
+          interaction.locale,
+          "messageDelete:ui.button.webhook_input",
+        ),
+      )
       .setStyle(ButtonStyle.Secondary),
     new ButtonBuilder()
       .setCustomId(MSG_DEL_CUSTOM_ID.COND_CANCEL)
       .setEmoji("❌")
-      .setLabel(tDefault("messageDelete:ui.button.condition_cancel"))
+      .setLabel(
+        tInteraction(
+          interaction.locale,
+          "messageDelete:ui.button.condition_cancel",
+        ),
+      )
       .setStyle(ButtonStyle.Secondary),
   );
 
   // 条件設定 UI を表示
   const message = await interaction.editReply({
     embeds: [
-      createInfoEmbed(tDefault("messageDelete:embed.title.condition_step")),
+      createInfoEmbed(
+        tInteraction(
+          interaction.locale,
+          "messageDelete:embed.title.condition_step",
+        ),
+      ),
     ],
     components: [
       new ActionRowBuilder<UserSelectMenuBuilder>().addComponents(userSelect),
@@ -148,16 +171,29 @@ export async function runConditionSetupStep(
       if (customId === MSG_DEL_CUSTOM_ID.WEBHOOK_INPUT) {
         const modal = new ModalBuilder()
           .setCustomId(MSG_DEL_CUSTOM_ID.MODAL_WEBHOOK)
-          .setTitle(tDefault("messageDelete:ui.modal.webhook_title"))
+          .setTitle(
+            tInteraction(
+              interaction.locale,
+              "messageDelete:ui.modal.webhook_title",
+            ),
+          )
           .addComponents(
             new ActionRowBuilder<TextInputBuilder>().addComponents(
               new TextInputBuilder()
                 .setCustomId(MSG_DEL_CUSTOM_ID.MODAL_INPUT_WEBHOOK)
-                .setLabel(tDefault("messageDelete:ui.modal.webhook_label"))
+                .setLabel(
+                  tInteraction(
+                    interaction.locale,
+                    "messageDelete:ui.modal.webhook_label",
+                  ),
+                )
                 .setStyle(TextInputStyle.Short)
                 .setRequired(true)
                 .setPlaceholder(
-                  tDefault("messageDelete:ui.modal.webhook_placeholder"),
+                  tInteraction(
+                    interaction.locale,
+                    "messageDelete:ui.modal.webhook_placeholder",
+                  ),
                 ),
             ),
           );
@@ -177,8 +213,11 @@ export async function runConditionSetupStep(
           await submit.reply({
             embeds: [
               createWarningEmbed(
-                tDefault("messageDelete:user-response.webhook_invalid_format"),
-                { title: tDefault("common:title_invalid_input") },
+                tInteraction(
+                  i.locale,
+                  "messageDelete:user-response.webhook_invalid_format",
+                ),
+                { title: tInteraction(i.locale, "common:title_invalid_input") },
               ),
             ],
             ephemeral: true,
@@ -203,10 +242,13 @@ export async function runConditionSetupStep(
           await i.reply({
             embeds: [
               createWarningEmbed(
-                tDefault(
+                tInteraction(
+                  i.locale,
                   "messageDelete:user-response.condition_step_no_filter",
                 ),
-                { title: tDefault("common:title_filter_required") },
+                {
+                  title: tInteraction(i.locale, "common:title_filter_required"),
+                },
               ),
             ],
             ephemeral: true,
@@ -235,7 +277,10 @@ export async function runConditionSetupStep(
           .editReply({
             embeds: [
               createInfoEmbed(
-                tDefault("messageDelete:user-response.cancelled"),
+                tInteraction(
+                  interaction.locale,
+                  "messageDelete:user-response.cancelled",
+                ),
               ),
             ],
             components: [],
@@ -256,8 +301,13 @@ export async function runConditionSetupStep(
         .editReply({
           embeds: [
             createWarningEmbed(
-              tDefault("messageDelete:user-response.condition_step_timeout"),
-              { title: tDefault("common:title_timeout") },
+              tInteraction(
+                interaction.locale,
+                "messageDelete:user-response.condition_step_timeout",
+              ),
+              {
+                title: tInteraction(interaction.locale, "common:title_timeout"),
+              },
             ),
           ],
           components: [],

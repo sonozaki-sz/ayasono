@@ -10,10 +10,7 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
-import {
-  tDefault,
-  tInteraction,
-} from "../../../../../shared/locale/localeManager";
+import { tInteraction } from "../../../../../shared/locale/localeManager";
 import { getBotStickyMessageConfigService } from "../../../../services/botCompositionRoot";
 import { createWarningEmbed } from "../../../../utils/messageResponse";
 import { STICKY_MESSAGE_COMMAND } from "../stickyMessageCommand.constants";
@@ -87,18 +84,31 @@ export async function handleStickyMessageSet(
     STICKY_MESSAGE_COMMAND.OPTION_VALUE.EMBED;
 
   if (useEmbed) {
-    // Embed モーダルを表示する（tDefault は同期）
+    // Embed モーダルを表示する（tInteraction は同期）
     const modal = new ModalBuilder()
       .setCustomId(
         `${STICKY_MESSAGE_COMMAND.SET_EMBED_MODAL_ID_PREFIX}${targetChannel.id}`,
       )
-      .setTitle(tDefault("stickyMessage:ui.modal.set_embed_title"));
+      .setTitle(
+        tInteraction(
+          interaction.locale,
+          "stickyMessage:ui.modal.set_embed_title",
+        ),
+      );
 
     const titleInput = new TextInputBuilder()
       .setCustomId(STICKY_MESSAGE_COMMAND.MODAL_INPUT.EMBED_TITLE)
-      .setLabel(tDefault("stickyMessage:ui.modal.set_embed_title_label"))
+      .setLabel(
+        tInteraction(
+          interaction.locale,
+          "stickyMessage:ui.modal.set_embed_title_label",
+        ),
+      )
       .setPlaceholder(
-        tDefault("stickyMessage:ui.modal.set_embed_title_placeholder"),
+        tInteraction(
+          interaction.locale,
+          "stickyMessage:ui.modal.set_embed_title_placeholder",
+        ),
       )
       .setStyle(TextInputStyle.Short)
       .setRequired(false)
@@ -106,9 +116,17 @@ export async function handleStickyMessageSet(
 
     const descriptionInput = new TextInputBuilder()
       .setCustomId(STICKY_MESSAGE_COMMAND.MODAL_INPUT.EMBED_DESCRIPTION)
-      .setLabel(tDefault("stickyMessage:ui.modal.set_embed_description_label"))
+      .setLabel(
+        tInteraction(
+          interaction.locale,
+          "stickyMessage:ui.modal.set_embed_description_label",
+        ),
+      )
       .setPlaceholder(
-        tDefault("stickyMessage:ui.modal.set_embed_description_placeholder"),
+        tInteraction(
+          interaction.locale,
+          "stickyMessage:ui.modal.set_embed_description_placeholder",
+        ),
       )
       .setStyle(TextInputStyle.Paragraph)
       .setRequired(false)
@@ -116,9 +134,17 @@ export async function handleStickyMessageSet(
 
     const colorInput = new TextInputBuilder()
       .setCustomId(STICKY_MESSAGE_COMMAND.MODAL_INPUT.EMBED_COLOR)
-      .setLabel(tDefault("stickyMessage:ui.modal.set_embed_color_label"))
+      .setLabel(
+        tInteraction(
+          interaction.locale,
+          "stickyMessage:ui.modal.set_embed_color_label",
+        ),
+      )
       .setPlaceholder(
-        tDefault("stickyMessage:ui.modal.set_embed_color_placeholder"),
+        tInteraction(
+          interaction.locale,
+          "stickyMessage:ui.modal.set_embed_color_placeholder",
+        ),
       )
       .setStyle(TextInputStyle.Short)
       .setRequired(false)
@@ -137,13 +163,23 @@ export async function handleStickyMessageSet(
       .setCustomId(
         `${STICKY_MESSAGE_COMMAND.SET_MODAL_ID_PREFIX}${targetChannel.id}`,
       )
-      .setTitle(tDefault("stickyMessage:ui.modal.set_title"));
+      .setTitle(
+        tInteraction(interaction.locale, "stickyMessage:ui.modal.set_title"),
+      );
 
     const messageInput = new TextInputBuilder()
       .setCustomId(STICKY_MESSAGE_COMMAND.MODAL_INPUT.MESSAGE)
-      .setLabel(tDefault("stickyMessage:ui.modal.set_message_label"))
+      .setLabel(
+        tInteraction(
+          interaction.locale,
+          "stickyMessage:ui.modal.set_message_label",
+        ),
+      )
       .setPlaceholder(
-        tDefault("stickyMessage:ui.modal.set_message_placeholder"),
+        tInteraction(
+          interaction.locale,
+          "stickyMessage:ui.modal.set_message_placeholder",
+        ),
       )
       .setStyle(TextInputStyle.Paragraph)
       .setRequired(true)

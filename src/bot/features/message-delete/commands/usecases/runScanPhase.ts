@@ -11,7 +11,7 @@ import {
 } from "discord.js";
 import {
   logPrefixed,
-  tDefault,
+  tInteraction,
 } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import {
@@ -52,16 +52,22 @@ export async function runScanPhase(
   const cancelState = { reason: "user" as "user" | "timeout" };
 
   const buildProgressContent = (totalScanned: number, collected: number) =>
-    tDefault("messageDelete:user-response.scan_progress", {
-      totalScanned,
-      collected,
-      limit: count,
-    });
+    tInteraction(
+      interaction.locale,
+      "messageDelete:user-response.scan_progress",
+      {
+        totalScanned,
+        collected,
+        limit: count,
+      },
+    );
 
   const cancelRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
       .setCustomId(MSG_DEL_CUSTOM_ID.SCAN_CANCEL)
-      .setLabel(tDefault("messageDelete:ui.button.scan_cancel"))
+      .setLabel(
+        tInteraction(interaction.locale, "messageDelete:ui.button.scan_cancel"),
+      )
       .setStyle(ButtonStyle.Secondary),
   );
 
@@ -119,6 +125,7 @@ export async function runScanPhase(
   let scannedMessages: ScannedMessageWithChannel[];
   try {
     scannedMessages = await scanMessages(channels, {
+      locale: interaction.locale,
       count,
       targetUserIds,
       keyword,
@@ -141,9 +148,15 @@ export async function runScanPhase(
     );
     await interaction.editReply({
       embeds: [
-        createErrorEmbed(tDefault("messageDelete:user-response.scan_failed"), {
-          title: tDefault("common:title_scan_error"),
-        }),
+        createErrorEmbed(
+          tInteraction(
+            interaction.locale,
+            "messageDelete:user-response.scan_failed",
+          ),
+          {
+            title: tInteraction(interaction.locale, "common:title_scan_error"),
+          },
+        ),
       ],
       content: "",
       components: [],
@@ -164,7 +177,7 @@ export async function runScanPhase(
           ? ("messageDelete:user-response.scan_timed_out_empty" as const)
           : ("messageDelete:user-response.cancelled" as const);
       await interaction.editReply({
-        embeds: [createInfoEmbed(tDefault(msgKey))],
+        embeds: [createInfoEmbed(tInteraction(interaction.locale, msgKey))],
         content: "",
         components: [],
       });
@@ -176,7 +189,10 @@ export async function runScanPhase(
       await interaction.editReply({
         embeds: [
           createInfoEmbed(
-            tDefault("messageDelete:user-response.scan_timed_out"),
+            tInteraction(
+              interaction.locale,
+              "messageDelete:user-response.scan_timed_out",
+            ),
           ),
         ],
         content: "",
