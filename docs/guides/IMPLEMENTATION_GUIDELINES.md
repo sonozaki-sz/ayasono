@@ -146,20 +146,88 @@ src/shared/features/<feature-name>/
 
 #### Custom ID（ボタン・セレクト・モーダル）
 
-フォーマット: `<feature>:<action>[:<id>]`（コロン区切り、lowercase・kebab-case）
+フォーマット: `<feature>:<subject>-<qualifier>[:<dynamic-param>]`（コロン区切り、kebab-case）
 
-- 動的パラメータは末尾に付加する
-- 定数は `src/bot/features/<feature>/constants/*.constants.ts` に集約する
+| セグメント | 必須 | 説明 | 例 |
+| --- | --- | --- | --- |
+| `<feature>` | ✅ | 機能名（コマンド名と一致） | `guild-config`, `bump-reminder`, `vc-recruit` |
+| `<subject>-<qualifier>` | ✅ | 「対象-修飾子」の形式。対象が何で、何をするか/何であるかを表す | `reset-confirm`, `page-next`, `webhook-modal` |
+| `<dynamic-param>` | ❌ | 動的パラメータ（チャンネルID等、実行時に決まる値） | `{channelId}`, `{panelChannelId}` |
+
+**subject の命名規則:**
+
+- 名詞を使う: `page`, `reset`, `mention`, `webhook`, `user`, `deletion`
+- 形容詞・前置詞を単独で subject にしない: ❌ `final-confirm` → ✅ `deletion-confirm`、❌ `after-filter` → ✅ `after-date-filter`
+
+**qualifier の種類:**
+
+| 種類 | qualifier 例 | 用途 |
+| --- | --- | --- |
+| アクション | confirm, cancel, start, delete, reset, submit, exclude | ボタン操作 |
+| ナビゲーション | first, prev, next, last, jump, back | ページ遷移 |
+| UI種別 | modal, select, input | UI要素の識別 |
+| 状態 | on, off | トグル |
+
+**ネスト規則（モーダル内の入力フィールド）:**
+
+モーダルの入力フィールドは `<subject>-modal-input` で表す:
 
 ```ts
-// ✅
-"vc-recruit:create:{panelChannelId}"
-"sticky-message:set-modal:{channelId}"
-
-// ❌
-"vcRecruit_create"
-"stickyMessage-setModal"
+"message-delete:webhook-modal"        // モーダル本体
+"message-delete:webhook-modal-input"  // モーダル内の入力フィールド
 ```
+
+**命名ルール:**
+
+- `<subject>-<qualifier>` は必ず「対象-修飾子」の順序にする（修飾子から始めない）
+- 複合語もkebab-caseで統一（`reset-all-confirm`、`after-date-filter`）
+- 動的パラメータがない場合は2セグメントで完結する
+
+```ts
+// ✅ アクション
+"guild-config:reset-confirm"              // リセットの確認ボタン
+"guild-config:reset-cancel"               // リセットのキャンセルボタン
+"guild-config:reset-all-confirm"          // 全設定リセットの確認ボタン
+"guild-config:import-confirm"             // インポートの確認ボタン
+"message-delete:deletion-confirm"         // 削除の最終確認ボタン
+"message-delete:preview-confirm"          // プレビューの確認ボタン
+
+// ✅ ナビゲーション
+"guild-config:page-first"                 // 最初のページへ
+"guild-config:page-prev"                  // 前のページへ
+"guild-config:page-next"                  // 次のページへ
+"guild-config:page-last"                  // 最後のページへ
+"guild-config:page-jump"                  // ページジャンプ
+"message-delete:deletion-back"            // プレビューに戻る
+
+// ✅ UI種別
+"message-delete:webhook-modal"            // Webhook入力モーダル
+"message-delete:webhook-modal-input"      // モーダル内の入力フィールド
+"guild-config:page-select"               // ページセレクトメニュー
+"message-delete:user-select"             // ユーザーセレクトメニュー
+
+// ✅ 状態
+"bump-reminder:mention-on:{guildId}"     // メンション通知ON
+"bump-reminder:mention-off:{guildId}"    // メンション通知OFF
+
+// ✅ 動的パラメータ付き
+"vc-recruit:panel-create:{channelId}"    // パネル作成
+"sticky-message:set-modal:{channelId}"   // 設定モーダル
+
+// ❌ 修飾子から始めている
+"guild-config:confirm-reset"
+"guild-config:cancel-import"
+
+// ❌ subject が形容詞・前置詞のみ
+"message-delete:final-confirm"            // → deletion-confirm
+"message-delete:after-filter"             // → after-date-filter
+
+// ❌ アンダースコアやcamelCase
+"guild_config_reset_confirm"
+"vcRecruit:createPanel"
+```
+
+- 定数は `src/bot/features/<feature>/constants/*.constants.ts` に集約する
 
 ### コメント規約
 
