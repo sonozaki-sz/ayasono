@@ -63,7 +63,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageUpdate", ()
       channelType: ChannelType.GuildVoice,
     });
 
-    await handleStickyMessageUpdate(interaction as never, "guild-1");
+    await handleStickyMessageUpdate(interaction as never);
 
     expect(interaction.reply).toHaveBeenCalledWith(
       expect.objectContaining({ flags: MessageFlags.Ephemeral }),
@@ -77,7 +77,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageUpdate", ()
     findByChannelMock.mockResolvedValue(null);
     const interaction = createInteractionMock();
 
-    await handleStickyMessageUpdate(interaction as never, "guild-1");
+    await handleStickyMessageUpdate(interaction as never);
 
     expect(interaction.reply).toHaveBeenCalledWith(
       expect.objectContaining({ flags: MessageFlags.Ephemeral }),
@@ -95,7 +95,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageUpdate", ()
     });
     const interaction = createInteractionMock({ useEmbed: false });
 
-    await handleStickyMessageUpdate(interaction as never, "guild-1");
+    await handleStickyMessageUpdate(interaction as never);
 
     expect(showModalMock).toHaveBeenCalled();
     const modal = showModalMock.mock.calls[0][0];
@@ -116,7 +116,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageUpdate", ()
     });
     const interaction = createInteractionMock({ useEmbed: true });
 
-    await handleStickyMessageUpdate(interaction as never, "guild-1");
+    await handleStickyMessageUpdate(interaction as never);
 
     expect(showModalMock).toHaveBeenCalled();
     const modal = showModalMock.mock.calls[0][0];
@@ -135,7 +135,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageUpdate", ()
     });
     const interaction = createInteractionMock({ useEmbed: true });
 
-    await handleStickyMessageUpdate(interaction as never, "guild-1");
+    await handleStickyMessageUpdate(interaction as never);
 
     expect(showModalMock).toHaveBeenCalled();
   });
@@ -158,7 +158,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageUpdate", ()
       },
     };
 
-    await handleStickyMessageUpdate(interaction as never, "guild-1");
+    await handleStickyMessageUpdate(interaction as never);
 
     expect(showModalMock).toHaveBeenCalled();
     const modal = showModalMock.mock.calls[0][0];
@@ -172,7 +172,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageUpdate", ()
       channelFromOption: { id: "voice-ch", type: ChannelType.GuildVoice },
     });
 
-    await handleStickyMessageUpdate(interaction as never, "guild-1");
+    await handleStickyMessageUpdate(interaction as never);
 
     expect(interaction.reply).toHaveBeenCalled();
   });

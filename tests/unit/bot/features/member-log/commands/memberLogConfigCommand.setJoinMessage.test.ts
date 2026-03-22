@@ -47,7 +47,6 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.setJoinMessage
     await expect(
       handleMemberLogConfigSetJoinMessage(
         makeInteraction() as never,
-        "guild-1",
       ),
     ).rejects.toBeInstanceOf(ValidationError);
   });
@@ -56,9 +55,8 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.setJoinMessage
     ensurePermissionMock.mockResolvedValue(undefined);
 
     await handleMemberLogConfigSetJoinMessage(
-      makeInteraction() as never,
-      "guild-1",
-    );
+        makeInteraction() as never,
+      );
 
     expect(ensurePermissionMock).toHaveBeenCalledTimes(1);
     expect(showModalMock).toHaveBeenCalledTimes(1);
@@ -68,9 +66,8 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.setJoinMessage
     ensurePermissionMock.mockResolvedValue(undefined);
 
     await handleMemberLogConfigSetJoinMessage(
-      makeInteraction() as never,
-      "guild-1",
-    );
+        makeInteraction() as never,
+      );
 
     const modal = (showModalMock.mock.calls[0] as unknown[])[0] as {
       data: { custom_id: string };

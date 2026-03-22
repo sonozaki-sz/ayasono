@@ -10,6 +10,7 @@ vi.mock("@/shared/locale/localeManager", () => ({
 }));
 
 vi.mock("@/bot/utils/messageResponse", () => ({
+  createInfoEmbed: vi.fn((description: string) => ({ description })),
   createSuccessEmbed: vi.fn((description: string) => ({ description })),
 }));
 
@@ -36,10 +37,9 @@ describe("bot/features/ping/commands/pingCommand.execute", () => {
     await executePingCommand(interaction as never);
 
     // tInteraction returns the key as-is
-    expect(interaction.reply).toHaveBeenCalledWith({ content: "ping:user-response.measuring" });
+    expect(interaction.reply).toHaveBeenCalledWith({ embeds: [{ description: "ping:user-response.measuring" }] });
     expect(createSuccessEmbed).toHaveBeenCalledWith("ping:user-response.result");
     expect(interaction.editReply).toHaveBeenCalledWith({
-      content: "",
       embeds: [{ description: "ping:user-response.result" }],
     });
   });

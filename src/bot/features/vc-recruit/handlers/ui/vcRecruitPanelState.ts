@@ -41,11 +41,11 @@ export function setVcRecruitSession(
 /**
  * セッションを取得する
  * @param interactionId インタラクション ID
- * @returns セッション情報（存在しない場合は null）
+ * @returns セッション情報（存在しない場合は undefined）
  */
 export function getVcRecruitSession(
   interactionId: string,
-): VcRecruitSession | null {
+): VcRecruitSession | undefined {
   return sessions.get(interactionId);
 }
 

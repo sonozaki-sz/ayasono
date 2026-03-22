@@ -3,6 +3,7 @@
 
 import type { PrismaClient } from "@prisma/client";
 import { DatabaseError } from "../../errors/customErrors";
+import { DEFAULT_LOCALE } from "../../locale/i18n";
 import type {
   AfkConfig,
   BumpReminderConfig,
@@ -41,7 +42,6 @@ const DB_ERROR = {
  */
 export class PrismaGuildConfigRepository implements IGuildConfigRepository {
   private prisma: PrismaClient;
-  private readonly DEFAULT_LOCALE = "ja";
   private readonly afkConfigRepository: AfkConfigRepository;
   private readonly bumpReminderConfigRepository: BumpReminderConfigRepository;
   private readonly vacConfigRepository: VacConfigRepository;
@@ -100,7 +100,7 @@ export class PrismaGuildConfigRepository implements IGuildConfigRepository {
   private getCoreDeps() {
     return {
       prisma: this.prisma,
-      defaultLocale: this.DEFAULT_LOCALE,
+      defaultLocale: DEFAULT_LOCALE,
       toDatabaseError: (prefix: string, error: unknown) =>
         this.toDatabaseError(prefix, error),
     };

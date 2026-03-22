@@ -257,6 +257,20 @@ export const vcRecruit = {
     "panel message deletion detected, resending panel GuildId: {{guildId}} PanelChannelId: {{panelChannelId}} MessageId: {{messageId}}",
   "log.panel_resent":
     "panel message resent GuildId: {{guildId}} PanelChannelId: {{panelChannelId}} NewMessageId: {{newMessageId}}",
+  "log.database_setup_add_failed":
+    "Failed to add setup",
+  "log.database_panel_message_update_failed":
+    "Failed to update panel message ID",
+  "log.database_setup_remove_failed":
+    "Failed to remove setup",
+  "log.database_vc_add_failed":
+    "Failed to add created voice channel",
+  "log.database_vc_remove_failed":
+    "Failed to remove created voice channel",
+  "log.database_role_add_failed":
+    "Failed to add mention role",
+  "log.database_role_remove_failed":
+    "Failed to remove mention role",
 } as const;
 
 export type VcRecruitTranslations = typeof vcRecruit;

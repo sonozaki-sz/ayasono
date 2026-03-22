@@ -3,7 +3,10 @@
 
 import type { ChatInputCommandInteraction } from "discord.js";
 import { tInteraction } from "../../../../shared/locale/localeManager";
-import { createSuccessEmbed } from "../../../utils/messageResponse";
+import {
+  createInfoEmbed,
+  createSuccessEmbed,
+} from "../../../utils/messageResponse";
 
 const PING_I18N_KEYS = {
   EMBED_MEASURING: "ping:user-response.measuring",
@@ -22,8 +25,9 @@ export async function executePingCommand(
     interaction.locale,
     PING_I18N_KEYS.EMBED_MEASURING,
   );
+  // 計測中の一時表示（後続で結果Embedに差し替え）
   await interaction.reply({
-    content: measuring,
+    embeds: [createInfoEmbed(measuring)],
   });
   const sent = await interaction.fetchReply();
 
@@ -42,7 +46,6 @@ export async function executePingCommand(
   const embed = createSuccessEmbed(description);
 
   await interaction.editReply({
-    content: "",
     embeds: [embed],
   });
 }

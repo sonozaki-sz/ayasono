@@ -27,7 +27,7 @@ export async function executeVacConfigCommand(
     }
 
     // 実行前に管理権限を検証
-    await ensureManageGuildPermission(interaction, guildId);
+    await ensureManageGuildPermission(interaction);
 
     // サブコマンド別に処理を委譲
     const subcommand = interaction.options.getSubcommand();

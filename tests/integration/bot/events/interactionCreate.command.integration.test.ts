@@ -36,6 +36,7 @@ vi.mock("@/bot/errors/interactionErrorHandler", () => ({
   handleInteractionError: vi.fn(),
 }));
 vi.mock("@/bot/utils/messageResponse", () => ({
+  createInfoEmbed: vi.fn((description: string) => ({ description })),
   createSuccessEmbed: vi.fn((description: string) => ({ description })),
 }));
 vi.mock("@/shared/utils/logger", () => ({
@@ -112,10 +113,9 @@ describe("integration: interactionCreate + pingCommand", () => {
       "user-1",
       5,
     );
-    expect(interaction.reply).toHaveBeenCalledWith({ content: "🏓 計測中..." });
+    expect(interaction.reply).toHaveBeenCalledWith({ embeds: [{ description: "🏓 計測中..." }] });
     expect(interaction.fetchReply).toHaveBeenCalledTimes(1);
     expect(interaction.editReply).toHaveBeenCalledWith({
-      content: "",
       embeds: [
         {
           description:

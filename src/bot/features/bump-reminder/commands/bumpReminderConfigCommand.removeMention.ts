@@ -23,7 +23,7 @@ export async function handleBumpReminderConfigRemoveMention(
   guildId: string,
 ): Promise<void> {
   // 実行時にも管理権限を確認
-  await ensureManageGuildPermission(interaction, guildId);
+  await ensureManageGuildPermission(interaction);
 
   const bumpReminderConfigService = getBotBumpReminderConfigService();
   const successTitle = tInteraction(

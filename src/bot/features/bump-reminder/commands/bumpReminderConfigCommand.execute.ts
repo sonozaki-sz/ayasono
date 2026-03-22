@@ -30,7 +30,7 @@ export async function executeBumpReminderConfigCommand(
     }
 
     // 管理権限を統一ガードで検証
-    await ensureManageGuildPermission(interaction, guildId);
+    await ensureManageGuildPermission(interaction);
 
     // サブコマンドごとに機能別ハンドラへ委譲
     const subcommand = interaction.options.getSubcommand();

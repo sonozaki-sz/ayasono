@@ -18,7 +18,7 @@ export async function handleMemberLogConfigView(
   guildId: string,
 ): Promise<void> {
   // 実行時にも管理権限を確認
-  await ensureMemberLogManageGuildPermission(interaction, guildId);
+  await ensureMemberLogManageGuildPermission(interaction);
 
   // 常に最新設定を取得して表示
   const config =

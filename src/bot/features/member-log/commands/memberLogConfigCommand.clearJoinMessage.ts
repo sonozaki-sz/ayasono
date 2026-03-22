@@ -22,7 +22,7 @@ export async function handleMemberLogConfigClearJoinMessage(
   guildId: string,
 ): Promise<void> {
   // 実行時にも管理権限を確認
-  await ensureMemberLogManageGuildPermission(interaction, guildId);
+  await ensureMemberLogManageGuildPermission(interaction);
 
   // 参加メッセージを削除
   await getBotMemberLogConfigService().clearJoinMessage(guildId);

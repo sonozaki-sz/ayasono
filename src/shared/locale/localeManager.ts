@@ -7,6 +7,7 @@ import type { IBaseGuildRepository } from "../database/types";
 import { logger } from "../utils/logger";
 import {
   DEFAULT_LOCALE,
+  I18N_NAMESPACES,
   SUPPORTED_LOCALES,
   type AllParseKeys,
   type SupportedLocale,
@@ -91,19 +92,7 @@ export class LocaleManager {
 
       keySeparator: false,
 
-      ns: [
-        "common",
-        "system",
-        "ping",
-        "afk",
-        "bumpReminder",
-        "vac",
-        "vc",
-        "messageDelete",
-        "memberLog",
-        "stickyMessage",
-        "vcRecruit",
-      ],
+      ns: [...I18N_NAMESPACES],
       defaultNS: "common",
     });
 

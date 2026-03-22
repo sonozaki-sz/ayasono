@@ -16,7 +16,7 @@ const PREVIEW_MAX = 1024;
 
 export const stickyMessageViewSelectHandler: StringSelectHandler = {
   /**
-   * ハンドラが指定の customId に协台するかどうかを返す
+   * ハンドラが指定の customId に対応するかどうかを返す
    * @param customId セレクトメニューの customId
    * @returns 一致する場合 true
    */

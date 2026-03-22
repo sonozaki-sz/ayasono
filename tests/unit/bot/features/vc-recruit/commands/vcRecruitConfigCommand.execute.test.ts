@@ -149,7 +149,6 @@ describe("bot/features/vc-recruit/commands/vcRecruitConfigCommand.execute", () =
 
     expect(handleVcRecruitConfigAddRoleMock).toHaveBeenCalledWith(
       interaction,
-      GUILD_ID,
     );
     expect(handleCommandErrorMock).not.toHaveBeenCalled();
   });

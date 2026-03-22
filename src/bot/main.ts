@@ -22,6 +22,7 @@ import { initializeBotCompositionRoot } from "./services/botCompositionRoot";
 import { registerBotEvents } from "./services/botEventRegistration";
 import { loadCommands } from "./utils/commandLoader";
 import { loadEvents } from "./utils/eventLoader";
+import type { Command } from "./types/discord";
 
 // コマンド登録先（ギルド/グローバル）をログ表示で識別するための定数
 const COMMAND_REGISTRATION_SCOPE = {
@@ -33,6 +34,24 @@ const COMMAND_REGISTRATION_SCOPE = {
 const PROCESS_EXIT_CODE = {
   FAILURE: 1,
 } as const;
+
+/**
+ * 登録されたコマンド名を列挙してログ出力する
+ * @param commands 登録したコマンド一覧
+ * @param scope 登録スコープ（guild / global）
+ */
+function logRegisteredCommands(commands: Command[], scope: string): void {
+  for (const command of commands) {
+    logger.info(
+      tDefault("system:bot.commands.command_registered", {
+        name: command.data.name,
+      }),
+    );
+  }
+  logger.info(
+    `${logPrefixed("system:log_prefix.bot", "system:bot.commands.registered")} (${scope})`,
+  );
+}
 
 /**
  * Bot 起動シーケンスを実行するエントリー関数
@@ -105,33 +124,13 @@ async function startBot() {
           body: commands.map((cmd) => cmd.data.toJSON()),
         },
       );
-      // Discord API への登録成功後にコマンド名を列挙してから完了ログを出力
-      for (const command of commands) {
-        logger.info(
-          tDefault("system:bot.commands.command_registered", {
-            name: command.data.name,
-          }),
-        );
-      }
-      logger.info(
-        `${logPrefixed("system:log_prefix.bot", "system:bot.commands.registered")} (${COMMAND_REGISTRATION_SCOPE.GUILD})`,
-      );
+      logRegisteredCommands(commands, COMMAND_REGISTRATION_SCOPE.GUILD);
     } else {
       // グローバルコマンドとして登録（本番用）
       await client.rest.put(Routes.applicationCommands(env.DISCORD_APP_ID), {
         body: commands.map((cmd) => cmd.data.toJSON()),
       });
-      // Discord API への登録成功後にコマンド名を列挙してから完了ログを出力
-      for (const command of commands) {
-        logger.info(
-          tDefault("system:bot.commands.command_registered", {
-            name: command.data.name,
-          }),
-        );
-      }
-      logger.info(
-        `${logPrefixed("system:log_prefix.bot", "system:bot.commands.registered")} (${COMMAND_REGISTRATION_SCOPE.GLOBAL})`,
-      );
+      logRegisteredCommands(commands, COMMAND_REGISTRATION_SCOPE.GLOBAL);
     }
 
     // Discord イベントをクライアントへ登録

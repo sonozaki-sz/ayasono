@@ -401,12 +401,12 @@ export const vcRecruitButtonHandler: ButtonHandler = {
         ],
       });
 
-      // 60秒後にセレクトメニューを無効化
-      setTimeout(async () => {
+      // タイムアウト後にセレクトメニューを無効化
+      setTimeout(() => {
         const disabledMenu = StringSelectMenuBuilder.from(
           selectMenu.toJSON(),
         ).setDisabled(true);
-        await interaction
+        interaction
           .editReply({
             components: [
               new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
@@ -414,7 +414,7 @@ export const vcRecruitButtonHandler: ButtonHandler = {
               ),
             ],
           })
-          .catch(() => null);
+          .catch(() => {});
       }, VC_RECRUIT_TIMEOUT.COMPONENT_DISABLE_MS);
 
       return;

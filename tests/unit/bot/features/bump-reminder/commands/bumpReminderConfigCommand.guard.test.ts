@@ -23,7 +23,7 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.guard", 
     };
 
     expect(() =>
-      ensureManageGuildPermission(interaction as never, "guild-1"),
+      ensureManageGuildPermission(interaction as never),
     ).not.toThrow();
     expect(interaction.memberPermissions.has).toHaveBeenCalledWith(
       PermissionFlagsBits.ManageGuild,
@@ -39,7 +39,7 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.guard", 
     };
 
     expect(() =>
-      ensureManageGuildPermission(interaction as never, "guild-1"),
+      ensureManageGuildPermission(interaction as never),
     ).toThrow(PermissionError);
   });
 });

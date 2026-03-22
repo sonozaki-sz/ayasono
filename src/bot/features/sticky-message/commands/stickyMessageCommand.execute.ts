@@ -46,7 +46,7 @@ export async function executeStickyMessageCommand(
     const subcommand = interaction.options.getSubcommand();
     switch (subcommand) {
       case STICKY_MESSAGE_COMMAND.SUBCOMMAND.SET:
-        await handleStickyMessageSet(interaction, guildId);
+        await handleStickyMessageSet(interaction);
         break;
       case STICKY_MESSAGE_COMMAND.SUBCOMMAND.REMOVE:
         await handleStickyMessageRemove(interaction, guildId);
@@ -55,7 +55,7 @@ export async function executeStickyMessageCommand(
         await handleStickyMessageView(interaction, guildId);
         break;
       case STICKY_MESSAGE_COMMAND.SUBCOMMAND.UPDATE:
-        await handleStickyMessageUpdate(interaction, guildId);
+        await handleStickyMessageUpdate(interaction);
         break;
       default:
         throw new ValidationError(

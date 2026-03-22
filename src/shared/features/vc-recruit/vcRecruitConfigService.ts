@@ -10,6 +10,7 @@ import {
   VC_RECRUIT_MENTION_ROLE_REMOVE_RESULT,
   type VcRecruitMentionRoleRemoveResult,
 } from "../../database/types";
+import { tDefault } from "../../locale/localeManager";
 import { executeWithDatabaseError } from "../../utils/errorHandling";
 import {
   DEFAULT_VC_RECRUIT_CONFIG,
@@ -73,7 +74,7 @@ export class VcRecruitConfigService {
       };
       await this.saveVcRecruitConfig(guildId, updated);
       return updated;
-    }, "addSetup failed");
+    }, tDefault("vcRecruit:log.database_setup_add_failed"));
   }
 
   /**
@@ -94,7 +95,7 @@ export class VcRecruitConfigService {
       };
       await this.saveVcRecruitConfig(guildId, updated);
       return updated;
-    }, "updatePanelMessageId failed");
+    }, tDefault("vcRecruit:log.database_panel_message_update_failed"));
   }
 
   /**
@@ -114,7 +115,7 @@ export class VcRecruitConfigService {
       };
       await this.saveVcRecruitConfig(guildId, updated);
       return updated;
-    }, "removeSetup failed");
+    }, tDefault("vcRecruit:log.database_setup_remove_failed"));
   }
 
   /**
@@ -178,7 +179,7 @@ export class VcRecruitConfigService {
       };
       await this.saveVcRecruitConfig(guildId, updated);
       return updated;
-    }, "addCreatedVoiceChannelId failed");
+    }, tDefault("vcRecruit:log.database_vc_add_failed"));
   }
 
   /**
@@ -201,7 +202,7 @@ export class VcRecruitConfigService {
       };
       await this.saveVcRecruitConfig(guildId, updated);
       return updated;
-    }, "removeCreatedVoiceChannelId failed");
+    }, tDefault("vcRecruit:log.database_vc_remove_failed"));
   }
 
   /**
@@ -249,7 +250,7 @@ export class VcRecruitConfigService {
       };
       await this.saveVcRecruitConfig(guildId, updated);
       return VC_RECRUIT_MENTION_ROLE_ADD_RESULT.ADDED;
-    }, "addMentionRoleId failed");
+    }, tDefault("vcRecruit:log.database_role_add_failed"));
   }
 
   /**
@@ -269,7 +270,7 @@ export class VcRecruitConfigService {
       };
       await this.saveVcRecruitConfig(guildId, updated);
       return VC_RECRUIT_MENTION_ROLE_REMOVE_RESULT.REMOVED;
-    }, "removeMentionRoleId failed");
+    }, tDefault("vcRecruit:log.database_role_remove_failed"));
   }
 
   /** デフォルトのスレッドアーカイブ時間 */

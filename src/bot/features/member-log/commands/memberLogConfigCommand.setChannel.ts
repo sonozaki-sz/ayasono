@@ -28,7 +28,7 @@ export async function handleMemberLogConfigSetChannel(
   guildId: string,
 ): Promise<void> {
   // 実行時にも管理権限を確認
-  await ensureMemberLogManageGuildPermission(interaction, guildId);
+  await ensureMemberLogManageGuildPermission(interaction);
 
   // チャンネルオプションを取得
   const channel = interaction.options.getChannel(

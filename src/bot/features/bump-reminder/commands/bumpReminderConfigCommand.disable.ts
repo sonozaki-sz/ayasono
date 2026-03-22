@@ -26,7 +26,7 @@ export async function handleBumpReminderConfigDisable(
   guildId: string,
 ): Promise<void> {
   // 実行時にも管理権限を確認
-  await ensureManageGuildPermission(interaction, guildId);
+  await ensureManageGuildPermission(interaction);
 
   // メモリ上の pending リマインダーをキャンセル
   const bumpReminderManager = getBotBumpReminderManager();

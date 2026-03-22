@@ -103,7 +103,6 @@ describe("bot/features/sticky-message/commands/stickyMessageCommand.execute", ()
 
     expect(handleStickyMessageSetMock).toHaveBeenCalledWith(
       interaction,
-      "guild-1",
     );
   });
 
@@ -142,7 +141,6 @@ describe("bot/features/sticky-message/commands/stickyMessageCommand.execute", ()
 
     expect(handleStickyMessageUpdateMock).toHaveBeenCalledWith(
       interaction,
-      "guild-1",
     );
   });
 

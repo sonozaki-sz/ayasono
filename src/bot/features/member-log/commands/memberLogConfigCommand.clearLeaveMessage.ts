@@ -22,7 +22,7 @@ export async function handleMemberLogConfigClearLeaveMessage(
   guildId: string,
 ): Promise<void> {
   // 実行時にも管理権限を確認
-  await ensureMemberLogManageGuildPermission(interaction, guildId);
+  await ensureMemberLogManageGuildPermission(interaction);
 
   // 退出メッセージを削除
   await getBotMemberLogConfigService().clearLeaveMessage(guildId);

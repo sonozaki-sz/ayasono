@@ -25,12 +25,12 @@ describe("shared/utils/ttlMap", () => {
     expect(map.get("key1")).toBe("value1");
   });
 
-  it("存在しないキーを get すると null を返す", () => {
+  it("存在しないキーを get すると undefined を返す", () => {
     // Arrange
     const map = new TtlMap<string>(5000);
 
     // Act & Assert
-    expect(map.get("nonexistent")).toBeNull();
+    expect(map.get("nonexistent")).toBeUndefined();
   });
 
   it("has でエントリの存在を確認できる", () => {
@@ -52,7 +52,7 @@ describe("shared/utils/ttlMap", () => {
     vi.advanceTimersByTime(3000);
 
     // Assert
-    expect(map.get("key1")).toBeNull();
+    expect(map.get("key1")).toBeUndefined();
     expect(map.has("key1")).toBe(false);
   });
 
@@ -73,7 +73,7 @@ describe("shared/utils/ttlMap", () => {
 
     // 新しい TTL が経過すると削除される
     vi.advanceTimersByTime(2000);
-    expect(map.get("key1")).toBeNull();
+    expect(map.get("key1")).toBeUndefined();
   });
 
   it("delete でエントリとタイマーを削除できる", () => {
@@ -85,7 +85,7 @@ describe("shared/utils/ttlMap", () => {
     map.delete("key1");
 
     // Assert
-    expect(map.get("key1")).toBeNull();
+    expect(map.get("key1")).toBeUndefined();
     expect(map.has("key1")).toBe(false);
   });
 
@@ -108,9 +108,9 @@ describe("shared/utils/ttlMap", () => {
     map.clear();
 
     // Assert — 全エントリが削除されている
-    expect(map.get("key1")).toBeNull();
-    expect(map.get("key2")).toBeNull();
-    expect(map.get("key3")).toBeNull();
+    expect(map.get("key1")).toBeUndefined();
+    expect(map.get("key2")).toBeUndefined();
+    expect(map.get("key3")).toBeUndefined();
   });
 
   it("clear 後に TTL が経過してもエラーが発生しない", () => {

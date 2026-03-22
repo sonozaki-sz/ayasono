@@ -161,7 +161,7 @@ export async function handleGuildMemberAdd(member: GuildMember): Promise<void> {
         "memberLog:log.notification_failed",
         { guildId },
       ),
-      { err },
+      err,
     );
   }
 }

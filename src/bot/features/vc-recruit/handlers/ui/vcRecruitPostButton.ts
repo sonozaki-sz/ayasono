@@ -98,12 +98,14 @@ async function updateToEndedState(
     EmbedBuilder.from(embed).setTitle(endedTitle),
   );
 
+  // 募集終了済みの表示用ボタン（操作不可・customId はディスパッチされないプレースホルダー）
   const endedButton = new ButtonBuilder()
     .setCustomId("vc-recruit:ended-placeholder")
     .setLabel(endedLabel)
     .setStyle(ButtonStyle.Secondary)
     .setDisabled(true);
 
+  // 既存の削除ボタンID が取得できなかった場合のフォールバック（通常は到達しない）
   const deleteButton = new ButtonBuilder()
     .setCustomId(resolvedDeleteId ?? "vc-recruit:delete-fallback")
     .setLabel(deleteLabel)

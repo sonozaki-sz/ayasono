@@ -18,7 +18,7 @@ export async function handleBumpReminderConfigView(
   guildId: string,
 ): Promise<void> {
   // 実行時にも管理権限を確認
-  await ensureManageGuildPermission(interaction, guildId);
+  await ensureManageGuildPermission(interaction);
 
   // 常に最新設定を取得して表示
   const config =

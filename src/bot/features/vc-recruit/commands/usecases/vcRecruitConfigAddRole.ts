@@ -23,11 +23,9 @@ import {
  * vc-recruit-config add-role を実行する
  * RoleSelectMenu（複数選択可）をエフェメラルで表示する
  * @param interaction コマンド実行インタラクション
- * @param guildId 実行対象ギルドID
  */
 export async function handleVcRecruitConfigAddRole(
   interaction: ChatInputCommandInteraction,
-  _guildId: string,
 ): Promise<void> {
   if (!interaction.guild) {
     throw ValidationError.fromKey(COMMON_I18N_KEYS.GUILD_ONLY);

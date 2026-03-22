@@ -48,11 +48,11 @@ export async function executeMemberLogConfigCommand(
         break;
 
       case MEMBER_LOG_CONFIG_COMMAND.SUBCOMMAND.SET_JOIN_MESSAGE:
-        await handleMemberLogConfigSetJoinMessage(interaction, guildId);
+        await handleMemberLogConfigSetJoinMessage(interaction);
         break;
 
       case MEMBER_LOG_CONFIG_COMMAND.SUBCOMMAND.SET_LEAVE_MESSAGE:
-        await handleMemberLogConfigSetLeaveMessage(interaction, guildId);
+        await handleMemberLogConfigSetLeaveMessage(interaction);
         break;
 
       case MEMBER_LOG_CONFIG_COMMAND.SUBCOMMAND.CLEAR_JOIN_MESSAGE:

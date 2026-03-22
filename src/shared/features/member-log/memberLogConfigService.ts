@@ -50,17 +50,28 @@ export class MemberLogConfigService {
   }
 
   /**
+   * 現在の設定を読み込み、指定フィールドを上書きして保存する
+   * @param guildId 設定対象のギルドID
+   * @param partial 上書きするフィールド
+   */
+  private async updatePartial(
+    guildId: string,
+    partial: Partial<MemberLogConfig>,
+  ): Promise<void> {
+    const current = await this.getMemberLogConfigOrDefault(guildId);
+    await this.repository.updateMemberLogConfig(guildId, {
+      ...current,
+      ...partial,
+    });
+  }
+
+  /**
    * 通知チャンネルを設定する
    * @param guildId 設定対象のギルドID
    * @param channelId 通知先チャンネルID
    */
   async setChannelId(guildId: string, channelId: string): Promise<void> {
-    // 現在の設定を読み込み、channelId のみ更新して保存する
-    const current = await this.getMemberLogConfigOrDefault(guildId);
-    await this.repository.updateMemberLogConfig(guildId, {
-      ...current,
-      channelId,
-    });
+    await this.updatePartial(guildId, { channelId });
   }
 
   /**
@@ -69,12 +80,7 @@ export class MemberLogConfigService {
    * @param enabled 有効化するか
    */
   async setEnabled(guildId: string, enabled: boolean): Promise<void> {
-    // 現在の設定を読み込み、enabled フラグのみ更新して保存する
-    const current = await this.getMemberLogConfigOrDefault(guildId);
-    await this.repository.updateMemberLogConfig(guildId, {
-      ...current,
-      enabled,
-    });
+    await this.updatePartial(guildId, { enabled });
   }
 
   /**
@@ -83,12 +89,7 @@ export class MemberLogConfigService {
    * @param message カスタム参加メッセージ文字列
    */
   async setJoinMessage(guildId: string, message: string): Promise<void> {
-    // 現在の設定を読み込み、joinMessage のみ更新して保存する
-    const current = await this.getMemberLogConfigOrDefault(guildId);
-    await this.repository.updateMemberLogConfig(guildId, {
-      ...current,
-      joinMessage: message,
-    });
+    await this.updatePartial(guildId, { joinMessage: message });
   }
 
   /**
@@ -97,12 +98,7 @@ export class MemberLogConfigService {
    * @param message カスタム退出メッセージ文字列
    */
   async setLeaveMessage(guildId: string, message: string): Promise<void> {
-    // 現在の設定を読み込み、leaveMessage のみ更新して保存する
-    const current = await this.getMemberLogConfigOrDefault(guildId);
-    await this.repository.updateMemberLogConfig(guildId, {
-      ...current,
-      leaveMessage: message,
-    });
+    await this.updatePartial(guildId, { leaveMessage: message });
   }
 
   /**
@@ -110,11 +106,7 @@ export class MemberLogConfigService {
    * @param guildId 設定対象のギルドID
    */
   async clearJoinMessage(guildId: string): Promise<void> {
-    const current = await this.getMemberLogConfigOrDefault(guildId);
-    await this.repository.updateMemberLogConfig(guildId, {
-      ...current,
-      joinMessage: undefined,
-    });
+    await this.updatePartial(guildId, { joinMessage: undefined });
   }
 
   /**
@@ -122,11 +114,7 @@ export class MemberLogConfigService {
    * @param guildId 設定対象のギルドID
    */
   async clearLeaveMessage(guildId: string): Promise<void> {
-    const current = await this.getMemberLogConfigOrDefault(guildId);
-    await this.repository.updateMemberLogConfig(guildId, {
-      ...current,
-      leaveMessage: undefined,
-    });
+    await this.updatePartial(guildId, { leaveMessage: undefined });
   }
 
   /**
@@ -135,12 +123,7 @@ export class MemberLogConfigService {
    * @param guildId 設定対象のギルドID
    */
   async disableAndClearChannel(guildId: string): Promise<void> {
-    const current = await this.getMemberLogConfigOrDefault(guildId);
-    await this.repository.updateMemberLogConfig(guildId, {
-      ...current,
-      channelId: undefined,
-      enabled: false,
-    });
+    await this.updatePartial(guildId, { channelId: undefined, enabled: false });
   }
 }
 
