@@ -2,7 +2,7 @@
 
 > トリガーチャンネル参加時に専用ボイスチャンネルを自動作成・管理する機能
 
-最終更新: 2026年3月21日
+最終更新: 2026年3月22日
 
 ---
 
@@ -263,8 +263,8 @@
 | `vac-config.create-trigger-vc.description` | サブコマンド説明 | トリガーチャンネルを作成 | Create trigger channel |
 | `vac-config.create-trigger-vc.category.description` | オプション説明 | 作成先カテゴリ（TOP またはカテゴリ。未指定時は実行カテゴリ） | Destination category (TOP or category; defaults to current category) |
 | `vac-config.remove-trigger-vc.description` | サブコマンド説明 | トリガーチャンネルを削除 | Remove trigger channel |
-| `vac-config.remove-trigger-vc.category.description` | オプション説明 | 削除対象（TOP またはカテゴリ。未指定時は実行カテゴリ） | Target category (TOP or category; defaults to current category) |
-| `vac-config.remove-trigger-vc.category.top` | カテゴリ選択肢 | TOP（カテゴリなし） | TOP (no category) |
+| `vac-config.remove-trigger-vc.category.description` | レガシー（未使用） | 削除対象（TOP またはカテゴリ。未指定時は実行カテゴリ） | Target category (TOP or category; defaults to current category) |
+| `vac-config.remove-trigger-vc.category.top` | レガシー（未使用） | TOP（カテゴリなし） | TOP (no category) |
 | `vac-config.view.description` | サブコマンド説明 | 現在の設定を表示 | Show current settings |
 
 ### ユーザーレスポンス
@@ -272,7 +272,8 @@
 | キー | 用途 | ja | en |
 | --- | --- | --- | --- |
 | `user-response.trigger_created` | トリガー作成成功 | トリガーチャンネル {{channel}} を作成しました。 | Created trigger channel {{channel}} |
-| `user-response.trigger_removed` | トリガー削除成功 | トリガーチャンネル {{channel}} を削除しました。 | Removed trigger channel {{channel}} |
+| `user-response.trigger_removed` | トリガー削除成功（単数） | トリガーチャンネル {{channel}} を削除しました。 | Removed trigger channel {{channel}} |
+| `user-response.triggers_removed` | トリガー削除成功（複数） | {{count}}件のトリガーチャンネルを削除しました。 | Removed {{count}} trigger channel(s). |
 | `user-response.renamed` | VC名変更成功 | VC名を {{name}} に変更しました。 | VC name has been changed to {{name}} |
 | `user-response.limit_changed` | 人数制限変更成功 | 人数制限を {{limit}} に設定しました。 | User limit has been set to {{limit}} |
 | `user-response.members_moved` | AFK移動成功 | {{channel}} へ移動しました。 | Moved to {{channel}}. |
@@ -286,6 +287,7 @@
 | `user-response.not_in_vc` | VC未参加エラー（パネル） | このVCに参加しているユーザーのみ操作できます。 | Only users currently in this VC can use this action. |
 | `user-response.not_in_any_vc` | VC未参加エラー（コマンド） | このコマンドはVC参加中にのみ使用できます。 | This command can only be used while in a VC. |
 | `user-response.not_vac_channel` | VAC管理外エラー | このVCは自動作成チャンネルではありません。 | This VC is not managed by auto-create feature. |
+| `user-response.name_required` | VC名未入力エラー | VC名を入力してください。 | Please enter a VC name. |
 | `user-response.limit_out_of_range` | 人数制限範囲エラー | 人数制限は0〜99の範囲で指定してください。 | User limit must be between 0 and 99. |
 | `user-response.afk_move_failed` | AFK移動失敗 | AFK チャンネルへの移動に失敗しました。対象ユーザーがVCから退出した可能性があります。 | Failed to move to AFK channel. The target user(s) may have left the VC. |
 
@@ -309,6 +311,8 @@
 
 | キー | 用途 | ja | en |
 | --- | --- | --- | --- |
+| `ui.select.trigger_remove_placeholder` | トリガー削除セレクトメニュープレースホルダー | 削除するトリガーチャンネルを選択（複数選択可） | Select trigger channels to remove (multiple) |
+| `ui.button.trigger_remove_confirm` | トリガー削除確認ボタン | 削除する | Delete |
 | `ui.button.rename` | VC名変更ボタン | VC名を変更 | Change VC Name |
 | `ui.button.limit` | 人数制限ボタン | 人数制限を変更 | Change User Limit |
 | `ui.modal.limit_placeholder` | 人数制限プレースホルダー | 0〜99（0: 無制限） | 0–99 (0: unlimited) |

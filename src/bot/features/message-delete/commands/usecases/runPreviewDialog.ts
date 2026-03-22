@@ -71,7 +71,7 @@ export async function showPreviewDialog(
     return {
       embeds: [
         buildCommandConditionsEmbed(locale, options),
-        buildPreviewEmbed(locale, filtered, safePage, totalPages, excludedIds),
+        buildPreviewEmbed(locale, filtered, safePage, excludedIds),
       ],
       components: buildPreviewComponents(
         locale,

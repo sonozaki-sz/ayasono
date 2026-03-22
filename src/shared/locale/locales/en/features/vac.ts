@@ -23,6 +23,8 @@ export const vac = {
     "Created trigger channel {{channel}}",
   "user-response.trigger_removed":
     "Removed trigger channel {{channel}}",
+  "user-response.triggers_removed":
+    "Removed {{count}} trigger channel(s).",
   "user-response.renamed":
     "VC name has been changed to {{name}}",
   "user-response.limit_changed":
@@ -87,6 +89,10 @@ export const vac = {
     "You can change VC settings from this panel.",
 
   // ── UI labels ──────────────────────────────────
+  "ui.select.trigger_remove_placeholder":
+    "Select trigger channels to remove (multiple)",
+  "ui.button.trigger_remove_confirm":
+    "Delete",
   "ui.button.rename":
     "Change VC Name",
   "ui.button.limit":

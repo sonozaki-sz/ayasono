@@ -15,6 +15,10 @@ export const bumpReminder = {
     "Role to mention in reminders",
   "bump-reminder-config.remove-mention.description":
     "Remove mention role setting",
+  "bump-reminder-config.remove-mention-users.description":
+    "Remove notification users",
+  "bump-reminder-config.reset.description":
+    "Reset bump reminder settings",
   "bump-reminder-config.view.description":
     "Show current settings",
 
@@ -41,6 +45,14 @@ export const bumpReminder = {
     "Notification turned ON.",
   "user-response.panel_mention_toggled_off":
     "Notification turned OFF.",
+  "user-response.reset_success":
+    "Bump reminder settings have been reset.",
+  "user-response.reset_cancelled":
+    "Reset has been cancelled.",
+  "user-response.remove_users_success":
+    "Selected users have been removed from the notification list.",
+  "user-response.remove_users_empty":
+    "No users are registered for notifications.",
   "user-response.panel_update_failed":
     "Failed to update the notification list.",
 
@@ -51,6 +63,22 @@ export const bumpReminder = {
   // ── embed: not_configured ──────────────────────
   "embed.description.not_configured":
     "Bump reminder is not configured.",
+
+  // ── embed: reset ─────────────────────────────
+  "embed.title.reset_confirm":
+    "Confirm Bump Reminder Reset",
+  "embed.description.reset_confirm":
+    "Are you sure you want to reset bump reminder settings?\nThe following settings will be deleted. This action cannot be undone.",
+  "embed.field.name.reset_target":
+    "Targets to Delete",
+  "embed.field.value.reset_target":
+    "Enabled/Disabled setting / Mention role / Mention users / Pending reminders",
+
+  // ── embed: remove_users ──────────────────────
+  "embed.title.remove_users":
+    "Remove Notification Users",
+  "embed.description.remove_users":
+    "Select users to remove.",
 
   // ── embed: config_view ─────────────────────────
   "embed.title.config_view":
@@ -75,6 +103,14 @@ export const bumpReminder = {
     "Turn Notification ON",
   "ui.button.mention_off":
     "Turn Notification OFF",
+  "ui.button.reset_confirm":
+    "Reset",
+  "ui.button.reset_cancel":
+    "Cancel",
+  "ui.button.select_all":
+    "Select All",
+  "ui.button.submit_delete":
+    "Delete",
 
   // ── Logs ─────────────────────────────────────
   "log.detected":
@@ -93,6 +129,8 @@ export const bumpReminder = {
     "disabled GuildId: {{guildId}}",
   "log.config_mention_set":
     "mention role set GuildId: {{guildId}} RoleId: {{roleId}}",
+  "log.config_reset":
+    "settings reset GuildId: {{guildId}}",
   "log.config_mention_removed":
     "mention settings removed GuildId: {{guildId}} Target: {{target}}",
   "log.config_users_removed":

@@ -33,10 +33,6 @@ export const vacConfigCommand: Command = {
       "vac",
       "vac-config.create-trigger-vc.category.description",
     );
-    const removeCategoryDesc = getCommandLocalizations(
-      "vac",
-      "vac-config.remove-trigger-vc.category.description",
-    );
     const viewDesc = getCommandLocalizations(
       "vac",
       "vac-config.view.description",
@@ -65,15 +61,7 @@ export const vacConfigCommand: Command = {
         subcommand
           .setName(VAC_CONFIG_COMMAND.SUBCOMMAND.REMOVE_TRIGGER)
           .setDescription(removeDesc.ja)
-          .setDescriptionLocalizations(removeDesc.localizations)
-          .addStringOption((option) =>
-            option
-              .setName(VAC_CONFIG_COMMAND.OPTION.CATEGORY)
-              .setDescription(removeCategoryDesc.ja)
-              .setDescriptionLocalizations(removeCategoryDesc.localizations)
-              .setRequired(false)
-              .setAutocomplete(true),
-          ),
+          .setDescriptionLocalizations(removeDesc.localizations),
       )
       .addSubcommand((subcommand) =>
         subcommand

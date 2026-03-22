@@ -11,6 +11,7 @@ import {
 import { tInteraction } from "../../../../shared/locale/localeManager";
 import {
   STATUS_COLORS,
+  createInfoEmbed,
   createSuccessEmbed,
 } from "../../../utils/messageResponse";
 import {
@@ -157,7 +158,6 @@ function buildPaginationNavRow(
  * @param locale interaction.locale
  * @param filteredMessages フィルター適用済みのスキャン済みメッセージ
  * @param page 現在のページ番号（0-indexed）
- * @param totalPages 総ページ数
  * @param excludedIds 除外対象のメッセージID セット
  * @returns プレビュー EmbedBuilder
  */
@@ -165,34 +165,24 @@ export function buildPreviewEmbed(
   locale: string,
   filteredMessages: ScannedMessage[],
   page: number,
-  totalPages: number,
   excludedIds: ReadonlySet<string>,
 ): EmbedBuilder {
-  const embed = new EmbedBuilder().setColor(STATUS_COLORS.info).setTitle(
-    tInteraction(locale, "messageDelete:embed.title.confirm", {
-      page: page + 1,
-      total: Math.max(1, totalPages),
-    }),
-  );
-
   const start = page * MSG_DEL_PAGE_SIZE;
   const slice = filteredMessages.slice(start, start + MSG_DEL_PAGE_SIZE);
+  const title = tInteraction(locale, "messageDelete:embed.title.confirm");
 
   if (slice.length === 0) {
-    embed.setDescription(
+    return createInfoEmbed(
       tInteraction(locale, "messageDelete:user-response.zero_targets"),
-    );
-    return embed;
-  }
-
-  for (let i = 0; i < slice.length; i++) {
-    const m = slice[i];
-    embed.addFields(
-      buildMessageField(locale, m, start + i + 1, excludedIds.has(m.messageId)),
+      { title },
     );
   }
 
-  return embed;
+  const fields = slice.map((m, i) =>
+    buildMessageField(locale, m, start + i + 1, excludedIds.has(m.messageId)),
+  );
+
+  return createInfoEmbed("", { title, fields });
 }
 
 /**
@@ -386,7 +376,6 @@ export function buildPreviewComponents(
  * @param locale interaction.locale
  * @param targetMessages 削除対象のメッセージ（除外済みを含まない）
  * @param page 現在のページ番号（0-indexed）
- * @param totalPages 総ページ数
  * @param totalDeleteCount 合計削除予定件数
  * @returns 最終確認 EmbedBuilder
  */
@@ -394,16 +383,12 @@ export function buildFinalConfirmEmbed(
   locale: string,
   targetMessages: ScannedMessage[],
   page: number,
-  totalPages: number,
   totalDeleteCount: number,
 ): EmbedBuilder {
   const embed = new EmbedBuilder()
     .setColor(STATUS_COLORS.danger)
     .setTitle(
-      tInteraction(locale, "messageDelete:embed.title.deletion_confirm", {
-        page: page + 1,
-        total: Math.max(1, totalPages),
-      }),
+      tInteraction(locale, "messageDelete:embed.title.deletion_confirm"),
     )
     .setDescription(
       tInteraction(locale, "messageDelete:embed.description.deletion_warning") +

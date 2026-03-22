@@ -3,7 +3,6 @@ import { handleBumpReminderConfigRemoveMention } from "@/bot/features/bump-remin
 import { ValidationError } from "@/shared/errors/customErrors";
 import { BUMP_REMINDER_MENTION_ROLE_RESULT } from "@/shared/features/bump-reminder/bumpReminderConfigService";
 
-const ensureManageGuildPermissionMock = vi.fn();
 const getBumpReminderConfigMock = vi.fn();
 const setMentionRoleMock = vi.fn();
 
@@ -36,21 +35,12 @@ vi.mock("@/bot/utils/messageResponse", () => ({
   createSuccessEmbed: vi.fn((description: string) => ({ description })),
 }));
 
-vi.mock(
-  "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.guard",
-  () => ({
-    ensureManageGuildPermission: (...args: unknown[]) =>
-      ensureManageGuildPermissionMock(...args),
-  }),
-);
-
 // remove-mention サブコマンドが
 // ロール未設定時の ValidationError 送出と設定済みロール削除時の成功応答を
 // サービス層の結果コードに応じて正しく分岐するかを検証する
 describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.removeMention", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    ensureManageGuildPermissionMock.mockResolvedValue(undefined);
     getBumpReminderConfigMock.mockResolvedValue({
       enabled: true,
       mentionRoleId: "role-1",

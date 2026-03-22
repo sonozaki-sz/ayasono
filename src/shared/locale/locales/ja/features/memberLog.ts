@@ -21,6 +21,8 @@ export const memberLog = {
     "カスタム参加メッセージを削除",
   "member-log-config.clear-leave-message.description":
     "カスタム退出メッセージを削除",
+  "member-log-config.reset.description":
+    "メンバーログ設定をリセット",
   "member-log-config.view.description":
     "現在の設定を表示",
 
@@ -43,6 +45,10 @@ export const memberLog = {
     "退出メッセージを削除しました。",
   "user-response.text_channel_only":
     "テキストチャンネルを指定してください。",
+  "user-response.reset_success":
+    "メンバーログ設定をリセットしました。",
+  "user-response.reset_cancelled":
+    "リセットをキャンセルしました。",
   "user-response.channel_deleted_notice":
     "⚠️ メンバーログの通知チャンネルが削除されました。\n設定をリセットしたので、`/member-log-config set-channel` で再設定してください。",
 
@@ -51,6 +57,14 @@ export const memberLog = {
     "設定完了",
   "embed.title.config_view":
     "メンバーログ機能",
+  "embed.title.reset_confirm":
+    "メンバーログ設定リセット確認",
+  "embed.description.reset_confirm":
+    "メンバーログ設定をリセットしますか？\n以下の設定が削除されます。この操作は元に戻せません。",
+  "embed.field.name.reset_target":
+    "削除対象",
+  "embed.field.value.reset_target":
+    "有効/無効設定 / 通知チャンネル / カスタム参加メッセージ / カスタム退出メッセージ",
   "embed.description.not_configured":
     "メンバーログが設定されていません。",
   "embed.field.name.status":
@@ -109,6 +123,10 @@ export const memberLog = {
     "",
 
   // ── UIラベル ──────────────────────────────────
+  "ui.button.reset_confirm":
+    "リセットする",
+  "ui.button.reset_cancel":
+    "キャンセル",
   "ui.modal.set_join_message_title":
     "参加メッセージを設定",
   "ui.modal.set_join_message_label":
@@ -145,6 +163,8 @@ export const memberLog = {
     "退出メッセージ設定 GuildId: {{guildId}}",
   "log.config_join_message_cleared":
     "参加メッセージ削除 GuildId: {{guildId}}",
+  "log.config_reset":
+    "設定リセット GuildId: {{guildId}}",
   "log.config_leave_message_cleared":
     "退出メッセージ削除 GuildId: {{guildId}}",
   "log.database_user_setting_find_failed":

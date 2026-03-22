@@ -2,7 +2,7 @@
 
 > Member Log - メンバー参加・脱退時のログ機能
 
-最終更新: 2026年3月18日（{serverName}プレースホルダー追加・{count}を{memberCount}にリネーム）
+最終更新: 2026年3月22日（ローカライズセクションを実装に合わせて更新）
 
 ---
 
@@ -498,7 +498,7 @@
 | `log.config_leave_message_cleared` | 退出メッセージ削除ログ | 退出メッセージ削除 GuildId: {{guildId}} | leave message cleared GuildId: {{guildId}} |
 | `log.database_user_setting_find_failed` | DB取得失敗ログ | ユーザー設定取得に失敗 UserId: {{userId}} GuildId: {{guildId}} | Failed to find user setting UserId: {{userId}} GuildId: {{guildId}} |
 | `log.database_user_setting_upsert_failed` | DB保存失敗ログ | ユーザー設定保存に失敗 UserId: {{userId}} GuildId: {{guildId}} | Failed to upsert user setting UserId: {{userId}} GuildId: {{guildId}} |
-| `log.config_reset` | リセットログ | メンバーログ設定リセット GuildId: {{guildId}} | member log settings reset GuildId: {{guildId}} |
+| `log.config_reset` | リセットログ | 設定リセット GuildId: {{guildId}} | settings reset GuildId: {{guildId}} |
 
 ---
 

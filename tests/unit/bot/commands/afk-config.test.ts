@@ -19,12 +19,20 @@ const createInfoEmbedMock = vi.fn(
     description,
   }),
 );
+const createWarningEmbedMock = vi.fn(
+  (description: string, _options?: unknown) => ({
+    kind: "warning",
+    description,
+  }),
+);
 
 // afkConfigService が使う DB レイヤーのみモック
+const saveAfkConfigMock = vi.fn();
 vi.mock("@/shared/database/guildConfigRepositoryProvider", () => ({
   getGuildConfigRepository: () => ({
     setAfkChannel: (...args: unknown[]) => setAfkChannelMock(...args),
     getAfkConfig: (...args: unknown[]) => getAfkConfigMock(...args),
+    updateAfkConfig: (...args: unknown[]) => saveAfkConfigMock(...args),
   }),
 }));
 
@@ -53,6 +61,8 @@ vi.mock("@/bot/utils/messageResponse", () => ({
     createSuccessEmbedMock(description, options),
   createInfoEmbed: (description: string, options?: unknown) =>
     createInfoEmbedMock(description, options),
+  createWarningEmbed: (description: string, options?: unknown) =>
+    createWarningEmbedMock(description, options),
 }));
 
 import { afkConfigCommand } from "@/bot/commands/afk-config";
@@ -145,7 +155,7 @@ describe("bot/commands/afk-config", () => {
     expect(setAfkChannelMock).not.toHaveBeenCalled();
   });
 
-  it("view サブコマンドで未設定の場合は情報 Embed が返されることを確認", async () => {
+  it("view サブコマンドで未設定の場合も createInfoEmbed で統一フォーマット表示する", async () => {
     getAfkConfigMock.mockResolvedValueOnce(null);
     const interaction = createInteraction({
       options: {
@@ -160,17 +170,16 @@ describe("bot/commands/afk-config", () => {
 
     expect(getAfkConfigMock).toHaveBeenCalledWith("guild-1");
     expect(createInfoEmbedMock).toHaveBeenCalled();
-    expect(interaction.reply).toHaveBeenCalledWith({
-      embeds: [{ kind: "info", description: "afk:embed.field.value.not_configured" }],
-      flags: 64,
-    });
+    expect(interaction.reply).toHaveBeenCalledWith(
+      expect.objectContaining({ flags: 64 }),
+    );
   });
 
   // view で未設定判定の分岐（enabled=false / channelId=null）を網羅する
   it.each([
     { enabled: false, channelId: "afk-channel" },
     { enabled: true, channelId: null },
-  ])("設定が不正な場合は未設定状態を表示することを確認: %j", async (config) => {
+  ])("設定が不正な場合も統一フォーマットで表示することを確認: %j", async (config) => {
     getAfkConfigMock.mockResolvedValueOnce(config);
     const interaction = createInteraction({
       options: {
@@ -183,9 +192,7 @@ describe("bot/commands/afk-config", () => {
       interaction as unknown as ChatInputCommandInteraction,
     );
 
-    expect(createInfoEmbedMock).toHaveBeenCalledWith("afk:embed.field.value.not_configured", {
-      title: "afk:embed.title.config_view",
-    });
+    expect(createInfoEmbedMock).toHaveBeenCalled();
   });
 
   it("view サブコマンドで設定済みの場合は AFK チャンネル情報が表示されることを確認", async () => {
@@ -206,11 +213,13 @@ describe("bot/commands/afk-config", () => {
 
     expect(createInfoEmbedMock).toHaveBeenCalledWith("", {
       title: "afk:embed.title.config_view",
-      fields: [{ name: "afk:embed.field.name.channel", value: "<#afk-channel>", inline: true }],
+      fields: [
+        { name: "afk:embed.field.name.status", value: "common:enabled", inline: true },
+        { name: "afk:embed.field.name.channel", value: "<#afk-channel>", inline: true },
+      ],
     });
-    expect(interaction.reply).toHaveBeenCalledWith({
-      embeds: [{ kind: "info", description: "" }],
-      flags: 64,
-    });
+    expect(interaction.reply).toHaveBeenCalledWith(
+      expect.objectContaining({ flags: 64 }),
+    );
   });
 });

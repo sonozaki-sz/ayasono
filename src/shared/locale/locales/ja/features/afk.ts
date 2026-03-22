@@ -15,6 +15,8 @@ export const afk = {
     "AFKチャンネル（ボイスチャンネル）",
   "afk-config.view.description":
     "現在の設定を表示",
+  "afk-config.clear-channel.description":
+    "AFKチャンネル設定を解除",
 
   // ── ユーザーレスポンス ────────────────────────
   "user-response.moved":
@@ -31,6 +33,8 @@ export const afk = {
     "AFKチャンネルが見つかりませんでした。\nチャンネルが削除されている可能性があります。",
   "user-response.invalid_channel_type":
     "ボイスチャンネルを指定してください。",
+  "user-response.clear_channel_success":
+    "AFKチャンネル設定を解除しました。",
 
   // ── embed: success ──────────────────────────
   "embed.title.success":
@@ -39,16 +43,20 @@ export const afk = {
   // ── embed: config_view ──────────────────────
   "embed.title.config_view":
     "AFK機能",
+  "embed.field.name.status":
+    "状態",
   "embed.field.name.channel":
     "AFKチャンネル",
   "embed.field.value.not_configured":
-    "AFKチャンネルが設定されていません。",
+    "未設定",
 
   // ── ログ ─────────────────────────────────────
   "log.moved":
     "ユーザーをAFKチャンネルに移動 GuildId: {{guildId}} UserId: {{userId}} ChannelId: {{channelId}}",
   "log.configured":
     "AFKチャンネル設定 GuildId: {{guildId}} ChannelId: {{channelId}}",
+  "log.channel_cleared":
+    "AFKチャンネル設定を解除 GuildId: {{guildId}}",
   "log.database_channel_set":
     "AFKチャンネルを設定 GuildId: {{guildId}} ChannelId: {{channelId}}",
   "log.database_channel_set_failed":

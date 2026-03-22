@@ -55,6 +55,10 @@ export const memberLogConfigCommand: Command = {
       "memberLog",
       "member-log-config.clear-leave-message.description",
     );
+    const resetDesc = getCommandLocalizations(
+      "memberLog",
+      "member-log-config.reset.description",
+    );
     const viewDesc = getCommandLocalizations(
       "memberLog",
       "member-log-config.view.description",
@@ -126,6 +130,13 @@ export const memberLogConfigCommand: Command = {
             .setName(MEMBER_LOG_CONFIG_COMMAND.SUBCOMMAND.CLEAR_LEAVE_MESSAGE)
             .setDescription(clearLeaveMessageDesc.ja)
             .setDescriptionLocalizations(clearLeaveMessageDesc.localizations),
+        )
+        .addSubcommand((subcommand) =>
+          // 設定リセット
+          subcommand
+            .setName(MEMBER_LOG_CONFIG_COMMAND.SUBCOMMAND.RESET)
+            .setDescription(resetDesc.ja)
+            .setDescriptionLocalizations(resetDesc.localizations),
         )
         .addSubcommand((subcommand) =>
           // 設定表示

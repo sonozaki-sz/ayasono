@@ -1,7 +1,6 @@
 // tests/unit/bot/features/bump-reminder/commands/bumpReminderConfigCommand.enable.test.ts
 import { handleBumpReminderConfigEnable } from "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.enable";
 
-const ensureManageGuildPermissionMock = vi.fn();
 const setEnabledMock = vi.fn();
 const createSuccessEmbedMock = vi.fn((description: string) => ({
   description,
@@ -30,18 +29,9 @@ vi.mock("@/bot/utils/messageResponse", () => ({
     createSuccessEmbedMock(description),
 }));
 
-vi.mock(
-  "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.guard",
-  () => ({
-    ensureManageGuildPermission: (...args: unknown[]) =>
-      ensureManageGuildPermissionMock(...args),
-  }),
-);
-
 describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.enable", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    ensureManageGuildPermissionMock.mockResolvedValue(undefined);
     setEnabledMock.mockResolvedValue(undefined);
   });
 

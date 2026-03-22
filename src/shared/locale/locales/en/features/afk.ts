@@ -15,6 +15,8 @@ export const afk = {
     "AFK channel (voice channel)",
   "afk-config.view.description":
     "Show current settings",
+  "afk-config.clear-channel.description":
+    "Clear AFK channel setting",
 
   // ── User responses ───────────────────────────
   "user-response.moved":
@@ -31,6 +33,8 @@ export const afk = {
     "AFK channel not found.\nThe channel may have been deleted.",
   "user-response.invalid_channel_type":
     "Please specify a voice channel.",
+  "user-response.clear_channel_success":
+    "AFK channel setting has been cleared.",
 
   // ── embed: success ──────────────────────────
   "embed.title.success":
@@ -39,16 +43,20 @@ export const afk = {
   // ── embed: config_view ──────────────────────
   "embed.title.config_view":
     "AFK",
+  "embed.field.name.status":
+    "Status",
   "embed.field.name.channel":
     "AFK Channel",
   "embed.field.value.not_configured":
-    "AFK channel is not configured",
+    "Not configured",
 
   // ── Logs ─────────────────────────────────────
   "log.moved":
     "moved user to AFK channel GuildId: {{guildId}} UserId: {{userId}} ChannelId: {{channelId}}",
   "log.configured":
     "channel configured GuildId: {{guildId}} ChannelId: {{channelId}}",
+  "log.channel_cleared":
+    "AFK channel setting cleared GuildId: {{guildId}}",
   "log.database_channel_set":
     "AFK channel set GuildId: {{guildId}} ChannelId: {{channelId}}",
   "log.database_channel_set_failed":

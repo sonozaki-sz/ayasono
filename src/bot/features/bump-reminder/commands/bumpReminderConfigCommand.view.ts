@@ -5,7 +5,6 @@ import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
 import { tInteraction } from "../../../../shared/locale/localeManager";
 import { getBotBumpReminderConfigService } from "../../../services/botCompositionRoot";
 import { createInfoEmbed } from "../../../utils/messageResponse";
-import { ensureManageGuildPermission } from "./bumpReminderConfigCommand.guard";
 
 /**
  * 現在の bump-reminder 設定を表示する
@@ -17,9 +16,6 @@ export async function handleBumpReminderConfigView(
   interaction: ChatInputCommandInteraction,
   guildId: string,
 ): Promise<void> {
-  // 実行時にも管理権限を確認
-  await ensureManageGuildPermission(interaction);
-
   // 常に最新設定を取得して表示
   const config =
     await getBotBumpReminderConfigService().getBumpReminderConfig(guildId);

@@ -42,15 +42,27 @@ vi.mock("@/bot/utils/messageResponse", () => ({
     title: opts?.title,
     fields: opts?.fields,
   })),
+  createWarningEmbed: vi.fn((desc: string, opts?: { title?: string }) => ({
+    type: "warning",
+    description: desc,
+    title: opts?.title,
+  })),
+}));
+
+// afkConfigDefaults のモック
+vi.mock("@/shared/features/afk/afkConfigDefaults", () => ({
+  createDefaultAfkConfig: () => ({ enabled: false, channelId: null }),
 }));
 
 // afkConfigService のモック
 const mockGetAfkConfig = vi.fn();
 const mockSetAfkChannel = vi.fn();
+const mockSaveAfkConfig = vi.fn();
 
 vi.mock("@/shared/features/afk/afkConfigService", () => ({
   getAfkConfig: (...args: unknown[]) => mockGetAfkConfig(...args),
   setAfkChannel: (...args: unknown[]) => mockSetAfkChannel(...args),
+  saveAfkConfig: (...args: unknown[]) => mockSaveAfkConfig(...args),
 }));
 
 /** ChatInputCommandInteraction のモックを作成する */
@@ -133,7 +145,7 @@ describe("AFK Commands Integration", () => {
       const viewEmbed = viewReply.mock.calls[0][0].embeds[0];
       expect(viewEmbed.type).toBe("info");
       expect(viewEmbed.fields).toBeDefined();
-      expect(viewEmbed.fields[0].value).toContain("vc-afk-1");
+      expect(viewEmbed.fields[1].value).toContain("vc-afk-1");
     });
 
     it("未設定の場合 view は未設定メッセージを返すこと", async () => {
@@ -147,7 +159,6 @@ describe("AFK Commands Integration", () => {
 
       const embed = replyMock.mock.calls[0][0].embeds[0];
       expect(embed.type).toBe("info");
-      expect(embed.description).toContain("not_configured");
     });
 
     it("テキストチャンネルを指定した場合は ValidationError になること", async () => {

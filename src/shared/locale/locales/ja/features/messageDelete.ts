@@ -108,9 +108,9 @@ export const messageDelete = {
 
   // ── Embed ─────────────────────────────────────
   "embed.title.confirm":
-    "📋 削除対象メッセージ（{{page}} / {{total}} ページ）",
+    "削除対象メッセージ",
   "embed.title.deletion_confirm":
-    "🗑️ 本当に削除しますか？（{{page}} / {{total}} ページ）",
+    "🗑️ 本当に削除しますか？",
   "embed.description.deletion_warning":
     "⚠️ **この操作は取り消せません**",
   "embed.description.deletion_confirm":

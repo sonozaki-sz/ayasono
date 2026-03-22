@@ -23,6 +23,8 @@ export const vac = {
     "トリガーチャンネル {{channel}} を作成しました。",
   "user-response.trigger_removed":
     "トリガーチャンネル {{channel}} を削除しました。",
+  "user-response.triggers_removed":
+    "{{count}}件のトリガーチャンネルを削除しました。",
   "user-response.renamed":
     "VC名を {{name}} に変更しました。",
   "user-response.limit_changed":
@@ -87,6 +89,10 @@ export const vac = {
     "このパネルからVCの設定を変更できます。",
 
   // ── UIラベル ──────────────────────────────────
+  "ui.select.trigger_remove_placeholder":
+    "削除するトリガーチャンネルを選択（複数選択可）",
+  "ui.button.trigger_remove_confirm":
+    "削除する",
   "ui.button.rename":
     "VC名を変更",
   "ui.button.limit":

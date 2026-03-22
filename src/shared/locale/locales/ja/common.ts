@@ -94,6 +94,12 @@ export const common = {
     "末尾",
   "ui.button.page_jump":
     "{{page}}/{{total}}ページ",
+  "ui.modal.page_jump_title":
+    "ページ指定",
+  "ui.modal.page_jump_label":
+    "ページ番号",
+  "ui.modal.page_jump_placeholder":
+    "1〜{{total}}の整数",
 
   // 共通キャンセル
   cancelled:

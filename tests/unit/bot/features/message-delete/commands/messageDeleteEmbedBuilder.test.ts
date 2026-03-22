@@ -140,7 +140,7 @@ describe("bot/features/message-delete/commands/messageDeleteEmbedBuilder", () =>
     it("指定ページのメッセージを含む embed を構築する", async () => {
       const { buildPreviewEmbed } = await loadModule();
       const msgs = [makeMsg("msg-1"), makeMsg("msg-2")];
-      const embed = buildPreviewEmbed("ja", msgs, 0, 1, new Set());
+      const embed = buildPreviewEmbed("ja", msgs, 0, new Set());
       expect(embed).toBeDefined();
       // Embed should have fields
       expect(embed.data.fields?.length).toBeGreaterThan(0);
@@ -149,7 +149,7 @@ describe("bot/features/message-delete/commands/messageDeleteEmbedBuilder", () =>
     it("除外メッセージに取り消し線を付けて embed を構築する", async () => {
       const { buildPreviewEmbed } = await loadModule();
       const msgs = [makeMsg("msg-1"), makeMsg("msg-2")];
-      const embed = buildPreviewEmbed("ja", msgs, 0, 1, new Set(["msg-1"]));
+      const embed = buildPreviewEmbed("ja", msgs, 0, new Set(["msg-1"]));
       expect(embed).toBeDefined();
       // First field should have strikethrough
       const firstField = embed.data.fields?.[0];
@@ -158,7 +158,7 @@ describe("bot/features/message-delete/commands/messageDeleteEmbedBuilder", () =>
 
     it("ページにメッセージがない場合に対象ゼロの説明を表示する", async () => {
       const { buildPreviewEmbed } = await loadModule();
-      const embed = buildPreviewEmbed("ja", [], 0, 0, new Set());
+      const embed = buildPreviewEmbed("ja", [], 0, new Set());
       expect(embed.data.description).toBeTruthy();
     });
   });
@@ -172,14 +172,14 @@ describe("bot/features/message-delete/commands/messageDeleteEmbedBuilder", () =>
     it("メッセージを含む最終確認 embed を構築する", async () => {
       const { buildFinalConfirmEmbed } = await loadModule();
       const msgs = [makeMsg("msg-1"), makeMsg("msg-2")];
-      const embed = buildFinalConfirmEmbed("ja", msgs, 0, 1, 2);
+      const embed = buildFinalConfirmEmbed("ja", msgs, 0, 2);
       expect(embed).toBeDefined();
       expect(embed.data.fields?.length).toBeGreaterThan(0);
     });
 
     it("空の最終確認 embed を構築する", async () => {
       const { buildFinalConfirmEmbed } = await loadModule();
-      const embed = buildFinalConfirmEmbed("ja", [], 0, 0, 0);
+      const embed = buildFinalConfirmEmbed("ja", [], 0, 0);
       expect(embed).toBeDefined();
     });
   });
