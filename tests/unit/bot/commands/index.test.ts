@@ -47,34 +47,35 @@ const KNOWN_COMMAND_NAMES = [
 ];
 
 describe("commandLoader", () => {
-  it("commands/ ディレクトリから Command オブジェクトを自動ロードする", async () => {
-    const commands = await loadCommands();
-
-    expect(commands.length).toBeGreaterThan(0);
+  // loadCommands() は全コマンドファイルを動的ロードするため高コスト。
+  // テスト間で結果をキャッシュし、初回のみ実行する。
+  let cachedCommands: Awaited<ReturnType<typeof loadCommands>>;
+  beforeAll(async () => {
+    cachedCommands = await loadCommands();
   });
 
-  it("ロードされた各コマンドは data と execute を持つ", async () => {
-    const commands = await loadCommands();
+  it("commands/ ディレクトリから Command オブジェクトを自動ロードする", () => {
+    expect(cachedCommands.length).toBeGreaterThan(0);
+  });
 
-    for (const cmd of commands) {
+  it("ロードされた各コマンドは data と execute を持つ", () => {
+    for (const cmd of cachedCommands) {
       expect(cmd.data).toBeDefined();
       expect(typeof cmd.execute).toBe("function");
       expect(typeof cmd.data.name).toBe("string");
     }
   });
 
-  it("コマンド名が重複していない（export default との二重収集がない）", async () => {
-    const commands = await loadCommands();
-    const names = commands.map((c) => c.data.name);
+  it("コマンド名が重複していない（export default との二重収集がない）", () => {
+    const names = cachedCommands.map((c) => c.data.name);
     const uniqueNames = new Set(names);
 
     // export default と named export の両方を持つファイルで同一コマンドが二重登録されないことを保証
     expect(names.length).toBe(uniqueNames.size);
   });
 
-  it("既知のコマンドがすべて含まれている", async () => {
-    const commands = await loadCommands();
-    const names = commands.map((c) => c.data.name);
+  it("既知のコマンドがすべて含まれている", () => {
+    const names = cachedCommands.map((c) => c.data.name);
 
     for (const expectedName of KNOWN_COMMAND_NAMES) {
       expect(names).toContain(expectedName);

@@ -47,24 +47,26 @@ const KNOWN_EVENT_NAMES = [
 ];
 
 describe("eventLoader", () => {
-  it("events/ ディレクトリから BotEvent オブジェクトを自動ロードする", async () => {
-    const events = await loadEvents();
-
-    expect(events.length).toBeGreaterThan(0);
+  // loadEvents() は全イベントファイルを動的ロードするため高コスト。
+  // テスト間で結果をキャッシュし、初回のみ実行する。
+  let cachedEvents: Awaited<ReturnType<typeof loadEvents>>;
+  beforeAll(async () => {
+    cachedEvents = await loadEvents();
   });
 
-  it("ロードされた各イベントは name と execute を持つ", async () => {
-    const events = await loadEvents();
+  it("events/ ディレクトリから BotEvent オブジェクトを自動ロードする", () => {
+    expect(cachedEvents.length).toBeGreaterThan(0);
+  });
 
-    for (const event of events) {
+  it("ロードされた各イベントは name と execute を持つ", () => {
+    for (const event of cachedEvents) {
       expect(event.name).toBeDefined();
       expect(typeof event.execute).toBe("function");
     }
   });
 
-  it("既知のイベントがすべて含まれている", async () => {
-    const events = await loadEvents();
-    const names = events.map((e) => e.name);
+  it("既知のイベントがすべて含まれている", () => {
+    const names = cachedEvents.map((e) => e.name);
 
     for (const expectedName of KNOWN_EVENT_NAMES) {
       expect(names).toContain(expectedName);
