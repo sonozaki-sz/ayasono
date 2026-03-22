@@ -32,14 +32,14 @@ describe("bot/features/vc-recruit/handlers/ui/vcRecruitPanelState", () => {
     expect(getVcRecruitSession("interaction-1")).toEqual(session);
   });
 
-  it("存在しないキーを取得すると null を返す", () => {
-    expect(getVcRecruitSession("nonexistent")).toBeNull();
+  it("存在しないキーを取得すると undefined を返す", () => {
+    expect(getVcRecruitSession("nonexistent")).toBeUndefined();
   });
 
   it("deleteVcRecruitSession でセッションを削除できる", () => {
     setVcRecruitSession("interaction-2", makeSession());
     deleteVcRecruitSession("interaction-2");
-    expect(getVcRecruitSession("interaction-2")).toBeNull();
+    expect(getVcRecruitSession("interaction-2")).toBeUndefined();
   });
 
   it("updateVcRecruitSession でセッションを部分更新できる", () => {
@@ -55,7 +55,7 @@ describe("bot/features/vc-recruit/handlers/ui/vcRecruitPanelState", () => {
 
   it("存在しないキーを更新しても何も起こらない", () => {
     updateVcRecruitSession("nonexistent", { mentionRoleIds: ["role-1"] });
-    expect(getVcRecruitSession("nonexistent")).toBeNull();
+    expect(getVcRecruitSession("nonexistent")).toBeUndefined();
   });
 
   it("selectedVcId を更新できる", () => {
@@ -68,9 +68,9 @@ describe("bot/features/vc-recruit/handlers/ui/vcRecruitPanelState", () => {
 
   it("15分後にセッションが自動的に削除される", () => {
     setVcRecruitSession("interaction-6", makeSession());
-    expect(getVcRecruitSession("interaction-6")).not.toBeNull();
+    expect(getVcRecruitSession("interaction-6")).not.toBeUndefined();
 
     vi.advanceTimersByTime(15 * 60 * 1000);
-    expect(getVcRecruitSession("interaction-6")).toBeNull();
+    expect(getVcRecruitSession("interaction-6")).toBeUndefined();
   });
 });

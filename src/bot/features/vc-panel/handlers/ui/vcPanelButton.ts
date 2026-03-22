@@ -249,29 +249,17 @@ export const vcPanelButtonHandler: ButtonHandler = {
  * @returns 解決したチャンネルID（未対応時は空文字）
  */
 function getPanelChannelId(customId: string): string {
-  if (customId.startsWith(VAC_PANEL_CUSTOM_ID.RENAME_BUTTON_PREFIX)) {
-    return getVacPanelChannelId(
-      customId,
-      VAC_PANEL_CUSTOM_ID.RENAME_BUTTON_PREFIX,
-    );
-  }
-  if (customId.startsWith(VAC_PANEL_CUSTOM_ID.LIMIT_BUTTON_PREFIX)) {
-    return getVacPanelChannelId(
-      customId,
-      VAC_PANEL_CUSTOM_ID.LIMIT_BUTTON_PREFIX,
-    );
-  }
-  if (customId.startsWith(VAC_PANEL_CUSTOM_ID.AFK_BUTTON_PREFIX)) {
-    return getVacPanelChannelId(
-      customId,
-      VAC_PANEL_CUSTOM_ID.AFK_BUTTON_PREFIX,
-    );
-  }
-  if (customId.startsWith(VAC_PANEL_CUSTOM_ID.REFRESH_BUTTON_PREFIX)) {
-    return getVacPanelChannelId(
-      customId,
-      VAC_PANEL_CUSTOM_ID.REFRESH_BUTTON_PREFIX,
-    );
+  // 全パネルボタンプレフィックスを走査し、一致するプレフィックスからチャンネルIDを抽出する
+  const prefixes = [
+    VAC_PANEL_CUSTOM_ID.RENAME_BUTTON_PREFIX,
+    VAC_PANEL_CUSTOM_ID.LIMIT_BUTTON_PREFIX,
+    VAC_PANEL_CUSTOM_ID.AFK_BUTTON_PREFIX,
+    VAC_PANEL_CUSTOM_ID.REFRESH_BUTTON_PREFIX,
+  ] as const;
+  for (const prefix of prefixes) {
+    if (customId.startsWith(prefix)) {
+      return getVacPanelChannelId(customId, prefix);
+    }
   }
   return "";
 }

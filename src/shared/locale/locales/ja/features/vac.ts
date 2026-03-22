@@ -49,6 +49,8 @@ export const vac = {
     "このコマンドはVC参加中にのみ使用できます。",
   "user-response.not_vac_channel":
     "このVCは自動作成チャンネルではありません。",
+  "user-response.name_required":
+    "VC名を入力してください。",
   "user-response.limit_out_of_range":
     "人数制限は0〜99の範囲で指定してください。",
   "user-response.afk_move_failed":

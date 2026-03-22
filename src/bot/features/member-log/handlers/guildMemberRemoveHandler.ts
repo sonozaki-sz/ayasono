@@ -179,7 +179,7 @@ export async function handleGuildMemberRemove(
         "memberLog:log.notification_failed",
         { guildId },
       ),
-      { err },
+      err,
     );
   }
 }

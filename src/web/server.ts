@@ -3,7 +3,7 @@
 
 import { dirname } from "path";
 import { fileURLToPath } from "url";
-import { env } from "../shared/config/env";
+import { NODE_ENV, env } from "../shared/config/env";
 import {
   setupGlobalErrorHandlers,
   setupGracefulShutdown,
@@ -32,7 +32,7 @@ const __dirname = dirname(__filename);
  */
 async function startWebServer() {
   // 本番では JWT_SECRET を必須化（Web API 認証の安全性確保）
-  if (env.NODE_ENV === "production" && !env.JWT_SECRET) {
+  if (env.NODE_ENV === NODE_ENV.PRODUCTION && !env.JWT_SECRET) {
     console.error(
       "❌ Environment variable validation failed:\n" +
         "  - JWT_SECRET: JWT_SECRET is required in production\n" +

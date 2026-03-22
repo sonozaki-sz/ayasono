@@ -40,10 +40,10 @@ export class TtlMap<V> {
   /**
    * エントリを取得する
    * @param key エントリキー
-   * @returns エントリ値（存在しない場合は null）
+   * @returns エントリ値（存在しない場合は undefined）
    */
-  get(key: string): V | null {
-    return this.map.get(key) ?? null;
+  get(key: string): V | undefined {
+    return this.map.get(key);
   }
 
   /**

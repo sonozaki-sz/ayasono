@@ -19,12 +19,10 @@ import { STICKY_MESSAGE_COMMAND } from "../stickyMessageCommand.constants";
  * sticky-message set を実行する
  * チャンネルを検証し、embed オプションに応じたモーダルを表示する
  * @param interaction コマンド実行インタラクション
- * @param guildId 実行対象ギルドID
  * @returns 実行完了を示す Promise
  */
 export async function handleStickyMessageSet(
   interaction: ChatInputCommandInteraction,
-  _guildId: string,
 ): Promise<void> {
   // channel: 第2引数 false で任意。省略時はコマンド実行チャンネルを対象にする
   const channelOption = interaction.options.getChannel(

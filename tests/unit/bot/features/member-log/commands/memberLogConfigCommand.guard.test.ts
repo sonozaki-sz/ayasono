@@ -33,7 +33,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.guard", () => 
     const interaction = makeInteraction(true);
 
     await expect(
-      ensureMemberLogManageGuildPermission(interaction as never, "guild-1"),
+      ensureMemberLogManageGuildPermission(interaction as never),
     ).resolves.toBeUndefined();
   });
 
@@ -41,7 +41,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.guard", () => 
     const interaction = makeInteraction(false);
 
     await expect(
-      ensureMemberLogManageGuildPermission(interaction as never, "guild-1"),
+      ensureMemberLogManageGuildPermission(interaction as never),
     ).rejects.toBeInstanceOf(PermissionError);
   });
 
@@ -49,7 +49,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.guard", () => 
     const interaction = makeInteraction(null);
 
     await expect(
-      ensureMemberLogManageGuildPermission(interaction as never, "guild-1"),
+      ensureMemberLogManageGuildPermission(interaction as never),
     ).rejects.toBeInstanceOf(PermissionError);
   });
 

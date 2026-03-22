@@ -131,12 +131,12 @@ export const vcPanelModalHandler: ModalHandler = {
             createWarningEmbed(
               tInteraction(
                 interaction.locale,
-                "vac:user-response.not_vac_channel",
+                "vac:user-response.name_required",
               ),
               {
                 title: tInteraction(
                   interaction.locale,
-                  "common:title_channel_invalid",
+                  "common:validation.error_title",
                 ),
               },
             ),

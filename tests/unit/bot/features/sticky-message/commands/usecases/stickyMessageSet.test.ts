@@ -64,7 +64,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageSet", () =>
       channelType: ChannelType.GuildVoice,
     });
 
-    await handleStickyMessageSet(interaction as never, "guild-1");
+    await handleStickyMessageSet(interaction as never);
 
     expect(interaction._replyMock).toHaveBeenCalledWith(
       expect.objectContaining({ flags: MessageFlags.Ephemeral }),
@@ -79,7 +79,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageSet", () =>
       channelFromOption: { id: "voice-ch", type: ChannelType.GuildVoice },
     });
 
-    await handleStickyMessageSet(interaction as never, "guild-1");
+    await handleStickyMessageSet(interaction as never);
 
     expect(interaction._replyMock).toHaveBeenCalledWith(
       expect.objectContaining({ flags: MessageFlags.Ephemeral }),
@@ -92,7 +92,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageSet", () =>
     findByChannelMock.mockResolvedValue({ id: "existing" });
     const interaction = createInteractionMock();
 
-    await handleStickyMessageSet(interaction as never, "guild-1");
+    await handleStickyMessageSet(interaction as never);
 
     expect(interaction._replyMock).toHaveBeenCalledWith(
       expect.objectContaining({ flags: MessageFlags.Ephemeral }),
@@ -106,7 +106,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageSet", () =>
     findByChannelMock.mockResolvedValue(null);
     const interaction = createInteractionMock({ useEmbed: false });
 
-    await handleStickyMessageSet(interaction as never, "guild-1");
+    await handleStickyMessageSet(interaction as never);
 
     expect(showModalMock).toHaveBeenCalled();
     const modal = showModalMock.mock.calls[0][0];
@@ -120,7 +120,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageSet", () =>
     findByChannelMock.mockResolvedValue(null);
     const interaction = createInteractionMock({ useEmbed: true });
 
-    await handleStickyMessageSet(interaction as never, "guild-1");
+    await handleStickyMessageSet(interaction as never);
 
     expect(showModalMock).toHaveBeenCalled();
     const modal = showModalMock.mock.calls[0][0];
@@ -135,7 +135,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageSet", () =>
       channelFromOption: { id: "specific-ch", type: ChannelType.GuildText },
     });
 
-    await handleStickyMessageSet(interaction as never, "guild-1");
+    await handleStickyMessageSet(interaction as never);
 
     expect(findByChannelMock).toHaveBeenCalledWith("specific-ch");
   });
@@ -153,7 +153,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageSet", () =>
       },
     };
 
-    await handleStickyMessageSet(interaction as never, "guild-1");
+    await handleStickyMessageSet(interaction as never);
 
     expect(interaction.reply).toHaveBeenCalledWith(
       expect.objectContaining({ flags: MessageFlags.Ephemeral }),
@@ -175,7 +175,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageSet", () =>
       },
     };
 
-    await handleStickyMessageSet(interaction as never, "guild-1");
+    await handleStickyMessageSet(interaction as never);
 
     expect(showModalMock).toHaveBeenCalled();
     const modal = showModalMock.mock.calls[0][0];

@@ -20,19 +20,16 @@ export function disableComponentsAfterTimeout(
   rows: ActionRowBuilder<MessageActionRowComponentBuilder>[],
   timeoutMs: number,
 ): void {
-  setTimeout(async () => {
-    try {
-      // 各行のコンポーネントを複製して disabled にする
-      const disabledRows = rows.map((row) => {
-        const cloned = ActionRowBuilder.from<MessageActionRowComponentBuilder>(
-          row.toJSON(),
-        );
-        cloned.components.forEach((c) => c.setDisabled(true));
-        return cloned;
-      });
-      await interaction.editReply({ components: disabledRows });
-    } catch {
-      // メッセージが既に削除済みの場合は無視
-    }
+  setTimeout(() => {
+    // 各行のコンポーネントを複製して disabled にする
+    const disabledRows = rows.map((row) => {
+      const cloned = ActionRowBuilder.from<MessageActionRowComponentBuilder>(
+        row.toJSON(),
+      );
+      cloned.components.forEach((c) => c.setDisabled(true));
+      return cloned;
+    });
+    // メッセージが既に削除済みの場合は無視
+    interaction.editReply({ components: disabledRows }).catch(() => {});
   }, timeoutMs);
 }

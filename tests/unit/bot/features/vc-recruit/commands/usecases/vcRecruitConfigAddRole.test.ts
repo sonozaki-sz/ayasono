@@ -47,13 +47,13 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigAddRole", () 
   it("guild が null の場合は ValidationError を投げる", async () => {
     const interaction = makeInteraction({ hasGuild: false });
     await expect(
-      handleVcRecruitConfigAddRole(interaction as never, GUILD_ID),
+      handleVcRecruitConfigAddRole(interaction as never),
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
   it("RoleSelectMenu とボタンをエフェメラルで返信する", async () => {
     const interaction = makeInteraction();
-    await handleVcRecruitConfigAddRole(interaction as never, GUILD_ID);
+    await handleVcRecruitConfigAddRole(interaction as never);
 
     expect(interaction.reply).toHaveBeenCalledTimes(1);
     const call = interaction.reply.mock.calls[0][0];
@@ -65,7 +65,7 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigAddRole", () 
 
   it("セレクトメニューの customId にセッション ID が含まれる", async () => {
     const interaction = makeInteraction();
-    await handleVcRecruitConfigAddRole(interaction as never, GUILD_ID);
+    await handleVcRecruitConfigAddRole(interaction as never);
 
     const call = interaction.reply.mock.calls[0][0];
     const selectRow = call.components[0];

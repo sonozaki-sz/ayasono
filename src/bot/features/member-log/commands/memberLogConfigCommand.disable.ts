@@ -22,7 +22,7 @@ export async function handleMemberLogConfigDisable(
   guildId: string,
 ): Promise<void> {
   // 実行時にも管理権限を確認
-  await ensureMemberLogManageGuildPermission(interaction, guildId);
+  await ensureMemberLogManageGuildPermission(interaction);
 
   // 機能を無効化
   await getBotMemberLogConfigService().setEnabled(guildId, false);

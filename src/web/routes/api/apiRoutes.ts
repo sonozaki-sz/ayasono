@@ -3,6 +3,7 @@
 
 import type { FastifyPluginAsync } from "fastify";
 import { apiAuthPlugin } from "../../middleware/auth";
+import { version } from "../../../../package.json";
 
 export const apiRoutes: FastifyPluginAsync = async (fastify) => {
   await fastify.register(apiAuthPlugin);
@@ -10,7 +11,7 @@ export const apiRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get("/", async () => {
     return {
       message: "Ayasono API",
-      version: "2.0.0",
+      version,
     };
   });
 };

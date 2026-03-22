@@ -187,8 +187,8 @@ async function handleTeardownSelect(
     ],
   });
 
-  // 60秒後にボタンを無効化
-  setTimeout(async () => {
+  // タイムアウト後にボタンを無効化
+  setTimeout(() => {
     const disabledConfirm = ButtonBuilder.from(
       confirmButton.toJSON(),
     ).setDisabled(true);
@@ -198,7 +198,7 @@ async function handleTeardownSelect(
     const disabledRedo = ButtonBuilder.from(redoButton.toJSON()).setDisabled(
       true,
     );
-    await interaction
+    interaction
       .editReply({
         components: [
           new ActionRowBuilder<ButtonBuilder>().addComponents(
@@ -208,6 +208,6 @@ async function handleTeardownSelect(
           ),
         ],
       })
-      .catch(() => null);
+      .catch(() => {});
   }, VC_RECRUIT_TIMEOUT.COMPONENT_DISABLE_MS);
 }

@@ -23,7 +23,7 @@ export async function handleBumpReminderConfigEnable(
   guildId: string,
 ): Promise<void> {
   // 実行時にも管理権限を確認
-  await ensureManageGuildPermission(interaction, guildId);
+  await ensureManageGuildPermission(interaction);
 
   // enable 実行チャンネルを通知先として保存
   const channelId = interaction.channelId;

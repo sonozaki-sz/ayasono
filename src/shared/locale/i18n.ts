@@ -17,9 +17,9 @@ export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 export const DEFAULT_LOCALE: SupportedLocale = "ja";
 
 /**
- * 全翻訳ネームスペース
+ * 全翻訳ネームスペース一覧
  */
-export type AllNamespaces = [
+export const I18N_NAMESPACES = [
   "common",
   "system",
   "ping",
@@ -31,7 +31,12 @@ export type AllNamespaces = [
   "memberLog",
   "stickyMessage",
   "vcRecruit",
-];
+] as const;
+
+/**
+ * 全翻訳ネームスペース
+ */
+export type AllNamespaces = typeof I18N_NAMESPACES;
 
 /**
  * 全ネームスペースにまたがる翻訳キー型
@@ -61,19 +66,7 @@ export const initI18n = async (): Promise<I18nInstance> => {
     keySeparator: false,
 
     // 名前空間設定
-    ns: [
-      "common",
-      "system",
-      "ping",
-      "afk",
-      "bumpReminder",
-      "vac",
-      "vc",
-      "messageDelete",
-      "memberLog",
-      "stickyMessage",
-      "vcRecruit",
-    ],
+    ns: [...I18N_NAMESPACES],
     defaultNS: "common",
   });
 

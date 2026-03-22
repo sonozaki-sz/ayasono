@@ -156,7 +156,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.execute", () =
 
       await executeMemberLogConfigCommand(interaction as never);
 
-      expect(setJoinMessageMock).toHaveBeenCalledWith(interaction, "guild-1");
+      expect(setJoinMessageMock).toHaveBeenCalledWith(interaction);
     });
 
     it("set-leave-message サブコマンドが handleMemberLogConfigSetLeaveMessage へ委譲されることを確認", async () => {
@@ -166,7 +166,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.execute", () =
 
       await executeMemberLogConfigCommand(interaction as never);
 
-      expect(setLeaveMessageMock).toHaveBeenCalledWith(interaction, "guild-1");
+      expect(setLeaveMessageMock).toHaveBeenCalledWith(interaction);
     });
 
     it("view サブコマンドが handleMemberLogConfigView へ委譲されることを確認", async () => {

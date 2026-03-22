@@ -1,3 +1,6 @@
+// src/bot/features/member-log/handlers/accountAge.ts
+// アカウント年齢の計算ユーティリティ
+
 import { intervalToDuration } from "date-fns";
 
 /**

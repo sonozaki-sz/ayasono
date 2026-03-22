@@ -13,9 +13,6 @@ import { getBotStickyMessageConfigService } from "../../../../services/botCompos
 import { createInfoEmbed } from "../../../../utils/messageResponse";
 import { STICKY_MESSAGE_COMMAND } from "../stickyMessageCommand.constants";
 
-/** StringSelectMenu に表示できる選択肢の最大件数 */
-const MAX_OPTIONS = 25;
-
 /**
  * sticky-message view を実行する
  * ギルドで設定済みの全チャンネルを StringSelectMenu で提示し、
@@ -49,20 +46,22 @@ export async function handleStickyMessageView(
 
   // StringSelectMenu を構築して選択肢を返信する
   // 上限 25 件まで選択肢として追加
-  const options = stickies.slice(0, MAX_OPTIONS).map((sticky) => {
-    // キャッシュからチャンネル名を取得し、未キャッシュ時は ID をフォールバックとして使う
-    const channel = interaction.guild?.channels.cache.get(sticky.channelId);
-    const label = channel ? `#${channel.name}` : `#${sticky.channelId}`;
-    const preview =
-      sticky.content.length > 50
-        ? `${sticky.content.substring(0, 50)}...`
-        : sticky.content;
+  const options = stickies
+    .slice(0, STICKY_MESSAGE_COMMAND.MAX_SELECT_OPTIONS)
+    .map((sticky) => {
+      // キャッシュからチャンネル名を取得し、未キャッシュ時は ID をフォールバックとして使う
+      const channel = interaction.guild?.channels.cache.get(sticky.channelId);
+      const label = channel ? `#${channel.name}` : `#${sticky.channelId}`;
+      const preview =
+        sticky.content.length > 50
+          ? `${sticky.content.substring(0, 50)}...`
+          : sticky.content;
 
-    return new StringSelectMenuOptionBuilder()
-      .setLabel(label)
-      .setValue(sticky.channelId)
-      .setDescription(preview);
-  });
+      return new StringSelectMenuOptionBuilder()
+        .setLabel(label)
+        .setValue(sticky.channelId)
+        .setDescription(preview);
+    });
 
   const select = new StringSelectMenuBuilder()
     .setCustomId(STICKY_MESSAGE_COMMAND.VIEW_SELECT_CUSTOM_ID)

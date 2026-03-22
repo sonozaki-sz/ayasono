@@ -784,7 +784,7 @@ describe("bot/features/vac/ui handlers", () => {
 
     expect(voiceChannel.edit).not.toHaveBeenCalled();
     expect(safeReply).toHaveBeenCalledWith(interaction, {
-      embeds: [{ message: "vac:user-response.not_vac_channel" }],
+      embeds: [{ message: "vac:user-response.name_required" }],
       flags: 64,
     });
   });

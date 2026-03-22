@@ -49,6 +49,8 @@ export const vac = {
     "This command can only be used while in a VC.",
   "user-response.not_vac_channel":
     "This VC is not managed by auto-create feature.",
+  "user-response.name_required":
+    "Please enter a VC name.",
   "user-response.limit_out_of_range":
     "User limit must be between 0 and 99.",
   "user-response.afk_move_failed":

@@ -26,7 +26,7 @@ export async function executeVcRecruitConfigCommand(
       throw ValidationError.fromKey(COMMON_I18N_KEYS.GUILD_ONLY);
     }
 
-    await ensureManageGuildPermission(interaction, guildId);
+    await ensureManageGuildPermission(interaction);
 
     const subcommand = interaction.options.getSubcommand();
     switch (subcommand) {
@@ -37,7 +37,7 @@ export async function executeVcRecruitConfigCommand(
         await handleVcRecruitConfigTeardown(interaction, guildId);
         break;
       case VC_RECRUIT_CONFIG_COMMAND.SUBCOMMAND.ADD_ROLE:
-        await handleVcRecruitConfigAddRole(interaction, guildId);
+        await handleVcRecruitConfigAddRole(interaction);
         break;
       case VC_RECRUIT_CONFIG_COMMAND.SUBCOMMAND.REMOVE_ROLE:
         await handleVcRecruitConfigRemoveRole(interaction, guildId);

@@ -31,21 +31,21 @@ describe("bot/features/vc-recruit/handlers/ui/vcRecruitTeardownState", () => {
     expect(getTeardownConfirmSession("sel-id-1")).toEqual(session);
   });
 
-  it("存在しないキーを取得すると null を返す", () => {
-    expect(getTeardownConfirmSession("nonexistent")).toBeNull();
+  it("存在しないキーを取得すると undefined を返す", () => {
+    expect(getTeardownConfirmSession("nonexistent")).toBeUndefined();
   });
 
   it("deleteTeardownConfirmSession でセッションを削除できる", () => {
     setTeardownConfirmSession("sel-id-2", makeSession());
     deleteTeardownConfirmSession("sel-id-2");
-    expect(getTeardownConfirmSession("sel-id-2")).toBeNull();
+    expect(getTeardownConfirmSession("sel-id-2")).toBeUndefined();
   });
 
   it("60秒後にセッションが自動的に削除される", () => {
     setTeardownConfirmSession("sel-id-3", makeSession());
-    expect(getTeardownConfirmSession("sel-id-3")).not.toBeNull();
+    expect(getTeardownConfirmSession("sel-id-3")).not.toBeUndefined();
 
     vi.advanceTimersByTime(60_000);
-    expect(getTeardownConfirmSession("sel-id-3")).toBeNull();
+    expect(getTeardownConfirmSession("sel-id-3")).toBeUndefined();
   });
 });

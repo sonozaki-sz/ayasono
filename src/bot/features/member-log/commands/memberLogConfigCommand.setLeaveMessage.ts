@@ -15,15 +15,13 @@ import { ensureMemberLogManageGuildPermission } from "./memberLogConfigCommand.g
 /**
  * カスタム退出メッセージ設定モーダルを表示する
  * @param interaction コマンド実行インタラクション
- * @param guildId 設定更新対象のギルドID
  * @returns 実行完了を示す Promise
  */
 export async function handleMemberLogConfigSetLeaveMessage(
   interaction: ChatInputCommandInteraction,
-  guildId: string,
 ): Promise<void> {
   // 実行時にも管理権限を確認
-  await ensureMemberLogManageGuildPermission(interaction, guildId);
+  await ensureMemberLogManageGuildPermission(interaction);
 
   const modal = new ModalBuilder()
     .setCustomId(MEMBER_LOG_CONFIG_COMMAND.SET_LEAVE_MESSAGE_MODAL_ID)

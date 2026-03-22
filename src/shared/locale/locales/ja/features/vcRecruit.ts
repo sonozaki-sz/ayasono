@@ -256,6 +256,20 @@ export const vcRecruit = {
     "パネルメッセージ削除を検知、パネルを再送信します GuildId: {{guildId}} PanelChannelId: {{panelChannelId}} MessageId: {{messageId}}",
   "log.panel_resent":
     "パネルメッセージを再送信しました GuildId: {{guildId}} PanelChannelId: {{panelChannelId}} NewMessageId: {{newMessageId}}",
+  "log.database_setup_add_failed":
+    "セットアップ追加に失敗",
+  "log.database_panel_message_update_failed":
+    "パネルメッセージID更新に失敗",
+  "log.database_setup_remove_failed":
+    "セットアップ削除に失敗",
+  "log.database_vc_add_failed":
+    "作成VC追加に失敗",
+  "log.database_vc_remove_failed":
+    "作成VC削除に失敗",
+  "log.database_role_add_failed":
+    "メンションロール追加に失敗",
+  "log.database_role_remove_failed":
+    "メンションロール削除に失敗",
 } as const;
 
 export type VcRecruitTranslations = typeof vcRecruit;

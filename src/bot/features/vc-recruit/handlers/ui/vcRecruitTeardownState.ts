@@ -40,11 +40,11 @@ export function setTeardownConfirmSession(
 /**
  * teardown 確認セッションを取得する
  * @param selectInteractionId セレクトインタラクションの ID
- * @returns セッション情報（存在しない場合は null）
+ * @returns セッション情報（存在しない場合は undefined）
  */
 export function getTeardownConfirmSession(
   selectInteractionId: string,
-): TeardownConfirmSession | null {
+): TeardownConfirmSession | undefined {
   return sessions.get(selectInteractionId);
 }
 
