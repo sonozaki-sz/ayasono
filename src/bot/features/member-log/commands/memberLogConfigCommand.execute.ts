@@ -5,6 +5,7 @@ import { type ChatInputCommandInteraction } from "discord.js";
 import { ValidationError } from "../../../../shared/errors/customErrors";
 import { handleCommandError } from "../../../errors/interactionErrorHandler";
 import { COMMON_I18N_KEYS } from "../../../shared/i18nKeys";
+import { ensureManageGuildPermission } from "../../../shared/permissionGuards";
 import { MEMBER_LOG_CONFIG_COMMAND } from "./memberLogConfigCommand.constants";
 import { handleMemberLogConfigDisable } from "./memberLogConfigCommand.disable";
 import { handleMemberLogConfigEnable } from "./memberLogConfigCommand.enable";
@@ -13,6 +14,7 @@ import { handleMemberLogConfigClearJoinMessage } from "./memberLogConfigCommand.
 import { handleMemberLogConfigClearLeaveMessage } from "./memberLogConfigCommand.clearLeaveMessage";
 import { handleMemberLogConfigSetJoinMessage } from "./memberLogConfigCommand.setJoinMessage";
 import { handleMemberLogConfigSetLeaveMessage } from "./memberLogConfigCommand.setLeaveMessage";
+import { handleMemberLogConfigReset } from "./memberLogConfigCommand.reset";
 import { handleMemberLogConfigView } from "./memberLogConfigCommand.view";
 
 /**
@@ -30,6 +32,9 @@ export async function executeMemberLogConfigCommand(
     if (!guildId) {
       throw ValidationError.fromKey(COMMON_I18N_KEYS.GUILD_ONLY);
     }
+
+    // 管理権限を統一ガードで検証
+    ensureManageGuildPermission(interaction);
 
     // サブコマンドごとに機能別ハンドラへ委譲
     const subcommand = interaction.options.getSubcommand();
@@ -61,6 +66,10 @@ export async function executeMemberLogConfigCommand(
 
       case MEMBER_LOG_CONFIG_COMMAND.SUBCOMMAND.CLEAR_LEAVE_MESSAGE:
         await handleMemberLogConfigClearLeaveMessage(interaction, guildId);
+        break;
+
+      case MEMBER_LOG_CONFIG_COMMAND.SUBCOMMAND.RESET:
+        await handleMemberLogConfigReset(interaction, guildId);
         break;
 
       case MEMBER_LOG_CONFIG_COMMAND.SUBCOMMAND.VIEW:

@@ -11,7 +11,6 @@ import {
 import { logger } from "../../../../shared/utils/logger";
 import { getBotBumpReminderConfigService } from "../../../services/botCompositionRoot";
 import { createSuccessEmbed } from "../../../utils/messageResponse";
-import { ensureManageGuildPermission } from "./bumpReminderConfigCommand.guard";
 
 /**
  * メンションロール設定を削除する
@@ -22,9 +21,6 @@ export async function handleBumpReminderConfigRemoveMention(
   interaction: ChatInputCommandInteraction,
   guildId: string,
 ): Promise<void> {
-  // 実行時にも管理権限を確認
-  await ensureManageGuildPermission(interaction);
-
   const bumpReminderConfigService = getBotBumpReminderConfigService();
   const successTitle = tInteraction(
     interaction.locale,

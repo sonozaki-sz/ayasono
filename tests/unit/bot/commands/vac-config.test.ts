@@ -537,36 +537,32 @@ describe("bot/commands/vac-config", () => {
     expect(handleCommandError).toHaveBeenCalledTimes(1);
   });
 
-  it("remove-trigger-vc でトリガーチャンネルが削除されてボイスチャンネルも削除されることを確認", async () => {
+  it("remove-trigger-vc でトリガーチャンネルがある場合にセレクトメニュー付きで reply する", async () => {
     getVacConfigOrDefaultMock.mockResolvedValue({
-      enabled: true,
       triggerChannelIds: ["tr-1"],
-      createdChannels: [],
     });
 
     const category = {
       id: "cat-1",
       name: "Cat",
       type: ChannelType.GuildCategory,
-      children: { cache: { size: 1 } },
     };
-    const deleteMock = vi.fn().mockResolvedValue(undefined);
     const interaction = createCommandInteraction({
       options: {
         getSubcommand: vi.fn(() => "remove-trigger-vc"),
-        getString: vi.fn(() => "cat-1"),
+        getString: vi.fn(() => null),
       },
       guild: createGuildWithChannels({
         byId: {
-          "cat-1": category,
           "tr-1": {
             id: "tr-1",
-            name: "CreateVC",
             type: ChannelType.GuildVoice,
             parent: category,
-            delete: deleteMock,
           },
         },
+      }),
+      reply: vi.fn().mockResolvedValue({
+        createMessageComponentCollector: () => ({ on: vi.fn() }),
       }),
     });
 
@@ -574,83 +570,18 @@ describe("bot/commands/vac-config", () => {
       interaction as unknown as ChatInputCommandInteraction,
     );
 
-    expect(removeTriggerChannelMock).toHaveBeenCalledWith("guild-1", "tr-1");
-    expect(deleteMock).toHaveBeenCalledTimes(1);
-    expect(interaction.reply).toHaveBeenCalledWith({
-      embeds: [expect.objectContaining({ description: expect.any(String) })],
-      flags: 64,
-    });
-  });
-
-  it("2回目の fetch でボイスチャンネル以外が返ってもトリガー設定が削除されることを確認", async () => {
-    getVacConfigOrDefaultMock.mockResolvedValue({
-      enabled: true,
-      triggerChannelIds: ["tr-2"],
-      createdChannels: [],
-    });
-
-    const category = {
-      id: "cat-1",
-      name: "Cat",
-      type: ChannelType.GuildCategory,
-      children: { cache: { size: 1 } },
-    };
-    const interaction = createCommandInteraction({
-      options: {
-        getSubcommand: vi.fn(() => "remove-trigger-vc"),
-        getString: vi.fn(() => "cat-1"),
-      },
-      guild: createGuildWithChannels({
-        byId: {
-          "cat-1": category,
-          "tr-2": {
-            id: "tr-2",
-            name: "CreateVC",
-            type: ChannelType.GuildVoice,
-            parent: category,
-          },
-        },
+    expect(interaction.reply).toHaveBeenCalledWith(
+      expect.objectContaining({
+        embeds: expect.any(Array),
+        components: expect.any(Array),
+        flags: 64,
       }),
-    });
-
-    let triggerFetchCount = 0;
-    interaction.guild?.channels.fetch.mockImplementation(async (id: string) => {
-      if (id === "cat-1") {
-        return category;
-      }
-      if (id === "tr-2") {
-        triggerFetchCount += 1;
-        if (triggerFetchCount === 1) {
-          return {
-            id: "tr-2",
-            name: "CreateVC",
-            type: ChannelType.GuildVoice,
-            parent: category,
-          };
-        }
-        return {
-          id: "tr-2",
-          name: "CreateVC",
-          type: ChannelType.GuildText,
-          parent: category,
-        };
-      }
-      return null;
-    });
-
-    await vacConfigCommand.execute(
-      interaction as unknown as ChatInputCommandInteraction,
     );
-
-    expect(removeTriggerChannelMock).toHaveBeenCalledWith("guild-1", "tr-2");
-    expect(interaction.reply).toHaveBeenCalledTimes(1);
   });
 
-  it("トリガーが見つからない場合は remove エラーが handleCommandError へ委譲されることを確認", async () => {
+  it("remove-trigger-vc でトリガーチャンネルが0件の場合は handleCommandError へ委譲される", async () => {
     getVacConfigOrDefaultMock.mockResolvedValue({
-      enabled: true,
       triggerChannelIds: [],
-      createdChannels: [],
     });
 
     const interaction = createCommandInteraction({
@@ -665,176 +596,6 @@ describe("bot/commands/vac-config", () => {
     );
 
     expect(handleCommandError).toHaveBeenCalledTimes(1);
-  });
-
-  it("トリガー ID は存在するがチャンネルが無効な場合は remove エラーが委譲されることを確認", async () => {
-    getVacConfigOrDefaultMock.mockResolvedValue({
-      enabled: true,
-      triggerChannelIds: ["invalid-1", "invalid-2"],
-      createdChannels: [],
-    });
-
-    const interaction = createCommandInteraction({
-      options: {
-        getSubcommand: vi.fn(() => "remove-trigger-vc"),
-        getString: vi.fn(() => null),
-      },
-      guild: createGuildWithChannels({
-        byId: {
-          "text-1": { id: "text-1", type: ChannelType.GuildText, parent: null },
-          "invalid-1": null,
-          "invalid-2": { id: "invalid-2", type: ChannelType.GuildText },
-        },
-      }),
-    });
-
-    await vacConfigCommand.execute(
-      interaction as unknown as ChatInputCommandInteraction,
-    );
-
-    expect(handleCommandError).toHaveBeenCalledTimes(1);
-    expect(removeTriggerChannelMock).not.toHaveBeenCalled();
-  });
-
-  it("トリガーVCが別カテゴリに属する場合は指定カテゴリに対応するトリガーが見つからずエラーが委譲されることを確認", async () => {
-    getVacConfigOrDefaultMock.mockResolvedValue({
-      enabled: true,
-      triggerChannelIds: ["tr-mismatch"],
-      createdChannels: [],
-    });
-
-    const targetCategory = {
-      id: "cat-target",
-      name: "Target",
-      type: ChannelType.GuildCategory,
-      children: { cache: { size: 1 } },
-    };
-    const anotherCategory = {
-      id: "cat-other",
-      name: "Other",
-      type: ChannelType.GuildCategory,
-      children: { cache: { size: 1 } },
-    };
-
-    const interaction = createCommandInteraction({
-      options: {
-        getSubcommand: vi.fn(() => "remove-trigger-vc"),
-        getString: vi.fn(() => "cat-target"),
-      },
-      guild: createGuildWithChannels({
-        byId: {
-          "cat-target": targetCategory,
-          "tr-mismatch": {
-            id: "tr-mismatch",
-            name: "CreateVC",
-            type: ChannelType.GuildVoice,
-            parent: anotherCategory,
-          },
-        },
-      }),
-    });
-
-    await vacConfigCommand.execute(
-      interaction as unknown as ChatInputCommandInteraction,
-    );
-
-    expect(handleCommandError).toHaveBeenCalledTimes(1);
-    expect(removeTriggerChannelMock).not.toHaveBeenCalled();
-  });
-
-  it("トリガー検索中の fetch が失敗した場合は remove エラーが委譲されることを確認", async () => {
-    getVacConfigOrDefaultMock.mockResolvedValue({
-      enabled: true,
-      triggerChannelIds: ["tr-throw"],
-      createdChannels: [],
-    });
-
-    const interaction = createCommandInteraction({
-      options: {
-        getSubcommand: vi.fn(() => "remove-trigger-vc"),
-        getString: vi.fn(() => null),
-      },
-      guild: createGuildWithChannels({
-        byId: {
-          "text-1": { id: "text-1", type: ChannelType.GuildText, parent: null },
-        },
-      }),
-    });
-
-    interaction.guild?.channels.fetch.mockImplementation(async (id: string) => {
-      if (id === "text-1") {
-        return { id: "text-1", type: ChannelType.GuildText, parent: null };
-      }
-      if (id === "tr-throw") {
-        throw new Error("trigger fetch failed");
-      }
-      return null;
-    });
-
-    await vacConfigCommand.execute(
-      interaction as unknown as ChatInputCommandInteraction,
-    );
-
-    expect(handleCommandError).toHaveBeenCalledTimes(1);
-  });
-
-  it("実際のチャンネル削除時の fetch が失敗してもトリガー設定が削除されることを確認", async () => {
-    getVacConfigOrDefaultMock.mockResolvedValue({
-      enabled: true,
-      triggerChannelIds: ["tr-err"],
-      createdChannels: [],
-    });
-
-    const category = {
-      id: "cat-err",
-      name: "ErrCat",
-      type: ChannelType.GuildCategory,
-      children: { cache: { size: 1 } },
-    };
-    const interaction = createCommandInteraction({
-      options: {
-        getSubcommand: vi.fn(() => "remove-trigger-vc"),
-        getString: vi.fn(() => "cat-err"),
-      },
-      guild: createGuildWithChannels({
-        byId: {
-          "cat-err": category,
-          "tr-err": {
-            id: "tr-err",
-            name: "CreateVC",
-            type: ChannelType.GuildVoice,
-            parent: category,
-          },
-        },
-      }),
-    });
-
-    let triggerFetchCount = 0;
-    interaction.guild?.channels.fetch.mockImplementation(async (id: string) => {
-      if (id === "cat-err") {
-        return category;
-      }
-      if (id === "tr-err") {
-        triggerFetchCount += 1;
-        if (triggerFetchCount === 1) {
-          return {
-            id: "tr-err",
-            name: "CreateVC",
-            type: ChannelType.GuildVoice,
-            parent: category,
-          };
-        }
-        throw new Error("fetch failed");
-      }
-      return null;
-    });
-
-    await vacConfigCommand.execute(
-      interaction as unknown as ChatInputCommandInteraction,
-    );
-
-    expect(removeTriggerChannelMock).toHaveBeenCalledWith("guild-1", "tr-err");
-    expect(interaction.reply).toHaveBeenCalledTimes(1);
   });
 
   it("remove-trigger-vc でギルドが予期せず欠如している場合は handleCommandError へ委譲されることを確認", async () => {

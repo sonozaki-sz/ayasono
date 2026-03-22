@@ -68,6 +68,18 @@ vi.mock(
   }),
 );
 
+const resetMock = vi.fn();
+vi.mock(
+  "@/bot/features/member-log/commands/memberLogConfigCommand.reset",
+  () => ({
+    handleMemberLogConfigReset: (...args: unknown[]) => resetMock(...args),
+  }),
+);
+
+vi.mock("@/bot/shared/permissionGuards", () => ({
+  ensureManageGuildPermission: vi.fn(),
+}));
+
 // ---- ヘルパー ----
 
 /** テスト用 interaction モックを生成する */
@@ -76,6 +88,8 @@ function makeInteraction(
 ) {
   return {
     guildId: overrides.guildId !== undefined ? overrides.guildId : "guild-1",
+    locale: "ja",
+    memberPermissions: { has: vi.fn(() => true) },
     options: {
       getSubcommand: vi.fn(
         () => overrides.subcommand ?? MEMBER_LOG_CONFIG_COMMAND.SUBCOMMAND.VIEW,

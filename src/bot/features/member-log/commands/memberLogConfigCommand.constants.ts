@@ -14,6 +14,7 @@ export const MEMBER_LOG_CONFIG_COMMAND = {
     SET_LEAVE_MESSAGE: "set-leave-message",
     CLEAR_JOIN_MESSAGE: "clear-join-message",
     CLEAR_LEAVE_MESSAGE: "clear-leave-message",
+    RESET: "reset",
     VIEW: "view",
   },
   OPTION: {

@@ -11,6 +11,8 @@ export const BUMP_REMINDER_CONFIG_COMMAND = {
     DISABLE: "disable",
     SET_MENTION: "set-mention",
     REMOVE_MENTION: "remove-mention",
+    REMOVE_MENTION_USERS: "remove-mention-users",
+    RESET: "reset",
     VIEW: "view",
   },
   OPTION: {

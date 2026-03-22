@@ -94,6 +94,12 @@ export const common = {
     "Last",
   "ui.button.page_jump":
     "Page {{page}}/{{total}}",
+  "ui.modal.page_jump_title":
+    "Jump to Page",
+  "ui.modal.page_jump_label":
+    "Page number",
+  "ui.modal.page_jump_placeholder":
+    "Integer from 1 to {{total}}",
 
   // Common cancel
   cancelled:

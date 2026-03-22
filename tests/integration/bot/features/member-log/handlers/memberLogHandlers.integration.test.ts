@@ -301,8 +301,8 @@ describe("Member Log Handlers Integration", () => {
         (f: { name: string }) => f.name === "memberLog:embed.field.name.leave_stay_duration",
       );
       expect(stayField).toBeDefined();
-      // 日数が含まれること
-      expect(stayField.value).toContain("days");
+      // 年・月・日形式で表示されること（0の単位は省略）
+      expect(stayField.value).toContain("age_years");
     });
 
     it("カスタム退出メッセージのプレースホルダーが全て展開されること", async () => {

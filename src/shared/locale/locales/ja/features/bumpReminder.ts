@@ -15,6 +15,10 @@ export const bumpReminder = {
     "リマインダーでメンションするロール",
   "bump-reminder-config.remove-mention.description":
     "メンションロール設定を削除",
+  "bump-reminder-config.remove-mention-users.description":
+    "通知ユーザーを削除",
+  "bump-reminder-config.reset.description":
+    "Bumpリマインダー設定をリセット",
   "bump-reminder-config.view.description":
     "現在の設定を表示",
 
@@ -41,6 +45,14 @@ export const bumpReminder = {
     "通知をONにしました。",
   "user-response.panel_mention_toggled_off":
     "通知をOFFにしました。",
+  "user-response.reset_success":
+    "Bumpリマインダー設定をリセットしました。",
+  "user-response.reset_cancelled":
+    "リセットをキャンセルしました。",
+  "user-response.remove_users_success":
+    "選択したユーザーを通知リストから削除しました。",
+  "user-response.remove_users_empty":
+    "通知登録されているユーザーがいません。",
   "user-response.panel_update_failed":
     "Bump通知リストの更新に失敗しました。",
 
@@ -51,6 +63,22 @@ export const bumpReminder = {
   // ── embed: not_configured ──────────────────────
   "embed.description.not_configured":
     "Bumpリマインダーが設定されていません。",
+
+  // ── embed: reset ─────────────────────────────
+  "embed.title.reset_confirm":
+    "Bumpリマインダー設定リセット確認",
+  "embed.description.reset_confirm":
+    "Bumpリマインダー設定をリセットしますか？\n以下の設定が削除されます。この操作は元に戻せません。",
+  "embed.field.name.reset_target":
+    "削除対象",
+  "embed.field.value.reset_target":
+    "有効/無効設定 / メンションロール / メンションユーザー / 進行中のリマインダー",
+
+  // ── embed: remove_users ──────────────────────
+  "embed.title.remove_users":
+    "通知ユーザー削除",
+  "embed.description.remove_users":
+    "削除するユーザーを選択してください。",
 
   // ── embed: config_view ─────────────────────────
   "embed.title.config_view":
@@ -75,6 +103,14 @@ export const bumpReminder = {
     "ユーザー通知をONにする",
   "ui.button.mention_off":
     "ユーザー通知をOFFにする",
+  "ui.button.reset_confirm":
+    "リセットする",
+  "ui.button.reset_cancel":
+    "キャンセル",
+  "ui.button.select_all":
+    "全員を選択",
+  "ui.button.submit_delete":
+    "削除する",
 
   // ── ログ ─────────────────────────────────────
   "log.detected":
@@ -93,6 +129,8 @@ export const bumpReminder = {
     "無効化 GuildId: {{guildId}}",
   "log.config_mention_set":
     "メンションロール設定 GuildId: {{guildId}} RoleId: {{roleId}}",
+  "log.config_reset":
+    "設定リセット GuildId: {{guildId}}",
   "log.config_mention_removed":
     "メンション設定削除 GuildId: {{guildId}} Target: {{target}}",
   "log.config_users_removed":

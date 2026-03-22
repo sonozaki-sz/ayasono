@@ -21,6 +21,8 @@ export const memberLog = {
     "Clear the custom join message",
   "member-log-config.clear-leave-message.description":
     "Clear the custom leave message",
+  "member-log-config.reset.description":
+    "Reset member log settings",
   "member-log-config.view.description":
     "Show current settings",
 
@@ -43,6 +45,10 @@ export const memberLog = {
     "Leave message has been cleared",
   "user-response.text_channel_only":
     "Please specify a text channel.",
+  "user-response.reset_success":
+    "Member log settings have been reset.",
+  "user-response.reset_cancelled":
+    "Reset has been cancelled.",
   "user-response.channel_deleted_notice":
     "⚠️ The member log notification channel has been deleted.\nSettings have been reset. Please reconfigure with `/member-log-config set-channel`.",
 
@@ -51,6 +57,14 @@ export const memberLog = {
     "Settings Updated",
   "embed.title.config_view":
     "Member Log",
+  "embed.title.reset_confirm":
+    "Member Log Settings Reset",
+  "embed.description.reset_confirm":
+    "Reset member log settings?\nThe following settings will be deleted. This action cannot be undone.",
+  "embed.field.name.reset_target":
+    "Targets",
+  "embed.field.value.reset_target":
+    "Enabled/Disabled / Notification Channel / Custom Join Message / Custom Leave Message",
   "embed.description.not_configured":
     "Member log is not configured.",
   "embed.field.name.status":
@@ -109,6 +123,10 @@ export const memberLog = {
     " ",
 
   // ── UI labels ──────────────────────────────────
+  "ui.button.reset_confirm":
+    "Reset",
+  "ui.button.reset_cancel":
+    "Cancel",
   "ui.modal.set_join_message_title":
     "Set Join Message",
   "ui.modal.set_join_message_label":
@@ -145,6 +163,8 @@ export const memberLog = {
     "leave message set GuildId: {{guildId}}",
   "log.config_join_message_cleared":
     "join message cleared GuildId: {{guildId}}",
+  "log.config_reset":
+    "settings reset GuildId: {{guildId}}",
   "log.config_leave_message_cleared":
     "leave message cleared GuildId: {{guildId}}",
   "log.database_user_setting_find_failed":

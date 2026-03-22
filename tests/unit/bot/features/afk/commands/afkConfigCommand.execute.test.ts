@@ -5,6 +5,7 @@ import { ChannelType, PermissionFlagsBits } from "discord.js";
 
 const setAfkChannelMock = vi.fn();
 const getAfkConfigMock = vi.fn();
+const saveAfkConfigMock = vi.fn();
 const tGuildMock = vi.fn();
 const tDefaultMock = vi.fn((key: string) => `default:${key}`);
 const createSuccessEmbedMock = vi.fn((description: string) => ({
@@ -15,10 +16,22 @@ const createInfoEmbedMock = vi.fn((description: string) => ({
   description,
   kind: "info",
 }));
+const createWarningEmbedMock = vi.fn((description: string) => ({
+  description,
+  kind: "warning",
+}));
+
+vi.mock("@/shared/features/afk/afkConfigDefaults", () => ({
+  createDefaultAfkConfig: () => ({
+    enabled: false,
+    channelId: null,
+  }),
+}));
 
 vi.mock("@/shared/features/afk/afkConfigService", () => ({
   setAfkChannel: (...args: unknown[]) => setAfkChannelMock(...args),
   getAfkConfig: (...args: unknown[]) => getAfkConfigMock(...args),
+  saveAfkConfig: (...args: unknown[]) => saveAfkConfigMock(...args),
 }));
 
 vi.mock("@/shared/locale/localeManager", () => ({
@@ -40,6 +53,8 @@ vi.mock("@/bot/utils/messageResponse", () => ({
   createSuccessEmbed: (description: string) =>
     createSuccessEmbedMock(description),
   createInfoEmbed: (description: string) => createInfoEmbedMock(description),
+  createWarningEmbed: (description: string) =>
+    createWarningEmbedMock(description),
 }));
 
 function createInteraction(subcommand: string) {
@@ -108,5 +123,38 @@ describe("bot/features/afk/commands/afkConfigCommand.execute", () => {
       embeds: [{ description: "", kind: "info" }],
       flags: 64,
     });
+  });
+
+  it("view サブコマンドで未設定時も createInfoEmbed で統一フォーマット表示する", async () => {
+    getAfkConfigMock.mockResolvedValue(null);
+    const interaction = createInteraction("view");
+
+    await executeAfkConfigCommand(interaction as never);
+
+    expect(createInfoEmbedMock).toHaveBeenCalled();
+    expect(interaction.reply).toHaveBeenCalledWith(
+      expect.objectContaining({
+        embeds: expect.any(Array),
+        flags: 64,
+      }),
+    );
+  });
+
+  it("clear-channel サブコマンドで AFK チャンネル設定を解除する", async () => {
+    const interaction = createInteraction("clear-channel");
+
+    await executeAfkConfigCommand(interaction as never);
+
+    expect(saveAfkConfigMock).toHaveBeenCalledWith("guild-1", {
+      enabled: false,
+      channelId: null,
+    });
+    expect(createSuccessEmbedMock).toHaveBeenCalled();
+    expect(interaction.reply).toHaveBeenCalledWith(
+      expect.objectContaining({
+        embeds: expect.any(Array),
+        flags: 64,
+      }),
+    );
   });
 });

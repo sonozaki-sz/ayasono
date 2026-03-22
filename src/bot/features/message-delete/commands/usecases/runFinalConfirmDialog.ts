@@ -40,7 +40,6 @@ export async function showFinalConfirmDialog(
         locale,
         targetMessages,
         page,
-        totalPages,
         targetMessages.length,
       ),
     ],

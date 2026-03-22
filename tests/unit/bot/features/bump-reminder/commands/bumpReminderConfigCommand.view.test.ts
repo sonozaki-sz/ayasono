@@ -1,7 +1,6 @@
 // tests/unit/bot/features/bump-reminder/commands/bumpReminderConfigCommand.view.test.ts
 import { handleBumpReminderConfigView } from "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.view";
 
-const ensureManageGuildPermissionMock = vi.fn();
 const getBumpReminderConfigMock = vi.fn();
 const createInfoEmbedMock = vi.fn((description: string) => ({
   description,
@@ -25,18 +24,9 @@ vi.mock("@/bot/utils/messageResponse", () => ({
   createInfoEmbed: (description: string) => createInfoEmbedMock(description),
 }));
 
-vi.mock(
-  "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.guard",
-  () => ({
-    ensureManageGuildPermission: (...args: unknown[]) =>
-      ensureManageGuildPermissionMock(...args),
-  }),
-);
-
 describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.view", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    ensureManageGuildPermissionMock.mockReturnValue(undefined);
   });
 
   it("設定が null の場合は未設定状態を示す embed を返す", async () => {

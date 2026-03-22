@@ -39,6 +39,14 @@ export const bumpReminderConfigCommand: Command = {
       "bumpReminder",
       "bump-reminder-config.remove-mention.description",
     );
+    const removeUsersDesc = getCommandLocalizations(
+      "bumpReminder",
+      "bump-reminder-config.remove-mention-users.description",
+    );
+    const resetDesc = getCommandLocalizations(
+      "bumpReminder",
+      "bump-reminder-config.reset.description",
+    );
     const viewDesc = getCommandLocalizations(
       "bumpReminder",
       "bump-reminder-config.view.description",
@@ -86,6 +94,22 @@ export const bumpReminderConfigCommand: Command = {
             .setName(BUMP_REMINDER_CONFIG_COMMAND.SUBCOMMAND.REMOVE_MENTION)
             .setDescription(removeMentionDesc.ja)
             .setDescriptionLocalizations(removeMentionDesc.localizations),
+        )
+        .addSubcommand((subcommand) =>
+          // 通知ユーザー削除
+          subcommand
+            .setName(
+              BUMP_REMINDER_CONFIG_COMMAND.SUBCOMMAND.REMOVE_MENTION_USERS,
+            )
+            .setDescription(removeUsersDesc.ja)
+            .setDescriptionLocalizations(removeUsersDesc.localizations),
+        )
+        .addSubcommand((subcommand) =>
+          // 設定リセット
+          subcommand
+            .setName(BUMP_REMINDER_CONFIG_COMMAND.SUBCOMMAND.RESET)
+            .setDescription(resetDesc.ja)
+            .setDescriptionLocalizations(resetDesc.localizations),
         )
         .addSubcommand((subcommand) =>
           // 現在設定表示

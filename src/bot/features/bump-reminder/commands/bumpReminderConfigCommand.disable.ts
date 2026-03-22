@@ -12,7 +12,6 @@ import {
   getBotBumpReminderManager,
 } from "../../../services/botCompositionRoot";
 import { createSuccessEmbed } from "../../../utils/messageResponse";
-import { ensureManageGuildPermission } from "./bumpReminderConfigCommand.guard";
 
 /**
  * 通知機能を無効化する
@@ -25,9 +24,6 @@ export async function handleBumpReminderConfigDisable(
   interaction: ChatInputCommandInteraction,
   guildId: string,
 ): Promise<void> {
-  // 実行時にも管理権限を確認
-  await ensureManageGuildPermission(interaction);
-
   // メモリ上の pending リマインダーをキャンセル
   const bumpReminderManager = getBotBumpReminderManager();
   await bumpReminderManager.cancelReminder(guildId);

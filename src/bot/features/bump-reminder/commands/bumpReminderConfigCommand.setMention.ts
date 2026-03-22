@@ -12,7 +12,6 @@ import { logger } from "../../../../shared/utils/logger";
 import { getBotBumpReminderConfigService } from "../../../services/botCompositionRoot";
 import { createSuccessEmbed } from "../../../utils/messageResponse";
 import { BUMP_REMINDER_CONFIG_COMMAND } from "./bumpReminderConfigCommand.constants";
-import { ensureManageGuildPermission } from "./bumpReminderConfigCommand.guard";
 
 /**
  * メンションロールを設定する
@@ -23,9 +22,6 @@ export async function handleBumpReminderConfigSetMention(
   interaction: ChatInputCommandInteraction,
   guildId: string,
 ): Promise<void> {
-  // 実行時にも管理権限を確認
-  await ensureManageGuildPermission(interaction);
-
   // role オプションを取得（required: true なので必ず存在）
   const role = interaction.options.getRole(
     BUMP_REMINDER_CONFIG_COMMAND.OPTION.ROLE,

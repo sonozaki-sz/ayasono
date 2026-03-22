@@ -3,7 +3,6 @@ import { handleBumpReminderConfigSetMention } from "@/bot/features/bump-reminder
 import { ValidationError } from "@/shared/errors/customErrors";
 import { BUMP_REMINDER_MENTION_ROLE_RESULT } from "@/shared/features/bump-reminder/bumpReminderConfigService";
 
-const ensureManageGuildPermissionMock = vi.fn();
 const setBumpReminderMentionRoleMock = vi.fn();
 
 vi.mock("@/shared/locale/localeManager", () => ({
@@ -29,18 +28,9 @@ vi.mock("@/bot/utils/messageResponse", () => ({
   createSuccessEmbed: vi.fn((description: string) => ({ description })),
 }));
 
-vi.mock(
-  "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.guard",
-  () => ({
-    ensureManageGuildPermission: (...args: unknown[]) =>
-      ensureManageGuildPermissionMock(...args),
-  }),
-);
-
 describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.setMention", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    ensureManageGuildPermissionMock.mockResolvedValue(undefined);
     setBumpReminderMentionRoleMock.mockResolvedValue(
       BUMP_REMINDER_MENTION_ROLE_RESULT.UPDATED,
     );

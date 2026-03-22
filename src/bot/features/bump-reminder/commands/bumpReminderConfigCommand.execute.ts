@@ -10,6 +10,8 @@ import { handleBumpReminderConfigDisable } from "./bumpReminderConfigCommand.dis
 import { handleBumpReminderConfigEnable } from "./bumpReminderConfigCommand.enable";
 import { ensureManageGuildPermission } from "./bumpReminderConfigCommand.guard";
 import { handleBumpReminderConfigRemoveMention } from "./bumpReminderConfigCommand.removeMention";
+import { handleBumpReminderConfigRemoveUsers } from "./bumpReminderConfigCommand.removeUsers";
+import { handleBumpReminderConfigReset } from "./bumpReminderConfigCommand.reset";
 import { handleBumpReminderConfigSetMention } from "./bumpReminderConfigCommand.setMention";
 import { handleBumpReminderConfigView } from "./bumpReminderConfigCommand.view";
 
@@ -50,6 +52,14 @@ export async function executeBumpReminderConfigCommand(
 
       case BUMP_REMINDER_CONFIG_COMMAND.SUBCOMMAND.REMOVE_MENTION:
         await handleBumpReminderConfigRemoveMention(interaction, guildId);
+        break;
+
+      case BUMP_REMINDER_CONFIG_COMMAND.SUBCOMMAND.REMOVE_MENTION_USERS:
+        await handleBumpReminderConfigRemoveUsers(interaction, guildId);
+        break;
+
+      case BUMP_REMINDER_CONFIG_COMMAND.SUBCOMMAND.RESET:
+        await handleBumpReminderConfigReset(interaction, guildId);
         break;
 
       case BUMP_REMINDER_CONFIG_COMMAND.SUBCOMMAND.VIEW:

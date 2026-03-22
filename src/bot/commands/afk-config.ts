@@ -17,6 +17,7 @@ const AFK_CONFIG_COMMAND = {
   NAME: "afk-config",
   SUBCOMMAND: {
     SET_CHANNEL: "set-channel",
+    CLEAR_CHANNEL: "clear-channel",
     VIEW: "view",
   },
   OPTION: {
@@ -38,6 +39,10 @@ export const afkConfigCommand: Command = {
     const channelDesc = getCommandLocalizations(
       "afk",
       "afk-config.set-channel.channel.description",
+    );
+    const clearChannelDesc = getCommandLocalizations(
+      "afk",
+      "afk-config.clear-channel.description",
     );
     const viewDesc = getCommandLocalizations(
       "afk",
@@ -65,6 +70,13 @@ export const afkConfigCommand: Command = {
                 .addChannelTypes(ChannelType.GuildVoice)
                 .setRequired(true),
             ),
+        )
+        .addSubcommand((subcommand) =>
+          // AFK チャンネル設定解除
+          subcommand
+            .setName(AFK_CONFIG_COMMAND.SUBCOMMAND.CLEAR_CHANNEL)
+            .setDescription(clearChannelDesc.ja)
+            .setDescriptionLocalizations(clearChannelDesc.localizations),
         )
         .addSubcommand((subcommand) =>
           // 現在設定の表示

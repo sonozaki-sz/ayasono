@@ -74,11 +74,9 @@ export async function handleGuildMemberRemove(
       ? Math.floor(member.joinedTimestamp / 1000)
       : null;
     const leftTimestamp = Math.floor(Date.now() / 1000);
-    const stayDays =
+    const stayDuration =
       member.joinedTimestamp !== null
-        ? Math.floor(
-            (Date.now() - member.joinedTimestamp) / (1000 * 60 * 60 * 24),
-          )
+        ? calcDuration(member.joinedTimestamp)
         : null;
     const memberCount = member.guild.memberCount;
     // createdTimestamp が存在する場合のみアカウント年齢を算出（member.user の null 判定を集約）
@@ -121,11 +119,14 @@ export async function handleGuildMemberRemove(
         },
         {
           name: t("memberLog:embed.field.name.leave_stay_duration"),
-          value: (() => {
-            if (stayDays === null)
-              return t("memberLog:embed.field.value.unknown");
-            return t("memberLog:embed.field.value.days", { count: stayDays });
-          })(),
+          value: stayDuration
+            ? formatAccountAge(
+                stayDuration.years,
+                stayDuration.months,
+                stayDuration.days,
+                t,
+              )
+            : t("memberLog:embed.field.value.unknown"),
           inline: true,
         },
         {

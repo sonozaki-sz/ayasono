@@ -8,8 +8,10 @@ import {
   type ChatInputCommandInteraction,
 } from "discord.js";
 import { ValidationError } from "../../../../shared/errors/customErrors";
+import { createDefaultAfkConfig } from "../../../../shared/features/afk/afkConfigDefaults";
 import {
   getAfkConfig,
+  saveAfkConfig,
   setAfkChannel,
 } from "../../../../shared/features/afk/afkConfigService";
 import {
@@ -25,6 +27,7 @@ import { COMMON_I18N_KEYS } from "../../../shared/i18nKeys";
 
 const AFK_CONFIG_SUBCOMMAND = {
   SET_CHANNEL: "set-channel",
+  CLEAR_CHANNEL: "clear-channel",
   VIEW: "view",
 } as const;
 
@@ -50,6 +53,9 @@ export async function executeAfkConfigCommand(
   switch (subcommand) {
     case AFK_CONFIG_SUBCOMMAND.SET_CHANNEL:
       await handleSetChannel(interaction, guildId);
+      break;
+    case AFK_CONFIG_SUBCOMMAND.CLEAR_CHANNEL:
+      await handleClearChannel(interaction, guildId);
       break;
     case AFK_CONFIG_SUBCOMMAND.VIEW:
       await handleViewSetting(interaction, guildId);
@@ -111,6 +117,40 @@ async function handleSetChannel(
 }
 
 /**
+ * afk-config clear-channel のチャンネル設定解除を行う
+ * @param interaction コマンド実行インタラクション
+ * @param guildId 実行対象ギルドID
+ * @returns 実行完了を示す Promise
+ */
+async function handleClearChannel(
+  interaction: ChatInputCommandInteraction,
+  guildId: string,
+): Promise<void> {
+  await saveAfkConfig(guildId, createDefaultAfkConfig());
+
+  const description = tInteraction(
+    interaction.locale,
+    "afk:user-response.clear_channel_success",
+  );
+  const successTitle = tInteraction(
+    interaction.locale,
+    "afk:embed.title.success",
+  );
+  const embed = createSuccessEmbed(description, { title: successTitle });
+
+  await interaction.reply({
+    embeds: [embed],
+    flags: MessageFlags.Ephemeral,
+  });
+
+  logger.info(
+    logPrefixed("system:log_prefix.afk", "afk:log.channel_cleared", {
+      guildId,
+    }),
+  );
+}
+
+/**
  * afk-config view の現在設定表示を返す
  * @param interaction コマンド実行インタラクション
  * @param guildId 実行対象ギルドID
@@ -121,31 +161,32 @@ async function handleViewSetting(
   guildId: string,
 ): Promise<void> {
   const config = await getAfkConfig(guildId);
+  const locale = interaction.locale;
 
-  const title = tInteraction(interaction.locale, "afk:embed.title.config_view");
+  const title = tInteraction(locale, "afk:embed.title.config_view");
+  const isConfigured = config?.enabled && config?.channelId;
 
-  if (!config || !config.enabled || !config.channelId) {
-    const description = tInteraction(
-      interaction.locale,
-      "afk:embed.field.value.not_configured",
-    );
-    const embed = createInfoEmbed(description, { title });
-    await interaction.reply({
-      embeds: [embed],
-      flags: MessageFlags.Ephemeral,
-    });
-    return;
-  }
-
-  const fieldChannel = tInteraction(
-    interaction.locale,
-    "afk:embed.field.name.channel",
+  const statusValue = tInteraction(
+    locale,
+    isConfigured ? "common:enabled" : "common:disabled",
   );
+  const channelValue = config?.channelId
+    ? `<#${config.channelId}>`
+    : tInteraction(locale, "afk:embed.field.value.not_configured");
 
   const embed = createInfoEmbed("", {
     title,
     fields: [
-      { name: fieldChannel, value: `<#${config.channelId}>`, inline: true },
+      {
+        name: tInteraction(locale, "afk:embed.field.name.status"),
+        value: statusValue,
+        inline: true,
+      },
+      {
+        name: tInteraction(locale, "afk:embed.field.name.channel"),
+        value: channelValue,
+        inline: true,
+      },
     ],
   });
 

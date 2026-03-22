@@ -108,9 +108,9 @@ export const messageDelete = {
 
   // ── Embed ─────────────────────────────────────
   "embed.title.confirm":
-    "📋 Messages to Delete ({{page}} / {{total}})",
+    "Messages to Delete",
   "embed.title.deletion_confirm":
-    "🗑️ Are you sure? ({{page}} / {{total}})",
+    "🗑️ Are you sure?",
   "embed.description.deletion_warning":
     "⚠️ **This action cannot be undone**",
   "embed.description.deletion_confirm":
