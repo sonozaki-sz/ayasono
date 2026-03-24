@@ -2,7 +2,7 @@
 
 > Discord Developer Portal でアプリを作成し、サーバーへ招待するまでの手順
 
-最終更新: 2026年2月26日
+最終更新: 2026年3月25日
 
 ---
 
@@ -72,13 +72,13 @@
 | 権限 | 用途 |
 | -- | -- |
 | View Channels | チャンネルの閲覧（基本動作） |
-| Send Messages | メッセージ送信 |
-| Send Messages in Threads | スレッド内メッセージ送信 |
-| Embed Links | Embed 形式での送信 |
-| Read Message History | メッセージ履歴の読み取り（Bump 検知） |
-| Manage Messages | メッセージの削除（スティッキーメッセージ・一括削除機能） |
-| Manage Channels | チャンネルの作成・削除（VAC 機能） |
-| Move Members | メンバーの VC 移動（AFK 機能） |
+| Send Messages | メッセージ送信（全機能） |
+| Send Messages in Threads | スレッド内メッセージ送信（VC募集） |
+| Embed Links | Embed 形式での送信（全機能） |
+| Read Message History | メッセージ履歴の読み取り（メッセージ削除・メッセージ固定） |
+| Manage Messages | メッセージの削除・管理（メッセージ削除・メッセージ固定・VC募集） |
+| Manage Channels | チャンネルの作成・削除（VC自動作成・VC募集） |
+| Move Members | メンバーの VC 移動（AFK・VC自動作成・VC募集） |
 
 ### 4-2. 招待 URL の生成とサーバー追加
 
