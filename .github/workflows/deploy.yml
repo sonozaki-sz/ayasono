@@ -120,6 +120,42 @@ jobs:
               env: $env
             }')"
 
+      - name: 古い Docker イメージを削除（最新3つを保持）
+        run: |
+          PORTAINER_URL="${{ secrets.PORTAINER_URL }}"
+          ENDPOINT_ID="${{ secrets.PORTAINER_ENDPOINT_ID }}"
+          API_KEY="${{ secrets.PORTAINER_API_KEY }}"
+          IMAGE_NAME="ghcr.io/sonozaki-sz/ayasono"
+          KEEP_COUNT=3
+
+          # Portainer Docker API 経由で対象イメージ一覧を取得
+          IMAGES=$(curl -fsSL \
+            "${PORTAINER_URL}/api/endpoints/${ENDPOINT_ID}/docker/images/json?all=false" \
+            -H "X-API-Key: ${API_KEY}" \
+            | jq --arg name "$IMAGE_NAME" '
+              [ .[] | select(
+                (.RepoTags != null and any(.RepoTags[]; startswith($name))) or
+                (.RepoDigests != null and any(.RepoDigests[]; startswith($name)))
+              )]
+              | sort_by(.Created) | reverse
+            ')
+
+          TOTAL=$(echo "$IMAGES" | jq 'length')
+          echo "対象イメージ数: ${TOTAL}（保持: ${KEEP_COUNT}）"
+
+          if [ "$TOTAL" -le "$KEEP_COUNT" ]; then
+            echo "削除対象なし"
+            exit 0
+          fi
+
+          # 古いイメージを削除（KEEP_COUNT 番目以降）
+          echo "$IMAGES" | jq -r ".[$KEEP_COUNT:][].Id" | while read -r IMAGE_ID; do
+            echo "削除: ${IMAGE_ID}"
+            curl -fsSL -X DELETE \
+              "${PORTAINER_URL}/api/endpoints/${ENDPOINT_ID}/docker/images/${IMAGE_ID}?force=false" \
+              -H "X-API-Key: ${API_KEY}" || echo "⚠ 削除スキップ（使用中の可能性）: ${IMAGE_ID}"
+          done
+
   # ─────────────────────────────────────────────
   # Discord 通知（成功）
   #   - main への push でデプロイが成功した場合のみ
