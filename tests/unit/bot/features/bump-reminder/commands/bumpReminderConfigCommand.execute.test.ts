@@ -8,6 +8,8 @@ const enableMock = vi.fn();
 const disableMock = vi.fn();
 const setMentionMock = vi.fn();
 const removeMentionMock = vi.fn();
+const removeUsersMock = vi.fn();
+const resetMock = vi.fn();
 const showMock = vi.fn();
 
 vi.mock("@/shared/locale/localeManager", () => ({
@@ -61,6 +63,21 @@ vi.mock(
 );
 
 vi.mock(
+  "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.removeUsers",
+  () => ({
+    handleBumpReminderConfigRemoveUsers: (...args: unknown[]) =>
+      removeUsersMock(...args),
+  }),
+);
+
+vi.mock(
+  "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.reset",
+  () => ({
+    handleBumpReminderConfigReset: (...args: unknown[]) => resetMock(...args),
+  }),
+);
+
+vi.mock(
   "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.view",
   () => ({
     handleBumpReminderConfigView: (...args: unknown[]) => showMock(...args),
@@ -103,6 +120,37 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.execute"
     await executeBumpReminderConfigCommand(interaction as never);
 
     expect(showMock).toHaveBeenCalledWith(interaction, "guild-1");
+  });
+
+  it("remove-mention-users サブコマンドを対応するハンドラーへルーティングする", async () => {
+    const interaction = createInteraction(
+      BUMP_REMINDER_CONFIG_COMMAND.SUBCOMMAND.REMOVE_MENTION_USERS,
+    );
+
+    await executeBumpReminderConfigCommand(interaction as never);
+
+    expect(removeUsersMock).toHaveBeenCalledWith(interaction, "guild-1");
+  });
+
+  it("reset サブコマンドを対応するハンドラーへルーティングする", async () => {
+    const interaction = createInteraction(
+      BUMP_REMINDER_CONFIG_COMMAND.SUBCOMMAND.RESET,
+    );
+
+    await executeBumpReminderConfigCommand(interaction as never);
+
+    expect(resetMock).toHaveBeenCalledWith(interaction, "guild-1");
+  });
+
+  it("guildId が null の場合に handleCommandError へ委譲されること", async () => {
+    const interaction = {
+      guildId: null,
+      options: { getSubcommand: vi.fn(() => "enable") },
+    };
+
+    await executeBumpReminderConfigCommand(interaction as never);
+
+    expect(handleCommandError).toHaveBeenCalledTimes(1);
   });
 
   it("未定義のサブコマンドが渡された場合は handleCommandError に委譲し、サイレントに無視しないことを保証", async () => {

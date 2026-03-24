@@ -101,4 +101,88 @@ describe("bot/handlers/interactionCreate/index", () => {
     expect(handleStringSelectMenuMock).toHaveBeenCalledTimes(1);
     expect(handleUserSelectMenuMock).not.toHaveBeenCalled();
   });
+
+  it("ボタンが handleButton へルーティングされることを確認", async () => {
+    const { handleInteractionCreate } =
+      await import("@/bot/handlers/interactionCreate/handleInteractionCreate");
+
+    const interaction = {
+      client: {},
+      isChatInputCommand: () => false,
+      isAutocomplete: () => false,
+      isModalSubmit: () => false,
+      isButton: () => true,
+      isUserSelectMenu: () => false,
+      isRoleSelectMenu: () => false,
+      isStringSelectMenu: () => false,
+    };
+
+    await handleInteractionCreate(interaction as never);
+
+    expect(handleButtonMock).toHaveBeenCalledTimes(1);
+    expect(handleChatInputCommandMock).not.toHaveBeenCalled();
+  });
+
+  it("モーダル送信が handleModalSubmit へルーティングされることを確認", async () => {
+    const { handleInteractionCreate } =
+      await import("@/bot/handlers/interactionCreate/handleInteractionCreate");
+
+    const interaction = {
+      client: {},
+      isChatInputCommand: () => false,
+      isAutocomplete: () => false,
+      isModalSubmit: () => true,
+      isButton: () => false,
+      isUserSelectMenu: () => false,
+      isRoleSelectMenu: () => false,
+      isStringSelectMenu: () => false,
+    };
+
+    await handleInteractionCreate(interaction as never);
+
+    expect(handleModalSubmitMock).toHaveBeenCalledTimes(1);
+    expect(handleButtonMock).not.toHaveBeenCalled();
+  });
+
+  it("オートコンプリートが handleAutocomplete へルーティングされることを確認", async () => {
+    const { handleInteractionCreate } =
+      await import("@/bot/handlers/interactionCreate/handleInteractionCreate");
+
+    const interaction = {
+      client: {},
+      isChatInputCommand: () => false,
+      isAutocomplete: () => true,
+      isModalSubmit: () => false,
+      isButton: () => false,
+      isUserSelectMenu: () => false,
+      isRoleSelectMenu: () => false,
+      isStringSelectMenu: () => false,
+    };
+
+    await handleInteractionCreate(interaction as never);
+
+    expect(handleAutocompleteMock).toHaveBeenCalledTimes(1);
+    expect(handleChatInputCommandMock).not.toHaveBeenCalled();
+  });
+
+  it("ロールセレクトメニューが handleRoleSelectMenu へルーティングされることを確認", async () => {
+    const { handleInteractionCreate } =
+      await import("@/bot/handlers/interactionCreate/handleInteractionCreate");
+
+    const interaction = {
+      client: {},
+      isChatInputCommand: () => false,
+      isAutocomplete: () => false,
+      isModalSubmit: () => false,
+      isButton: () => false,
+      isUserSelectMenu: () => false,
+      isRoleSelectMenu: () => true,
+      isStringSelectMenu: () => false,
+    };
+
+    await handleInteractionCreate(interaction as never);
+
+    expect(handleRoleSelectMenuMock).toHaveBeenCalledTimes(1);
+    expect(handleStringSelectMenuMock).not.toHaveBeenCalled();
+  });
 });

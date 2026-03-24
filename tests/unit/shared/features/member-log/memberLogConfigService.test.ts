@@ -136,6 +136,70 @@ describe("shared/features/member-log/memberLogConfigService", () => {
         leaveMessage: "さようなら!",
       });
     });
+
+    it("clearJoinMessage が joinMessage を undefined に上書きして他のフィールドを保持すること", async () => {
+      const { module } = await loadModule();
+      const repository = createRepositoryMock();
+      const service = new module.MemberLogConfigService(repository as never);
+      repository.getMemberLogConfig.mockResolvedValueOnce({
+        enabled: true,
+        channelId: "ch-1",
+        joinMessage: "ようこそ!",
+        leaveMessage: "さようなら!",
+      });
+      repository.updateMemberLogConfig.mockResolvedValueOnce(undefined);
+
+      await service.clearJoinMessage("guild-1");
+
+      expect(repository.updateMemberLogConfig).toHaveBeenCalledWith("guild-1", {
+        enabled: true,
+        channelId: "ch-1",
+        joinMessage: undefined,
+        leaveMessage: "さようなら!",
+      });
+    });
+
+    it("clearLeaveMessage が leaveMessage を undefined に上書きして他のフィールドを保持すること", async () => {
+      const { module } = await loadModule();
+      const repository = createRepositoryMock();
+      const service = new module.MemberLogConfigService(repository as never);
+      repository.getMemberLogConfig.mockResolvedValueOnce({
+        enabled: true,
+        channelId: "ch-1",
+        joinMessage: "ようこそ!",
+        leaveMessage: "さようなら!",
+      });
+      repository.updateMemberLogConfig.mockResolvedValueOnce(undefined);
+
+      await service.clearLeaveMessage("guild-1");
+
+      expect(repository.updateMemberLogConfig).toHaveBeenCalledWith("guild-1", {
+        enabled: true,
+        channelId: "ch-1",
+        joinMessage: "ようこそ!",
+        leaveMessage: undefined,
+      });
+    });
+
+    it("disableAndClearChannel が channelId を undefined・enabled を false にマージして保存すること", async () => {
+      const { module } = await loadModule();
+      const repository = createRepositoryMock();
+      const service = new module.MemberLogConfigService(repository as never);
+      repository.getMemberLogConfig.mockResolvedValueOnce({
+        enabled: true,
+        channelId: "ch-1",
+        joinMessage: "ようこそ!",
+      });
+      repository.updateMemberLogConfig.mockResolvedValueOnce(undefined);
+
+      await service.disableAndClearChannel("guild-1");
+
+      expect(repository.updateMemberLogConfig).toHaveBeenCalledWith("guild-1", {
+        enabled: false,
+        channelId: undefined,
+        joinMessage: "ようこそ!",
+      });
+    });
   });
 
   // createMemberLogConfigService が新しいインスタンスを返すことを検証

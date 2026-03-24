@@ -11,9 +11,10 @@ datasource db {
 
 // Guild Configuration
 model GuildConfig {
-  id        String   @id @default(cuid())
-  guildId   String   @unique
-  locale    String   @default("ja")
+  id             String   @id @default(cuid())
+  guildId        String   @unique
+  locale         String   @default("ja")
+  errorChannelId String?  @map("error_channel_id")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

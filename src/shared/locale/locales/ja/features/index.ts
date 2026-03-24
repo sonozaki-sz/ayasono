@@ -10,3 +10,4 @@ export { messageDelete } from "./messageDelete";
 export { memberLog } from "./memberLog";
 export { stickyMessage } from "./stickyMessage";
 export { vcRecruit } from "./vcRecruit";
+export { guildConfig } from "./guildConfig";

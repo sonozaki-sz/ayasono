@@ -5,6 +5,8 @@ import type { PrismaClient } from "@prisma/client";
 import type { IGuildConfigRepository } from "../../shared/database/types";
 import { getGuildConfigRepository } from "../../shared/database/guildConfigRepositoryProvider";
 import type { BumpReminderConfigService } from "../../shared/features/bump-reminder/bumpReminderConfigService";
+import { createGuildConfigService } from "../../shared/features/guild-config/guildConfigService";
+import type { GuildConfigService } from "../../shared/features/guild-config/guildConfigService";
 import { createMemberLogConfigService } from "../../shared/features/member-log/memberLogConfigService";
 import type { MemberLogConfigService } from "../../shared/features/member-log/memberLogConfigService";
 import { createStickyMessageConfigService } from "../../shared/features/sticky-message/stickyMessageConfigService";
@@ -34,6 +36,7 @@ import type { IVcRecruitRepository } from "../features/vc-recruit/repositories/v
 
 export interface BotServices {
   guildConfigRepository: IGuildConfigRepository;
+  guildConfigService: GuildConfigService;
   bumpReminderConfigService: BumpReminderConfigService;
   bumpReminderRepository: BumpReminderRepositoryType;
   bumpReminderManager: BumpReminderManager;
@@ -56,6 +59,13 @@ export const getBotGuildConfigRepository: () => IGuildConfigRepository =
 export const setBotGuildConfigRepository: (
   value: IGuildConfigRepository,
 ) => void = _guildConfigRepositoryAccessor[1];
+
+const _guildConfigServiceAccessor =
+  createBotServiceAccessor<GuildConfigService>("GuildConfigService");
+export const getBotGuildConfigService: () => GuildConfigService =
+  _guildConfigServiceAccessor[0];
+export const setBotGuildConfigService: (value: GuildConfigService) => void =
+  _guildConfigServiceAccessor[1];
 
 const _bumpReminderConfigServiceAccessor =
   createBotServiceAccessor<BumpReminderConfigService>(
@@ -149,6 +159,10 @@ export function initializeBotCompositionRoot(
   setBotGuildConfigRepository(guildConfigRepository);
   localeManager.setRepository(guildConfigRepository);
 
+  // GuildConfig
+  const guildConfigService = createGuildConfigService(guildConfigRepository);
+  setBotGuildConfigService(guildConfigService);
+
   // BumpReminder
   const bumpReminderConfigService = getBumpReminderFeatureConfigService(
     guildConfigRepository,
@@ -201,6 +215,7 @@ export function initializeBotCompositionRoot(
 
   return {
     guildConfigRepository,
+    guildConfigService,
     bumpReminderConfigService,
     bumpReminderRepository,
     bumpReminderManager,

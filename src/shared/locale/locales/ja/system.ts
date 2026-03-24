@@ -25,6 +25,7 @@ export const system = {
   "log_prefix.voice_state_update": "voiceStateUpdate",
   "log_prefix.channel_delete": "channelDelete",
   "log_prefix.ready": "ready",
+  "log_prefix.guild_config": "ギルド設定",
 
   // Bot起動・シャットダウン
   "bot.starting":

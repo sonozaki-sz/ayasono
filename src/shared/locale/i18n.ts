@@ -31,6 +31,7 @@ export const I18N_NAMESPACES = [
   "memberLog",
   "stickyMessage",
   "vcRecruit",
+  "guildConfig",
 ] as const;
 
 /**

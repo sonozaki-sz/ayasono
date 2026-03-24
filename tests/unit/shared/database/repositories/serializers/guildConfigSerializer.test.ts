@@ -11,6 +11,7 @@ describe("shared/database/repositories/serializers/guildConfigSerializer", () =>
     id: "id-1",
     guildId: "guild-1",
     locale: "ja",
+    errorChannelId: null,
     createdAt: new Date("2026-01-01T00:00:00.000Z"),
     updatedAt: new Date("2026-01-02T00:00:00.000Z"),
   };
@@ -19,6 +20,18 @@ describe("shared/database/repositories/serializers/guildConfigSerializer", () =>
     expect(toGuildConfig(baseRecord)).toEqual({
       guildId: "guild-1",
       locale: "ja",
+      errorChannelId: undefined,
+      createdAt: baseRecord.createdAt,
+      updatedAt: baseRecord.updatedAt,
+    });
+  });
+
+  it("toGuildConfig が errorChannelId を正しく変換すること", () => {
+    const record = { ...baseRecord, errorChannelId: "ch-1" };
+    expect(toGuildConfig(record)).toEqual({
+      guildId: "guild-1",
+      locale: "ja",
+      errorChannelId: "ch-1",
       createdAt: baseRecord.createdAt,
       updatedAt: baseRecord.updatedAt,
     });
@@ -56,6 +69,21 @@ describe("shared/database/repositories/serializers/guildConfigSerializer", () =>
     expect(data).toEqual({ guildId: "guild-4", locale: "en" });
   });
 
+  it("toGuildConfigCreateData が errorChannelId を含む場合にそのまま出力すること", () => {
+    const data = toGuildConfigCreateData(
+      {
+        guildId: "guild-5",
+        locale: "ja",
+        errorChannelId: "ch-err",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      "ja",
+    );
+
+    expect(data).toEqual({ guildId: "guild-5", locale: "ja", errorChannelId: "ch-err" });
+  });
+
   it("toGuildConfigUpdateData が locale のみを含むオブジェクトを返すこと", () => {
     expect(toGuildConfigUpdateData({ locale: "en" })).toEqual({ locale: "en" });
   });
@@ -63,5 +91,11 @@ describe("shared/database/repositories/serializers/guildConfigSerializer", () =>
   // フィールドを一切渡さない場合は空オブジェクトが返ることを確認
   it("toGuildConfigUpdateData がフィールド未指定の場合に空オブジェクトを返すこと", () => {
     expect(toGuildConfigUpdateData({})).toEqual({});
+  });
+
+  it("toGuildConfigUpdateData が errorChannelId を文字列で渡した場合にそのまま保持すること", () => {
+    expect(toGuildConfigUpdateData({ errorChannelId: "ch-1" })).toEqual({
+      errorChannelId: "ch-1",
+    });
   });
 });

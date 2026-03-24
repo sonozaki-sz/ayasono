@@ -68,6 +68,24 @@ vi.mock(
   }),
 );
 
+const clearJoinMessageMock = vi.fn();
+vi.mock(
+  "@/bot/features/member-log/commands/memberLogConfigCommand.clearJoinMessage",
+  () => ({
+    handleMemberLogConfigClearJoinMessage: (...args: unknown[]) =>
+      clearJoinMessageMock(...args),
+  }),
+);
+
+const clearLeaveMessageMock = vi.fn();
+vi.mock(
+  "@/bot/features/member-log/commands/memberLogConfigCommand.clearLeaveMessage",
+  () => ({
+    handleMemberLogConfigClearLeaveMessage: (...args: unknown[]) =>
+      clearLeaveMessageMock(...args),
+  }),
+);
+
 const resetMock = vi.fn();
 vi.mock(
   "@/bot/features/member-log/commands/memberLogConfigCommand.reset",
@@ -191,6 +209,36 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.execute", () =
       await executeMemberLogConfigCommand(interaction as never);
 
       expect(viewMock).toHaveBeenCalledWith(interaction, "guild-1");
+    });
+
+    it("clear-join-message サブコマンドが handleMemberLogConfigClearJoinMessage へ委譲されることを確認", async () => {
+      const interaction = makeInteraction({
+        subcommand: MEMBER_LOG_CONFIG_COMMAND.SUBCOMMAND.CLEAR_JOIN_MESSAGE,
+      });
+
+      await executeMemberLogConfigCommand(interaction as never);
+
+      expect(clearJoinMessageMock).toHaveBeenCalledWith(interaction, "guild-1");
+    });
+
+    it("clear-leave-message サブコマンドが handleMemberLogConfigClearLeaveMessage へ委譲されることを確認", async () => {
+      const interaction = makeInteraction({
+        subcommand: MEMBER_LOG_CONFIG_COMMAND.SUBCOMMAND.CLEAR_LEAVE_MESSAGE,
+      });
+
+      await executeMemberLogConfigCommand(interaction as never);
+
+      expect(clearLeaveMessageMock).toHaveBeenCalledWith(interaction, "guild-1");
+    });
+
+    it("reset サブコマンドが handleMemberLogConfigReset へ委譲されることを確認", async () => {
+      const interaction = makeInteraction({
+        subcommand: MEMBER_LOG_CONFIG_COMMAND.SUBCOMMAND.RESET,
+      });
+
+      await executeMemberLogConfigCommand(interaction as never);
+
+      expect(resetMock).toHaveBeenCalledWith(interaction, "guild-1");
     });
   });
 
