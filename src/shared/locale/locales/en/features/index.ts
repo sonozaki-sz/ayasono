@@ -4,6 +4,7 @@
 export { afk } from "./afk";
 export { bumpReminder } from "./bumpReminder";
 export { guildConfig } from "./guildConfig";
+export { help } from "./help";
 export { memberLog } from "./memberLog";
 export { messageDelete } from "./messageDelete";
 export { ping } from "./ping";

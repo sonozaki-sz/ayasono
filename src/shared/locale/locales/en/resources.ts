@@ -6,6 +6,7 @@ import {
   afk,
   bumpReminder,
   guildConfig,
+  help,
   memberLog,
   messageDelete,
   ping,
@@ -20,6 +21,7 @@ export const en: {
   common: typeof common;
   system: typeof system;
   ping: typeof ping;
+  help: typeof help;
   afk: typeof afk;
   bumpReminder: typeof bumpReminder;
   vac: typeof vac;
@@ -33,6 +35,7 @@ export const en: {
   common,
   system,
   ping,
+  help,
   afk,
   bumpReminder,
   vac,

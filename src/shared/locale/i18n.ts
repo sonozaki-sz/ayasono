@@ -23,6 +23,7 @@ export const I18N_NAMESPACES = [
   "common",
   "system",
   "ping",
+  "help",
   "afk",
   "bumpReminder",
   "vac",
