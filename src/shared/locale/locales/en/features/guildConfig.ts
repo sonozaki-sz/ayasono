@@ -80,6 +80,13 @@ export const guildConfig = {
   "ui.button.import_confirm": "Import",
   "ui.button.import_cancel": "Cancel",
 
+  // ── Error channel notifications ─────────────────
+  "error-notification.title": "Error Notification",
+  "error-notification.warn_title": "Warning Notification",
+  "error-notification.feature": "Feature",
+  "error-notification.action": "Action",
+  "error-notification.message": "Details",
+
   // ── Logs ──────────────────────────────────────
   "log.locale_set": "Language set GuildId: {{guildId}} Locale: {{locale}}",
   "log.error_channel_set":

@@ -80,6 +80,13 @@ export const guildConfig = {
   "ui.button.import_confirm": "インポートする",
   "ui.button.import_cancel": "キャンセル",
 
+  // ── エラーチャンネル通知 ─────────────────────────
+  "error-notification.title": "エラー通知",
+  "error-notification.warn_title": "警告通知",
+  "error-notification.feature": "機能",
+  "error-notification.action": "処理",
+  "error-notification.message": "詳細",
+
   // ── ログ ──────────────────────────────────────
   "log.locale_set": "言語設定 GuildId: {{guildId}} Locale: {{locale}}",
   "log.error_channel_set":

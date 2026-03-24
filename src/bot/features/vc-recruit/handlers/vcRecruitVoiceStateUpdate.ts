@@ -5,6 +5,7 @@ import { ChannelType, type VoiceState } from "discord.js";
 import { logPrefixed } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import { getBotVcRecruitRepository } from "../../../services/botCompositionRoot";
+import { notifyErrorChannel } from "../../../shared/errorChannelNotifier";
 
 const VC_RECRUIT_LOG_KEYS = {
   EMPTY_VC_DELETED: "vcRecruit:log.empty_vc_deleted",
@@ -64,5 +65,9 @@ export async function handleVcRecruitVoiceStateUpdate(
       ),
       error,
     );
+    await notifyErrorChannel(channel.guild, error, {
+      feature: "VC募集",
+      action: "VC状態変更の処理失敗",
+    });
   }
 }

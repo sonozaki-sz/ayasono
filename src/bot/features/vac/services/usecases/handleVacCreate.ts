@@ -10,6 +10,10 @@ import {
 import type { VacConfigService } from "../../../../../shared/features/vac/vacConfigService";
 import { logPrefixed } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
+import {
+  notifyErrorChannel,
+  notifyWarnChannel,
+} from "../../../../shared/errorChannelNotifier";
 import { sendVcControlPanel } from "../../../vc-panel/vcControlPanel";
 
 const VAC_EVENT = {
@@ -72,6 +76,14 @@ export async function handleVacCreateUseCase(
         categoryId: parentCategory.id,
       }),
     );
+    await notifyWarnChannel(
+      member.guild,
+      `Category ${parentCategory.id} channel limit reached`,
+      {
+        feature: "VAC",
+        action: "カテゴリのチャンネル上限到達でVC作成不可",
+      },
+    );
     return;
   }
 
@@ -96,11 +108,15 @@ export async function handleVacCreateUseCase(
     return;
   }
 
-  await sendVcControlPanel(voiceChannel).catch((error) => {
+  await sendVcControlPanel(voiceChannel).catch(async (error) => {
     logger.error(
       logPrefixed("system:log_prefix.vac", "vac:log.panel_send_failed"),
       error,
     );
+    await notifyErrorChannel(member.guild, error, {
+      feature: "VAC",
+      action: "コントロールパネル送信失敗",
+    });
   });
 
   try {

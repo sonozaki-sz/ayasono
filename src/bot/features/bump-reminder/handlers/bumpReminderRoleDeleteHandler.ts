@@ -5,6 +5,7 @@ import type { Role } from "discord.js";
 import { logPrefixed } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import { getBotBumpReminderConfigService } from "../../../services/botCompositionRoot";
+import { notifyErrorChannel } from "../../../shared/errorChannelNotifier";
 
 /**
  * ロール削除時に、該当ロールが mentionRoleId に設定されていれば自動クリアする
@@ -41,5 +42,9 @@ export async function handleBumpReminderRoleDelete(role: Role): Promise<void> {
       ),
       err,
     );
+    await notifyErrorChannel(role.guild, err, {
+      feature: "Bumpリマインダー",
+      action: "ロール削除時のメンション整理失敗",
+    });
   }
 }

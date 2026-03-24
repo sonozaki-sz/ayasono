@@ -2,7 +2,7 @@
 
 > Guild Config - ギルド全体の共通設定の管理・バックアップ機能
 
-最終更新: 2026年3月21日
+最終更新: 2026年3月25日
 
 ---
 
@@ -79,12 +79,82 @@
 
 **ビジネスルール:**
 
-- エラー通知チャンネルは、イベント駆動の機能（Bumpリマインダー、メッセージ固定、メンバーログ）でインタラクション起点でないエラーが発生した場合のフォールバック送信先として使用される
+- エラー通知チャンネルは、イベント駆動の機能（Bumpリマインダー、メッセージ固定、メンバーログ、VC募集、VAC）でインタラクション起点でないエラーが発生した場合のフォールバック送信先として使用される
 - エラー通知チャンネルが未設定の場合、フォールバック先がないエラーはログ出力のみで通知されない
+- 通知対象は `logger.error` および `logger.warn` レベルのうち、管理者が知るべきもの。`debug` レベルや意図的な `.catch(() => null)` は対象外
+
+**通知対象箇所（`logger.error` レベル）:**
+
+| # | 機能 | ファイル | 内容 |
+| --- | --- | --- | --- |
+| 1 | メンバーログ | `guildMemberAddHandler.ts:156` | 入室通知の送信失敗 |
+| 2 | メンバーログ | `guildMemberRemoveHandler.ts:175` | 退室通知の送信失敗 |
+| 3 | メッセージ固定 | `stickyMessageCreateHandler.ts:27` | 再送処理の失敗 |
+| 4 | メッセージ固定 | `stickyMessageChannelDeleteHandler.ts:41` | チャンネル削除時のクリーンアップ失敗 |
+| 5 | メッセージ固定 | `stickyMessageResendService.ts:50` | スケジュールされた再送のエラー |
+| 6 | メッセージ固定 | `stickyMessageResendService.ts:85` | メッセージ送信失敗 |
+| 7 | Bumpリマインダー | `bumpReminderHandler.ts:102` | Bump検出処理の失敗 |
+| 8 | Bumpリマインダー | `sendBumpReminder.ts:134` | リマインダー送信失敗 |
+| 9 | Bumpリマインダー | `sendBumpPanel.ts:75` | パネル送信失敗 |
+| 10 | Bumpリマインダー | `bumpReminderMemberRemoveHandler.ts:39` | メンバー退出時のメンション整理失敗 |
+| 11 | Bumpリマインダー | `bumpReminderRoleDeleteHandler.ts:35` | ロール削除時のメンション整理失敗 |
+| 12 | Bumpリマインダー | `bumpReminderStartup.ts:52` | 起動時のスケジューラ復元失敗（※対象外：全ギルド横断処理のため特定ギルドへの通知不可。ログ出力のみ） |
+| 13 | VC募集 | `vcRecruitVoiceStateUpdate.ts:59` | VC状態変更の処理失敗 |
+| 14 | VC募集 | `vcRecruitChannelDeleteHandler.ts:62` | 投稿チャンネル削除失敗 |
+| 15 | VC募集 | `vcRecruitChannelDeleteHandler.ts:98` | パネルチャンネル削除失敗 |
+| 16 | VAC | `handleVacCreate.ts:99` | コントロールパネル送信失敗 |
+
+**通知対象箇所（`logger.warn` レベル）:**
+
+| # | 機能 | ファイル | 内容 |
+| --- | --- | --- | --- |
+| 17 | メンバーログ | `guildMemberAddHandler.ts:39` | 通知先チャンネル消失→設定自動リセット |
+| 18 | メンバーログ | `guildMemberRemoveHandler.ts:45` | 通知先チャンネル消失→設定自動リセット |
+| 19 | Bumpリマインダー | `sendBumpReminder.ts:39` | リマインダー送信先チャンネル未発見 |
+| 20 | VAC | `handleVacCreate.ts:69` | カテゴリのチャンネル上限到達でVC作成不可 |
+
+**通知対象外（debug/軽微/意図的な無視）:**
+
+| # | 機能 | 内容 | 理由 |
+| --- | --- | --- | --- |
+| 21-22 | Bumpリマインダー | 旧パネル削除失敗 | debug レベル、後続処理に影響なし |
+| 23 | メッセージ固定 | 旧メッセージ削除失敗 | debug レベル、既に削除済みの場合 |
+| 24-25 | VC募集 | teardown編集失敗 | タイムアウト後の `.catch(() => {})` |
+| 26-28 | VAC | チャンネル移動/削除/fetch | 意図的な `.catch(() => null)` |
+| 29 | 共通 | `executeWithLoggedError` | VAC内部で使用 |
 
 ### UI
 
 **レスポンス（成功）:** `createSuccessEmbed` でチャンネル設定完了を通知
+
+### エラーチャンネル通知の実装
+
+**ユーティリティ:** `src/bot/shared/errorChannelNotifier.ts`
+
+| 関数 | 用途 | Embed |
+| --- | --- | --- |
+| `notifyErrorChannel(guild, error, context)` | error レベルの通知 | `createErrorEmbed`（赤） |
+| `notifyWarnChannel(guild, message, context)` | warn レベルの通知 | `createWarningEmbed`（黄） |
+
+**共通動作:**
+
+1. `GuildConfigService.getConfig(guildId)` で `errorChannelId` を取得
+2. 未設定 → return（何もしない）
+3. `guild.channels.fetch(errorChannelId)` でチャンネル取得（テキストチャンネルのみ）
+4. Embed 生成（機能名・処理内容・エラーメッセージ/警告メッセージ・タイムスタンプ）
+5. チャンネルに送信
+6. 送信失敗時は `logger.debug` のみ（再帰通知しない）
+
+**Embed フォーマット:**
+
+| 項目 | 内容 |
+| --- | --- |
+| タイトル | エラー通知 / 警告通知（i18n） |
+| フィールド | 機能（inline）/ 処理（inline）/ 詳細 |
+| タイムスタンプ | `setTimestamp()` による自動付与 |
+| エラーメッセージ上限 | 1024文字（Discord Embed フィールド制限） |
+
+**i18n キー:** `guildConfig:error-notification.*`（`title`, `warn_title`, `feature`, `action`, `message`）
 
 ---
 
@@ -469,6 +539,16 @@
 | `ui.button.reset_all_cancel` | 全リセットキャンセルボタン | キャンセル | Cancel |
 | `ui.button.import_confirm` | インポート確認ボタン | インポートする | Import |
 | `ui.button.import_cancel` | インポートキャンセルボタン | キャンセル | Cancel |
+
+### エラーチャンネル通知
+
+| キー | 用途 | ja | en |
+| --- | --- | --- | --- |
+| `error-notification.title` | エラー通知タイトル | エラー通知 | Error Notification |
+| `error-notification.warn_title` | 警告通知タイトル | 警告通知 | Warning Notification |
+| `error-notification.feature` | 機能フィールド名 | 機能 | Feature |
+| `error-notification.action` | 処理フィールド名 | 処理 | Action |
+| `error-notification.message` | 詳細フィールド名 | 詳細 | Details |
 
 ### ログ
 

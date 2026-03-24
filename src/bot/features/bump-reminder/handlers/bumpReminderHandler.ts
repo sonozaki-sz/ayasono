@@ -8,6 +8,7 @@ import {
   getBotBumpReminderConfigService,
   getBotBumpReminderRepository,
 } from "../../../services/botCompositionRoot";
+import { notifyErrorChannel } from "../../../shared/errorChannelNotifier";
 import type { BumpServiceName } from "../constants/bumpReminderConstants";
 import { getReminderDelayMinutes } from "../constants/bumpReminderConstants";
 import { scheduleBumpReminder } from "./usecases/scheduleBumpReminder";
@@ -110,6 +111,13 @@ export async function handleBumpDetected(
       ),
       error,
     );
+    const guild = client.guilds?.cache?.get(guildId);
+    if (guild) {
+      await notifyErrorChannel(guild, error, {
+        feature: "Bumpリマインダー",
+        action: "Bump検出処理の失敗",
+      });
+    }
   }
 }
 

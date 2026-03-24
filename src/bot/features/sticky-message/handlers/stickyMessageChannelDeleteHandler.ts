@@ -8,6 +8,7 @@ import {
   getBotStickyMessageConfigService,
   getBotStickyMessageResendService,
 } from "../../../services/botCompositionRoot";
+import { notifyErrorChannel } from "../../../shared/errorChannelNotifier";
 
 /**
  * channelDelete 時にスティッキーメッセージの DB レコードとタイマーを破棄する
@@ -49,5 +50,11 @@ export async function handleStickyMessageChannelDelete(
       ),
       { channelId, err },
     );
+    if ("guild" in channel) {
+      await notifyErrorChannel(channel.guild, err, {
+        feature: "メッセージ固定",
+        action: "チャンネル削除時のクリーンアップ失敗",
+      });
+    }
   }
 }

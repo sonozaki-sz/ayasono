@@ -8,6 +8,10 @@ import { getGuildTranslator } from "../../../../../shared/locale/helpers";
 import type { AllNamespaces } from "../../../../../shared/locale/i18n";
 import { logPrefixed } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
+import {
+  notifyErrorChannel,
+  notifyWarnChannel,
+} from "../../../../shared/errorChannelNotifier";
 import type { BumpServiceName } from "../../constants/bumpReminderConstants";
 
 /**
@@ -46,6 +50,13 @@ export async function sendBumpReminder(
           },
         ),
       );
+      const guild = client.guilds?.cache?.get(guildId);
+      if (guild) {
+        await notifyWarnChannel(guild, `Channel ${channelId} not found`, {
+          feature: "Bumpリマインダー",
+          action: "リマインダー送信先チャンネル未発見",
+        });
+      }
       return;
     }
 
@@ -143,6 +154,13 @@ export async function sendBumpReminder(
       ),
       error,
     );
+    const guild = client.guilds?.cache?.get(guildId);
+    if (guild) {
+      await notifyErrorChannel(guild, error, {
+        feature: "Bumpリマインダー",
+        action: "リマインダー送信失敗",
+      });
+    }
   }
 }
 

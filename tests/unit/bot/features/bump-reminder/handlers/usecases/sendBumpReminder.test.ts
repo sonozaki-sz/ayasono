@@ -49,6 +49,10 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
     vi.doMock("@/shared/locale/helpers", () => ({
       getGuildTranslator: getGuildTranslatorMock,
     }));
+    vi.doMock("@/bot/shared/errorChannelNotifier", () => ({
+      notifyErrorChannel: vi.fn(),
+      notifyWarnChannel: vi.fn(),
+    }));
   });
 
   function makeChannel({
@@ -69,6 +73,9 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
     return {
       channels: {
         fetch: vi.fn().mockResolvedValue(channel),
+      },
+      guilds: {
+        cache: new Map([["guild-1", { id: "guild-1" }]]),
       },
     };
   }
@@ -234,7 +241,10 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
 
   it("チャンネルフェッチが例外を投げた場合はエラーログを記録する", async () => {
     const fetchMock = vi.fn().mockRejectedValue(new Error("fetch failed"));
-    const client = { channels: { fetch: fetchMock } };
+    const client = {
+      channels: { fetch: fetchMock },
+      guilds: { cache: new Map([["guild-1", { id: "guild-1" }]]) },
+    };
     const service = makeConfigService({ enabled: true });
 
     const { sendBumpReminder } = await import(

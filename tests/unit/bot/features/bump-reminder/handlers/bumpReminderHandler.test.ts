@@ -32,6 +32,11 @@ const getBotBumpReminderRepositoryMock = vi.fn(() => ({
   findPendingByGuildAndService: vi.fn().mockResolvedValue(null),
 }));
 
+vi.mock("@/bot/shared/errorChannelNotifier", () => ({
+  notifyErrorChannel: vi.fn(),
+  notifyWarnChannel: vi.fn(),
+}));
+
 vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotBumpReminderConfigService: () => getBotBumpReminderConfigServiceMock(),
   getBotBumpReminderRepository: () => getBotBumpReminderRepositoryMock(),
@@ -222,6 +227,9 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
           fetch: vi.fn().mockResolvedValue({
             isTextBased: () => false,
           }),
+        },
+        guilds: {
+          cache: new Map([["guild-1", { id: "guild-1" }]]),
         },
       };
       const repository = {
@@ -922,6 +930,9 @@ describe("bot/features/bump-reminder/bumpReminderHandler", () => {
       const client = {
         channels: {
           fetch: vi.fn().mockResolvedValue(channel),
+        },
+        guilds: {
+          cache: new Map([["guild-1", { id: "guild-1" }]]),
         },
       };
       getGuildTranslatorMock.mockResolvedValue((key: string) => key);

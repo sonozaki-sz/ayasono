@@ -22,6 +22,11 @@ vi.mock("@/shared/utils/logger", () => ({
   },
 }));
 
+vi.mock("@/bot/shared/errorChannelNotifier", () => ({
+  notifyErrorChannel: vi.fn(),
+  notifyWarnChannel: vi.fn(),
+}));
+
 // i18n のモック
 vi.mock("@/shared/locale/localeManager", () => ({
   logPrefixed: (

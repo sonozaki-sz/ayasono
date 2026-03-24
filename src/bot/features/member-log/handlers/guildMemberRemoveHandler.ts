@@ -11,6 +11,10 @@ import { getGuildTranslator } from "../../../../shared/locale/helpers";
 import { logPrefixed } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import { getBotMemberLogConfigService } from "../../../services/botCompositionRoot";
+import {
+  notifyErrorChannel,
+  notifyWarnChannel,
+} from "../../../shared/errorChannelNotifier";
 import { calcDuration } from "./accountAge";
 import { formatAccountAge, formatCustomMessage } from "./memberLogUtils";
 
@@ -51,6 +55,14 @@ export async function handleGuildMemberRemove(
             channelId: config.channelId,
           },
         ),
+      );
+      await notifyWarnChannel(
+        member.guild,
+        `Channel ${config.channelId} not found`,
+        {
+          feature: "メンバーログ",
+          action: "通知先チャンネル消失→設定自動リセット",
+        },
       );
       const t = await getGuildTranslator(guildId);
       await member.guild.systemChannel
@@ -182,5 +194,9 @@ export async function handleGuildMemberRemove(
       ),
       err,
     );
+    await notifyErrorChannel(member.guild, err, {
+      feature: "メンバーログ",
+      action: "退室通知の送信失敗",
+    });
   }
 }

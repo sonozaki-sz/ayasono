@@ -47,6 +47,11 @@ vi.mock("@/shared/utils/logger", () => ({
   },
 }));
 
+vi.mock("@/bot/shared/errorChannelNotifier", () => ({
+  notifyErrorChannel: vi.fn(),
+  notifyWarnChannel: vi.fn(),
+}));
+
 // sendBumpReminder ユースケースを検証: テキストチャンネル不在・無効化・正常送信の各シナリオをカバーする
 describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => {
   // モックの呼び出し記録をリセットし、翻訳関数がキーをそのまま返すデフォルト動作をセット
@@ -59,6 +64,9 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
     const client = {
       channels: {
         fetch: vi.fn().mockResolvedValue({ isTextBased: () => false }),
+      },
+      guilds: {
+        cache: new Map([["guild-1", { id: "guild-1" }]]),
       },
     };
     const configService = { getBumpReminderConfigOrDefault: vi.fn() };

@@ -12,6 +12,10 @@ vi.mock(
   }),
 );
 vi.mock("@/shared/utils/logger", () => ({ logger: loggerMock }));
+vi.mock("@/bot/shared/errorChannelNotifier", () => ({
+  notifyErrorChannel: vi.fn(),
+  notifyWarnChannel: vi.fn(),
+}));
 vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: vi.fn((key: string) => key),
   tInteraction: vi.fn((_locale: string, key: string) => key),

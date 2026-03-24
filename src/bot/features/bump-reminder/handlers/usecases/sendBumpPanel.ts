@@ -13,6 +13,7 @@ import {
 } from "../../../../../shared/locale/helpers";
 import { logPrefixed } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
+import { notifyErrorChannel } from "../../../../shared/errorChannelNotifier";
 import { createInfoEmbed } from "../../../../utils/messageResponse";
 import {
   BUMP_CONSTANTS,
@@ -82,6 +83,13 @@ export async function sendBumpPanel(
       ),
       error,
     );
+    const guild = client.guilds?.cache?.get(guildId);
+    if (guild) {
+      await notifyErrorChannel(guild, error, {
+        feature: "Bumpリマインダー",
+        action: "パネル送信失敗",
+      });
+    }
     return undefined;
   }
 }
