@@ -41,7 +41,7 @@ export const guildConfig = {
     "一部のチャンネルまたはロールが見つかりません。設定を確認してください。",
 
   // ── embed: view ───────────────────────────────
-  "embed.title.view": "🛡️ ギルド設定",
+  "embed.title.view": "ギルド設定",
   "embed.field.name.locale": "言語",
   "embed.field.name.error_channel": "エラー通知チャンネル",
   "embed.field.value.not_configured": "未設定",

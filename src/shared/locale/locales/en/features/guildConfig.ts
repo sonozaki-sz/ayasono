@@ -41,7 +41,7 @@ export const guildConfig = {
     "Some channels or roles were not found. Please review the settings.",
 
   // ── embed: view ───────────────────────────────
-  "embed.title.view": "🛡️ Guild Settings",
+  "embed.title.view": "Guild Settings",
   "embed.field.name.locale": "Language",
   "embed.field.name.error_channel": "Error Notification Channel",
   "embed.field.value.not_configured": "Not configured",
