@@ -35,6 +35,7 @@ export type Env = {
   CORS_ORIGIN?: string | undefined;
   LOG_LEVEL: "error" | "warn" | "info" | "http" | "verbose" | "debug" | "silly";
   TEST_MODE: boolean;
+  USER_MANUAL_URL?: string | undefined;
 };
 
 // 環境変数スキーマ定義（起動時バリデーション用）
@@ -74,6 +75,9 @@ export const envSchema: z.ZodType<Env> = z.object({
     .string()
     .optional()
     .transform((val) => val === "true"),
+
+  // ユーザーマニュアルURL（/help コマンドで表示、未設定時は省略）
+  USER_MANUAL_URL: z.string().url().optional(),
 });
 
 // 実行環境変数を検証して利用可能な設定へ変換する
