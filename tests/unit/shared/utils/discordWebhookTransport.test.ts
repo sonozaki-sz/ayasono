@@ -1,8 +1,8 @@
 // tests/unit/shared/utils/discordWebhookTransport.test.ts
 // DiscordWebhookTransport の Webhook 送信・エラー耐性・description 組み立てロジックを検証する
 
-import { DiscordWebhookTransport } from "@/shared/utils/discordWebhookTransport";
 import type { Mock } from "vitest";
+import { DiscordWebhookTransport } from "@/shared/utils/discordWebhookTransport";
 import { name as PROJECT_NAME } from "../../../../package.json";
 
 // i18next をモックして t() が期待値を返すようにする

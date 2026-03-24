@@ -4,16 +4,16 @@
 import {
   ActionRowBuilder,
   ButtonBuilder,
+  type ButtonInteraction,
   ButtonStyle,
   ChannelType,
   EmbedBuilder,
+  type Message,
   MessageFlags,
   ModalBuilder,
   PermissionFlagsBits,
   TextInputBuilder,
   TextInputStyle,
-  type ButtonInteraction,
-  type Message,
 } from "discord.js";
 import {
   tGuild,
@@ -647,4 +647,4 @@ async function handleCancel(interaction: ButtonInteraction): Promise<void> {
     .catch(() => null);
 }
 
-export { updateToEndedState, parsePostButtonIds };
+export { parsePostButtonIds, updateToEndedState };

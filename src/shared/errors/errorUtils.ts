@@ -1,7 +1,7 @@
 // src/shared/errors/errorUtils.ts
 // Discord非依存のエラー共通ユーティリティ
 
-import { NODE_ENV, env } from "../config/env";
+import { env, NODE_ENV } from "../config/env";
 import { tDefault } from "../locale/localeManager";
 import { logger } from "../utils/logger";
 import { BaseError } from "./customErrors";

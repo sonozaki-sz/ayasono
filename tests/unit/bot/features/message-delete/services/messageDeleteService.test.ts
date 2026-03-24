@@ -5,8 +5,24 @@ import { Collection } from "discord.js";
 import type { Mock } from "vitest";
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: vi.fn((key: string, params?: Record<string, unknown>) =>
     params ? `${key}:${JSON.stringify(params)}` : key,
   ),
@@ -529,7 +545,9 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
         messages: { delete: vi.fn().mockResolvedValue(undefined) as Mock },
         bulkDelete: vi
           .fn()
-          .mockResolvedValue(makeCollection([{ id: "msg-1" }, { id: "msg-2" }])) as Mock,
+          .mockResolvedValue(
+            makeCollection([{ id: "msg-1" }, { id: "msg-2" }]),
+          ) as Mock,
       };
 
       const makeMsg = (id: string) => ({
@@ -544,9 +562,10 @@ describe("bot/features/message-delete/services/messageDeleteService", () => {
         _channel: channel,
       });
 
-      const result = await deleteScannedMessages(
-        [makeMsg("msg-1") as never, makeMsg("msg-2") as never],
-      );
+      const result = await deleteScannedMessages([
+        makeMsg("msg-1") as never,
+        makeMsg("msg-2") as never,
+      ]);
 
       expect(result.totalDeleted).toBe(2);
       expect(result.channelBreakdown["ch-1"].count).toBe(2);

@@ -1,8 +1,9 @@
 // tests/integration/bot/events/interactionCreate.command.integration.test.ts
+
+import type { ChatInputCommandInteraction } from "discord.js";
 import type { Mock } from "vitest";
 import { pingCommand } from "@/bot/commands/ping";
 import { interactionCreateEvent } from "@/bot/events/interactionCreate";
-import type { ChatInputCommandInteraction } from "discord.js";
 
 // コマンド・イベント結合検証のため、翻訳とEmbed生成のみ固定化する
 vi.mock("@/shared/locale/commandLocalizations", () => ({
@@ -12,15 +13,27 @@ vi.mock("@/shared/locale/commandLocalizations", () => ({
   }),
 }));
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: vi.fn((key: string) => key),
   tInteraction: vi.fn(
-    (
-      _locale: string,
-      key: string,
-      params?: Record<string, unknown>,
-    ) => {
+    (_locale: string, key: string, params?: Record<string, unknown>) => {
       if (key === "ping:user-response.measuring") {
         return "🏓 計測中...";
       }
@@ -113,7 +126,9 @@ describe("integration: interactionCreate + pingCommand", () => {
       "user-1",
       5,
     );
-    expect(interaction.reply).toHaveBeenCalledWith({ embeds: [{ description: "🏓 計測中..." }] });
+    expect(interaction.reply).toHaveBeenCalledWith({
+      embeds: [{ description: "🏓 計測中..." }],
+    });
     expect(interaction.fetchReply).toHaveBeenCalledTimes(1);
     expect(interaction.editReply).toHaveBeenCalledWith({
       embeds: [

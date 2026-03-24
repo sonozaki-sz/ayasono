@@ -5,8 +5,8 @@ import type { Client } from "discord.js";
 import type { BumpReminderConfigService } from "../../../../../shared/features/bump-reminder/bumpReminderConfigService";
 import { getBotBumpReminderManager } from "../../../../services/botCompositionRoot";
 import {
-  getReminderDelayMinutes,
   type BumpServiceName,
+  getReminderDelayMinutes,
 } from "../../constants/bumpReminderConstants";
 import { sendBumpReminder } from "./sendBumpReminder";
 

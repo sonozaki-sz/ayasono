@@ -1,7 +1,7 @@
 // src/bot/features/vc-recruit/commands/helpers/vcRecruitTargetResolver.ts
 // vc-recruit-config の入力解決ヘルパー
 
-import { ChannelType, type CategoryChannel, type Guild } from "discord.js";
+import { type CategoryChannel, ChannelType, type Guild } from "discord.js";
 import { VC_RECRUIT_CONFIG_COMMAND } from "../vcRecruitConfigCommand.constants";
 
 /**

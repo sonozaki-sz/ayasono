@@ -7,13 +7,13 @@ import {
   type IAfkConfigRepository,
   type IGuildConfigRepository,
 } from "../../database/types";
-import { createServiceGetter } from "../../utils/serviceFactory";
 import { logPrefixed, tDefault } from "../../locale/localeManager";
 import { executeWithDatabaseError } from "../../utils/errorHandling";
 import { logger } from "../../utils/logger";
+import { createServiceGetter } from "../../utils/serviceFactory";
 import {
-  DEFAULT_AFK_CONFIG,
   createDefaultAfkConfig,
+  DEFAULT_AFK_CONFIG,
   normalizeAfkConfig,
 } from "./afkConfigDefaults";
 

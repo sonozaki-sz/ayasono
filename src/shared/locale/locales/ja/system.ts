@@ -28,194 +28,127 @@ export const system = {
   "log_prefix.guild_config": "ギルド設定",
 
   // Bot起動・シャットダウン
-  "bot.starting":
-    "Discord Botを起動しています...",
-  "bot.commands.registering":
-    "{{count}}個のコマンドを登録しています...",
-  "bot.commands.registered":
-    "コマンド登録完了",
-  "bot.commands.command_registered":
-    "  ✓ /{{name}}",
-  "bot.events.registering":
-    "{{count}}個のイベントを登録しています...",
-  "bot.events.registered":
-    "イベント登録完了",
-  "bot.startup.error":
-    "起動中にエラーが発生しました:",
-  "bot.startup.failed":
-    "起動失敗:",
-  "bot.client.initialized":
-    "Discord Botクライアントを初期化しました。",
-  "bot.client.shutting_down":
-    "Botクライアントをシャットダウンしています...",
+  "bot.starting": "Discord Botを起動しています...",
+  "bot.commands.registering": "{{count}}個のコマンドを登録しています...",
+  "bot.commands.registered": "コマンド登録完了",
+  "bot.commands.command_registered": "  ✓ /{{name}}",
+  "bot.events.registering": "{{count}}個のイベントを登録しています...",
+  "bot.events.registered": "イベント登録完了",
+  "bot.startup.error": "起動中にエラーが発生しました:",
+  "bot.startup.failed": "起動失敗:",
+  "bot.client.initialized": "Discord Botクライアントを初期化しました。",
+  "bot.client.shutting_down": "Botクライアントをシャットダウンしています...",
   "bot.client.shutdown_complete":
     "Botクライアントのシャットダウンが完了しました。",
-  "bot.presence_activity":
-    "せいちょーちう。 | {{count}} servers | by sonozaki",
+  "bot.presence_activity": "せいちょーちう。 | {{count}} servers | by sonozaki",
 
   // エラーハンドリング
-  "error.reply_failed":
-    "エラーメッセージの送信に失敗しました。",
-  "error.unhandled_rejection":
-    "未処理のPromise拒否:",
-  "error.uncaught_exception":
-    "未処理の例外:",
-  "error.unhandled_rejection_log":
-    "未処理のPromise拒否:",
-  "error.uncaught_exception_log":
-    "未捕捉の例外:",
-  "error.node_warning":
-    "Node警告:",
+  "error.reply_failed": "エラーメッセージの送信に失敗しました。",
+  "error.unhandled_rejection": "未処理のPromise拒否:",
+  "error.uncaught_exception": "未処理の例外:",
+  "error.unhandled_rejection_log": "未処理のPromise拒否:",
+  "error.uncaught_exception_log": "未捕捉の例外:",
+  "error.node_warning": "Node警告:",
   "error.global_handlers_already_registered":
     "グローバルエラーハンドラーは既に登録済みです。スキップします。",
   "error.shutdown_handlers_already_registered":
     "グレースフルシャットダウンハンドラーは既に登録済みです。スキップします。",
 
   // ロケール
-  "locale.manager_initialized":
-    "LocaleManagerをi18nextで初期化しました。",
-  "locale.translation_failed":
-    "翻訳に失敗しました Key: {{key}}",
+  "locale.manager_initialized": "LocaleManagerをi18nextで初期化しました。",
+  "locale.translation_failed": "翻訳に失敗しました Key: {{key}}",
 
   // クールダウンマネージャー
-  "cooldown.cleared_all":
-    "すべてのクールダウンをクリアしました。",
-  "cooldown.destroyed":
-    "CooldownManager を破棄しました。",
-  "cooldown.reset":
-    "リセット CommandName: {{commandName}} UserId: {{userId}}",
+  "cooldown.cleared_all": "すべてのクールダウンをクリアしました。",
+  "cooldown.destroyed": "CooldownManager を破棄しました。",
+  "cooldown.reset": "リセット CommandName: {{commandName}} UserId: {{userId}}",
   "cooldown.cleared_for_command":
     "コマンドの全クールダウンをクリア CommandName: {{commandName}}",
-  "cooldown.cleanup":
-    "{{count}}個の期限切れクールダウンを削除しました。",
+  "cooldown.cleanup": "{{count}}個の期限切れクールダウンを削除しました。",
 
   // スケジューラー（汎用ジョブ）
-  "scheduler.stopping":
-    "すべてのスケジュール済みジョブを停止中...",
-  "scheduler.job_exists":
-    "Job既存のため古いJobを削除 JobId: {{jobId}}",
-  "scheduler.executing_job":
-    "Job実行中 JobId: {{jobId}}",
-  "scheduler.job_completed":
-    "Job完了 JobId: {{jobId}}",
-  "scheduler.job_error":
-    "Jobエラー JobId: {{jobId}}",
-  "scheduler.schedule_failed":
-    "Jobスケジュール失敗 JobId: {{jobId}}",
-  "scheduler.job_removed":
-    "Job削除 JobId: {{jobId}}",
-  "scheduler.job_stopped":
-    "Job停止 JobId: {{jobId}}",
-  "scheduler.job_scheduled":
-    "Jobスケジュール完了 JobId: {{jobId}}",
+  "scheduler.stopping": "すべてのスケジュール済みジョブを停止中...",
+  "scheduler.job_exists": "Job既存のため古いJobを削除 JobId: {{jobId}}",
+  "scheduler.executing_job": "Job実行中 JobId: {{jobId}}",
+  "scheduler.job_completed": "Job完了 JobId: {{jobId}}",
+  "scheduler.job_error": "Jobエラー JobId: {{jobId}}",
+  "scheduler.schedule_failed": "Jobスケジュール失敗 JobId: {{jobId}}",
+  "scheduler.job_removed": "Job削除 JobId: {{jobId}}",
+  "scheduler.job_stopped": "Job停止 JobId: {{jobId}}",
+  "scheduler.job_scheduled": "Jobスケジュール完了 JobId: {{jobId}}",
 
   // シャットダウン
   "shutdown.signal_received":
     "{{signal}} を受信、適切にシャットダウンしています...",
   "shutdown.already_in_progress":
     "{{signal}} を受信しましたが、シャットダウンは既に進行中です。",
-  "shutdown.cleanup_complete":
-    "クリーンアップ完了",
-  "shutdown.cleanup_failed":
-    "クリーンアップ中のエラー:",
-  "shutdown.gracefully":
-    "適切にシャットダウンしています...",
-  "shutdown.sigterm":
-    "SIGTERMを受信、シャットダウンしています...",
+  "shutdown.cleanup_complete": "クリーンアップ完了",
+  "shutdown.cleanup_failed": "クリーンアップ中のエラー:",
+  "shutdown.gracefully": "適切にシャットダウンしています...",
+  "shutdown.sigterm": "SIGTERMを受信、シャットダウンしています...",
 
   // データベース操作ログ（GuildConfig 汎用のみ）
-  "database.prisma_not_available":
-    "Prismaクライアントが利用できません。",
-  "database.get_config_log":
-    "設定取得に失敗 GuildId: {{guildId}}",
-  "database.save_config_log":
-    "設定保存に失敗 GuildId: {{guildId}}",
-  "database.saved_config":
-    "設定を保存 GuildId: {{guildId}}",
-  "database.update_config_log":
-    "設定更新に失敗 GuildId: {{guildId}}",
-  "database.updated_config":
-    "設定を更新 GuildId: {{guildId}}",
-  "database.delete_config_log":
-    "設定削除に失敗 GuildId: {{guildId}}",
-  "database.deleted_config":
-    "設定を削除 GuildId: {{guildId}}",
-  "database.check_existence_log":
-    "存在確認に失敗 GuildId: {{guildId}}",
+  "database.prisma_not_available": "Prismaクライアントが利用できません。",
+  "database.get_config_log": "設定取得に失敗 GuildId: {{guildId}}",
+  "database.save_config_log": "設定保存に失敗 GuildId: {{guildId}}",
+  "database.saved_config": "設定を保存 GuildId: {{guildId}}",
+  "database.update_config_log": "設定更新に失敗 GuildId: {{guildId}}",
+  "database.updated_config": "設定を更新 GuildId: {{guildId}}",
+  "database.delete_config_log": "設定削除に失敗 GuildId: {{guildId}}",
+  "database.deleted_config": "設定を削除 GuildId: {{guildId}}",
+  "database.check_existence_log": "存在確認に失敗 GuildId: {{guildId}}",
 
   // Bot起動イベントログ
-  "ready.bot_ready":
-    "✅ Botの準備が完了しました！ {{tag}} としてログイン",
-  "ready.servers":
-    "📊 サーバー数: {{count}}",
-  "ready.users":
-    "👥 ユーザー数: {{count}}",
-  "ready.commands":
-    "💬 コマンド数: {{count}}",
-  "ready.event_registered":
-    "  ✓ {{name}}",
+  "ready.bot_ready": "✅ Botの準備が完了しました！ {{tag}} としてログイン",
+  "ready.servers": "📊 サーバー数: {{count}}",
+  "ready.users": "👥 ユーザー数: {{count}}",
+  "ready.commands": "💬 コマンド数: {{count}}",
+  "ready.event_registered": "  ✓ {{name}}",
 
   // インタラクションイベントログ
-  "interaction.unknown_command":
-    "不明なコマンド CommandName: {{commandName}}",
+  "interaction.unknown_command": "不明なコマンド CommandName: {{commandName}}",
   "interaction.command_executed":
     "コマンド実行 CommandName: {{commandName}} UserId: {{userId}}",
   "interaction.command_error":
     "コマンド実行エラー CommandName: {{commandName}}",
   "interaction.autocomplete_error":
     "自動補完エラー CommandName: {{commandName}}",
-  "interaction.unknown_modal":
-    "不明なモーダル CustomId: {{customId}}",
+  "interaction.unknown_modal": "不明なモーダル CustomId: {{customId}}",
   "interaction.modal_submitted":
     "モーダル送信 CustomId: {{customId}} UserId: {{userId}}",
-  "interaction.modal_error":
-    "モーダル実行エラー CustomId: {{customId}}",
-  "interaction.button_error":
-    "ボタン実行エラー CustomId: {{customId}}",
+  "interaction.modal_error": "モーダル実行エラー CustomId: {{customId}}",
+  "interaction.button_error": "ボタン実行エラー CustomId: {{customId}}",
   "interaction.select_menu_error":
     "セレクトメニュー実行エラー CustomId: {{customId}}",
 
   // Webサーバー
-  "web.server_started":
-    "起動 URL: {{url}}",
-  "web.startup_error":
-    "起動エラー:",
-  "web.unhandled_rejection":
-    "未処理のPromise拒否:",
-  "web.uncaught_exception":
-    "未処理の例外:",
-  "web.startup_failed":
-    "起動失敗:",
-  "web.api_error":
-    "APIエラー:",
-  "web.internal_server_error":
-    "内部サーバーエラー",
+  "web.server_started": "起動 URL: {{url}}",
+  "web.startup_error": "起動エラー:",
+  "web.unhandled_rejection": "未処理のPromise拒否:",
+  "web.uncaught_exception": "未処理の例外:",
+  "web.startup_failed": "起動失敗:",
+  "web.api_error": "APIエラー:",
+  "web.internal_server_error": "内部サーバーエラー",
   "web.auth_unauthorized":
     "[Auth] 未認証リクエスト Method: {{method}} URL: {{url}}",
   "web.auth_invalid_token":
     "[Auth] 無効なトークン Method: {{method}} URL: {{url}}",
-  "web.auth_unauthorized_error":
-    "Unauthorized",
-  "web.auth_forbidden_error":
-    "Forbidden",
+  "web.auth_unauthorized_error": "Unauthorized",
+  "web.auth_forbidden_error": "Forbidden",
   "web.auth_header_required":
     "Authorization: Bearer <api-key> ヘッダーが必要です。",
-  "web.auth_invalid_token_message":
-    "無効なトークンです。",
+  "web.auth_invalid_token_message": "無効なトークンです。",
 
   // Discord エラー通知
-  "discord.error_notification_title":
-    "🚨 {{appName}} エラー通知",
+  "discord.error_notification_title": "🚨 {{appName}} エラー通知",
 
   // エラーユーティリティ
-  "error.base_error_log":
-    "[{{errorName}}] {{message}}",
-  "error.unhandled_error_log":
-    "[UnhandledError] {{message}}",
+  "error.base_error_log": "[{{errorName}}] {{message}}",
+  "error.unhandled_error_log": "[UnhandledError] {{message}}",
 
   // JSONユーティリティ
   "json.parse_array_failed":
-    "parseJsonArray: パースに失敗しました。空配列を返します。 value=\"{{value}}\" error=\"{{error}}\"",
+    'parseJsonArray: パースに失敗しました。空配列を返します。 value="{{value}}" error="{{error}}"',
 } as const;
 
 export type SystemTranslations = typeof system;

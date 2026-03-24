@@ -5,13 +5,13 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
-  MessageFlags,
   type ChatInputCommandInteraction,
+  MessageFlags,
 } from "discord.js";
 import {
+  localeManager,
   logPrefixed,
   tInteraction,
-  localeManager,
 } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import { getBotGuildConfigService } from "../../../services/botCompositionRoot";

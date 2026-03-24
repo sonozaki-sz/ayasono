@@ -5,8 +5,24 @@ import { safeReply } from "@/bot/utils/interaction";
 const isVcPanelManagedChannelMock = vi.fn();
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tInteraction: vi.fn(
     (_locale: string, key: string, params?: Record<string, unknown>) => {
       if (key === "vac:user-response.renamed") {
@@ -129,7 +145,7 @@ describe("bot/features/vac/handlers/ui/vacPanelModal", () => {
     });
   });
 
-  it("数値に変換できない入力（\"abc\"）ではチャンネル編集を行わずバリデーションエラーを返すことを検証", async () => {
+  it('数値に変換できない入力（"abc"）ではチャンネル編集を行わずバリデーションエラーを返すことを検証', async () => {
     const editMock = vi.fn().mockResolvedValue(undefined);
     const interaction = createBaseInteraction({
       customId: "vac:limit-modal:voice-1",

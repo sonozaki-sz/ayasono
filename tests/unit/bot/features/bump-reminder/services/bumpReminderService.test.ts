@@ -14,8 +14,24 @@ const repositoryMock = {
 };
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: (key: string) => key,
   tInteraction: (...args: unknown[]) => args[1],
 }));
@@ -376,7 +392,9 @@ describe("shared/features/bump-reminder/manager", () => {
       undefined,
     );
     expect(logger.info).not.toHaveBeenCalledWith(
-      expect.stringContaining("bumpReminder:log.scheduler_duplicates_cancelled"),
+      expect.stringContaining(
+        "bumpReminder:log.scheduler_duplicates_cancelled",
+      ),
     );
   });
 

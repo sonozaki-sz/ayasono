@@ -1,7 +1,7 @@
 // tests/unit/bot/features/vc-recruit/commands/usecases/vcRecruitConfigTeardown.test.ts
 import { handleVcRecruitConfigTeardown } from "@/bot/features/vc-recruit/commands/usecases/vcRecruitConfigTeardown";
-import { disableComponentsAfterTimeout } from "@/bot/shared/disableComponentsAfterTimeout";
 import { VC_RECRUIT_TIMEOUT } from "@/bot/features/vc-recruit/commands/vcRecruitConfigCommand.constants";
+import { disableComponentsAfterTimeout } from "@/bot/shared/disableComponentsAfterTimeout";
 import { ValidationError } from "@/shared/errors/customErrors";
 
 // ---- モック定義 ----
@@ -24,8 +24,24 @@ vi.mock("@/bot/shared/disableComponentsAfterTimeout", () => ({
 }));
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tInteraction: (...args: unknown[]) =>
     tInteractionMock(...(args as Parameters<typeof tInteractionMock>)),
   tDefault: (...args: unknown[]) =>
@@ -95,8 +111,7 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigTeardown", ()
   it("categoryId が null の場合は TOP ラベルを使用する", async () => {
     const topLabel = "TOP（カテゴリーなし）";
     tInteractionMock.mockImplementation((_locale: string, key: string) => {
-      if (key === "vcRecruit:ui.select.teardown_top")
-        return topLabel;
+      if (key === "vcRecruit:ui.select.teardown_top") return topLabel;
       return key;
     });
 
@@ -145,9 +160,7 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigTeardown", ()
     const unknownLabel = "不明なカテゴリー（ID: cat-999）";
     tInteractionMock.mockImplementation(
       (_locale: string, key: string, opts?: Record<string, unknown>) => {
-        if (
-          key === "vcRecruit:ui.select.teardown_unknown_category"
-        )
+        if (key === "vcRecruit:ui.select.teardown_unknown_category")
           return `不明なカテゴリー（ID: ${opts?.id}）`;
         return key;
       },

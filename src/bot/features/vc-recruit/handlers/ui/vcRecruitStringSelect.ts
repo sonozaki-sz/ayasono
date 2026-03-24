@@ -19,8 +19,8 @@ import {
 } from "../../commands/vcRecruitConfigCommand.constants";
 import { updateVcRecruitSession } from "./vcRecruitPanelState";
 import {
-  type TeardownSetupEntry,
   setTeardownConfirmSession,
+  type TeardownSetupEntry,
 } from "./vcRecruitTeardownState";
 
 export const vcRecruitStringSelectHandler: StringSelectHandler = {

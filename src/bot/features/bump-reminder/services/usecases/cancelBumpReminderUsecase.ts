@@ -5,8 +5,8 @@ import { logPrefixed } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import {
   BUMP_REMINDER_STATUS,
-  toBumpReminderKey,
   type BumpServiceName,
+  toBumpReminderKey,
 } from "../../constants/bumpReminderConstants";
 import { type IBumpReminderRepository } from "../../repositories/types";
 import {

@@ -5,7 +5,9 @@ import { ValidationError } from "@/shared/errors/customErrors";
 // ---- モック定義 ----
 const ensurePermissionMock = vi.fn();
 const getMemberLogConfigMock = vi.fn();
-const tInteractionMock = vi.fn((_locale: string, key: string, _params?: Record<string, unknown>) => key);
+const tInteractionMock = vi.fn(
+  (_locale: string, key: string, _params?: Record<string, unknown>) => key,
+);
 const createInfoEmbedMock = vi.fn(
   (desc: string, opts?: { title?: string; fields?: unknown[] }) => ({
     description: desc,
@@ -29,10 +31,29 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
 }));
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
-  tInteraction: (locale: string, key: string, params?: Record<string, unknown>) =>
-    tInteractionMock(locale, key, params),
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
+  tInteraction: (
+    locale: string,
+    key: string,
+    params?: Record<string, unknown>,
+  ) => tInteractionMock(locale, key, params),
 }));
 
 vi.mock("@/bot/utils/messageResponse", () => ({
@@ -193,9 +214,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.view", () => {
     const callArg = createInfoEmbedMock.mock.calls[0][1];
     const joinField = (
       callArg!.fields as Array<{ name: string; value: string }>
-    ).find(
-      (f) => f.name === "memberLog:embed.field.name.join_message",
-    );
+    ).find((f) => f.name === "memberLog:embed.field.name.join_message");
     expect(joinField?.value).toBe("common:none");
   });
 });

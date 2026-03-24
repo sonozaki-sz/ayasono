@@ -2,8 +2,8 @@
 // APIルート
 
 import type { FastifyPluginAsync } from "fastify";
-import { apiAuthPlugin } from "../../middleware/auth";
 import { version } from "../../../../package.json";
+import { apiAuthPlugin } from "../../middleware/auth";
 
 export const apiRoutes: FastifyPluginAsync = async (fastify) => {
   await fastify.register(apiAuthPlugin);

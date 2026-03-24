@@ -3,19 +3,19 @@
 
 import {
   type IVcRecruitConfigRepository,
-  type VcRecruitConfig,
-  type VcRecruitSetup,
   VC_RECRUIT_MENTION_ROLE_ADD_RESULT,
-  type VcRecruitMentionRoleAddResult,
   VC_RECRUIT_MENTION_ROLE_REMOVE_RESULT,
+  type VcRecruitConfig,
+  type VcRecruitMentionRoleAddResult,
   type VcRecruitMentionRoleRemoveResult,
+  type VcRecruitSetup,
 } from "../../database/types";
 import { tDefault } from "../../locale/localeManager";
 import { executeWithDatabaseError } from "../../utils/errorHandling";
 import {
-  DEFAULT_VC_RECRUIT_CONFIG,
-  DEFAULT_THREAD_ARCHIVE_DURATION,
   createDefaultVcRecruitConfig,
+  DEFAULT_THREAD_ARCHIVE_DURATION,
+  DEFAULT_VC_RECRUIT_CONFIG,
   normalizeVcRecruitConfig,
 } from "./vcRecruitConfigDefaults";
 

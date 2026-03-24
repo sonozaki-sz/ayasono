@@ -31,7 +31,9 @@ describe("shared/features/sticky-message/stickyMessageConfigService", () => {
   });
 
   async function loadModule() {
-    return import("@/shared/features/sticky-message/stickyMessageConfigService");
+    return import(
+      "@/shared/features/sticky-message/stickyMessageConfigService"
+    );
   }
 
   it("findByChannel がリポジトリへ委譲すること", async () => {

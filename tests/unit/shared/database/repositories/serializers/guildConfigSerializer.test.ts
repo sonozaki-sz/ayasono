@@ -81,7 +81,11 @@ describe("shared/database/repositories/serializers/guildConfigSerializer", () =>
       "ja",
     );
 
-    expect(data).toEqual({ guildId: "guild-5", locale: "ja", errorChannelId: "ch-err" });
+    expect(data).toEqual({
+      guildId: "guild-5",
+      locale: "ja",
+      errorChannelId: "ch-err",
+    });
   });
 
   it("toGuildConfigUpdateData が locale のみを含むオブジェクトを返すこと", () => {

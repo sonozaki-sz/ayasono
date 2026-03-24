@@ -23,8 +23,24 @@ vi.mock("@/shared/utils/logger", () => ({
 
 // i18n のモック
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: vi.fn((key: string) => key),
   tGuild: vi.fn(async (_guildId: string, key: string) => key),
   tInteraction: (...args: unknown[]) => args[1],
@@ -57,7 +73,8 @@ const mockRepository: Record<string, Mock> = {
 };
 
 vi.mock("@/bot/services/botCompositionRoot", () => ({
-  getBotVcRecruitRepository: () => mockRepository as unknown as IVcRecruitRepository,
+  getBotVcRecruitRepository: () =>
+    mockRepository as unknown as IVcRecruitRepository,
 }));
 
 /** テスト用セットアップデータを作成する */
@@ -334,15 +351,16 @@ describe("VC Recruit Handlers Integration", () => {
         embeds: [],
         components: [
           {
-            components: [
-              { customId: "vc-recruit:post:join:other-vc" },
-            ],
+            components: [{ customId: "vc-recruit:post:join:other-vc" }],
           },
         ],
         edit: vi.fn(),
       };
 
-      const messagesCollection = new Collection<string, typeof recruitMessage>();
+      const messagesCollection = new Collection<
+        string,
+        typeof recruitMessage
+      >();
       messagesCollection.set("recruit-msg-1", recruitMessage);
       messagesCollection.set("other-msg", noMatchMessage as never);
 

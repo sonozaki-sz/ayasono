@@ -19,13 +19,13 @@ import {
   createInfoEmbed,
 } from "../../../../utils/messageResponse";
 import {
-  MSG_DEL_PHASE_TIMEOUT_MS,
   MSG_DEL_CUSTOM_ID,
+  MSG_DEL_PHASE_TIMEOUT_MS,
   type ScannedMessageWithChannel,
 } from "../../constants/messageDeleteConstants";
 import {
-  scanMessages,
   type ScanProgressData,
+  scanMessages,
 } from "../../services/messageDeleteService";
 import type { ParsedOptions } from "./dialogUtils";
 

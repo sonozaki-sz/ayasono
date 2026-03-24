@@ -3,12 +3,10 @@
 
 export const ping = {
   // ── コマンド定義 ─────────────────────────────
-  "ping.description":
-    "ボットの応答速度を確認",
+  "ping.description": "ボットの応答速度を確認",
 
   // ── ユーザーレスポンス ────────────────────────
-  "user-response.measuring":
-    "🏓 計測中...",
+  "user-response.measuring": "🏓 計測中...",
   "user-response.result":
     "📡 API レイテンシー: **{{apiLatency}}ms**\n💓 WebSocket Ping: **{{wsLatency}}ms**",
 } as const;

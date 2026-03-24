@@ -10,7 +10,10 @@ vi.mock("@/shared/locale/localeManager", () => ({
 }));
 
 const loggerMock = vi.hoisted(() => ({
-  debug: vi.fn(), info: vi.fn(), error: vi.fn(), warn: vi.fn(),
+  debug: vi.fn(),
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
 }));
 vi.mock("@/shared/utils/logger", () => ({ logger: loggerMock }));
 

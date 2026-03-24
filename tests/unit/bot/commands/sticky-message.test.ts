@@ -10,19 +10,27 @@ vi.mock("@/shared/locale/commandLocalizations", () => ({
   }),
 }));
 
-vi.mock("@/bot/features/sticky-message/commands/stickyMessageCommand.execute", () => ({
-  executeStickyMessageCommand: (...args: unknown[]) =>
-    executeStickyMessageCommandMock(...args),
-}));
+vi.mock(
+  "@/bot/features/sticky-message/commands/stickyMessageCommand.execute",
+  () => ({
+    executeStickyMessageCommand: (...args: unknown[]) =>
+      executeStickyMessageCommandMock(...args),
+  }),
+);
 
 vi.mock("@/bot/errors/interactionErrorHandler", () => ({
   handleCommandError: (...args: unknown[]) => handleCommandErrorMock(...args),
 }));
 
-vi.mock("@/bot/features/sticky-message/commands/stickyMessageCommand.constants", async () => {
-  const actual = await vi.importActual("@/bot/features/sticky-message/commands/stickyMessageCommand.constants");
-  return actual;
-});
+vi.mock(
+  "@/bot/features/sticky-message/commands/stickyMessageCommand.constants",
+  async () => {
+    const actual = await vi.importActual(
+      "@/bot/features/sticky-message/commands/stickyMessageCommand.constants",
+    );
+    return actual;
+  },
+);
 
 import { stickyMessageCommand } from "@/bot/commands/sticky-message";
 

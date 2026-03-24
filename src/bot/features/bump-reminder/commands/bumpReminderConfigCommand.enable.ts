@@ -1,7 +1,7 @@
 // src/bot/features/bump-reminder/commands/bumpReminderConfigCommand.enable.ts
 // bump-reminder-config enable 実行処理
 
-import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
+import { type ChatInputCommandInteraction, MessageFlags } from "discord.js";
 import {
   logPrefixed,
   tInteraction,

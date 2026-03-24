@@ -9,8 +9,14 @@ vi.mock("@/shared/locale/localeManager", () => ({
 
 const getConfigMock = vi.fn();
 const getAfkConfigMock = vi.fn();
-const getVacConfigMock = vi.fn().mockResolvedValue({ enabled: false, triggerChannelIds: [], createdChannels: [] });
-const getVcRecruitConfigMock = vi.fn().mockResolvedValue({ enabled: false, mentionRoleIds: [], setups: [] });
+const getVacConfigMock = vi.fn().mockResolvedValue({
+  enabled: false,
+  triggerChannelIds: [],
+  createdChannels: [],
+});
+const getVcRecruitConfigMock = vi
+  .fn()
+  .mockResolvedValue({ enabled: false, mentionRoleIds: [], setups: [] });
 const getStickyMessagesMock = vi.fn().mockResolvedValue([]);
 const getMemberLogConfigMock = vi.fn().mockResolvedValue(null);
 const getBumpConfigMock = vi.fn().mockResolvedValue(null);
@@ -18,10 +24,18 @@ const getBumpConfigMock = vi.fn().mockResolvedValue(null);
 vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotGuildConfigService: () => ({ getConfig: getConfigMock }),
   getBotVacConfigService: () => ({ getVacConfigOrDefault: getVacConfigMock }),
-  getBotVcRecruitConfigService: () => ({ getVcRecruitConfigOrDefault: getVcRecruitConfigMock }),
-  getBotStickyMessageConfigService: () => ({ findAllByGuild: getStickyMessagesMock }),
-  getBotMemberLogConfigService: () => ({ getMemberLogConfig: getMemberLogConfigMock }),
-  getBotBumpReminderConfigService: () => ({ getBumpReminderConfig: getBumpConfigMock }),
+  getBotVcRecruitConfigService: () => ({
+    getVcRecruitConfigOrDefault: getVcRecruitConfigMock,
+  }),
+  getBotStickyMessageConfigService: () => ({
+    findAllByGuild: getStickyMessagesMock,
+  }),
+  getBotMemberLogConfigService: () => ({
+    getMemberLogConfig: getMemberLogConfigMock,
+  }),
+  getBotBumpReminderConfigService: () => ({
+    getBumpReminderConfig: getBumpConfigMock,
+  }),
 }));
 
 vi.mock("@/shared/features/afk/afkConfigService", () => ({
@@ -29,7 +43,10 @@ vi.mock("@/shared/features/afk/afkConfigService", () => ({
 }));
 
 vi.mock("@/bot/utils/messageResponse", () => ({
-  createInfoEmbed: (_d: string, opts?: { title?: string; fields?: unknown[] }) => ({
+  createInfoEmbed: (
+    _d: string,
+    opts?: { title?: string; fields?: unknown[] },
+  ) => ({
     kind: "info",
     title: opts?.title,
     fields: opts?.fields,
@@ -55,11 +72,17 @@ describe("bot/features/guild-config/commands/guildConfigCommand.viewPages", () =
   describe("buildPage(0) - ギルド設定", () => {
     it("設定が存在する場合は locale と errorChannelId が表示されること", async () => {
       getConfigMock.mockResolvedValue({
-        guildId: "g1", locale: "ja", errorChannelId: "ch-1",
-        createdAt: new Date(), updatedAt: new Date(),
+        guildId: "g1",
+        locale: "ja",
+        errorChannelId: "ch-1",
+        createdAt: new Date(),
+        updatedAt: new Date(),
       });
 
-      const embed = await buildPage(0, "g1", "ja") as unknown as Record<string, unknown>;
+      const embed = (await buildPage(0, "g1", "ja")) as unknown as Record<
+        string,
+        unknown
+      >;
       expect(embed.title).toBe("guildConfig:embed.title.view");
       expect(embed.fields).toEqual(
         expect.arrayContaining([
@@ -71,21 +94,31 @@ describe("bot/features/guild-config/commands/guildConfigCommand.viewPages", () =
 
     it("設定が存在しない場合はデフォルト表示されること", async () => {
       getConfigMock.mockResolvedValue(null);
-      const embed = await buildPage(0, "g1", "ja") as unknown as Record<string, unknown>;
+      const embed = (await buildPage(0, "g1", "ja")) as unknown as Record<
+        string,
+        unknown
+      >;
       expect(embed.title).toBe("guildConfig:embed.title.view");
       expect(embed.fields).toEqual(
         expect.arrayContaining([
-          expect.objectContaining({ value: "guildConfig:embed.field.value.not_configured" }),
+          expect.objectContaining({
+            value: "guildConfig:embed.field.value.not_configured",
+          }),
         ]),
       );
     });
 
     it("locale が en の場合は English (en) と表示されること", async () => {
       getConfigMock.mockResolvedValue({
-        guildId: "g1", locale: "en",
-        createdAt: new Date(), updatedAt: new Date(),
+        guildId: "g1",
+        locale: "en",
+        createdAt: new Date(),
+        updatedAt: new Date(),
       });
-      const embed = await buildPage(0, "g1", "ja") as unknown as Record<string, unknown>;
+      const embed = (await buildPage(0, "g1", "ja")) as unknown as Record<
+        string,
+        unknown
+      >;
       expect(embed.fields).toEqual(
         expect.arrayContaining([
           expect.objectContaining({ value: "English (en)" }),
@@ -97,8 +130,14 @@ describe("bot/features/guild-config/commands/guildConfigCommand.viewPages", () =
   // ページ2: AFK
   describe("buildPage(1) - AFK", () => {
     it("AFK が設定済みの場合は enabled と channelId が表示されること", async () => {
-      getAfkConfigMock.mockResolvedValue({ enabled: true, channelId: "afk-ch" });
-      const embed = await buildPage(1, "g1", "ja") as unknown as Record<string, unknown>;
+      getAfkConfigMock.mockResolvedValue({
+        enabled: true,
+        channelId: "afk-ch",
+      });
+      const embed = (await buildPage(1, "g1", "ja")) as unknown as Record<
+        string,
+        unknown
+      >;
       expect(embed.title).toBe("afk:embed.title.config_view");
       expect(embed.fields).toEqual(
         expect.arrayContaining([
@@ -110,7 +149,10 @@ describe("bot/features/guild-config/commands/guildConfigCommand.viewPages", () =
 
     it("AFK が未設定の場合は disabled と not_configured が表示されること", async () => {
       getAfkConfigMock.mockResolvedValue(null);
-      const embed = await buildPage(1, "g1", "ja") as unknown as Record<string, unknown>;
+      const embed = (await buildPage(1, "g1", "ja")) as unknown as Record<
+        string,
+        unknown
+      >;
       expect(embed.fields).toEqual(
         expect.arrayContaining([
           expect.objectContaining({ value: "common:disabled" }),
@@ -122,13 +164,18 @@ describe("bot/features/guild-config/commands/guildConfigCommand.viewPages", () =
   // ページ3: VAC
   describe("buildPage(2) - VAC", () => {
     it("トリガーチャンネルが表示されること", async () => {
-      getVacConfigMock.mockResolvedValue({ enabled: true, triggerChannelIds: ["vc-1"], createdChannels: [] });
-      const embed = await buildPage(2, "g1", "ja") as unknown as Record<string, unknown>;
+      getVacConfigMock.mockResolvedValue({
+        enabled: true,
+        triggerChannelIds: ["vc-1"],
+        createdChannels: [],
+      });
+      const embed = (await buildPage(2, "g1", "ja")) as unknown as Record<
+        string,
+        unknown
+      >;
       expect(embed.title).toBe("vac:embed.title.config_view");
       expect(embed.fields).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ value: "<#vc-1>" }),
-        ]),
+        expect.arrayContaining([expect.objectContaining({ value: "<#vc-1>" })]),
       );
     });
   });
@@ -141,7 +188,10 @@ describe("bot/features/guild-config/commands/guildConfigCommand.viewPages", () =
         mentionRoleIds: [],
         setups: [{ panelChannelId: "p1", postChannelId: "po1" }],
       });
-      const embed = await buildPage(3, "g1", "ja") as unknown as Record<string, unknown>;
+      const embed = (await buildPage(3, "g1", "ja")) as unknown as Record<
+        string,
+        unknown
+      >;
       expect(embed.title).toBe("vcRecruit:embed.title.config_view");
     });
   });
@@ -150,12 +200,13 @@ describe("bot/features/guild-config/commands/guildConfigCommand.viewPages", () =
   describe("buildPage(4) - メッセージ固定", () => {
     it("スティッキーメッセージのチャンネルが表示されること", async () => {
       getStickyMessagesMock.mockResolvedValue([{ channelId: "st-1" }]);
-      const embed = await buildPage(4, "g1", "ja") as unknown as Record<string, unknown>;
+      const embed = (await buildPage(4, "g1", "ja")) as unknown as Record<
+        string,
+        unknown
+      >;
       expect(embed.title).toBe("stickyMessage:embed.title.view");
       expect(embed.fields).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ value: "<#st-1>" }),
-        ]),
+        expect.arrayContaining([expect.objectContaining({ value: "<#st-1>" })]),
       );
     });
   });
@@ -164,9 +215,15 @@ describe("bot/features/guild-config/commands/guildConfigCommand.viewPages", () =
   describe("buildPage(5) - メンバーログ", () => {
     it("設定が存在する場合は全フィールドが表示されること", async () => {
       getMemberLogConfigMock.mockResolvedValue({
-        enabled: true, channelId: "ml-ch", joinMessage: "welcome", leaveMessage: "bye",
+        enabled: true,
+        channelId: "ml-ch",
+        joinMessage: "welcome",
+        leaveMessage: "bye",
       });
-      const embed = await buildPage(5, "g1", "ja") as unknown as Record<string, unknown>;
+      const embed = (await buildPage(5, "g1", "ja")) as unknown as Record<
+        string,
+        unknown
+      >;
       expect(embed.title).toBe("memberLog:embed.title.config_view");
       const fields = embed.fields as Array<{ value: string }>;
       expect(fields).toHaveLength(4);
@@ -174,7 +231,10 @@ describe("bot/features/guild-config/commands/guildConfigCommand.viewPages", () =
 
     it("設定が存在しない場合は未設定メッセージが表示されること", async () => {
       getMemberLogConfigMock.mockResolvedValue(null);
-      const embed = await buildPage(5, "g1", "ja") as unknown as Record<string, unknown>;
+      const embed = (await buildPage(5, "g1", "ja")) as unknown as Record<
+        string,
+        unknown
+      >;
       expect(embed.title).toBe("memberLog:embed.title.config_view");
     });
   });
@@ -183,9 +243,14 @@ describe("bot/features/guild-config/commands/guildConfigCommand.viewPages", () =
   describe("buildPage(6) - Bumpリマインダー", () => {
     it("設定が存在する場合はステータスとメンション情報が表示されること", async () => {
       getBumpConfigMock.mockResolvedValue({
-        enabled: true, mentionRoleId: "role-1", mentionUserIds: ["u1"],
+        enabled: true,
+        mentionRoleId: "role-1",
+        mentionUserIds: ["u1"],
       });
-      const embed = await buildPage(6, "g1", "ja") as unknown as Record<string, unknown>;
+      const embed = (await buildPage(6, "g1", "ja")) as unknown as Record<
+        string,
+        unknown
+      >;
       expect(embed.title).toBe("bumpReminder:embed.title.config_view");
       const fields = embed.fields as Array<{ value: string }>;
       expect(fields).toHaveLength(3);
@@ -193,7 +258,10 @@ describe("bot/features/guild-config/commands/guildConfigCommand.viewPages", () =
 
     it("設定が存在しない場合は未設定メッセージが表示されること", async () => {
       getBumpConfigMock.mockResolvedValue(null);
-      const embed = await buildPage(6, "g1", "ja") as unknown as Record<string, unknown>;
+      const embed = (await buildPage(6, "g1", "ja")) as unknown as Record<
+        string,
+        unknown
+      >;
       expect(embed.title).toBe("bumpReminder:embed.title.config_view");
     });
   });
@@ -201,7 +269,10 @@ describe("bot/features/guild-config/commands/guildConfigCommand.viewPages", () =
   // 範囲外のページ
   describe("buildPage(99) - 範囲外", () => {
     it("範囲外のページインデックスでもエラーにならずデフォルト Embed を返すこと", async () => {
-      const embed = await buildPage(99, "g1", "ja") as unknown as Record<string, unknown>;
+      const embed = (await buildPage(99, "g1", "ja")) as unknown as Record<
+        string,
+        unknown
+      >;
       expect(embed).toBeDefined();
     });
   });

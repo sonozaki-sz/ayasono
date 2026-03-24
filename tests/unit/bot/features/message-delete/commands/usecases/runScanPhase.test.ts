@@ -3,8 +3,14 @@
 import type { Mock } from "vitest";
 
 const scanMessagesMock = vi.fn();
-const createErrorEmbedMock = vi.fn((d: string) => ({ _type: "error", description: d }));
-const createInfoEmbedMock = vi.fn((d: string) => ({ _type: "info", description: d }));
+const createErrorEmbedMock = vi.fn((d: string) => ({
+  _type: "error",
+  description: d,
+}));
+const createInfoEmbedMock = vi.fn((d: string) => ({
+  _type: "info",
+  description: d,
+}));
 
 vi.mock("@/bot/features/message-delete/services/messageDeleteService", () => ({
   scanMessages: (...args: unknown[]) => scanMessagesMock(...args),
@@ -16,8 +22,24 @@ vi.mock("@/bot/utils/messageResponse", () => ({
 }));
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: vi.fn((key: string, params?: Record<string, unknown>) =>
     params ? `${key}:${JSON.stringify(params)}` : key,
   ),
@@ -27,7 +49,6 @@ vi.mock("@/shared/locale/localeManager", () => ({
 vi.mock("@/shared/utils/logger", () => ({
   logger: { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
-
 
 const mockOptions: import("@/bot/features/message-delete/commands/usecases/dialogUtils").ParsedOptions =
   {
@@ -54,19 +75,14 @@ function makeMockCollector() {
   };
 }
 
-function makeInteraction(
-  scanReplyOverride?: object,
-) {
+function makeInteraction(scanReplyOverride?: object) {
   const cancelCollector = makeMockCollector();
-  const scanReply =
-    scanReplyOverride ?? {
-      createMessageComponentCollector: vi.fn(() => cancelCollector),
-    };
+  const scanReply = scanReplyOverride ?? {
+    createMessageComponentCollector: vi.fn(() => cancelCollector),
+  };
   return {
     user: { id: "user-1" },
-    editReply: vi
-      .fn()
-      .mockResolvedValue(scanReply) as Mock,
+    editReply: vi.fn().mockResolvedValue(scanReply) as Mock,
     _collector: cancelCollector,
   };
 }
@@ -157,7 +173,10 @@ describe("bot/features/message-delete/commands/usecases/runScanPhase", () => {
         capturedSignal = opts.signal;
         // signal が abort されるまで待機
         await new Promise<void>((resolve) => {
-          if (opts.signal?.aborted) { resolve(); return; }
+          if (opts.signal?.aborted) {
+            resolve();
+            return;
+          }
           opts.signal?.addEventListener("abort", () => resolve());
         });
         return [];
@@ -198,7 +217,10 @@ describe("bot/features/message-delete/commands/usecases/runScanPhase", () => {
       async (_channels: never, opts: { signal?: AbortSignal }) => {
         // signal が abort されるまで待機
         await new Promise<void>((resolve) => {
-          if (opts.signal?.aborted) { resolve(); return; }
+          if (opts.signal?.aborted) {
+            resolve();
+            return;
+          }
           opts.signal?.addEventListener("abort", () => resolve());
         });
         return [{ messageId: "msg-1" }];
@@ -242,7 +264,10 @@ describe("bot/features/message-delete/commands/usecases/runScanPhase", () => {
     scanMessagesMock.mockImplementation(
       async (_channels: never, opts: { signal?: AbortSignal }) => {
         await new Promise<void>((resolve) => {
-          if (opts.signal?.aborted) { resolve(); return; }
+          if (opts.signal?.aborted) {
+            resolve();
+            return;
+          }
           opts.signal?.addEventListener("abort", () => resolve());
         });
         return [{ messageId: "msg-timeout" }];

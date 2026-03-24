@@ -4,8 +4,8 @@
 // - 正常系: スキャン → プレビュー確認 → 最終確認 → 削除完了 の1本道
 
 import { executeMessageDeleteCommand } from "@/bot/features/message-delete/commands/messageDeleteCommand.execute";
-import { MSG_DEL_CUSTOM_ID } from "@/bot/features/message-delete/constants/messageDeleteConstants";
 import type { ScannedMessageWithChannel } from "@/bot/features/message-delete/constants/messageDeleteConstants";
+import { MSG_DEL_CUSTOM_ID } from "@/bot/features/message-delete/constants/messageDeleteConstants";
 
 // ── モック関数 ──────────────────────────────────────────────────────────────
 
@@ -13,25 +13,38 @@ const scanMessagesMock = vi.fn();
 const deleteScannedMessagesMock = vi.fn();
 const parseDateStrMock = vi.fn();
 
-const createErrorEmbedMock = vi.fn((d: string) => ({ _type: "error", description: d }));
-const createWarningEmbedMock = vi.fn((d: string) => ({ _type: "warning", description: d }));
-const createInfoEmbedMock = vi.fn((d: string) => ({ _type: "info", description: d }));
+const createErrorEmbedMock = vi.fn((d: string) => ({
+  _type: "error",
+  description: d,
+}));
+const createWarningEmbedMock = vi.fn((d: string) => ({
+  _type: "warning",
+  description: d,
+}));
+const createInfoEmbedMock = vi.fn((d: string) => ({
+  _type: "info",
+  description: d,
+}));
 
 vi.mock("@/bot/features/message-delete/services/messageDeleteService", () => ({
   scanMessages: (...args: unknown[]) => scanMessagesMock(...args),
-  deleteScannedMessages: (...args: unknown[]) => deleteScannedMessagesMock(...args),
+  deleteScannedMessages: (...args: unknown[]) =>
+    deleteScannedMessagesMock(...args),
   parseDateStr: (...args: unknown[]) => parseDateStrMock(...args),
 }));
 
-vi.mock("@/bot/features/message-delete/commands/messageDeleteEmbedBuilder", () => ({
-  buildCommandConditionsEmbed: vi.fn(() => ({ _type: "conditions" })),
-  buildPreviewEmbed: vi.fn(() => ({ _type: "preview" })),
-  buildPreviewComponents: vi.fn(() => []),
-  buildFinalConfirmEmbed: vi.fn(() => ({ _type: "final" })),
-  buildFinalConfirmComponents: vi.fn(() => []),
-  buildCompletionEmbed: vi.fn(() => ({ _type: "completion" })),
-  buildFilteredMessages: vi.fn((msgs: unknown[]) => msgs),
-}));
+vi.mock(
+  "@/bot/features/message-delete/commands/messageDeleteEmbedBuilder",
+  () => ({
+    buildCommandConditionsEmbed: vi.fn(() => ({ _type: "conditions" })),
+    buildPreviewEmbed: vi.fn(() => ({ _type: "preview" })),
+    buildPreviewComponents: vi.fn(() => []),
+    buildFinalConfirmEmbed: vi.fn(() => ({ _type: "final" })),
+    buildFinalConfirmComponents: vi.fn(() => []),
+    buildCompletionEmbed: vi.fn(() => ({ _type: "completion" })),
+    buildFilteredMessages: vi.fn((msgs: unknown[]) => msgs),
+  }),
+);
 
 vi.mock("@/bot/utils/messageResponse", () => ({
   createErrorEmbed: (d: string) => createErrorEmbedMock(d),
@@ -44,8 +57,24 @@ vi.mock("@/bot/errors/interactionErrorHandler", () => ({
 }));
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: vi.fn((key: string) => `t:${key}`),
   tInteraction: (_locale: string, key: string) => `t:${key}`,
 }));
@@ -125,7 +154,9 @@ function makeScanInteraction(userId: string, guildId: string) {
       id: guildId,
       members: { me },
       channels: {
-        fetch: vi.fn().mockResolvedValue({ size: 1, values: () => [mockChannel] }),
+        fetch: vi
+          .fn()
+          .mockResolvedValue({ size: 1, values: () => [mockChannel] }),
       },
     },
     editReply: vi.fn().mockResolvedValue({
@@ -184,11 +215,9 @@ function createInteraction(overrides: InteractionOverrides = {}) {
   };
 
   // デフォルト: どの editReply 呼び出しにもコレクター付きメッセージを返す
-  const defaultEditReply = vi
-    .fn()
-    .mockResolvedValue({
-      createMessageComponentCollector: vi.fn(() => makeMockCollector()),
-    });
+  const defaultEditReply = vi.fn().mockResolvedValue({
+    createMessageComponentCollector: vi.fn(() => makeMockCollector()),
+  });
 
   return {
     guildId,
@@ -197,7 +226,9 @@ function createInteraction(overrides: InteractionOverrides = {}) {
           id: guildId,
           members: { me },
           channels: {
-            fetch: vi.fn().mockResolvedValue({ size: 1, values: () => [mockChannel] }),
+            fetch: vi
+              .fn()
+              .mockResolvedValue({ size: 1, values: () => [mockChannel] }),
           },
         }
       : null,
@@ -282,7 +313,9 @@ describe("executeMessageDeleteCommand", () => {
 
       expect(createErrorEmbedMock).toHaveBeenCalledOnce();
       expect(interaction.editReply).toHaveBeenCalledWith(
-        expect.objectContaining({ embeds: [expect.objectContaining({ _type: "error" })] }),
+        expect.objectContaining({
+          embeds: [expect.objectContaining({ _type: "error" })],
+        }),
       );
     });
 
@@ -296,7 +329,10 @@ describe("executeMessageDeleteCommand", () => {
     });
 
     it("days と after/before が同時指定された場合は警告 Embed を返して終了する", async () => {
-      const interaction = createInteraction({ daysOption: 7, afterStr: "2024-01-01" });
+      const interaction = createInteraction({
+        daysOption: 7,
+        afterStr: "2024-01-01",
+      });
 
       await executeMessageDeleteCommand(interaction as never);
 
@@ -305,7 +341,10 @@ describe("executeMessageDeleteCommand", () => {
 
     it("after の日付フォーマットが不正な場合は警告 Embed を返して終了する", async () => {
       parseDateStrMock.mockReturnValue(null);
-      const interaction = createInteraction({ daysOption: null, afterStr: "not-a-date" });
+      const interaction = createInteraction({
+        daysOption: null,
+        afterStr: "not-a-date",
+      });
 
       await executeMessageDeleteCommand(interaction as never);
 
@@ -314,7 +353,10 @@ describe("executeMessageDeleteCommand", () => {
 
     it("after が未来日時の場合は警告 Embed を返して終了する", async () => {
       parseDateStrMock.mockReturnValue(new Date(Date.now() + 86_400_000));
-      const interaction = createInteraction({ daysOption: null, afterStr: "2030-01-01" });
+      const interaction = createInteraction({
+        daysOption: null,
+        afterStr: "2030-01-01",
+      });
 
       await executeMessageDeleteCommand(interaction as never);
 
@@ -323,7 +365,10 @@ describe("executeMessageDeleteCommand", () => {
 
     it("before の日付フォーマットが不正な場合は警告 Embed を返して終了する", async () => {
       parseDateStrMock.mockReturnValue(null);
-      const interaction = createInteraction({ daysOption: null, beforeStr: "not-a-date" });
+      const interaction = createInteraction({
+        daysOption: null,
+        beforeStr: "not-a-date",
+      });
 
       await executeMessageDeleteCommand(interaction as never);
 
@@ -333,7 +378,10 @@ describe("executeMessageDeleteCommand", () => {
     it("before が未来日時の場合は警告 Embed を返して終了する", async () => {
       // YYYY-MM-DD 形式の場合: parseDateStr が2回呼ばれる（endOfDay=true / false）
       parseDateStrMock.mockReturnValue(new Date("2030-01-01T00:00:00Z"));
-      const interaction = createInteraction({ daysOption: null, beforeStr: "2030-01-01" });
+      const interaction = createInteraction({
+        daysOption: null,
+        beforeStr: "2030-01-01",
+      });
 
       await executeMessageDeleteCommand(interaction as never);
 
@@ -377,7 +425,9 @@ describe("executeMessageDeleteCommand", () => {
       const LOCK_GUILD = "guild-locked";
 
       // 1回目: scanMessages を永遠にブロックしてロックを保持
-      scanMessagesMock.mockReturnValueOnce(new Promise<ScannedMessageWithChannel[]>(() => {}));
+      scanMessagesMock.mockReturnValueOnce(
+        new Promise<ScannedMessageWithChannel[]>(() => {}),
+      );
 
       const interaction1 = createInteraction({ guildId: LOCK_GUILD });
       const interaction2 = createInteraction({ guildId: LOCK_GUILD });
@@ -427,7 +477,9 @@ describe("executeMessageDeleteCommand", () => {
       const finalConfirmCollector = makeMockCollector();
       const finalReplyMsg = {
         createMessageComponentCollector: vi.fn(() => {
-          queueMicrotask(() => finalConfirmCollector._trigger("collect", finalClickInteraction));
+          queueMicrotask(() =>
+            finalConfirmCollector._trigger("collect", finalClickInteraction),
+          );
           return finalConfirmCollector;
         }),
       };
@@ -447,7 +499,9 @@ describe("executeMessageDeleteCommand", () => {
       const previewCollector = makeMockCollector();
       const previewReplyMsg = {
         createMessageComponentCollector: vi.fn(() => {
-          queueMicrotask(() => previewCollector._trigger("collect", confirmClickInteraction));
+          queueMicrotask(() =>
+            previewCollector._trigger("collect", confirmClickInteraction),
+          );
           return previewCollector;
         }),
       };
@@ -512,7 +566,9 @@ describe("executeMessageDeleteCommand", () => {
       const previewCollector = makeMockCollector();
       const previewReplyMsg = {
         createMessageComponentCollector: vi.fn(() => {
-          queueMicrotask(() => previewCollector._trigger("collect", cancelClickInteraction));
+          queueMicrotask(() =>
+            previewCollector._trigger("collect", cancelClickInteraction),
+          );
           return previewCollector;
         }),
       };
@@ -559,7 +615,9 @@ describe("executeMessageDeleteCommand", () => {
       const finalConfirmCollector = makeMockCollector();
       const finalReplyMsg = {
         createMessageComponentCollector: vi.fn(() => {
-          queueMicrotask(() => finalConfirmCollector._trigger("collect", finalCancelInteraction));
+          queueMicrotask(() =>
+            finalConfirmCollector._trigger("collect", finalCancelInteraction),
+          );
           return finalConfirmCollector;
         }),
       };
@@ -576,7 +634,9 @@ describe("executeMessageDeleteCommand", () => {
       const previewCollector = makeMockCollector();
       const previewReplyMsg = {
         createMessageComponentCollector: vi.fn(() => {
-          queueMicrotask(() => previewCollector._trigger("collect", confirmClickInteraction));
+          queueMicrotask(() =>
+            previewCollector._trigger("collect", confirmClickInteraction),
+          );
           return previewCollector;
         }),
       };
@@ -623,7 +683,9 @@ describe("executeMessageDeleteCommand", () => {
       const finalConfirmCollector2 = makeMockCollector();
       const finalReplyMsg2 = {
         createMessageComponentCollector: vi.fn(() => {
-          queueMicrotask(() => finalConfirmCollector2._trigger("collect", finalYesInteraction));
+          queueMicrotask(() =>
+            finalConfirmCollector2._trigger("collect", finalYesInteraction),
+          );
           return finalConfirmCollector2;
         }),
       };
@@ -640,7 +702,9 @@ describe("executeMessageDeleteCommand", () => {
       const previewCollector2 = makeMockCollector();
       const previewReplyMsg2 = {
         createMessageComponentCollector: vi.fn(() => {
-          queueMicrotask(() => previewCollector2._trigger("collect", confirmClickInteraction2));
+          queueMicrotask(() =>
+            previewCollector2._trigger("collect", confirmClickInteraction2),
+          );
           return previewCollector2;
         }),
       };
@@ -658,7 +722,9 @@ describe("executeMessageDeleteCommand", () => {
       const finalConfirmCollector1 = makeMockCollector();
       const finalReplyMsg1 = {
         createMessageComponentCollector: vi.fn(() => {
-          queueMicrotask(() => finalConfirmCollector1._trigger("collect", finalBackInteraction));
+          queueMicrotask(() =>
+            finalConfirmCollector1._trigger("collect", finalBackInteraction),
+          );
           return finalConfirmCollector1;
         }),
       };
@@ -674,7 +740,9 @@ describe("executeMessageDeleteCommand", () => {
       const previewCollector1 = makeMockCollector();
       const previewReplyMsg1 = {
         createMessageComponentCollector: vi.fn(() => {
-          queueMicrotask(() => previewCollector1._trigger("collect", confirmClickInteraction1));
+          queueMicrotask(() =>
+            previewCollector1._trigger("collect", confirmClickInteraction1),
+          );
           return previewCollector1;
         }),
       };
@@ -709,7 +777,9 @@ describe("executeMessageDeleteCommand", () => {
       const previewReplyMsg = {
         createMessageComponentCollector: vi.fn(() => {
           // タイムアウトをシミュレート: "collect" を発火せず "end" が idle で発火
-          queueMicrotask(() => previewCollector._trigger("end", new Map(), "idle"));
+          queueMicrotask(() =>
+            previewCollector._trigger("end", new Map(), "idle"),
+          );
           return previewCollector;
         }),
       };

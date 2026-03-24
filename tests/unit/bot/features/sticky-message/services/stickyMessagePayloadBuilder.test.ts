@@ -1,10 +1,10 @@
 // tests/unit/bot/features/sticky-message/services/stickyMessagePayloadBuilder.test.ts
 
+import { EmbedBuilder } from "discord.js";
 import {
   buildStickyMessagePayload,
   parseColorStr,
 } from "@/bot/features/sticky-message/services/stickyMessagePayloadBuilder";
-import { EmbedBuilder } from "discord.js";
 
 function makeSticky(
   overrides: Partial<{

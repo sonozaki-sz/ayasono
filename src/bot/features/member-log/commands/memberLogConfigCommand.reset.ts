@@ -5,8 +5,8 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
-  MessageFlags,
   type ChatInputCommandInteraction,
+  MessageFlags,
 } from "discord.js";
 import { createDefaultMemberLogConfig } from "../../../../shared/features/member-log/memberLogConfigDefaults";
 import {

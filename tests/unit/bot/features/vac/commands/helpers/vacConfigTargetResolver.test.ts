@@ -1,9 +1,10 @@
 // tests/unit/bot/features/vac/commands/helpers/vacConfigTargetResolver.test.ts
+
+import { ChannelType } from "discord.js";
 import {
   findTriggerChannelByCategory,
   resolveTargetCategory,
 } from "@/bot/features/vac/commands/helpers/vacConfigTargetResolver";
-import { ChannelType } from "discord.js";
 
 describe("bot/features/vac/commands/helpers/vacConfigTargetResolver", () => {
   // カテゴリ解決とトリガー探索の分岐を安定して検証する

@@ -1,13 +1,13 @@
 // src/shared/locale/locales/ja/features/index.ts
 // 全機能翻訳のre-export
 
-export { ping } from "./ping";
 export { afk } from "./afk";
 export { bumpReminder } from "./bumpReminder";
+export { guildConfig } from "./guildConfig";
+export { memberLog } from "./memberLog";
+export { messageDelete } from "./messageDelete";
+export { ping } from "./ping";
+export { stickyMessage } from "./stickyMessage";
 export { vac } from "./vac";
 export { vc } from "./vc";
-export { messageDelete } from "./messageDelete";
-export { memberLog } from "./memberLog";
-export { stickyMessage } from "./stickyMessage";
 export { vcRecruit } from "./vcRecruit";
-export { guildConfig } from "./guildConfig";

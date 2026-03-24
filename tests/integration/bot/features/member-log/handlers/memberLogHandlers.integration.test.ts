@@ -21,16 +21,33 @@ vi.mock("@/shared/utils/logger", () => ({
 
 // i18n のモック（翻訳キーをそのまま返す + パラメータ展開）
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: vi.fn((key: string) => key),
   tInteraction: (...args: unknown[]) => args[1],
 }));
 
 // getGuildTranslator のモック
 vi.mock("@/shared/locale/helpers", () => ({
-  getGuildTranslator: vi.fn(async () => (key: string, params?: Record<string, unknown>) =>
-    params ? `${key}:${JSON.stringify(params)}` : key,
+  getGuildTranslator: vi.fn(
+    async () => (key: string, params?: Record<string, unknown>) =>
+      params ? `${key}:${JSON.stringify(params)}` : key,
   ),
 }));
 
@@ -117,9 +134,7 @@ describe("Member Log Handlers Integration", () => {
   describe("guildMemberAdd: 参加通知", () => {
     async function loadHandler() {
       return (
-        await import(
-          "@/bot/features/member-log/handlers/guildMemberAddHandler"
-        )
+        await import("@/bot/features/member-log/handlers/guildMemberAddHandler")
       ).handleGuildMemberAdd;
     }
 
@@ -141,8 +156,12 @@ describe("Member Log Handlers Integration", () => {
       // フィールドにユーザーメンション・アカウント作成日・参加日時・メンバー数が含まれる
       const fieldNames = embed.data.fields.map((f: { name: string }) => f.name);
       expect(fieldNames).toContain("memberLog:embed.field.name.join_username");
-      expect(fieldNames).toContain("memberLog:embed.field.name.join_account_created");
-      expect(fieldNames).toContain("memberLog:embed.field.name.join_member_count");
+      expect(fieldNames).toContain(
+        "memberLog:embed.field.name.join_account_created",
+      );
+      expect(fieldNames).toContain(
+        "memberLog:embed.field.name.join_member_count",
+      );
     });
 
     it("アカウント年齢がEmbed内に正しくフォーマットされること", async () => {
@@ -156,7 +175,8 @@ describe("Member Log Handlers Integration", () => {
 
       const embed = sendMock.mock.calls[0][0].embeds[0];
       const ageField = embed.data.fields.find(
-        (f: { name: string }) => f.name === "memberLog:embed.field.name.join_account_created",
+        (f: { name: string }) =>
+          f.name === "memberLog:embed.field.name.join_account_created",
       );
       expect(ageField).toBeDefined();
       // アカウント年齢のフォーマット文字列が含まれること
@@ -168,7 +188,8 @@ describe("Member Log Handlers Integration", () => {
       const handler = await loadHandler();
       mockConfigService.getMemberLogConfig.mockResolvedValue(
         createConfig({
-          joinMessage: "Welcome {userMention} to {serverName}! Member #{memberCount}",
+          joinMessage:
+            "Welcome {userMention} to {serverName}! Member #{memberCount}",
         }),
       );
 
@@ -203,7 +224,14 @@ describe("Member Log Handlers Integration", () => {
 
       mockConfigService.getMemberLogConfig.mockResolvedValue(createConfig());
 
-      const invites = new Collection<string, { code: string; uses: number; inviter: { id: string; displayName: string; bot: boolean } | null }>();
+      const invites = new Collection<
+        string,
+        {
+          code: string;
+          uses: number;
+          inviter: { id: string; displayName: string; bot: boolean } | null;
+        }
+      >();
       invites.set("abc123", {
         code: "abc123",
         uses: 1,
@@ -217,7 +245,8 @@ describe("Member Log Handlers Integration", () => {
 
       const embed = sendMock.mock.calls[0][0].embeds[0];
       const inviteField = embed.data.fields.find(
-        (f: { name: string }) => f.name === "memberLog:embed.field.name.join_invited_by",
+        (f: { name: string }) =>
+          f.name === "memberLog:embed.field.name.join_invited_by",
       );
       expect(inviteField).toBeDefined();
       expect(inviteField.value).toContain("abc123");
@@ -248,7 +277,9 @@ describe("Member Log Handlers Integration", () => {
 
       await handler(member as never);
 
-      expect(mockConfigService.disableAndClearChannel).toHaveBeenCalledWith("guild-1");
+      expect(mockConfigService.disableAndClearChannel).toHaveBeenCalledWith(
+        "guild-1",
+      );
       expect(systemChannelSendMock).toHaveBeenCalledTimes(1);
     });
   });
@@ -282,9 +313,15 @@ describe("Member Log Handlers Integration", () => {
 
       const fieldNames = embed.data.fields.map((f: { name: string }) => f.name);
       expect(fieldNames).toContain("memberLog:embed.field.name.leave_username");
-      expect(fieldNames).toContain("memberLog:embed.field.name.leave_server_left");
-      expect(fieldNames).toContain("memberLog:embed.field.name.leave_stay_duration");
-      expect(fieldNames).toContain("memberLog:embed.field.name.leave_member_count");
+      expect(fieldNames).toContain(
+        "memberLog:embed.field.name.leave_server_left",
+      );
+      expect(fieldNames).toContain(
+        "memberLog:embed.field.name.leave_stay_duration",
+      );
+      expect(fieldNames).toContain(
+        "memberLog:embed.field.name.leave_member_count",
+      );
     });
 
     it("滞在期間が正しく計算されてEmbedに含まれること", async () => {
@@ -298,7 +335,8 @@ describe("Member Log Handlers Integration", () => {
 
       const embed = sendMock.mock.calls[0][0].embeds[0];
       const stayField = embed.data.fields.find(
-        (f: { name: string }) => f.name === "memberLog:embed.field.name.leave_stay_duration",
+        (f: { name: string }) =>
+          f.name === "memberLog:embed.field.name.leave_stay_duration",
       );
       expect(stayField).toBeDefined();
       // 年・月・日形式で表示されること（0の単位は省略）
@@ -309,7 +347,8 @@ describe("Member Log Handlers Integration", () => {
       const handler = await loadHandler();
       mockConfigService.getMemberLogConfig.mockResolvedValue(
         createConfig({
-          leaveMessage: "{userMention} ({userName}) left {serverName}. Now {memberCount} members.",
+          leaveMessage:
+            "{userMention} ({userName}) left {serverName}. Now {memberCount} members.",
         }),
       );
 
@@ -335,7 +374,8 @@ describe("Member Log Handlers Integration", () => {
       const embed = sendMock.mock.calls[0][0].embeds[0];
       // ユーザー名が unknown になる
       const usernameField = embed.data.fields.find(
-        (f: { name: string }) => f.name === "memberLog:embed.field.name.leave_username",
+        (f: { name: string }) =>
+          f.name === "memberLog:embed.field.name.leave_username",
       );
       expect(usernameField.value).toContain("unknown");
     });
@@ -363,7 +403,9 @@ describe("Member Log Handlers Integration", () => {
 
       await handler(member as never);
 
-      expect(mockConfigService.disableAndClearChannel).toHaveBeenCalledWith("guild-1");
+      expect(mockConfigService.disableAndClearChannel).toHaveBeenCalledWith(
+        "guild-1",
+      );
       expect(systemChannelSendMock).toHaveBeenCalledTimes(1);
     });
   });
@@ -375,9 +417,7 @@ describe("Member Log Handlers Integration", () => {
   describe("統合シナリオ: 参加→退出の一連のフロー", () => {
     it("同一メンバーの参加通知と退出通知が両方正しく送信されること", async () => {
       const addHandler = (
-        await import(
-          "@/bot/features/member-log/handlers/guildMemberAddHandler"
-        )
+        await import("@/bot/features/member-log/handlers/guildMemberAddHandler")
       ).handleGuildMemberAdd;
       const removeHandler = (
         await import(
@@ -406,7 +446,9 @@ describe("Member Log Handlers Integration", () => {
       expect(sendMock).toHaveBeenCalledTimes(2);
       const leaveCall = sendMock.mock.calls[1][0];
       expect(leaveCall.content).toBe("Goodbye TestUser!");
-      expect(leaveCall.embeds[0].data.title).toBe("memberLog:embed.title.leave");
+      expect(leaveCall.embeds[0].data.title).toBe(
+        "memberLog:embed.title.leave",
+      );
     });
   });
 });

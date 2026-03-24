@@ -11,8 +11,24 @@ vi.mock("@/bot/features/message-delete/services/messageDeleteService", () => ({
 }));
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: vi.fn((key: string, params?: Record<string, unknown>) =>
     params ? `${key}:${JSON.stringify(params)}` : key,
   ),
@@ -35,7 +51,13 @@ vi.mock("discord.js", async (importOriginal) => {
     ...orig,
     ModalBuilder: MockClass(["setCustomId", "setTitle", "addComponents"]),
     ActionRowBuilder: MockClass(["addComponents"]),
-    TextInputBuilder: MockClass(["setCustomId", "setLabel", "setStyle", "setRequired", "setPlaceholder"]),
+    TextInputBuilder: MockClass([
+      "setCustomId",
+      "setLabel",
+      "setStyle",
+      "setRequired",
+      "setPlaceholder",
+    ]),
   };
 });
 
@@ -171,7 +193,9 @@ describe("bot/features/message-delete/commands/usecases/dialogUtils", () => {
         "+00:00",
       );
       expect(result.filter.after).toBe(afterDate);
-      expect((result.filter as { afterRaw?: string }).afterRaw).toBe("2024-01-01");
+      expect((result.filter as { afterRaw?: string }).afterRaw).toBe(
+        "2024-01-01",
+      );
       expect(result.filter.days).toBeUndefined();
     });
 
@@ -242,7 +266,9 @@ describe("bot/features/message-delete/commands/usecases/dialogUtils", () => {
         "+00:00",
       );
       expect(result.filter.before).toBe(beforeDate);
-      expect((result.filter as { beforeRaw?: string }).beforeRaw).toBe("2024-01-31");
+      expect((result.filter as { beforeRaw?: string }).beforeRaw).toBe(
+        "2024-01-31",
+      );
       expect(result.filter.days).toBeUndefined();
     });
 

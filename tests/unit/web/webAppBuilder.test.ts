@@ -37,8 +37,15 @@ describe("web/webAppBuilder", () => {
     vi.doMock("@/web/routes/health", () => ({ healthRoute }));
     vi.doMock("@/shared/locale/localeManager", () => ({
       tDefault,
-      logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => {
-        const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+      logPrefixed: (
+        prefixKey: string,
+        messageKey: string,
+        params?: Record<string, unknown>,
+        sub?: string,
+      ) => {
+        const m = params
+          ? `${messageKey}:${JSON.stringify(params)}`
+          : messageKey;
         return sub ? `[${prefixKey}:${sub}] ${m}` : `[${prefixKey}] ${m}`;
       },
     }));
@@ -131,12 +138,15 @@ describe("web/webAppBuilder", () => {
       { status },
     );
 
-    expect(logger.error).toHaveBeenCalledWith("[system:log_prefix.web] system:web.api_error", {
-      error: "internal details",
-      stack: expect.any(String),
-      url: "/api/test",
-      method: "GET",
-    });
+    expect(logger.error).toHaveBeenCalledWith(
+      "[system:log_prefix.web] system:web.api_error",
+      {
+        error: "internal details",
+        stack: expect.any(String),
+        url: "/api/test",
+        method: "GET",
+      },
+    );
     expect(status).toHaveBeenCalledWith(418);
     expect(send).toHaveBeenCalledWith({
       error: "tr:system:web.internal_server_error",

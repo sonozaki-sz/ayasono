@@ -7,8 +7,11 @@ import {
 } from "@/bot/shared/pagination";
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  tInteraction: (_locale: string, key: string, params?: Record<string, unknown>) =>
-    params ? `${key}:${JSON.stringify(params)}` : key,
+  tInteraction: (
+    _locale: string,
+    key: string,
+    params?: Record<string, unknown>,
+  ) => (params ? `${key}:${JSON.stringify(params)}` : key),
 }));
 
 describe("bot/shared/pagination", () => {

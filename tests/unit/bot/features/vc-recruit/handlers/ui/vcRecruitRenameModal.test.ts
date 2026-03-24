@@ -1,6 +1,7 @@
 // tests/unit/bot/features/vc-recruit/handlers/ui/vcRecruitRenameModal.test.ts
-import { vcRecruitRenameModalHandler } from "@/bot/features/vc-recruit/handlers/ui/vcRecruitRenameModal";
+
 import { ChannelType, MessageFlags } from "discord.js";
+import { vcRecruitRenameModalHandler } from "@/bot/features/vc-recruit/handlers/ui/vcRecruitRenameModal";
 
 // ---- モック定義 ----
 
@@ -15,8 +16,24 @@ vi.mock("@/bot/utils/messageResponse", () => ({
   createSuccessEmbed: vi.fn((msg: string) => ({ success: msg })),
 }));
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tGuild: (...args: unknown[]) =>
     tGuildMock(...(args as Parameters<typeof tGuildMock>)),
   tInteraction: vi.fn((_locale: string, key: string) => key),
@@ -73,9 +90,9 @@ function makeModalInteraction(opts: {
 // matches() の検証
 describe("vcRecruitRenameModalHandler / matches()", () => {
   it("rename-vc-modal プレフィックスに一致する", () => {
-    expect(
-      vcRecruitRenameModalHandler.matches(`${MODAL_PREFIX}${VC_ID}`),
-    ).toBe(true);
+    expect(vcRecruitRenameModalHandler.matches(`${MODAL_PREFIX}${VC_ID}`)).toBe(
+      true,
+    );
   });
 
   it("無関係な customId には一致しない", () => {

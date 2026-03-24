@@ -10,21 +10,33 @@ vi.mock("@/shared/locale/commandLocalizations", () => ({
   }),
 }));
 
-vi.mock("@/bot/features/message-delete/commands/messageDeleteCommand.execute", () => ({
-  executeMessageDeleteCommand: (...args: unknown[]) =>
-    executeMessageDeleteCommandMock(...args),
-}));
+vi.mock(
+  "@/bot/features/message-delete/commands/messageDeleteCommand.execute",
+  () => ({
+    executeMessageDeleteCommand: (...args: unknown[]) =>
+      executeMessageDeleteCommandMock(...args),
+  }),
+);
 
 vi.mock("@/bot/errors/interactionErrorHandler", () => ({
   handleCommandError: (...args: unknown[]) => handleCommandErrorMock(...args),
 }));
 
-vi.mock("@/bot/features/message-delete/commands/messageDeleteCommand.constants", () => ({
-  MSG_DEL_COMMAND: {
-    NAME: "message-delete",
-    OPTION: { COUNT: "count", USER: "user", KEYWORD: "keyword", AFTER: "after", BEFORE: "before" },
-  },
-}));
+vi.mock(
+  "@/bot/features/message-delete/commands/messageDeleteCommand.constants",
+  () => ({
+    MSG_DEL_COMMAND: {
+      NAME: "message-delete",
+      OPTION: {
+        COUNT: "count",
+        USER: "user",
+        KEYWORD: "keyword",
+        AFTER: "after",
+        BEFORE: "before",
+      },
+    },
+  }),
+);
 
 import { messageDeleteCommand } from "@/bot/commands/message-delete";
 

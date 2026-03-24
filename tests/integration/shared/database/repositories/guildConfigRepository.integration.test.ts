@@ -20,8 +20,24 @@ vi.mock("@/shared/utils/logger", () => ({
 
 // i18n のモック
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: (key: string) => `mocked:${key}`,
   tInteraction: (...args: unknown[]) => args[1],
 }));
@@ -345,7 +361,9 @@ describe("PrismaGuildConfigRepository", () => {
 
       await repository.setBumpReminderEnabled("123456789", true, "ch-1");
 
-      expect(mockPrismaClient.guildBumpReminderConfig.upsert).toHaveBeenCalledWith({
+      expect(
+        mockPrismaClient.guildBumpReminderConfig.upsert,
+      ).toHaveBeenCalledWith({
         where: { guildId: "123456789" },
         create: {
           guildId: "123456789",
@@ -365,7 +383,9 @@ describe("PrismaGuildConfigRepository", () => {
 
       await repository.setBumpReminderEnabled("123456789", false);
 
-      expect(mockPrismaClient.guildBumpReminderConfig.upsert).toHaveBeenCalledWith({
+      expect(
+        mockPrismaClient.guildBumpReminderConfig.upsert,
+      ).toHaveBeenCalledWith({
         where: { guildId: "123456789" },
         create: {
           guildId: "123456789",
@@ -391,7 +411,9 @@ describe("PrismaGuildConfigRepository", () => {
 
       await repository.updateBumpReminderConfig("123456789", nextConfig);
 
-      expect(mockPrismaClient.guildBumpReminderConfig.upsert).toHaveBeenCalledWith({
+      expect(
+        mockPrismaClient.guildBumpReminderConfig.upsert,
+      ).toHaveBeenCalledWith({
         where: { guildId: "123456789" },
         create: {
           guildId: "123456789",
@@ -436,7 +458,9 @@ describe("PrismaGuildConfigRepository", () => {
       );
 
       expect(result).toBe("added");
-      expect(mockPrismaClient.guildBumpReminderConfig.update).toHaveBeenCalledWith({
+      expect(
+        mockPrismaClient.guildBumpReminderConfig.update,
+      ).toHaveBeenCalledWith({
         where: { guildId: "123456789" },
         data: { mentionUserIds: '["user-a","user-b"]' },
       });
@@ -453,7 +477,9 @@ describe("PrismaGuildConfigRepository", () => {
       );
 
       expect(result).toBe("already-exists");
-      expect(mockPrismaClient.guildBumpReminderConfig.update).not.toHaveBeenCalled();
+      expect(
+        mockPrismaClient.guildBumpReminderConfig.update,
+      ).not.toHaveBeenCalled();
     });
   });
 
@@ -484,7 +510,9 @@ describe("PrismaGuildConfigRepository", () => {
       );
 
       expect(result).toBe("updated");
-      expect(mockPrismaClient.guildBumpReminderConfig.update).toHaveBeenCalledWith({
+      expect(
+        mockPrismaClient.guildBumpReminderConfig.update,
+      ).toHaveBeenCalledWith({
         where: { guildId: "123456789" },
         data: { mentionRoleId: "new-role" },
       });
@@ -517,7 +545,9 @@ describe("PrismaGuildConfigRepository", () => {
       );
 
       expect(result).toBe("removed");
-      expect(mockPrismaClient.guildBumpReminderConfig.update).toHaveBeenCalledWith({
+      expect(
+        mockPrismaClient.guildBumpReminderConfig.update,
+      ).toHaveBeenCalledWith({
         where: { guildId: "123456789" },
         data: { mentionUserIds: '["user-a"]' },
       });
@@ -534,7 +564,9 @@ describe("PrismaGuildConfigRepository", () => {
       );
 
       expect(result).toBe("not-found");
-      expect(mockPrismaClient.guildBumpReminderConfig.update).not.toHaveBeenCalled();
+      expect(
+        mockPrismaClient.guildBumpReminderConfig.update,
+      ).not.toHaveBeenCalled();
     });
   });
 
@@ -544,7 +576,8 @@ describe("PrismaGuildConfigRepository", () => {
         null,
       );
 
-      const result = await repository.clearBumpReminderMentionUsers("123456789");
+      const result =
+        await repository.clearBumpReminderMentionUsers("123456789");
 
       expect(result).toBe("not-configured");
     });
@@ -555,10 +588,13 @@ describe("PrismaGuildConfigRepository", () => {
       });
       mockPrismaClient.guildBumpReminderConfig.update.mockResolvedValue({});
 
-      const result = await repository.clearBumpReminderMentionUsers("123456789");
+      const result =
+        await repository.clearBumpReminderMentionUsers("123456789");
 
       expect(result).toBe("cleared");
-      expect(mockPrismaClient.guildBumpReminderConfig.update).toHaveBeenCalledWith({
+      expect(
+        mockPrismaClient.guildBumpReminderConfig.update,
+      ).toHaveBeenCalledWith({
         where: { guildId: "123456789" },
         data: { mentionUserIds: "[]" },
       });
@@ -569,10 +605,13 @@ describe("PrismaGuildConfigRepository", () => {
         mentionUserIds: "[]",
       });
 
-      const result = await repository.clearBumpReminderMentionUsers("123456789");
+      const result =
+        await repository.clearBumpReminderMentionUsers("123456789");
 
       expect(result).toBe("already-empty");
-      expect(mockPrismaClient.guildBumpReminderConfig.update).not.toHaveBeenCalled();
+      expect(
+        mockPrismaClient.guildBumpReminderConfig.update,
+      ).not.toHaveBeenCalled();
     });
   });
 
@@ -597,7 +636,9 @@ describe("PrismaGuildConfigRepository", () => {
       const result = await repository.clearBumpReminderMentions("123456789");
 
       expect(result).toBe("cleared");
-      expect(mockPrismaClient.guildBumpReminderConfig.update).toHaveBeenCalledWith({
+      expect(
+        mockPrismaClient.guildBumpReminderConfig.update,
+      ).toHaveBeenCalledWith({
         where: { guildId: "123456789" },
         data: { mentionRoleId: null, mentionUserIds: "[]" },
       });
@@ -612,7 +653,9 @@ describe("PrismaGuildConfigRepository", () => {
       const result = await repository.clearBumpReminderMentions("123456789");
 
       expect(result).toBe("already-cleared");
-      expect(mockPrismaClient.guildBumpReminderConfig.update).not.toHaveBeenCalled();
+      expect(
+        mockPrismaClient.guildBumpReminderConfig.update,
+      ).not.toHaveBeenCalled();
     });
   });
 });

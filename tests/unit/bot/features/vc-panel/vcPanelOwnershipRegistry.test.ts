@@ -9,8 +9,9 @@ describe("bot/features/vc-panel/vcPanelOwnershipRegistry", () => {
   });
 
   it("チェッカーが未登録の場合は false を返す", async () => {
-    const { isVcPanelManagedChannel } =
-      await import("@/bot/features/vc-panel/vcPanelOwnershipRegistry");
+    const { isVcPanelManagedChannel } = await import(
+      "@/bot/features/vc-panel/vcPanelOwnershipRegistry"
+    );
     await expect(isVcPanelManagedChannel("guild-1", "ch-1")).resolves.toBe(
       false,
     );

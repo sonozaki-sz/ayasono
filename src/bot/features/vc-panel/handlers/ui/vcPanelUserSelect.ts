@@ -3,8 +3,8 @@
 
 import {
   ChannelType,
-  MessageFlags,
   type GuildMember,
+  MessageFlags,
   type StringSelectMenuInteraction,
 } from "discord.js";
 import { getAfkConfig } from "../../../../../shared/features/afk/afkConfigService";

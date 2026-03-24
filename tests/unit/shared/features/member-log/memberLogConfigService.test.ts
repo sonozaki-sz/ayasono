@@ -17,8 +17,9 @@ describe("shared/features/member-log/memberLogConfigService", () => {
       getGuildConfigRepository: getGuildConfigRepositoryMock,
     }));
 
-    const module =
-      await import("@/shared/features/member-log/memberLogConfigService");
+    const module = await import(
+      "@/shared/features/member-log/memberLogConfigService"
+    );
 
     return { module, getGuildConfigRepositoryMock };
   };

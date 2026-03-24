@@ -3,16 +3,16 @@
 
 import {
   ChannelType,
+  type ChatInputCommandInteraction,
   MessageFlags,
   type OverwriteResolvable,
   PermissionFlagsBits,
-  type ChatInputCommandInteraction,
   type TextChannel,
 } from "discord.js";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
 import { tInteraction } from "../../../../../shared/locale/localeManager";
-import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
 import { getBotVcRecruitRepository } from "../../../../services/botCompositionRoot";
+import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
 import { createSuccessEmbed } from "../../../../utils/messageResponse";
 import { resolveTargetCategory } from "../helpers/vcRecruitTargetResolver";
 import {

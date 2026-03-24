@@ -9,8 +9,8 @@ import {
   tInteraction,
 } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
-import { createSuccessEmbed } from "../../../utils/messageResponse";
 import { COMMON_I18N_KEYS } from "../../../shared/i18nKeys";
+import { createSuccessEmbed } from "../../../utils/messageResponse";
 
 const AFK_I18N_KEYS = {
   ERROR_GUILD_ONLY: COMMON_I18N_KEYS.GUILD_ONLY,

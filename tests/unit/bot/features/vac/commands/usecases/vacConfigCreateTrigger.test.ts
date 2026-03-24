@@ -1,4 +1,7 @@
 // tests/unit/bot/features/vac/commands/usecases/vacConfigCreateTrigger.test.ts
+
+import { ChannelType, MessageFlags } from "discord.js";
+import type { Mock } from "vitest";
 import {
   findTriggerChannelByCategory,
   resolveTargetCategory,
@@ -7,12 +10,26 @@ import { handleVacConfigCreateTrigger } from "@/bot/features/vac/commands/usecas
 import { getBotVacConfigService } from "@/bot/services/botCompositionRoot";
 import { createSuccessEmbed } from "@/bot/utils/messageResponse";
 import { ValidationError } from "@/shared/errors/customErrors";
-import { ChannelType, MessageFlags } from "discord.js";
-import type { Mock } from "vitest";
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: vi.fn((key: string) => key),
   tGuild: vi.fn(async (_guildId: string, key: string) => key),
   tInteraction: (...args: unknown[]) => args[1],

@@ -3,11 +3,11 @@
 
 import type { StringSelectMenuInteraction } from "discord.js";
 import type { StringSelectHandler } from "../../../../handlers/interactionCreate/ui/types";
+import { buildViewPayload } from "../../commands/guildConfigCommand.view";
 import {
   GUILD_CONFIG_CUSTOM_ID,
   VIEW_PAGES,
 } from "../../constants/guildConfig.constants";
-import { buildViewPayload } from "../../commands/guildConfigCommand.view";
 
 /**
  * guild-config view のページセレクトメニューを処理するハンドラ

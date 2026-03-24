@@ -1,17 +1,34 @@
 // tests/unit/bot/features/vac/services/usecases/handleVacCreate.test.ts
-import type { VacConfigService } from "@/shared/features/vac/vacConfigService";
-import { handleVacCreateUseCase } from "@/bot/features/vac/services/usecases/handleVacCreate";
-import { sendVcControlPanel } from "@/bot/features/vc-panel/vcControlPanel";
+
 import { ChannelType, PermissionFlagsBits } from "discord.js";
 import type { Mock, Mocked } from "vitest";
+import { handleVacCreateUseCase } from "@/bot/features/vac/services/usecases/handleVacCreate";
+import { sendVcControlPanel } from "@/bot/features/vc-panel/vcControlPanel";
+import type { VacConfigService } from "@/shared/features/vac/vacConfigService";
 
 const loggerInfoMock = vi.fn();
 const loggerWarnMock = vi.fn();
 const loggerErrorMock = vi.fn();
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: vi.fn((key: string) => `default:${key}`),
   tInteraction: (...args: unknown[]) => args[1],
 }));

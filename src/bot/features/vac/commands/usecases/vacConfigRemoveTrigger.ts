@@ -6,9 +6,9 @@ import {
   ButtonBuilder,
   ButtonStyle,
   ChannelType,
+  type ChatInputCommandInteraction,
   MessageFlags,
   StringSelectMenuBuilder,
-  type ChatInputCommandInteraction,
 } from "discord.js";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
 import {
@@ -16,8 +16,8 @@ import {
   tInteraction,
 } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
-import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
 import { getBotVacConfigService } from "../../../../services/botCompositionRoot";
+import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
 import {
   createInfoEmbed,
   createSuccessEmbed,

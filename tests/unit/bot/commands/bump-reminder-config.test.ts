@@ -57,8 +57,24 @@ vi.mock("@/shared/locale/commandLocalizations", () => ({
   }),
 }));
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: tDefaultMock,
   tGuild: tGuildMock,
   tInteraction: (...args: unknown[]) => args[1],
@@ -70,7 +86,12 @@ vi.mock("@/bot/utils/messageResponse", () => ({
   createInfoEmbed: vi.fn((message: string) => ({ message })),
   createSuccessEmbed: (description: string) =>
     createSuccessEmbedMock(description),
-  STATUS_COLORS: { success: 0x57f287, info: 0x3498db, warning: 0xfee75c, error: 0xed4245 },
+  STATUS_COLORS: {
+    success: 0x57f287,
+    info: 0x3498db,
+    warning: 0xfee75c,
+    error: 0xed4245,
+  },
 }));
 
 // ログ出力の副作用を抑止
@@ -170,8 +191,7 @@ describe("bot/commands/bump-reminder-config", () => {
     expect(interaction.reply).toHaveBeenCalledWith({
       embeds: [
         {
-          description:
-            "bumpReminder:user-response.enable_success",
+          description: "bumpReminder:user-response.enable_success",
         },
       ],
       flags: MessageFlags.Ephemeral,
@@ -195,8 +215,7 @@ describe("bot/commands/bump-reminder-config", () => {
     expect(interaction.reply).toHaveBeenCalledWith({
       embeds: [
         {
-          description:
-            "bumpReminder:user-response.disable_success",
+          description: "bumpReminder:user-response.disable_success",
         },
       ],
       flags: MessageFlags.Ephemeral,
@@ -204,24 +223,27 @@ describe("bot/commands/bump-reminder-config", () => {
   });
 
   // 各サブコマンドの権限不足時にエラーハンドラへ委譲されることを検証
-  it.each(["enable", "disable", "set-mention", "remove-mention", "view"])(
-    "%s サブコマンドで権限不足の場合は handleCommandError へ委譲されることを確認",
-    async (subcommand) => {
-      const interaction = createInteraction({
-        memberPermissions: { has: vi.fn(() => false) },
-        options: {
-          getSubcommand: vi.fn(() => subcommand),
-          getRole: vi.fn(() => null),
-        },
-      });
+  it.each([
+    "enable",
+    "disable",
+    "set-mention",
+    "remove-mention",
+    "view",
+  ])("%s サブコマンドで権限不足の場合は handleCommandError へ委譲されることを確認", async (subcommand) => {
+    const interaction = createInteraction({
+      memberPermissions: { has: vi.fn(() => false) },
+      options: {
+        getSubcommand: vi.fn(() => subcommand),
+        getRole: vi.fn(() => null),
+      },
+    });
 
-      await bumpReminderConfigCommand.execute(
-        interaction as unknown as ChatInputCommandInteraction,
-      );
+    await bumpReminderConfigCommand.execute(
+      interaction as unknown as ChatInputCommandInteraction,
+    );
 
-      expect(handleCommandError).toHaveBeenCalledTimes(1);
-    },
-  );
+    expect(handleCommandError).toHaveBeenCalledTimes(1);
+  });
 
   it("set-mention で role が null の場合はエラーが委譲されることを確認", async () => {
     const interaction = createInteraction({
@@ -259,8 +281,7 @@ describe("bot/commands/bump-reminder-config", () => {
     expect(interaction.reply).toHaveBeenCalledWith({
       embeds: [
         {
-          description:
-            "bumpReminder:user-response.set_mention_role_success",
+          description: "bumpReminder:user-response.set_mention_role_success",
         },
       ],
       flags: MessageFlags.Ephemeral,
@@ -299,8 +320,7 @@ describe("bot/commands/bump-reminder-config", () => {
     expect(interaction.reply).toHaveBeenCalledWith({
       embeds: [
         {
-          message:
-            "bumpReminder:embed.description.not_configured",
+          message: "bumpReminder:embed.description.not_configured",
         },
       ],
       flags: MessageFlags.Ephemeral,
@@ -382,8 +402,7 @@ describe("bot/commands/bump-reminder-config", () => {
     expect(interaction.reply).toHaveBeenCalledWith({
       embeds: [
         {
-          description:
-            "bumpReminder:user-response.remove_mention_role",
+          description: "bumpReminder:user-response.remove_mention_role",
         },
       ],
       flags: MessageFlags.Ephemeral,

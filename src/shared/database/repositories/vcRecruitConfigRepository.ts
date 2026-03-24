@@ -2,12 +2,12 @@
 // VC募集設定リポジトリ（guild_vc_recruit_configs テーブル）
 
 import type { PrismaClient } from "@prisma/client";
+import { parseJsonArray } from "../../utils/jsonUtils";
 import type {
   IVcRecruitConfigRepository,
   VcRecruitConfig,
   VcRecruitSetup,
 } from "../types";
-import { parseJsonArray } from "../../utils/jsonUtils";
 
 /**
  * guild_vc_recruit_configs テーブルを使用した VC募集設定リポジトリ

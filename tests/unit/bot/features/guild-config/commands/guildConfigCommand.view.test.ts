@@ -9,9 +9,12 @@ vi.mock("@/shared/locale/localeManager", () => ({
 }));
 
 const buildPageMock = vi.fn().mockResolvedValue({ kind: "embed" });
-vi.mock("@/bot/features/guild-config/commands/guildConfigCommand.viewPages", () => ({
-  buildPage: (...args: unknown[]) => buildPageMock(...args),
-}));
+vi.mock(
+  "@/bot/features/guild-config/commands/guildConfigCommand.viewPages",
+  () => ({
+    buildPage: (...args: unknown[]) => buildPageMock(...args),
+  }),
+);
 
 vi.mock("@/bot/shared/pagination", () => ({
   buildPaginationRow: vi.fn(() => ({ components: [] })),
@@ -22,9 +25,9 @@ vi.mock("@/bot/shared/disableComponentsAfterTimeout", () => ({
 }));
 
 import {
-  handleView,
   buildViewComponents,
   buildViewPayload,
+  handleView,
 } from "@/bot/features/guild-config/commands/guildConfigCommand.view";
 import { disableComponentsAfterTimeout } from "@/bot/shared/disableComponentsAfterTimeout";
 

@@ -5,10 +5,10 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
+  type MessageComponentInteraction,
   ModalBuilder,
   TextInputBuilder,
   TextInputStyle,
-  type MessageComponentInteraction,
 } from "discord.js";
 import { tInteraction } from "../../shared/locale/localeManager";
 

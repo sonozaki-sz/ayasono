@@ -22,6 +22,7 @@ process.env.TZ = "UTC";
 // ============================================================
 // EventEmitter の警告（MaxListenersExceededWarning）を抑える
 import { EventEmitter } from "events";
+
 EventEmitter.defaultMaxListeners = 20;
 
 // 不要な標準出力ノイズを抑制（error は失敗解析のため維持）

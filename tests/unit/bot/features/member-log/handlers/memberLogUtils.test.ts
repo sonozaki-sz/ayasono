@@ -89,9 +89,12 @@ describe("bot/features/member-log/handlers/memberLogUtils", () => {
   // formatAccountAge：年・月・日の組み合わせで正しいフォーマット結果を返すことを検証
   describe("formatAccountAge", () => {
     const t = (key: string, opts?: { count?: number }) => {
-      if (key === "memberLog:embed.field.value.age_years") return `${opts?.count}年`;
-      if (key === "memberLog:embed.field.value.age_months") return `${opts?.count}ヶ月`;
-      if (key === "memberLog:embed.field.value.age_days") return `${opts?.count}日`;
+      if (key === "memberLog:embed.field.value.age_years")
+        return `${opts?.count}年`;
+      if (key === "memberLog:embed.field.value.age_months")
+        return `${opts?.count}ヶ月`;
+      if (key === "memberLog:embed.field.value.age_days")
+        return `${opts?.count}日`;
       if (key === "memberLog:embed.field.value.age_separator") return "";
       return key;
     };

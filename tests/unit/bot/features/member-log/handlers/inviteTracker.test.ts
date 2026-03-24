@@ -65,7 +65,9 @@ describe("bot/features/member-log/handlers/inviteTracker", () => {
         },
       };
 
-      await expect(initGuildInviteCache(guild as never)).resolves.toBeUndefined();
+      await expect(
+        initGuildInviteCache(guild as never),
+      ).resolves.toBeUndefined();
     });
   });
 

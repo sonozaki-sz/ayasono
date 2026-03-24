@@ -1,6 +1,7 @@
 // tests/unit/bot/events/voiceStateUpdate.test.ts
-import { voiceStateUpdateEvent } from "@/bot/events/voiceStateUpdate";
+
 import { Events } from "discord.js";
+import { voiceStateUpdateEvent } from "@/bot/events/voiceStateUpdate";
 
 const handleVacVoiceStateUpdateMock = vi.fn();
 

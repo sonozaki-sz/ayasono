@@ -19,13 +19,26 @@ describe("shared/errors/processErrorHandler", () => {
 
     vi.doMock("@/shared/locale/localeManager", () => ({
       tDefault: tDefaultMock,
-      logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => {
+      logPrefixed: (
+        prefixKey: string,
+        messageKey: string,
+        params?: Record<string, unknown>,
+        sub?: string,
+      ) => {
         const p = tDefaultMock(prefixKey);
-        const m = params ? tDefaultMock(messageKey, params as { signal?: string }) : tDefaultMock(messageKey);
+        const m = params
+          ? tDefaultMock(messageKey, params as { signal?: string })
+          : tDefaultMock(messageKey);
         return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
       },
-      logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => {
-        const m = params ? tDefaultMock(messageKey, params as { signal?: string }) : tDefaultMock(messageKey);
+      logCommand: (
+        commandName: string,
+        messageKey: string,
+        params?: Record<string, unknown>,
+      ) => {
+        const m = params
+          ? tDefaultMock(messageKey, params as { signal?: string })
+          : tDefaultMock(messageKey);
         return `[${commandName}] ${m}`;
       },
     }));
@@ -45,15 +58,18 @@ describe("shared/errors/processErrorHandler", () => {
     const onSpy = vi
       .spyOn(process, "on")
       .mockImplementation((() => process) as typeof process.on);
-    const { setupGlobalErrorHandlers } =
-      await import("@/shared/errors/processErrorHandler");
+    const { setupGlobalErrorHandlers } = await import(
+      "@/shared/errors/processErrorHandler"
+    );
 
     setupGlobalErrorHandlers();
     setupGlobalErrorHandlers();
 
     expect(onSpy).toHaveBeenCalledTimes(3);
     expect(loggerMock.warn).toHaveBeenCalledWith(
-      expect.stringContaining("system:error.global_handlers_already_registered"),
+      expect.stringContaining(
+        "system:error.global_handlers_already_registered",
+      ),
     );
   });
 
@@ -67,8 +83,9 @@ describe("shared/errors/processErrorHandler", () => {
       return process;
     }) as typeof process.on);
 
-    const { setupGlobalErrorHandlers } =
-      await import("@/shared/errors/processErrorHandler");
+    const { setupGlobalErrorHandlers } = await import(
+      "@/shared/errors/processErrorHandler"
+    );
     setupGlobalErrorHandlers();
 
     const unhandledRejection = handlers.get("unhandledRejection");
@@ -106,8 +123,9 @@ describe("shared/errors/processErrorHandler", () => {
       .mockImplementation((() => undefined as never) as typeof process.exit);
 
     const { BaseError } = await import("@/shared/errors/customErrors");
-    const { setupGlobalErrorHandlers } =
-      await import("@/shared/errors/processErrorHandler");
+    const { setupGlobalErrorHandlers } = await import(
+      "@/shared/errors/processErrorHandler"
+    );
     setupGlobalErrorHandlers();
 
     const uncaughtException = handlers.get("uncaughtException");
@@ -138,8 +156,9 @@ describe("shared/errors/processErrorHandler", () => {
       .mockImplementation((() => undefined as never) as typeof process.exit);
 
     const { BaseError } = await import("@/shared/errors/customErrors");
-    const { setupGlobalErrorHandlers } =
-      await import("@/shared/errors/processErrorHandler");
+    const { setupGlobalErrorHandlers } = await import(
+      "@/shared/errors/processErrorHandler"
+    );
     setupGlobalErrorHandlers();
 
     const uncaughtException = handlers.get("uncaughtException");
@@ -160,8 +179,9 @@ describe("shared/errors/processErrorHandler", () => {
       return process;
     }) as typeof process.on);
 
-    const { setupGlobalErrorHandlers } =
-      await import("@/shared/errors/processErrorHandler");
+    const { setupGlobalErrorHandlers } = await import(
+      "@/shared/errors/processErrorHandler"
+    );
     setupGlobalErrorHandlers();
 
     const warningHandler = handlers.get("warning");
@@ -191,8 +211,9 @@ describe("shared/errors/processErrorHandler", () => {
       return process;
     }) as typeof process.on);
 
-    const { setupGlobalErrorHandlers } =
-      await import("@/shared/errors/processErrorHandler");
+    const { setupGlobalErrorHandlers } = await import(
+      "@/shared/errors/processErrorHandler"
+    );
     setupGlobalErrorHandlers();
 
     const warningHandler = handlers.get("warning");
@@ -228,8 +249,9 @@ describe("shared/errors/processErrorHandler", () => {
       return process;
     }) as typeof process.on);
 
-    const { setupGlobalErrorHandlers } =
-      await import("@/shared/errors/processErrorHandler");
+    const { setupGlobalErrorHandlers } = await import(
+      "@/shared/errors/processErrorHandler"
+    );
     setupGlobalErrorHandlers();
 
     const warningHandler = handlers.get("warning");
@@ -264,8 +286,9 @@ describe("shared/errors/processErrorHandler", () => {
       return process;
     }) as typeof process.on);
 
-    const { setupGlobalErrorHandlers } =
-      await import("@/shared/errors/processErrorHandler");
+    const { setupGlobalErrorHandlers } = await import(
+      "@/shared/errors/processErrorHandler"
+    );
     setupGlobalErrorHandlers();
 
     const warningHandler = handlers.get("warning");
@@ -302,15 +325,18 @@ describe("shared/errors/processErrorHandler", () => {
       .spyOn(process, "exit")
       .mockImplementation((() => undefined as never) as typeof process.exit);
 
-    const { setupGracefulShutdown } =
-      await import("@/shared/errors/processErrorHandler");
+    const { setupGracefulShutdown } = await import(
+      "@/shared/errors/processErrorHandler"
+    );
 
     const cleanup = vi.fn().mockResolvedValue(undefined);
     setupGracefulShutdown(cleanup);
     setupGracefulShutdown(cleanup);
 
     expect(loggerMock.warn).toHaveBeenCalledWith(
-      expect.stringContaining("system:error.shutdown_handlers_already_registered"),
+      expect.stringContaining(
+        "system:error.shutdown_handlers_already_registered",
+      ),
     );
 
     onceHandlers.get("SIGTERM")?.();
@@ -333,13 +359,26 @@ describe("shared/errors/processErrorHandler", () => {
     vi.clearAllMocks();
     vi.doMock("@/shared/locale/localeManager", () => ({
       tDefault: tDefaultMock,
-      logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => {
+      logPrefixed: (
+        prefixKey: string,
+        messageKey: string,
+        params?: Record<string, unknown>,
+        sub?: string,
+      ) => {
         const p = tDefaultMock(prefixKey);
-        const m = params ? tDefaultMock(messageKey, params as { signal?: string }) : tDefaultMock(messageKey);
+        const m = params
+          ? tDefaultMock(messageKey, params as { signal?: string })
+          : tDefaultMock(messageKey);
         return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
       },
-      logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => {
-        const m = params ? tDefaultMock(messageKey, params as { signal?: string }) : tDefaultMock(messageKey);
+      logCommand: (
+        commandName: string,
+        messageKey: string,
+        params?: Record<string, unknown>,
+      ) => {
+        const m = params
+          ? tDefaultMock(messageKey, params as { signal?: string })
+          : tDefaultMock(messageKey);
         return `[${commandName}] ${m}`;
       },
     }));
@@ -362,8 +401,9 @@ describe("shared/errors/processErrorHandler", () => {
       .spyOn(process, "exit")
       .mockImplementation((() => undefined as never) as typeof process.exit);
 
-    const { setupGracefulShutdown: setupGracefulShutdown2 } =
-      await import("@/shared/errors/processErrorHandler");
+    const { setupGracefulShutdown: setupGracefulShutdown2 } = await import(
+      "@/shared/errors/processErrorHandler"
+    );
 
     setupGracefulShutdown2(failingCleanup);
     secondOnceHandlers.get("SIGINT")?.();
@@ -399,8 +439,9 @@ describe("shared/errors/processErrorHandler", () => {
         }),
     );
 
-    const { setupGracefulShutdown } =
-      await import("@/shared/errors/processErrorHandler");
+    const { setupGracefulShutdown } = await import(
+      "@/shared/errors/processErrorHandler"
+    );
     setupGracefulShutdown(cleanup);
 
     const sigterm = onceHandlers.get("SIGTERM");
@@ -431,8 +472,9 @@ describe("shared/errors/processErrorHandler", () => {
       .spyOn(process, "exit")
       .mockImplementation((() => undefined as never) as typeof process.exit);
 
-    const { setupGracefulShutdown } =
-      await import("@/shared/errors/processErrorHandler");
+    const { setupGracefulShutdown } = await import(
+      "@/shared/errors/processErrorHandler"
+    );
     setupGracefulShutdown();
 
     onceHandlers.get("SIGINT")?.();

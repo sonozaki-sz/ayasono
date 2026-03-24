@@ -1,6 +1,7 @@
 // tests/unit/bot/features/vc-recruit/handlers/vcRecruitVoiceStateUpdate.test.ts
-import { handleVcRecruitVoiceStateUpdate } from "@/bot/features/vc-recruit/handlers/vcRecruitVoiceStateUpdate";
+
 import { ChannelType } from "discord.js";
+import { handleVcRecruitVoiceStateUpdate } from "@/bot/features/vc-recruit/handlers/vcRecruitVoiceStateUpdate";
 
 // ---- モック定義 ----
 

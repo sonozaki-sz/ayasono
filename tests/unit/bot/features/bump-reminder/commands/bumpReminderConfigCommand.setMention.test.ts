@@ -6,8 +6,24 @@ import { BUMP_REMINDER_MENTION_ROLE_RESULT } from "@/shared/features/bump-remind
 const setBumpReminderMentionRoleMock = vi.fn();
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: vi.fn((key: string) => `default:${key}`),
   tGuild: vi.fn(async () => "translated"),
   tInteraction: (...args: unknown[]) => args[1],
@@ -54,8 +70,7 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.setMenti
     expect(interaction.reply).toHaveBeenCalledWith({
       embeds: [
         {
-          description:
-            "bumpReminder:user-response.set_mention_role_success",
+          description: "bumpReminder:user-response.set_mention_role_success",
         },
       ],
       flags: 64,

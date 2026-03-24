@@ -2,11 +2,11 @@
 // 削除対象チャンネルリストの構築
 
 import {
-  PermissionFlagsBits,
   type ChatInputCommandInteraction,
   type Guild,
   type GuildTextBasedChannel,
   type MessageComponentInteraction,
+  PermissionFlagsBits,
 } from "discord.js";
 import {
   logPrefixed,

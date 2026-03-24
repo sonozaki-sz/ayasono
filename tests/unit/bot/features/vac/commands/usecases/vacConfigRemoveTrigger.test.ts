@@ -1,7 +1,8 @@
 // tests/unit/bot/features/vac/commands/usecases/vacConfigRemoveTrigger.test.ts
+
+import { ChannelType } from "discord.js";
 import { handleVacConfigRemoveTrigger } from "@/bot/features/vac/commands/usecases/vacConfigRemoveTrigger";
 import { ValidationError } from "@/shared/errors/customErrors";
-import { ChannelType } from "discord.js";
 
 const removeTriggerChannelMock = vi.fn();
 const getVacConfigOrDefaultMock = vi.fn();
@@ -114,13 +115,16 @@ describe("bot/features/vac/commands/usecases/vacConfigRemoveTrigger", () => {
     });
     removeTriggerChannelMock.mockResolvedValue(undefined);
 
-    const channelMocks: Record<string, {
-      id: string;
-      name: string;
-      type: ChannelType;
-      parent: { type: ChannelType; name: string } | null;
-      delete: ReturnType<typeof vi.fn>;
-    }> = {
+    const channelMocks: Record<
+      string,
+      {
+        id: string;
+        name: string;
+        type: ChannelType;
+        parent: { type: ChannelType; name: string } | null;
+        delete: ReturnType<typeof vi.fn>;
+      }
+    > = {
       "trigger-1": {
         id: "trigger-1",
         name: "CreateVC-1",
@@ -140,14 +144,19 @@ describe("bot/features/vac/commands/usecases/vacConfigRemoveTrigger", () => {
     const fetchMock = vi.fn((id: string) => Promise.resolve(channelMocks[id]));
 
     const collectHandlers: ((i: unknown) => Promise<void>)[] = [];
-    const endHandlers: ((collected: unknown, reason: string) => Promise<void>)[] = [];
+    const endHandlers: ((
+      collected: unknown,
+      reason: string,
+    ) => Promise<void>)[] = [];
 
     const collectorMock = {
-      on: vi.fn((event: string, handler: (...args: unknown[]) => Promise<void>) => {
-        if (event === "collect") collectHandlers.push(handler);
-        if (event === "end") endHandlers.push(handler);
-        return collectorMock;
-      }),
+      on: vi.fn(
+        (event: string, handler: (...args: unknown[]) => Promise<void>) => {
+          if (event === "collect") collectHandlers.push(handler);
+          if (event === "end") endHandlers.push(handler);
+          return collectorMock;
+        },
+      ),
       stop: vi.fn(),
     };
 
@@ -184,8 +193,14 @@ describe("bot/features/vac/commands/usecases/vacConfigRemoveTrigger", () => {
     };
     await collectHandlers[0](confirmInteraction);
 
-    expect(removeTriggerChannelMock).toHaveBeenCalledWith("guild-1", "trigger-1");
-    expect(removeTriggerChannelMock).not.toHaveBeenCalledWith("guild-1", "trigger-2");
+    expect(removeTriggerChannelMock).toHaveBeenCalledWith(
+      "guild-1",
+      "trigger-1",
+    );
+    expect(removeTriggerChannelMock).not.toHaveBeenCalledWith(
+      "guild-1",
+      "trigger-2",
+    );
     expect(channelMocks["trigger-1"].delete).toHaveBeenCalled();
     expect(channelMocks["trigger-2"].delete).not.toHaveBeenCalled();
     expect(confirmInteraction.update).toHaveBeenCalledWith(
@@ -209,13 +224,18 @@ describe("bot/features/vac/commands/usecases/vacConfigRemoveTrigger", () => {
       parent: { type: ChannelType.GuildCategory, name: "General" },
     });
 
-    const endHandlers: ((collected: unknown, reason: string) => Promise<void>)[] = [];
+    const endHandlers: ((
+      collected: unknown,
+      reason: string,
+    ) => Promise<void>)[] = [];
 
     const collectorMock = {
-      on: vi.fn((event: string, handler: (...args: unknown[]) => Promise<void>) => {
-        if (event === "end") endHandlers.push(handler);
-        return collectorMock;
-      }),
+      on: vi.fn(
+        (event: string, handler: (...args: unknown[]) => Promise<void>) => {
+          if (event === "end") endHandlers.push(handler);
+          return collectorMock;
+        },
+      ),
       stop: vi.fn(),
     };
 

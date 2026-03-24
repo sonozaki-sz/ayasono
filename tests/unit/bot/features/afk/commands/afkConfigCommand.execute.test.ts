@@ -1,7 +1,8 @@
 // tests/unit/bot/features/afk/commands/afkConfigCommand.execute.test.ts
+
+import { ChannelType, PermissionFlagsBits } from "discord.js";
 import { executeAfkConfigCommand } from "@/bot/features/afk/commands/afkConfigCommand.execute";
 import { ValidationError } from "@/shared/errors/customErrors";
-import { ChannelType, PermissionFlagsBits } from "discord.js";
 
 const setAfkChannelMock = vi.fn();
 const getAfkConfigMock = vi.fn();
@@ -35,8 +36,24 @@ vi.mock("@/shared/features/afk/afkConfigService", () => ({
 }));
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: (key: string) => tDefaultMock(key),
   tGuild: (guildId: string, key: string, params?: Record<string, unknown>) =>
     tGuildMock(guildId, key, params),
@@ -107,7 +124,12 @@ describe("bot/features/afk/commands/afkConfigCommand.execute", () => {
 
     expect(setAfkChannelMock).toHaveBeenCalledWith("guild-1", "afk-channel");
     expect(interaction.reply).toHaveBeenCalledWith({
-      embeds: [{ description: "afk:user-response.set_channel_success", kind: "success" }],
+      embeds: [
+        {
+          description: "afk:user-response.set_channel_success",
+          kind: "success",
+        },
+      ],
       flags: 64,
     });
   });

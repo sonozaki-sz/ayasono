@@ -5,8 +5,8 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
-  MessageFlags,
   type ChatInputCommandInteraction,
+  MessageFlags,
 } from "discord.js";
 import { createDefaultBumpReminderConfig } from "../../../../shared/features/bump-reminder/bumpReminderConfigDefaults";
 import {

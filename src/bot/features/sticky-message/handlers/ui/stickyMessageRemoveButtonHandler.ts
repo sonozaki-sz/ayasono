@@ -2,8 +2,8 @@
 // sticky-message remove の「削除する」ボタン押下を処理する
 
 import {
-  ChannelType,
   type ButtonInteraction,
+  ChannelType,
   type TextChannel,
 } from "discord.js";
 import { tInteraction } from "../../../../../shared/locale/localeManager";

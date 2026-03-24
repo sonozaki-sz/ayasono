@@ -1,19 +1,19 @@
 // src/bot/features/guild-config/handlers/ui/guildConfigViewButtonHandler.ts
 // guild-config view ページネーションボタンハンドラ
 
-import { ComponentType, type ButtonInteraction } from "discord.js";
+import { type ButtonInteraction, ComponentType } from "discord.js";
+import type { ButtonHandler } from "../../../../handlers/interactionCreate/ui/types";
 import {
   parsePaginationAction,
   resolvePageFromAction,
   showPaginationJumpModal,
 } from "../../../../shared/pagination";
-import type { ButtonHandler } from "../../../../handlers/interactionCreate/ui/types";
+import { buildViewPayload } from "../../commands/guildConfigCommand.view";
 import {
+  GUILD_CONFIG_CUSTOM_ID,
   GUILD_CONFIG_PREFIX,
   VIEW_PAGES,
-  GUILD_CONFIG_CUSTOM_ID,
 } from "../../constants/guildConfig.constants";
-import { buildViewPayload } from "../../commands/guildConfigCommand.view";
 
 /**
  * guild-config view のページネーションボタンを処理するハンドラ

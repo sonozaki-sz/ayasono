@@ -1,7 +1,11 @@
 // tests/unit/shared/locale/logPrefixed.test.ts
 // logPrefixed / logCommand ヘルパー関数のテスト
 
-import { localeManager, logCommand, logPrefixed } from "@/shared/locale/localeManager";
+import {
+  localeManager,
+  logCommand,
+  logPrefixed,
+} from "@/shared/locale/localeManager";
 
 // i18n 依存の翻訳結果を検証するためロケールを初期化
 beforeAll(async () => {
@@ -72,11 +76,10 @@ describe("logCommand", () => {
   });
 
   it("補間パラメータがメッセージに正しく展開されること", () => {
-    const result = logCommand(
-      "/bump-reminder",
-      "bumpReminder:log.detected",
-      { guildId: "321", service: "disboard" },
-    );
+    const result = logCommand("/bump-reminder", "bumpReminder:log.detected", {
+      guildId: "321",
+      service: "disboard",
+    });
 
     expect(result).toBe(
       "[/bump-reminder] Bumpを検知 GuildId: 321 Service: disboard",

@@ -1,14 +1,31 @@
 // tests/unit/bot/features/vac/services/usecases/handleVacDelete.test.ts
-import type { VacConfigService } from "@/shared/features/vac/vacConfigService";
-import { handleVacDeleteUseCase } from "@/bot/features/vac/services/usecases/handleVacDelete";
+
 import { ChannelType } from "discord.js";
 import type { Mocked } from "vitest";
+import { handleVacDeleteUseCase } from "@/bot/features/vac/services/usecases/handleVacDelete";
+import type { VacConfigService } from "@/shared/features/vac/vacConfigService";
 
 const loggerInfoMock = vi.fn();
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: vi.fn((key: string) => `default:${key}`),
   tInteraction: (...args: unknown[]) => args[1],
 }));

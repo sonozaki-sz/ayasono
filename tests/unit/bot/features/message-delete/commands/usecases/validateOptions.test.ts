@@ -11,8 +11,8 @@ import {
   parseAndValidateOptions,
 } from "@/bot/features/message-delete/commands/usecases/validateOptions";
 import {
-  MSG_DEL_DEFAULT_COUNT,
   MS_PER_DAY,
+  MSG_DEL_DEFAULT_COUNT,
 } from "@/bot/features/message-delete/constants/messageDeleteConstants";
 
 // ── モック ────────────────────────────────────────────────────────────────
@@ -34,8 +34,24 @@ vi.mock("@/bot/utils/messageResponse", () => ({
 }));
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: (key: string) => tDefaultMock(key),
   tInteraction: (...args: unknown[]) => args[1],
 }));
@@ -317,7 +333,9 @@ describe("bot/features/message-delete/commands/usecases/validateOptions", () => 
         const result = await parseAndValidateOptions(interaction as never);
         const after = Date.now();
         expect(result?.afterTs).toBeGreaterThanOrEqual(before - 7 * MS_PER_DAY);
-        expect(result?.afterTs).toBeLessThanOrEqual(after - 7 * MS_PER_DAY + 100);
+        expect(result?.afterTs).toBeLessThanOrEqual(
+          after - 7 * MS_PER_DAY + 100,
+        );
         expect(result?.daysOption).toBe(7);
         expect(result?.beforeTs).toBe(Infinity);
       });

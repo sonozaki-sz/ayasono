@@ -19,18 +19,41 @@ vi.mock("@/shared/utils/logger", () => ({
 
 // i18n のモック
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: vi.fn((key: string) => key),
-  tInteraction: vi.fn((_locale: string, key: string, params?: Record<string, unknown>) =>
-    params ? `${key}:${JSON.stringify(params)}` : key,
+  tInteraction: vi.fn(
+    (_locale: string, key: string, params?: Record<string, unknown>) =>
+      params ? `${key}:${JSON.stringify(params)}` : key,
   ),
 }));
 
 // messageResponse のモック
 vi.mock("@/bot/utils/messageResponse", () => ({
-  createSuccessEmbed: vi.fn((desc: string) => ({ type: "success", description: desc })),
-  createErrorEmbed: vi.fn((desc: string) => ({ type: "error", description: desc })),
+  createSuccessEmbed: vi.fn((desc: string) => ({
+    type: "success",
+    description: desc,
+  })),
+  createErrorEmbed: vi.fn((desc: string) => ({
+    type: "error",
+    description: desc,
+  })),
 }));
 
 // interactionErrorHandler のモック
@@ -156,10 +179,9 @@ describe("VC Command Integration", () => {
 
       await handler(interaction as never);
 
-      expect(mockVcRecruitRepository.isCreatedVcRecruitChannel).toHaveBeenCalledWith(
-        "guild-1",
-        "managed-vc-1",
-      );
+      expect(
+        mockVcRecruitRepository.isCreatedVcRecruitChannel,
+      ).toHaveBeenCalledWith("guild-1", "managed-vc-1");
       expect(editMock).toHaveBeenCalledWith({ name: "Party Room" });
     });
   });
@@ -221,7 +243,9 @@ describe("VC Command Integration", () => {
 
       // VAC でも VC募集でもない
       mockVacConfigService.isManagedVacChannel.mockResolvedValue(false);
-      mockVcRecruitRepository.isCreatedVcRecruitChannel.mockResolvedValue(false);
+      mockVcRecruitRepository.isCreatedVcRecruitChannel.mockResolvedValue(
+        false,
+      );
 
       const { interaction } = createInteraction();
 
@@ -286,7 +310,9 @@ describe("VC Command Integration", () => {
 
       // 両方のサービスがチェックされる
       expect(mockVacConfigService.isManagedVacChannel).toHaveBeenCalledTimes(1);
-      expect(mockVcRecruitRepository.isCreatedVcRecruitChannel).toHaveBeenCalledTimes(1);
+      expect(
+        mockVcRecruitRepository.isCreatedVcRecruitChannel,
+      ).toHaveBeenCalledTimes(1);
       // コマンドは成功
       expect(editMock).toHaveBeenCalledWith({ name: "Recruit Room" });
       expect(replyMock).toHaveBeenCalledTimes(1);
@@ -306,7 +332,9 @@ describe("VC Command Integration", () => {
 
       // VAC が true なので VC募集チェックは呼ばれない
       expect(mockVacConfigService.isManagedVacChannel).toHaveBeenCalledTimes(1);
-      expect(mockVcRecruitRepository.isCreatedVcRecruitChannel).not.toHaveBeenCalled();
+      expect(
+        mockVcRecruitRepository.isCreatedVcRecruitChannel,
+      ).not.toHaveBeenCalled();
       expect(editMock).toHaveBeenCalledTimes(1);
     });
   });

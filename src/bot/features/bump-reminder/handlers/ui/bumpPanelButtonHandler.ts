@@ -1,7 +1,7 @@
 // src/bot/features/bump-reminder/handlers/ui/bumpPanelButtonHandler.ts
 // Bumpパネルの通知ON/OFFボタン処理
 
-import { MessageFlags, type ButtonInteraction } from "discord.js";
+import { type ButtonInteraction, MessageFlags } from "discord.js";
 import {
   BUMP_REMINDER_MENTION_USER_ADD_RESULT,
   BUMP_REMINDER_MENTION_USER_REMOVE_RESULT,

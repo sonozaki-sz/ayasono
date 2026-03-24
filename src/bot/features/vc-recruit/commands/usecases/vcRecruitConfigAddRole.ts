@@ -5,14 +5,14 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
+  type ChatInputCommandInteraction,
   MessageFlags,
   RoleSelectMenuBuilder,
-  type ChatInputCommandInteraction,
 } from "discord.js";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
 import { tInteraction } from "../../../../../shared/locale/localeManager";
-import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
 import { disableComponentsAfterTimeout } from "../../../../shared/disableComponentsAfterTimeout";
+import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
 import {
   DISCORD_SELECT_MAX_OPTIONS,
   VC_RECRUIT_ROLE_CUSTOM_ID,

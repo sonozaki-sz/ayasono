@@ -1,8 +1,9 @@
 // tests/unit/bot/features/vac/services/usecases/cleanupVacOnStartup.test.ts
-import type { VacConfigService } from "@/shared/features/vac/vacConfigService";
-import { cleanupVacOnStartupUseCase } from "@/bot/features/vac/services/usecases/cleanupVacOnStartup";
+
 import { ChannelType } from "discord.js";
 import type { Mocked } from "vitest";
+import { cleanupVacOnStartupUseCase } from "@/bot/features/vac/services/usecases/cleanupVacOnStartup";
+import type { VacConfigService } from "@/shared/features/vac/vacConfigService";
 
 function createRepositoryMock(): Mocked<VacConfigService> {
   return {

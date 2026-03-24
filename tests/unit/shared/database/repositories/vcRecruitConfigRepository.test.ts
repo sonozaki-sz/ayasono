@@ -37,7 +37,8 @@ describe("shared/database/repositories/vcRecruitConfigRepository", () => {
         guildId: "guild-1",
         enabled: true,
         mentionRoleIds: '["role-1","role-2"]',
-        setups: '[{"id":"setup-1","categoryId":"cat-1","createdVoiceChannelIds":[]}]',
+        setups:
+          '[{"id":"setup-1","categoryId":"cat-1","createdVoiceChannelIds":[]}]',
       });
 
       const { VcRecruitConfigRepository } = await loadModule();
@@ -47,7 +48,9 @@ describe("shared/database/repositories/vcRecruitConfigRepository", () => {
       expect(result).toEqual({
         enabled: true,
         mentionRoleIds: ["role-1", "role-2"],
-        setups: [{ id: "setup-1", categoryId: "cat-1", createdVoiceChannelIds: [] }],
+        setups: [
+          { id: "setup-1", categoryId: "cat-1", createdVoiceChannelIds: [] },
+        ],
       });
     });
 

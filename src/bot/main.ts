@@ -20,9 +20,9 @@ import { setPrismaClient } from "../shared/utils/prisma";
 import { createBotClient } from "./client";
 import { initializeBotCompositionRoot } from "./services/botCompositionRoot";
 import { registerBotEvents } from "./services/botEventRegistration";
+import type { Command } from "./types/discord";
 import { loadCommands } from "./utils/commandLoader";
 import { loadEvents } from "./utils/eventLoader";
-import type { Command } from "./types/discord";
 
 // コマンド登録先（ギルド/グローバル）をログ表示で識別するための定数
 const COMMAND_REGISTRATION_SCOPE = {

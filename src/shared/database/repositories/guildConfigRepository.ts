@@ -22,8 +22,6 @@ import type {
 import { AfkConfigRepository } from "./afkConfigRepository";
 import { BumpReminderConfigRepository } from "./bumpReminderConfigRepository";
 import { MemberLogConfigRepository } from "./memberLogConfigRepository";
-import { VacConfigRepository } from "./vacConfigRepository";
-import { VcRecruitConfigRepository } from "./vcRecruitConfigRepository";
 import {
   deleteGuildConfigUsecase,
   existsGuildConfigUsecase,
@@ -33,6 +31,8 @@ import {
   updateGuildConfigUsecase,
   updateGuildLocaleUsecase,
 } from "./usecases/guildConfigCoreUsecases";
+import { VacConfigRepository } from "./vacConfigRepository";
+import { VcRecruitConfigRepository } from "./vcRecruitConfigRepository";
 
 const DB_ERROR = {
   UNKNOWN: "unknown error",

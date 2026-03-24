@@ -20,7 +20,12 @@ vi.mock("@/bot/handlers/interactionCreate/flow/modal", () => ({
 }));
 
 vi.mock("@/bot/utils/messageResponse", () => ({
-  STATUS_COLORS: { success: 0x57f287, info: 0x3498db, warning: 0xfee75c, error: 0xed4245 },
+  STATUS_COLORS: {
+    success: 0x57f287,
+    info: 0x3498db,
+    warning: 0xfee75c,
+    error: 0xed4245,
+  },
 }));
 
 vi.mock("@/bot/handlers/interactionCreate/flow/components", () => ({
@@ -41,8 +46,9 @@ describe("bot/handlers/interactionCreate/index", () => {
   });
 
   it("チャットインプットコマンドが handleChatInputCommand へルーティングされることを確認", async () => {
-    const { handleInteractionCreate } =
-      await import("@/bot/handlers/interactionCreate/handleInteractionCreate");
+    const { handleInteractionCreate } = await import(
+      "@/bot/handlers/interactionCreate/handleInteractionCreate"
+    );
 
     const interaction = {
       client: {},
@@ -61,8 +67,9 @@ describe("bot/handlers/interactionCreate/index", () => {
   });
 
   it("ユーザーセレクトメニューが handleUserSelectMenu へルーティングされることを確認", async () => {
-    const { handleInteractionCreate } =
-      await import("@/bot/handlers/interactionCreate/handleInteractionCreate");
+    const { handleInteractionCreate } = await import(
+      "@/bot/handlers/interactionCreate/handleInteractionCreate"
+    );
 
     const interaction = {
       client: {},
@@ -82,8 +89,9 @@ describe("bot/handlers/interactionCreate/index", () => {
   });
 
   it("ストリングセレクトメニューが handleStringSelectMenu へルーティングされることを確認", async () => {
-    const { handleInteractionCreate } =
-      await import("@/bot/handlers/interactionCreate/handleInteractionCreate");
+    const { handleInteractionCreate } = await import(
+      "@/bot/handlers/interactionCreate/handleInteractionCreate"
+    );
 
     const interaction = {
       client: {},
@@ -103,8 +111,9 @@ describe("bot/handlers/interactionCreate/index", () => {
   });
 
   it("ボタンが handleButton へルーティングされることを確認", async () => {
-    const { handleInteractionCreate } =
-      await import("@/bot/handlers/interactionCreate/handleInteractionCreate");
+    const { handleInteractionCreate } = await import(
+      "@/bot/handlers/interactionCreate/handleInteractionCreate"
+    );
 
     const interaction = {
       client: {},
@@ -124,8 +133,9 @@ describe("bot/handlers/interactionCreate/index", () => {
   });
 
   it("モーダル送信が handleModalSubmit へルーティングされることを確認", async () => {
-    const { handleInteractionCreate } =
-      await import("@/bot/handlers/interactionCreate/handleInteractionCreate");
+    const { handleInteractionCreate } = await import(
+      "@/bot/handlers/interactionCreate/handleInteractionCreate"
+    );
 
     const interaction = {
       client: {},
@@ -145,8 +155,9 @@ describe("bot/handlers/interactionCreate/index", () => {
   });
 
   it("オートコンプリートが handleAutocomplete へルーティングされることを確認", async () => {
-    const { handleInteractionCreate } =
-      await import("@/bot/handlers/interactionCreate/handleInteractionCreate");
+    const { handleInteractionCreate } = await import(
+      "@/bot/handlers/interactionCreate/handleInteractionCreate"
+    );
 
     const interaction = {
       client: {},
@@ -166,8 +177,9 @@ describe("bot/handlers/interactionCreate/index", () => {
   });
 
   it("ロールセレクトメニューが handleRoleSelectMenu へルーティングされることを確認", async () => {
-    const { handleInteractionCreate } =
-      await import("@/bot/handlers/interactionCreate/handleInteractionCreate");
+    const { handleInteractionCreate } = await import(
+      "@/bot/handlers/interactionCreate/handleInteractionCreate"
+    );
 
     const interaction = {
       client: {},

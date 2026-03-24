@@ -1,9 +1,10 @@
 // tests/unit/bot/features/vc-recruit/handlers/ui/vcRecruitModal.test.ts
-import {
-  vcRecruitModalHandler,
-  buildRecruitMessageButtons,
-} from "@/bot/features/vc-recruit/handlers/ui/vcRecruitModal";
+
 import { ButtonStyle, ChannelType, MessageFlags } from "discord.js";
+import {
+  buildRecruitMessageButtons,
+  vcRecruitModalHandler,
+} from "@/bot/features/vc-recruit/handlers/ui/vcRecruitModal";
 
 // ---- モック定義 ----
 
@@ -39,11 +40,32 @@ vi.mock("@/bot/utils/messageResponse", () => ({
   createWarningEmbed: vi.fn((msg: string) => ({ warning: msg })),
   createSuccessEmbed: vi.fn((msg: string) => ({ success: msg })),
   createInfoEmbed: vi.fn((msg: string) => ({ info: msg })),
-  STATUS_COLORS: { success: 0x57f287, info: 0x3498db, warning: 0xfee75c, error: 0xed4245 },
+  STATUS_COLORS: {
+    success: 0x57f287,
+    info: 0x3498db,
+    warning: 0xfee75c,
+    error: 0xed4245,
+  },
 }));
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tGuild: (...args: unknown[]) =>
     tGuildMock(...(args as Parameters<typeof tGuildMock>)),
   tInteraction: vi.fn((_locale: string, key: string) => key),
@@ -373,7 +395,9 @@ describe("vcRecruitModalHandler / execute()", () => {
       selectedVcId: "__new__",
       createdAt: Date.now(),
     });
-    findSetupByPanelChannelIdMock.mockResolvedValue(makeSetup({ categoryId: "cat-1" }));
+    findSetupByPanelChannelIdMock.mockResolvedValue(
+      makeSetup({ categoryId: "cat-1" }),
+    );
 
     // CATEGORY_CHANNEL_LIMIT = 50 なので size=50 で上限到達
     const guild = makeGuild({ categorySize: 50 });
@@ -546,7 +570,9 @@ describe("vcRecruitModalHandler / execute()", () => {
 
     const interaction = makeInteraction();
     (interaction as Record<string, unknown>).guild = guild;
-    interaction.editReply = vi.fn().mockRejectedValue(new Error("editReply失敗"));
+    interaction.editReply = vi
+      .fn()
+      .mockRejectedValue(new Error("editReply失敗"));
 
     await expect(
       vcRecruitModalHandler.execute(interaction as never),
@@ -576,7 +602,9 @@ describe("vcRecruitModalHandler / execute()", () => {
 
     const interaction = makeInteraction();
     (interaction as Record<string, unknown>).guild = guild;
-    interaction.editReply = vi.fn().mockRejectedValue(new Error("editReply失敗"));
+    interaction.editReply = vi
+      .fn()
+      .mockRejectedValue(new Error("editReply失敗"));
 
     await expect(
       vcRecruitModalHandler.execute(interaction as never),
@@ -672,7 +700,9 @@ describe("vcRecruitModalHandler / execute()", () => {
 
     const newVc = makeVoiceChannel("new-vc-nofetch");
     const guild = makeGuild({ createVcResult: newVc });
-    guild.members.fetch = vi.fn().mockRejectedValue(new Error("メンバー取得失敗"));
+    guild.members.fetch = vi
+      .fn()
+      .mockRejectedValue(new Error("メンバー取得失敗"));
 
     const interaction = makeInteraction();
     (interaction as Record<string, unknown>).guild = guild;
@@ -739,9 +769,21 @@ describe("buildRecruitMessageButtons()", () => {
   it("tGuild がボタンラベル用に呼ばれる", async () => {
     await buildRecruitMessageButtons("guild-1", "user-1", "vc-1");
 
-    expect(tGuildMock).toHaveBeenCalledWith("guild-1", "vcRecruit:ui.button.join_vc");
-    expect(tGuildMock).toHaveBeenCalledWith("guild-1", "vcRecruit:ui.button.rename_vc");
-    expect(tGuildMock).toHaveBeenCalledWith("guild-1", "vcRecruit:ui.button.end_vc");
-    expect(tGuildMock).toHaveBeenCalledWith("guild-1", "vcRecruit:ui.button.delete_post");
+    expect(tGuildMock).toHaveBeenCalledWith(
+      "guild-1",
+      "vcRecruit:ui.button.join_vc",
+    );
+    expect(tGuildMock).toHaveBeenCalledWith(
+      "guild-1",
+      "vcRecruit:ui.button.rename_vc",
+    );
+    expect(tGuildMock).toHaveBeenCalledWith(
+      "guild-1",
+      "vcRecruit:ui.button.end_vc",
+    );
+    expect(tGuildMock).toHaveBeenCalledWith(
+      "guild-1",
+      "vcRecruit:ui.button.delete_post",
+    );
   });
 });

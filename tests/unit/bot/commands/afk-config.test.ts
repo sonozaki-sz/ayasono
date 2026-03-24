@@ -48,8 +48,24 @@ vi.mock("@/shared/locale/commandLocalizations", () => ({
   }),
 }));
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: tDefaultMock,
   tGuild: tGuildMock,
   tInteraction: (...args: unknown[]) => args[1],
@@ -131,7 +147,12 @@ describe("bot/commands/afk-config", () => {
     );
     expect(setAfkChannelMock).toHaveBeenCalledWith("guild-1", "afk-channel");
     expect(interaction.reply).toHaveBeenCalledWith({
-      embeds: [{ kind: "success", description: "afk:user-response.set_channel_success" }],
+      embeds: [
+        {
+          kind: "success",
+          description: "afk:user-response.set_channel_success",
+        },
+      ],
       flags: 64,
     });
   });
@@ -214,8 +235,16 @@ describe("bot/commands/afk-config", () => {
     expect(createInfoEmbedMock).toHaveBeenCalledWith("", {
       title: "afk:embed.title.config_view",
       fields: [
-        { name: "afk:embed.field.name.status", value: "common:enabled", inline: true },
-        { name: "afk:embed.field.name.channel", value: "<#afk-channel>", inline: true },
+        {
+          name: "afk:embed.field.name.status",
+          value: "common:enabled",
+          inline: true,
+        },
+        {
+          name: "afk:embed.field.name.channel",
+          value: "<#afk-channel>",
+          inline: true,
+        },
       ],
     });
     expect(interaction.reply).toHaveBeenCalledWith(

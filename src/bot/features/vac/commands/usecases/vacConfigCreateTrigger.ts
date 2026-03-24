@@ -8,8 +8,8 @@ import {
 } from "discord.js";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
 import { tInteraction } from "../../../../../shared/locale/localeManager";
-import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
 import { getBotVacConfigService } from "../../../../services/botCompositionRoot";
+import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
 import { createSuccessEmbed } from "../../../../utils/messageResponse";
 import {
   findTriggerChannelByCategory,

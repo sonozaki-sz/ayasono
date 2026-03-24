@@ -106,14 +106,19 @@ describe("bumpReminderConfigCommand.removeUsers", () => {
     removeBumpReminderMentionUserMock.mockResolvedValue(undefined);
 
     const collectHandlers: ((i: unknown) => Promise<void>)[] = [];
-    const endHandlers: ((collected: unknown, reason: string) => Promise<void>)[] = [];
+    const endHandlers: ((
+      collected: unknown,
+      reason: string,
+    ) => Promise<void>)[] = [];
 
     const collectorMock = {
-      on: vi.fn((event: string, handler: (...args: unknown[]) => Promise<void>) => {
-        if (event === "collect") collectHandlers.push(handler);
-        if (event === "end") endHandlers.push(handler);
-        return collectorMock;
-      }),
+      on: vi.fn(
+        (event: string, handler: (...args: unknown[]) => Promise<void>) => {
+          if (event === "collect") collectHandlers.push(handler);
+          if (event === "end") endHandlers.push(handler);
+          return collectorMock;
+        },
+      ),
       stop: vi.fn(),
     };
 
@@ -154,9 +159,18 @@ describe("bumpReminderConfigCommand.removeUsers", () => {
     };
     await collectHandlers[0](deleteInteraction);
 
-    expect(removeBumpReminderMentionUserMock).toHaveBeenCalledWith("guild-1", "user-a");
-    expect(removeBumpReminderMentionUserMock).toHaveBeenCalledWith("guild-1", "user-c");
-    expect(removeBumpReminderMentionUserMock).not.toHaveBeenCalledWith("guild-1", "user-b");
+    expect(removeBumpReminderMentionUserMock).toHaveBeenCalledWith(
+      "guild-1",
+      "user-a",
+    );
+    expect(removeBumpReminderMentionUserMock).toHaveBeenCalledWith(
+      "guild-1",
+      "user-c",
+    );
+    expect(removeBumpReminderMentionUserMock).not.toHaveBeenCalledWith(
+      "guild-1",
+      "user-b",
+    );
     expect(deleteInteraction.update).toHaveBeenCalledWith(
       expect.objectContaining({
         embeds: expect.any(Array),
@@ -176,10 +190,12 @@ describe("bumpReminderConfigCommand.removeUsers", () => {
     const collectHandlers: ((i: unknown) => Promise<void>)[] = [];
 
     const collectorMock = {
-      on: vi.fn((event: string, handler: (...args: unknown[]) => Promise<void>) => {
-        if (event === "collect") collectHandlers.push(handler);
-        return collectorMock;
-      }),
+      on: vi.fn(
+        (event: string, handler: (...args: unknown[]) => Promise<void>) => {
+          if (event === "collect") collectHandlers.push(handler);
+          return collectorMock;
+        },
+      ),
       stop: vi.fn(),
     };
 
@@ -216,8 +232,14 @@ describe("bumpReminderConfigCommand.removeUsers", () => {
     };
     await collectHandlers[0](deleteInteraction);
 
-    expect(removeBumpReminderMentionUserMock).toHaveBeenCalledWith("guild-1", "user-a");
-    expect(removeBumpReminderMentionUserMock).toHaveBeenCalledWith("guild-1", "user-b");
+    expect(removeBumpReminderMentionUserMock).toHaveBeenCalledWith(
+      "guild-1",
+      "user-a",
+    );
+    expect(removeBumpReminderMentionUserMock).toHaveBeenCalledWith(
+      "guild-1",
+      "user-b",
+    );
     expect(removeBumpReminderMentionUserMock).toHaveBeenCalledTimes(2);
     expect(collectorMock.stop).toHaveBeenCalled();
   });
@@ -228,13 +250,18 @@ describe("bumpReminderConfigCommand.removeUsers", () => {
       mentionUserIds: ["user-a"],
     });
 
-    const endHandlers: ((collected: unknown, reason: string) => Promise<void>)[] = [];
+    const endHandlers: ((
+      collected: unknown,
+      reason: string,
+    ) => Promise<void>)[] = [];
 
     const collectorMock = {
-      on: vi.fn((event: string, handler: (...args: unknown[]) => Promise<void>) => {
-        if (event === "end") endHandlers.push(handler);
-        return collectorMock;
-      }),
+      on: vi.fn(
+        (event: string, handler: (...args: unknown[]) => Promise<void>) => {
+          if (event === "end") endHandlers.push(handler);
+          return collectorMock;
+        },
+      ),
       stop: vi.fn(),
     };
 

@@ -1,7 +1,7 @@
 // src/bot/features/bump-reminder/commands/bumpReminderConfigCommand.setMention.ts
 // bump-reminder-config set-mention 実行処理
 
-import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
+import { type ChatInputCommandInteraction, MessageFlags } from "discord.js";
 import { ValidationError } from "../../../../shared/errors/customErrors";
 import { BUMP_REMINDER_MENTION_ROLE_RESULT } from "../../../../shared/features/bump-reminder/bumpReminderConfigService";
 import {

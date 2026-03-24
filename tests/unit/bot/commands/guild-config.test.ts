@@ -45,10 +45,16 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
     getBumpReminderConfig: vi.fn().mockResolvedValue(null),
   }),
   getBotVacConfigService: () => ({
-    getVacConfigOrDefault: vi.fn().mockResolvedValue({ enabled: false, triggerChannelIds: [], createdChannels: [] }),
+    getVacConfigOrDefault: vi.fn().mockResolvedValue({
+      enabled: false,
+      triggerChannelIds: [],
+      createdChannels: [],
+    }),
   }),
   getBotVcRecruitConfigService: () => ({
-    getVcRecruitConfigOrDefault: vi.fn().mockResolvedValue({ enabled: false, mentionRoleIds: [], setups: [] }),
+    getVcRecruitConfigOrDefault: vi
+      .fn()
+      .mockResolvedValue({ enabled: false, mentionRoleIds: [], setups: [] }),
   }),
   getBotStickyMessageConfigService: () => ({
     findAllByGuild: vi.fn().mockResolvedValue([]),
@@ -63,10 +69,22 @@ vi.mock("@/shared/features/afk/afkConfigService", () => ({
 }));
 
 vi.mock("@/bot/utils/messageResponse", () => ({
-  createSuccessEmbed: (d: string, _o?: unknown) => ({ kind: "success", description: d }),
-  createInfoEmbed: (d: string, _o?: unknown) => ({ kind: "info", description: d }),
-  createWarningEmbed: (d: string, _o?: unknown) => ({ kind: "warning", description: d }),
-  createErrorEmbed: (d: string, _o?: unknown) => ({ kind: "error", description: d }),
+  createSuccessEmbed: (d: string, _o?: unknown) => ({
+    kind: "success",
+    description: d,
+  }),
+  createInfoEmbed: (d: string, _o?: unknown) => ({
+    kind: "info",
+    description: d,
+  }),
+  createWarningEmbed: (d: string, _o?: unknown) => ({
+    kind: "warning",
+    description: d,
+  }),
+  createErrorEmbed: (d: string, _o?: unknown) => ({
+    kind: "error",
+    description: d,
+  }),
 }));
 
 vi.mock("@/bot/errors/interactionErrorHandler", () => ({
@@ -105,7 +123,9 @@ type TestInteraction = {
   guild: null;
 };
 
-function createInteraction(overrides?: Partial<TestInteraction>): TestInteraction {
+function createInteraction(
+  overrides?: Partial<TestInteraction>,
+): TestInteraction {
   return {
     guildId: "guild-1",
     locale: "ja",

@@ -1,10 +1,11 @@
 // tests/unit/bot/features/vc-recruit/handlers/ui/vcRecruitPostButton.test.ts
+
+import { ChannelType, MessageFlags, PermissionFlagsBits } from "discord.js";
 import {
-  vcRecruitPostButtonHandler,
   parsePostButtonIds,
   updateToEndedState,
+  vcRecruitPostButtonHandler,
 } from "@/bot/features/vc-recruit/handlers/ui/vcRecruitPostButton";
-import { ChannelType, MessageFlags, PermissionFlagsBits } from "discord.js";
 
 // ---- モック定義 ----
 
@@ -21,8 +22,24 @@ vi.mock("@/bot/utils/messageResponse", () => ({
   createSuccessEmbed: vi.fn((msg: string) => ({ success: msg })),
 }));
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tGuild: (...args: unknown[]) =>
     tGuildMock(...(args as Parameters<typeof tGuildMock>)),
   tInteraction: vi.fn((_locale: string, key: string) => key),

@@ -1,6 +1,7 @@
 // tests/unit/bot/features/vc-recruit/handlers/ui/vcRecruitAddRoleSelectHandler.test.ts
-import { vcRecruitAddRoleSelectHandler } from "@/bot/features/vc-recruit/handlers/ui/vcRecruitAddRoleSelectHandler";
+
 import { VC_RECRUIT_ROLE_CUSTOM_ID } from "@/bot/features/vc-recruit/commands/vcRecruitConfigCommand.constants";
+import { vcRecruitAddRoleSelectHandler } from "@/bot/features/vc-recruit/handlers/ui/vcRecruitAddRoleSelectHandler";
 import { vcRecruitAddRoleSelections } from "@/bot/features/vc-recruit/handlers/ui/vcRecruitRoleState";
 
 // vcRecruitAddRoleSelectHandler の matches 判定と選択ロールの状態保存を検証

@@ -2,8 +2,8 @@
 // vac-config の入力解決ヘルパー
 
 import {
-  ChannelType,
   type CategoryChannel,
+  ChannelType,
   type Guild,
   type VoiceChannel,
 } from "discord.js";

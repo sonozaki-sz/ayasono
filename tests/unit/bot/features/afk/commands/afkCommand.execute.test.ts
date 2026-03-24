@@ -15,8 +15,24 @@ vi.mock("@/shared/features/afk/afkConfigService", () => ({
 }));
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: (key: string) => tDefaultMock(key),
   tGuild: (guildId: string, key: string, params?: Record<string, unknown>) =>
     tGuildMock(guildId, key, params),
@@ -95,7 +111,9 @@ describe("bot/features/afk/commands/afkCommand.execute", () => {
       id: "afk-channel",
       type: 2,
     });
-    expect(createSuccessEmbedMock).toHaveBeenCalledWith("afk:user-response.moved");
+    expect(createSuccessEmbedMock).toHaveBeenCalledWith(
+      "afk:user-response.moved",
+    );
     expect(interaction.reply).toHaveBeenCalledWith({
       embeds: [{ description: "afk:user-response.moved" }],
     });
@@ -112,7 +130,10 @@ describe("bot/features/afk/commands/afkCommand.execute", () => {
   });
 
   it("config.enabled が false の場合は ValidationError を投げる", async () => {
-    getAfkConfigMock.mockResolvedValue({ enabled: false, channelId: "afk-channel" });
+    getAfkConfigMock.mockResolvedValue({
+      enabled: false,
+      channelId: "afk-channel",
+    });
     const interaction = createInteraction();
 
     await expect(

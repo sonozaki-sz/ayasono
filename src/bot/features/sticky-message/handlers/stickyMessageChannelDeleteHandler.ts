@@ -1,7 +1,7 @@
 // src/bot/features/sticky-message/handlers/stickyMessageChannelDeleteHandler.ts
 // スティッキーメッセージ channelDelete ハンドラー
 
-import { ChannelType, type Channel } from "discord.js";
+import { type Channel, ChannelType } from "discord.js";
 import { logPrefixed } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import {

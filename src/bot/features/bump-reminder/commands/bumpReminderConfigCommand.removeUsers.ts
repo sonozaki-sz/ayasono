@@ -5,9 +5,9 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
+  type ChatInputCommandInteraction,
   MessageFlags,
   StringSelectMenuBuilder,
-  type ChatInputCommandInteraction,
 } from "discord.js";
 import { ValidationError } from "../../../../shared/errors/customErrors";
 import {
@@ -15,13 +15,13 @@ import {
   tInteraction,
 } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
+import { getBotBumpReminderConfigService } from "../../../services/botCompositionRoot";
 import {
   buildPaginationRow,
   parsePaginationAction,
   resolvePageFromAction,
   showPaginationJumpModal,
 } from "../../../shared/pagination";
-import { getBotBumpReminderConfigService } from "../../../services/botCompositionRoot";
 import {
   createInfoEmbed,
   createSuccessEmbed,

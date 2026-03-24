@@ -2,14 +2,14 @@
 // Guild別言語対応（i18next版）
 
 import i18next, { type TFunction, type TOptionsBase } from "i18next";
-import { NODE_ENV, env } from "../config/env";
+import { env, NODE_ENV } from "../config/env";
 import type { IBaseGuildRepository } from "../database/types";
 import { logger } from "../utils/logger";
 import {
+  type AllParseKeys,
   DEFAULT_LOCALE,
   I18N_NAMESPACES,
   SUPPORTED_LOCALES,
-  type AllParseKeys,
   type SupportedLocale,
 } from "./i18n";
 import { resources } from "./locales/resources";

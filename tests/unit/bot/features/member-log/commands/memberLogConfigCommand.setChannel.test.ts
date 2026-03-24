@@ -1,8 +1,9 @@
 // tests/unit/bot/features/member-log/commands/memberLogConfigCommand.setChannel.test.ts
+
+import { ChannelType } from "discord.js";
 import { MEMBER_LOG_CONFIG_COMMAND } from "@/bot/features/member-log/commands/memberLogConfigCommand.constants";
 import { handleMemberLogConfigSetChannel } from "@/bot/features/member-log/commands/memberLogConfigCommand.setChannel";
 import { ValidationError } from "@/shared/errors/customErrors";
-import { ChannelType } from "discord.js";
 
 // ---- モック定義 ----
 const ensurePermissionMock = vi.fn();
@@ -36,8 +37,24 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
 }));
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tGuild: (guildId: string, key: string, opts?: Record<string, unknown>) =>
     tGuildMock(guildId, key, opts),
   tInteraction: vi.fn((_locale: string, key: string) => key),

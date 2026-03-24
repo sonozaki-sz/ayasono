@@ -190,7 +190,10 @@ describe("shared/features/vac/vacConfigService", () => {
     );
     const service = new VacConfigService(repository);
 
-    const result = await service.addCreatedVacChannel("g1", makeChannel("vc-1"));
+    const result = await service.addCreatedVacChannel(
+      "g1",
+      makeChannel("vc-1"),
+    );
 
     expect(result.createdChannels).toHaveLength(1);
     expect(repository.updateVacConfig).not.toHaveBeenCalled();

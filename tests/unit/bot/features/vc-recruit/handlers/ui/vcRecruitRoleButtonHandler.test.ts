@@ -1,6 +1,7 @@
 // tests/unit/bot/features/vc-recruit/handlers/ui/vcRecruitRoleButtonHandler.test.ts
-import { vcRecruitRoleButtonHandler } from "@/bot/features/vc-recruit/handlers/ui/vcRecruitRoleButtonHandler";
+
 import { VC_RECRUIT_ROLE_CUSTOM_ID } from "@/bot/features/vc-recruit/commands/vcRecruitConfigCommand.constants";
+import { vcRecruitRoleButtonHandler } from "@/bot/features/vc-recruit/handlers/ui/vcRecruitRoleButtonHandler";
 import {
   vcRecruitAddRoleSelections,
   vcRecruitRemoveRoleSelections,
@@ -11,8 +12,7 @@ import {
 const addMentionRoleIdMock = vi.fn();
 const removeMentionRoleIdMock = vi.fn();
 const tGuildMock = vi.fn(
-  async (_guildId: string, key: string, _opts?: Record<string, unknown>) =>
-    key,
+  async (_guildId: string, key: string, _opts?: Record<string, unknown>) => key,
 );
 
 vi.mock("@/bot/services/botCompositionRoot", () => ({
@@ -23,8 +23,24 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
   }),
 }));
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tGuild: (...args: unknown[]) =>
     tGuildMock(...(args as Parameters<typeof tGuildMock>)),
   tInteraction: vi.fn((_locale: string, key: string) => key),

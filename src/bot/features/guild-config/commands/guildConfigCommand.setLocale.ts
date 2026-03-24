@@ -1,11 +1,11 @@
 // src/bot/features/guild-config/commands/guildConfigCommand.setLocale.ts
 // guild-config set-locale サブコマンド実行処理
 
-import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
+import { type ChatInputCommandInteraction, MessageFlags } from "discord.js";
 import {
+  localeManager,
   logPrefixed,
   tInteraction,
-  localeManager,
 } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import { getBotGuildConfigService } from "../../../services/botCompositionRoot";

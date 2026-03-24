@@ -1,15 +1,15 @@
 // src/bot/features/vac/services/vacService.ts
 // VAC機能のビジネスロジックサービス
 
-import { ChannelType, type Channel, type VoiceState } from "discord.js";
-import { logPrefixed, tDefault } from "../../../../shared/locale/localeManager";
-import { executeWithLoggedError } from "../../../../shared/utils/errorHandling";
-import { logger } from "../../../../shared/utils/logger";
-import type { BotClient } from "../../../client";
+import { type Channel, ChannelType, type VoiceState } from "discord.js";
 import {
   getVacConfigService,
   type VacConfigService,
 } from "../../../../shared/features/vac/vacConfigService";
+import { logPrefixed, tDefault } from "../../../../shared/locale/localeManager";
+import { executeWithLoggedError } from "../../../../shared/utils/errorHandling";
+import { logger } from "../../../../shared/utils/logger";
+import type { BotClient } from "../../../client";
 import { cleanupVacOnStartupUseCase } from "./usecases/cleanupVacOnStartup";
 import { handleVacCreateUseCase } from "./usecases/handleVacCreate";
 import { handleVacDeleteUseCase } from "./usecases/handleVacDelete";

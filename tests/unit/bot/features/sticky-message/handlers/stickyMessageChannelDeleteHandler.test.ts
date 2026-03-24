@@ -1,7 +1,7 @@
 // tests/unit/bot/features/sticky-message/handlers/stickyMessageChannelDeleteHandler.test.ts
 
-import { handleStickyMessageChannelDelete } from "@/bot/features/sticky-message/handlers/stickyMessageChannelDeleteHandler";
 import { ChannelType } from "discord.js";
+import { handleStickyMessageChannelDelete } from "@/bot/features/sticky-message/handlers/stickyMessageChannelDeleteHandler";
 
 const { cancelTimerMock, deleteByChannelMock, debugMock } = vi.hoisted(() => ({
   cancelTimerMock: vi.fn(),

@@ -1,7 +1,8 @@
 // tests/unit/bot/features/vc-recruit/handlers/vcRecruitChannelDeleteHandler.test.ts
+
+import { ChannelType } from "discord.js";
 import { handleVcRecruitChannelDelete } from "@/bot/features/vc-recruit/handlers/vcRecruitChannelDeleteHandler";
 import { logger } from "@/shared/utils/logger";
-import { ChannelType } from "discord.js";
 
 // ---- モック定義 ----
 
@@ -30,8 +31,24 @@ vi.mock("@/shared/utils/logger", () => ({
 }));
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tGuild: vi.fn(async (_guildId: string, key: string) => key),
   tInteraction: vi.fn((_locale: string, key: string) => key),
   tDefault: vi.fn((key: string) => key),
@@ -194,7 +211,9 @@ describe("bot/features/vc-recruit/handlers/vcRecruitChannelDeleteHandler", () =>
     findSetupByPanelChannelIdMock.mockResolvedValue(setup);
 
     // fetch は成功するが delete() が throw
-    const throwingDelete = vi.fn().mockRejectedValue(new Error("DiscordAPIError: Missing Permissions"));
+    const throwingDelete = vi
+      .fn()
+      .mockRejectedValue(new Error("DiscordAPIError: Missing Permissions"));
     const channel = makeGuildChannel("panel-ch-5", {
       fetchResult: { delete: throwingDelete },
     });
@@ -218,7 +237,9 @@ describe("bot/features/vc-recruit/handlers/vcRecruitChannelDeleteHandler", () =>
     };
     findSetupByPostChannelIdMock.mockResolvedValue(setup);
 
-    const throwingDelete = vi.fn().mockRejectedValue(new Error("DiscordAPIError: Missing Permissions"));
+    const throwingDelete = vi
+      .fn()
+      .mockRejectedValue(new Error("DiscordAPIError: Missing Permissions"));
     const channel = makeGuildChannel("post-ch-6", {
       fetchResult: { delete: throwingDelete },
     });
@@ -258,9 +279,7 @@ describe("bot/features/vc-recruit/handlers/vcRecruitChannelDeleteHandler", () =>
     const msgWithoutTarget = {
       components: [
         {
-          components: [
-            { customId: "vc-recruit:end-vc:user-2:other-vc" },
-          ],
+          components: [{ customId: "vc-recruit:end-vc:user-2:other-vc" }],
         },
       ],
       embeds: [],

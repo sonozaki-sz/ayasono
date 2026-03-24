@@ -1,7 +1,7 @@
 // src/bot/features/bump-reminder/commands/bumpReminderConfigCommand.view.ts
 // bump-reminder-config view 実行処理
 
-import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
+import { type ChatInputCommandInteraction, MessageFlags } from "discord.js";
 import { tInteraction } from "../../../../shared/locale/localeManager";
 import { getBotBumpReminderConfigService } from "../../../services/botCompositionRoot";
 import { createInfoEmbed } from "../../../utils/messageResponse";

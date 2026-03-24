@@ -24,8 +24,11 @@ vi.mock("@/bot/shared/disableComponentsAfterTimeout", () => ({
   disableComponentsAfterTimeout: vi.fn(),
 }));
 
+import {
+  GUILD_CONFIG_CUSTOM_ID,
+  PAGE_VALUES,
+} from "@/bot/features/guild-config/constants/guildConfig.constants";
 import { guildConfigViewSelectHandler } from "@/bot/features/guild-config/handlers/ui/guildConfigViewSelectHandler";
-import { GUILD_CONFIG_CUSTOM_ID, PAGE_VALUES } from "@/bot/features/guild-config/constants/guildConfig.constants";
 
 function createSelectInteraction(value: string) {
   return {
@@ -47,11 +50,17 @@ describe("bot/features/guild-config/handlers/ui/guildConfigViewSelectHandler", (
   // matches のテスト
   describe("matches", () => {
     it("guild-config:page-select に一致すること", () => {
-      expect(guildConfigViewSelectHandler.matches(GUILD_CONFIG_CUSTOM_ID.PAGE_SELECT)).toBe(true);
+      expect(
+        guildConfigViewSelectHandler.matches(
+          GUILD_CONFIG_CUSTOM_ID.PAGE_SELECT,
+        ),
+      ).toBe(true);
     });
 
     it("無関係な customId には一致しないこと", () => {
-      expect(guildConfigViewSelectHandler.matches("other:page-select")).toBe(false);
+      expect(guildConfigViewSelectHandler.matches("other:page-select")).toBe(
+        false,
+      );
     });
   });
 

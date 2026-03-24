@@ -3,9 +3,9 @@
 
 import {
   ChannelType,
+  type ChatInputCommandInteraction,
   MessageFlags,
   PermissionFlagsBits,
-  type ChatInputCommandInteraction,
 } from "discord.js";
 import { ValidationError } from "../../../../shared/errors/customErrors";
 import { createDefaultAfkConfig } from "../../../../shared/features/afk/afkConfigDefaults";
@@ -19,11 +19,11 @@ import {
   tInteraction,
 } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
+import { COMMON_I18N_KEYS } from "../../../shared/i18nKeys";
 import {
   createInfoEmbed,
   createSuccessEmbed,
 } from "../../../utils/messageResponse";
-import { COMMON_I18N_KEYS } from "../../../shared/i18nKeys";
 
 const AFK_CONFIG_SUBCOMMAND = {
   SET_CHANNEL: "set-channel",

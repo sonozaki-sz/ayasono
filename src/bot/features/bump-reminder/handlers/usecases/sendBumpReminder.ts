@@ -4,8 +4,8 @@
 import type { Client } from "discord.js";
 import type { ParseKeys } from "i18next";
 import type { BumpReminderConfigService } from "../../../../../shared/features/bump-reminder/bumpReminderConfigService";
-import type { AllNamespaces } from "../../../../../shared/locale/i18n";
 import { getGuildTranslator } from "../../../../../shared/locale/helpers";
+import type { AllNamespaces } from "../../../../../shared/locale/i18n";
 import { logPrefixed } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import type { BumpServiceName } from "../../constants/bumpReminderConstants";
