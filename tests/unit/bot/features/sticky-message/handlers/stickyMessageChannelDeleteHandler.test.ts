@@ -22,6 +22,11 @@ vi.mock("@/shared/utils/logger", () => ({
   logger: { debug: debugMock, error: vi.fn() },
 }));
 
+vi.mock("@/bot/shared/errorChannelNotifier", () => ({
+  notifyErrorChannel: vi.fn(),
+  notifyWarnChannel: vi.fn(),
+}));
+
 describe("bot/features/sticky-message/handlers/stickyMessageChannelDeleteHandler", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -66,7 +71,11 @@ describe("bot/features/sticky-message/handlers/stickyMessageChannelDeleteHandler
 
   it("DB エラーが発生しても外部に再スローしない", async () => {
     deleteByChannelMock.mockRejectedValueOnce(new Error("db error"));
-    const channel = { id: "ch-2", type: ChannelType.GuildText };
+    const channel = {
+      id: "ch-2",
+      type: ChannelType.GuildText,
+      guild: { id: "guild-1" },
+    };
 
     // エラーが外に伝播しないこと
     await expect(

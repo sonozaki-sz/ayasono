@@ -5,6 +5,7 @@ import type { TextChannel } from "discord.js";
 import type { IStickyMessageRepository } from "../../../../shared/database/types";
 import { logPrefixed } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
+import { notifyErrorChannel } from "../../../shared/errorChannelNotifier";
 import { buildStickyMessagePayload } from "./stickyMessagePayloadBuilder";
 
 /** チャンネルごとの再送信タイマー管理 */
@@ -55,6 +56,10 @@ export class StickyMessageResendService {
           ),
           err,
         );
+        void notifyErrorChannel(channel.guild, err, {
+          feature: "メッセージ固定",
+          action: "スケジュールされた再送のエラー",
+        });
       });
     }, RESEND_DELAY_MS);
 
@@ -94,6 +99,10 @@ export class StickyMessageResendService {
         ),
         { channelId: channel.id, guildId, err },
       );
+      await notifyErrorChannel(channel.guild, err, {
+        feature: "メッセージ固定",
+        action: "メッセージ送信失敗",
+      });
     }
   }
 

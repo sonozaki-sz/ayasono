@@ -5,6 +5,7 @@ import type { GuildMember, PartialGuildMember } from "discord.js";
 import { logPrefixed } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import { getBotBumpReminderConfigService } from "../../../services/botCompositionRoot";
+import { notifyErrorChannel } from "../../../shared/errorChannelNotifier";
 
 /**
  * メンバー退出時に、該当ユーザーが mentionUserIds に含まれていれば自動除去する
@@ -45,5 +46,9 @@ export async function handleBumpReminderMemberRemove(
       ),
       err,
     );
+    await notifyErrorChannel(member.guild, err, {
+      feature: "Bumpリマインダー",
+      action: "メンバー退出時のメンション整理失敗",
+    });
   }
 }

@@ -12,6 +12,7 @@ import {
 import { logPrefixed, tGuild } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import { getBotVcRecruitRepository } from "../../../services/botCompositionRoot";
+import { notifyErrorChannel } from "../../../shared/errorChannelNotifier";
 import { VC_RECRUIT_POST_CUSTOM_ID } from "../commands/vcRecruitConfigCommand.constants";
 
 const VC_RECRUIT_LOG_KEYS = {
@@ -59,7 +60,7 @@ export async function handleVcRecruitChannelDelete(
       .fetch(setupByPanel.postChannelId)
       .catch(() => null);
     if (postChannel)
-      await postChannel.delete().catch((err: unknown) => {
+      await postChannel.delete().catch(async (err: unknown) => {
         logger.error(
           logPrefixed(
             "system:log_prefix.vc_recruit",
@@ -71,6 +72,10 @@ export async function handleVcRecruitChannelDelete(
           ),
           { error: err },
         );
+        await notifyErrorChannel(channel.guild, err, {
+          feature: "VC募集",
+          action: "投稿チャンネル削除失敗",
+        });
       });
     // DB からセットアップを削除
     await repo.removeSetup(guildId, setupByPanel.panelChannelId);
@@ -95,7 +100,7 @@ export async function handleVcRecruitChannelDelete(
       .fetch(setupByPost.panelChannelId)
       .catch(() => null);
     if (panelChannel)
-      await panelChannel.delete().catch((err: unknown) => {
+      await panelChannel.delete().catch(async (err: unknown) => {
         logger.error(
           logPrefixed(
             "system:log_prefix.vc_recruit",
@@ -107,6 +112,10 @@ export async function handleVcRecruitChannelDelete(
           ),
           { error: err },
         );
+        await notifyErrorChannel(channel.guild, err, {
+          feature: "VC募集",
+          action: "パネルチャンネル削除失敗",
+        });
       });
     // DB からセットアップを削除
     await repo.removeSetup(guildId, setupByPost.panelChannelId);

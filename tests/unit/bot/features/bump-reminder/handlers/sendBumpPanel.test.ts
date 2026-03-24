@@ -47,6 +47,11 @@ vi.mock("@/shared/locale/localeManager", () => ({
   tInteraction: (...args: unknown[]) => args[1],
 }));
 
+vi.mock("@/bot/shared/errorChannelNotifier", () => ({
+  notifyErrorChannel: vi.fn(),
+  notifyWarnChannel: vi.fn(),
+}));
+
 vi.mock("@/bot/utils/messageResponse", () => ({
   createInfoEmbed: (...args: unknown[]) => createInfoEmbedMock(...args),
 }));
@@ -132,6 +137,9 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpPanel", () => {
     const client = {
       channels: {
         fetch: vi.fn().mockRejectedValue(error),
+      },
+      guilds: {
+        cache: new Map([["guild-1", { id: "guild-1" }]]),
       },
     };
 

@@ -45,6 +45,11 @@ vi.mock("@/bot/features/vc-panel/vcControlPanel", () => ({
   sendVcControlPanel: vi.fn(),
 }));
 
+vi.mock("@/bot/shared/errorChannelNotifier", () => ({
+  notifyErrorChannel: vi.fn(),
+  notifyWarnChannel: vi.fn(),
+}));
+
 function createRepositoryMock(): Mocked<VacConfigService> {
   return {
     getVacConfigOrDefault: vi.fn(),

@@ -5,6 +5,7 @@ import { ChannelType, type Message } from "discord.js";
 import { logPrefixed } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import { getBotStickyMessageResendService } from "../../../services/botCompositionRoot";
+import { notifyErrorChannel } from "../../../shared/errorChannelNotifier";
 
 /**
  * messageCreate イベントでスティッキーメッセージを処理する
@@ -36,5 +37,11 @@ export async function handleStickyMessageCreate(
       ),
       { channelId: message.channelId, guildId: message.guildId, err },
     );
+    if (message.guild) {
+      await notifyErrorChannel(message.guild, err, {
+        feature: "メッセージ固定",
+        action: "再送処理の失敗",
+      });
+    }
   }
 }

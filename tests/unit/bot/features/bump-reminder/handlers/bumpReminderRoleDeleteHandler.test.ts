@@ -19,6 +19,11 @@ vi.mock("@/shared/utils/logger", () => ({
   logger: { info: vi.fn(), error: vi.fn() },
 }));
 
+vi.mock("@/bot/shared/errorChannelNotifier", () => ({
+  notifyErrorChannel: vi.fn(),
+  notifyWarnChannel: vi.fn(),
+}));
+
 vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotBumpReminderConfigService: () => ({
     getBumpReminderConfig: (...args: unknown[]) =>

@@ -2,7 +2,7 @@
 
 > Guild Config - ギルド全体の共通設定の管理・バックアップ機能
 
-最終更新: 2026年3月21日
+最終更新: 2026年3月25日
 
 ---
 
@@ -98,7 +98,7 @@
 | 9 | Bumpリマインダー | `sendBumpPanel.ts:75` | パネル送信失敗 |
 | 10 | Bumpリマインダー | `bumpReminderMemberRemoveHandler.ts:39` | メンバー退出時のメンション整理失敗 |
 | 11 | Bumpリマインダー | `bumpReminderRoleDeleteHandler.ts:35` | ロール削除時のメンション整理失敗 |
-| 12 | Bumpリマインダー | `bumpReminderStartup.ts:52` | 起動時のスケジューラ復元失敗 |
+| 12 | Bumpリマインダー | `bumpReminderStartup.ts:52` | 起動時のスケジューラ復元失敗（※対象外：全ギルド横断処理のため特定ギルドへの通知不可。ログ出力のみ） |
 | 13 | VC募集 | `vcRecruitVoiceStateUpdate.ts:59` | VC状態変更の処理失敗 |
 | 14 | VC募集 | `vcRecruitChannelDeleteHandler.ts:62` | 投稿チャンネル削除失敗 |
 | 15 | VC募集 | `vcRecruitChannelDeleteHandler.ts:98` | パネルチャンネル削除失敗 |
@@ -126,6 +126,35 @@
 ### UI
 
 **レスポンス（成功）:** `createSuccessEmbed` でチャンネル設定完了を通知
+
+### エラーチャンネル通知の実装
+
+**ユーティリティ:** `src/bot/shared/errorChannelNotifier.ts`
+
+| 関数 | 用途 | Embed |
+| --- | --- | --- |
+| `notifyErrorChannel(guild, error, context)` | error レベルの通知 | `createErrorEmbed`（赤） |
+| `notifyWarnChannel(guild, message, context)` | warn レベルの通知 | `createWarningEmbed`（黄） |
+
+**共通動作:**
+
+1. `GuildConfigService.getConfig(guildId)` で `errorChannelId` を取得
+2. 未設定 → return（何もしない）
+3. `guild.channels.fetch(errorChannelId)` でチャンネル取得（テキストチャンネルのみ）
+4. Embed 生成（機能名・処理内容・エラーメッセージ/警告メッセージ・タイムスタンプ）
+5. チャンネルに送信
+6. 送信失敗時は `logger.debug` のみ（再帰通知しない）
+
+**Embed フォーマット:**
+
+| 項目 | 内容 |
+| --- | --- |
+| タイトル | エラー通知 / 警告通知（i18n） |
+| フィールド | 機能（inline）/ 処理（inline）/ 詳細 |
+| タイムスタンプ | `setTimestamp()` による自動付与 |
+| エラーメッセージ上限 | 1024文字（Discord Embed フィールド制限） |
+
+**i18n キー:** `guildConfig:error-notification.*`（`title`, `warn_title`, `feature`, `action`, `message`）
 
 ---
 
@@ -510,6 +539,16 @@
 | `ui.button.reset_all_cancel` | 全リセットキャンセルボタン | キャンセル | Cancel |
 | `ui.button.import_confirm` | インポート確認ボタン | インポートする | Import |
 | `ui.button.import_cancel` | インポートキャンセルボタン | キャンセル | Cancel |
+
+### エラーチャンネル通知
+
+| キー | 用途 | ja | en |
+| --- | --- | --- | --- |
+| `error-notification.title` | エラー通知タイトル | エラー通知 | Error Notification |
+| `error-notification.warn_title` | 警告通知タイトル | 警告通知 | Warning Notification |
+| `error-notification.feature` | 機能フィールド名 | 機能 | Feature |
+| `error-notification.action` | 処理フィールド名 | 処理 | Action |
+| `error-notification.message` | 詳細フィールド名 | 詳細 | Details |
 
 ### ログ
 
