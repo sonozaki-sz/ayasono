@@ -75,7 +75,7 @@
 - [ ] Bumpリマインダー — 検出・リマインダー送信・パネル送信・復元失敗等にエラーチャンネルへ通知（6箇所）
 - [ ] VC募集・VAC — チャンネル操作・パネル送信失敗時にエラーチャンネルへ通知（4箇所）
 
-対象箇所の詳細は `docs/specs/GUILD_CONFIG_SPEC.md` のエラー通知チャンネル仕様を参照。
+通知対象箇所の詳細（error 16箇所 + warn 4箇所 + 対象外9箇所）は `docs/specs/GUILD_CONFIG_SPEC.md` の set-error-channel セクションを参照。
 
 ### 2. 基本コマンド追加
 

@@ -79,8 +79,49 @@
 
 **ビジネスルール:**
 
-- エラー通知チャンネルは、イベント駆動の機能（Bumpリマインダー、メッセージ固定、メンバーログ）でインタラクション起点でないエラーが発生した場合のフォールバック送信先として使用される
+- エラー通知チャンネルは、イベント駆動の機能（Bumpリマインダー、メッセージ固定、メンバーログ、VC募集、VAC）でインタラクション起点でないエラーが発生した場合のフォールバック送信先として使用される
 - エラー通知チャンネルが未設定の場合、フォールバック先がないエラーはログ出力のみで通知されない
+- 通知対象は `logger.error` および `logger.warn` レベルのうち、管理者が知るべきもの。`debug` レベルや意図的な `.catch(() => null)` は対象外
+
+**通知対象箇所（`logger.error` レベル）:**
+
+| # | 機能 | ファイル | 内容 |
+| --- | --- | --- | --- |
+| 1 | メンバーログ | `guildMemberAddHandler.ts:156` | 入室通知の送信失敗 |
+| 2 | メンバーログ | `guildMemberRemoveHandler.ts:175` | 退室通知の送信失敗 |
+| 3 | メッセージ固定 | `stickyMessageCreateHandler.ts:27` | 再送処理の失敗 |
+| 4 | メッセージ固定 | `stickyMessageChannelDeleteHandler.ts:41` | チャンネル削除時のクリーンアップ失敗 |
+| 5 | メッセージ固定 | `stickyMessageResendService.ts:50` | スケジュールされた再送のエラー |
+| 6 | メッセージ固定 | `stickyMessageResendService.ts:85` | メッセージ送信失敗 |
+| 7 | Bumpリマインダー | `bumpReminderHandler.ts:102` | Bump検出処理の失敗 |
+| 8 | Bumpリマインダー | `sendBumpReminder.ts:134` | リマインダー送信失敗 |
+| 9 | Bumpリマインダー | `sendBumpPanel.ts:75` | パネル送信失敗 |
+| 10 | Bumpリマインダー | `bumpReminderMemberRemoveHandler.ts:39` | メンバー退出時のメンション整理失敗 |
+| 11 | Bumpリマインダー | `bumpReminderRoleDeleteHandler.ts:35` | ロール削除時のメンション整理失敗 |
+| 12 | Bumpリマインダー | `bumpReminderStartup.ts:52` | 起動時のスケジューラ復元失敗 |
+| 13 | VC募集 | `vcRecruitVoiceStateUpdate.ts:59` | VC状態変更の処理失敗 |
+| 14 | VC募集 | `vcRecruitChannelDeleteHandler.ts:62` | 投稿チャンネル削除失敗 |
+| 15 | VC募集 | `vcRecruitChannelDeleteHandler.ts:98` | パネルチャンネル削除失敗 |
+| 16 | VAC | `handleVacCreate.ts:99` | コントロールパネル送信失敗 |
+
+**通知対象箇所（`logger.warn` レベル）:**
+
+| # | 機能 | ファイル | 内容 |
+| --- | --- | --- | --- |
+| 17 | メンバーログ | `guildMemberAddHandler.ts:39` | 通知先チャンネル消失→設定自動リセット |
+| 18 | メンバーログ | `guildMemberRemoveHandler.ts:45` | 通知先チャンネル消失→設定自動リセット |
+| 19 | Bumpリマインダー | `sendBumpReminder.ts:39` | リマインダー送信先チャンネル未発見 |
+| 20 | VAC | `handleVacCreate.ts:69` | カテゴリのチャンネル上限到達でVC作成不可 |
+
+**通知対象外（debug/軽微/意図的な無視）:**
+
+| # | 機能 | 内容 | 理由 |
+| --- | --- | --- | --- |
+| 21-22 | Bumpリマインダー | 旧パネル削除失敗 | debug レベル、後続処理に影響なし |
+| 23 | メッセージ固定 | 旧メッセージ削除失敗 | debug レベル、既に削除済みの場合 |
+| 24-25 | VC募集 | teardown編集失敗 | タイムアウト後の `.catch(() => {})` |
+| 26-28 | VAC | チャンネル移動/削除/fetch | 意図的な `.catch(() => null)` |
+| 29 | 共通 | `executeWithLoggedError` | VAC内部で使用 |
 
 ### UI
 
