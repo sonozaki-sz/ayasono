@@ -21,3 +21,10 @@ kill <PID>
 ```
 
 TTY が `?` のプロセスはターミナルに紐づかないバックグラウンド実行なので、手動で停止する必要がある。
+
+### VSCode で TypeScript エラーが消えない
+
+`pnpm typecheck` は通るのに VSCode 上で赤線が残る場合、言語サーバーのキャッシュが原因。
+
+1. `Ctrl+Shift+P` → **TypeScript: Restart TS Server** を実行
+2. それでも解消しない場合は **Developer: Reload Window** を実行
