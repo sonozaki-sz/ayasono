@@ -41,8 +41,9 @@ describe("bot/features/sticky-message/repositories/stickyMessageRepository", () 
   });
 
   async function loadModule() {
-    const mod =
-      await import("@/bot/features/sticky-message/repositories/stickyMessageRepository");
+    const mod = await import(
+      "@/bot/features/sticky-message/repositories/stickyMessageRepository"
+    );
     return mod;
   }
 

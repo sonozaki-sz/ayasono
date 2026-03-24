@@ -30,8 +30,24 @@ vi.mock("@/bot/errors/interactionErrorHandler", () => ({
   handleCommandError: handleCommandErrorMock,
 }));
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: tDefaultMock,
   tGuild: tGuildMock,
   tInteraction: (...args: unknown[]) => args[1],
@@ -75,8 +91,9 @@ describe("bot/features/sticky-message/commands/stickyMessageCommand.execute", ()
   });
 
   it("DM など guildId が null のインタラクションはギルド外として早期検証エラーになる", async () => {
-    const { executeStickyMessageCommand } =
-      await import("@/bot/features/sticky-message/commands/stickyMessageCommand.execute");
+    const { executeStickyMessageCommand } = await import(
+      "@/bot/features/sticky-message/commands/stickyMessageCommand.execute"
+    );
     const interaction = createInteractionMock({ guildId: null });
 
     await executeStickyMessageCommand(interaction as never);
@@ -85,8 +102,9 @@ describe("bot/features/sticky-message/commands/stickyMessageCommand.execute", ()
   });
 
   it("ManageChannels 権限がない場合は ValidationError として処理される", async () => {
-    const { executeStickyMessageCommand } =
-      await import("@/bot/features/sticky-message/commands/stickyMessageCommand.execute");
+    const { executeStickyMessageCommand } = await import(
+      "@/bot/features/sticky-message/commands/stickyMessageCommand.execute"
+    );
     const interaction = createInteractionMock({ hasPermission: false });
 
     await executeStickyMessageCommand(interaction as never);
@@ -95,20 +113,20 @@ describe("bot/features/sticky-message/commands/stickyMessageCommand.execute", ()
   });
 
   it("set サブコマンドで handleStickyMessageSet が呼ばれる", async () => {
-    const { executeStickyMessageCommand } =
-      await import("@/bot/features/sticky-message/commands/stickyMessageCommand.execute");
+    const { executeStickyMessageCommand } = await import(
+      "@/bot/features/sticky-message/commands/stickyMessageCommand.execute"
+    );
     const interaction = createInteractionMock({ subcommand: "set" });
 
     await executeStickyMessageCommand(interaction as never);
 
-    expect(handleStickyMessageSetMock).toHaveBeenCalledWith(
-      interaction,
-    );
+    expect(handleStickyMessageSetMock).toHaveBeenCalledWith(interaction);
   });
 
   it("remove サブコマンドで handleStickyMessageRemove が呼ばれる", async () => {
-    const { executeStickyMessageCommand } =
-      await import("@/bot/features/sticky-message/commands/stickyMessageCommand.execute");
+    const { executeStickyMessageCommand } = await import(
+      "@/bot/features/sticky-message/commands/stickyMessageCommand.execute"
+    );
     const interaction = createInteractionMock({ subcommand: "remove" });
 
     await executeStickyMessageCommand(interaction as never);
@@ -120,8 +138,9 @@ describe("bot/features/sticky-message/commands/stickyMessageCommand.execute", ()
   });
 
   it("view サブコマンドで handleStickyMessageView が呼ばれる", async () => {
-    const { executeStickyMessageCommand } =
-      await import("@/bot/features/sticky-message/commands/stickyMessageCommand.execute");
+    const { executeStickyMessageCommand } = await import(
+      "@/bot/features/sticky-message/commands/stickyMessageCommand.execute"
+    );
     const interaction = createInteractionMock({ subcommand: "view" });
 
     await executeStickyMessageCommand(interaction as never);
@@ -133,20 +152,20 @@ describe("bot/features/sticky-message/commands/stickyMessageCommand.execute", ()
   });
 
   it("update サブコマンドで handleStickyMessageUpdate が呼ばれる", async () => {
-    const { executeStickyMessageCommand } =
-      await import("@/bot/features/sticky-message/commands/stickyMessageCommand.execute");
+    const { executeStickyMessageCommand } = await import(
+      "@/bot/features/sticky-message/commands/stickyMessageCommand.execute"
+    );
     const interaction = createInteractionMock({ subcommand: "update" });
 
     await executeStickyMessageCommand(interaction as never);
 
-    expect(handleStickyMessageUpdateMock).toHaveBeenCalledWith(
-      interaction,
-    );
+    expect(handleStickyMessageUpdateMock).toHaveBeenCalledWith(interaction);
   });
 
   it("定義外のサブコマンド名が渡された場合は網羅外として ValidationError 扱いになる", async () => {
-    const { executeStickyMessageCommand } =
-      await import("@/bot/features/sticky-message/commands/stickyMessageCommand.execute");
+    const { executeStickyMessageCommand } = await import(
+      "@/bot/features/sticky-message/commands/stickyMessageCommand.execute"
+    );
     const interaction = createInteractionMock({ subcommand: "unknown" });
 
     await executeStickyMessageCommand(interaction as never);
@@ -155,8 +174,9 @@ describe("bot/features/sticky-message/commands/stickyMessageCommand.execute", ()
   });
 
   it("ユースケース内で予期せぬ例外が発生した場合、handleCommandError へ委譲されて握りつぶされない", async () => {
-    const { executeStickyMessageCommand } =
-      await import("@/bot/features/sticky-message/commands/stickyMessageCommand.execute");
+    const { executeStickyMessageCommand } = await import(
+      "@/bot/features/sticky-message/commands/stickyMessageCommand.execute"
+    );
     const err = new Error("something failed");
     handleStickyMessageSetMock.mockRejectedValueOnce(err);
     const interaction = createInteractionMock({ subcommand: "set" });

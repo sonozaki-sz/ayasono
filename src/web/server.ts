@@ -3,7 +3,7 @@
 
 import { dirname } from "path";
 import { fileURLToPath } from "url";
-import { NODE_ENV, env } from "../shared/config/env";
+import { env, NODE_ENV } from "../shared/config/env";
 import {
   setupGlobalErrorHandlers,
   setupGracefulShutdown,

@@ -1,7 +1,7 @@
 // src/bot/features/vc-command/commands/usecases/vcRename.ts
 // VC名変更ユースケース
 
-import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
+import { type ChatInputCommandInteraction, MessageFlags } from "discord.js";
 import { tInteraction } from "../../../../../shared/locale/localeManager";
 import { createSuccessEmbed } from "../../../../utils/messageResponse";
 import { resolveVoiceChannelForEdit } from "../helpers/vcVoiceChannelResolver";

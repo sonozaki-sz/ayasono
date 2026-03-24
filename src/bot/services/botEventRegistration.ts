@@ -4,14 +4,14 @@
 import { logPrefixed, tDefault } from "../../shared/locale/localeManager";
 import { logger } from "../../shared/utils/logger";
 import type { BotClient } from "../client";
-import { registerBotEvent, type BotEvent } from "../types/discord";
+import { type BotEvent, registerBotEvent } from "../types/discord";
 
 /**
  * Bot が扱うイベント一覧をクライアントへ登録する関数
  */
 export function registerBotEvents(
   client: BotClient,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny: イベントの型パラメータは動的
   events: readonly BotEvent<any>[],
 ): void {
   logger.info(

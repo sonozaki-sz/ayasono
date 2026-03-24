@@ -3,8 +3,8 @@
 
 import {
   AttachmentBuilder,
-  MessageFlags,
   type ChatInputCommandInteraction,
+  MessageFlags,
 } from "discord.js";
 import {
   logPrefixed,

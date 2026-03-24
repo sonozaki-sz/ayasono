@@ -1,16 +1,16 @@
 // tests/unit/bot/utils/messageResponse.test.ts
 // メッセージレスポンスユーティリティのテスト
 
+import { EmbedBuilder } from "discord.js";
 import {
-  type MessageStatus,
   createErrorEmbed,
   createInfoEmbed,
   createStatusEmbed,
   createSuccessEmbed,
   createWarningEmbed,
+  type MessageStatus,
 } from "@/bot/utils/messageResponse";
 import { localeManager } from "@/shared/locale/localeManager";
-import { EmbedBuilder } from "discord.js";
 
 // i18n 依存のタイトル検証に備えてロケールを初期化
 beforeAll(async () => {
@@ -25,20 +25,17 @@ describe("messageResponse", () => {
       ["info", 0x3498db, "ℹ️"],
       ["warning", 0xfee75c, "⚠️"],
       ["error", 0xed4245, "❌"],
-    ])(
-      "%s ステータスの embed に正しい色と絵文字が設定されることを確認",
-      (status, expectedColor, expectedEmoji) => {
-        const title = "Test Title";
-        const description = "Test Description";
+    ])("%s ステータスの embed に正しい色と絵文字が設定されることを確認", (status, expectedColor, expectedEmoji) => {
+      const title = "Test Title";
+      const description = "Test Description";
 
-        const embed = createStatusEmbed(status, title, description);
+      const embed = createStatusEmbed(status, title, description);
 
-        expect(embed).toBeInstanceOf(EmbedBuilder);
-        expect(embed.data.color).toBe(expectedColor);
-        expect(embed.data.title).toBe(`${expectedEmoji} ${title}`);
-        expect(embed.data.description).toBe(description);
-      },
-    );
+      expect(embed).toBeInstanceOf(EmbedBuilder);
+      expect(embed.data.color).toBe(expectedColor);
+      expect(embed.data.title).toBe(`${expectedEmoji} ${title}`);
+      expect(embed.data.description).toBe(description);
+    });
 
     it("timestamp オプションが true の場合に embed にタイムスタンプが付与されることを確認", () => {
       // timestamp オプション有効時は埋め込みに時刻が付与される

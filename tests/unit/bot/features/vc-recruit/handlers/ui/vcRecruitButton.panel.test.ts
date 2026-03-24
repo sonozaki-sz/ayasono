@@ -1,8 +1,8 @@
 // tests/unit/bot/features/vc-recruit/handlers/ui/vcRecruitButton.panel.test.ts
 // 「VC募集を作成」ボタン（CREATE）と「次へ（詳細入力）」ボタン（MODAL_OPEN）の動作を検証
 
-import { vcRecruitButtonHandler } from "@/bot/features/vc-recruit/handlers/ui/vcRecruitButton";
 import { MessageFlags } from "discord.js";
+import { vcRecruitButtonHandler } from "@/bot/features/vc-recruit/handlers/ui/vcRecruitButton";
 
 // ---- モック定義 ----
 
@@ -51,11 +51,32 @@ vi.mock("@/bot/utils/messageResponse", () => ({
   createSuccessEmbed: vi.fn((msg: string) => ({ success: msg })),
   createInfoEmbed: vi.fn((msg: string) => ({ info: msg })),
   createWarningEmbed: vi.fn((msg: string) => ({ warning: msg })),
-  STATUS_COLORS: { success: 0x57f287, info: 0x3498db, warning: 0xfee75c, error: 0xed4245 },
+  STATUS_COLORS: {
+    success: 0x57f287,
+    info: 0x3498db,
+    warning: 0xfee75c,
+    error: 0xed4245,
+  },
 }));
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tInteraction: (...args: unknown[]) =>
     tInteractionMock(...(args as Parameters<typeof tInteractionMock>)),
   tDefault: vi.fn((key: string) => key),

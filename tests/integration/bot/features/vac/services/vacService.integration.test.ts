@@ -5,11 +5,11 @@
  * ユニットテストと異なり、ユースケースをモックせず実コードを通して検証する
  */
 
-import { VacService } from "@/bot/features/vac/services/vacService";
-import type { VacConfigService } from "@/shared/features/vac/vacConfigService";
-import type { VacConfig } from "@/shared/database/types";
 import { ChannelType, PermissionFlagsBits } from "discord.js";
 import type { Mocked } from "vitest";
+import { VacService } from "@/bot/features/vac/services/vacService";
+import type { VacConfig } from "@/shared/database/types";
+import type { VacConfigService } from "@/shared/features/vac/vacConfigService";
 
 // Logger のモック
 vi.mock("@/shared/utils/logger", () => ({
@@ -23,8 +23,24 @@ vi.mock("@/shared/utils/logger", () => ({
 
 // i18n のモック
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: vi.fn((key: string) => `default:${key}`),
   tInteraction: (...args: unknown[]) => args[1],
 }));
@@ -36,7 +52,10 @@ vi.mock("@/bot/features/vc-panel/vcControlPanel", () => ({
 
 // errorHandling のモック（実処理に近い形で委譲）
 vi.mock("@/shared/utils/errorHandling", () => ({
-  executeWithLoggedError: async (operation: () => Promise<void>, _message: string) => {
+  executeWithLoggedError: async (
+    operation: () => Promise<void>,
+    _message: string,
+  ) => {
     await operation();
   },
 }));
@@ -119,7 +138,11 @@ function createVoiceState(options: {
           displayName: options.displayName ?? "TestUser",
           guild: {
             id: options.guildId ?? "guild-1",
-            channels: { fetch: fetchMock, create: createMock, cache: channelsCache },
+            channels: {
+              fetch: fetchMock,
+              create: createMock,
+              cache: channelsCache,
+            },
           },
           voice: { setChannel: setChannelMock },
         }
@@ -147,20 +170,24 @@ describe("VacService Integration", () => {
       const service = new VacService(repository);
 
       // --- Phase 1: トリガーVC参加 → チャンネル作成 ---
-      repository.getVacConfigOrDefault.mockResolvedValue(
-        createEnabledConfig(),
-      );
+      repository.getVacConfigOrDefault.mockResolvedValue(createEnabledConfig());
 
-      const { state: joinState, createMock, setChannelMock: joinSetChannel } =
-        createVoiceState({
-          channelId: "trigger-1",
-          memberId: "user-1",
-          displayName: "Alice",
-        });
+      const {
+        state: joinState,
+        createMock,
+        setChannelMock: joinSetChannel,
+      } = createVoiceState({
+        channelId: "trigger-1",
+        memberId: "user-1",
+        displayName: "Alice",
+      });
 
       const oldJoin = createVoiceState({ channelId: null }).state;
 
-      await service.handleVoiceStateUpdate(oldJoin as never, joinState as never);
+      await service.handleVoiceStateUpdate(
+        oldJoin as never,
+        joinState as never,
+      );
 
       // チャンネル作成を確認
       expect(createMock).toHaveBeenCalledWith(
@@ -189,7 +216,11 @@ describe("VacService Integration", () => {
       repository.getVacConfigOrDefault.mockResolvedValue(
         createEnabledConfig({
           createdChannels: [
-            { voiceChannelId: "created-voice-1", ownerId: "user-1", createdAt: 1700000000000 },
+            {
+              voiceChannelId: "created-voice-1",
+              ownerId: "user-1",
+              createdAt: 1700000000000,
+            },
           ],
         }),
       );
@@ -222,7 +253,11 @@ describe("VacService Integration", () => {
       repository.getVacConfigOrDefault.mockResolvedValue(
         createEnabledConfig({
           createdChannels: [
-            { voiceChannelId: "created-voice-1", ownerId: "user-1", createdAt: 1 },
+            {
+              voiceChannelId: "created-voice-1",
+              ownerId: "user-1",
+              createdAt: 1,
+            },
           ],
         }),
       );
@@ -252,23 +287,37 @@ describe("VacService Integration", () => {
       repository.getVacConfigOrDefault.mockResolvedValue(
         createEnabledConfig({
           createdChannels: [
-            { voiceChannelId: "existing-vc-1", ownerId: "user-1", createdAt: 1 },
+            {
+              voiceChannelId: "existing-vc-1",
+              ownerId: "user-1",
+              createdAt: 1,
+            },
           ],
         }),
       );
 
-      const { state: joinState, fetchMock, createMock, setChannelMock } =
-        createVoiceState({
-          channelId: "trigger-1",
-          memberId: "user-1",
-        });
+      const {
+        state: joinState,
+        fetchMock,
+        createMock,
+        setChannelMock,
+      } = createVoiceState({
+        channelId: "trigger-1",
+        memberId: "user-1",
+      });
 
-      const existingChannel = { id: "existing-vc-1", type: ChannelType.GuildVoice };
+      const existingChannel = {
+        id: "existing-vc-1",
+        type: ChannelType.GuildVoice,
+      };
       fetchMock.mockResolvedValue(existingChannel);
 
       const oldState = createVoiceState({ channelId: null }).state;
 
-      await service.handleVoiceStateUpdate(oldState as never, joinState as never);
+      await service.handleVoiceStateUpdate(
+        oldState as never,
+        joinState as never,
+      );
 
       // 既存チャンネルに移動
       expect(setChannelMock).toHaveBeenCalledWith(existingChannel);
@@ -289,19 +338,26 @@ describe("VacService Integration", () => {
         }),
       );
 
-      const { state: joinState, fetchMock, createMock, setChannelMock } =
-        createVoiceState({
-          channelId: "trigger-1",
-          memberId: "user-1",
-          displayName: "Alice",
-        });
+      const {
+        state: joinState,
+        fetchMock,
+        createMock,
+        setChannelMock,
+      } = createVoiceState({
+        channelId: "trigger-1",
+        memberId: "user-1",
+        displayName: "Alice",
+      });
 
       // 既存チャンネルの fetch が失敗
       fetchMock.mockRejectedValue(new Error("not found"));
 
       const oldState = createVoiceState({ channelId: null }).state;
 
-      await service.handleVoiceStateUpdate(oldState as never, joinState as never);
+      await service.handleVoiceStateUpdate(
+        oldState as never,
+        joinState as never,
+      );
 
       // 古いレコードを削除
       expect(repository.removeCreatedVacChannel).toHaveBeenCalledWith(
@@ -328,13 +384,21 @@ describe("VacService Integration", () => {
       repository.getVacConfigOrDefault.mockResolvedValue(
         createEnabledConfig({
           createdChannels: [
-            { voiceChannelId: "old-managed-vc", ownerId: "user-2", createdAt: 1 },
+            {
+              voiceChannelId: "old-managed-vc",
+              ownerId: "user-2",
+              createdAt: 1,
+            },
           ],
         }),
       );
 
       // 移動先（newState）: トリガーVC
-      const { state: newState, createMock, setChannelMock } = createVoiceState({
+      const {
+        state: newState,
+        createMock,
+        setChannelMock,
+      } = createVoiceState({
         channelId: "trigger-1",
         memberId: "user-1",
         displayName: "Bob",
@@ -347,7 +411,10 @@ describe("VacService Integration", () => {
         memberCount: 0,
       });
 
-      await service.handleVoiceStateUpdate(oldState as never, newState as never);
+      await service.handleVoiceStateUpdate(
+        oldState as never,
+        newState as never,
+      );
 
       // 新規VAC作成
       expect(createMock).toHaveBeenCalledTimes(1);
@@ -366,9 +433,7 @@ describe("VacService Integration", () => {
       const repository = createRepositoryMock();
       const service = new VacService(repository);
 
-      repository.getVacConfigOrDefault.mockResolvedValue(
-        createEnabledConfig(),
-      );
+      repository.getVacConfigOrDefault.mockResolvedValue(createEnabledConfig());
 
       const { state: joinState, createMock } = createVoiceState({
         channelId: "trigger-1",
@@ -377,7 +442,10 @@ describe("VacService Integration", () => {
       });
       const oldState = createVoiceState({ channelId: null }).state;
 
-      await service.handleVoiceStateUpdate(oldState as never, joinState as never);
+      await service.handleVoiceStateUpdate(
+        oldState as never,
+        joinState as never,
+      );
 
       expect(createMock).not.toHaveBeenCalled();
       expect(repository.addCreatedVacChannel).not.toHaveBeenCalled();
@@ -389,9 +457,7 @@ describe("VacService Integration", () => {
       const repository = createRepositoryMock();
       const service = new VacService(repository);
 
-      repository.getVacConfigOrDefault.mockResolvedValue(
-        createEnabledConfig(),
-      );
+      repository.getVacConfigOrDefault.mockResolvedValue(createEnabledConfig());
 
       const channelDeleteMock = vi.fn().mockResolvedValue(undefined);
       const createMock = vi.fn().mockResolvedValue({
@@ -400,7 +466,9 @@ describe("VacService Integration", () => {
         delete: channelDeleteMock,
       });
 
-      const setChannelMock = vi.fn().mockRejectedValue(new Error("user disconnected"));
+      const setChannelMock = vi
+        .fn()
+        .mockRejectedValue(new Error("user disconnected"));
 
       const newState = {
         guild: { id: "guild-1" },
@@ -426,7 +494,10 @@ describe("VacService Integration", () => {
       };
       const oldState = createVoiceState({ channelId: null }).state;
 
-      await service.handleVoiceStateUpdate(oldState as never, newState as never);
+      await service.handleVoiceStateUpdate(
+        oldState as never,
+        newState as never,
+      );
 
       // チャンネルは作成された
       expect(createMock).toHaveBeenCalledTimes(1);
@@ -539,9 +610,13 @@ describe("VacService Integration", () => {
         }),
       );
 
-      const guildFetchMock = vi.fn()
+      const guildFetchMock = vi
+        .fn()
         // トリガーチャンネルの fetch
-        .mockResolvedValueOnce({ id: "valid-trigger", type: ChannelType.GuildVoice })
+        .mockResolvedValueOnce({
+          id: "valid-trigger",
+          type: ChannelType.GuildVoice,
+        })
         .mockResolvedValueOnce(null) // stale-trigger は存在しない
         // 作成済みチャンネルの fetch
         .mockResolvedValueOnce(null) // orphaned-vc は存在しない
@@ -656,8 +731,12 @@ describe("VacService Integration", () => {
         }),
       );
 
-      const guildFetchMock = vi.fn()
-        .mockResolvedValueOnce({ id: "trigger-1", type: ChannelType.GuildVoice })
+      const guildFetchMock = vi
+        .fn()
+        .mockResolvedValueOnce({
+          id: "trigger-1",
+          type: ChannelType.GuildVoice,
+        })
         .mockResolvedValueOnce({
           id: "active-vc",
           type: ChannelType.GuildVoice,
@@ -688,7 +767,10 @@ describe("VacService Integration", () => {
       const oldState = { channelId: "same-ch", guild: { id: "guild-1" } };
       const newState = { guild: { id: "guild-1" }, channelId: "same-ch" };
 
-      await service.handleVoiceStateUpdate(oldState as never, newState as never);
+      await service.handleVoiceStateUpdate(
+        oldState as never,
+        newState as never,
+      );
 
       expect(repository.getVacConfigOrDefault).not.toHaveBeenCalled();
     });
@@ -709,7 +791,10 @@ describe("VacService Integration", () => {
       });
       const oldState = createVoiceState({ channelId: null }).state;
 
-      await service.handleVoiceStateUpdate(oldState as never, joinState as never);
+      await service.handleVoiceStateUpdate(
+        oldState as never,
+        joinState as never,
+      );
 
       expect(createMock).not.toHaveBeenCalled();
     });
@@ -728,7 +813,10 @@ describe("VacService Integration", () => {
       });
       const oldState = createVoiceState({ channelId: null }).state;
 
-      await service.handleVoiceStateUpdate(oldState as never, joinState as never);
+      await service.handleVoiceStateUpdate(
+        oldState as never,
+        joinState as never,
+      );
 
       expect(createMock).not.toHaveBeenCalled();
     });
@@ -766,9 +854,7 @@ describe("VacService Integration", () => {
       const repository = createRepositoryMock();
       const service = new VacService(repository);
 
-      repository.getVacConfigOrDefault.mockResolvedValue(
-        createEnabledConfig(),
-      );
+      repository.getVacConfigOrDefault.mockResolvedValue(createEnabledConfig());
 
       const { state: joinState, createMock } = createVoiceState({
         channelId: "trigger-1",
@@ -778,7 +864,10 @@ describe("VacService Integration", () => {
       });
       const oldState = createVoiceState({ channelId: null }).state;
 
-      await service.handleVoiceStateUpdate(oldState as never, joinState as never);
+      await service.handleVoiceStateUpdate(
+        oldState as never,
+        joinState as never,
+      );
 
       expect(createMock).toHaveBeenCalledWith(
         expect.objectContaining({ name: "Alice's Room (3)" }),

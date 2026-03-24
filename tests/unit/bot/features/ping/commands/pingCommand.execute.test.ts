@@ -3,8 +3,24 @@ import { executePingCommand } from "@/bot/features/ping/commands/pingCommand.exe
 import { createSuccessEmbed } from "@/bot/utils/messageResponse";
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tGuild: vi.fn(),
   tInteraction: vi.fn((_locale: string, key: string) => key),
 }));
@@ -37,8 +53,12 @@ describe("bot/features/ping/commands/pingCommand.execute", () => {
     await executePingCommand(interaction as never);
 
     // tInteraction returns the key as-is
-    expect(interaction.reply).toHaveBeenCalledWith({ embeds: [{ description: "ping:user-response.measuring" }] });
-    expect(createSuccessEmbed).toHaveBeenCalledWith("ping:user-response.result");
+    expect(interaction.reply).toHaveBeenCalledWith({
+      embeds: [{ description: "ping:user-response.measuring" }],
+    });
+    expect(createSuccessEmbed).toHaveBeenCalledWith(
+      "ping:user-response.result",
+    );
     expect(interaction.editReply).toHaveBeenCalledWith({
       embeds: [{ description: "ping:user-response.result" }],
     });

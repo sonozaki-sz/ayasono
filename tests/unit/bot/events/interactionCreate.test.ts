@@ -1,4 +1,7 @@
 // tests/unit/bot/events/interactionCreate.test.ts
+
+import { Events, MessageFlags } from "discord.js";
+import type { Mock } from "vitest";
 import {
   handleCommandError,
   handleInteractionError,
@@ -6,8 +9,6 @@ import {
 import { interactionCreateEvent } from "@/bot/events/interactionCreate";
 import { tInteraction } from "@/shared/locale/localeManager";
 import { logger } from "@/shared/utils/logger";
-import { Events, MessageFlags } from "discord.js";
-import type { Mock } from "vitest";
 
 // ErrorHandler は呼び出し有無の検証に限定する
 vi.mock("@/bot/errors/interactionErrorHandler", () => ({
@@ -17,14 +18,35 @@ vi.mock("@/bot/errors/interactionErrorHandler", () => ({
 
 // ローカライズは固定文字列化してアサーションを簡潔にする
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: vi.fn((key: string) => `default:${key}`),
   tInteraction: vi.fn((_locale: string, key: string) => `interaction:${key}`),
 }));
 
 vi.mock("@/bot/utils/messageResponse", () => ({
-  STATUS_COLORS: { success: 0x57f287, info: 0x3498db, warning: 0xfee75c, error: 0xed4245 },
+  STATUS_COLORS: {
+    success: 0x57f287,
+    info: 0x3498db,
+    warning: 0xfee75c,
+    error: 0xed4245,
+  },
 }));
 
 // ログ出力は副作用回避のためダミー化する
@@ -261,7 +283,9 @@ describe("bot/events/interactionCreate", () => {
     await interactionCreateEvent.execute(interaction as never);
 
     expect(logger.warn).toHaveBeenCalledWith(
-      expect.stringContaining("[system:log_prefix.interaction_create:command] system:interaction.unknown_command"),
+      expect.stringContaining(
+        "[system:log_prefix.interaction_create:command] system:interaction.unknown_command",
+      ),
     );
     expect(interaction.reply).not.toHaveBeenCalled();
   });
@@ -306,7 +330,9 @@ describe("bot/events/interactionCreate", () => {
 
     expect(command.execute).toHaveBeenCalledWith(interaction);
     expect(logger.debug).toHaveBeenCalledWith(
-      expect.stringContaining("[system:log_prefix.interaction_create:command] system:interaction.command_executed"),
+      expect.stringContaining(
+        "[system:log_prefix.interaction_create:command] system:interaction.command_executed",
+      ),
     );
   });
 
@@ -362,7 +388,9 @@ describe("bot/events/interactionCreate", () => {
     await interactionCreateEvent.execute(interaction as never);
 
     expect(logger.error).toHaveBeenCalledWith(
-      expect.stringContaining("[system:log_prefix.interaction_create:command] system:interaction.autocomplete_error"),
+      expect.stringContaining(
+        "[system:log_prefix.interaction_create:command] system:interaction.autocomplete_error",
+      ),
       autocompleteError,
     );
   });
@@ -388,7 +416,9 @@ describe("bot/events/interactionCreate", () => {
 
     expect(modalExecute).not.toHaveBeenCalled();
     expect(logger.warn).toHaveBeenCalledWith(
-      expect.stringContaining("[system:log_prefix.interaction_create:modal] system:interaction.unknown_modal"),
+      expect.stringContaining(
+        "[system:log_prefix.interaction_create:modal] system:interaction.unknown_modal",
+      ),
     );
   });
 
@@ -410,7 +440,9 @@ describe("bot/events/interactionCreate", () => {
     await interactionCreateEvent.execute(interaction as never);
 
     expect(logger.warn).toHaveBeenCalledWith(
-      expect.stringContaining("[system:log_prefix.interaction_create:modal] system:interaction.unknown_modal"),
+      expect.stringContaining(
+        "[system:log_prefix.interaction_create:modal] system:interaction.unknown_modal",
+      ),
     );
   });
 

@@ -27,10 +27,10 @@
   },
   // エディター設定
   "editor.formatOnSave": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.defaultFormatter": "biomejs.biome",
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit",
-    "source.organizeImports": "explicit"
+    "source.fixAll.biome": "explicit",
+    "source.organizeImports.biome": "explicit"
   },
   "editor.tabSize": 2,
   "editor.insertSpaces": true,
@@ -78,26 +78,25 @@
   "git.enableSmartCommit": true,
   // ポート自動転送（高番ポートの大量検出を抑制）
   "remote.autoForwardPorts": true,
-  // ESLint設定
-  "eslint.validate": ["javascript", "typescript"],
-  "eslint.format.enable": true,
+  // Biome設定
+  "biome.enabled": true,
   // cSpell設定（問題タブに表示しない）
   "cSpell.diagnosticLevel": "Hint",
   "cSpell.showStatus": false,
   // 言語別設定
   "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.defaultFormatter": "biomejs.biome",
     "editor.formatOnSave": true
   },
   "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.defaultFormatter": "biomejs.biome",
     "editor.formatOnSave": true
   },
   "[json]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "biomejs.biome"
   },
   "[jsonc]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "biomejs.biome"
   },
   // その他
   "todo-tree.tree.scanMode": "workspace only",

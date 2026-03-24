@@ -1,8 +1,8 @@
 // tests/unit/bot/features/member-log/handlers/ui/memberLogSetLeaveMessageModalHandler.test.ts
 
 import { MessageFlags } from "discord.js";
-import { memberLogSetLeaveMessageModalHandler } from "@/bot/features/member-log/handlers/ui/memberLogSetLeaveMessageModalHandler";
 import { MEMBER_LOG_CONFIG_COMMAND } from "@/bot/features/member-log/commands/memberLogConfigCommand.constants";
+import { memberLogSetLeaveMessageModalHandler } from "@/bot/features/member-log/handlers/ui/memberLogSetLeaveMessageModalHandler";
 
 // ---- モック定義（vi.hoisted でファクトリ参照可能にする） ----
 const mocks = vi.hoisted(() => ({
@@ -24,8 +24,24 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
 }));
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tGuild: mocks.tGuild,
   tDefault: mocks.tDefault,
   tInteraction: (...args: unknown[]) => args[1],
@@ -76,26 +92,22 @@ describe("bot/features/member-log/handlers/ui/memberLogSetLeaveMessageModalHandl
     });
 
     it("別の customId に対して false を返すことを確認", () => {
-      expect(
-        memberLogSetLeaveMessageModalHandler.matches("other:modal"),
-      ).toBe(false);
+      expect(memberLogSetLeaveMessageModalHandler.matches("other:modal")).toBe(
+        false,
+      );
     });
   });
 
   describe("execute", () => {
     it("guild が null の場合は何もせず返ることを確認", async () => {
       const interaction = makeInteraction({ guild: false });
-      await memberLogSetLeaveMessageModalHandler.execute(
-        interaction as never,
-      );
+      await memberLogSetLeaveMessageModalHandler.execute(interaction as never);
       expect(mocks.setLeaveMessage).not.toHaveBeenCalled();
     });
 
     it("service.setLeaveMessage が guildId とメッセージを引数に呼ばれることを確認", async () => {
       const interaction = makeInteraction({ message: "バイバイ {userName}" });
-      await memberLogSetLeaveMessageModalHandler.execute(
-        interaction as never,
-      );
+      await memberLogSetLeaveMessageModalHandler.execute(interaction as never);
       expect(mocks.setLeaveMessage).toHaveBeenCalledWith(
         "guild-1",
         "バイバイ {userName}",
@@ -104,9 +116,7 @@ describe("bot/features/member-log/handlers/ui/memberLogSetLeaveMessageModalHandl
 
     it("MODAL_INPUT_MESSAGE の customId でテキスト入力が取得されることを確認", async () => {
       const interaction = makeInteraction();
-      await memberLogSetLeaveMessageModalHandler.execute(
-        interaction as never,
-      );
+      await memberLogSetLeaveMessageModalHandler.execute(interaction as never);
       expect(interaction.fields.getTextInputValue).toHaveBeenCalledWith(
         MEMBER_LOG_CONFIG_COMMAND.MODAL_INPUT_MESSAGE,
       );
@@ -114,9 +124,7 @@ describe("bot/features/member-log/handlers/ui/memberLogSetLeaveMessageModalHandl
 
     it("成功時に Ephemeral な success embed で reply が呼ばれることを確認", async () => {
       const interaction = makeInteraction();
-      await memberLogSetLeaveMessageModalHandler.execute(
-        interaction as never,
-      );
+      await memberLogSetLeaveMessageModalHandler.execute(interaction as never);
       expect(interaction.reply).toHaveBeenCalledWith(
         expect.objectContaining({
           embeds: expect.any(Array),

@@ -2,21 +2,21 @@
 // 機能別リポジトリインターフェース（必要な範囲だけ依存できる）
 
 import type {
-  GuildConfig,
-  AfkConfig,
-  MemberLogConfig,
-  VacConfig,
-  BumpReminderConfig,
-} from "./entities";
-import type {
   BumpReminderMentionClearResult,
   BumpReminderMentionRoleResult,
   BumpReminderMentionUserAddResult,
   BumpReminderMentionUserRemoveResult,
   BumpReminderMentionUsersClearResult,
 } from "./bumpReminderTypes";
-import type { VcRecruitConfig } from "./vcRecruitTypes";
+import type {
+  AfkConfig,
+  BumpReminderConfig,
+  GuildConfig,
+  MemberLogConfig,
+  VacConfig,
+} from "./entities";
 import type { StickyMessage } from "./stickyMessageTypes";
+import type { VcRecruitConfig } from "./vcRecruitTypes";
 
 export interface IBaseGuildRepository {
   getConfig(guildId: string): Promise<GuildConfig | null>;
@@ -127,8 +127,7 @@ export interface IStickyMessageRepository {
  * 全機能を束ねた統合インターフェース
  */
 export interface IGuildConfigRepository
-  extends
-    IBaseGuildRepository,
+  extends IBaseGuildRepository,
     IAfkConfigRepository,
     IBumpReminderConfigRepository,
     IVacConfigRepository,

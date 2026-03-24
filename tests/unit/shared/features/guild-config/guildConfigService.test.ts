@@ -16,8 +16,8 @@ vi.mock("@/shared/database/guildConfigRepositoryProvider", () => ({
   getGuildConfigRepository: () => ({}),
 }));
 
-import { GuildConfigService } from "@/shared/features/guild-config/guildConfigService";
 import { EXPORT_SCHEMA_VERSION } from "@/shared/features/guild-config/guildConfigDefaults";
+import { GuildConfigService } from "@/shared/features/guild-config/guildConfigService";
 
 // GuildConfigService のビジネスロジックを検証
 describe("shared/features/guild-config/guildConfigService", () => {
@@ -50,7 +50,12 @@ describe("shared/features/guild-config/guildConfigService", () => {
   // getConfig のテスト
   describe("getConfig", () => {
     it("リポジトリから取得した設定をそのまま返すこと", async () => {
-      const config = { guildId: "g1", locale: "ja", createdAt: new Date(), updatedAt: new Date() };
+      const config = {
+        guildId: "g1",
+        locale: "ja",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
       repoMock.getConfig.mockResolvedValue(config);
       const result = await service.getConfig("g1");
       expect(result).toBe(config);
@@ -159,9 +164,16 @@ describe("shared/features/guild-config/guildConfigService", () => {
   // importConfig のテスト
   describe("importConfig", () => {
     it("リポジトリの importFullConfig を呼び出すこと", async () => {
-      const data = { version: 1, exportedAt: "", guildId: "g1", config: { locale: "ja" } };
+      const data = {
+        version: 1,
+        exportedAt: "",
+        guildId: "g1",
+        config: { locale: "ja" },
+      };
       await service.importConfig("g1", data);
-      expect(repoMock.importFullConfig).toHaveBeenCalledWith("g1", { locale: "ja" });
+      expect(repoMock.importFullConfig).toHaveBeenCalledWith("g1", {
+        locale: "ja",
+      });
     });
   });
 });

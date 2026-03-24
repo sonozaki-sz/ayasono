@@ -1,4 +1,6 @@
 // tests/unit/shared/database/repositories/usecases/guildConfigCoreUsecases.test.ts
+
+import type { MockedFunction } from "vitest";
 import {
   existsGuildConfigRecord,
   findGuildConfigRecord,
@@ -23,7 +25,6 @@ import {
   updateGuildConfigUsecase,
   updateGuildLocaleUsecase,
 } from "@/shared/database/repositories/usecases/guildConfigCoreUsecases";
-import type { MockedFunction } from "vitest";
 
 vi.mock(
   "@/shared/database/repositories/persistence/guildConfigReadPersistence",
@@ -66,33 +67,30 @@ describe("shared/database/repositories/usecases/guildConfigCoreUsecases", () => 
     ),
   };
 
-  const findGuildConfigRecordMock =
-    findGuildConfigRecord as MockedFunction<typeof findGuildConfigRecord>;
+  const findGuildConfigRecordMock = findGuildConfigRecord as MockedFunction<
+    typeof findGuildConfigRecord
+  >;
   const toGuildConfigMock = toGuildConfig as MockedFunction<
     typeof toGuildConfig
   >;
   const toCreateDataMock = toGuildConfigCreateData as MockedFunction<
     typeof toGuildConfigCreateData
   >;
-  const createGuildConfigRecordMock =
-    createGuildConfigRecord as MockedFunction<
-      typeof createGuildConfigRecord
-    >;
+  const createGuildConfigRecordMock = createGuildConfigRecord as MockedFunction<
+    typeof createGuildConfigRecord
+  >;
   const toUpdateDataMock = toGuildConfigUpdateData as MockedFunction<
     typeof toGuildConfigUpdateData
   >;
-  const upsertGuildConfigRecordMock =
-    upsertGuildConfigRecord as MockedFunction<
-      typeof upsertGuildConfigRecord
-    >;
-  const deleteGuildConfigRecordMock =
-    deleteGuildConfigRecord as MockedFunction<
-      typeof deleteGuildConfigRecord
-    >;
-  const existsGuildConfigRecordMock =
-    existsGuildConfigRecord as MockedFunction<
-      typeof existsGuildConfigRecord
-    >;
+  const upsertGuildConfigRecordMock = upsertGuildConfigRecord as MockedFunction<
+    typeof upsertGuildConfigRecord
+  >;
+  const deleteGuildConfigRecordMock = deleteGuildConfigRecord as MockedFunction<
+    typeof deleteGuildConfigRecord
+  >;
+  const existsGuildConfigRecordMock = existsGuildConfigRecord as MockedFunction<
+    typeof existsGuildConfigRecord
+  >;
   const findGuildLocaleMock = findGuildLocale as MockedFunction<
     typeof findGuildLocale
   >;

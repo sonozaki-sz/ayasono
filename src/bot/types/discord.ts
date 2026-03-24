@@ -37,7 +37,7 @@ declare module "discord.js" {
  */
 export function registerBotEvent(
   emitter: Client,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny: イベントの型パラメータは動的
   event: BotEvent<any>,
 ): void {
   if (event.once) {

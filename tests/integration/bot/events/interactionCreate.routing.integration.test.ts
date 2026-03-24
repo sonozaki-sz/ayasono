@@ -11,8 +11,24 @@ vi.mock("@/bot/errors/interactionErrorHandler", () => ({
 
 // ローカライズとロガーは副作用を排除する
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: vi.fn((key: string) => key),
   tGuild: vi.fn(async (_guildId: string, key: string) => key),
   tInteraction: (...args: unknown[]) => args[1],
@@ -107,9 +123,9 @@ describe("integration: interactionCreate handler routing", () => {
   });
 
   it("modal submit が modalHandlers へルーティングされること", async () => {
-    const modalModule = await vi.importMock(
+    const modalModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/modals",
-    ) as {
+    )) as {
       __modalHandler: {
         execute: Mock<(arg: unknown) => Promise<void>>;
       };
@@ -128,9 +144,9 @@ describe("integration: interactionCreate handler routing", () => {
   });
 
   it("button interaction が buttonHandlers を経由して処理されること", async () => {
-    const buttonModule = await vi.importMock(
+    const buttonModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/buttons",
-    ) as {
+    )) as {
       __buttonHandler: {
         execute: Mock<(arg: unknown) => Promise<void>>;
       };
@@ -149,9 +165,9 @@ describe("integration: interactionCreate handler routing", () => {
   });
 
   it("user select ハンドラの例外が interaction 用エラーハンドラへ委譲されること", async () => {
-    const selectModule = await vi.importMock(
+    const selectModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/selectMenus",
-    ) as {
+    )) as {
       __userSelectHandler: {
         execute: Mock<(arg: unknown) => Promise<void>>;
       };

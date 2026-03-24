@@ -21,7 +21,9 @@ import {
 /**
  * guild_bump_reminder_configs テーブルを使用した Bumpリマインダー設定リポジトリ
  */
-export class BumpReminderConfigRepository implements IBumpReminderConfigRepository {
+export class BumpReminderConfigRepository
+  implements IBumpReminderConfigRepository
+{
   private readonly prisma: PrismaClient;
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;

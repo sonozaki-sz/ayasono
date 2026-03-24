@@ -35,8 +35,9 @@ describe("shared/features/bump-reminder/bumpReminderConfigService", () => {
       getGuildConfigRepository: getGuildConfigRepositoryMock,
     }));
 
-    const module =
-      await import("@/shared/features/bump-reminder/bumpReminderConfigService");
+    const module = await import(
+      "@/shared/features/bump-reminder/bumpReminderConfigService"
+    );
 
     return {
       module,
@@ -235,9 +236,9 @@ describe("shared/features/bump-reminder/bumpReminderConfigService", () => {
     ).resolves.toBe(REMOVE);
 
     repository.clearBumpReminderMentionUsers.mockResolvedValue(USERS_CLEAR);
-    await expect(service.clearBumpReminderMentionUsers("guild-1")).resolves.toBe(
-      USERS_CLEAR,
-    );
+    await expect(
+      service.clearBumpReminderMentionUsers("guild-1"),
+    ).resolves.toBe(USERS_CLEAR);
 
     repository.clearBumpReminderMentions.mockResolvedValue(CLEAR);
     await expect(service.clearBumpReminderMentions("guild-1")).resolves.toBe(

@@ -15,8 +15,24 @@ vi.mock("@/shared/utils/logger", () => ({ logger: loggerMock }));
 vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: vi.fn((key: string) => key),
   tInteraction: vi.fn((_locale: string, key: string) => key),
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
 }));
 
 function createMessageMock(
@@ -59,8 +75,9 @@ describe("bot/features/sticky-message/handlers/stickyMessageCreateHandler", () =
   });
 
   it("Bot からのメッセージは無視する", async () => {
-    const { handleStickyMessageCreate } =
-      await import("@/bot/features/sticky-message/handlers/stickyMessageCreateHandler");
+    const { handleStickyMessageCreate } = await import(
+      "@/bot/features/sticky-message/handlers/stickyMessageCreateHandler"
+    );
     const message = createMessageMock({ author: { bot: true } });
 
     await handleStickyMessageCreate(message as never);
@@ -69,8 +86,9 @@ describe("bot/features/sticky-message/handlers/stickyMessageCreateHandler", () =
   });
 
   it("DM（guildId が null）はギルドスコープの機能対象外のため無視される", async () => {
-    const { handleStickyMessageCreate } =
-      await import("@/bot/features/sticky-message/handlers/stickyMessageCreateHandler");
+    const { handleStickyMessageCreate } = await import(
+      "@/bot/features/sticky-message/handlers/stickyMessageCreateHandler"
+    );
     const message = createMessageMock({ guildId: null });
 
     await handleStickyMessageCreate(message as never);
@@ -79,8 +97,9 @@ describe("bot/features/sticky-message/handlers/stickyMessageCreateHandler", () =
   });
 
   it("テキスト以外のチャンネルのメッセージは無視する", async () => {
-    const { handleStickyMessageCreate } =
-      await import("@/bot/features/sticky-message/handlers/stickyMessageCreateHandler");
+    const { handleStickyMessageCreate } = await import(
+      "@/bot/features/sticky-message/handlers/stickyMessageCreateHandler"
+    );
     const message = createMessageMock({
       channel: { type: ChannelType.GuildVoice },
     });
@@ -91,8 +110,9 @@ describe("bot/features/sticky-message/handlers/stickyMessageCreateHandler", () =
   });
 
   it("再送サービスが例外を投げても呼び出し元に伝播させずエラーログのみ記録する", async () => {
-    const { handleStickyMessageCreate } =
-      await import("@/bot/features/sticky-message/handlers/stickyMessageCreateHandler");
+    const { handleStickyMessageCreate } = await import(
+      "@/bot/features/sticky-message/handlers/stickyMessageCreateHandler"
+    );
     handleMessageCreateMock.mockRejectedValueOnce(new Error("resend error"));
     const message = createMessageMock();
 

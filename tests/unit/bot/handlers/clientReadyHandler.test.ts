@@ -1,23 +1,38 @@
 // tests/unit/bot/handlers/clientReadyHandler.test.ts
-import { handleClientReady } from "@/bot/handlers/clientReadyHandler";
-import { ActivityType, PresenceUpdateStatus } from "discord.js";
 
-const tDefaultMock = vi.fn(
-  (key: string, params?: Record<string, unknown>) => {
-    if (key === "system:bot.presence_activity") {
-      return `presence:${String(params?.count)}`;
-    }
-    return `default:${key}`;
-  },
-);
+import { ActivityType, PresenceUpdateStatus } from "discord.js";
+import { handleClientReady } from "@/bot/handlers/clientReadyHandler";
+
+const tDefaultMock = vi.fn((key: string, params?: Record<string, unknown>) => {
+  if (key === "system:bot.presence_activity") {
+    return `presence:${String(params?.count)}`;
+  }
+  return `default:${key}`;
+});
 const loggerInfoMock = vi.fn();
 const restoreBumpRemindersOnStartupMock = vi.fn();
 const cleanupVacOnStartupMock = vi.fn();
 const initGuildInviteCacheMock = vi.fn();
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: (key: string, params?: Record<string, unknown>) =>
     tDefaultMock(key, params),
   tInteraction: (...args: unknown[]) => args[1],
@@ -59,7 +74,12 @@ describe("bot/handlers/clientReadyHandler", () => {
     const fakeGuilds = [{ id: "g1" }, { id: "g2" }, { id: "g3" }];
     const client = {
       user: { tag: "bot#0001", setPresence: setPresenceMock },
-      guilds: { cache: { size: 3, map: (fn: (g: unknown) => unknown) => fakeGuilds.map(fn) } },
+      guilds: {
+        cache: {
+          size: 3,
+          map: (fn: (g: unknown) => unknown) => fakeGuilds.map(fn),
+        },
+      },
       users: { cache: { size: 10 } },
       commands: { size: 5 },
     };
@@ -87,7 +107,12 @@ describe("bot/handlers/clientReadyHandler", () => {
     );
     const client = {
       user: { tag: "bot#0001", setPresence: vi.fn() },
-      guilds: { cache: { size: 1, map: (fn: (g: unknown) => unknown) => [{ id: "g1" }].map(fn) } },
+      guilds: {
+        cache: {
+          size: 1,
+          map: (fn: (g: unknown) => unknown) => [{ id: "g1" }].map(fn),
+        },
+      },
       users: { cache: { size: 1 } },
       commands: { size: 1 },
     };

@@ -1,6 +1,7 @@
 // tests/unit/bot/events/guildMemberRemove.test.ts
-import { guildMemberRemoveEvent } from "@/bot/events/guildMemberRemove";
+
 import { Events } from "discord.js";
+import { guildMemberRemoveEvent } from "@/bot/events/guildMemberRemove";
 
 const handleGuildMemberRemoveMock = vi.fn();
 const handleBumpReminderMemberRemoveMock = vi.fn();

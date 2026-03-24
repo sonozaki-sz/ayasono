@@ -1,6 +1,7 @@
 // tests/unit/bot/events/roleDelete.test.ts
-import { roleDeleteEvent } from "@/bot/events/roleDelete";
+
 import { Events } from "discord.js";
+import { roleDeleteEvent } from "@/bot/events/roleDelete";
 
 const handleBumpReminderRoleDeleteMock = vi.fn();
 

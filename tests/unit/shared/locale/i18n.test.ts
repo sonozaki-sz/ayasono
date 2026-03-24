@@ -17,7 +17,7 @@ describe("shared/locale/i18n", () => {
       default: i18nextMock,
     }));
 
-      vi.doMock("@/shared/config/env", () => ({
+    vi.doMock("@/shared/config/env", () => ({
       NODE_ENV: {
         DEVELOPMENT: "development",
         PRODUCTION: "production",

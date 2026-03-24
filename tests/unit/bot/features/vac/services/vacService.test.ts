@@ -1,15 +1,16 @@
 // tests/unit/bot/features/vac/services/vacService.test.ts
-import type { VacConfigService } from "@/shared/features/vac/vacConfigService";
+
+import { ChannelType } from "discord.js";
+import type { Mocked } from "vitest";
 import { cleanupVacOnStartupUseCase } from "@/bot/features/vac/services/usecases/cleanupVacOnStartup";
 import { handleVacCreateUseCase } from "@/bot/features/vac/services/usecases/handleVacCreate";
 import { handleVacDeleteUseCase } from "@/bot/features/vac/services/usecases/handleVacDelete";
 import {
-  VacService,
   createVacService,
   getVacService,
+  VacService,
 } from "@/bot/features/vac/services/vacService";
-import { ChannelType } from "discord.js";
-import type { Mocked } from "vitest";
+import type { VacConfigService } from "@/shared/features/vac/vacConfigService";
 
 const executeWithLoggedErrorMock = vi.fn(
   async (operation: () => Promise<void>, _message: string) => {
@@ -20,8 +21,24 @@ const loggerInfoMock = vi.fn();
 const getVacConfigServiceMock = vi.fn();
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: vi.fn((key: string) => `default:${key}`),
   tInteraction: (...args: unknown[]) => args[1],
 }));

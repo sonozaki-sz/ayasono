@@ -3,14 +3,14 @@
 
 import {
   ChannelType,
-  PermissionFlagsBits,
   type GuildMember,
+  PermissionFlagsBits,
   type VoiceState,
 } from "discord.js";
+import type { VacConfigService } from "../../../../../shared/features/vac/vacConfigService";
 import { logPrefixed } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import { sendVcControlPanel } from "../../../vc-panel/vcControlPanel";
-import type { VacConfigService } from "../../../../../shared/features/vac/vacConfigService";
 
 const VAC_EVENT = {
   DEFAULT_LIMIT: 99,

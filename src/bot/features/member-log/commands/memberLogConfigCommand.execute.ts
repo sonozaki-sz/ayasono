@@ -6,15 +6,15 @@ import { ValidationError } from "../../../../shared/errors/customErrors";
 import { handleCommandError } from "../../../errors/interactionErrorHandler";
 import { COMMON_I18N_KEYS } from "../../../shared/i18nKeys";
 import { ensureManageGuildPermission } from "../../../shared/permissionGuards";
+import { handleMemberLogConfigClearJoinMessage } from "./memberLogConfigCommand.clearJoinMessage";
+import { handleMemberLogConfigClearLeaveMessage } from "./memberLogConfigCommand.clearLeaveMessage";
 import { MEMBER_LOG_CONFIG_COMMAND } from "./memberLogConfigCommand.constants";
 import { handleMemberLogConfigDisable } from "./memberLogConfigCommand.disable";
 import { handleMemberLogConfigEnable } from "./memberLogConfigCommand.enable";
+import { handleMemberLogConfigReset } from "./memberLogConfigCommand.reset";
 import { handleMemberLogConfigSetChannel } from "./memberLogConfigCommand.setChannel";
-import { handleMemberLogConfigClearJoinMessage } from "./memberLogConfigCommand.clearJoinMessage";
-import { handleMemberLogConfigClearLeaveMessage } from "./memberLogConfigCommand.clearLeaveMessage";
 import { handleMemberLogConfigSetJoinMessage } from "./memberLogConfigCommand.setJoinMessage";
 import { handleMemberLogConfigSetLeaveMessage } from "./memberLogConfigCommand.setLeaveMessage";
-import { handleMemberLogConfigReset } from "./memberLogConfigCommand.reset";
 import { handleMemberLogConfigView } from "./memberLogConfigCommand.view";
 
 /**

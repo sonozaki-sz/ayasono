@@ -16,8 +16,8 @@ import {
   type ScannedMessageWithChannel,
 } from "../../constants/messageDeleteConstants";
 import {
-  deleteScannedMessages,
   type DeleteProgressData,
+  deleteScannedMessages,
 } from "../../services/messageDeleteService";
 import { buildCompletionEmbed } from "../messageDeleteEmbedBuilder";
 import type { ParsedOptions } from "./dialogUtils";

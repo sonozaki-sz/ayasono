@@ -37,7 +37,8 @@ describe("shared/database/repositories/vacConfigRepository", () => {
         guildId: "guild-1",
         enabled: true,
         triggerChannelIds: '["ch-1","ch-2"]',
-        createdChannels: '[{"voiceChannelId":"v1","ownerId":"owner-1","createdAt":0}]',
+        createdChannels:
+          '[{"voiceChannelId":"v1","ownerId":"owner-1","createdAt":0}]',
       });
 
       const { VacConfigRepository } = await loadModule();
@@ -47,7 +48,9 @@ describe("shared/database/repositories/vacConfigRepository", () => {
       expect(result).toEqual({
         enabled: true,
         triggerChannelIds: ["ch-1", "ch-2"],
-        createdChannels: [{ voiceChannelId: "v1", ownerId: "owner-1", createdAt: 0 }],
+        createdChannels: [
+          { voiceChannelId: "v1", ownerId: "owner-1", createdAt: 0 },
+        ],
       });
     });
 
@@ -102,7 +105,9 @@ describe("shared/database/repositories/vacConfigRepository", () => {
       await repo.updateVacConfig("guild-1", {
         enabled: true,
         triggerChannelIds: ["ch-1"],
-        createdChannels: [{ voiceChannelId: "v1", ownerId: "owner-1", createdAt: 0 }],
+        createdChannels: [
+          { voiceChannelId: "v1", ownerId: "owner-1", createdAt: 0 },
+        ],
       });
 
       expect(prisma.guildVacConfig.upsert).toHaveBeenCalledWith({
@@ -111,12 +116,14 @@ describe("shared/database/repositories/vacConfigRepository", () => {
           guildId: "guild-1",
           enabled: true,
           triggerChannelIds: '["ch-1"]',
-          createdChannels: '[{"voiceChannelId":"v1","ownerId":"owner-1","createdAt":0}]',
+          createdChannels:
+            '[{"voiceChannelId":"v1","ownerId":"owner-1","createdAt":0}]',
         },
         update: {
           enabled: true,
           triggerChannelIds: '["ch-1"]',
-          createdChannels: '[{"voiceChannelId":"v1","ownerId":"owner-1","createdAt":0}]',
+          createdChannels:
+            '[{"voiceChannelId":"v1","ownerId":"owner-1","createdAt":0}]',
         },
       });
     });

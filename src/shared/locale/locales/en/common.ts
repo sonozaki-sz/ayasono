@@ -42,68 +42,46 @@ export const common = {
 
   // Cross-feature errors (absorbed from errors.ts)
   // Database errors
-  "database.get_config_failed":
-    "Failed to get config",
-  "database.save_config_failed":
-    "Failed to save config",
-  "database.update_config_failed":
-    "Failed to update config",
-  "database.delete_config_failed":
-    "Failed to delete config",
-  "database.check_existence_failed":
-    "Failed to check existence",
-  "database.unknown_error":
-    "unknown error",
+  "database.get_config_failed": "Failed to get config",
+  "database.save_config_failed": "Failed to save config",
+  "database.update_config_failed": "Failed to update config",
+  "database.delete_config_failed": "Failed to delete config",
+  "database.check_existence_failed": "Failed to check existence",
+  "database.unknown_error": "unknown error",
 
   // Validation errors
-  "validation.error_title":
-    "Invalid Input",
-  "validation.guild_only":
-    "This command can only be used within a server",
-  "validation.invalid_subcommand":
-    "Invalid subcommand",
+  "validation.error_title": "Invalid Input",
+  "validation.guild_only": "This command can only be used within a server",
+  "validation.invalid_subcommand": "Invalid subcommand",
 
   // Permission errors
   "permission.manage_guild_required":
     "Manage Server (MANAGE_GUILD) permission is required to execute this command.",
 
   // Interaction errors
-  "interaction.timeout":
-    "Operation timed out.",
+  "interaction.timeout": "Operation timed out.",
 
   // General errors
-  "general.error_title":
-    "Error",
+  "general.error_title": "Error",
   "general.unexpected_production":
     "An unexpected error occurred. Please try again later.",
-  "general.unexpected_with_message":
-    "Error: {{message}}",
+  "general.unexpected_with_message": "Error: {{message}}",
 
   // Cooldown (absorbed from commands.ts)
-  "cooldown.wait":
-    "⏱️ You can use this command in **{{seconds}} seconds**",
+  "cooldown.wait": "⏱️ You can use this command in **{{seconds}} seconds**",
 
   // Pagination (cross-feature UI components)
-  "ui.button.page_first":
-    "First",
-  "ui.button.page_prev":
-    "Prev",
-  "ui.button.page_next":
-    "Next",
-  "ui.button.page_last":
-    "Last",
-  "ui.button.page_jump":
-    "Page {{page}}/{{total}}",
-  "ui.modal.page_jump_title":
-    "Jump to Page",
-  "ui.modal.page_jump_label":
-    "Page number",
-  "ui.modal.page_jump_placeholder":
-    "Integer from 1 to {{total}}",
+  "ui.button.page_first": "First",
+  "ui.button.page_prev": "Prev",
+  "ui.button.page_next": "Next",
+  "ui.button.page_last": "Last",
+  "ui.button.page_jump": "Page {{page}}/{{total}}",
+  "ui.modal.page_jump_title": "Jump to Page",
+  "ui.modal.page_jump_label": "Page number",
+  "ui.modal.page_jump_placeholder": "Integer from 1 to {{total}}",
 
   // Common cancel
-  cancelled:
-    "Cancelled.",
+  cancelled: "Cancelled.",
 } as const;
 
 export type CommonTranslations = typeof common;

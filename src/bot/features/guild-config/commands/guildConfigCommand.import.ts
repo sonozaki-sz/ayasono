@@ -5,15 +5,15 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
-  MessageFlags,
   type ChatInputCommandInteraction,
+  MessageFlags,
 } from "discord.js";
 import type { GuildConfigExportData } from "../../../../shared/features/guild-config/guildConfigDefaults";
 import type { AllParseKeys } from "../../../../shared/locale/i18n";
 import {
+  localeManager,
   logPrefixed,
   tInteraction,
-  localeManager,
 } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import { TtlMap } from "../../../../shared/utils/ttlMap";

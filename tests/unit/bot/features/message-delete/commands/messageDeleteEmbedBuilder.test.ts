@@ -2,15 +2,34 @@
 // messageDeleteEmbedBuilder の単体テスト
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: vi.fn((key: string, params?: Record<string, unknown>) =>
     params ? `${key}:${JSON.stringify(params)}` : key,
   ),
   tInteraction: (...args: unknown[]) => args[1],
 }));
 
-import type { ScannedMessage, MessageDeleteFilter } from "@/bot/features/message-delete/constants/messageDeleteConstants";
+import type {
+  MessageDeleteFilter,
+  ScannedMessage,
+} from "@/bot/features/message-delete/constants/messageDeleteConstants";
 
 function makeMsg(
   id: string,
@@ -53,10 +72,7 @@ describe("bot/features/message-delete/commands/messageDeleteEmbedBuilder", () =>
 
     it("authorId でフィルタリングする", async () => {
       const { buildFilteredMessages } = await loadModule();
-      const msgs = [
-        makeMsg("msg-1", "user-1"),
-        makeMsg("msg-2", "user-2"),
-      ];
+      const msgs = [makeMsg("msg-1", "user-1"), makeMsg("msg-2", "user-2")];
       const result = buildFilteredMessages(msgs, { authorId: "user-1" });
       expect(result).toHaveLength(1);
       expect(result[0].authorId).toBe("user-1");
@@ -74,12 +90,7 @@ describe("bot/features/message-delete/commands/messageDeleteEmbedBuilder", () =>
     it("days で直近のメッセージのみフィルタリングする", async () => {
       const { buildFilteredMessages } = await loadModule();
       const now = Date.now();
-      const recent = makeMsg(
-        "msg-1",
-        "user-1",
-        "ch-1",
-        new Date(now - 1000),
-      );
+      const recent = makeMsg("msg-1", "user-1", "ch-1", new Date(now - 1000));
       const old = makeMsg(
         "msg-2",
         "user-1",

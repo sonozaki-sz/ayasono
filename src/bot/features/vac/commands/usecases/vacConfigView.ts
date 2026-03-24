@@ -3,8 +3,8 @@
 
 import { type ChatInputCommandInteraction, MessageFlags } from "discord.js";
 import { ValidationError } from "../../../../../shared/errors/customErrors";
-import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
 import { getBotVacConfigService } from "../../../../services/botCompositionRoot";
+import { COMMON_I18N_KEYS } from "../../../../shared/i18nKeys";
 import { createInfoEmbed } from "../../../../utils/messageResponse";
 import { presentVacConfigView } from "../presenters/vacConfigViewPresenter";
 

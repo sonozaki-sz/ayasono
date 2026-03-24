@@ -10,7 +10,9 @@ describe("shared/database/guildConfigRepositoryProvider", () => {
       createGuildConfigRepository: createGuildConfigRepositoryMock,
     }));
 
-    const module = await import("@/shared/database/guildConfigRepositoryProvider");
+    const module = await import(
+      "@/shared/database/guildConfigRepositoryProvider"
+    );
     expect(() => module.getGuildConfigRepository()).toThrow(
       "GuildConfigRepository is not initialized",
     );
@@ -29,7 +31,9 @@ describe("shared/database/guildConfigRepositoryProvider", () => {
       createGuildConfigRepository: createGuildConfigRepositoryMock,
     }));
 
-    const module = await import("@/shared/database/guildConfigRepositoryProvider");
+    const module = await import(
+      "@/shared/database/guildConfigRepositoryProvider"
+    );
 
     const firstA = module.getGuildConfigRepository(prismaA as never);
     const secondA = module.getGuildConfigRepository(prismaA as never);
@@ -53,7 +57,9 @@ describe("shared/database/guildConfigRepositoryProvider", () => {
       createGuildConfigRepository: createGuildConfigRepositoryMock,
     }));
 
-    const module = await import("@/shared/database/guildConfigRepositoryProvider");
+    const module = await import(
+      "@/shared/database/guildConfigRepositoryProvider"
+    );
 
     module.getGuildConfigRepository(prisma as never);
     expect(module.getGuildConfigRepository()).toBe(repoFromPrisma);
@@ -71,7 +77,9 @@ describe("shared/database/guildConfigRepositoryProvider", () => {
       createGuildConfigRepository: createGuildConfigRepositoryMock,
     }));
 
-    const module = await import("@/shared/database/guildConfigRepositoryProvider");
+    const module = await import(
+      "@/shared/database/guildConfigRepositoryProvider"
+    );
 
     module.getGuildConfigRepository(prisma as never);
     module.resetGuildConfigRepositoryCache();
@@ -90,7 +98,9 @@ describe("shared/database/guildConfigRepositoryProvider", () => {
     );
     const typesModule = await import("@/shared/database/types");
 
-    expect(providerModule.getGuildConfigRepository).toEqual(expect.any(Function));
+    expect(providerModule.getGuildConfigRepository).toEqual(
+      expect.any(Function),
+    );
     expect(providerModule.setDefaultGuildConfigRepository).toEqual(
       expect.any(Function),
     );

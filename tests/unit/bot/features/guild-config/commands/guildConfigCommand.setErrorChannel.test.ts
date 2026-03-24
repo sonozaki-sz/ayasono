@@ -10,7 +10,10 @@ vi.mock("@/shared/locale/localeManager", () => ({
 }));
 
 const loggerMock = vi.hoisted(() => ({
-  debug: vi.fn(), info: vi.fn(), error: vi.fn(), warn: vi.fn(),
+  debug: vi.fn(),
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
 }));
 vi.mock("@/shared/utils/logger", () => ({ logger: loggerMock }));
 
@@ -55,7 +58,9 @@ describe("bot/features/guild-config/commands/guildConfigCommand.setErrorChannel"
 
   it("テキストチャンネル以外の場合は ValidationError をスローすること", async () => {
     const interaction = createInteraction(ChannelType.GuildVoice);
-    await expect(handleSetErrorChannel(interaction, "guild-1")).rejects.toThrow();
+    await expect(
+      handleSetErrorChannel(interaction, "guild-1"),
+    ).rejects.toThrow();
     expect(updateErrorChannelMock).not.toHaveBeenCalled();
   });
 });

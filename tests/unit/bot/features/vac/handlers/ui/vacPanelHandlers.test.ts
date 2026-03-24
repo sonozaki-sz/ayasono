@@ -1,9 +1,10 @@
 // tests/unit/bot/features/vac/handlers/ui/vacPanelHandlers.test.ts
+
+import type { Mock } from "vitest";
 import { vcPanelButtonHandler } from "@/bot/features/vc-panel/handlers/ui/vcPanelButton";
 import { vcPanelModalHandler } from "@/bot/features/vc-panel/handlers/ui/vcPanelModal";
 import { vcPanelUserSelectHandler } from "@/bot/features/vc-panel/handlers/ui/vcPanelUserSelect";
 import { safeReply } from "@/bot/utils/interaction";
-import type { Mock } from "vitest";
 
 const isVcPanelManagedChannelMock = vi.fn().mockResolvedValue(true);
 const getAfkConfigMock = vi.fn();
@@ -49,8 +50,24 @@ vi.mock("@/shared/database/guildConfigRepositoryProvider", () => ({
   tInteraction: vi.fn((_locale: string, key: string) => key),
 }));
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tInteraction: vi.fn((_locale: string, key: string) => key),
 }));
 vi.mock("@/bot/utils/interaction", () => ({
@@ -218,7 +235,6 @@ describe("bot/features/vac/ui handlers", () => {
       showModal: vi.fn(),
     };
 
-
     await vacPanelButtonHandler.execute(interaction as never);
 
     expect(safeReply).toHaveBeenCalledWith(interaction, {
@@ -244,7 +260,6 @@ describe("bot/features/vac/ui handlers", () => {
       message: { deletable: false, delete: vi.fn() },
       showModal: vi.fn(),
     };
-
 
     await vacPanelButtonHandler.execute(interaction as never);
 
@@ -274,7 +289,6 @@ describe("bot/features/vac/ui handlers", () => {
       showModal: vi.fn().mockResolvedValue(undefined),
     };
 
-
     await vacPanelButtonHandler.execute(interaction as never);
 
     expect(interaction.showModal).toHaveBeenCalledTimes(1);
@@ -299,7 +313,6 @@ describe("bot/features/vac/ui handlers", () => {
       message: { deletable: false, delete: vi.fn() },
       showModal: vi.fn().mockResolvedValue(undefined),
     };
-
 
     await vacPanelButtonHandler.execute(interaction as never);
 
@@ -333,7 +346,6 @@ describe("bot/features/vac/ui handlers", () => {
       message: { deletable: false, delete: vi.fn() },
       showModal: vi.fn(),
     };
-
 
     await vacPanelButtonHandler.execute(interaction as never);
 
@@ -406,7 +418,6 @@ describe("bot/features/vac/ui handlers", () => {
       showModal: vi.fn(),
     };
 
-
     const panelModule = (await vi.importMock(
       "@/bot/features/vc-panel/vcControlPanel",
     )) as {
@@ -452,7 +463,6 @@ describe("bot/features/vac/ui handlers", () => {
       showModal: vi.fn(),
     };
 
-
     const panelModule = (await vi.importMock(
       "@/bot/features/vc-panel/vcControlPanel",
     )) as {
@@ -493,7 +503,6 @@ describe("bot/features/vac/ui handlers", () => {
       message: { deletable: true, delete: deleteMock },
       showModal: vi.fn(),
     };
-
 
     const panelModule = (await vi.importMock(
       "@/bot/features/vc-panel/vcControlPanel",
@@ -550,7 +559,6 @@ describe("bot/features/vac/ui handlers", () => {
       showModal: vi.fn(),
     };
 
-
     const panelModule = (await vi.importMock(
       "@/bot/features/vc-panel/vcControlPanel",
     )) as {
@@ -593,7 +601,6 @@ describe("bot/features/vac/ui handlers", () => {
         getTextInputValue: vi.fn(() => "120"),
       },
     };
-
 
     await vacPanelModalHandler.execute(interaction as never);
 
@@ -711,7 +718,6 @@ describe("bot/features/vac/ui handlers", () => {
       },
     };
 
-
     await vacPanelModalHandler.execute(interaction as never);
 
     expect(safeReply).toHaveBeenCalledWith(interaction, {
@@ -742,7 +748,6 @@ describe("bot/features/vac/ui handlers", () => {
         getTextInputValue: vi.fn(() => "new-name"),
       },
     };
-
 
     await vacPanelModalHandler.execute(interaction as never);
 
@@ -778,7 +783,6 @@ describe("bot/features/vac/ui handlers", () => {
         getTextInputValue: vi.fn(() => "   "),
       },
     };
-
 
     await vacPanelModalHandler.execute(interaction as never);
 
@@ -816,7 +820,6 @@ describe("bot/features/vac/ui handlers", () => {
       },
     };
 
-
     await vacPanelModalHandler.execute(interaction as never);
 
     expect(voiceChannel.edit).toHaveBeenCalledWith({ name: "my-vc" });
@@ -853,7 +856,6 @@ describe("bot/features/vac/ui handlers", () => {
       },
     };
 
-
     await vacPanelModalHandler.execute(interaction as never);
 
     expect(voiceChannel.edit).toHaveBeenCalledWith({ userLimit: 5 });
@@ -889,7 +891,6 @@ describe("bot/features/vac/ui handlers", () => {
         getTextInputValue: vi.fn(() => "0"),
       },
     };
-
 
     await vacPanelModalHandler.execute(interaction as never);
 
@@ -947,7 +948,6 @@ describe("bot/features/vac/ui handlers", () => {
       user: { id: "operator" },
       values: ["move-user", "skip-user"],
     };
-
 
     const databaseModule = (await vi.importMock(
       "@/shared/database/guildConfigRepositoryProvider",
@@ -1063,7 +1063,6 @@ describe("bot/features/vac/ui handlers", () => {
       values: ["user-1"],
     };
 
-
     await vacPanelUserSelectHandler.execute(interaction as never);
 
     expect(safeReply).toHaveBeenCalledWith(interaction, {
@@ -1088,7 +1087,6 @@ describe("bot/features/vac/ui handlers", () => {
       user: { id: "operator" },
       values: ["user-1"],
     };
-
 
     await vacPanelUserSelectHandler.execute(interaction as never);
 
@@ -1116,7 +1114,6 @@ describe("bot/features/vac/ui handlers", () => {
       user: { id: "operator" },
       values: ["user-1"],
     };
-
 
     getAfkConfigMock.mockResolvedValueOnce(null);
 
@@ -1149,7 +1146,6 @@ describe("bot/features/vac/ui handlers", () => {
       user: { id: "operator" },
       values: ["user-1"],
     };
-
 
     const databaseModule = (await vi.importMock(
       "@/shared/database/guildConfigRepositoryProvider",
@@ -1192,7 +1188,6 @@ describe("bot/features/vac/ui handlers", () => {
       user: { id: "operator" },
       values: ["user-1"],
     };
-
 
     const databaseModule = (await vi.importMock(
       "@/shared/database/guildConfigRepositoryProvider",
@@ -1248,7 +1243,6 @@ describe("bot/features/vac/ui handlers", () => {
       user: { id: "operator" },
       values: ["move-user"],
     };
-
 
     const databaseModule = (await vi.importMock(
       "@/shared/database/guildConfigRepositoryProvider",
@@ -1311,7 +1305,6 @@ describe("bot/features/vac/ui handlers", () => {
       user: { id: "operator" },
       values: ["broken-user", "move-user"],
     };
-
 
     const databaseModule = (await vi.importMock(
       "@/shared/database/guildConfigRepositoryProvider",

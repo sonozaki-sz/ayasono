@@ -42,68 +42,46 @@ export const common = {
 
   // 機能横断エラー（旧 errors.ts から吸収）
   // データベースエラー
-  "database.get_config_failed":
-    "設定の取得に失敗しました。",
-  "database.save_config_failed":
-    "設定の保存に失敗しました。",
-  "database.update_config_failed":
-    "設定の更新に失敗しました。",
-  "database.delete_config_failed":
-    "設定の削除に失敗しました。",
-  "database.check_existence_failed":
-    "存在確認に失敗しました。",
-  "database.unknown_error":
-    "不明なエラー",
+  "database.get_config_failed": "設定の取得に失敗しました。",
+  "database.save_config_failed": "設定の保存に失敗しました。",
+  "database.update_config_failed": "設定の更新に失敗しました。",
+  "database.delete_config_failed": "設定の削除に失敗しました。",
+  "database.check_existence_failed": "存在確認に失敗しました。",
+  "database.unknown_error": "不明なエラー",
 
   // バリデーションエラー
-  "validation.error_title":
-    "入力エラー",
-  "validation.guild_only":
-    "このコマンドはサーバー内でのみ使用できます。",
-  "validation.invalid_subcommand":
-    "無効なサブコマンドです。",
+  "validation.error_title": "入力エラー",
+  "validation.guild_only": "このコマンドはサーバー内でのみ使用できます。",
+  "validation.invalid_subcommand": "無効なサブコマンドです。",
 
   // 権限エラー
   "permission.manage_guild_required":
     "このコマンドを実行するにはサーバー管理（MANAGE_GUILD）権限が必要です。",
 
   // インタラクションエラー
-  "interaction.timeout":
-    "操作がタイムアウトしました。",
+  "interaction.timeout": "操作がタイムアウトしました。",
 
   // 一般的なエラー
-  "general.error_title":
-    "エラー",
+  "general.error_title": "エラー",
   "general.unexpected_production":
     "予期しないエラーが発生しました。後ほど再度お試しください。",
-  "general.unexpected_with_message":
-    "エラー: {{message}}",
+  "general.unexpected_with_message": "エラー: {{message}}",
 
   // クールダウン（旧 commands.ts から吸収）
-  "cooldown.wait":
-    "⏱️ このコマンドは **{{seconds}}秒後** に使用できます。",
+  "cooldown.wait": "⏱️ このコマンドは **{{seconds}}秒後** に使用できます。",
 
   // ページネーション（機能横断UIコンポーネント）
-  "ui.button.page_first":
-    "先頭",
-  "ui.button.page_prev":
-    "前へ",
-  "ui.button.page_next":
-    "次へ",
-  "ui.button.page_last":
-    "末尾",
-  "ui.button.page_jump":
-    "{{page}}/{{total}}ページ",
-  "ui.modal.page_jump_title":
-    "ページ指定",
-  "ui.modal.page_jump_label":
-    "ページ番号",
-  "ui.modal.page_jump_placeholder":
-    "1〜{{total}}の整数",
+  "ui.button.page_first": "先頭",
+  "ui.button.page_prev": "前へ",
+  "ui.button.page_next": "次へ",
+  "ui.button.page_last": "末尾",
+  "ui.button.page_jump": "{{page}}/{{total}}ページ",
+  "ui.modal.page_jump_title": "ページ指定",
+  "ui.modal.page_jump_label": "ページ番号",
+  "ui.modal.page_jump_placeholder": "1〜{{total}}の整数",
 
   // 共通キャンセル
-  cancelled:
-    "キャンセルしました。",
+  cancelled: "キャンセルしました。",
 } as const;
 
 export type CommonTranslations = typeof common;

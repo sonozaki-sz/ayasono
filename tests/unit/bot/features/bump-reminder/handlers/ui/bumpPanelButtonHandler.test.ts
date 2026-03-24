@@ -1,4 +1,6 @@
 // tests/unit/bot/features/bump-reminder/handlers/ui/bumpPanelButtonHandler.test.ts
+
+import { MessageFlags } from "discord.js";
 import { bumpPanelButtonHandler } from "@/bot/features/bump-reminder/handlers/ui/bumpPanelButtonHandler";
 import { getBotBumpReminderConfigService } from "@/bot/services/botCompositionRoot";
 import {
@@ -7,7 +9,6 @@ import {
 } from "@/bot/utils/messageResponse";
 import { tInteraction } from "@/shared/locale/localeManager";
 import { logger } from "@/shared/utils/logger";
-import { MessageFlags } from "discord.js";
 
 const safeReplyMock = vi.fn();
 const addMentionUserMock = vi.fn();
@@ -37,23 +38,36 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
 }));
 
 // 定数と翻訳を固定化してカスタムID判定と応答内容の検証を安定させる
-vi.mock(
-  "@/bot/features/bump-reminder/constants/bumpReminderConstants",
-  () => ({
-    BUMP_CONSTANTS: {
-      CUSTOM_ID_PREFIX: {
-        MENTION_ON: "bump-reminder:mention-on:",
-        MENTION_OFF: "bump-reminder:mention-off:",
-      },
+vi.mock("@/bot/features/bump-reminder/constants/bumpReminderConstants", () => ({
+  BUMP_CONSTANTS: {
+    CUSTOM_ID_PREFIX: {
+      MENTION_ON: "bump-reminder:mention-on:",
+      MENTION_OFF: "bump-reminder:mention-off:",
     },
-  }),
-);
+  },
+}));
 vi.mock("@/shared/locale/helpers", () => ({
   getGuildTranslator: vi.fn(async () => (key: string) => key),
 }));
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: (key: string) => key,
   tInteraction: vi.fn((...args: unknown[]) => args[1]),
 }));
@@ -103,12 +117,12 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
   });
 
   it("ON/OFF ボタンの customId prefix 判定が有効であることを検証", () => {
-    expect(bumpPanelButtonHandler.matches("bump-reminder:mention-on:guild-1")).toBe(
-      true,
-    );
-    expect(bumpPanelButtonHandler.matches("bump-reminder:mention-off:guild-1")).toBe(
-      true,
-    );
+    expect(
+      bumpPanelButtonHandler.matches("bump-reminder:mention-on:guild-1"),
+    ).toBe(true);
+    expect(
+      bumpPanelButtonHandler.matches("bump-reminder:mention-off:guild-1"),
+    ).toBe(true);
     expect(bumpPanelButtonHandler.matches("other:guild-1")).toBe(false);
   });
 
@@ -252,7 +266,10 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
         expect.stringContaining("bumpReminder:log.panel_handle_failed"),
         expect.any(Error),
       );
-      expect(tInteraction).toHaveBeenCalledWith("ja", "common:title_operation_error");
+      expect(tInteraction).toHaveBeenCalledWith(
+        "ja",
+        "common:title_operation_error",
+      );
       expect(createErrorEmbed).toHaveBeenCalledWith(
         "bumpReminder:user-response.panel_update_failed",
         { title: "common:title_operation_error" },

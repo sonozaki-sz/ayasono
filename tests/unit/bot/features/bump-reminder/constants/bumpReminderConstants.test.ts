@@ -16,7 +16,9 @@ describe("shared/features/bump-reminder/constants", () => {
       },
     }));
 
-    return import("@/bot/features/bump-reminder/constants/bumpReminderConstants");
+    return import(
+      "@/bot/features/bump-reminder/constants/bumpReminderConstants"
+    );
   }
 
   // モジュールキャッシュとタイマー副作用を各ケースでリセットする

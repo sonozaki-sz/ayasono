@@ -3,8 +3,8 @@
 
 import {
   ChannelType,
-  MessageFlags,
   type GuildMember,
+  MessageFlags,
   type ModalSubmitInteraction,
 } from "discord.js";
 import { tInteraction } from "../../../../../shared/locale/localeManager";

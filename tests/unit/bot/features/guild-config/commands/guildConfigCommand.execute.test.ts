@@ -16,31 +16,53 @@ const handleResetAllMock = vi.fn();
 const handleExportMock = vi.fn();
 const handleImportMock = vi.fn();
 
-vi.mock("@/bot/features/guild-config/commands/guildConfigCommand.setLocale", () => ({
-  handleSetLocale: (...args: unknown[]) => handleSetLocaleMock(...args),
-}));
-vi.mock("@/bot/features/guild-config/commands/guildConfigCommand.setErrorChannel", () => ({
-  handleSetErrorChannel: (...args: unknown[]) => handleSetErrorChannelMock(...args),
-}));
+vi.mock(
+  "@/bot/features/guild-config/commands/guildConfigCommand.setLocale",
+  () => ({
+    handleSetLocale: (...args: unknown[]) => handleSetLocaleMock(...args),
+  }),
+);
+vi.mock(
+  "@/bot/features/guild-config/commands/guildConfigCommand.setErrorChannel",
+  () => ({
+    handleSetErrorChannel: (...args: unknown[]) =>
+      handleSetErrorChannelMock(...args),
+  }),
+);
 vi.mock("@/bot/features/guild-config/commands/guildConfigCommand.view", () => ({
   handleView: (...args: unknown[]) => handleViewMock(...args),
 }));
-vi.mock("@/bot/features/guild-config/commands/guildConfigCommand.reset", () => ({
-  handleReset: (...args: unknown[]) => handleResetMock(...args),
-}));
-vi.mock("@/bot/features/guild-config/commands/guildConfigCommand.resetAll", () => ({
-  handleResetAll: (...args: unknown[]) => handleResetAllMock(...args),
-}));
-vi.mock("@/bot/features/guild-config/commands/guildConfigCommand.export", () => ({
-  handleExport: (...args: unknown[]) => handleExportMock(...args),
-}));
-vi.mock("@/bot/features/guild-config/commands/guildConfigCommand.import", () => ({
-  handleImport: (...args: unknown[]) => handleImportMock(...args),
-}));
+vi.mock(
+  "@/bot/features/guild-config/commands/guildConfigCommand.reset",
+  () => ({
+    handleReset: (...args: unknown[]) => handleResetMock(...args),
+  }),
+);
+vi.mock(
+  "@/bot/features/guild-config/commands/guildConfigCommand.resetAll",
+  () => ({
+    handleResetAll: (...args: unknown[]) => handleResetAllMock(...args),
+  }),
+);
+vi.mock(
+  "@/bot/features/guild-config/commands/guildConfigCommand.export",
+  () => ({
+    handleExport: (...args: unknown[]) => handleExportMock(...args),
+  }),
+);
+vi.mock(
+  "@/bot/features/guild-config/commands/guildConfigCommand.import",
+  () => ({
+    handleImport: (...args: unknown[]) => handleImportMock(...args),
+  }),
+);
 
 import { executeGuildConfigCommand } from "@/bot/features/guild-config/commands/guildConfigCommand.execute";
 
-function createInteraction(subcommand: string, overrides?: Record<string, unknown>) {
+function createInteraction(
+  subcommand: string,
+  overrides?: Record<string, unknown>,
+) {
   return {
     guildId: "guild-1",
     locale: "ja",

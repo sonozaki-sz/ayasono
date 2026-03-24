@@ -28,7 +28,9 @@ import { createErrorEmbed, createWarningEmbed } from "../utils/messageResponse";
 
 /** ユーザー操作で回復可能なエラー（warning レベルで表示） */
 const WARNING_ERROR_CLASSES: ReadonlyArray<
-  new (...args: never[]) => BaseError
+  new (
+    ...args: never[]
+  ) => BaseError
 > = [ValidationError, NotFoundError, TimeoutError, ConfigurationError];
 
 /** エラークラスと common タイトルキーの対応 */

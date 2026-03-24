@@ -9,7 +9,10 @@ vi.mock("@/shared/locale/localeManager", () => ({
 }));
 
 const loggerMock = vi.hoisted(() => ({
-  debug: vi.fn(), info: vi.fn(), error: vi.fn(), warn: vi.fn(),
+  debug: vi.fn(),
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
 }));
 vi.mock("@/shared/utils/logger", () => ({ logger: loggerMock }));
 
@@ -20,8 +23,14 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
   }),
 }));
 
-const createSuccessEmbedMock = vi.fn((d: string) => ({ kind: "success", description: d }));
-const createErrorEmbedMock = vi.fn((d: string) => ({ kind: "error", description: d }));
+const createSuccessEmbedMock = vi.fn((d: string) => ({
+  kind: "success",
+  description: d,
+}));
+const createErrorEmbedMock = vi.fn((d: string) => ({
+  kind: "error",
+  description: d,
+}));
 vi.mock("@/bot/utils/messageResponse", () => ({
   createSuccessEmbed: (d: string, _o?: unknown) => createSuccessEmbedMock(d),
   createErrorEmbed: (d: string, _o?: unknown) => createErrorEmbedMock(d),

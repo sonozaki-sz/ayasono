@@ -7,8 +7,8 @@ import {
   ButtonStyle,
   ChannelType,
   EmbedBuilder,
-  MessageFlags,
   type GuildMember,
+  MessageFlags,
   type ModalSubmitInteraction,
   type TextChannel,
   type VoiceChannel,
@@ -24,17 +24,17 @@ import {
   createSuccessEmbed,
   createWarningEmbed,
 } from "../../../../utils/messageResponse";
-import { VC_RECRUIT_PANEL_COLOR } from "../../commands/vcRecruitConfigCommand.constants";
 import { sendVcControlPanel } from "../../../vc-panel/vcControlPanel";
 import {
   VC_RECRUIT_CONFIG_COMMAND,
+  VC_RECRUIT_PANEL_COLOR,
   VC_RECRUIT_PANEL_CUSTOM_ID,
   VC_RECRUIT_POST_CUSTOM_ID,
 } from "../../commands/vcRecruitConfigCommand.constants";
 import {
-  NEW_VC_VALUE,
   deleteVcRecruitSession,
   getVcRecruitSession,
+  NEW_VC_VALUE,
 } from "./vcRecruitPanelState";
 
 /**

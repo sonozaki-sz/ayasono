@@ -8,10 +8,10 @@ import type {
   IBaseGuildRepository,
   IGuildConfigRepository,
 } from "../../database/types";
+import { logPrefixed, tDefault } from "../../locale/localeManager";
 import { executeWithDatabaseError } from "../../utils/errorHandling";
 import { logger } from "../../utils/logger";
 import { createServiceGetter } from "../../utils/serviceFactory";
-import { logPrefixed, tDefault } from "../../locale/localeManager";
 import {
   EXPORT_SCHEMA_VERSION,
   type GuildConfigExportData,

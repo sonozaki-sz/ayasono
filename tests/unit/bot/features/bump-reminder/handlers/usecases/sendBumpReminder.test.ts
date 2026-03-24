@@ -22,8 +22,28 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
 
     vi.doMock("@/shared/utils/logger", () => ({ logger: loggerMock }));
     vi.doMock("@/shared/locale/localeManager", () => ({
-      logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-      logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+      logPrefixed: (
+        prefixKey: string,
+        messageKey: string,
+        params?: Record<string, unknown>,
+        sub?: string,
+      ) => {
+        const p = `${prefixKey}`;
+        const m = params
+          ? `${messageKey}:${JSON.stringify(params)}`
+          : messageKey;
+        return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+      },
+      logCommand: (
+        commandName: string,
+        messageKey: string,
+        params?: Record<string, unknown>,
+      ) => {
+        const m = params
+          ? `${messageKey}:${JSON.stringify(params)}`
+          : messageKey;
+        return `[${commandName}] ${m}`;
+      },
       tDefault: tDefaultMock,
     }));
     vi.doMock("@/shared/locale/helpers", () => ({
@@ -60,8 +80,9 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
   }
 
   it("sendBumpReminder 関数がエクスポートされていることを確認する", async () => {
-    const module =
-      await import("@/bot/features/bump-reminder/handlers/usecases/sendBumpReminder");
+    const module = await import(
+      "@/bot/features/bump-reminder/handlers/usecases/sendBumpReminder"
+    );
 
     expect(typeof module.sendBumpReminder).toBe("function");
   });
@@ -71,8 +92,9 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
     const client = makeClient(channel);
     const service = makeConfigService();
 
-    const { sendBumpReminder } =
-      await import("@/bot/features/bump-reminder/handlers/usecases/sendBumpReminder");
+    const { sendBumpReminder } = await import(
+      "@/bot/features/bump-reminder/handlers/usecases/sendBumpReminder"
+    );
     await sendBumpReminder(
       client as never,
       "guild-1",
@@ -91,8 +113,9 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
     const client = makeClient(channel);
     const service = makeConfigService({ enabled: false });
 
-    const { sendBumpReminder } =
-      await import("@/bot/features/bump-reminder/handlers/usecases/sendBumpReminder");
+    const { sendBumpReminder } = await import(
+      "@/bot/features/bump-reminder/handlers/usecases/sendBumpReminder"
+    );
     await sendBumpReminder(
       client as never,
       "guild-1",
@@ -115,8 +138,9 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
       mentionUserIds: [],
     });
 
-    const { sendBumpReminder } =
-      await import("@/bot/features/bump-reminder/handlers/usecases/sendBumpReminder");
+    const { sendBumpReminder } = await import(
+      "@/bot/features/bump-reminder/handlers/usecases/sendBumpReminder"
+    );
     await sendBumpReminder(
       client as never,
       "guild-1",
@@ -141,8 +165,9 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
       mentionUserIds: [],
     });
 
-    const { sendBumpReminder } =
-      await import("@/bot/features/bump-reminder/handlers/usecases/sendBumpReminder");
+    const { sendBumpReminder } = await import(
+      "@/bot/features/bump-reminder/handlers/usecases/sendBumpReminder"
+    );
     await sendBumpReminder(
       client as never,
       "guild-1",
@@ -165,8 +190,9 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
       mentionUserIds: [],
     });
 
-    const { sendBumpReminder } =
-      await import("@/bot/features/bump-reminder/handlers/usecases/sendBumpReminder");
+    const { sendBumpReminder } = await import(
+      "@/bot/features/bump-reminder/handlers/usecases/sendBumpReminder"
+    );
     await sendBumpReminder(
       client as never,
       "guild-1",
@@ -188,8 +214,9 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
       mentionUserIds: ["user-1", "user-2"],
     });
 
-    const { sendBumpReminder } =
-      await import("@/bot/features/bump-reminder/handlers/usecases/sendBumpReminder");
+    const { sendBumpReminder } = await import(
+      "@/bot/features/bump-reminder/handlers/usecases/sendBumpReminder"
+    );
     await sendBumpReminder(
       client as never,
       "guild-1",
@@ -206,14 +233,13 @@ describe("bot/features/bump-reminder/handlers/usecases/sendBumpReminder", () => 
   });
 
   it("チャンネルフェッチが例外を投げた場合はエラーログを記録する", async () => {
-    const fetchMock = vi
-      .fn()
-      .mockRejectedValue(new Error("fetch failed"));
+    const fetchMock = vi.fn().mockRejectedValue(new Error("fetch failed"));
     const client = { channels: { fetch: fetchMock } };
     const service = makeConfigService({ enabled: true });
 
-    const { sendBumpReminder } =
-      await import("@/bot/features/bump-reminder/handlers/usecases/sendBumpReminder");
+    const { sendBumpReminder } = await import(
+      "@/bot/features/bump-reminder/handlers/usecases/sendBumpReminder"
+    );
     await sendBumpReminder(
       client as never,
       "guild-1",

@@ -6,7 +6,9 @@ import { ValidationError } from "@/shared/errors/customErrors";
 const ensurePermissionMock = vi.fn();
 const getMemberLogConfigMock = vi.fn();
 const setEnabledMock = vi.fn();
-const tInteractionMock = vi.fn((_locale: string, key: string, _params?: Record<string, unknown>) => key);
+const tInteractionMock = vi.fn(
+  (_locale: string, key: string, _params?: Record<string, unknown>) => key,
+);
 const tDefaultMock = vi.fn(
   (key: string, _opts?: Record<string, unknown>) => key,
 );
@@ -35,10 +37,29 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
 }));
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
-  tInteraction: (locale: string, key: string, params?: Record<string, unknown>) =>
-    tInteractionMock(locale, key, params),
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
+  tInteraction: (
+    locale: string,
+    key: string,
+    params?: Record<string, unknown>,
+  ) => tInteractionMock(locale, key, params),
   tDefault: (key: string, opts?: Record<string, unknown>) =>
     tDefaultMock(key, opts),
 }));

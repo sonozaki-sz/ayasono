@@ -3,8 +3,8 @@
 
 import {
   ChannelType,
-  MessageFlags,
   type ChatInputCommandInteraction,
+  MessageFlags,
 } from "discord.js";
 import { ValidationError } from "../../../../shared/errors/customErrors";
 import {

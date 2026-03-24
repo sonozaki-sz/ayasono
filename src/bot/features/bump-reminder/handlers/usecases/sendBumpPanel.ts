@@ -8,8 +8,8 @@ import {
   type Client,
 } from "discord.js";
 import {
-  getGuildTranslator,
   type GuildTFunction,
+  getGuildTranslator,
 } from "../../../../../shared/locale/helpers";
 import { logPrefixed } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";

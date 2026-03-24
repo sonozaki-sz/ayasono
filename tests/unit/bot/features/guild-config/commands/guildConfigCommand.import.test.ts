@@ -10,7 +10,10 @@ vi.mock("@/shared/locale/localeManager", () => ({
 }));
 
 const loggerMock = vi.hoisted(() => ({
-  debug: vi.fn(), info: vi.fn(), error: vi.fn(), warn: vi.fn(),
+  debug: vi.fn(),
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
 }));
 vi.mock("@/shared/utils/logger", () => ({ logger: loggerMock }));
 
@@ -26,7 +29,10 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
 vi.mock("@/bot/utils/messageResponse", () => ({
   createSuccessEmbed: (d: string) => ({ kind: "success", description: d }),
   createErrorEmbed: (d: string) => ({ kind: "error", description: d }),
-  createWarningEmbed: (d: string, _o?: unknown) => ({ kind: "warning", description: d }),
+  createWarningEmbed: (d: string, _o?: unknown) => ({
+    kind: "warning",
+    description: d,
+  }),
 }));
 
 // fetch モック
@@ -73,13 +79,20 @@ describe("bot/features/guild-config/commands/guildConfigCommand.import", () => {
   });
 
   it("JSONパースエラーの場合はエラーメッセージを返すこと", async () => {
-    fetchMock.mockResolvedValue({ text: () => Promise.resolve("invalid json") });
+    fetchMock.mockResolvedValue({
+      text: () => Promise.resolve("invalid json"),
+    });
     const { interaction } = createInteraction();
     await handleImport(interaction, "guild-1");
 
     expect(interaction.reply).toHaveBeenCalledWith(
       expect.objectContaining({
-        embeds: [{ kind: "error", description: "guildConfig:user-response.import_invalid_json" }],
+        embeds: [
+          {
+            kind: "error",
+            description: "guildConfig:user-response.import_invalid_json",
+          },
+        ],
       }),
     );
   });
@@ -87,21 +100,30 @@ describe("bot/features/guild-config/commands/guildConfigCommand.import", () => {
   it("バリデーションエラーの場合はエラーメッセージを返すこと", async () => {
     const validJson = JSON.stringify({ version: 999 });
     fetchMock.mockResolvedValue({ text: () => Promise.resolve(validJson) });
-    validateImportDataMock.mockReturnValue("guildConfig:user-response.import_unsupported_version");
+    validateImportDataMock.mockReturnValue(
+      "guildConfig:user-response.import_unsupported_version",
+    );
 
     const { interaction } = createInteraction();
     await handleImport(interaction, "guild-1");
 
     expect(interaction.reply).toHaveBeenCalledWith(
       expect.objectContaining({
-        embeds: [{ kind: "error", description: "guildConfig:user-response.import_unsupported_version" }],
+        embeds: [
+          {
+            kind: "error",
+            description: "guildConfig:user-response.import_unsupported_version",
+          },
+        ],
       }),
     );
   });
 
   it("バリデーション通過時は確認ダイアログが表示されること", async () => {
     const data = { version: 1, guildId: "guild-1", config: { locale: "ja" } };
-    fetchMock.mockResolvedValue({ text: () => Promise.resolve(JSON.stringify(data)) });
+    fetchMock.mockResolvedValue({
+      text: () => Promise.resolve(JSON.stringify(data)),
+    });
     validateImportDataMock.mockReturnValue(null);
 
     const { interaction } = createInteraction();
@@ -114,7 +136,9 @@ describe("bot/features/guild-config/commands/guildConfigCommand.import", () => {
 
   it("確認ボタン押下で importConfig と invalidateLocaleCache が呼ばれること", async () => {
     const data = { version: 1, guildId: "guild-1", config: { locale: "ja" } };
-    fetchMock.mockResolvedValue({ text: () => Promise.resolve(JSON.stringify(data)) });
+    fetchMock.mockResolvedValue({
+      text: () => Promise.resolve(JSON.stringify(data)),
+    });
     validateImportDataMock.mockReturnValue(null);
 
     const { interaction, collectCb } = createInteraction();
@@ -133,7 +157,9 @@ describe("bot/features/guild-config/commands/guildConfigCommand.import", () => {
 
   it("キャンセルボタン押下で importConfig が呼ばれないこと", async () => {
     const data = { version: 1, guildId: "guild-1", config: { locale: "ja" } };
-    fetchMock.mockResolvedValue({ text: () => Promise.resolve(JSON.stringify(data)) });
+    fetchMock.mockResolvedValue({
+      text: () => Promise.resolve(JSON.stringify(data)),
+    });
     validateImportDataMock.mockReturnValue(null);
 
     const { interaction, collectCb } = createInteraction();
@@ -150,8 +176,14 @@ describe("bot/features/guild-config/commands/guildConfigCommand.import", () => {
   });
 
   it("チャンネル/ロールが不在の場合は警告付きで確認ダイアログが表示されること", async () => {
-    const data = { version: 1, guildId: "guild-1", config: { locale: "ja", errorChannelId: "missing-ch" } };
-    fetchMock.mockResolvedValue({ text: () => Promise.resolve(JSON.stringify(data)) });
+    const data = {
+      version: 1,
+      guildId: "guild-1",
+      config: { locale: "ja", errorChannelId: "missing-ch" },
+    };
+    fetchMock.mockResolvedValue({
+      text: () => Promise.resolve(JSON.stringify(data)),
+    });
     validateImportDataMock.mockReturnValue(null);
 
     // missing-ch はチャンネルキャッシュに含まれない
@@ -175,7 +207,9 @@ describe("bot/features/guild-config/commands/guildConfigCommand.import", () => {
         bumpReminder: { mentionRoleId: "missing-role" },
       },
     };
-    fetchMock.mockResolvedValue({ text: () => Promise.resolve(JSON.stringify(data)) });
+    fetchMock.mockResolvedValue({
+      text: () => Promise.resolve(JSON.stringify(data)),
+    });
     validateImportDataMock.mockReturnValue(null);
 
     // すべてのリソースがキャッシュに存在しない
@@ -189,7 +223,9 @@ describe("bot/features/guild-config/commands/guildConfigCommand.import", () => {
 
   it("タイムアウト時にキャンセルメッセージに更新されること", async () => {
     const data = { version: 1, guildId: "guild-1", config: { locale: "ja" } };
-    fetchMock.mockResolvedValue({ text: () => Promise.resolve(JSON.stringify(data)) });
+    fetchMock.mockResolvedValue({
+      text: () => Promise.resolve(JSON.stringify(data)),
+    });
     validateImportDataMock.mockReturnValue(null);
 
     const { interaction, collectCb } = createInteraction();

@@ -15,8 +15,24 @@ vi.mock("@/shared/utils/logger", () => ({ logger: loggerMock }));
 vi.mock("@/shared/locale/localeManager", () => ({
   tDefault: vi.fn((key: string) => key),
   tInteraction: vi.fn((_locale: string, key: string) => key),
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
 }));
 
 function createChannelMock(
@@ -73,8 +89,9 @@ describe("bot/features/sticky-message/services/stickyMessageResendService", () =
     };
     repo.findByChannel.mockResolvedValue(sticky);
 
-    const { StickyMessageResendService } =
-      await import("@/bot/features/sticky-message/services/stickyMessageResendService");
+    const { StickyMessageResendService } = await import(
+      "@/bot/features/sticky-message/services/stickyMessageResendService"
+    );
     const service = new StickyMessageResendService(repo as never);
     const channel = createChannelMock({ id: "channel-1" });
 
@@ -103,8 +120,9 @@ describe("bot/features/sticky-message/services/stickyMessageResendService", () =
     };
     repo.findByChannel.mockResolvedValue(sticky);
 
-    const { StickyMessageResendService } =
-      await import("@/bot/features/sticky-message/services/stickyMessageResendService");
+    const { StickyMessageResendService } = await import(
+      "@/bot/features/sticky-message/services/stickyMessageResendService"
+    );
     const service = new StickyMessageResendService(repo as never);
     const channel = createChannelMock({ id: "channel-2" });
 
@@ -131,8 +149,9 @@ describe("bot/features/sticky-message/services/stickyMessageResendService", () =
     };
     repo.findByChannel.mockResolvedValue(sticky);
 
-    const { StickyMessageResendService } =
-      await import("@/bot/features/sticky-message/services/stickyMessageResendService");
+    const { StickyMessageResendService } = await import(
+      "@/bot/features/sticky-message/services/stickyMessageResendService"
+    );
     const service = new StickyMessageResendService(repo as never);
     const channel = createChannelMock({
       id: "channel-3",
@@ -158,8 +177,9 @@ describe("bot/features/sticky-message/services/stickyMessageResendService", () =
     };
     repo.findByChannel.mockResolvedValue(sticky);
 
-    const { StickyMessageResendService } =
-      await import("@/bot/features/sticky-message/services/stickyMessageResendService");
+    const { StickyMessageResendService } = await import(
+      "@/bot/features/sticky-message/services/stickyMessageResendService"
+    );
     const service = new StickyMessageResendService(repo as never);
     const channel = createChannelMock({
       id: "channel-4",
@@ -184,8 +204,9 @@ describe("bot/features/sticky-message/services/stickyMessageResendService", () =
     };
     repo.findByChannel.mockResolvedValue(sticky);
 
-    const { StickyMessageResendService } =
-      await import("@/bot/features/sticky-message/services/stickyMessageResendService");
+    const { StickyMessageResendService } = await import(
+      "@/bot/features/sticky-message/services/stickyMessageResendService"
+    );
     const service = new StickyMessageResendService(repo as never);
     const channel = createChannelMock({
       id: "channel-5",
@@ -205,8 +226,9 @@ describe("bot/features/sticky-message/services/stickyMessageResendService", () =
     const repo = createRepoMock();
     repo.findByChannel.mockResolvedValue(null);
 
-    const { StickyMessageResendService } =
-      await import("@/bot/features/sticky-message/services/stickyMessageResendService");
+    const { StickyMessageResendService } = await import(
+      "@/bot/features/sticky-message/services/stickyMessageResendService"
+    );
     const service = new StickyMessageResendService(repo as never);
     const channel = createChannelMock({ id: "channel-6" });
 
@@ -227,8 +249,9 @@ describe("bot/features/sticky-message/services/stickyMessageResendService", () =
     };
     repo.findByChannel.mockResolvedValue(sticky);
 
-    const { StickyMessageResendService } =
-      await import("@/bot/features/sticky-message/services/stickyMessageResendService");
+    const { StickyMessageResendService } = await import(
+      "@/bot/features/sticky-message/services/stickyMessageResendService"
+    );
     const service = new StickyMessageResendService(repo as never);
     const channel = createChannelMock({ id: "channel-7" });
 
@@ -242,8 +265,9 @@ describe("bot/features/sticky-message/services/stickyMessageResendService", () =
   it("タイマーが存在しないチャンネルに cancelTimer を呼んでも何も起きない", async () => {
     const repo = createRepoMock();
 
-    const { StickyMessageResendService } =
-      await import("@/bot/features/sticky-message/services/stickyMessageResendService");
+    const { StickyMessageResendService } = await import(
+      "@/bot/features/sticky-message/services/stickyMessageResendService"
+    );
     const service = new StickyMessageResendService(repo as never);
 
     // Should not throw
@@ -251,8 +275,9 @@ describe("bot/features/sticky-message/services/stickyMessageResendService", () =
   });
 
   it("引数なしで呼ぶと「未初期化」エラーになる初期化ガードが働く", async () => {
-    const { getStickyMessageResendService } =
-      await import("@/bot/features/sticky-message/services/stickyMessageResendService");
+    const { getStickyMessageResendService } = await import(
+      "@/bot/features/sticky-message/services/stickyMessageResendService"
+    );
 
     expect(() => getStickyMessageResendService()).toThrow(
       "StickyMessageResendService is not initialized",
@@ -261,8 +286,9 @@ describe("bot/features/sticky-message/services/stickyMessageResendService", () =
 
   it("getStickyMessageResendService は初期化してシングルトンを返す", async () => {
     const repo = createRepoMock();
-    const { getStickyMessageResendService } =
-      await import("@/bot/features/sticky-message/services/stickyMessageResendService");
+    const { getStickyMessageResendService } = await import(
+      "@/bot/features/sticky-message/services/stickyMessageResendService"
+    );
 
     const service1 = getStickyMessageResendService(repo as never);
     const service2 = getStickyMessageResendService();
@@ -275,8 +301,9 @@ describe("bot/features/sticky-message/services/stickyMessageResendService", () =
     // findByChannel throws to cause resend() itself to reject
     repo.findByChannel.mockRejectedValue(new Error("DB fatal error"));
 
-    const { StickyMessageResendService } =
-      await import("@/bot/features/sticky-message/services/stickyMessageResendService");
+    const { StickyMessageResendService } = await import(
+      "@/bot/features/sticky-message/services/stickyMessageResendService"
+    );
     const service = new StickyMessageResendService(repo as never);
     const channel = createChannelMock({ id: "channel-err" });
 

@@ -23,9 +23,26 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
   })),
 }));
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
-  tInteraction: (_locale: string, key: string) => tInteractionMock(_locale, key),
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
+  tInteraction: (_locale: string, key: string) =>
+    tInteractionMock(_locale, key),
 }));
 vi.mock("@/bot/utils/messageResponse", () => ({
   createWarningEmbed: warningEmbedMock,
@@ -71,8 +88,9 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler
   });
 
   it("VIEW_SELECT_CUSTOM_ID に完全一致する customId を正しく識別する", async () => {
-    const { stickyMessageViewSelectHandler } =
-      await import("@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler");
+    const { stickyMessageViewSelectHandler } = await import(
+      "@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler"
+    );
     expect(
       stickyMessageViewSelectHandler.matches("sticky-message:view-select"),
     ).toBe(true);
@@ -84,8 +102,9 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler
   });
 
   it("values が空配列の場合（チャンネル未選択）はコンポーネントのみクリアして早期リターンする", async () => {
-    const { stickyMessageViewSelectHandler } =
-      await import("@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler");
+    const { stickyMessageViewSelectHandler } = await import(
+      "@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler"
+    );
     const updateMock = vi.fn().mockResolvedValue(undefined);
     const interaction = createInteractionMock({
       values: [],
@@ -99,8 +118,9 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler
   });
 
   it("スティッキーメッセージが見つからない場合に警告で更新する", async () => {
-    const { stickyMessageViewSelectHandler } =
-      await import("@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler");
+    const { stickyMessageViewSelectHandler } = await import(
+      "@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler"
+    );
     findByChannelMock.mockResolvedValue(null);
     const updateMock = vi.fn().mockResolvedValue(undefined);
     const interaction = createInteractionMock({ updateMock });
@@ -114,8 +134,9 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler
   });
 
   it("embedData が null の場合はプレーンテキスト表示パスに分岐し、setColor が呼ばれない", async () => {
-    const { stickyMessageViewSelectHandler } =
-      await import("@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler");
+    const { stickyMessageViewSelectHandler } = await import(
+      "@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler"
+    );
     findByChannelMock.mockResolvedValue({
       id: "sticky-1",
       channelId: "ch-1",
@@ -141,8 +162,9 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler
   });
 
   it("embedData がある場合は embed 形式・タイトル・カラーフィールドを表示する", async () => {
-    const { stickyMessageViewSelectHandler } =
-      await import("@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler");
+    const { stickyMessageViewSelectHandler } = await import(
+      "@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler"
+    );
     const embedData = JSON.stringify({
       title: "Embed Title",
       color: 0xff0000,
@@ -168,8 +190,9 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler
   });
 
   it("updatedBy が設定されている場合に updatedBy フィールドを表示する", async () => {
-    const { stickyMessageViewSelectHandler } =
-      await import("@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler");
+    const { stickyMessageViewSelectHandler } = await import(
+      "@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler"
+    );
     findByChannelMock.mockResolvedValue({
       id: "sticky-1",
       channelId: "ch-1",
@@ -190,8 +213,9 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler
   });
 
   it("Discord の embed フィールド文字数上限（1024）を超えるコンテンツが '...' で切り詰められる", async () => {
-    const { stickyMessageViewSelectHandler } =
-      await import("@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler");
+    const { stickyMessageViewSelectHandler } = await import(
+      "@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler"
+    );
     const longContent = "a".repeat(1100);
     findByChannelMock.mockResolvedValue({
       id: "sticky-1",
@@ -215,8 +239,9 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler
   });
 
   it("コンテンツがちょうど 1024 文字の場合は切り詰めない", async () => {
-    const { stickyMessageViewSelectHandler } =
-      await import("@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler");
+    const { stickyMessageViewSelectHandler } = await import(
+      "@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler"
+    );
     const exactContent = "a".repeat(1024);
     findByChannelMock.mockResolvedValue({
       id: "sticky-1",
@@ -241,8 +266,9 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler
   });
 
   it("embedData が不正な JSON 文字列でも例外を投げず、更新処理が正常完了する", async () => {
-    const { stickyMessageViewSelectHandler } =
-      await import("@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler");
+    const { stickyMessageViewSelectHandler } = await import(
+      "@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler"
+    );
     findByChannelMock.mockResolvedValue({
       id: "sticky-1",
       channelId: "ch-1",
@@ -261,8 +287,9 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler
   });
 
   it("embedData に title も color もない場合はどちらのフィールドも追加しない", async () => {
-    const { stickyMessageViewSelectHandler } =
-      await import("@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler");
+    const { stickyMessageViewSelectHandler } = await import(
+      "@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler"
+    );
     // title も color もない embedData
     const embedData = JSON.stringify({ content: "embed-only content" });
     findByChannelMock.mockResolvedValue({
@@ -290,8 +317,9 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler
   });
 
   it("guildId が null の場合に null 合体演算子で undefined にフォールバックし、クラッシュせず更新できる", async () => {
-    const { stickyMessageViewSelectHandler } =
-      await import("@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler");
+    const { stickyMessageViewSelectHandler } = await import(
+      "@/bot/features/sticky-message/handlers/ui/stickyMessageViewSelectHandler"
+    );
     findByChannelMock.mockResolvedValue({
       id: "sticky-1",
       channelId: "ch-1",

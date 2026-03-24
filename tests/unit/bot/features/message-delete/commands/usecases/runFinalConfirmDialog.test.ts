@@ -25,26 +25,51 @@ vi.mock("@/bot/utils/messageResponse", () => ({
 }));
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: vi.fn((key: string, params?: Record<string, unknown>) =>
     params ? `${key}:${JSON.stringify(params)}` : key,
   ),
-  tInteraction: (_locale: string, key: string, params?: Record<string, unknown>) =>
-    params ? `${key}:${JSON.stringify(params)}` : key,
+  tInteraction: (
+    _locale: string,
+    key: string,
+    params?: Record<string, unknown>,
+  ) => (params ? `${key}:${JSON.stringify(params)}` : key),
 }));
 
 vi.mock("@/shared/utils/logger", () => ({
   logger: { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
 
-vi.mock("@/bot/features/message-delete/commands/usecases/dialogUtils", async (importOriginal) => {
-  const orig = await importOriginal<typeof import("@/bot/features/message-delete/commands/usecases/dialogUtils")>();
-  return {
-    ...orig,
-    showJumpModal: (...args: any[]) => showJumpModalMock(...args),
-  };
-});
+vi.mock(
+  "@/bot/features/message-delete/commands/usecases/dialogUtils",
+  async (importOriginal) => {
+    const orig =
+      await importOriginal<
+        typeof import("@/bot/features/message-delete/commands/usecases/dialogUtils")
+      >();
+    return {
+      ...orig,
+      showJumpModal: (...args: any[]) => showJumpModalMock(...args),
+    };
+  },
+);
 
 /** Flush all pending microtasks so async handlers after `await editReply` are registered */
 async function flushMicrotasks() {
@@ -55,11 +80,14 @@ async function flushMicrotasks() {
 }
 
 function makeMockCollector() {
-  const handlers: Record<string, ((...args: any[]) => Promise<void> | void)[]> = {};
+  const handlers: Record<string, ((...args: any[]) => Promise<void> | void)[]> =
+    {};
   return {
-    on: vi.fn((event: string, handler: (...args: any[]) => Promise<void> | void) => {
-      (handlers[event] ??= []).push(handler);
-    }),
+    on: vi.fn(
+      (event: string, handler: (...args: any[]) => Promise<void> | void) => {
+        (handlers[event] ??= []).push(handler);
+      },
+    ),
     stop: vi.fn(),
     async _trigger(event: string, ...args: unknown[]) {
       const hs = handlers[event] ?? [];
@@ -105,7 +133,9 @@ describe("bot/features/message-delete/commands/usecases/runFinalConfirmDialog", 
     );
   }
 
-  function makeBaseInteraction(collectorToReturn?: ReturnType<typeof makeMockCollector>) {
+  function makeBaseInteraction(
+    collectorToReturn?: ReturnType<typeof makeMockCollector>,
+  ) {
     const collector = collectorToReturn ?? makeMockCollector();
     const response = {
       createMessageComponentCollector: vi.fn(() => collector),
@@ -124,7 +154,9 @@ describe("bot/features/message-delete/commands/usecases/runFinalConfirmDialog", 
 
     const collector = makeMockCollector();
     const baseInteraction = makeBaseInteraction(collector);
-    const clickInteraction = makeComponentInteraction(MSG_DEL_CUSTOM_ID.FINAL_YES);
+    const clickInteraction = makeComponentInteraction(
+      MSG_DEL_CUSTOM_ID.FINAL_YES,
+    );
 
     const promise = showFinalConfirmDialog(baseInteraction as never, [], 60000);
 
@@ -142,7 +174,9 @@ describe("bot/features/message-delete/commands/usecases/runFinalConfirmDialog", 
 
     const collector = makeMockCollector();
     const baseInteraction = makeBaseInteraction(collector);
-    const clickInteraction = makeComponentInteraction(MSG_DEL_CUSTOM_ID.FINAL_NO);
+    const clickInteraction = makeComponentInteraction(
+      MSG_DEL_CUSTOM_ID.FINAL_NO,
+    );
 
     const promise = showFinalConfirmDialog(baseInteraction as never, [], 60000);
     await flushMicrotasks();
@@ -158,7 +192,9 @@ describe("bot/features/message-delete/commands/usecases/runFinalConfirmDialog", 
 
     const collector = makeMockCollector();
     const baseInteraction = makeBaseInteraction(collector);
-    const clickInteraction = makeComponentInteraction(MSG_DEL_CUSTOM_ID.FINAL_BACK);
+    const clickInteraction = makeComponentInteraction(
+      MSG_DEL_CUSTOM_ID.FINAL_BACK,
+    );
 
     const promise = showFinalConfirmDialog(baseInteraction as never, [], 60000);
     await flushMicrotasks();
@@ -229,7 +265,9 @@ describe("bot/features/message-delete/commands/usecases/runFinalConfirmDialog", 
 
     const collector = makeMockCollector();
     const baseInteraction = makeBaseInteraction(collector);
-    const clickInteraction = makeComponentInteraction(MSG_DEL_CUSTOM_ID.FINAL_YES);
+    const clickInteraction = makeComponentInteraction(
+      MSG_DEL_CUSTOM_ID.FINAL_YES,
+    );
 
     const promise = showFinalConfirmDialog(baseInteraction as never, [], 60000);
     await flushMicrotasks();
@@ -250,8 +288,13 @@ describe("bot/features/message-delete/commands/usecases/runFinalConfirmDialog", 
 
     const collector = makeMockCollector();
     const baseInteraction = makeBaseInteraction(collector);
-    const wrongUserInteraction = makeComponentInteraction(MSG_DEL_CUSTOM_ID.FINAL_YES, "wrong-user");
-    const rightUserInteraction = makeComponentInteraction(MSG_DEL_CUSTOM_ID.FINAL_YES);
+    const wrongUserInteraction = makeComponentInteraction(
+      MSG_DEL_CUSTOM_ID.FINAL_YES,
+      "wrong-user",
+    );
+    const rightUserInteraction = makeComponentInteraction(
+      MSG_DEL_CUSTOM_ID.FINAL_YES,
+    );
 
     const promise = showFinalConfirmDialog(baseInteraction as never, [], 60000);
     await flushMicrotasks();
@@ -271,7 +314,9 @@ describe("bot/features/message-delete/commands/usecases/runFinalConfirmDialog", 
     const collector = makeMockCollector();
     const baseInteraction = makeBaseInteraction(collector);
     const firstInteraction = makeComponentInteraction(MSG_DEL_CUSTOM_ID.FIRST);
-    const confirmInteraction = makeComponentInteraction(MSG_DEL_CUSTOM_ID.FINAL_YES);
+    const confirmInteraction = makeComponentInteraction(
+      MSG_DEL_CUSTOM_ID.FINAL_YES,
+    );
 
     const promise = showFinalConfirmDialog(baseInteraction as never, [], 60000);
     await flushMicrotasks();
@@ -289,7 +334,9 @@ describe("bot/features/message-delete/commands/usecases/runFinalConfirmDialog", 
     const collector = makeMockCollector();
     const baseInteraction = makeBaseInteraction(collector);
     const prevInteraction = makeComponentInteraction(MSG_DEL_CUSTOM_ID.PREV);
-    const confirmInteraction = makeComponentInteraction(MSG_DEL_CUSTOM_ID.FINAL_YES);
+    const confirmInteraction = makeComponentInteraction(
+      MSG_DEL_CUSTOM_ID.FINAL_YES,
+    );
 
     const promise = showFinalConfirmDialog(baseInteraction as never, [], 60000);
     await flushMicrotasks();
@@ -305,7 +352,9 @@ describe("bot/features/message-delete/commands/usecases/runFinalConfirmDialog", 
     const collector = makeMockCollector();
     const baseInteraction = makeBaseInteraction(collector);
     const nextInteraction = makeComponentInteraction(MSG_DEL_CUSTOM_ID.NEXT);
-    const confirmInteraction = makeComponentInteraction(MSG_DEL_CUSTOM_ID.FINAL_YES);
+    const confirmInteraction = makeComponentInteraction(
+      MSG_DEL_CUSTOM_ID.FINAL_YES,
+    );
 
     const promise = showFinalConfirmDialog(baseInteraction as never, [], 60000);
     await flushMicrotasks();
@@ -321,7 +370,9 @@ describe("bot/features/message-delete/commands/usecases/runFinalConfirmDialog", 
     const collector = makeMockCollector();
     const baseInteraction = makeBaseInteraction(collector);
     const lastInteraction = makeComponentInteraction(MSG_DEL_CUSTOM_ID.LAST);
-    const confirmInteraction = makeComponentInteraction(MSG_DEL_CUSTOM_ID.FINAL_YES);
+    const confirmInteraction = makeComponentInteraction(
+      MSG_DEL_CUSTOM_ID.FINAL_YES,
+    );
 
     const promise = showFinalConfirmDialog(baseInteraction as never, [], 60000);
     await flushMicrotasks();
@@ -339,7 +390,9 @@ describe("bot/features/message-delete/commands/usecases/runFinalConfirmDialog", 
     const collector = makeMockCollector();
     const baseInteraction = makeBaseInteraction(collector);
     const jumpInteraction = makeComponentInteraction(MSG_DEL_CUSTOM_ID.JUMP);
-    const confirmInteraction = makeComponentInteraction(MSG_DEL_CUSTOM_ID.FINAL_YES);
+    const confirmInteraction = makeComponentInteraction(
+      MSG_DEL_CUSTOM_ID.FINAL_YES,
+    );
 
     // 2 pages (MSG_DEL_PAGE_SIZE = 5, so 6 msgs = 2 pages)
     const msgs = Array.from({ length: 6 }, (_, i) => ({
@@ -347,7 +400,11 @@ describe("bot/features/message-delete/commands/usecases/runFinalConfirmDialog", 
       createdAt: new Date(),
     }));
 
-    const promise = showFinalConfirmDialog(baseInteraction as never, msgs as never, 60000);
+    const promise = showFinalConfirmDialog(
+      baseInteraction as never,
+      msgs as never,
+      60000,
+    );
     await flushMicrotasks();
 
     await collector._trigger("collect", jumpInteraction);
@@ -363,7 +420,9 @@ describe("bot/features/message-delete/commands/usecases/runFinalConfirmDialog", 
     const collector = makeMockCollector();
     const baseInteraction = makeBaseInteraction(collector);
     const jumpInteraction = makeComponentInteraction(MSG_DEL_CUSTOM_ID.JUMP);
-    const confirmInteraction = makeComponentInteraction(MSG_DEL_CUSTOM_ID.FINAL_YES);
+    const confirmInteraction = makeComponentInteraction(
+      MSG_DEL_CUSTOM_ID.FINAL_YES,
+    );
 
     const promise = showFinalConfirmDialog(baseInteraction as never, [], 60000);
     await flushMicrotasks();
@@ -384,7 +443,9 @@ describe("bot/features/message-delete/commands/usecases/runFinalConfirmDialog", 
     const collector = makeMockCollector();
     const baseInteraction = makeBaseInteraction(collector);
     const jumpInteraction = makeComponentInteraction(MSG_DEL_CUSTOM_ID.JUMP);
-    const confirmInteraction = makeComponentInteraction(MSG_DEL_CUSTOM_ID.FINAL_YES);
+    const confirmInteraction = makeComponentInteraction(
+      MSG_DEL_CUSTOM_ID.FINAL_YES,
+    );
 
     const promise = showFinalConfirmDialog(baseInteraction as never, [], 60000);
     await flushMicrotasks();

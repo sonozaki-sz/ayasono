@@ -21,7 +21,9 @@ const applyModalFilterValueMock = vi.fn(
     errorKey: undefined,
   }),
 );
-const getTimezoneOffsetForLocaleMock = vi.fn((..._args: any[]): string => "+00:00");
+const getTimezoneOffsetForLocaleMock = vi.fn(
+  (..._args: any[]): string => "+00:00",
+);
 
 vi.mock(
   "@/bot/features/message-delete/commands/messageDeleteEmbedBuilder",
@@ -42,13 +44,32 @@ vi.mock("@/bot/utils/messageResponse", () => ({
 }));
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: vi.fn((key: string, params?: Record<string, unknown>) =>
     params ? `${key}:${JSON.stringify(params)}` : key,
   ),
-  tInteraction: (_locale: string, key: string, params?: Record<string, unknown>) =>
-    params ? `${key}:${JSON.stringify(params)}` : key,
+  tInteraction: (
+    _locale: string,
+    key: string,
+    params?: Record<string, unknown>,
+  ) => (params ? `${key}:${JSON.stringify(params)}` : key),
 }));
 
 vi.mock("@/shared/utils/logger", () => ({
@@ -85,10 +106,8 @@ async function flushMicrotasks() {
 }
 
 function makeMockCollector() {
-  const handlers: Record<
-    string,
-    ((...args: any[]) => Promise<void> | void)[]
-  > = {};
+  const handlers: Record<string, ((...args: any[]) => Promise<void> | void)[]> =
+    {};
   return {
     on: vi.fn(
       (event: string, handler: (...args: any[]) => Promise<void> | void) => {

@@ -1,11 +1,12 @@
 // tests/unit/shared/utils/errorHandling.test.ts
+
+import type { MockedFunction } from "vitest";
 import { DatabaseError } from "@/shared/errors/customErrors";
 import {
   executeWithDatabaseError,
   executeWithLoggedError,
 } from "@/shared/utils/errorHandling";
 import { logger } from "@/shared/utils/logger";
-import type { MockedFunction } from "vitest";
 
 vi.mock("@/shared/utils/logger", () => ({
   logger: {

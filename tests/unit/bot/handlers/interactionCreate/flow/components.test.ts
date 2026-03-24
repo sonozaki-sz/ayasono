@@ -1,4 +1,6 @@
 // tests/unit/bot/handlers/interactionCreate/flow/components.test.ts
+
+import type { Mock } from "vitest";
 import { handleInteractionError } from "@/bot/errors/interactionErrorHandler";
 import {
   handleButton,
@@ -6,13 +8,28 @@ import {
   handleStringSelectMenu,
   handleUserSelectMenu,
 } from "@/bot/handlers/interactionCreate/flow/components";
-import type { Mock } from "vitest";
 
 const loggerErrorMock = vi.fn();
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: vi.fn((key: string) => `default:${key}`),
   tInteraction: (...args: unknown[]) => args[1],
 }));

@@ -21,8 +21,9 @@ describe("bot/features/bump-reminder/services/bumpReminderConfigServiceResolver"
     const service = { getBumpReminderConfig: vi.fn() };
     createBumpReminderConfigServiceMock.mockReturnValue(service);
 
-    const { createBumpReminderFeatureConfigService } =
-      await import("@/bot/features/bump-reminder/services/bumpReminderConfigServiceResolver");
+    const { createBumpReminderFeatureConfigService } = await import(
+      "@/bot/features/bump-reminder/services/bumpReminderConfigServiceResolver"
+    );
 
     const repository = { getBumpReminderConfigByGuildId: vi.fn() };
     const resolved = createBumpReminderFeatureConfigService(
@@ -39,8 +40,9 @@ describe("bot/features/bump-reminder/services/bumpReminderConfigServiceResolver"
     const shared = { getBumpReminderConfig: vi.fn() };
     getBumpReminderConfigServiceMock.mockReturnValue(shared);
 
-    const { getBumpReminderFeatureConfigService } =
-      await import("@/bot/features/bump-reminder/services/bumpReminderConfigServiceResolver");
+    const { getBumpReminderFeatureConfigService } = await import(
+      "@/bot/features/bump-reminder/services/bumpReminderConfigServiceResolver"
+    );
 
     const resolved = getBumpReminderFeatureConfigService();
 
@@ -55,8 +57,9 @@ describe("bot/features/bump-reminder/services/bumpReminderConfigServiceResolver"
       .mockReturnValueOnce(serviceA)
       .mockReturnValueOnce(serviceB);
 
-    const { getBumpReminderFeatureConfigService } =
-      await import("@/bot/features/bump-reminder/services/bumpReminderConfigServiceResolver");
+    const { getBumpReminderFeatureConfigService } = await import(
+      "@/bot/features/bump-reminder/services/bumpReminderConfigServiceResolver"
+    );
 
     const repoA = { id: "repo-a" };
     const repoB = { id: "repo-b" };

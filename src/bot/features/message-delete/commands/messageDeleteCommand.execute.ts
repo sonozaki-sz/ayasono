@@ -2,9 +2,9 @@
 // /message-delete コマンド実行処理
 
 import {
-  MessageFlags,
   type ChatInputCommandInteraction,
   type MessageComponentInteraction,
+  MessageFlags,
 } from "discord.js";
 import {
   logPrefixed,
@@ -20,6 +20,7 @@ import {
 } from "../../../utils/messageResponse";
 import {
   type MessageDeleteFilter,
+  MSG_DEL_PHASE_TIMEOUT_MS,
   type ScannedMessageWithChannel,
 } from "../constants/messageDeleteConstants";
 import { buildTargetChannels } from "./usecases/buildTargetChannels";
@@ -35,7 +36,6 @@ import {
   hasSlashCommandFilter,
   parseAndValidateOptions,
 } from "./usecases/validateOptions";
-import { MSG_DEL_PHASE_TIMEOUT_MS } from "../constants/messageDeleteConstants";
 
 // ===== サーバー単位の処理中ロック =====
 // スキャン〜削除実行の間はロックを保持し、同一サーバー内の重複実行を防止する

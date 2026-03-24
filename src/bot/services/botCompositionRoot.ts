@@ -2,33 +2,33 @@
 // Bot層の依存解決を集約する Composition Root
 
 import type { PrismaClient } from "@prisma/client";
-import type { IGuildConfigRepository } from "../../shared/database/types";
 import { getGuildConfigRepository } from "../../shared/database/guildConfigRepositoryProvider";
+import type { IGuildConfigRepository } from "../../shared/database/types";
 import type { BumpReminderConfigService } from "../../shared/features/bump-reminder/bumpReminderConfigService";
-import { createGuildConfigService } from "../../shared/features/guild-config/guildConfigService";
 import type { GuildConfigService } from "../../shared/features/guild-config/guildConfigService";
-import { createMemberLogConfigService } from "../../shared/features/member-log/memberLogConfigService";
+import { createGuildConfigService } from "../../shared/features/guild-config/guildConfigService";
 import type { MemberLogConfigService } from "../../shared/features/member-log/memberLogConfigService";
-import { createStickyMessageConfigService } from "../../shared/features/sticky-message/stickyMessageConfigService";
+import { createMemberLogConfigService } from "../../shared/features/member-log/memberLogConfigService";
 import type { StickyMessageConfigService } from "../../shared/features/sticky-message/stickyMessageConfigService";
-import { getVacConfigService } from "../../shared/features/vac/vacConfigService";
+import { createStickyMessageConfigService } from "../../shared/features/sticky-message/stickyMessageConfigService";
 import type { VacConfigService } from "../../shared/features/vac/vacConfigService";
+import { getVacConfigService } from "../../shared/features/vac/vacConfigService";
 import { createVcRecruitConfigService } from "../../shared/features/vc-recruit/vcRecruitConfigService";
 import { localeManager } from "../../shared/locale/localeManager";
 import { createBotServiceAccessor } from "../../shared/utils/serviceFactory";
 import { getBumpReminderRepository } from "../features/bump-reminder/repositories/bumpReminderRepository";
 import type { IBumpReminderRepository as BumpReminderRepositoryType } from "../features/bump-reminder/repositories/types";
 import { getBumpReminderFeatureConfigService } from "../features/bump-reminder/services/bumpReminderConfigServiceResolver";
-import { getBumpReminderManager } from "../features/bump-reminder/services/bumpReminderService";
 import type { BumpReminderManager } from "../features/bump-reminder/services/bumpReminderService";
+import { getBumpReminderManager } from "../features/bump-reminder/services/bumpReminderService";
 import { getStickyMessageRepository } from "../features/sticky-message/repositories/stickyMessageRepository";
-import { getStickyMessageResendService } from "../features/sticky-message/services/stickyMessageResendService";
 import type { StickyMessageResendService } from "../features/sticky-message/services/stickyMessageResendService";
-import { getVacService } from "../features/vac/services/vacService";
+import { getStickyMessageResendService } from "../features/sticky-message/services/stickyMessageResendService";
 import type { VacService } from "../features/vac/services/vacService";
+import { getVacService } from "../features/vac/services/vacService";
 import { registerVcPanelOwnershipChecker } from "../features/vc-panel/vcPanelOwnershipRegistry";
-import { createVcRecruitRepository } from "../features/vc-recruit/repositories/vcRecruitRepository";
 import type { IVcRecruitRepository } from "../features/vc-recruit/repositories/vcRecruitRepository";
+import { createVcRecruitRepository } from "../features/vc-recruit/repositories/vcRecruitRepository";
 
 // ---------------------------------------------------------------------------
 // BotServices interface

@@ -13,8 +13,24 @@ const setLeaveMessageMock = vi.fn();
 const viewMock = vi.fn();
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: vi.fn((key: string) => key),
   tInteraction: (...args: unknown[]) => args[1],
 }));
@@ -228,7 +244,10 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.execute", () =
 
       await executeMemberLogConfigCommand(interaction as never);
 
-      expect(clearLeaveMessageMock).toHaveBeenCalledWith(interaction, "guild-1");
+      expect(clearLeaveMessageMock).toHaveBeenCalledWith(
+        interaction,
+        "guild-1",
+      );
     });
 
     it("reset サブコマンドが handleMemberLogConfigReset へ委譲されることを確認", async () => {

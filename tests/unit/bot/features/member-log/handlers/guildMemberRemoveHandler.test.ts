@@ -51,8 +51,24 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotMemberLogConfigService: () => getBotMemberLogConfigServiceMock(),
 }));
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: (key: string, opts?: Record<string, unknown>) =>
     tDefaultMock(key, opts),
   tInteraction: (...args: unknown[]) => args[1],
@@ -135,8 +151,9 @@ describe("bot/features/member-log/handlers/guildMemberRemoveHandler", () => {
   // 設定取得・チャンネル解決の早期リターン分岐を検証
   describe("early returns", () => {
     it("config が null の場合は channel.send が呼ばれないことを確認", async () => {
-      const { handleGuildMemberRemove } =
-        await import("@/bot/features/member-log/handlers/guildMemberRemoveHandler");
+      const { handleGuildMemberRemove } = await import(
+        "@/bot/features/member-log/handlers/guildMemberRemoveHandler"
+      );
       getMemberLogConfigMock.mockResolvedValue(null);
       const member = makeGuildMember();
 
@@ -146,8 +163,9 @@ describe("bot/features/member-log/handlers/guildMemberRemoveHandler", () => {
     });
 
     it("config.enabled が false の場合は channel.send が呼ばれないことを確認", async () => {
-      const { handleGuildMemberRemove } =
-        await import("@/bot/features/member-log/handlers/guildMemberRemoveHandler");
+      const { handleGuildMemberRemove } = await import(
+        "@/bot/features/member-log/handlers/guildMemberRemoveHandler"
+      );
       getMemberLogConfigMock.mockResolvedValue({
         enabled: false,
         channelId: "ch-1",
@@ -160,8 +178,9 @@ describe("bot/features/member-log/handlers/guildMemberRemoveHandler", () => {
     });
 
     it("channelId が未設定の場合は channel.send が呼ばれないことを確認", async () => {
-      const { handleGuildMemberRemove } =
-        await import("@/bot/features/member-log/handlers/guildMemberRemoveHandler");
+      const { handleGuildMemberRemove } = await import(
+        "@/bot/features/member-log/handlers/guildMemberRemoveHandler"
+      );
       getMemberLogConfigMock.mockResolvedValue({
         enabled: true,
         channelId: null,
@@ -174,8 +193,9 @@ describe("bot/features/member-log/handlers/guildMemberRemoveHandler", () => {
     });
 
     it("チャンネルが fetch で見つからない場合に disableAndClearChannel が呼ばれることを確認", async () => {
-      const { handleGuildMemberRemove } =
-        await import("@/bot/features/member-log/handlers/guildMemberRemoveHandler");
+      const { handleGuildMemberRemove } = await import(
+        "@/bot/features/member-log/handlers/guildMemberRemoveHandler"
+      );
       getMemberLogConfigMock.mockResolvedValue({
         enabled: true,
         channelId: "unknown-ch",
@@ -192,8 +212,9 @@ describe("bot/features/member-log/handlers/guildMemberRemoveHandler", () => {
     });
 
     it("テキストチャンネル以外の場合に disableAndClearChannel が呼ばれることを確認", async () => {
-      const { handleGuildMemberRemove } =
-        await import("@/bot/features/member-log/handlers/guildMemberRemoveHandler");
+      const { handleGuildMemberRemove } = await import(
+        "@/bot/features/member-log/handlers/guildMemberRemoveHandler"
+      );
       getMemberLogConfigMock.mockResolvedValue({
         enabled: true,
         channelId: "ch-voice",
@@ -216,8 +237,9 @@ describe("bot/features/member-log/handlers/guildMemberRemoveHandler", () => {
   // 正常フロー（Embed 送信・サムネイル・カスタムメッセージ）を検証
   describe("success flow", () => {
     it("有効な設定で channel.send が embeds を含む引数で呼ばれることを確認", async () => {
-      const { handleGuildMemberRemove } =
-        await import("@/bot/features/member-log/handlers/guildMemberRemoveHandler");
+      const { handleGuildMemberRemove } = await import(
+        "@/bot/features/member-log/handlers/guildMemberRemoveHandler"
+      );
       getMemberLogConfigMock.mockResolvedValue({
         enabled: true,
         channelId: "ch-1",
@@ -233,8 +255,9 @@ describe("bot/features/member-log/handlers/guildMemberRemoveHandler", () => {
     });
 
     it("アバター URL が存在する場合に setThumbnail が呼ばれることを確認", async () => {
-      const { handleGuildMemberRemove } =
-        await import("@/bot/features/member-log/handlers/guildMemberRemoveHandler");
+      const { handleGuildMemberRemove } = await import(
+        "@/bot/features/member-log/handlers/guildMemberRemoveHandler"
+      );
       getMemberLogConfigMock.mockResolvedValue({
         enabled: true,
         channelId: "ch-1",
@@ -249,8 +272,9 @@ describe("bot/features/member-log/handlers/guildMemberRemoveHandler", () => {
     });
 
     it("member.user が null の場合でも channel.send が呼ばれ setThumbnail は呼ばれないことを確認", async () => {
-      const { handleGuildMemberRemove } =
-        await import("@/bot/features/member-log/handlers/guildMemberRemoveHandler");
+      const { handleGuildMemberRemove } = await import(
+        "@/bot/features/member-log/handlers/guildMemberRemoveHandler"
+      );
       getMemberLogConfigMock.mockResolvedValue({
         enabled: true,
         channelId: "ch-1",
@@ -265,8 +289,9 @@ describe("bot/features/member-log/handlers/guildMemberRemoveHandler", () => {
     });
 
     it("joinedTimestamp が null の場合でも channel.send が呼ばれることを確認", async () => {
-      const { handleGuildMemberRemove } =
-        await import("@/bot/features/member-log/handlers/guildMemberRemoveHandler");
+      const { handleGuildMemberRemove } = await import(
+        "@/bot/features/member-log/handlers/guildMemberRemoveHandler"
+      );
       getMemberLogConfigMock.mockResolvedValue({
         enabled: true,
         channelId: "ch-1",
@@ -281,8 +306,9 @@ describe("bot/features/member-log/handlers/guildMemberRemoveHandler", () => {
     });
 
     it("leaveMessage が設定されている場合に content が渡されることを確認", async () => {
-      const { handleGuildMemberRemove } =
-        await import("@/bot/features/member-log/handlers/guildMemberRemoveHandler");
+      const { handleGuildMemberRemove } = await import(
+        "@/bot/features/member-log/handlers/guildMemberRemoveHandler"
+      );
       getMemberLogConfigMock.mockResolvedValue({
         enabled: true,
         channelId: "ch-1",
@@ -298,8 +324,9 @@ describe("bot/features/member-log/handlers/guildMemberRemoveHandler", () => {
     });
 
     it("leaveMessage が未設定の場合に content が undefined であることを確認", async () => {
-      const { handleGuildMemberRemove } =
-        await import("@/bot/features/member-log/handlers/guildMemberRemoveHandler");
+      const { handleGuildMemberRemove } = await import(
+        "@/bot/features/member-log/handlers/guildMemberRemoveHandler"
+      );
       getMemberLogConfigMock.mockResolvedValue({
         enabled: true,
         channelId: "ch-1",
@@ -315,8 +342,9 @@ describe("bot/features/member-log/handlers/guildMemberRemoveHandler", () => {
     });
 
     it("calcDuration が years=0 months=0 を返す場合でも embed が送信されることを確認", async () => {
-      const { handleGuildMemberRemove } =
-        await import("@/bot/features/member-log/handlers/guildMemberRemoveHandler");
+      const { handleGuildMemberRemove } = await import(
+        "@/bot/features/member-log/handlers/guildMemberRemoveHandler"
+      );
       calcDurationMock.mockReturnValueOnce({ years: 0, months: 0, days: 5 });
       getMemberLogConfigMock.mockResolvedValue({
         enabled: true,
@@ -331,8 +359,9 @@ describe("bot/features/member-log/handlers/guildMemberRemoveHandler", () => {
     });
 
     it("calcDuration が months=0 days=0 を返す場合でも embed が送信されることを確認", async () => {
-      const { handleGuildMemberRemove } =
-        await import("@/bot/features/member-log/handlers/guildMemberRemoveHandler");
+      const { handleGuildMemberRemove } = await import(
+        "@/bot/features/member-log/handlers/guildMemberRemoveHandler"
+      );
       calcDurationMock.mockReturnValueOnce({ years: 1, months: 0, days: 0 });
       getMemberLogConfigMock.mockResolvedValue({
         enabled: true,
@@ -347,8 +376,9 @@ describe("bot/features/member-log/handlers/guildMemberRemoveHandler", () => {
     });
 
     it("joinedTimestamp が undefined の場合に stayDays の ?? 0 フォールバックを通って embed が送信されることを確認", async () => {
-      const { handleGuildMemberRemove } =
-        await import("@/bot/features/member-log/handlers/guildMemberRemoveHandler");
+      const { handleGuildMemberRemove } = await import(
+        "@/bot/features/member-log/handlers/guildMemberRemoveHandler"
+      );
       getMemberLogConfigMock.mockResolvedValue({
         enabled: true,
         channelId: "ch-1",
@@ -362,8 +392,9 @@ describe("bot/features/member-log/handlers/guildMemberRemoveHandler", () => {
     });
 
     it("送信成功後に logger.debug が呼ばれることを確認", async () => {
-      const { handleGuildMemberRemove } =
-        await import("@/bot/features/member-log/handlers/guildMemberRemoveHandler");
+      const { handleGuildMemberRemove } = await import(
+        "@/bot/features/member-log/handlers/guildMemberRemoveHandler"
+      );
       getMemberLogConfigMock.mockResolvedValue({
         enabled: true,
         channelId: "ch-1",
@@ -380,8 +411,9 @@ describe("bot/features/member-log/handlers/guildMemberRemoveHandler", () => {
     // joinedTimestamp が undefined（number | null 型に対して TypeScript 上 undefined は来ないが、
     // 実行時には起き得る）の場合に stayDays の `?? 0` フォールバックが動作することを確認する
     it("実行時に joinedTimestamp が undefined の場合でも stayDays の ?? 0 フォールバックで embed が送信されることを確認", async () => {
-      const { handleGuildMemberRemove } =
-        await import("@/bot/features/member-log/handlers/guildMemberRemoveHandler");
+      const { handleGuildMemberRemove } = await import(
+        "@/bot/features/member-log/handlers/guildMemberRemoveHandler"
+      );
       getMemberLogConfigMock.mockResolvedValue({
         enabled: true,
         channelId: "ch-1",
@@ -420,8 +452,9 @@ describe("bot/features/member-log/handlers/guildMemberRemoveHandler", () => {
   // エラー発生時に Bot がクラッシュしないことを検証
   describe("error handling", () => {
     it("channel.send が例外を投げた場合に logger.error が呼ばれることを確認", async () => {
-      const { handleGuildMemberRemove } =
-        await import("@/bot/features/member-log/handlers/guildMemberRemoveHandler");
+      const { handleGuildMemberRemove } = await import(
+        "@/bot/features/member-log/handlers/guildMemberRemoveHandler"
+      );
       getMemberLogConfigMock.mockResolvedValue({
         enabled: true,
         channelId: "ch-1",

@@ -2,7 +2,6 @@
 // VAC設定のサービス実装（Repositoryパターン準拠）
 
 import { getGuildConfigRepository } from "../../database/guildConfigRepositoryProvider";
-import { createServiceGetter } from "../../utils/serviceFactory";
 import {
   type IGuildConfigRepository,
   type IVacConfigRepository,
@@ -12,9 +11,10 @@ import {
 import { logPrefixed, tDefault } from "../../locale/localeManager";
 import { executeWithDatabaseError } from "../../utils/errorHandling";
 import { logger } from "../../utils/logger";
+import { createServiceGetter } from "../../utils/serviceFactory";
 import {
-  DEFAULT_VAC_CONFIG,
   createDefaultVacConfig,
+  DEFAULT_VAC_CONFIG,
   normalizeVacConfig,
 } from "./vacConfigDefaults";
 

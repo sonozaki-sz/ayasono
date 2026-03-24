@@ -1,6 +1,7 @@
 // tests/unit/bot/features/vc-recruit/commands/helpers/vcRecruitTargetResolver.test.ts
-import { resolveTargetCategory } from "@/bot/features/vc-recruit/commands/helpers/vcRecruitTargetResolver";
+
 import { ChannelType } from "discord.js";
+import { resolveTargetCategory } from "@/bot/features/vc-recruit/commands/helpers/vcRecruitTargetResolver";
 
 // ChannelType の数値をモック用に使用
 const GUILD_CATEGORY = ChannelType.GuildCategory;
@@ -81,7 +82,7 @@ describe("bot/features/vc-recruit/commands/helpers/vcRecruitTargetResolver", () 
     expect(result).toBeNull();
   });
 
-  it("categoryOption が \"TOP\"（大文字）のとき、null を返す（トップカテゴリー指定）", async () => {
+  it('categoryOption が "TOP"（大文字）のとき、null を返す（トップカテゴリー指定）', async () => {
     const guild = makeGuild({});
     const result = await resolveTargetCategory(
       guild as never,
@@ -91,7 +92,7 @@ describe("bot/features/vc-recruit/commands/helpers/vcRecruitTargetResolver", () 
     expect(result).toBeNull();
   });
 
-  it("categoryOption が \"top\"（小文字）のとき、null を返す（大文字小文字無視）", async () => {
+  it('categoryOption が "top"（小文字）のとき、null を返す（大文字小文字無視）', async () => {
     const guild = makeGuild({});
     const result = await resolveTargetCategory(
       guild as never,

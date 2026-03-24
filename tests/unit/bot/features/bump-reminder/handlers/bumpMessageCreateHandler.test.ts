@@ -57,7 +57,7 @@ describe("bot/features/bump-reminder/handlers/bumpMessageCreateHandler", () => {
     expect(handleBumpDetectedMock).not.toHaveBeenCalled();
   });
 
-  it("テストモードで \"test /bump\" プレフィックスを含むメッセージが Disboard バンプとして検出されることを検証", async () => {
+  it('テストモードで "test /bump" プレフィックスを含むメッセージが Disboard バンプとして検出されることを検証', async () => {
     const message = createMessage({
       author: { id: "user-1", bot: false },
       content: "test /bump",
@@ -74,7 +74,7 @@ describe("bot/features/bump-reminder/handlers/bumpMessageCreateHandler", () => {
     );
   });
 
-  it("テストモードで \"test /dissoku up\" プレフィックスを含むメッセージが Dissoku バンプとして検出されることを検証", async () => {
+  it('テストモードで "test /dissoku up" プレフィックスを含むメッセージが Dissoku バンプとして検出されることを検証', async () => {
     const message = createMessage({
       author: { id: "user-1", bot: false },
       content: "test /dissoku up",

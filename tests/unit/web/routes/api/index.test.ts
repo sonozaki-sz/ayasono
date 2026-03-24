@@ -11,11 +11,9 @@ describe("web/routes/api/index", () => {
     let registeredRootHandler: (() => Promise<unknown>) | undefined;
     const fastifyMock = {
       register: vi.fn().mockResolvedValue(undefined),
-      get: vi.fn(
-        (_path: string, handler: () => Promise<unknown> | unknown) => {
-          registeredRootHandler = async () => handler();
-        },
-      ),
+      get: vi.fn((_path: string, handler: () => Promise<unknown> | unknown) => {
+        registeredRootHandler = async () => handler();
+      }),
     };
 
     await apiRoutes(fastifyMock as never, {});

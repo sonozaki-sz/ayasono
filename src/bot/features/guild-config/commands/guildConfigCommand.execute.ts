@@ -2,19 +2,19 @@
 // guild-config コマンドのサブコマンドルーティング
 
 import {
-  PermissionFlagsBits,
   type ChatInputCommandInteraction,
+  PermissionFlagsBits,
 } from "discord.js";
 import { ValidationError } from "../../../../shared/errors/customErrors";
 import { tInteraction } from "../../../../shared/locale/localeManager";
 import { COMMON_I18N_KEYS } from "../../../shared/i18nKeys";
-import { handleSetLocale } from "./guildConfigCommand.setLocale";
-import { handleSetErrorChannel } from "./guildConfigCommand.setErrorChannel";
-import { handleView } from "./guildConfigCommand.view";
-import { handleReset } from "./guildConfigCommand.reset";
-import { handleResetAll } from "./guildConfigCommand.resetAll";
 import { handleExport } from "./guildConfigCommand.export";
 import { handleImport } from "./guildConfigCommand.import";
+import { handleReset } from "./guildConfigCommand.reset";
+import { handleResetAll } from "./guildConfigCommand.resetAll";
+import { handleSetErrorChannel } from "./guildConfigCommand.setErrorChannel";
+import { handleSetLocale } from "./guildConfigCommand.setLocale";
+import { handleView } from "./guildConfigCommand.view";
 
 const SUBCOMMAND = {
   SET_LOCALE: "set-locale",

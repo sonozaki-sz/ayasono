@@ -1,11 +1,28 @@
 // tests/unit/bot/features/bump-reminder/commands/bumpReminderConfigCommand.guard.test.ts
+
+import { PermissionFlagsBits } from "discord.js";
 import { ensureManageGuildPermission } from "@/bot/features/bump-reminder/commands/bumpReminderConfigCommand.guard";
 import { PermissionError } from "@/shared/errors/customErrors";
-import { PermissionFlagsBits } from "discord.js";
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tInteraction: (_locale: string, key: string) => key,
 }));
 
@@ -38,8 +55,8 @@ describe("bot/features/bump-reminder/commands/bumpReminderConfigCommand.guard", 
       },
     };
 
-    expect(() =>
-      ensureManageGuildPermission(interaction as never),
-    ).toThrow(PermissionError);
+    expect(() => ensureManageGuildPermission(interaction as never)).toThrow(
+      PermissionError,
+    );
   });
 });

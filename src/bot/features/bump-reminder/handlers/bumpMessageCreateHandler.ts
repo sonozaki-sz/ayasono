@@ -2,7 +2,7 @@
 // messageCreate における Bump 検知のユースケース処理
 
 import type { Message } from "discord.js";
-import { NODE_ENV, env } from "../../../../shared/config/env";
+import { env, NODE_ENV } from "../../../../shared/config/env";
 import type { BotClient } from "../../../client";
 import {
   BUMP_COMMANDS,

@@ -7,12 +7,12 @@ import {
   ButtonStyle,
   ChannelSelectMenuBuilder,
   ChannelType,
+  type ChatInputCommandInteraction,
   ComponentType,
   ModalBuilder,
   TextInputBuilder,
   TextInputStyle,
   UserSelectMenuBuilder,
-  type ChatInputCommandInteraction,
 } from "discord.js";
 import { tInteraction } from "../../../../../shared/locale/localeManager";
 import {
@@ -20,11 +20,11 @@ import {
   createWarningEmbed,
 } from "../../../../utils/messageResponse";
 import {
+  type ConditionSetupResult,
   MSG_DEL_CONDITION_STEP_TIMEOUT_MS,
   MSG_DEL_CUSTOM_ID,
   MSG_DEL_MODAL_TIMEOUT_MS,
   MSG_DEL_SELECT_MAX_OPTIONS,
-  type ConditionSetupResult,
 } from "../../constants/messageDeleteConstants";
 
 /**

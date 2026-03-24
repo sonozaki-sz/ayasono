@@ -4,6 +4,7 @@
 import {
   ActionRowBuilder,
   ButtonBuilder,
+  type ButtonInteraction,
   ButtonStyle,
   ChannelType,
   DiscordAPIError,
@@ -15,7 +16,6 @@ import {
   StringSelectMenuOptionBuilder,
   TextInputBuilder,
   TextInputStyle,
-  type ButtonInteraction,
   type VoiceChannel,
 } from "discord.js";
 import { tInteraction } from "../../../../../shared/locale/localeManager";
@@ -26,9 +26,9 @@ import {
 } from "../../../../services/botCompositionRoot";
 import { safeReply } from "../../../../utils/interaction";
 import {
-  STATUS_COLORS,
   createSuccessEmbed,
   createWarningEmbed,
+  STATUS_COLORS,
 } from "../../../../utils/messageResponse";
 import { buildTeardownSelectOptions } from "../../commands/usecases/vcRecruitConfigTeardown";
 import {
@@ -38,8 +38,8 @@ import {
   VC_RECRUIT_TIMEOUT,
 } from "../../commands/vcRecruitConfigCommand.constants";
 import {
-  NEW_VC_VALUE,
   getVcRecruitSession,
+  NEW_VC_VALUE,
   setVcRecruitSession,
 } from "./vcRecruitPanelState";
 import {

@@ -3,7 +3,7 @@
 
 import winston from "winston";
 import DailyRotateFile from "winston-daily-rotate-file";
-import { NODE_ENV, env } from "../config/env";
+import { env, NODE_ENV } from "../config/env";
 import { DiscordWebhookTransport } from "./discordWebhookTransport";
 
 // 実行環境を判定し、コンソール出力の粒度を切り替える

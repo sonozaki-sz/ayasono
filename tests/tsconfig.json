@@ -2,9 +2,8 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "rootDir": "..", // プロジェクトルートをrootDirとして設定
-    "baseUrl": "..",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["../src/*"]
     },
     "types": ["node", "vitest/globals"], // テスト環境用の型定義
     "noEmit": true, // テストコードはビルドしない

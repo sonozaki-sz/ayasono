@@ -1,15 +1,32 @@
 // tests/unit/bot/features/vac/commands/usecases/vacConfigView.test.ts
+
+import { MessageFlags } from "discord.js";
+import type { Mock } from "vitest";
 import { presentVacConfigView } from "@/bot/features/vac/commands/presenters/vacConfigViewPresenter";
 import { handleVacConfigView } from "@/bot/features/vac/commands/usecases/vacConfigView";
 import { getBotVacConfigService } from "@/bot/services/botCompositionRoot";
 import { createInfoEmbed } from "@/bot/utils/messageResponse";
 import { ValidationError } from "@/shared/errors/customErrors";
-import { MessageFlags } from "discord.js";
-import type { Mock } from "vitest";
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: vi.fn((key: string) => key),
   tInteraction: (...args: unknown[]) => args[1],
 }));
@@ -77,15 +94,11 @@ describe("bot/features/vac/commands/usecases/vacConfigView", () => {
     await handleVacConfigView(interaction as never, "guild-1");
 
     expect(getVacConfigOrDefault).toHaveBeenCalledWith("guild-1");
-    expect(presentVacConfigView).toHaveBeenCalledWith(
-      interaction.guild,
-      "ja",
-      {
-        enabled: true,
-        triggerChannelIds: ["trigger-1"],
-        createdChannels: [],
-      },
-    );
+    expect(presentVacConfigView).toHaveBeenCalledWith(interaction.guild, "ja", {
+      enabled: true,
+      triggerChannelIds: ["trigger-1"],
+      createdChannels: [],
+    });
 
     expect(createInfoEmbed).toHaveBeenCalledWith("", {
       title: "VAC設定",

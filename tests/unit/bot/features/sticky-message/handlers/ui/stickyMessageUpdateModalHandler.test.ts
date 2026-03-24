@@ -21,8 +21,24 @@ vi.mock(
   () => ({ buildStickyMessagePayload: buildPayloadMock }),
 );
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tGuild: tGuildMock,
   tDefault: vi.fn((key: string) => key),
   tInteraction: (...args: unknown[]) => args[1],
@@ -98,8 +114,9 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandle
   });
 
   it("UPDATE_MODAL_ID_PREFIX にマッチする customId を正しく識別する", async () => {
-    const { stickyMessageUpdateModalHandler } =
-      await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandler");
+    const { stickyMessageUpdateModalHandler } = await import(
+      "@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandler"
+    );
     expect(
       stickyMessageUpdateModalHandler.matches(
         "sticky-message:update-modal:ch-1",
@@ -113,8 +130,9 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandle
   });
 
   it("guild が null の場合に早期リターンする", async () => {
-    const { stickyMessageUpdateModalHandler } =
-      await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandler");
+    const { stickyMessageUpdateModalHandler } = await import(
+      "@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandler"
+    );
     const interaction = createInteractionMock({ guild: false });
 
     await stickyMessageUpdateModalHandler.execute(interaction as never);
@@ -123,8 +141,9 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandle
   });
 
   it("コンテンツが空の場合に警告を Ephemeral 返信する", async () => {
-    const { stickyMessageUpdateModalHandler } =
-      await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandler");
+    const { stickyMessageUpdateModalHandler } = await import(
+      "@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandler"
+    );
     const interaction = createInteractionMock({ contentValue: "  " });
 
     await stickyMessageUpdateModalHandler.execute(interaction as never);
@@ -136,8 +155,9 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandle
   });
 
   it("スティッキーメッセージが見つからない場合に情報を Ephemeral 返信する", async () => {
-    const { stickyMessageUpdateModalHandler } =
-      await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandler");
+    const { stickyMessageUpdateModalHandler } = await import(
+      "@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandler"
+    );
     findByChannelMock.mockResolvedValue(null);
     const interaction = createInteractionMock();
 
@@ -150,8 +170,9 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandle
   });
 
   it("DB更新→旧メッセージ削除→新メッセージ送信という正常系の連鎖フロー全体が正しく実行される", async () => {
-    const { stickyMessageUpdateModalHandler } =
-      await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandler");
+    const { stickyMessageUpdateModalHandler } = await import(
+      "@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandler"
+    );
     findByChannelMock.mockResolvedValue({
       id: "sticky-1",
       lastMessageId: "old-msg-id",
@@ -175,8 +196,9 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandle
   });
 
   it("旧メッセージの取得・削除に失敗しても例外を握りつぶして後続処理（返信）が完了する", async () => {
-    const { stickyMessageUpdateModalHandler } =
-      await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandler");
+    const { stickyMessageUpdateModalHandler } = await import(
+      "@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandler"
+    );
     findByChannelMock.mockResolvedValue({
       id: "sticky-1",
       lastMessageId: "old-msg-id",
@@ -190,8 +212,9 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandle
   });
 
   it("DB更新は成功したがDiscordへの再送信が失敗した場合に、エラーがログに記録される", async () => {
-    const { stickyMessageUpdateModalHandler } =
-      await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandler");
+    const { stickyMessageUpdateModalHandler } = await import(
+      "@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandler"
+    );
     findByChannelMock.mockResolvedValue({
       id: "sticky-1",
       lastMessageId: "old-msg-id",
@@ -210,8 +233,9 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandle
   });
 
   it("キャッシュにチャンネルがない場合は再送信をスキップする", async () => {
-    const { stickyMessageUpdateModalHandler } =
-      await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandler");
+    const { stickyMessageUpdateModalHandler } = await import(
+      "@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandler"
+    );
     findByChannelMock.mockResolvedValue({
       id: "sticky-1",
       lastMessageId: "old-msg-id",
@@ -224,8 +248,9 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandle
   });
 
   it("updateContent でDBエラーが発生した場合に例外が上位へ伝播し、かつエラーログが記録される", async () => {
-    const { stickyMessageUpdateModalHandler } =
-      await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandler");
+    const { stickyMessageUpdateModalHandler } = await import(
+      "@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateModalHandler"
+    );
     findByChannelMock.mockResolvedValue({
       id: "sticky-1",
       lastMessageId: null,

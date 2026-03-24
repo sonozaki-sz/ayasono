@@ -9,8 +9,8 @@ import type {
 } from "../../database/types";
 import { createServiceGetter } from "../../utils/serviceFactory";
 import {
-  DEFAULT_MEMBER_LOG_CONFIG,
   createDefaultMemberLogConfig,
+  DEFAULT_MEMBER_LOG_CONFIG,
 } from "./memberLogConfigDefaults";
 
 export type { MemberLogConfig };

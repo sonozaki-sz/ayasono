@@ -1,6 +1,7 @@
 // tests/unit/bot/events/guildMemberAdd.test.ts
-import { guildMemberAddEvent } from "@/bot/events/guildMemberAdd";
+
 import { Events } from "discord.js";
+import { guildMemberAddEvent } from "@/bot/events/guildMemberAdd";
 
 const handleGuildMemberAddMock = vi.fn();
 

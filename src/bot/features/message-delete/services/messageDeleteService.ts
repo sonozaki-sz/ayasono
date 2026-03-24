@@ -423,7 +423,7 @@ export async function deleteScannedMessages(
     const channelName = channelMessages[0].channelName;
     const rawChannel = channelMessages[0]._channel;
     // byChannel と channelStatusMap は同じキーセットで構築されるため必ず存在する
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    // biome-ignore lint/style/noNonNullAssertion: byChannel と channelStatusMap は同じキーセットで構築されるため必ず存在する
     const channelStatus = channelStatusMap.get(channelId)!;
 
     const newMsgs = channelMessages.filter(

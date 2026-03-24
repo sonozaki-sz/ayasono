@@ -1,15 +1,32 @@
 // tests/unit/bot/handlers/interactionCreate/flow/modal.test.ts
+
+import type { Mock } from "vitest";
 import { handleInteractionError } from "@/bot/errors/interactionErrorHandler";
 import { handleModalSubmit } from "@/bot/handlers/interactionCreate/flow/modal";
-import type { Mock } from "vitest";
 
 const loggerWarnMock = vi.fn();
 const loggerDebugMock = vi.fn();
 const loggerErrorMock = vi.fn();
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: vi.fn((key: string) => `default:${key}`),
   tInteraction: (...args: unknown[]) => args[1],
 }));
@@ -44,9 +61,9 @@ describe("bot/handlers/interactionCreate/flow/modal", () => {
 
   it("未登録の customId を持つモーダルが送信された場合は警告ログを出してハンドラーを呼び出さないことを確認", async () => {
     const interaction = { customId: "unknown", user: { tag: "user#0001" } };
-    const uiModule = await vi.importMock(
+    const uiModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/modals",
-    ) as {
+    )) as {
       modalHandlers: Array<{ execute: Mock }>;
     };
 
@@ -58,9 +75,9 @@ describe("bot/handlers/interactionCreate/flow/modal", () => {
 
   it("customId に一致するモーダルハンドラーが実行されることを確認", async () => {
     const interaction = { customId: "vac:rename", user: { tag: "user#0001" } };
-    const uiModule = await vi.importMock(
+    const uiModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/modals",
-    ) as {
+    )) as {
       modalHandlers: Array<{ execute: Mock }>;
     };
 
@@ -72,9 +89,9 @@ describe("bot/handlers/interactionCreate/flow/modal", () => {
 
   it("モーダルハンドラーが例外を投げた場合は handleInteractionError に委譲してエラーログを記録することを確認", async () => {
     const error = new Error("modal failed");
-    const uiModule = await vi.importMock(
+    const uiModule = (await vi.importMock(
       "@/bot/handlers/interactionCreate/ui/modals",
-    ) as {
+    )) as {
       modalHandlers: Array<{ execute: Mock }>;
     };
     uiModule.modalHandlers[0].execute.mockRejectedValueOnce(error);

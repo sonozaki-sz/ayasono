@@ -4,12 +4,13 @@
  * エラーハンドリング機能のテスト
  */
 
+import { type ChatInputCommandInteraction, MessageFlags } from "discord.js";
 import type { Mocked } from "vitest";
 import {
   handleCommandError,
   handleInteractionError,
 } from "@/bot/errors/interactionErrorHandler";
-import { NODE_ENV, env } from "@/shared/config/env";
+import { env, NODE_ENV } from "@/shared/config/env";
 import {
   BaseError,
   ConfigurationError,
@@ -22,7 +23,6 @@ import {
 } from "@/shared/errors/customErrors";
 import { getUserFriendlyMessage, logError } from "@/shared/errors/errorHandler";
 import { logger } from "@/shared/utils/logger";
-import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
 
 // Logger のモック
 vi.mock("@/shared/utils/logger", () => ({
@@ -356,10 +356,7 @@ describe("ErrorHandler", () => {
         editReply: vi.fn().mockResolvedValue(undefined),
       };
 
-      await handleInteractionError(
-        interaction,
-        new NotFoundError("not found"),
-      );
+      await handleInteractionError(interaction, new NotFoundError("not found"));
 
       const payload = interaction.reply.mock.calls[0][0];
       const embed = payload.embeds[0];
@@ -378,10 +375,7 @@ describe("ErrorHandler", () => {
         editReply: vi.fn().mockResolvedValue(undefined),
       };
 
-      await handleInteractionError(
-        interaction,
-        new TimeoutError("timed out"),
-      );
+      await handleInteractionError(interaction, new TimeoutError("timed out"));
 
       const payload = interaction.reply.mock.calls[0][0];
       const embed = payload.embeds[0];

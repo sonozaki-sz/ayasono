@@ -5,8 +5,8 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
-  EmbedBuilder,
   type Channel,
+  EmbedBuilder,
   type TextChannel,
 } from "discord.js";
 import { logPrefixed, tGuild } from "../../../../shared/locale/localeManager";

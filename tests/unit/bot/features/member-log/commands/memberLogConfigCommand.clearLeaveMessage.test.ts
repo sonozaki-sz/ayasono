@@ -32,8 +32,24 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
 }));
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tGuild: (guildId: string, key: string) => tGuildMock(guildId, key),
   tInteraction: vi.fn((_locale: string, key: string) => key),
   tDefault: (key: string, opts?: Record<string, unknown>) =>
@@ -92,7 +108,10 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.clearLeaveMess
     ensurePermissionMock.mockResolvedValue(undefined);
     const interaction = makeInteraction();
 
-    await handleMemberLogConfigClearLeaveMessage(interaction as never, "guild-1");
+    await handleMemberLogConfigClearLeaveMessage(
+      interaction as never,
+      "guild-1",
+    );
 
     expect(interaction.reply).toHaveBeenCalledWith(
       expect.objectContaining({ embeds: expect.any(Array) }),

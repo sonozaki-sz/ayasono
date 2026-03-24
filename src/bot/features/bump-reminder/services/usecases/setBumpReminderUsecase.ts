@@ -4,15 +4,15 @@
 import { logPrefixed } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import {
+  type BumpServiceName,
   toBumpReminderJobId,
   toBumpReminderKey,
   toScheduledAt,
-  type BumpServiceName,
 } from "../../constants/bumpReminderConstants";
 import { type IBumpReminderRepository } from "../../repositories/types";
 import {
-  scheduleReminderInMemory,
   type ScheduledReminderRef,
+  scheduleReminderInMemory,
 } from "../helpers/bumpReminderScheduleHelper";
 import { createTrackedReminderTask } from "../helpers/bumpReminderTrackedTask";
 

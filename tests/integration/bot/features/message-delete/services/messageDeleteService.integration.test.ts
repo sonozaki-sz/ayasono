@@ -25,8 +25,24 @@ vi.mock("@/shared/utils/logger", () => ({
 
 // i18n のモック
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: vi.fn((key: string) => key),
   tInteraction: (...args: unknown[]) => args[1],
 }));
@@ -46,7 +62,11 @@ function makeMessage(
   authorId: string,
   content: string,
   createdTimestamp: number,
-  opts: { webhookId?: string; attachments?: number; embeds?: { title?: string }[] } = {},
+  opts: {
+    webhookId?: string;
+    attachments?: number;
+    embeds?: { title?: string }[];
+  } = {},
 ) {
   return {
     id,
@@ -97,9 +117,13 @@ function makeChannel(
     },
   };
   if (opts.hasBulkDelete !== false) {
-    channel.bulkDelete = opts.bulkDeleteMock ?? (vi.fn().mockImplementation(
-      (ids: string[]) => makeCollection(ids.map((msgId) => ({ id: msgId }))),
-    ) as Mock);
+    channel.bulkDelete =
+      opts.bulkDeleteMock ??
+      (vi
+        .fn()
+        .mockImplementation((ids: string[]) =>
+          makeCollection(ids.map((msgId) => ({ id: msgId }))),
+        ) as Mock);
   }
   return channel;
 }
@@ -115,7 +139,8 @@ describe("MessageDeleteService Integration", () => {
     vi.spyOn(Date, "now").mockReturnValue(fixedNow);
     // サービス内の sleep() を即時解決にする（setTimeout を 0ms に差し替え）
     originalSetTimeout = globalThis.setTimeout;
-    globalThis.setTimeout = ((fn: () => void) => originalSetTimeout(fn, 0)) as never;
+    globalThis.setTimeout = ((fn: () => void) =>
+      originalSetTimeout(fn, 0)) as never;
   });
 
   afterEach(() => {
@@ -223,16 +248,13 @@ describe("MessageDeleteService Integration", () => {
 
       const chBad = makeChannel("ch-bad", { hasPermission: false });
 
-      const result = await scanMessages(
-        [chGood as never, chBad as never],
-        {
-          count: 10,
-          targetUserIds: [],
-          afterTs: 0,
-          beforeTs: Infinity,
-          locale: "ja",
-        },
-      );
+      const result = await scanMessages([chGood as never, chBad as never], {
+        count: 10,
+        targetUserIds: [],
+        afterTs: 0,
+        beforeTs: Infinity,
+        locale: "ja",
+      });
 
       expect(result).toHaveLength(1);
       expect(result[0].channelId).toBe("ch-good");
@@ -273,8 +295,8 @@ describe("MessageDeleteService Integration", () => {
       // beforeTs は Discord API の `before` Snowflake として渡される
       // モックでは before パラメータを受け取った時点で「それ以前」のメッセージのみ返す
       const ch = makeChannel("ch-1");
-      (ch.messages.fetch as Mock)
-        .mockImplementation(async (opts: { before?: string }) => {
+      (ch.messages.fetch as Mock).mockImplementation(
+        async (opts: { before?: string }) => {
           if (opts.before) {
             // before 指定あり → beforeTs より古いメッセージのみ返す
             return makeCollection([
@@ -283,7 +305,8 @@ describe("MessageDeleteService Integration", () => {
             ]);
           }
           return makeCollection([]);
-        });
+        },
+      );
 
       const result = await scanMessages([ch as never], {
         count: 10,
@@ -341,7 +364,12 @@ describe("MessageDeleteService Integration", () => {
         makeMessage(`a-${i}`, "u1", `msg-${i}`, now - (i + 1) * 1000),
       );
       const batch2 = [
-        makeMessage("a-extra", "u1", "extra", now - (MSG_DEL_FETCH_BATCH_SIZE + 1) * 1000),
+        makeMessage(
+          "a-extra",
+          "u1",
+          "extra",
+          now - (MSG_DEL_FETCH_BATCH_SIZE + 1) * 1000,
+        ),
       ];
 
       const ch = makeChannel("ch-A");
@@ -368,9 +396,11 @@ describe("MessageDeleteService Integration", () => {
       const { scanMessages, deleteScannedMessages } = await loadModule();
       const now = Date.now();
 
-      const bulkDeleteMock = vi.fn().mockImplementation(
-        (ids: string[]) => makeCollection(ids.map((id) => ({ id }))),
-      );
+      const bulkDeleteMock = vi
+        .fn()
+        .mockImplementation((ids: string[]) =>
+          makeCollection(ids.map((id) => ({ id }))),
+        );
       const ch = makeChannel("ch-1", { bulkDeleteMock });
 
       (ch.messages.fetch as Mock)
@@ -408,9 +438,11 @@ describe("MessageDeleteService Integration", () => {
       const { scanMessages, deleteScannedMessages } = await loadModule();
       const now = Date.now();
 
-      const bulkDeleteMock = vi.fn().mockImplementation(
-        (ids: string[]) => makeCollection(ids.map((id) => ({ id }))),
-      );
+      const bulkDeleteMock = vi
+        .fn()
+        .mockImplementation((ids: string[]) =>
+          makeCollection(ids.map((id) => ({ id }))),
+        );
       const ch = makeChannel("ch-1", { bulkDeleteMock });
 
       (ch.messages.fetch as Mock)
@@ -450,9 +482,11 @@ describe("MessageDeleteService Integration", () => {
       const oldTs = now - MSG_DEL_BULK_MAX_AGE_MS - 10_000; // 14日超
 
       const individualDeleteMock = vi.fn().mockResolvedValue(undefined);
-      const bulkDeleteMock = vi.fn().mockImplementation(
-        (ids: string[]) => makeCollection(ids.map((id) => ({ id }))),
-      );
+      const bulkDeleteMock = vi
+        .fn()
+        .mockImplementation((ids: string[]) =>
+          makeCollection(ids.map((id) => ({ id }))),
+        );
 
       const ch = makeChannel("ch-1", {
         bulkDeleteMock,
@@ -524,12 +558,16 @@ describe("MessageDeleteService Integration", () => {
       const { scanMessages, deleteScannedMessages } = await loadModule();
       const now = Date.now();
 
-      const bulkA = vi.fn().mockImplementation(
-        (ids: string[]) => makeCollection(ids.map((id) => ({ id }))),
-      );
-      const bulkB = vi.fn().mockImplementation(
-        (ids: string[]) => makeCollection(ids.map((id) => ({ id }))),
-      );
+      const bulkA = vi
+        .fn()
+        .mockImplementation((ids: string[]) =>
+          makeCollection(ids.map((id) => ({ id }))),
+        );
+      const bulkB = vi
+        .fn()
+        .mockImplementation((ids: string[]) =>
+          makeCollection(ids.map((id) => ({ id }))),
+        );
 
       const chA = makeChannel("ch-A", { bulkDeleteMock: bulkA });
       const chB = makeChannel("ch-B", { bulkDeleteMock: bulkB });
@@ -545,30 +583,31 @@ describe("MessageDeleteService Integration", () => {
 
       (chB.messages.fetch as Mock)
         .mockResolvedValueOnce(
-          makeCollection([
-            makeMessage("b1", "u2", "B1", now - 2000),
-          ]),
+          makeCollection([makeMessage("b1", "u2", "B1", now - 2000)]),
         )
         .mockResolvedValue(makeCollection([]));
 
-      const scanned = await scanMessages(
-        [chA as never, chB as never],
-        {
-          count: 10,
-          targetUserIds: [],
-          afterTs: 0,
-          beforeTs: Infinity,
-          locale: "ja",
-        },
-      );
+      const scanned = await scanMessages([chA as never, chB as never], {
+        count: 10,
+        targetUserIds: [],
+        afterTs: 0,
+        beforeTs: Infinity,
+        locale: "ja",
+      });
 
       expect(scanned).toHaveLength(3);
 
       const result = await deleteScannedMessages(scanned);
 
       expect(result.totalDeleted).toBe(3);
-      expect(result.channelBreakdown["ch-A"]).toEqual({ name: "ch-ch-A", count: 2 });
-      expect(result.channelBreakdown["ch-B"]).toEqual({ name: "ch-ch-B", count: 1 });
+      expect(result.channelBreakdown["ch-A"]).toEqual({
+        name: "ch-ch-A",
+        count: 2,
+      });
+      expect(result.channelBreakdown["ch-B"]).toEqual({
+        name: "ch-ch-B",
+        count: 1,
+      });
       // 各チャンネルの bulkDelete が呼ばれている
       expect(bulkA).toHaveBeenCalledWith(["a1", "a2"], true);
       expect(bulkB).toHaveBeenCalledWith(["b1"], true);
@@ -634,16 +673,13 @@ describe("MessageDeleteService Integration", () => {
         )
         .mockResolvedValue(makeCollection([]));
 
-      const scanned = await scanMessages(
-        [chA as never, chB as never],
-        {
-          count: 10,
-          targetUserIds: [],
-          afterTs: 0,
-          beforeTs: Infinity,
-          locale: "ja",
-        },
-      );
+      const scanned = await scanMessages([chA as never, chB as never], {
+        count: 10,
+        targetUserIds: [],
+        afterTs: 0,
+        beforeTs: Infinity,
+        locale: "ja",
+      });
 
       const result = await deleteScannedMessages(
         scanned,
@@ -653,7 +689,10 @@ describe("MessageDeleteService Integration", () => {
 
       // ch-A のメッセージは削除されたが、ch-B は abort で中断
       expect(result.totalDeleted).toBe(1);
-      expect(result.channelBreakdown["ch-A"]).toEqual({ name: "ch-ch-A", count: 1 });
+      expect(result.channelBreakdown["ch-A"]).toEqual({
+        name: "ch-ch-A",
+        count: 1,
+      });
     });
   });
 
@@ -665,9 +704,11 @@ describe("MessageDeleteService Integration", () => {
       const scanProgress = vi.fn().mockResolvedValue(undefined);
       const deleteProgress = vi.fn().mockResolvedValue(undefined);
 
-      const bulkDeleteMock = vi.fn().mockImplementation(
-        (ids: string[]) => makeCollection(ids.map((id) => ({ id }))),
-      );
+      const bulkDeleteMock = vi
+        .fn()
+        .mockImplementation((ids: string[]) =>
+          makeCollection(ids.map((id) => ({ id }))),
+        );
       const ch = makeChannel("ch-1", { bulkDeleteMock });
 
       (ch.messages.fetch as Mock)
@@ -710,7 +751,8 @@ describe("MessageDeleteService Integration", () => {
       const now = Date.now();
       const oldTs = now - MSG_DEL_BULK_MAX_AGE_MS - 10_000;
 
-      const deleteMock = vi.fn()
+      const deleteMock = vi
+        .fn()
         .mockResolvedValueOnce(undefined) // m1: 成功
         .mockRejectedValueOnce(new Error("Not found")) // m2: 失敗
         .mockResolvedValueOnce(undefined); // m3: 成功
@@ -762,7 +804,12 @@ describe("MessageDeleteService Integration", () => {
             // 範囲内: 2026-03-15T12:00:00Z（now）
             makeMessage("in-range", "u1", "in", now),
             // 範囲外: 2026-03-13T00:00:00Z
-            makeMessage("out-range", "u1", "out", new Date("2026-03-13T00:00:00Z").getTime()),
+            makeMessage(
+              "out-range",
+              "u1",
+              "out",
+              new Date("2026-03-13T00:00:00Z").getTime(),
+            ),
           ]),
         )
         .mockResolvedValue(makeCollection([]));

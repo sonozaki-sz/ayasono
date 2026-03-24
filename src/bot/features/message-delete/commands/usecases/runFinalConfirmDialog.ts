@@ -1,7 +1,7 @@
 // src/bot/features/message-delete/commands/usecases/runFinalConfirmDialog.ts
 // Stage 2: 最終確認ダイアログ処理
 
-import { MessageFlags, type MessageComponentInteraction } from "discord.js";
+import { type MessageComponentInteraction, MessageFlags } from "discord.js";
 import { tInteraction } from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import { createWarningEmbed } from "../../../../utils/messageResponse";
@@ -15,7 +15,7 @@ import {
   buildFinalConfirmComponents,
   buildFinalConfirmEmbed,
 } from "../messageDeleteEmbedBuilder";
-import { DIALOG_TYPE, showJumpModal, type FinalResult } from "./dialogUtils";
+import { DIALOG_TYPE, type FinalResult, showJumpModal } from "./dialogUtils";
 
 /**
  * Stage 2: 最終確認ダイアログを表示し、ユーザーの操作を待機する

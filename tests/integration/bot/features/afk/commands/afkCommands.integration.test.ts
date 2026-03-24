@@ -5,7 +5,11 @@
  * 設定→表示→利用のフロー、および各エラーパスを検証する
  */
 
-import { ChannelType, PermissionFlagsBits, PermissionsBitField } from "discord.js";
+import {
+  ChannelType,
+  PermissionFlagsBits,
+  PermissionsBitField,
+} from "discord.js";
 import type { Mock } from "vitest";
 import { ValidationError } from "@/shared/errors/customErrors";
 
@@ -21,11 +25,28 @@ vi.mock("@/shared/utils/logger", () => ({
 
 // i18n のモック
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: vi.fn((key: string) => key),
-  tInteraction: vi.fn((_locale: string, key: string, params?: Record<string, unknown>) =>
-    params ? `${key}:${JSON.stringify(params)}` : key,
+  tInteraction: vi.fn(
+    (_locale: string, key: string, params?: Record<string, unknown>) =>
+      params ? `${key}:${JSON.stringify(params)}` : key,
   ),
 }));
 
@@ -36,12 +57,14 @@ vi.mock("@/bot/utils/messageResponse", () => ({
     description: desc,
     title: opts?.title,
   })),
-  createInfoEmbed: vi.fn((desc: string, opts?: { title?: string; fields?: unknown[] }) => ({
-    type: "info",
-    description: desc,
-    title: opts?.title,
-    fields: opts?.fields,
-  })),
+  createInfoEmbed: vi.fn(
+    (desc: string, opts?: { title?: string; fields?: unknown[] }) => ({
+      type: "info",
+      description: desc,
+      title: opts?.title,
+      fields: opts?.fields,
+    }),
+  ),
   createWarningEmbed: vi.fn((desc: string, opts?: { title?: string }) => ({
     type: "warning",
     description: desc,
@@ -80,7 +103,9 @@ function createInteraction(overrides?: Record<string, unknown>) {
         members: { fetch: fetchMemberMock },
         channels: { fetch: fetchChannelMock },
       },
-      memberPermissions: new PermissionsBitField([PermissionFlagsBits.ManageGuild]),
+      memberPermissions: new PermissionsBitField([
+        PermissionFlagsBits.ManageGuild,
+      ]),
       options: {
         getSubcommand: vi.fn(() => "set-channel"),
         getChannel: vi.fn(),
@@ -116,8 +141,11 @@ describe("AFK Commands Integration", () => {
       const handler = await loadConfigHandler();
 
       // Phase 1: set-channel
-      const { interaction: setInteraction, replyMock: setReply } = createInteraction();
-      (setInteraction.options.getSubcommand as Mock).mockReturnValue("set-channel");
+      const { interaction: setInteraction, replyMock: setReply } =
+        createInteraction();
+      (setInteraction.options.getSubcommand as Mock).mockReturnValue(
+        "set-channel",
+      );
       (setInteraction.options.getChannel as Mock).mockReturnValue({
         id: "vc-afk-1",
         type: ChannelType.GuildVoice,
@@ -132,7 +160,8 @@ describe("AFK Commands Integration", () => {
       expect(setEmbed.type).toBe("success");
 
       // Phase 2: view
-      const { interaction: viewInteraction, replyMock: viewReply } = createInteraction();
+      const { interaction: viewInteraction, replyMock: viewReply } =
+        createInteraction();
       (viewInteraction.options.getSubcommand as Mock).mockReturnValue("view");
       mockGetAfkConfig.mockResolvedValue({
         enabled: true,
@@ -165,13 +194,17 @@ describe("AFK Commands Integration", () => {
       const handler = await loadConfigHandler();
 
       const { interaction } = createInteraction();
-      (interaction.options.getSubcommand as Mock).mockReturnValue("set-channel");
+      (interaction.options.getSubcommand as Mock).mockReturnValue(
+        "set-channel",
+      );
       (interaction.options.getChannel as Mock).mockReturnValue({
         id: "text-ch-1",
         type: ChannelType.GuildText,
       });
 
-      await expect(handler(interaction as never)).rejects.toThrow(ValidationError);
+      await expect(handler(interaction as never)).rejects.toThrow(
+        ValidationError,
+      );
       expect(mockSetAfkChannel).not.toHaveBeenCalled();
     });
 
@@ -181,9 +214,13 @@ describe("AFK Commands Integration", () => {
       const { interaction } = createInteraction({
         memberPermissions: new PermissionsBitField([]),
       });
-      (interaction.options.getSubcommand as Mock).mockReturnValue("set-channel");
+      (interaction.options.getSubcommand as Mock).mockReturnValue(
+        "set-channel",
+      );
 
-      await expect(handler(interaction as never)).rejects.toThrow(ValidationError);
+      await expect(handler(interaction as never)).rejects.toThrow(
+        ValidationError,
+      );
     });
   });
 
@@ -193,9 +230,8 @@ describe("AFK Commands Integration", () => {
 
   describe("afk: ユーザー移動コマンド", () => {
     async function loadAfkHandler() {
-      return (
-        await import("@/bot/features/afk/commands/afkCommand.execute")
-      ).executeAfkCommand;
+      return (await import("@/bot/features/afk/commands/afkCommand.execute"))
+        .executeAfkCommand;
     }
 
     it("設定済みの場合にユーザーをAFKチャンネルに移動できること", async () => {
@@ -242,10 +278,13 @@ describe("AFK Commands Integration", () => {
       });
 
       const setChannelMock = vi.fn().mockResolvedValue(undefined);
-      const { interaction, fetchMemberMock, fetchChannelMock } = createInteraction();
+      const { interaction, fetchMemberMock, fetchChannelMock } =
+        createInteraction();
 
       // 他のユーザーを指定
-      (interaction.options.getUser as Mock).mockReturnValue({ id: "target-user" });
+      (interaction.options.getUser as Mock).mockReturnValue({
+        id: "target-user",
+      });
 
       fetchMemberMock.mockResolvedValue({
         voice: {
@@ -273,7 +312,9 @@ describe("AFK Commands Integration", () => {
 
       const { interaction } = createInteraction();
 
-      await expect(handler(interaction as never)).rejects.toThrow(ValidationError);
+      await expect(handler(interaction as never)).rejects.toThrow(
+        ValidationError,
+      );
     });
 
     it("AFK機能が無効の場合は ValidationError になること", async () => {
@@ -283,7 +324,9 @@ describe("AFK Commands Integration", () => {
 
       const { interaction } = createInteraction();
 
-      await expect(handler(interaction as never)).rejects.toThrow(ValidationError);
+      await expect(handler(interaction as never)).rejects.toThrow(
+        ValidationError,
+      );
     });
 
     it("対象ユーザーがVCに未参加の場合は ValidationError になること", async () => {
@@ -299,7 +342,9 @@ describe("AFK Commands Integration", () => {
         voice: { channel: null },
       });
 
-      await expect(handler(interaction as never)).rejects.toThrow(ValidationError);
+      await expect(handler(interaction as never)).rejects.toThrow(
+        ValidationError,
+      );
     });
 
     it("AFKチャンネルが存在しない場合は ValidationError になること", async () => {
@@ -310,13 +355,16 @@ describe("AFK Commands Integration", () => {
         channelId: "deleted-vc",
       });
 
-      const { interaction, fetchMemberMock, fetchChannelMock } = createInteraction();
+      const { interaction, fetchMemberMock, fetchChannelMock } =
+        createInteraction();
       fetchMemberMock.mockResolvedValue({
         voice: { channel: { id: "current-vc" } },
       });
       fetchChannelMock.mockResolvedValue(null);
 
-      await expect(handler(interaction as never)).rejects.toThrow(ValidationError);
+      await expect(handler(interaction as never)).rejects.toThrow(
+        ValidationError,
+      );
     });
 
     it("AFKチャンネルがVCでない場合は ValidationError になること", async () => {
@@ -327,7 +375,8 @@ describe("AFK Commands Integration", () => {
         channelId: "text-ch",
       });
 
-      const { interaction, fetchMemberMock, fetchChannelMock } = createInteraction();
+      const { interaction, fetchMemberMock, fetchChannelMock } =
+        createInteraction();
       fetchMemberMock.mockResolvedValue({
         voice: { channel: { id: "current-vc" } },
       });
@@ -336,7 +385,9 @@ describe("AFK Commands Integration", () => {
         type: ChannelType.GuildText,
       });
 
-      await expect(handler(interaction as never)).rejects.toThrow(ValidationError);
+      await expect(handler(interaction as never)).rejects.toThrow(
+        ValidationError,
+      );
     });
   });
 
@@ -355,7 +406,9 @@ describe("AFK Commands Integration", () => {
 
       // Phase 1: 管理者が set-channel で AFK チャンネルを設定
       const { interaction: configInteraction } = createInteraction();
-      (configInteraction.options.getSubcommand as Mock).mockReturnValue("set-channel");
+      (configInteraction.options.getSubcommand as Mock).mockReturnValue(
+        "set-channel",
+      );
       (configInteraction.options.getChannel as Mock).mockReturnValue({
         id: "vc-afk-1",
         type: ChannelType.GuildVoice,
@@ -372,8 +425,12 @@ describe("AFK Commands Integration", () => {
       });
 
       const setChannelMock = vi.fn().mockResolvedValue(undefined);
-      const { interaction: afkInteraction, replyMock, fetchMemberMock, fetchChannelMock } =
-        createInteraction();
+      const {
+        interaction: afkInteraction,
+        replyMock,
+        fetchMemberMock,
+        fetchChannelMock,
+      } = createInteraction();
 
       fetchMemberMock.mockResolvedValue({
         voice: {

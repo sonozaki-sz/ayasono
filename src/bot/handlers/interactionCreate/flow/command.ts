@@ -2,9 +2,9 @@
 // スラッシュコマンド / オートコンプリート処理
 
 import {
-  MessageFlags,
   type AutocompleteInteraction,
   type ChatInputCommandInteraction,
+  MessageFlags,
 } from "discord.js";
 import {
   logPrefixed,

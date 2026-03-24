@@ -1,7 +1,7 @@
 // src/bot/features/member-log/commands/memberLogConfigCommand.view.ts
 // member-log-config view 実行処理
 
-import { MessageFlags, type ChatInputCommandInteraction } from "discord.js";
+import { type ChatInputCommandInteraction, MessageFlags } from "discord.js";
 import { tInteraction } from "../../../../shared/locale/localeManager";
 import { getBotMemberLogConfigService } from "../../../services/botCompositionRoot";
 import { createInfoEmbed } from "../../../utils/messageResponse";

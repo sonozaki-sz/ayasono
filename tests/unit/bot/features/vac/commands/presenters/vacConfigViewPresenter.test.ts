@@ -1,11 +1,28 @@
 // tests/unit/bot/features/vac/commands/presenters/vacConfigViewPresenter.test.ts
+
+import { ChannelType } from "discord.js";
 import { presentVacConfigView } from "@/bot/features/vac/commands/presenters/vacConfigViewPresenter";
 import type { VacConfig } from "@/shared/database/types";
-import { ChannelType } from "discord.js";
 
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tInteraction: vi.fn((_locale: string, key: string) => {
     const labels: Record<string, string> = {
       "vac:embed.field.value.top": "TOP",
@@ -49,11 +66,7 @@ describe("bot/features/vac/commands/presenters/vacConfigViewPresenter", () => {
       ],
     };
 
-    const result = await presentVacConfigView(
-      guild as never,
-      "ja",
-      config,
-    );
+    const result = await presentVacConfigView(guild as never, "ja", config);
 
     expect(result.title).toBe("VAC設定");
     expect(result.fieldTrigger).toBe("トリガー");
@@ -76,11 +89,7 @@ describe("bot/features/vac/commands/presenters/vacConfigViewPresenter", () => {
       createdChannels: [],
     };
 
-    const result = await presentVacConfigView(
-      guild as never,
-      "ja",
-      config,
-    );
+    const result = await presentVacConfigView(guild as never, "ja", config);
 
     expect(result.triggerChannels).toBe("未設定");
     expect(result.createdVcDetails).toBe("作成済みVCなし");

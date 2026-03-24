@@ -5,12 +5,12 @@
  * デバウンスタイマー、旧メッセージ削除→新メッセージ送信→DB更新のフルフローを検証する
  */
 
+import type { Mocked } from "vitest";
 import { StickyMessageResendService } from "@/bot/features/sticky-message/services/stickyMessageResendService";
 import type {
   IStickyMessageRepository,
   StickyMessage,
 } from "@/shared/database/types";
-import type { Mocked } from "vitest";
 
 // Logger のモック
 vi.mock("@/shared/utils/logger", () => ({
@@ -24,8 +24,24 @@ vi.mock("@/shared/utils/logger", () => ({
 
 // i18n のモック
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tDefault: vi.fn((key: string) => key),
   tInteraction: (...args: unknown[]) => args[1],
 }));
@@ -42,7 +58,9 @@ function createRepositoryMock(): Mocked<IStickyMessageRepository> {
   } as unknown as Mocked<IStickyMessageRepository>;
 }
 
-function createStickyMessage(overrides?: Partial<StickyMessage>): StickyMessage {
+function createStickyMessage(
+  overrides?: Partial<StickyMessage>,
+): StickyMessage {
   return {
     id: "sticky-1",
     guildId: "guild-1",
@@ -109,7 +127,9 @@ describe("StickyMessageResendService Integration", () => {
       // 5秒後に再送信される
       await vi.advanceTimersByTimeAsync(1000);
       expect(sendMock).toHaveBeenCalledTimes(1);
-      expect(sendMock).toHaveBeenCalledWith({ content: "This is a sticky message" });
+      expect(sendMock).toHaveBeenCalledWith({
+        content: "This is a sticky message",
+      });
       expect(repository.updateLastMessageId).toHaveBeenCalledWith(
         "sticky-1",
         "new-msg-1",
@@ -197,8 +217,14 @@ describe("StickyMessageResendService Integration", () => {
       const repository = createRepositoryMock();
       const service = new StickyMessageResendService(repository);
 
-      const stickyA = createStickyMessage({ id: "sticky-A", channelId: "ch-A" });
-      const stickyB = createStickyMessage({ id: "sticky-B", channelId: "ch-B" });
+      const stickyA = createStickyMessage({
+        id: "sticky-A",
+        channelId: "ch-A",
+      });
+      const stickyB = createStickyMessage({
+        id: "sticky-B",
+        channelId: "ch-B",
+      });
       repository.findByChannel
         .mockResolvedValueOnce(stickyA)
         .mockResolvedValueOnce(stickyB);

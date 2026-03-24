@@ -13,8 +13,8 @@ import { type IBumpReminderRepository } from "../../repositories/types";
 import { type BumpReminderTaskFactory } from "../bumpReminderService";
 import { createBumpReminderRestorePlan } from "../helpers/bumpReminderRestorePlanner";
 import {
-  scheduleReminderInMemory,
   type ScheduledReminderRef,
+  scheduleReminderInMemory,
 } from "../helpers/bumpReminderScheduleHelper";
 import { createTrackedReminderTask } from "../helpers/bumpReminderTrackedTask";
 

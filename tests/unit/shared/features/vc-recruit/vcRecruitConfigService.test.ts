@@ -348,7 +348,7 @@ describe("shared/features/vc-recruit/vcRecruitConfigService", () => {
   // addMentionRoleId / removeMentionRoleId（3分岐 / 2分岐）
   // ──────────────────────────────────────────────────────────
 
-  it("addMentionRoleId: 新規ロールを追加すると \"added\" を返すこと", async () => {
+  it('addMentionRoleId: 新規ロールを追加すると "added" を返すこと', async () => {
     const repository = createRepositoryMock();
     repository.getVcRecruitConfig.mockResolvedValue(makeConfig());
     repository.updateVcRecruitConfig.mockResolvedValue(undefined);
@@ -359,7 +359,7 @@ describe("shared/features/vc-recruit/vcRecruitConfigService", () => {
     );
   });
 
-  it("addMentionRoleId: 重複するロールを追加すると \"already_exists\" を返すこと", async () => {
+  it('addMentionRoleId: 重複するロールを追加すると "already_exists" を返すこと', async () => {
     const repository = createRepositoryMock();
     repository.getVcRecruitConfig.mockResolvedValue(
       makeConfig({ mentionRoleIds: ["role-1"] }),
@@ -371,7 +371,7 @@ describe("shared/features/vc-recruit/vcRecruitConfigService", () => {
     );
   });
 
-  it("addMentionRoleId: 25 件登録済みの状態で追加すると \"limit_exceeded\" を返すこと", async () => {
+  it('addMentionRoleId: 25 件登録済みの状態で追加すると "limit_exceeded" を返すこと', async () => {
     const roles = Array.from({ length: 25 }, (_, i) => `role-${i}`);
     const repository = createRepositoryMock();
     repository.getVcRecruitConfig.mockResolvedValue(
@@ -384,7 +384,7 @@ describe("shared/features/vc-recruit/vcRecruitConfigService", () => {
     );
   });
 
-  it("removeMentionRoleId: 登録済みロールを削除すると \"removed\" を返すこと", async () => {
+  it('removeMentionRoleId: 登録済みロールを削除すると "removed" を返すこと', async () => {
     const repository = createRepositoryMock();
     repository.getVcRecruitConfig.mockResolvedValue(
       makeConfig({ mentionRoleIds: ["role-1"] }),
@@ -397,7 +397,7 @@ describe("shared/features/vc-recruit/vcRecruitConfigService", () => {
     );
   });
 
-  it("removeMentionRoleId: 未登録ロールを削除すると \"not_found\" を返すこと", async () => {
+  it('removeMentionRoleId: 未登録ロールを削除すると "not_found" を返すこと', async () => {
     const repository = createRepositoryMock();
     repository.getVcRecruitConfig.mockResolvedValue(makeConfig());
     const service = new VcRecruitConfigService(repository);
@@ -418,9 +418,8 @@ describe("shared/features/vc-recruit/vcRecruitConfigService", () => {
     const repository = createRepositoryMock();
     const service = createVcRecruitConfigService(repository);
     expect(service).toBeInstanceOf(
-      (
-        await import("@/shared/features/vc-recruit/vcRecruitConfigService")
-      ).VcRecruitConfigService,
+      (await import("@/shared/features/vc-recruit/vcRecruitConfigService"))
+        .VcRecruitConfigService,
     );
   });
 });

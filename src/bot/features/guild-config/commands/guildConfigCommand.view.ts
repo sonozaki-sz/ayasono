@@ -3,19 +3,19 @@
 
 import {
   ActionRowBuilder,
-  MessageFlags,
-  StringSelectMenuBuilder,
   type ChatInputCommandInteraction,
   type EmbedBuilder,
   type MessageActionRowComponentBuilder,
+  MessageFlags,
+  StringSelectMenuBuilder,
 } from "discord.js";
 import type { AllParseKeys } from "../../../../shared/locale/i18n";
 import { tInteraction } from "../../../../shared/locale/localeManager";
-import { buildPaginationRow } from "../../../shared/pagination";
 import { disableComponentsAfterTimeout } from "../../../shared/disableComponentsAfterTimeout";
+import { buildPaginationRow } from "../../../shared/pagination";
 import {
-  GUILD_CONFIG_PREFIX,
   GUILD_CONFIG_CUSTOM_ID,
+  GUILD_CONFIG_PREFIX,
   VIEW_PAGES,
   VIEW_TIMEOUT_MS,
 } from "../constants/guildConfig.constants";

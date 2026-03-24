@@ -13,8 +13,24 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
   })),
 }));
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tGuild: tGuildMock,
   tDefault: tDefaultMock,
   tInteraction: (_locale: string, _key: string) => "mock text",
@@ -58,8 +74,9 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageSet", () =>
   });
 
   it("チャンネルが GuildText でない場合に警告を Ephemeral 返信する", async () => {
-    const { handleStickyMessageSet } =
-      await import("@/bot/features/sticky-message/commands/usecases/stickyMessageSet");
+    const { handleStickyMessageSet } = await import(
+      "@/bot/features/sticky-message/commands/usecases/stickyMessageSet"
+    );
     const interaction = createInteractionMock({
       channelType: ChannelType.GuildVoice,
     });
@@ -73,8 +90,9 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageSet", () =>
   });
 
   it("テキスト以外のチャンネルオプションを指定した場合に警告を Ephemeral 返信する", async () => {
-    const { handleStickyMessageSet } =
-      await import("@/bot/features/sticky-message/commands/usecases/stickyMessageSet");
+    const { handleStickyMessageSet } = await import(
+      "@/bot/features/sticky-message/commands/usecases/stickyMessageSet"
+    );
     const interaction = createInteractionMock({
       channelFromOption: { id: "voice-ch", type: ChannelType.GuildVoice },
     });
@@ -87,8 +105,9 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageSet", () =>
   });
 
   it("スティッキーメッセージがすでに存在する場合に警告を Ephemeral 返信する", async () => {
-    const { handleStickyMessageSet } =
-      await import("@/bot/features/sticky-message/commands/usecases/stickyMessageSet");
+    const { handleStickyMessageSet } = await import(
+      "@/bot/features/sticky-message/commands/usecases/stickyMessageSet"
+    );
     findByChannelMock.mockResolvedValue({ id: "existing" });
     const interaction = createInteractionMock();
 
@@ -101,8 +120,9 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageSet", () =>
   });
 
   it("embed が false の場合にプレーンテキストモーダルを表示する", async () => {
-    const { handleStickyMessageSet } =
-      await import("@/bot/features/sticky-message/commands/usecases/stickyMessageSet");
+    const { handleStickyMessageSet } = await import(
+      "@/bot/features/sticky-message/commands/usecases/stickyMessageSet"
+    );
     findByChannelMock.mockResolvedValue(null);
     const interaction = createInteractionMock({ useEmbed: false });
 
@@ -115,8 +135,9 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageSet", () =>
   });
 
   it("embed が true の場合に embed モーダルを表示する", async () => {
-    const { handleStickyMessageSet } =
-      await import("@/bot/features/sticky-message/commands/usecases/stickyMessageSet");
+    const { handleStickyMessageSet } = await import(
+      "@/bot/features/sticky-message/commands/usecases/stickyMessageSet"
+    );
     findByChannelMock.mockResolvedValue(null);
     const interaction = createInteractionMock({ useEmbed: true });
 
@@ -128,8 +149,9 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageSet", () =>
   });
 
   it("channelOption が指定された場合にそのチャンネルを使用する", async () => {
-    const { handleStickyMessageSet } =
-      await import("@/bot/features/sticky-message/commands/usecases/stickyMessageSet");
+    const { handleStickyMessageSet } = await import(
+      "@/bot/features/sticky-message/commands/usecases/stickyMessageSet"
+    );
     findByChannelMock.mockResolvedValue(null);
     const interaction = createInteractionMock({
       channelFromOption: { id: "specific-ch", type: ChannelType.GuildText },
@@ -141,8 +163,9 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageSet", () =>
   });
 
   it("利用可能なチャンネルがない場合（channel が null）に警告を Ephemeral 返信する", async () => {
-    const { handleStickyMessageSet } =
-      await import("@/bot/features/sticky-message/commands/usecases/stickyMessageSet");
+    const { handleStickyMessageSet } = await import(
+      "@/bot/features/sticky-message/commands/usecases/stickyMessageSet"
+    );
     const interaction = {
       reply: vi.fn().mockResolvedValue(undefined),
       showModal: showModalMock,
@@ -161,8 +184,9 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageSet", () =>
   });
 
   it("getString が null を返す場合（style 未指定）はデフォルトで text スタイルのプレーンテキストモーダルを表示する", async () => {
-    const { handleStickyMessageSet } =
-      await import("@/bot/features/sticky-message/commands/usecases/stickyMessageSet");
+    const { handleStickyMessageSet } = await import(
+      "@/bot/features/sticky-message/commands/usecases/stickyMessageSet"
+    );
     findByChannelMock.mockResolvedValue(null);
     // getBoolean returns null triggers the ?? false branch
     const interaction = {

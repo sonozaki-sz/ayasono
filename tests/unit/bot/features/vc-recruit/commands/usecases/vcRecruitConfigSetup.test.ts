@@ -1,7 +1,8 @@
 // tests/unit/bot/features/vc-recruit/commands/usecases/vcRecruitConfigSetup.test.ts
+
+import { ChannelType } from "discord.js";
 import { handleVcRecruitConfigSetup } from "@/bot/features/vc-recruit/commands/usecases/vcRecruitConfigSetup";
 import { ValidationError } from "@/shared/errors/customErrors";
-import { ChannelType } from "discord.js";
 
 // ---- モック定義 ----
 
@@ -26,8 +27,24 @@ vi.mock(
   }),
 );
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tInteraction: (...args: unknown[]) =>
     tInteractionMock(...(args as Parameters<typeof tInteractionMock>)),
   tDefault: (...args: unknown[]) =>

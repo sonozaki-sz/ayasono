@@ -2,8 +2,8 @@
 // VAC設定リポジトリ（guild_vac_configs テーブル）
 
 import type { PrismaClient } from "@prisma/client";
-import type { IVacConfigRepository, VacChannelPair, VacConfig } from "../types";
 import { parseJsonArray } from "../../utils/jsonUtils";
+import type { IVacConfigRepository, VacChannelPair, VacConfig } from "../types";
 
 /**
  * guild_vac_configs テーブルを使用した VAC設定リポジトリ

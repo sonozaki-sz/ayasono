@@ -2,7 +2,6 @@
 // Bumpリマインダー設定サービス実装（Repositoryパターン準拠）
 
 import { getGuildConfigRepository } from "../../database/guildConfigRepositoryProvider";
-import { createServiceGetter } from "../../utils/serviceFactory";
 import {
   BUMP_REMINDER_MENTION_CLEAR_RESULT,
   BUMP_REMINDER_MENTION_ROLE_RESULT,
@@ -18,20 +17,12 @@ import {
   type IBumpReminderConfigRepository,
   type IGuildConfigRepository,
 } from "../../database/types";
+import { createServiceGetter } from "../../utils/serviceFactory";
 import {
-  DEFAULT_BUMP_REMINDER_CONFIG,
   createDefaultBumpReminderConfig,
+  DEFAULT_BUMP_REMINDER_CONFIG,
   normalizeBumpReminderConfig,
 } from "./bumpReminderConfigDefaults";
-
-export {
-  BUMP_REMINDER_MENTION_CLEAR_RESULT,
-  BUMP_REMINDER_MENTION_ROLE_RESULT,
-  BUMP_REMINDER_MENTION_USER_ADD_RESULT,
-  BUMP_REMINDER_MENTION_USER_REMOVE_RESULT,
-  BUMP_REMINDER_MENTION_USERS_CLEAR_RESULT,
-  DEFAULT_BUMP_REMINDER_CONFIG,
-};
 
 export type {
   BumpReminderConfig,
@@ -40,6 +31,14 @@ export type {
   BumpReminderMentionUserAddResult,
   BumpReminderMentionUserRemoveResult,
   BumpReminderMentionUsersClearResult,
+};
+export {
+  BUMP_REMINDER_MENTION_CLEAR_RESULT,
+  BUMP_REMINDER_MENTION_ROLE_RESULT,
+  BUMP_REMINDER_MENTION_USER_ADD_RESULT,
+  BUMP_REMINDER_MENTION_USER_REMOVE_RESULT,
+  BUMP_REMINDER_MENTION_USERS_CLEAR_RESULT,
+  DEFAULT_BUMP_REMINDER_CONFIG,
 };
 
 /**

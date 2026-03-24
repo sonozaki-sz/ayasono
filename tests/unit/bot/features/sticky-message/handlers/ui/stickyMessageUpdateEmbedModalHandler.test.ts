@@ -27,8 +27,24 @@ vi.mock(
   }),
 );
 vi.mock("@/shared/locale/localeManager", () => ({
-  logPrefixed: (prefixKey: string, messageKey: string, params?: Record<string, unknown>, sub?: string) => { const p = `${prefixKey}`; const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`; },
-  logCommand: (commandName: string, messageKey: string, params?: Record<string, unknown>) => { const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey; return `[${commandName}] ${m}`; },
+  logPrefixed: (
+    prefixKey: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+    sub?: string,
+  ) => {
+    const p = `${prefixKey}`;
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return sub ? `[${p}:${sub}] ${m}` : `[${p}] ${m}`;
+  },
+  logCommand: (
+    commandName: string,
+    messageKey: string,
+    params?: Record<string, unknown>,
+  ) => {
+    const m = params ? `${messageKey}:${JSON.stringify(params)}` : messageKey;
+    return `[${commandName}] ${m}`;
+  },
   tGuild: tGuildMock,
   tDefault: vi.fn((key: string) => key),
   tInteraction: (...args: unknown[]) => args[1],
@@ -115,8 +131,9 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalH
   });
 
   it("UPDATE_EMBED_MODAL_ID_PREFIX にマッチする customId を正しく識別する", async () => {
-    const { stickyMessageUpdateEmbedModalHandler } =
-      await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler");
+    const { stickyMessageUpdateEmbedModalHandler } = await import(
+      "@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler"
+    );
     expect(
       stickyMessageUpdateEmbedModalHandler.matches(
         "sticky-message:update-embed-modal:ch-1",
@@ -130,8 +147,9 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalH
   });
 
   it("guild が null の場合に早期リターンする", async () => {
-    const { stickyMessageUpdateEmbedModalHandler } =
-      await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler");
+    const { stickyMessageUpdateEmbedModalHandler } = await import(
+      "@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler"
+    );
     const interaction = createInteractionMock({ guild: false });
 
     await stickyMessageUpdateEmbedModalHandler.execute(interaction as never);
@@ -140,8 +158,9 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalH
   });
 
   it("タイトルと説明が両方空の場合は DB 更新を行わず警告を Ephemeral 返信する", async () => {
-    const { stickyMessageUpdateEmbedModalHandler } =
-      await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler");
+    const { stickyMessageUpdateEmbedModalHandler } = await import(
+      "@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler"
+    );
     const interaction = createInteractionMock({
       embedTitle: "",
       embedDescription: "",
@@ -156,8 +175,9 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalH
   });
 
   it("スティッキーメッセージが見つからない場合に情報を Ephemeral 返信する", async () => {
-    const { stickyMessageUpdateEmbedModalHandler } =
-      await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler");
+    const { stickyMessageUpdateEmbedModalHandler } = await import(
+      "@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler"
+    );
     findByChannelMock.mockResolvedValue(null);
     const interaction = createInteractionMock();
 
@@ -170,8 +190,9 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalH
   });
 
   it("コンテンツ更新・旧メッセージ削除・新規送信・lastMessageId 更新が一連の順序で実行される", async () => {
-    const { stickyMessageUpdateEmbedModalHandler } =
-      await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler");
+    const { stickyMessageUpdateEmbedModalHandler } = await import(
+      "@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler"
+    );
     findByChannelMock.mockResolvedValue({
       id: "sticky-1",
       lastMessageId: "old-msg-id",
@@ -199,8 +220,9 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalH
   });
 
   it("説明が空の場合はタイトルのみで更新処理を続行する", async () => {
-    const { stickyMessageUpdateEmbedModalHandler } =
-      await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler");
+    const { stickyMessageUpdateEmbedModalHandler } = await import(
+      "@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler"
+    );
     findByChannelMock.mockResolvedValue({
       id: "sticky-1",
       lastMessageId: null,
@@ -214,8 +236,9 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalH
   });
 
   it("旧メッセージの取得・削除に失敗しても例外を伝播させず処理を続行する", async () => {
-    const { stickyMessageUpdateEmbedModalHandler } =
-      await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler");
+    const { stickyMessageUpdateEmbedModalHandler } = await import(
+      "@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler"
+    );
     findByChannelMock.mockResolvedValue({
       id: "sticky-1",
       lastMessageId: "old-msg-id",
@@ -229,8 +252,9 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalH
   });
 
   it("更新後の再送信が失敗した場合にエラーをログに記録する", async () => {
-    const { stickyMessageUpdateEmbedModalHandler } =
-      await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler");
+    const { stickyMessageUpdateEmbedModalHandler } = await import(
+      "@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler"
+    );
     findByChannelMock.mockResolvedValue({
       id: "sticky-1",
       lastMessageId: "old-msg-id",
@@ -241,15 +265,18 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalH
     await stickyMessageUpdateEmbedModalHandler.execute(interaction as never);
 
     expect(loggerMock.error).toHaveBeenCalledWith(
-      expect.stringContaining("stickyMessage:log.resend_after_embed_update_failed"),
+      expect.stringContaining(
+        "stickyMessage:log.resend_after_embed_update_failed",
+      ),
       expect.any(Object),
     );
     expect(interaction._replyMock).toHaveBeenCalled();
   });
 
   it("キャッシュにチャンネルがない場合は再送信をスキップする", async () => {
-    const { stickyMessageUpdateEmbedModalHandler } =
-      await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler");
+    const { stickyMessageUpdateEmbedModalHandler } = await import(
+      "@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler"
+    );
     findByChannelMock.mockResolvedValue({
       id: "sticky-1",
       lastMessageId: "old-msg-id",
@@ -262,8 +289,9 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalH
   });
 
   it("DB 書き込み失敗時はエラーをロギングしたうえで呼び出し元に再スローする", async () => {
-    const { stickyMessageUpdateEmbedModalHandler } =
-      await import("@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler");
+    const { stickyMessageUpdateEmbedModalHandler } = await import(
+      "@/bot/features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler"
+    );
     findByChannelMock.mockResolvedValue({
       id: "sticky-1",
       lastMessageId: null,

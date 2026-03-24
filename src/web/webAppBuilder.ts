@@ -5,7 +5,7 @@ import fastifyCors from "@fastify/cors";
 import fastifyStatic from "@fastify/static";
 import Fastify, { type FastifyInstance } from "fastify";
 import { join } from "path";
-import { NODE_ENV, env } from "../shared/config/env";
+import { env, NODE_ENV } from "../shared/config/env";
 import { logPrefixed, tDefault } from "../shared/locale/localeManager";
 import { logger } from "../shared/utils/logger";
 import { apiRoutes } from "./routes/api/apiRoutes";
