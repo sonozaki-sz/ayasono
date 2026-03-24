@@ -23,6 +23,7 @@ services:
       # --- 任意 ---
       LOG_LEVEL: ${LOG_LEVEL:-info}
       DISCORD_ERROR_WEBHOOK_URL: ${DISCORD_ERROR_WEBHOOK_URL:-}
+      USER_MANUAL_URL: ${USER_MANUAL_URL:-}
     volumes:
       # SQLite データの永続化（名前付きボリューム）
       - sqlite_data:/app/storage
