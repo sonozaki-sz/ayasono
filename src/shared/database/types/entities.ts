@@ -6,6 +6,8 @@ export interface GuildConfig {
   guildId: string;
   // i18n の既定ロケール
   locale: string;
+  // エラー通知チャンネルID
+  errorChannelId?: string;
   // DB監査用タイムスタンプ
   createdAt: Date;
   updatedAt: Date;

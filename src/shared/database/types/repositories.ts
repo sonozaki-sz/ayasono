@@ -26,6 +26,22 @@ export interface IBaseGuildRepository {
   exists(guildId: string): Promise<boolean>;
   getLocale(guildId: string): Promise<string>;
   updateLocale(guildId: string, locale: string): Promise<void>;
+  updateErrorChannel(guildId: string, channelId: string): Promise<void>;
+  resetGuildSettings(guildId: string): Promise<void>;
+  getFullConfig(guildId: string): Promise<FullGuildConfig | null>;
+  importFullConfig(guildId: string, data: FullGuildConfig): Promise<void>;
+  deleteAllConfigs(guildId: string): Promise<void>;
+}
+
+/** エクスポート/インポート用の全設定統合型 */
+export interface FullGuildConfig {
+  locale: string;
+  errorChannelId?: string;
+  afk?: AfkConfig;
+  bumpReminder?: BumpReminderConfig;
+  vac?: Pick<VacConfig, "enabled" | "triggerChannelIds">;
+  memberLog?: MemberLogConfig;
+  vcRecruit?: VcRecruitConfig;
 }
 
 export interface IAfkConfigRepository {

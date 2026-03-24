@@ -1,6 +1,7 @@
 // src/bot/handlers/interactionCreate/ui/selectMenus.ts
 // セレクトメニューハンドラのレジストリ
 
+import { guildConfigViewSelectHandler } from "../../../features/guild-config/handlers/ui/guildConfigViewSelectHandler";
 import { stickyMessageRemoveSelectHandler } from "../../../features/sticky-message/handlers/ui/stickyMessageRemoveSelectHandler";
 import { stickyMessageViewSelectHandler } from "../../../features/sticky-message/handlers/ui/stickyMessageViewSelectHandler";
 import { vcPanelUserSelectHandler } from "../../../features/vc-panel/handlers/ui/vcPanelUserSelect";
@@ -21,6 +22,8 @@ export const roleSelectHandlers: RoleSelectHandler[] = [
 ];
 
 export const stringSelectHandlers: StringSelectHandler[] = [
+  // guild-config view ページセレクトメニューを処理
+  guildConfigViewSelectHandler,
   // sticky-message remove コマンドのチャンネル選択を処理
   stickyMessageRemoveSelectHandler,
   // sticky-message view コマンドのチャンネル選択を処理

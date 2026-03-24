@@ -7,17 +7,21 @@ type GuildConfigRecord = {
   id: string;
   guildId: string;
   locale: string;
+  errorChannelId: string | null;
   createdAt: Date;
   updatedAt: Date;
 };
 
 /**
  * DBレコードをドメインの GuildConfig へ変換する
+ * @param record Prismaレコード
+ * @returns ドメインオブジェクト
  */
 export function toGuildConfig(record: GuildConfigRecord): GuildConfig {
   return {
     guildId: record.guildId,
     locale: record.locale,
+    errorChannelId: record.errorChannelId ?? undefined,
     createdAt: record.createdAt,
     updatedAt: record.updatedAt,
   };
@@ -25,6 +29,9 @@ export function toGuildConfig(record: GuildConfigRecord): GuildConfig {
 
 /**
  * GuildConfig から create 用DBデータを生成する
+ * @param config ドメインオブジェクト
+ * @param defaultLocale デフォルトロケール
+ * @returns Prisma create 用データ
  */
 export function toGuildConfigCreateData(
   config: GuildConfig,
@@ -32,15 +39,21 @@ export function toGuildConfigCreateData(
 ): {
   guildId: string;
   locale: string;
+  errorChannelId?: string;
 } {
   return {
     guildId: config.guildId,
     locale: config.locale || defaultLocale,
+    ...(config.errorChannelId !== undefined && {
+      errorChannelId: config.errorChannelId,
+    }),
   };
 }
 
 /**
  * GuildConfig の部分更新データを DB update 形式へ変換する
+ * @param updates 更新差分
+ * @returns Prisma update 用データ
  */
 export function toGuildConfigUpdateData(
   updates: Partial<GuildConfig>,
@@ -48,6 +61,8 @@ export function toGuildConfigUpdateData(
   const data: Record<string, unknown> = {};
 
   if (updates.locale !== undefined) data.locale = updates.locale;
+  if (updates.errorChannelId !== undefined)
+    data.errorChannelId = updates.errorChannelId ?? null;
 
   return data;
 }

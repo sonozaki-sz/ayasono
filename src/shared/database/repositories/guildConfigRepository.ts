@@ -12,6 +12,7 @@ import type {
   BumpReminderMentionUserAddResult,
   BumpReminderMentionUserRemoveResult,
   BumpReminderMentionUsersClearResult,
+  FullGuildConfig,
   GuildConfig,
   IGuildConfigRepository,
   MemberLogConfig,
@@ -95,6 +96,168 @@ export class PrismaGuildConfigRepository implements IGuildConfigRepository {
 
   async updateLocale(guildId: string, locale: string): Promise<void> {
     await updateGuildLocaleUsecase(this.getCoreDeps(), guildId, locale);
+  }
+
+  /**
+   * エラー通知チャンネルを設定する
+   * @param guildId 対象ギルドID
+   * @param channelId エラー通知先チャンネルID
+   */
+  async updateErrorChannel(guildId: string, channelId: string): Promise<void> {
+    await updateGuildConfigUsecase(this.getCoreDeps(), guildId, {
+      errorChannelId: channelId,
+    });
+  }
+
+  /**
+   * ギルド設定（locale・errorChannelId）をデフォルトにリセットする
+   * 各機能の設定は保持される
+   * @param guildId 対象ギルドID
+   */
+  async resetGuildSettings(guildId: string): Promise<void> {
+    await updateGuildConfigUsecase(this.getCoreDeps(), guildId, {
+      locale: DEFAULT_LOCALE,
+      errorChannelId: undefined,
+    });
+  }
+
+  /**
+   * エクスポート用に全機能の設定を一括取得する
+   * @param guildId 対象ギルドID
+   * @returns 全設定データ（レコード未存在時は null）
+   */
+  async getFullConfig(guildId: string): Promise<FullGuildConfig | null> {
+    const config = await this.getConfig(guildId);
+    if (!config) return null;
+
+    // 各機能の設定を並行取得
+    const [afk, bumpReminder, vac, memberLog, vcRecruit] = await Promise.all([
+      this.getAfkConfig(guildId),
+      this.getBumpReminderConfig(guildId),
+      this.getVacConfig(guildId),
+      this.getMemberLogConfig(guildId),
+      this.getVcRecruitConfig(guildId),
+    ]);
+
+    const result: FullGuildConfig = {
+      locale: config.locale,
+      errorChannelId: config.errorChannelId,
+    };
+
+    if (afk) result.afk = afk;
+    if (bumpReminder) result.bumpReminder = bumpReminder;
+    // VAC は triggerChannelIds のみエクスポート（createdChannels はランタイムデータ）
+    if (vac)
+      result.vac = {
+        enabled: vac.enabled,
+        triggerChannelIds: vac.triggerChannelIds,
+      };
+    if (memberLog) result.memberLog = memberLog;
+    if (vcRecruit) result.vcRecruit = vcRecruit;
+
+    return result;
+  }
+
+  /**
+   * インポートデータから全機能の設定を一括上書き保存する
+   * @param guildId 対象ギルドID
+   * @param data インポートする全設定データ
+   */
+  async importFullConfig(
+    guildId: string,
+    data: FullGuildConfig,
+  ): Promise<void> {
+    // ギルド設定を更新
+    await updateGuildConfigUsecase(this.getCoreDeps(), guildId, {
+      locale: data.locale,
+      errorChannelId: data.errorChannelId,
+    });
+
+    // 各機能の設定を並行保存
+    const operations: Promise<void>[] = [];
+
+    if (data.afk) {
+      operations.push(
+        this.afkConfigRepository.updateAfkConfig(guildId, data.afk),
+      );
+    }
+    if (data.bumpReminder) {
+      operations.push(
+        this.bumpReminderConfigRepository.updateBumpReminderConfig(
+          guildId,
+          data.bumpReminder,
+        ),
+      );
+    }
+    if (data.vac) {
+      operations.push(
+        this.vacConfigRepository.updateVacConfig(guildId, {
+          enabled: data.vac.enabled,
+          triggerChannelIds: data.vac.triggerChannelIds,
+          createdChannels: [],
+        }),
+      );
+    }
+    if (data.memberLog) {
+      operations.push(
+        this.memberLogConfigRepository.updateMemberLogConfig(
+          guildId,
+          data.memberLog,
+        ),
+      );
+    }
+    if (data.vcRecruit) {
+      operations.push(
+        this.vcRecruitConfigRepository.updateVcRecruitConfig(
+          guildId,
+          data.vcRecruit,
+        ),
+      );
+    }
+
+    await Promise.all(operations);
+  }
+
+  /**
+   * ギルド設定と全機能設定を一括削除する（reset-all 用）
+   * レコードが存在しないテーブルはスキップする
+   * @param guildId 対象ギルドID
+   */
+  async deleteAllConfigs(guildId: string): Promise<void> {
+    // 各テーブルを並行削除（存在しない場合は無視）
+    const deleteIfExists = async (
+      fn: () => Promise<unknown>,
+    ): Promise<void> => {
+      try {
+        await fn();
+      } catch {
+        // レコードが存在しない場合のエラーを無視
+      }
+    };
+
+    await Promise.all([
+      deleteIfExists(() =>
+        this.prisma.guildConfig.delete({ where: { guildId } }),
+      ),
+      deleteIfExists(() =>
+        this.prisma.guildAfkConfig.delete({ where: { guildId } }),
+      ),
+      deleteIfExists(() =>
+        this.prisma.guildBumpReminderConfig.delete({ where: { guildId } }),
+      ),
+      deleteIfExists(() =>
+        this.prisma.guildVacConfig.delete({ where: { guildId } }),
+      ),
+      deleteIfExists(() =>
+        this.prisma.guildMemberLogConfig.delete({ where: { guildId } }),
+      ),
+      deleteIfExists(() =>
+        this.prisma.guildVcRecruitConfig.delete({ where: { guildId } }),
+      ),
+      deleteIfExists(() =>
+        this.prisma.stickyMessage.deleteMany({ where: { guildId } }),
+      ),
+    ]);
   }
 
   private getCoreDeps() {

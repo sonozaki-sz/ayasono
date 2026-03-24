@@ -2,6 +2,7 @@
 // ボタンハンドラのレジストリ
 
 import { bumpPanelButtonHandler } from "../../../features/bump-reminder/handlers/ui/bumpPanelButtonHandler";
+import { guildConfigViewButtonHandler } from "../../../features/guild-config/handlers/ui/guildConfigViewButtonHandler";
 import { stickyMessageRemoveButtonHandler } from "../../../features/sticky-message/handlers/ui/stickyMessageRemoveButtonHandler";
 import { vcPanelButtonHandler } from "../../../features/vc-panel/handlers/ui/vcPanelButton";
 import { vcRecruitButtonHandler } from "../../../features/vc-recruit/handlers/ui/vcRecruitButton";
@@ -10,6 +11,8 @@ import { vcRecruitRoleButtonHandler } from "../../../features/vc-recruit/handler
 import type { ButtonHandler } from "./types";
 
 export const buttonHandlers: ButtonHandler[] = [
+  // guild-config view ページネーションボタンを処理
+  guildConfigViewButtonHandler,
   // customId プレフィックスで bump パネル操作を処理
   bumpPanelButtonHandler,
   // sticky-message remove の「削除する」ボタンを処理

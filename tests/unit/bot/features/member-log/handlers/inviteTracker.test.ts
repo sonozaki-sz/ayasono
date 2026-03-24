@@ -35,6 +35,28 @@ describe("bot/features/member-log/handlers/inviteTracker", () => {
       expect(result).toBeNull();
     });
 
+    it("invite.uses が null の場合に 0 として扱われることを確認", async () => {
+      const fakeInvites = new Map([
+        ["nulluses", { code: "nulluses", uses: null }],
+      ]);
+      const guild = {
+        id: "guild-null",
+        invites: { fetch: vi.fn().mockResolvedValue(fakeInvites) },
+      };
+
+      await initGuildInviteCache(guild as never);
+
+      // uses=null → 0 としてキャッシュされるので、uses=1 で参加検出できる
+      const updatedInvites = new Map([
+        ["nulluses", { code: "nulluses", uses: 1 }],
+      ]);
+      const result = await findUsedInvite({
+        id: "guild-null",
+        invites: { fetch: vi.fn().mockResolvedValue(updatedInvites) },
+      } as never);
+      expect(result).toEqual({ code: "nulluses", uses: 1 });
+    });
+
     it("guild.invites.fetch が例外を投げた場合も例外が伝播しないことを確認", async () => {
       const guild = {
         id: "guild-2",

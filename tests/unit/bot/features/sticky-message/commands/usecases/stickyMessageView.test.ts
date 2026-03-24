@@ -48,7 +48,7 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageView", () =
     );
   });
 
-  it("スティッキーメッセージが存在する場合にセレクトメニューを表示する", async () => {
+  it("スティッキーメッセージが存在する場合にセレクトメニューの選択肢が件数分生成されること", async () => {
     const { handleStickyMessageView } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageView");
     const stickies = [
@@ -61,15 +61,53 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageView", () =
 
     await handleStickyMessageView(interaction as never, "guild-1");
 
-    expect(interaction.reply).toHaveBeenCalledWith(
-      expect.objectContaining({
-        components: expect.any(Array),
-        flags: MessageFlags.Ephemeral,
-      }),
-    );
+    const call = interaction.reply.mock.calls[0][0] as {
+      components: { components: { options: unknown[] }[] }[];
+    };
+    const selectMenu = call.components[0].components[0];
+    // 2件分の選択肢が生成されること
+    expect(selectMenu.options).toHaveLength(2);
   });
 
-  it("チャンネルがキャッシュに存在しない場合はチャンネル名の代わりに ID をラベル表示する", async () => {
+  it("50文字を超えるコンテンツが切り捨てられて省略記号が付くこと", async () => {
+    const { handleStickyMessageView } =
+      await import("@/bot/features/sticky-message/commands/usecases/stickyMessageView");
+    const longContent = "B".repeat(60);
+    const stickies = [
+      { id: "s1", channelId: "ch-1", content: longContent },
+    ];
+    findAllByGuildMock.mockResolvedValue(stickies);
+    const interaction = createInteractionMock(new Map());
+
+    await handleStickyMessageView(interaction as never, "guild-1");
+
+    const call = interaction.reply.mock.calls[0][0] as {
+      components: { components: { options: { data: { description: string } }[] }[] }[];
+    };
+    const option = call.components[0].components[0].options[0];
+    expect(option.data.description).toBe("B".repeat(50) + "...");
+  });
+
+  it("50文字以下のコンテンツはそのまま表示されること", async () => {
+    const { handleStickyMessageView } =
+      await import("@/bot/features/sticky-message/commands/usecases/stickyMessageView");
+    const shortContent = "Short message";
+    const stickies = [
+      { id: "s1", channelId: "ch-1", content: shortContent },
+    ];
+    findAllByGuildMock.mockResolvedValue(stickies);
+    const interaction = createInteractionMock(new Map());
+
+    await handleStickyMessageView(interaction as never, "guild-1");
+
+    const call = interaction.reply.mock.calls[0][0] as {
+      components: { components: { options: { data: { description: string } }[] }[] }[];
+    };
+    const option = call.components[0].components[0].options[0];
+    expect(option.data.description).toBe("Short message");
+  });
+
+  it("チャンネルがキャッシュに存在しない場合はチャンネル ID をラベルに使用すること", async () => {
     const { handleStickyMessageView } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageView");
     const stickies = [{ id: "s1", channelId: "unknown-ch", content: "Hi" }];
@@ -78,10 +116,31 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageView", () =
 
     await handleStickyMessageView(interaction as never, "guild-1");
 
-    expect(interaction.reply).toHaveBeenCalled();
+    const call = interaction.reply.mock.calls[0][0] as {
+      components: { components: { options: { data: { label: string } }[] }[] }[];
+    };
+    const option = call.components[0].components[0].options[0];
+    expect(option.data.label).toBe("#unknown-ch");
   });
 
-  it("Discord のセレクトメニューは最大 25 項目のため、30件あっても 25件に切り捨てられる", async () => {
+  it("チャンネルがキャッシュに存在する場合はチャンネル名をラベルに使用すること", async () => {
+    const { handleStickyMessageView } =
+      await import("@/bot/features/sticky-message/commands/usecases/stickyMessageView");
+    const stickies = [{ id: "s1", channelId: "ch-1", content: "Hi" }];
+    findAllByGuildMock.mockResolvedValue(stickies);
+    const channelCache = new Map([["ch-1", { name: "general" }]]);
+    const interaction = createInteractionMock(channelCache);
+
+    await handleStickyMessageView(interaction as never, "guild-1");
+
+    const call = interaction.reply.mock.calls[0][0] as {
+      components: { components: { options: { data: { label: string } }[] }[] }[];
+    };
+    const option = call.components[0].components[0].options[0];
+    expect(option.data.label).toBe("#general");
+  });
+
+  it("Discord のセレクトメニューは最大 25 項目のため、30件あっても 25件に切り捨てられること", async () => {
     const { handleStickyMessageView } =
       await import("@/bot/features/sticky-message/commands/usecases/stickyMessageView");
     const stickies = Array.from({ length: 30 }, (_, i) => ({
@@ -94,6 +153,10 @@ describe("bot/features/sticky-message/commands/usecases/stickyMessageView", () =
 
     await handleStickyMessageView(interaction as never, "guild-1");
 
-    expect(interaction.reply).toHaveBeenCalled();
+    const call = interaction.reply.mock.calls[0][0] as {
+      components: { components: { options: unknown[] }[] }[];
+    };
+    const selectMenu = call.components[0].components[0];
+    expect(selectMenu.options).toHaveLength(25);
   });
 });
