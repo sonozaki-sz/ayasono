@@ -508,7 +508,7 @@
 
 | キー | 用途 | ja | en |
 | --- | --- | --- | --- |
-| `embed.title.view` | 設定表示タイトル | 🛡️ ギルド設定 | 🛡️ Guild Settings |
+| `embed.title.view` | 設定表示タイトル | ギルド設定 | Guild Settings |
 | `embed.field.name.locale` | 言語フィールド名 | 言語 | Language |
 | `embed.field.name.error_channel` | エラーチャンネルフィールド名 | エラー通知チャンネル | Error Notification Channel |
 | `embed.field.value.not_configured` | 未設定値 | 未設定 | Not configured |
