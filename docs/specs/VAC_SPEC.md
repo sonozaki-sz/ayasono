@@ -30,6 +30,8 @@
 | 実行者 | ManageGuild | `/vac-config` 全サブコマンドの実行（コマンドレベルで制御） |
 | Bot | ManageChannels | VCの作成・削除・権限設定 |
 | Bot | MoveMembers | ユーザーの自動移動（作成VC・AFK移動） |
+| Bot | SendMessages | 操作パネルの送信 |
+| Bot | EmbedLinks | パネルのEmbed形式メッセージ |
 
 ---
 

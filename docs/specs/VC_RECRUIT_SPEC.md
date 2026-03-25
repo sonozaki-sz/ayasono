@@ -39,7 +39,7 @@
 | 実行者（config コマンド） | `MANAGE_GUILD` | setup / teardown / add-role / remove-role / view の実行 |
 | 実行者（募集操作ボタン） | 投稿者本人 または `MANAGE_CHANNELS` | 募集終了・募集削除・VC名変更の実行 |
 | 実行者（設定パネルボタン） | VC参加中のユーザーのみ | VC名変更・人数制限変更・AFK移動・パネル再送信 |
-| Bot | `SendMessages`, `ManageMessages`, `EmbedLinks`, `CreatePublicThreads`, `ManageChannels` | チャンネル作成・メッセージ送信・スレッド作成・チャンネル削除 |
+| Bot | `SendMessages`, `ManageMessages`, `EmbedLinks`, `CreatePublicThreads`, `ManageThreads`, `ManageChannels` | チャンネル作成・メッセージ送信・スレッド作成・スレッド管理・チャンネル削除 |
 
 ---
 
