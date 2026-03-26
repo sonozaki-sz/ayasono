@@ -193,16 +193,50 @@ https://<PORTAINER_HOST>/#!/<ENDPOINT_ID>/docker/stacks/ayasono?id=<STACK_ID>&ty
 
 ---
 
-## 4. ロールバック手順
+## 4. Portainer 自体のアップデート
 
-### 4-1. Portainer UI でのロールバック
+Portainer の新しいバージョンがリリースされた場合の更新手順。
+Portainer UI の左下にバージョン情報と更新通知が表示される（Settings → General ページ）。
+
+### 4-1. バージョン確認
+
+- **現在のバージョン**: Portainer UI 左下に表示（例: `Community Edition 2.33.7 LTS`）
+- **最新バージョン**: UI 左下の通知バナー、または [GitHub Releases](https://github.com/portainer/portainer/releases) で確認
+
+### 4-2. アップデート手順
+
+SSH でサーバーに接続後:
+
+```bash
+# 1. 最新イメージを取得
+docker compose -f /opt/infra/docker-compose.infra.yml -p infra pull portainer
+
+# 2. Portainer コンテナを再作成（データボリュームは維持される）
+docker compose -f /opt/infra/docker-compose.infra.yml -p infra up -d portainer
+```
+
+- `portainer_data` ボリュームに設定・ユーザー・Stack 情報が保存されているため、コンテナ再作成でもデータは失われない
+- `image: portainer/portainer-ce:latest` を使用しているため、compose ファイルの変更は不要
+
+### 4-3. アップデート後の確認
+
+1. `https://portainer.sonozaki.net` にアクセスしてログインできること
+2. UI 左下のバージョン表示が更新されていること
+3. Stacks → ayasono が正常に表示されていること
+4. GitHub Actions のデプロイが正常に動作すること（テスト PR で確認推奨）
+
+---
+
+## 5. ロールバック手順
+
+### 5-1. Portainer UI でのロールバック
 
 1. Portainer → **Stacks** → **ayasono** → **Editor**
 2. compose ファイル内のイメージタグを `ghcr.io/sonozaki-sz/ayasono:<旧SHA>` に変更
 3. **Update the stack** をクリック
 4. 復旧後、タグを `:latest` に戻して再度更新
 
-### 4-2. Git revert でのロールバック
+### 5-2. Git revert でのロールバック
 
 ```bash
 git revert <問題のコミットSHA>
@@ -212,7 +246,7 @@ git push origin main
 
 ---
 
-## 5. トラブルシューティング
+## 6. トラブルシューティング
 
 ### deploy ジョブが 404 エラーで失敗する
 
@@ -254,7 +288,7 @@ docker exec -u root ayasono-bot chown -R node:node /app/storage
 
 ---
 
-## 6. Docker・デプロイ関連ファイルの変更ルール
+## 7. Docker・デプロイ関連ファイルの変更ルール
 
 > Dockerfile / docker-compose ファイル / GitHub Actions ワークフローを変更する場合は、必ずローカルでテストを通過させてからコミットすること。
 > CI/CD を使ったデプロイは失敗するたびに本番停止時間が発生するため、ローカル確認を必須とする。
