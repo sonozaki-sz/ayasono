@@ -61,8 +61,8 @@
 | セクション | タスク | 残件 |
 | --- | --- | ---: |
 | 1.1 チケットチャンネル機能 | 実装タスク | 20 |
-| 1.2 ボタンリアクションロール機能 | 仕様書作成 | 1 |
-| **合計** | | **21** |
+| 1.2 ボタンリアクションロール機能 | 実装タスク | 16 |
+| **合計** | | **36** |
 
 ---
 
@@ -90,11 +90,26 @@
 - [ ] 自動削除（スケジューラー + Bot再起動時復元）
 - [ ] Composition Root 登録
 - [ ] テスト
-- [ ] ドキュメント更新（README / USER_MANUAL / DISCORD_BOT_SETUP / ARCHITECTURE の権限・テーブル・機能一覧追記）
+- [ ] ドキュメント更新（README / DISCORD_BOT_SETUP / ARCHITECTURE の権限・テーブル・機能一覧追記、USER_MANUAL に操作方法を追加）
 
-#### 1.2 ボタンリアクションロール機能（残: 1件）
+#### 1.2 ボタンリアクションロール機能（残: 16件）
 
-- [ ] 仕様書作成
+- [x] 仕様書作成
+- [ ] DBスキーマ追加（GuildReactionRolePanel テーブル）
+- [ ] リポジトリ実装（shared/database）
+- [ ] 設定サービス実装（shared/features/reaction-role）
+- [ ] 翻訳ファイル作成（ja/en）
+- [ ] コマンド定義（`/reaction-role-config`）
+- [ ] setup（モーダル + モード選択 + ボタン追加ループ + パネル設置）
+- [ ] teardown（パネル選択 + 確認フロー）
+- [ ] reset（2段階確認 + 全削除）
+- [ ] view（ページネーション + パネル選択）
+- [ ] edit-panel（モーダルでタイトル・説明文・カラー編集）
+- [ ] add-button / remove-button / edit-button
+- [ ] ロール操作（ボタンクリック → toggle / one-action / exclusive）
+- [ ] Composition Root 登録
+- [ ] テスト
+- [ ] ドキュメント更新（README / DISCORD_BOT_SETUP / ARCHITECTURE の権限・テーブル・機能一覧追記、USER_MANUAL に操作方法を追加）
 
 ---
 
