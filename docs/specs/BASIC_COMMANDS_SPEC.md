@@ -113,26 +113,37 @@
 
 ## ローカライズ
 
+### /ping
+
 **翻訳ファイル:** `src/shared/locale/locales/{ja,en}/features/ping.ts`
 
-### コマンド定義
+#### コマンド定義
 
 | キー | 用途 | ja | en |
 | --- | --- | --- | --- |
-| `ping.description` | コマンド説明 | Botの応答速度を確認 | Check bot response speed |
-| `help.description` | コマンド説明 | コマンド一覧を表示 | Show command list |
+| `ping.description` | コマンド説明 | ボットの応答速度を確認 | Check bot response speed |
 
-### ユーザーレスポンス
+#### ユーザーレスポンス
 
 | キー | 用途 | ja | en |
 | --- | --- | --- | --- |
 | `user-response.measuring` | 計測中メッセージ | 🏓 計測中... | 🏓 Measuring... |
+| `user-response.result` | ping結果 | 📡 API レイテンシー: **{{apiLatency}}ms**（改行）💓 WebSocket Ping: **{{wsLatency}}ms** | 📡 API Latency: **{{apiLatency}}ms**（改行）💓 WebSocket Ping: **{{wsLatency}}ms** |
 
-### Embed
+### /help
+
+**翻訳ファイル:** `src/shared/locale/locales/{ja,en}/features/help.ts`
+
+#### コマンド定義
 
 | キー | 用途 | ja | en |
 | --- | --- | --- | --- |
-| `embed.description.ping_result` | ping結果 | 📡 API レイテンシー: {{apiLatency}}ms / 💓 WebSocket Ping: {{wsLatency}}ms | 📡 API Latency: {{apiLatency}}ms / 💓 WebSocket Ping: {{wsLatency}}ms |
+| `help.description` | コマンド説明 | コマンド一覧を表示 | Show command list |
+
+#### Embed
+
+| キー | 用途 | ja | en |
+| --- | --- | --- | --- |
 | `embed.title.help` | ヘルプタイトル | 📖 ayasono コマンド一覧 | 📖 ayasono Commands |
 | `embed.description.help` | マニュアルリンク | 📚 詳しい使い方: {{url}} | 📚 Learn more: {{url}} |
 | `embed.field.name.basic` | 基本カテゴリ名 | 🔧 基本 | 🔧 Basic |

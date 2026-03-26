@@ -69,16 +69,19 @@
 
 3. **BOT PERMISSIONS** で以下を選択:
 
-| 権限 | 用途 |
-| -- | -- |
-| View Channels | チャンネルの閲覧（基本動作） |
-| Send Messages | メッセージ送信（全機能） |
-| Send Messages in Threads | スレッド内メッセージ送信（VC募集） |
-| Embed Links | Embed 形式での送信（全機能） |
-| Read Message History | メッセージ履歴の読み取り（メッセージ削除・メッセージ固定） |
-| Manage Messages | メッセージの削除・管理（メッセージ削除・メッセージ固定・VC募集） |
-| Manage Channels | チャンネルの作成・削除（VC自動作成・VC募集） |
-| Move Members | メンバーの VC 移動（AFK・VC自動作成・VC募集） |
+| 権限 | Developer Portal 表記 | 用途 |
+| -- | -- | -- |
+| チャンネルを表示 | View Channels | チャンネルの閲覧（基本動作） |
+| メッセージを送る | Send Messages | メッセージ送信（全機能） |
+| Threadsでメッセージを送る | Send Messages in Threads | スレッド内メッセージ送信（VC募集） |
+| 公開スレッドを作成 | Create Public Threads | 公開スレッドの作成（VC募集） |
+| スレッドを管理 | Manage Threads | スレッドの管理（VC募集） |
+| ファイルを添付 | Attach Files | ファイル添付（ギルド設定エクスポート） |
+| リンクを埋め込み | Embed Links | Embed 形式での送信（全機能） |
+| メッセージ履歴を読む | Read Message History | メッセージ履歴の読み取り（メッセージ削除・メッセージ固定） |
+| メッセージを管理 | Manage Messages | メッセージの削除・管理（メッセージ削除・メッセージ固定・VC募集） |
+| チャンネルの管理 | Manage Channels | チャンネルの作成・削除（VC自動作成・VC募集） |
+| メンバーを移動 | Move Members | メンバーの VC 移動（AFK・VC自動作成・VC募集） |
 
 ### 4-2. 招待 URL の生成とサーバー追加
 
