@@ -1,72 +1,24 @@
-name: CI / Deploy
+name: Deploy
 
-# main/developへの直接push、またはmain/develop向けPRで実行
 on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
-      - develop
-    types:
-      - opened
-      - synchronize
-      - reopened
-      - closed
+    paths:
+      - 'src/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'Dockerfile'
+      - 'docker-compose.yml'
+      - 'prisma/**'
 
 jobs:
-  # ─────────────────────────────────────────────
-  # CI: 型チェック・テスト
-  #   - main/develop 向け PR（closed 以外）で実行
-  #   - push to main はデプロイ時に test が skipped 扱いで続行（PR で CI 通過済みのため）
-  # ─────────────────────────────────────────────
-  test:
-    name: Test
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && github.event.action != 'closed'
-
-    steps:
-      - uses: actions/checkout@v6
-
-      - uses: pnpm/action-setup@v5
-        with:
-          version: latest
-
-      - uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-          cache: "pnpm"
-
-      - name: 依存関係のインストール
-        run: pnpm install --frozen-lockfile
-
-      - name: Prisma Client 生成
-        run: pnpm db:generate
-
-      - name: リント
-        run: pnpm lint
-
-      - name: 型チェック
-        run: pnpm typecheck
-
-      - name: テスト実行
-        run: pnpm test
-
-  # ─────────────────────────────────────────────
-  # CD: デプロイ（mainへの直接push、またはmain向けPRのマージ完了時のみ）
-  # ─────────────────────────────────────────────
   deploy:
     name: Deploy to VPS
-    needs: test
     runs-on: ubuntu-latest
-    if: |
-      always() &&
-      github.event_name == 'push' && github.ref == 'refs/heads/main' &&
-      (needs.test.result == 'success' || needs.test.result == 'skipped')
     permissions:
       contents: read
-      packages: write # イメージのプッシュ・削除に必要
+      packages: write
 
     steps:
       - uses: actions/checkout@v6
@@ -155,96 +107,3 @@ jobs:
               "${PORTAINER_URL}/api/endpoints/${ENDPOINT_ID}/docker/images/${IMAGE_ID}?force=false" \
               -H "X-API-Key: ${API_KEY}" || echo "⚠ 削除スキップ（使用中の可能性）: ${IMAGE_ID}"
           done
-
-  # ─────────────────────────────────────────────
-  # Discord 通知（成功）
-  #   - main への push でデプロイが成功した場合のみ
-  # ─────────────────────────────────────────────
-  notify-success:
-    name: Discord通知（成功）
-    needs: deploy
-    runs-on: ubuntu-latest
-    if: |
-      always() &&
-      needs.deploy.result == 'success' &&
-      github.event_name == 'push' &&
-      github.ref == 'refs/heads/main'
-
-    steps:
-      - name: Discord に成功通知を送信
-        run: |
-          curl -fsSL -X POST "${{ secrets.DISCORD_WEBHOOK_URL }}" \
-            -H "Content-Type: application/json" \
-            -d '{
-              "embeds": [
-                {
-                  "title": "✅ デプロイに成功しました",
-                  "color": 5763719,
-                  "fields": [
-                    {
-                      "name": "リポジトリ",
-                      "value": "[ayasono](https://github.com/${{ github.repository }})",
-                      "inline": false
-                    },
-                    {
-                      "name": "Portainer",
-                      "value": "Stack: [ayasono](https://${{ secrets.PORTAINER_HOST }}/#!/${{ secrets.PORTAINER_ENDPOINT_ID }}/docker/stacks/ayasono?id=${{ secrets.PORTAINER_STACK_ID }}&type=2)",
-                      "inline": false
-                    }
-                  ],
-                  "timestamp": "${{ github.event.head_commit.timestamp }}"
-                }
-              ]
-            }'
-
-  # ─────────────────────────────────────────────
-  # Discord 通知（失敗）
-  #   - main への push で test または deploy が失敗した場合のみ
-  # ─────────────────────────────────────────────
-  notify-failure:
-    name: Discord通知（失敗）
-    needs: [test, deploy]
-    runs-on: ubuntu-latest
-    if: |
-      always() &&
-      (needs.test.result == 'failure' || needs.deploy.result == 'failure') &&
-      github.event_name == 'push' &&
-      github.ref == 'refs/heads/main'
-
-    steps:
-      - name: 失敗したジョブを特定して Discord に通知
-        run: |
-          if [ "${{ needs.test.result }}" = "failure" ]; then
-            FAILED_JOB="test (Test)"
-          else
-            FAILED_JOB="deploy (Deploy to VPS)"
-          fi
-
-          curl -fsSL -X POST "${{ secrets.DISCORD_WEBHOOK_URL }}" \
-            -H "Content-Type: application/json" \
-            -d "{
-              \"embeds\": [
-                {
-                  \"title\": \"❌ デプロイに失敗しました\",
-                  \"color\": 16711680,
-                  \"fields\": [
-                    {
-                      \"name\": \"理由\",
-                      \"value\": \"ジョブ: \`${FAILED_JOB}\`\n[🔗 失敗したワークフローを確認](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})\",
-                      \"inline\": false
-                    },
-                    {
-                      \"name\": \"手動ロールバック\",
-                      \"value\": \"Portainer で前回の SHA タグを指定して再デプロイ\",
-                      \"inline\": false
-                    },
-                    {
-                      \"name\": \"Portainer\",
-                      \"value\": \"Stack: [ayasono](https://${{ secrets.PORTAINER_HOST }}/#!/${{ secrets.PORTAINER_ENDPOINT_ID }}/docker/stacks/ayasono?id=${{ secrets.PORTAINER_STACK_ID }}&type=2)\",
-                      \"inline\": false
-                    }
-                  ],
-                  \"timestamp\": \"${{ github.event.head_commit.timestamp }}\"
-                }
-              ]
-            }"
