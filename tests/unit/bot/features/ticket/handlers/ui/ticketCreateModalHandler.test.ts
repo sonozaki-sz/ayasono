@@ -76,6 +76,7 @@ vi.mock("@/bot/features/ticket/services/ticketService", () => ({
   hasStaffRole: vi.fn(),
 }));
 
+import { DiscordAPIError, RESTJSONErrorCodes } from "discord.js";
 import { createTicketChannel } from "@/bot/features/ticket/services/ticketService";
 
 function createMockModalInteraction(
@@ -87,18 +88,7 @@ function createMockModalInteraction(
     customId,
     locale: "ja",
     guildId: "guild-1",
-    guild: {
-      id: "guild-1",
-      members: { me: { id: "bot-1" } },
-      channels: {
-        fetch: vi.fn(),
-        cache: {
-          get: vi.fn(() => ({
-            permissionsFor: vi.fn(() => ({ has: vi.fn(() => true) })),
-          })),
-        },
-      },
-    },
+    guild: { id: "guild-1", channels: { fetch: vi.fn() } },
     channelId: "channel-1",
     channel: { send: vi.fn().mockResolvedValue({ id: "msg-1" }) },
     user: { id: "user-1" },
@@ -176,6 +166,54 @@ describe("bot/features/ticket/handlers/ui/ticketCreateModalHandler", () => {
           embeds: expect.any(Array),
         }),
       );
+    });
+
+    it("MissingPermissionsエラー時はエラー応答を返す", async () => {
+      const apiError = new DiscordAPIError(
+        {
+          code: RESTJSONErrorCodes.MissingPermissions,
+          message: "Missing Permissions",
+        },
+        RESTJSONErrorCodes.MissingPermissions,
+        403,
+        "POST",
+        "/guilds/guild-1/channels",
+        {},
+      );
+      vi.mocked(createTicketChannel).mockRejectedValue(apiError);
+
+      const interaction = createMockModalInteraction(
+        "ticket:create-modal:cat-1",
+        {
+          "ticket:create-subject": "Test Subject",
+          "ticket:create-detail": "Test Detail",
+        },
+      );
+
+      await ticketCreateModalHandler.execute(interaction as never);
+
+      expect(interaction.reply).toHaveBeenCalledWith(
+        expect.objectContaining({
+          embeds: [{ type: "error" }],
+        }),
+      );
+    });
+
+    it("MissingPermissions以外のエラーは再throwする", async () => {
+      const otherError = new Error("Unknown error");
+      vi.mocked(createTicketChannel).mockRejectedValue(otherError);
+
+      const interaction = createMockModalInteraction(
+        "ticket:create-modal:cat-1",
+        {
+          "ticket:create-subject": "Test Subject",
+          "ticket:create-detail": "Test Detail",
+        },
+      );
+
+      await expect(
+        ticketCreateModalHandler.execute(interaction as never),
+      ).rejects.toThrow("Unknown error");
     });
   });
 });

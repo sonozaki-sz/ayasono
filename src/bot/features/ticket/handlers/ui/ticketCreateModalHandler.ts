@@ -2,9 +2,10 @@
 // チケット作成モーダル送信ハンドラ
 
 import {
+  DiscordAPIError,
   MessageFlags,
   type ModalSubmitInteraction,
-  PermissionFlagsBits,
+  RESTJSONErrorCodes,
 } from "discord.js";
 import {
   logPrefixed,
@@ -45,42 +46,41 @@ export const ticketCreateModalHandler: ModalHandler = {
     const guild = interaction.guild;
     if (!guild) return;
 
-    // Bot がカテゴリ内でチャンネルを作成できるか権限チェック
-    const botMember = guild.members.me;
-    const category = guild.channels.cache.get(categoryId);
-    if (
-      botMember &&
-      category &&
-      !category
-        .permissionsFor(botMember)
-        ?.has([
-          PermissionFlagsBits.ManageChannels,
-          PermissionFlagsBits.ManageRoles,
-        ])
-    ) {
-      const embed = createErrorEmbed(
-        tInteraction(interaction.locale, "common:title_bot_permission_denied"),
-        { locale: interaction.locale },
-      );
-      await interaction.reply({
-        embeds: [embed],
-        flags: MessageFlags.Ephemeral,
-      });
-      return;
-    }
-
     const configService = getBotTicketConfigService();
     const ticketRepository = getBotTicketRepository();
 
-    const { channel } = await createTicketChannel(
-      guild,
-      categoryId,
-      interaction.user.id,
-      subject,
-      detail,
-      configService,
-      ticketRepository,
-    );
+    let channel: { id: string };
+    try {
+      const result = await createTicketChannel(
+        guild,
+        categoryId,
+        interaction.user.id,
+        subject,
+        detail,
+        configService,
+        ticketRepository,
+      );
+      channel = result.channel;
+    } catch (error) {
+      if (
+        error instanceof DiscordAPIError &&
+        error.code === RESTJSONErrorCodes.MissingPermissions
+      ) {
+        const embed = createErrorEmbed(
+          tInteraction(
+            interaction.locale,
+            "common:title_bot_permission_denied",
+          ),
+          { locale: interaction.locale },
+        );
+        await interaction.reply({
+          embeds: [embed],
+          flags: MessageFlags.Ephemeral,
+        });
+        return;
+      }
+      throw error;
+    }
 
     logger.info(
       logPrefixed("system:log_prefix.ticket", "ticket:log.ticket_created", {
