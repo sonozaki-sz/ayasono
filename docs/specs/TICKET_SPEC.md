@@ -114,15 +114,16 @@
 
 1. ユーザーの同時チケット数が上限未満か確認
 2. モーダルを表示（件名・詳細入力）
-3. 指定カテゴリ配下にチケットチャンネルを作成（チャンネル名: `ticket-{連番}`）
-4. チャンネル権限オーバーライドを設定:
+3. Bot がカテゴリに対して ManageChannels / ManageRoles 権限を持つか確認（不足時はエラー応答）
+4. 指定カテゴリ配下にチケットチャンネルを作成（チャンネル名: `ticket-{連番}`）
+5. チャンネル権限オーバーライドを設定:
    - `@everyone`: ViewChannel 拒否
    - チケット作成者: ViewChannel / SendMessages / ReadMessageHistory 許可
    - スタッフロール: ViewChannel / SendMessages / ReadMessageHistory 許可
    - Bot: ViewChannel / SendMessages / ManageChannels / ManageRoles 許可
-5. 初期メッセージ Embed + ボタンを送信
-6. 作成者とスタッフロールへのメンションメッセージを送信（通知目的）
-7. チケット情報を DB に保存
+6. 初期メッセージ Embed + ボタンを送信
+7. 作成者とスタッフロールへのメンションメッセージを送信（通知目的）
+8. チケット情報を DB に保存
 
 **ビジネスルール:**
 
