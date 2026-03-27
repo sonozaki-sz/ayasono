@@ -9,6 +9,15 @@ on:
       - opened
       - synchronize
       - reopened
+    paths:
+      - "src/**"
+      - "tests/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "tsconfig*.json"
+      - "vitest.config.ts"
+      - "biome.json"
+      - "prisma/**"
 
 jobs:
   test:
