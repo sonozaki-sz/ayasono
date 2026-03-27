@@ -74,10 +74,17 @@ function createMockModalInteraction(
     customId,
     locale: "ja",
     guildId: "guild-1",
-    guild: { id: "guild-1", channels: { fetch: vi.fn() } },
+    guild: {
+      id: "guild-1",
+      channels: { fetch: vi.fn() },
+      members: { me: { id: "bot-1" } },
+    },
     channelId: "channel-1",
     channel: {
       send: vi.fn().mockResolvedValue({ id: "msg-1", channelId: "channel-1" }),
+      permissionsFor: vi
+        .fn()
+        .mockReturnValue({ has: vi.fn().mockReturnValue(true) }),
     },
     user: { id: "user-1" },
     fields: {

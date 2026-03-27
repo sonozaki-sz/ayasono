@@ -8,6 +8,7 @@ import {
   EmbedBuilder,
   MessageFlags,
   type ModalSubmitInteraction,
+  PermissionFlagsBits,
   type TextChannel,
 } from "discord.js";
 import {
@@ -125,6 +126,25 @@ export const ticketSetupModalHandler: ModalHandler = {
     // パネルメッセージを送信
     const channel = interaction.channel as TextChannel | null;
     if (!channel) return;
+
+    // Bot の送信権限を確認
+    const botMember = interaction.guild?.members.me;
+    if (
+      botMember &&
+      !channel.permissionsFor(botMember)?.has(PermissionFlagsBits.SendMessages)
+    ) {
+      const embed = createErrorEmbed(
+        tInteraction(interaction.locale, "common:title_bot_permission_denied"),
+        { locale: interaction.locale },
+      );
+      await interaction.reply({
+        embeds: [embed],
+        flags: MessageFlags.Ephemeral,
+      });
+      ticketSetupSessions.delete(sessionId);
+      return;
+    }
+
     const panelMessage = await channel.send({
       embeds: [panelEmbed],
       components: [panelButton],
