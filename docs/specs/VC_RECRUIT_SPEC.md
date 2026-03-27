@@ -41,6 +41,8 @@
 | 実行者（設定パネルボタン） | VC参加中のユーザーのみ | VC名変更・人数制限変更・AFK移動・パネル再送信 |
 | Bot | `SendMessages`, `ManageMessages`, `EmbedLinks`, `CreatePublicThreads`, `ManageThreads`, `ManageChannels` | チャンネル作成・メッセージ送信・スレッド作成・スレッド管理・チャンネル削除 |
 
+> Bot に上記の権限が不足している場合、インタラクション経由の操作では Bot権限不足エラー（共通フォーマット）を返します。詳細は [MESSAGE_RESPONSE_SPEC.md](MESSAGE_RESPONSE_SPEC.md) を参照。
+
 ---
 
 ## VC自動作成（募集ボタン経由）
@@ -1063,6 +1065,27 @@ flowchart TD
 | `log.setup_removed` | セットアップ削除ログ | セットアップ削除 GuildId: {{guildId}} CategoryId: {{categoryId}} | setup removed GuildId: {{guildId}} CategoryId: {{categoryId}} |
 | `log.panel_delete_detected` | パネルメッセージ削除検知ログ | パネルメッセージ削除を検知、パネルを再送信します GuildId: {{guildId}} PanelChannelId: {{panelChannelId}} MessageId: {{messageId}} | panel message deletion detected, resending panel GuildId: {{guildId}} PanelChannelId: {{panelChannelId}} MessageId: {{messageId}} |
 | `log.panel_resent` | パネル再送信ログ | パネルメッセージを再送信しました GuildId: {{guildId}} PanelChannelId: {{panelChannelId}} NewMessageId: {{newMessageId}} | panel message resent GuildId: {{guildId}} PanelChannelId: {{panelChannelId}} NewMessageId: {{newMessageId}} |
+
+---
+
+## テストケース
+
+### ユニットテスト
+
+- [x] setup: guild null、セットアップ済み/カテゴリ満杯エラー、カテゴリあり/なし正常作成、ViewChannel権限チェック、Bot権限不足エラー伝播
+- [x] teardown: 0件エラー、セレクトメニュー表示、カスケード削除、UnknownChannel吸収
+- [x] add-role / remove-role: ロール選択UI、ロール追加/削除、guildId null
+- [x] view: 空設定info、カテゴリ名/TOPラベル、ロール一覧表示
+- [x] 募集モーダル: 新規VC作成(VC参加中/未参加)、既存VC選択、カテゴリ満杯、Bot権限不足エラー伝播、投稿チャンネル送信不可、スレッド失敗
+- [x] 投稿ボタン: リネーム/終了/削除の権限チェック（投稿者/ManageChannels）、確認フロー
+- [x] voiceStateUpdate: 空室VC自動削除、メンバー残存時非削除、管理外VC無視
+- [x] channelDelete: パネル/投稿チャンネルのカスケード削除、作成VC外部削除+ボタン更新
+- [x] messageDelete: パネルメッセージ自己修復（再送信+DB更新）
+
+### インテグレーションテスト
+
+- [x] VC作成→空室→自動削除→募集メッセージ更新
+- [x] パネル削除→自己修復、カスケード削除の連鎖防止
 
 ---
 

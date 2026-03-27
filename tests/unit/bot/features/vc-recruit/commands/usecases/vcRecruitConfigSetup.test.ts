@@ -1,6 +1,6 @@
 // tests/unit/bot/features/vc-recruit/commands/usecases/vcRecruitConfigSetup.test.ts
 
-import { ChannelType } from "discord.js";
+import { ChannelType, DiscordAPIError, RESTJSONErrorCodes } from "discord.js";
 import { handleVcRecruitConfigSetup } from "@/bot/features/vc-recruit/commands/usecases/vcRecruitConfigSetup";
 import { ValidationError } from "@/shared/errors/customErrors";
 
@@ -187,6 +187,27 @@ describe("bot/features/vc-recruit/commands/usecases/vcRecruitConfigSetup", () =>
     await expect(
       handleVcRecruitConfigSetup(interaction as never, GUILD_ID),
     ).rejects.toBeInstanceOf(ValidationError);
+  });
+
+  it("guild.channels.create で MissingPermissions エラーが発生した場合は上位ハンドラへ伝播する", async () => {
+    const apiError = new DiscordAPIError(
+      {
+        code: RESTJSONErrorCodes.MissingPermissions,
+        message: "Missing Permissions",
+      },
+      RESTJSONErrorCodes.MissingPermissions,
+      403,
+      "POST",
+      "/guilds/guild-1/channels",
+      {},
+    );
+    const guild = makeGuild();
+    guild.channels.create = vi.fn().mockRejectedValue(apiError);
+    const interaction = makeInteraction({ guildObj: guild });
+
+    await expect(
+      handleVcRecruitConfigSetup(interaction as never, GUILD_ID),
+    ).rejects.toBe(apiError);
   });
 
   it("カテゴリーなし（TOP）で正常にセットアップでき、パネル/投稿チャンネルを作成して DB に保存する", async () => {

@@ -53,6 +53,7 @@
 - AFK機能が無効（`enabled=false`）または未設定（`channelId=null`）の場合はエラー
 - 対象ユーザーがVCに参加していない場合はエラー
 - AFKチャンネルが削除済み・存在しない場合はエラー
+- Bot に `MoveMembers` 権限が不足している場合は Bot権限不足エラー（共通フォーマット、[MESSAGE_RESPONSE_SPEC.md](MESSAGE_RESPONSE_SPEC.md) 参照）
 
 ### UI
 
@@ -234,6 +235,21 @@
 | `log.database_channel_set_failed` | DB操作エラーログ | AFKチャンネル設定に失敗 GuildId: {{guildId}} ChannelId: {{channelId}} | Failed to set AFK channel GuildId: {{guildId}} ChannelId: {{channelId}} |
 | `log.database_config_saved` | DB操作ログ | AFK設定を保存 GuildId: {{guildId}} | AFK config saved GuildId: {{guildId}} |
 | `log.database_config_save_failed` | DB操作エラーログ | AFK設定保存に失敗 GuildId: {{guildId}} | Failed to save AFK config GuildId: {{guildId}} |
+
+---
+
+## テストケース
+
+### ユニットテスト
+
+- [x] `/afk`: ギルド外実行エラー、正常移動+成功Embed、config未設定/無効エラー、メンバー未検出/VC未参加/AFKチャンネル不在エラー、Bot権限不足エラー伝播、userオプション指定
+- [x] `/afk-config set-channel`: ManageGuild権限チェック、正常設定、非VCチャンネルエラー
+- [x] `/afk-config view`: 設定済み/未設定の表示
+- [x] `/afk-config clear-channel`: 設定解除
+
+### インテグレーションテスト
+
+- [x] set-channel → view → /afk 移動の一連フロー
 
 ---
 

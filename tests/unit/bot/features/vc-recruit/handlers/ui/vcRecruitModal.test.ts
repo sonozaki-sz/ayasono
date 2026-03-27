@@ -1,6 +1,12 @@
 // tests/unit/bot/features/vc-recruit/handlers/ui/vcRecruitModal.test.ts
 
-import { ButtonStyle, ChannelType, MessageFlags } from "discord.js";
+import {
+  ButtonStyle,
+  ChannelType,
+  DiscordAPIError,
+  MessageFlags,
+  RESTJSONErrorCodes,
+} from "discord.js";
 import {
   buildRecruitMessageButtons,
   vcRecruitModalHandler,
@@ -386,6 +392,39 @@ describe("vcRecruitModalHandler / execute()", () => {
       }),
     );
     expect(deleteVcRecruitSessionMock).toHaveBeenCalledWith(SESSION_ID);
+  });
+
+  it("guild.channels.create で MissingPermissions エラーが発生した場合は上位ハンドラへ伝播する", async () => {
+    getVcRecruitSessionMock.mockReturnValue({
+      panelChannelId: PANEL_CH_ID,
+      mentionRoleIds: [],
+      selectedVcId: "__new__",
+      createdAt: Date.now(),
+    });
+    findSetupByPanelChannelIdMock.mockResolvedValue(makeSetup());
+
+    const apiError = new DiscordAPIError(
+      {
+        code: RESTJSONErrorCodes.MissingPermissions,
+        message: "Missing Permissions",
+      },
+      RESTJSONErrorCodes.MissingPermissions,
+      403,
+      "POST",
+      "/guilds/guild-1/channels",
+      {},
+    );
+    const guild = makeGuild();
+    guild.channels.create = vi.fn().mockRejectedValue(apiError);
+    const member = makeMember({ id: "user-vc-1" });
+    guild.members.fetch = vi.fn().mockResolvedValue(member);
+
+    const interaction = makeInteraction();
+    (interaction as Record<string, unknown>).guild = guild;
+
+    await expect(
+      vcRecruitModalHandler.execute(interaction as never),
+    ).rejects.toBe(apiError);
   });
 
   it("カテゴリーチャンネル数が上限に達している場合は category_full エラーを返して VC を作成しない", async () => {

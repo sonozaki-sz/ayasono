@@ -1,6 +1,11 @@
 // tests/unit/bot/features/sticky-message/handlers/ui/stickyMessageSetEmbedModalHandler.test.ts
 
-import { ChannelType, MessageFlags } from "discord.js";
+import {
+  ChannelType,
+  DiscordAPIError,
+  MessageFlags,
+  RESTJSONErrorCodes,
+} from "discord.js";
 
 const findByChannelMock = vi.fn();
 const createMock = vi.fn();
@@ -228,6 +233,32 @@ describe("bot/features/sticky-message/handlers/ui/stickyMessageSetEmbedModalHand
       expect.any(String),
       "user-1",
     );
+  });
+
+  it("channel.send で MissingPermissions エラーが発生した場合は上位ハンドラへ伝播する", async () => {
+    const { stickyMessageSetEmbedModalHandler } = await import(
+      "@/bot/features/sticky-message/handlers/ui/stickyMessageSetEmbedModalHandler"
+    );
+    findByChannelMock.mockResolvedValue(null);
+
+    const apiError = new DiscordAPIError(
+      {
+        code: RESTJSONErrorCodes.MissingPermissions,
+        message: "Missing Permissions",
+      },
+      RESTJSONErrorCodes.MissingPermissions,
+      403,
+      "POST",
+      "/channels/ch-1/messages",
+      {},
+    );
+    const interaction = createInteractionMock({
+      sendResult: Promise.reject(apiError),
+    });
+
+    await expect(
+      stickyMessageSetEmbedModalHandler.execute(interaction as never),
+    ).rejects.toBe(apiError);
   });
 
   it("create が失敗した場合にエラーを再スローする", async () => {

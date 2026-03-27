@@ -32,6 +32,8 @@
 | Bot | ManageRoles | ロールの付与・解除 |
 | Bot | SendMessages | パネル送信・応答メッセージ |
 
+> Bot に上記の権限が不足している場合は Bot権限不足エラー（共通フォーマット）を返します。詳細は [MESSAGE_RESPONSE_SPEC.md](MESSAGE_RESPONSE_SPEC.md) を参照。
+
 ---
 
 ## パネル設置（setup）
@@ -743,6 +745,24 @@
 | `log.button_edited` | ボタン編集ログ | ボタン編集 GuildId: {{guildId}} PanelId: {{panelId}} ButtonId: {{buttonId}} | button edited GuildId: {{guildId}} PanelId: {{panelId}} ButtonId: {{buttonId}} |
 | `log.database_panel_saved` | DB操作ログ | パネル設定を保存 GuildId: {{guildId}} PanelId: {{panelId}} | panel config saved GuildId: {{guildId}} PanelId: {{panelId}} |
 | `log.database_panel_save_failed` | DB操作エラーログ | パネル設定保存に失敗 GuildId: {{guildId}} PanelId: {{panelId}} | failed to save panel config GuildId: {{guildId}} PanelId: {{panelId}} |
+
+---
+
+## テストケース
+
+### ユニットテスト
+
+- [ ] setup: モーダル入力、モード選択、ボタン追加ループ、パネル送信+DB保存、Bot権限不足エラー伝播
+- [ ] teardown: パネル選択、確認ダイアログ、正常削除
+- [ ] reset: 2段階確認、全パネル削除
+- [ ] view: ページネーション、パネル選択
+- [ ] edit-panel: モーダルでタイトル・説明文・カラー編集
+- [ ] add-button / remove-button / edit-button: ボタン操作
+- [ ] ロール操作: ボタンクリック → toggle / one-action / exclusive モード
+
+### インテグレーションテスト
+
+- [ ] setup → ボタンクリック → ロール付与/解除のライフサイクル
 
 ---
 

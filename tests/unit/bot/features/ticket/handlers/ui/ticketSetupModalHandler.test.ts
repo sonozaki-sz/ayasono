@@ -1,5 +1,6 @@
 // tests/unit/bot/features/ticket/handlers/ui/ticketSetupModalHandler.test.ts
 
+import { DiscordAPIError, RESTJSONErrorCodes } from "discord.js";
 import { ticketSetupModalHandler } from "@/bot/features/ticket/handlers/ui/ticketSetupModalHandler";
 
 vi.mock("@/shared/locale/localeManager", () => ({
@@ -82,9 +83,6 @@ function createMockModalInteraction(
     channelId: "channel-1",
     channel: {
       send: vi.fn().mockResolvedValue({ id: "msg-1", channelId: "channel-1" }),
-      permissionsFor: vi
-        .fn()
-        .mockReturnValue({ has: vi.fn().mockReturnValue(true) }),
     },
     user: { id: "user-1" },
     fields: {
@@ -256,6 +254,41 @@ describe("bot/features/ticket/handlers/ui/ticketSetupModalHandler", () => {
       );
       expect(ticketSetupSessions.delete).toHaveBeenCalledWith("session-1");
       // ロール選択メニューのメッセージが削除されること（commandInteraction.deleteReply経由）
+    });
+
+    it("channel.send で MissingPermissions エラーが発生した場合は上位ハンドラへ伝播する", async () => {
+      vi.mocked(ticketSetupSessions.get).mockReturnValue({
+        categoryId: "cat-1",
+        staffRoleIds: ["role-1"],
+        commandInteraction: {
+          deleteReply: vi.fn().mockResolvedValue(undefined),
+        } as never,
+      });
+      mockConfigService.findByGuildAndCategory.mockResolvedValue(null);
+
+      const apiError = new DiscordAPIError(
+        {
+          code: RESTJSONErrorCodes.MissingPermissions,
+          message: "Missing Permissions",
+        },
+        RESTJSONErrorCodes.MissingPermissions,
+        403,
+        "POST",
+        "/channels/channel-1/messages",
+        {},
+      );
+      const interaction = createMockModalInteraction(
+        "ticket:setup-modal:session-1",
+        {
+          "ticket:setup-title": "Title",
+          "ticket:setup-description": "Desc",
+        },
+      );
+      interaction.channel.send = vi.fn().mockRejectedValue(apiError);
+
+      await expect(
+        ticketSetupModalHandler.execute(interaction as never),
+      ).rejects.toBe(apiError);
     });
 
     it("messageがnullの場合でもエラーにならない", async () => {

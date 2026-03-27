@@ -106,7 +106,7 @@ export const messageDelete = {
   "user-response.no_permission":
     "You do not have permission to perform this action.\nRequired permission: Manage Messages",
   "user-response.bot_no_permission":
-    "The bot does not have the required permissions to delete messages.\nRequired: Manage Messages, Read Message History, View Channel",
+    "The bot lacks the required permissions to perform this action.\nRequired: Manage Messages, Read Message History, View Channel\nPlease contact a server administrator to check the bot's permission settings.",
   "user-response.text_channel_only": "Please specify a text channel.",
   "user-response.no_messages_found": "No deletable messages were found.",
   "user-response.delete_failed": "An error occurred while deleting messages.",
@@ -123,13 +123,13 @@ export const messageDelete = {
   "user-response.locked":
     "A message-delete command is already running on this server. Please try again after it completes.",
   "user-response.channel_no_access":
-    "Cannot access the specified channel. The bot requires ReadMessageHistory and ManageMessages permissions.",
+    "Cannot access the specified channel.\nThe bot requires ReadMessageHistory and ManageMessages permissions.\nPlease contact a server administrator to check the bot's permission settings.",
   "user-response.webhook_invalid_format":
     "Invalid Webhook ID format. Please enter a 17-20 digit number.",
   "user-response.channel_partial_skip":
-    "Skipped channels due to insufficient bot permissions: {{channels}}",
+    "Skipped channels due to insufficient bot permissions: {{channels}}\nPlease contact a server administrator to check the bot's permission settings.",
   "user-response.channel_all_no_access":
-    "Cannot access specified channels. Bot requires ReadMessageHistory and ManageMessages permissions.",
+    "Cannot access specified channels.\nThe bot requires ReadMessageHistory and ManageMessages permissions.\nPlease contact a server administrator to check the bot's permission settings.",
   "user-response.scan_progress":
     "Scanning... {{totalScanned}} fetched\nSearching for targets... {{collected}} / {{limit}}",
   "user-response.delete_progress": "Deleting... {{totalDeleted}} / {{total}}",

@@ -4,7 +4,12 @@
  * エラーハンドリング機能のテスト
  */
 
-import { type ChatInputCommandInteraction, MessageFlags } from "discord.js";
+import {
+  type ChatInputCommandInteraction,
+  DiscordAPIError,
+  MessageFlags,
+  RESTJSONErrorCodes,
+} from "discord.js";
 import type { Mocked } from "vitest";
 import {
   handleCommandError,
@@ -466,6 +471,116 @@ describe("ErrorHandler", () => {
       const payload = interaction.reply.mock.calls[0][0];
       const embed = payload.embeds[0];
       expect(embed.data?.title ?? embed.title).toContain("common:error");
+    });
+  });
+
+  describe("DiscordAPIError MissingPermissions", () => {
+    it("MissingPermissions エラー時は Bot権限不足 メッセージで reply されることを確認", async () => {
+      const interaction: any = {
+        replied: false,
+        deferred: false,
+        locale: "ja",
+        reply: vi.fn().mockResolvedValue(undefined),
+        editReply: vi.fn().mockResolvedValue(undefined),
+      };
+
+      const apiError = new DiscordAPIError(
+        {
+          code: RESTJSONErrorCodes.MissingPermissions,
+          message: "Missing Permissions",
+        },
+        RESTJSONErrorCodes.MissingPermissions,
+        403,
+        "POST",
+        "/guilds/guild-1/channels",
+        {},
+      );
+
+      await handleCommandError(interaction, apiError);
+
+      expect(interaction.reply).toHaveBeenCalledWith(
+        expect.objectContaining({
+          embeds: expect.arrayContaining([
+            expect.objectContaining({
+              data: expect.objectContaining({
+                title: expect.stringContaining(
+                  "common:title_bot_permission_denied",
+                ),
+                description: "common:bot_permission.missing",
+              }),
+            }),
+          ]),
+          flags: MessageFlags.Ephemeral,
+        }),
+      );
+    });
+
+    it("MissingPermissions エラーで deferred 済みの場合は editReply が呼ばれることを確認", async () => {
+      const interaction: any = {
+        replied: false,
+        deferred: true,
+        locale: "ja",
+        reply: vi.fn().mockResolvedValue(undefined),
+        editReply: vi.fn().mockResolvedValue(undefined),
+      };
+
+      const apiError = new DiscordAPIError(
+        {
+          code: RESTJSONErrorCodes.MissingPermissions,
+          message: "Missing Permissions",
+        },
+        RESTJSONErrorCodes.MissingPermissions,
+        403,
+        "POST",
+        "/guilds/guild-1/channels",
+        {},
+      );
+
+      await handleInteractionError(interaction, apiError);
+
+      expect(interaction.editReply).toHaveBeenCalledWith(
+        expect.objectContaining({
+          embeds: expect.arrayContaining([
+            expect.objectContaining({
+              data: expect.objectContaining({
+                title: expect.stringContaining(
+                  "common:title_bot_permission_denied",
+                ),
+                description: "common:bot_permission.missing",
+              }),
+            }),
+          ]),
+        }),
+      );
+    });
+
+    it("MissingPermissions エラーでも返信失敗時はログに記録されることを確認", async () => {
+      const interaction: any = {
+        replied: false,
+        deferred: false,
+        locale: "ja",
+        reply: vi.fn().mockRejectedValue(new Error("Reply failed")),
+        editReply: vi.fn().mockResolvedValue(undefined),
+      };
+
+      const apiError = new DiscordAPIError(
+        {
+          code: RESTJSONErrorCodes.MissingPermissions,
+          message: "Missing Permissions",
+        },
+        RESTJSONErrorCodes.MissingPermissions,
+        403,
+        "POST",
+        "/guilds/guild-1/channels",
+        {},
+      );
+
+      await handleCommandError(interaction, apiError);
+
+      expect(logger.error).toHaveBeenCalledWith(
+        expect.stringContaining("返信に失敗しました"),
+        expect.any(Error),
+      );
     });
   });
 

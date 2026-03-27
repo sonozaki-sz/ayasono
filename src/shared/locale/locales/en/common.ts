@@ -80,6 +80,10 @@ export const common = {
   "ui.modal.page_jump_label": "Page number",
   "ui.modal.page_jump_placeholder": "Integer from 1 to {{total}}",
 
+  // Bot permission error
+  "bot_permission.missing":
+    "The bot lacks the required permissions to perform this action.\nPlease contact a server administrator to check the bot's permission settings.",
+
   // Common cancel
   cancelled: "Cancelled.",
 } as const;

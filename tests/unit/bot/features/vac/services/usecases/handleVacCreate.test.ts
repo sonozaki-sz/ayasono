@@ -1,9 +1,15 @@
 // tests/unit/bot/features/vac/services/usecases/handleVacCreate.test.ts
 
-import { ChannelType, PermissionFlagsBits } from "discord.js";
+import {
+  ChannelType,
+  DiscordAPIError,
+  PermissionFlagsBits,
+  RESTJSONErrorCodes,
+} from "discord.js";
 import type { Mock, Mocked } from "vitest";
 import { handleVacCreateUseCase } from "@/bot/features/vac/services/usecases/handleVacCreate";
 import { sendVcControlPanel } from "@/bot/features/vc-panel/vcControlPanel";
+import { notifyErrorChannel } from "@/bot/shared/errorChannelNotifier";
 import type { VacConfigService } from "@/shared/features/vac/vacConfigService";
 
 const loggerInfoMock = vi.fn();
@@ -316,6 +322,100 @@ describe("bot/features/vac/services/usecases/handleVacCreate", () => {
     expect(sendVcControlPanel).not.toHaveBeenCalled();
     expect(setChannelMock).not.toHaveBeenCalled();
     expect(repository.addCreatedVacChannel).not.toHaveBeenCalled();
+  });
+
+  it("チャンネル作成時にMissingPermissionsエラーが発生した場合はエラーチャンネルへ通知して早期リターンする", async () => {
+    const repository = createRepositoryMock();
+    const { newState, createMock, setChannelMock } = createVoiceStateInput();
+
+    repository.getVacConfigOrDefault.mockResolvedValue({
+      enabled: true,
+      triggerChannelIds: ["trigger-1"],
+      createdChannels: [],
+    });
+
+    const apiError = new DiscordAPIError(
+      {
+        code: RESTJSONErrorCodes.MissingPermissions,
+        message: "Missing Permissions",
+      },
+      RESTJSONErrorCodes.MissingPermissions,
+      403,
+      "POST",
+      "/guilds/guild-1/channels",
+      {},
+    );
+    createMock.mockRejectedValueOnce(apiError);
+
+    await handleVacCreateUseCase(repository, newState as never);
+
+    expect(notifyErrorChannel).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "guild-1" }),
+      apiError,
+      expect.objectContaining({ feature: "VAC" }),
+    );
+    expect(setChannelMock).not.toHaveBeenCalled();
+    expect(repository.addCreatedVacChannel).not.toHaveBeenCalled();
+  });
+
+  it("チャンネル作成時にMissingPermissions以外のエラーが発生した場合は再throwする", async () => {
+    const repository = createRepositoryMock();
+    const { newState, createMock } = createVoiceStateInput();
+
+    repository.getVacConfigOrDefault.mockResolvedValue({
+      enabled: true,
+      triggerChannelIds: ["trigger-1"],
+      createdChannels: [],
+    });
+
+    const otherError = new Error("Unknown error");
+    createMock.mockRejectedValueOnce(otherError);
+
+    await expect(
+      handleVacCreateUseCase(repository, newState as never),
+    ).rejects.toThrow("Unknown error");
+  });
+
+  it("既存所有チャンネルへの移動時にMissingPermissionsエラーが発生した場合はエラーチャンネルへ通知する", async () => {
+    const repository = createRepositoryMock();
+    const { newState, fetchMock, createMock, setChannelMock } =
+      createVoiceStateInput();
+
+    repository.getVacConfigOrDefault.mockResolvedValue({
+      enabled: true,
+      triggerChannelIds: ["trigger-1"],
+      createdChannels: [
+        {
+          voiceChannelId: "owned-1",
+          ownerId: "user-1",
+          createdAt: 1,
+        },
+      ],
+    });
+    const ownedChannel = { id: "owned-1", type: ChannelType.GuildVoice };
+    fetchMock.mockResolvedValue(ownedChannel);
+
+    const apiError = new DiscordAPIError(
+      {
+        code: RESTJSONErrorCodes.MissingPermissions,
+        message: "Missing Permissions",
+      },
+      RESTJSONErrorCodes.MissingPermissions,
+      403,
+      "PATCH",
+      "/guilds/guild-1/members/user-1",
+      {},
+    );
+    setChannelMock.mockRejectedValueOnce(apiError);
+
+    await handleVacCreateUseCase(repository, newState as never);
+
+    expect(notifyErrorChannel).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "guild-1" }),
+      apiError,
+      expect.objectContaining({ feature: "VAC" }),
+    );
+    expect(createMock).not.toHaveBeenCalled();
   });
 
   it("コントロールパネル送信が失敗してもユーザー移動とチャンネル保存は続行されること", async () => {

@@ -1,4 +1,5 @@
 // tests/unit/bot/features/afk/commands/afkCommand.execute.test.ts
+import { DiscordAPIError, RESTJSONErrorCodes } from "discord.js";
 import { executeAfkCommand } from "@/bot/features/afk/commands/afkCommand.execute";
 import { ValidationError } from "@/shared/errors/customErrors";
 
@@ -190,6 +191,27 @@ describe("bot/features/afk/commands/afkCommand.execute", () => {
     await expect(
       executeAfkCommand(interaction as never),
     ).rejects.toBeInstanceOf(ValidationError);
+  });
+
+  it("setChannel で MissingPermissions エラーが発生した場合は上位ハンドラへ伝播する", async () => {
+    const interaction = createInteraction();
+    const apiError = new DiscordAPIError(
+      {
+        code: RESTJSONErrorCodes.MissingPermissions,
+        message: "Missing Permissions",
+      },
+      RESTJSONErrorCodes.MissingPermissions,
+      403,
+      "PATCH",
+      "/guilds/guild-1/members/user-1",
+      {},
+    );
+    const member = await interaction.guild.members.fetch("any");
+    member.voice.setChannel = vi.fn().mockRejectedValue(apiError);
+
+    await expect(executeAfkCommand(interaction as never)).rejects.toBe(
+      apiError,
+    );
   });
 
   it("user オプションが指定されている場合はそのユーザーを対象にする", async () => {

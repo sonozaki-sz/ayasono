@@ -114,16 +114,16 @@
 
 1. ユーザーの同時チケット数が上限未満か確認
 2. モーダルを表示（件名・詳細入力）
-3. Bot がカテゴリに対して ManageChannels / ManageRoles 権限を持つか確認（不足時はエラー応答）
-4. 指定カテゴリ配下にチケットチャンネルを作成（チャンネル名: `ticket-{連番}`）
-5. チャンネル権限オーバーライドを設定:
+3. 指定カテゴリ配下にチケットチャンネルを作成（チャンネル名: `ticket-{連番}`）
+   - Bot に `ManageChannels` / `ManageRoles` 権限が不足している場合は Bot権限不足エラー（共通フォーマット、[MESSAGE_RESPONSE_SPEC.md](MESSAGE_RESPONSE_SPEC.md) 参照）
+4. チャンネル権限オーバーライドを設定:
    - `@everyone`: ViewChannel 拒否
    - チケット作成者: ViewChannel / SendMessages / ReadMessageHistory 許可
    - スタッフロール: ViewChannel / SendMessages / ReadMessageHistory 許可
    - Bot: ViewChannel / SendMessages / ManageChannels / ManageRoles 許可
-6. 初期メッセージ Embed + ボタンを送信
-7. 作成者とスタッフロールへのメンションメッセージを送信（通知目的）
-8. チケット情報を DB に保存
+5. 初期メッセージ Embed + ボタンを送信
+6. 作成者とスタッフロールへのメンションメッセージを送信（通知目的）
+7. チケット情報を DB に保存
 
 **ビジネスルール:**
 
@@ -893,6 +893,29 @@
 | `log.database_ticket_save_failed` | DB操作エラーログ | チケット保存に失敗 GuildId: {{guildId}} TicketId: {{ticketId}} | failed to save ticket GuildId: {{guildId}} TicketId: {{ticketId}} |
 | `log.panel_deleted` | パネル削除検知ログ | パネル削除を検知 GuildId: {{guildId}} CategoryId: {{categoryId}} | panel deletion detected GuildId: {{guildId}} CategoryId: {{categoryId}} |
 | `log.panel_channel_deleted` | パネルチャンネル削除検知ログ | パネル設置チャンネル削除を検知 GuildId: {{guildId}} CategoryId: {{categoryId}} | panel channel deletion detected GuildId: {{guildId}} CategoryId: {{categoryId}} |
+
+---
+
+## テストケース
+
+### ユニットテスト
+
+- [x] setup: RoleSelectMenu表示、セッション保存、モーダル入力、パネル送信+DB保存、既存設定エラー、Bot権限不足エラー伝播
+- [x] teardown: セレクトメニュー表示、確認ダイアログ、正常削除、キャンセル
+- [x] view: 単一/複数設定のページネーション、チャンネル名フォールバック
+- [x] edit-panel: モーダル表示、Embed更新、パネル更新失敗時の挙動
+- [x] set-roles / add-roles / remove-roles: RoleSelectMenuによるロール操作、最後のロール削除エラー
+- [x] set-auto-delete / set-max-tickets: パラメータ検証、正常更新
+- [x] チケット作成: ボタン→モーダル→チャンネル作成、上限チェック、Bot権限不足エラー伝播
+- [x] チケットクローズ: 権限チェック、ステータス変更、自動削除スケジュール登録
+- [x] チケット再オープン: 権限チェック、ステータス復元
+- [x] チケット削除: 確認ダイアログ、チャンネル削除
+- [x] 自動削除: スケジュール登録、Bot再起動時復元、ギルド/チャンネル未検出時のDB削除
+- [x] channelDelete / messageDelete: パネルチャンネル/メッセージ削除時の設定同期
+
+### インテグレーションテスト
+
+- [x] setup → create → close → reopen → delete のライフサイクル
 
 ---
 

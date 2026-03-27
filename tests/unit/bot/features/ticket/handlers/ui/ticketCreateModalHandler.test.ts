@@ -168,7 +168,7 @@ describe("bot/features/ticket/handlers/ui/ticketCreateModalHandler", () => {
       );
     });
 
-    it("MissingPermissionsエラー時はエラー応答を返す", async () => {
+    it("MissingPermissionsエラー時は上位ハンドラへ伝播する", async () => {
       const apiError = new DiscordAPIError(
         {
           code: RESTJSONErrorCodes.MissingPermissions,
@@ -190,16 +190,12 @@ describe("bot/features/ticket/handlers/ui/ticketCreateModalHandler", () => {
         },
       );
 
-      await ticketCreateModalHandler.execute(interaction as never);
-
-      expect(interaction.reply).toHaveBeenCalledWith(
-        expect.objectContaining({
-          embeds: [{ type: "error" }],
-        }),
-      );
+      await expect(
+        ticketCreateModalHandler.execute(interaction as never),
+      ).rejects.toThrow(apiError);
     });
 
-    it("MissingPermissions以外のエラーは再throwする", async () => {
+    it("その他のエラーも上位ハンドラへ伝播する", async () => {
       const otherError = new Error("Unknown error");
       vi.mocked(createTicketChannel).mockRejectedValue(otherError);
 

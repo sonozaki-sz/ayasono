@@ -91,6 +91,8 @@ export const vac = {
   "log.trigger_removed_by_delete":
     "削除されたトリガーチャンネルを設定から除外 GuildId: {{guildId}} ChannelId: {{channelId}}",
   "log.channel_delete_sync_failed": "channelDelete同期処理失敗",
+  "log.channel_create_failed":
+    "Bot権限不足によるVCチャンネル作成失敗 GuildId: {{guildId}}",
   "log.panel_send_failed": "操作パネル送信失敗",
   "log.startup_cleanup_failed": "起動時クリーンアップ失敗",
   "log.database_trigger_added":

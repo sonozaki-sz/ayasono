@@ -1,4 +1,5 @@
 // tests/unit/bot/features/vac/handlers/ui/vacPanelModal.test.ts
+import { DiscordAPIError, RESTJSONErrorCodes } from "discord.js";
 import { vcPanelModalHandler } from "@/bot/features/vc-panel/handlers/ui/vcPanelModal";
 import { safeReply } from "@/bot/utils/interaction";
 
@@ -143,6 +144,54 @@ describe("bot/features/vac/handlers/ui/vacPanelModal", () => {
       embeds: [{ message: "renamed:New Name" }],
       flags: 64,
     });
+  });
+
+  it("channel.edit で MissingPermissions エラーが発生した場合は上位ハンドラへ伝播する（rename）", async () => {
+    const apiError = new DiscordAPIError(
+      {
+        code: RESTJSONErrorCodes.MissingPermissions,
+        message: "Missing Permissions",
+      },
+      RESTJSONErrorCodes.MissingPermissions,
+      403,
+      "PATCH",
+      "/channels/voice-1",
+      {},
+    );
+    const editMock = vi.fn().mockRejectedValue(apiError);
+    const interaction = createBaseInteraction({
+      customId: "vac:rename-modal:voice-1",
+      channel: { id: "voice-1", type: 2, edit: editMock },
+      renameInput: "New Name",
+    });
+
+    await expect(
+      vcPanelModalHandler.execute(interaction as never),
+    ).rejects.toBe(apiError);
+  });
+
+  it("channel.edit で MissingPermissions エラーが発生した場合は上位ハンドラへ伝播する（limit）", async () => {
+    const apiError = new DiscordAPIError(
+      {
+        code: RESTJSONErrorCodes.MissingPermissions,
+        message: "Missing Permissions",
+      },
+      RESTJSONErrorCodes.MissingPermissions,
+      403,
+      "PATCH",
+      "/channels/voice-1",
+      {},
+    );
+    const editMock = vi.fn().mockRejectedValue(apiError);
+    const interaction = createBaseInteraction({
+      customId: "vac:limit-modal:voice-1",
+      channel: { id: "voice-1", type: 2, edit: editMock },
+      limitInput: "5",
+    });
+
+    await expect(
+      vcPanelModalHandler.execute(interaction as never),
+    ).rejects.toBe(apiError);
   });
 
   it('数値に変換できない入力（"abc"）ではチャンネル編集を行わずバリデーションエラーを返すことを検証', async () => {

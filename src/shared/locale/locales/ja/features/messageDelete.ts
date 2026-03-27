@@ -108,7 +108,7 @@ export const messageDelete = {
   "user-response.no_permission":
     "この操作を実行する権限がありません。\n必要な権限: メッセージ管理",
   "user-response.bot_no_permission":
-    "Botにメッセージ削除権限がありません。\n必要な権限: メッセージ管理・メッセージ履歴の閲覧・チャンネルの閲覧",
+    "Botに必要な権限が不足しているため、操作を実行できませんでした。\n必要な権限: メッセージ管理・メッセージ履歴の閲覧・チャンネルの閲覧\nサーバー管理者にBotの権限設定の確認をお願いします。",
   "user-response.text_channel_only": "テキストチャンネルを指定してください。",
   "user-response.no_messages_found":
     "削除可能なメッセージが見つかりませんでした。",
@@ -125,13 +125,13 @@ export const messageDelete = {
   "user-response.locked":
     "現在このサーバーでメッセージ削除コマンドを実行中です。完了後に再度お試しください。",
   "user-response.channel_no_access":
-    "指定したチャンネルにアクセスできません。BotにReadMessageHistoryおよびManageMessages権限が必要です。",
+    "指定したチャンネルにアクセスできません。\nBotにReadMessageHistoryおよびManageMessages権限が必要です。\nサーバー管理者にBotの権限設定の確認をお願いします。",
   "user-response.webhook_invalid_format":
     "Webhook ID の形式が不正です。17〜20桁の数字を入力してください。",
   "user-response.channel_partial_skip":
-    "以下のチャンネルはBotの権限不足のためスキップしました: {{channels}}",
+    "以下のチャンネルはBotの権限不足のためスキップしました: {{channels}}\nサーバー管理者にBotの権限設定の確認をお願いします。",
   "user-response.channel_all_no_access":
-    "指定したチャンネルにアクセスできません。BotにReadMessageHistoryおよびManageMessages権限が必要です。",
+    "指定したチャンネルにアクセスできません。\nBotにReadMessageHistoryおよびManageMessages権限が必要です。\nサーバー管理者にBotの権限設定の確認をお願いします。",
   "user-response.scan_progress":
     "スキャン中... {{totalScanned}}件\n対象メッセージを検索中... {{collected}} / {{limit}}件",
   "user-response.delete_progress": "削除中... {{totalDeleted}} / {{total}}件",
