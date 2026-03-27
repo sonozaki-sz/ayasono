@@ -82,7 +82,17 @@ export const common = {
 
   // Bot権限不足エラー
   "bot_permission.missing":
-    "Botに必要な権限が不足しているため、操作を実行できませんでした。\nサーバー管理者にBotの権限設定の確認をお願いします。",
+    "Botに必要な権限が不足しているため、操作を実行できませんでした。\nサーバー管理者に以下の確認をお願いします:\n・Botに管理者権限が付与されていること\n・対象チャンネルでBotの権限が制限されていないこと",
+  "bot_permission.hint_manage_channels":
+    "この操作にはBotに **チャンネルの管理（Manage Channels）** 権限が必要です。",
+  "bot_permission.hint_move_members":
+    "この操作にはBotに **メンバーを移動（Move Members）** 権限が必要です。\n管理者権限の付与を推奨します。",
+  "bot_permission.hint_send_messages":
+    "この操作にはBotに **メッセージを送信（Send Messages）** 権限が必要です。",
+  "bot_permission.hint_manage_messages":
+    "この操作にはBotに **メッセージの管理（Manage Messages）** 権限が必要です。",
+  "bot_permission.hint_manage_roles":
+    "この操作にはBotに **ロールの管理（Manage Roles）** 権限が必要です。",
 
   // 共通キャンセル
   cancelled: "キャンセルしました。",

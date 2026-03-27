@@ -67,22 +67,13 @@
 | `bot` | Bot としてサーバーに参加 |
 | `applications.commands` | スラッシュコマンドを登録 |
 
-3. **BOT PERMISSIONS** で以下を選択:
+3. **BOT PERMISSIONS** で **Administrator（管理者）** を選択:
 
-| 権限 | Developer Portal 表記 | 用途 |
-| -- | -- | -- |
-| チャンネルを表示 | View Channels | チャンネルの閲覧（基本動作） |
-| メッセージを送る | Send Messages | メッセージ送信（全機能） |
-| Threadsでメッセージを送る | Send Messages in Threads | スレッド内メッセージ送信（VC募集） |
-| 公開スレッドを作成 | Create Public Threads | 公開スレッドの作成（VC募集） |
-| スレッドを管理 | Manage Threads | スレッドの管理（VC募集） |
-| ファイルを添付 | Attach Files | ファイル添付（ギルド設定エクスポート） |
-| リンクを埋め込み | Embed Links | Embed 形式での送信（全機能） |
-| メッセージ履歴を読む | Read Message History | メッセージ履歴の読み取り（メッセージ削除・メッセージ固定） |
-| メッセージを管理 | Manage Messages | メッセージの削除・管理（メッセージ削除・メッセージ固定・VC募集） |
-| チャンネルの管理 | Manage Channels | チャンネルの作成・削除（VC自動作成・VC募集・チケット） |
-| ロールの管理 | Manage Roles | チャンネル権限の設定（チケット） |
-| メンバーを移動 | Move Members | メンバーの VC 移動（AFK・VC自動作成・VC募集） |
+| 権限 | Developer Portal 表記 |
+| -- | -- |
+| 管理者 | Administrator |
+
+> **管理者権限を推奨する理由**: Bot はチャンネル作成・メッセージ送信・メンバー移動・ロール管理など多数の権限を必要とします。また、Discord のロール階層制限により、Bot のロールより上位のメンバーに対する操作（VC移動など）が失敗するため、管理者権限を付与し Bot のロールを上位に配置することで安定した動作を確保できます。
 
 ### 4-2. 招待 URL の生成とサーバー追加
 

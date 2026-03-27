@@ -82,6 +82,74 @@ const isMissingPermissionsError = (error: unknown): boolean =>
   error instanceof DiscordAPIError &&
   error.code === RESTJSONErrorCodes.MissingPermissions;
 
+/** API エンドポイントのパターンと必要権限の対応 */
+const PERMISSION_HINTS: ReadonlyArray<{
+  pattern: RegExp;
+  method?: string;
+  key: string;
+}> = [
+  {
+    pattern: /\/guilds\/\d+\/channels$/,
+    method: "POST",
+    key: "common:bot_permission.hint_manage_channels",
+  },
+  {
+    pattern: /\/channels\/\d+$/,
+    method: "PATCH",
+    key: "common:bot_permission.hint_manage_channels",
+  },
+  {
+    pattern: /\/channels\/\d+$/,
+    method: "DELETE",
+    key: "common:bot_permission.hint_manage_channels",
+  },
+  {
+    pattern: /\/guilds\/\d+\/members\/\d+$/,
+    method: "PATCH",
+    key: "common:bot_permission.hint_move_members",
+  },
+  {
+    pattern: /\/channels\/\d+\/messages/,
+    method: "POST",
+    key: "common:bot_permission.hint_send_messages",
+  },
+  {
+    pattern: /\/channels\/\d+\/messages\/\d+$/,
+    method: "DELETE",
+    key: "common:bot_permission.hint_manage_messages",
+  },
+  {
+    pattern: /\/channels\/\d+\/messages\/bulk-delete$/,
+    method: "POST",
+    key: "common:bot_permission.hint_manage_messages",
+  },
+  {
+    pattern: /\/channels\/\d+\/permissions\/\d+$/,
+    key: "common:bot_permission.hint_manage_roles",
+  },
+];
+
+/**
+ * DiscordAPIError の URL/method から必要権限のヒントを取得する
+ * @param error DiscordAPIError
+ * @param locale interaction.locale
+ * @returns 権限ヒント文字列（不明の場合は空文字）
+ */
+const getPermissionHint = (error: DiscordAPIError, locale: string): string => {
+  for (const hint of PERMISSION_HINTS) {
+    if (
+      hint.pattern.test(error.url) &&
+      (!hint.method || hint.method === error.method)
+    ) {
+      return tInteraction(
+        locale,
+        hint.key as Parameters<typeof tInteraction>[1],
+      );
+    }
+  }
+  return "";
+};
+
 /**
  * エラー内容をEmbedで返信する内部関数
  * 返信済または defer済みの場合は editReply、未返信の場合は reply を使用する
@@ -95,15 +163,24 @@ const replyWithError = async (
 ): Promise<void> => {
   // Discord API の MissingPermissions は専用メッセージで応答する
   if (isMissingPermissionsError(error)) {
-    logError(toError(error));
+    const apiError = error as DiscordAPIError;
+    // MissingPermissions は運用系エラーのため warn レベルで記録
+    logger.warn(
+      logPrefixed("system:log_prefix.bot", "system:error.missing_permissions", {
+        url: apiError.url,
+        method: apiError.method,
+      }),
+    );
     const title = tInteraction(
       interaction.locale,
       "common:title_bot_permission_denied",
     );
-    const message = tInteraction(
+    const hint = getPermissionHint(apiError, interaction.locale);
+    const baseMessage = tInteraction(
       interaction.locale,
       "common:bot_permission.missing",
     );
+    const message = hint ? `${hint}\n\n${baseMessage}` : baseMessage;
     const embed = createErrorEmbed(message, { title });
 
     try {
