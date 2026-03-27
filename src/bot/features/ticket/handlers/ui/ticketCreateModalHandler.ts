@@ -38,6 +38,9 @@ export const ticketCreateModalHandler: ModalHandler = {
     const guild = interaction.guild;
     if (!guild) return;
 
+    // チャンネル作成+権限設定+メッセージ送信で3秒を超えるため事前に応答を遅延
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+
     const configService = getBotTicketConfigService();
     const ticketRepository = getBotTicketRepository();
 
@@ -65,9 +68,8 @@ export const ticketCreateModalHandler: ModalHandler = {
       }),
       { locale: interaction.locale },
     );
-    await interaction.reply({
+    await interaction.editReply({
       embeds: [embed],
-      flags: MessageFlags.Ephemeral,
     });
   },
 };
