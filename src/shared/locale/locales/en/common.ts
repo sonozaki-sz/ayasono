@@ -82,7 +82,17 @@ export const common = {
 
   // Bot permission error
   "bot_permission.missing":
-    "The bot lacks the required permissions to perform this action.\nPlease contact a server administrator to check the bot's permission settings.",
+    "The bot lacks the required permissions to perform this action.\nPlease ask a server administrator to check the following:\n・The bot has Administrator permission\n・The bot's permissions are not restricted in the target channel",
+  "bot_permission.hint_manage_channels":
+    "This action requires the bot to have **Manage Channels** permission.",
+  "bot_permission.hint_move_members":
+    "This action requires the bot to have **Move Members** permission.\nGranting Administrator permission is recommended.",
+  "bot_permission.hint_send_messages":
+    "This action requires the bot to have **Send Messages** permission.",
+  "bot_permission.hint_manage_messages":
+    "This action requires the bot to have **Manage Messages** permission.",
+  "bot_permission.hint_manage_roles":
+    "This action requires the bot to have **Manage Roles** permission.",
 
   // Common cancel
   cancelled: "Cancelled.",

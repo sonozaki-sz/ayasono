@@ -52,6 +52,8 @@ export const system = {
 
   // Error handling
   "error.reply_failed": "Failed to send error message",
+  "error.missing_permissions":
+    "Bot missing permissions URL: {{url}} Method: {{method}}",
   "error.unhandled_rejection": "Unhandled Promise rejection:",
   "error.uncaught_exception": "Uncaught exception:",
   "error.unhandled_rejection_log": "Unhandled Promise Rejection:",
