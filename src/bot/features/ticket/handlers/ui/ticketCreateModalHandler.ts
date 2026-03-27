@@ -1,7 +1,11 @@
 // src/bot/features/ticket/handlers/ui/ticketCreateModalHandler.ts
 // チケット作成モーダル送信ハンドラ
 
-import { MessageFlags, type ModalSubmitInteraction } from "discord.js";
+import {
+  MessageFlags,
+  type ModalSubmitInteraction,
+  PermissionFlagsBits,
+} from "discord.js";
 import {
   logPrefixed,
   tInteraction,
@@ -12,7 +16,10 @@ import {
   getBotTicketConfigService,
   getBotTicketRepository,
 } from "../../../../services/botCompositionRoot";
-import { createSuccessEmbed } from "../../../../utils/messageResponse";
+import {
+  createErrorEmbed,
+  createSuccessEmbed,
+} from "../../../../utils/messageResponse";
 import { TICKET_CUSTOM_ID } from "../../commands/ticketCommand.constants";
 import { createTicketChannel } from "../../services/ticketService";
 
@@ -37,6 +44,30 @@ export const ticketCreateModalHandler: ModalHandler = {
 
     const guild = interaction.guild;
     if (!guild) return;
+
+    // Bot がカテゴリ内でチャンネルを作成できるか権限チェック
+    const botMember = guild.members.me;
+    const category = guild.channels.cache.get(categoryId);
+    if (
+      botMember &&
+      category &&
+      !category
+        .permissionsFor(botMember)
+        ?.has([
+          PermissionFlagsBits.ManageChannels,
+          PermissionFlagsBits.ManageRoles,
+        ])
+    ) {
+      const embed = createErrorEmbed(
+        tInteraction(interaction.locale, "common:title_bot_permission_denied"),
+        { locale: interaction.locale },
+      );
+      await interaction.reply({
+        embeds: [embed],
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
 
     const configService = getBotTicketConfigService();
     const ticketRepository = getBotTicketRepository();
