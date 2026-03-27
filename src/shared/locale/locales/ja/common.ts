@@ -86,7 +86,7 @@ export const common = {
   "bot_permission.hint_manage_channels":
     "この操作にはBotに **チャンネルの管理（Manage Channels）** 権限が必要です。",
   "bot_permission.hint_move_members":
-    "この操作にはBotに **メンバーを移動（Move Members）** 権限が必要です。\n管理者権限の付与を推奨します。",
+    "この操作にはBotに **メンバーを移動（Move Members）** 権限が必要です。",
   "bot_permission.hint_send_messages":
     "この操作にはBotに **メッセージを送信（Send Messages）** 権限が必要です。",
   "bot_permission.hint_manage_messages":

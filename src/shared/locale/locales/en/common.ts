@@ -86,7 +86,7 @@ export const common = {
   "bot_permission.hint_manage_channels":
     "This action requires the bot to have **Manage Channels** permission.",
   "bot_permission.hint_move_members":
-    "This action requires the bot to have **Move Members** permission.\nGranting Administrator permission is recommended.",
+    "This action requires the bot to have **Move Members** permission.",
   "bot_permission.hint_send_messages":
     "This action requires the bot to have **Send Messages** permission.",
   "bot_permission.hint_manage_messages":
