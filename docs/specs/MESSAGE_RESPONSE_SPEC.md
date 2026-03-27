@@ -82,19 +82,32 @@ Discord API の `MissingPermissions`（50013）エラーは、全機能で統一
 
 ### インタラクション経由の場合（コマンド・ボタン・モーダル等）
 
-グローバルエラーハンドラ（`interactionErrorHandler`）が自動検出し、以下の Embed を ephemeral で返します。
+グローバルエラーハンドラ（`interactionErrorHandler`）が自動検出し、以下の Embed を ephemeral で返します。APIエンドポイント（URL / method）から必要な権限を自動推定し、具体的な権限名を表示します。
 
 | 項目 | 内容 |
 | --- | --- |
 | タイトル | ❌ Bot権限不足 |
-| 説明 | Botに必要な権限が不足しているため、操作を実行できませんでした。\nサーバー管理者にBotの権限設定の確認をお願いします。 |
+| 権限ヒント（該当時） | この操作にはBotに **メンバーを移動（Move Members）** 権限が必要です。（※操作に応じて変化） |
+| 説明 | Botに必要な権限が不足しているため、操作を実行できませんでした。\nサーバー管理者に以下の確認をお願いします:\n・Botに管理者権限が付与されていること\n・対象チャンネルでBotの権限が制限されていないこと |
 
 **対応する i18n キー:**
 
 | キー | 用途 |
 | --- | --- |
 | `common:title_bot_permission_denied` | Embed タイトル |
-| `common:bot_permission.missing` | Embed 説明文 |
+| `common:bot_permission.hint_*` | 操作別の権限ヒント（manage_channels / move_members / send_messages / manage_messages / manage_roles） |
+| `common:bot_permission.missing` | Embed 説明文（チェックリスト） |
+
+**権限ヒントの自動推定:**
+
+| API パターン | 推定権限 |
+| --- | --- |
+| `POST /guilds/{id}/channels` | Manage Channels |
+| `PATCH /channels/{id}` | Manage Channels |
+| `PATCH /guilds/{id}/members/{id}` | Move Members |
+| `POST /channels/{id}/messages` | Send Messages |
+| `DELETE /channels/{id}/messages/{id}` | Manage Messages |
+| `PUT /channels/{id}/permissions/{id}` | Manage Roles |
 
 ### イベント経由の場合（voiceStateUpdate・guildMemberAdd 等）
 

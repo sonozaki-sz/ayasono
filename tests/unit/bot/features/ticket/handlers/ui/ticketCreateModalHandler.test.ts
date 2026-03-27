@@ -96,6 +96,8 @@ function createMockModalInteraction(
       getTextInputValue: vi.fn((fieldId: string) => fields[fieldId] ?? ""),
     },
     reply: vi.fn().mockResolvedValue(undefined),
+    deferReply: vi.fn().mockResolvedValue(undefined),
+    editReply: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   };
 }
@@ -133,7 +135,7 @@ describe("bot/features/ticket/handlers/ui/ticketCreateModalHandler", () => {
       await ticketCreateModalHandler.execute(interaction as never);
 
       expect(createTicketChannel).not.toHaveBeenCalled();
-      expect(interaction.reply).not.toHaveBeenCalled();
+      expect(interaction.deferReply).not.toHaveBeenCalled();
     });
 
     it("正常系: チケットチャンネルを作成し成功応答する", async () => {
@@ -161,7 +163,8 @@ describe("bot/features/ticket/handlers/ui/ticketCreateModalHandler", () => {
         mockConfigService,
         mockTicketRepository,
       );
-      expect(interaction.reply).toHaveBeenCalledWith(
+      expect(interaction.deferReply).toHaveBeenCalled();
+      expect(interaction.editReply).toHaveBeenCalledWith(
         expect.objectContaining({
           embeds: expect.any(Array),
         }),
