@@ -7,6 +7,9 @@ import { stickyMessageSetEmbedModalHandler } from "../../../features/sticky-mess
 import { stickyMessageSetModalHandler } from "../../../features/sticky-message/handlers/ui/stickyMessageSetModalHandler";
 import { stickyMessageUpdateEmbedModalHandler } from "../../../features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler";
 import { stickyMessageUpdateModalHandler } from "../../../features/sticky-message/handlers/ui/stickyMessageUpdateModalHandler";
+import { ticketCreateModalHandler } from "../../../features/ticket/handlers/ui/ticketCreateModalHandler";
+import { ticketEditPanelModalHandler } from "../../../features/ticket/handlers/ui/ticketEditPanelModalHandler";
+import { ticketSetupModalHandler } from "../../../features/ticket/handlers/ui/ticketSetupModalHandler";
 import { vcPanelModalHandler } from "../../../features/vc-panel/handlers/ui/vcPanelModal";
 import { vcRecruitModalHandler } from "../../../features/vc-recruit/handlers/ui/vcRecruitModal";
 import { vcRecruitRenameModalHandler } from "../../../features/vc-recruit/handlers/ui/vcRecruitRenameModal";
@@ -31,4 +34,10 @@ export const modalHandlers: ModalHandler[] = [
   memberLogSetJoinMessageModalHandler,
   // member-log-config set-leave-message モーダルを処理
   memberLogSetLeaveMessageModalHandler,
+  // ticket setup モーダル（パネルタイトル・説明文入力）を処理
+  ticketSetupModalHandler,
+  // ticket create モーダル（件名・詳細入力）を処理
+  ticketCreateModalHandler,
+  // ticket edit-panel モーダル（パネル編集）を処理
+  ticketEditPanelModalHandler,
 ];

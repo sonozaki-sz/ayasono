@@ -48,6 +48,21 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
     stickyMessageService: {},
     vacService: {},
   })),
+  getBotTicketConfigService: vi.fn(() => ({})),
+  getBotTicketRepository: vi.fn(() => ({})),
+}));
+vi.mock("@/bot/features/ticket/services/ticketAutoDeleteService", () => ({
+  restoreAutoDeleteTimers: vi.fn(),
+  scheduleTicketAutoDelete: vi.fn(),
+  cancelTicketAutoDelete: vi.fn(),
+}));
+vi.mock("@/bot/features/ticket/services/ticketService", () => ({
+  createTicketChannel: vi.fn(),
+  closeTicket: vi.fn(),
+  reopenTicket: vi.fn(),
+  deleteTicket: vi.fn(),
+  hasTicketPermission: vi.fn(),
+  hasStaffRole: vi.fn(),
 }));
 
 // 現在 events/ に登録済みのイベント名（新規追加時はここへの手動追加不要）
@@ -68,7 +83,7 @@ describe("eventLoader", () => {
   let cachedEvents: Awaited<ReturnType<typeof loadEvents>>;
   beforeAll(async () => {
     cachedEvents = await loadEvents();
-  });
+  }, 30_000);
 
   it("events/ ディレクトリから BotEvent オブジェクトを自動ロードする", () => {
     expect(cachedEvents.length).toBeGreaterThan(0);

@@ -257,6 +257,12 @@ export class PrismaGuildConfigRepository implements IGuildConfigRepository {
       deleteIfExists(() =>
         this.prisma.stickyMessage.deleteMany({ where: { guildId } }),
       ),
+      deleteIfExists(() =>
+        this.prisma.ticket.deleteMany({ where: { guildId } }),
+      ),
+      deleteIfExists(() =>
+        this.prisma.guildTicketConfig.deleteMany({ where: { guildId } }),
+      ),
     ]);
   }
 

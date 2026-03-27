@@ -3,7 +3,11 @@
 
 import type { PrismaClient } from "@prisma/client";
 import { getGuildConfigRepository } from "../../shared/database/guildConfigRepositoryProvider";
-import type { IGuildConfigRepository } from "../../shared/database/types";
+import { getTicketConfigRepository } from "../../shared/database/repositories/ticketConfigRepository";
+import type {
+  IGuildConfigRepository,
+  ITicketRepository,
+} from "../../shared/database/types";
 import type { BumpReminderConfigService } from "../../shared/features/bump-reminder/bumpReminderConfigService";
 import type { GuildConfigService } from "../../shared/features/guild-config/guildConfigService";
 import { createGuildConfigService } from "../../shared/features/guild-config/guildConfigService";
@@ -11,6 +15,8 @@ import type { MemberLogConfigService } from "../../shared/features/member-log/me
 import { createMemberLogConfigService } from "../../shared/features/member-log/memberLogConfigService";
 import type { StickyMessageConfigService } from "../../shared/features/sticky-message/stickyMessageConfigService";
 import { createStickyMessageConfigService } from "../../shared/features/sticky-message/stickyMessageConfigService";
+import type { TicketConfigService } from "../../shared/features/ticket/ticketConfigService";
+import { createTicketConfigService } from "../../shared/features/ticket/ticketConfigService";
 import type { VacConfigService } from "../../shared/features/vac/vacConfigService";
 import { getVacConfigService } from "../../shared/features/vac/vacConfigService";
 import { createVcRecruitConfigService } from "../../shared/features/vc-recruit/vcRecruitConfigService";
@@ -24,6 +30,7 @@ import { getBumpReminderManager } from "../features/bump-reminder/services/bumpR
 import { getStickyMessageRepository } from "../features/sticky-message/repositories/stickyMessageRepository";
 import type { StickyMessageResendService } from "../features/sticky-message/services/stickyMessageResendService";
 import { getStickyMessageResendService } from "../features/sticky-message/services/stickyMessageResendService";
+import { getTicketRepository } from "../features/ticket/repositories/ticketRepository";
 import type { VacService } from "../features/vac/services/vacService";
 import { getVacService } from "../features/vac/services/vacService";
 import { registerVcPanelOwnershipChecker } from "../features/vc-panel/vcPanelOwnershipRegistry";
@@ -45,6 +52,8 @@ export interface BotServices {
   stickyMessageConfigService: StickyMessageConfigService;
   stickyMessageResendService: StickyMessageResendService;
   memberLogConfigService: MemberLogConfigService;
+  ticketConfigService: TicketConfigService;
+  ticketRepository: ITicketRepository;
   vcRecruitRepository: IVcRecruitRepository;
 }
 
@@ -134,6 +143,20 @@ export const setBotMemberLogConfigService: (
   value: MemberLogConfigService,
 ) => void = _memberLogConfigServiceAccessor[1];
 
+const _ticketConfigServiceAccessor =
+  createBotServiceAccessor<TicketConfigService>("TicketConfigService");
+export const getBotTicketConfigService: () => TicketConfigService =
+  _ticketConfigServiceAccessor[0];
+export const setBotTicketConfigService: (value: TicketConfigService) => void =
+  _ticketConfigServiceAccessor[1];
+
+const _ticketRepositoryAccessor =
+  createBotServiceAccessor<ITicketRepository>("TicketRepository");
+export const getBotTicketRepository: () => ITicketRepository =
+  _ticketRepositoryAccessor[0];
+export const setBotTicketRepository: (value: ITicketRepository) => void =
+  _ticketRepositoryAccessor[1];
+
 const _vcRecruitRepositoryAccessor =
   createBotServiceAccessor<IVcRecruitRepository>("VcRecruitRepository");
 export const getBotVcRecruitRepository: () => IVcRecruitRepository =
@@ -196,6 +219,13 @@ export function initializeBotCompositionRoot(
   );
   setBotMemberLogConfigService(memberLogConfigService);
 
+  // Ticket
+  const ticketConfigRepository = getTicketConfigRepository(prisma);
+  const ticketConfigService = createTicketConfigService(ticketConfigRepository);
+  const ticketRepository = getTicketRepository(prisma);
+  setBotTicketConfigService(ticketConfigService);
+  setBotTicketRepository(ticketRepository);
+
   // VcRecruit
   const vcRecruitConfigService = createVcRecruitConfigService(
     guildConfigRepository,
@@ -224,6 +254,8 @@ export function initializeBotCompositionRoot(
     stickyMessageConfigService,
     stickyMessageResendService,
     memberLogConfigService,
+    ticketConfigService,
+    ticketRepository,
     vcRecruitRepository,
   };
 }

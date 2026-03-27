@@ -61,14 +61,14 @@ src/
 │   │   └── discord.ts     # Bot専用のdiscord.js型拡張
 │   ├── commands/          # スラッシュコマンド定義（commandLoader が自動スキャン）
 │   ├── events/            # Discord イベントハンドラ（eventLoader が自動スキャン）
-│   ├── features/          # Bot専用機能（bump-reminder, vac, sticky-message 等）
-│   │   └── <feature>/
-│   │       ├── commands/   # コマンド実行ロジック（*.execute.ts, *.guard.ts 等）
-│   │       ├── handlers/   # イベント境界・起動処理
-│   │       │   └── ui/    # Button/Select/Modal などUI境界
-│   │       ├── services/   # 機能固有のビジネスロジック
-│   │       ├── repositories/ # 機能固有のランタイムデータのリポジトリ（設定以外）
-│   │       └── constants/  # 共通定数・CustomID 定義
+│   ├── features/          # Bot専用機能（機能ごとにサブディレクトリ）
+│   │   ├── <feature>/
+│   │   │   ├── commands/   # コマンド実行ロジック（*.execute.ts, *.guard.ts 等）
+│   │   │   ├── handlers/   # イベント境界・起動処理
+│   │   │   │   └── ui/    # Button/Select/Modal などUI境界
+│   │   │   ├── services/   # 機能固有のビジネスロジック
+│   │   │   ├── repositories/ # 機能固有のランタイムデータのリポジトリ（設定以外）
+│   │   │   └── constants/  # 共通定数・CustomID 定義
 │   ├── handlers/interactionCreate/
 │   │   ├── flow/          # command/components/modal のフロー制御
 │   │   │   └── components.ts # customIdベースの汎用ハンドラディスパッチ
@@ -183,6 +183,19 @@ intents: [
 
 > **注意**: `MessageContent` と `GuildMembers` は Discord Developer Portal での **Privileged Intents 有効化**が必要です。
 
+### Bot パーミッション
+
+| パーミッション   | 用途                                       |
+| ---------------- | ------------------------------------------ |
+| ManageChannels   | チケットチャンネルの作成・削除             |
+| ManageRoles      | チケットチャンネルの権限オーバーライド     |
+
+### イベントハンドラ
+
+| イベント      | 用途                                   |
+| ------------- | -------------------------------------- |
+| guildDelete   | Bot退出時の全設定クリーンアップ        |
+
 ### BotClient クラス
 
 `discord.js` の `Client` を拡張し、以下を追加しています：
@@ -279,6 +292,8 @@ const prisma = getPrismaClient(); // null の場合あり
 | `GuildVcRecruitConfig`    | VC 募集設定                                |
 | `BumpReminder`            | Bump リマインダー記録（スケジュールデータ） |
 | `StickyMessage`           | 固定メッセージ記録                         |
+| `GuildTicketConfig`       | チケット機能設定（カテゴリ・スタッフロール・パネル情報） |
+| `Ticket`                  | チケットレコード（ステータス・作成者・自動削除タイマー） |
 
 JSON 配列フィールド（`mentionUserIds`, `triggerChannelIds` 等）は SQLite の制約上 `String` 型で保存し、`parseJsonArray()` で読み出し時に変換します。
 

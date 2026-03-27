@@ -33,6 +33,7 @@
 | ログフォーマット              | ✅           | ✅   | ✅     | `logPrefixed()` / `logCommand()` によるプレフィックス統一  |
 | コア（エラー/DB/ロガー/設定） | ✅           | ✅   | ✅     |                                                            |
 | ギルド設定                    | ✅           | ✅   | ✅     | view/set/reset/export/import + エラーチャンネル通知        |
+| チケットシステム              | ✅           | ✅   | ✅     | パネルUI・チケット作成/クローズ/再オープン/削除・自動削除  |
 | 基本コマンド                  | ✅           | ✅   | ✅     | `/ping` `/help`                                            |
 | Web UI                        | ⬜           | 🚧   | 🚧     | Fastify + ヘルスチェックのみ                               |
 
@@ -60,39 +61,40 @@
 
 | セクション | タスク | 残件 |
 | --- | --- | ---: |
-| 1.1 チケットチャンネル機能 | 実装タスク | 20 |
-| 1.2 ボタンリアクションロール機能 | 実装タスク | 16 |
-| **合計** | | **36** |
+| 1.1 チケットチャンネル機能 | 実装タスク | 0 |
+| 1.2 リアクションロール機能 | 実装タスク | 17 |
+| **合計** | | **17** |
 
 ---
 
 ### 1. 新機能実装予定
 
-#### 1.1 チケットチャンネル機能（残: 20件）
+#### 1.1 チケットチャンネル機能（残: 0件）
 
 - [x] 仕様書作成
-- [ ] DBスキーマ追加（GuildTicketConfig / Ticket テーブル）
-- [ ] リポジトリ実装（shared/database）
-- [ ] 設定サービス実装（shared/features/ticket）
-- [ ] 翻訳ファイル作成（ja/en）
-- [ ] コマンド定義（`/ticket`, `/ticket-config`）
-- [ ] setup（パネル設置 + RoleSelectMenu + モーダル）
-- [ ] teardown（カテゴリ選択 + 確認フロー）
-- [ ] reset（2段階確認 + 全削除）
-- [ ] view（ページネーション + カテゴリ選択）
-- [ ] edit-panel（モーダルでタイトル・説明文編集）
-- [ ] set-roles / add-roles / remove-roles（RoleSelectMenu）
-- [ ] set-auto-delete / set-max-tickets
-- [ ] チケット作成（ボタン → モーダル → チャンネル作成 + 権限設定）
-- [ ] チケットクローズ（権限変更 + タイマー開始）
-- [ ] チケット再オープン（権限復元 + タイマーストップ）
-- [ ] チケット削除（確認ダイアログ + チャンネル削除）
-- [ ] 自動削除（スケジューラー + Bot再起動時復元）
-- [ ] Composition Root 登録
-- [ ] テスト
-- [ ] ドキュメント更新（README / DISCORD_BOT_SETUP / ARCHITECTURE の権限・テーブル・機能一覧追記、USER_MANUAL に操作方法を追加）
+- [x] DBスキーマ追加（GuildTicketConfig / Ticket テーブル）
+- [x] リポジトリ実装（shared/database）
+- [x] 設定サービス実装（shared/features/ticket）
+- [x] 翻訳ファイル作成（ja/en）
+- [x] コマンド定義（`/ticket`, `/ticket-config`）
+- [x] setup（パネル設置 + RoleSelectMenu + モーダル）
+- [x] teardown（カテゴリ選択 + 確認フロー）
+- [x] reset（廃止）
+- [x] view（ページネーション + カテゴリ選択）
+- [x] edit-panel（モーダルでタイトル・説明文編集）
+- [x] set-roles / add-roles / remove-roles（RoleSelectMenu）
+- [x] set-auto-delete / set-max-tickets
+- [x] チケット作成（ボタン → モーダル → チャンネル作成 + 権限設定）
+- [x] チケットクローズ（権限変更 + タイマー開始）
+- [x] チケット再オープン（権限復元 + タイマーストップ）
+- [x] チケット削除（確認ダイアログ + チャンネル削除）
+- [x] 自動削除（スケジューラー + Bot再起動時復元）
+- [x] Composition Root 登録
+- [x] テスト
+- [x] ドキュメント更新（README / DISCORD_BOT_SETUP / ARCHITECTURE の権限・テーブル・機能一覧追記、USER_MANUAL に操作方法を追加）
+- [x] `/help` コマンドにチケット機能の項目を追加
 
-#### 1.2 ボタンリアクションロール機能（残: 16件）
+#### 1.2 リアクションロール機能（残: 17件）
 
 - [x] 仕様書作成
 - [ ] DBスキーマ追加（GuildReactionRolePanel テーブル）
@@ -110,6 +112,7 @@
 - [ ] Composition Root 登録
 - [ ] テスト
 - [ ] ドキュメント更新（README / DISCORD_BOT_SETUP / ARCHITECTURE の権限・テーブル・機能一覧追記、USER_MANUAL に操作方法を追加）
+- [ ] `/help` コマンドにリアクションロール機能の項目を追加
 
 ---
 

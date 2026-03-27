@@ -42,6 +42,7 @@ export default defineConfig({
         // Repositories: DB 委譲のみ、独自ロジックなし → 計測対象外
         "src/bot/features/**/repositories/*.ts",
         "src/shared/database/repositories/guildConfigRepository.ts",
+        "src/shared/database/repositories/ticketConfigRepository.ts",
         // Repository usecases: 単一 prisma 呼び出しのみ（分岐・変換なし）→ 計測対象外
         "src/bot/features/bump-reminder/repositories/usecases/deleteBumpReminder.ts",
         "src/bot/features/bump-reminder/repositories/usecases/findBumpReminderById.ts",

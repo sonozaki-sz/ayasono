@@ -76,6 +76,7 @@
 | --- | --- | --- | --- | --- |
 | `ticket:setup-title` | パネルタイトル | Short | ✅ | サポート |
 | `ticket:setup-description` | パネル説明文 | Paragraph | ✅ | サポートが必要な場合は下のボタンからチケットを作成してください。 |
+| `ticket:setup-color` | カラー（例: #00A8F3） | Short | ❌ | #00A8F3 |
 
 **パネル Embed（設置後）:**
 
@@ -83,13 +84,13 @@
 | --- | --- |
 | タイトル | {カスタムタイトル}（デフォルト: サポート） |
 | 説明 | {カスタム説明文}（デフォルト: サポートが必要な場合は下のボタンからチケットを作成してください。） |
-| カラー | `#00A8F3` |
+| カラー | {カスタムカラー}（デフォルト: `#00A8F3`） |
 
 **パネルボタン:**
 
-| コンポーネント | ラベル | スタイル | 動作 |
-| --- | --- | --- | --- |
-| `ticket:create:<categoryId>` | チケットを作成 | Primary | チケット作成モーダルを表示 |
+| コンポーネント | emoji | ラベル | スタイル | 動作 |
+| --- | --- | --- | --- | --- |
+| `ticket:create:<categoryId>` | 🎫 | チケットを作成 | Primary | チケット作成モーダルを表示 |
 
 **成功メッセージ（`createSuccessEmbed` 使用 / ephemeral）:**
 
@@ -120,7 +121,8 @@
    - スタッフロール: ViewChannel / SendMessages / ReadMessageHistory 許可
    - Bot: ViewChannel / SendMessages / ManageChannels / ManageRoles 許可
 5. 初期メッセージ Embed + ボタンを送信
-6. チケット情報を DB に保存
+6. 作成者とスタッフロールへのメンションメッセージを送信（通知目的）
+7. チケット情報を DB に保存
 
 **ビジネスルール:**
 
@@ -141,17 +143,17 @@
 | 項目 | 内容 |
 | --- | --- |
 | タイトル | チケット: {件名} |
-| フィールド: 詳細 | {詳細内容} |
+| 説明 | {詳細内容} |
 | フィールド: 作成者 | @User |
 | フィールド: 作成日時 | YYYY/MM/DD HH:mm |
-| カラー | `#00A8F3` |
+| カラー | パネル設定のカスタムカラー（デフォルト: `#00A8F3`） |
 
 **初期メッセージボタン:**
 
-| コンポーネント | ラベル | スタイル | 動作 |
-| --- | --- | --- | --- |
-| `ticket:close:<ticketId>` | クローズ | Secondary | チケットをクローズ（作成者・スタッフ） |
-| `ticket:delete:<ticketId>` | 削除 | Danger | チケットを即時削除（スタッフのみ） |
+| コンポーネント | emoji | ラベル | スタイル | 動作 |
+| --- | --- | --- | --- | --- |
+| `ticket:close:<ticketId>` | 🔒 | クローズ | Secondary | チケットをクローズ（作成者・スタッフ） |
+| `ticket:delete:<ticketId>` | 🗑️ | 削除 | Danger | チケットを即時削除（スタッフのみ） |
 
 ---
 
@@ -199,10 +201,10 @@
 
 **クローズ通知ボタン:**
 
-| コンポーネント | ラベル | スタイル | 動作 |
-| --- | --- | --- | --- |
-| `ticket:open:<ticketId>` | 再オープン | Primary | チケットを再オープン（作成者・スタッフ） |
-| `ticket:delete:<ticketId>` | 削除 | Danger | チケットを即時削除（スタッフのみ） |
+| コンポーネント | emoji | ラベル | スタイル | 動作 |
+| --- | --- | --- | --- | --- |
+| `ticket:open:<ticketId>` | 🔓 | 再オープン | Secondary | チケットを再オープン（作成者・スタッフ） |
+| `ticket:delete:<ticketId>` | 🗑️ | 削除 | Danger | チケットを即時削除（スタッフのみ） |
 
 ---
 
@@ -244,10 +246,17 @@
 
 | 項目 | 内容 |
 | --- | --- |
-| タイトル | チケット再オープン |
-| 説明 | チケットを再オープンしました。 |
+| タイトル | チケットオープン |
+| 説明 | チケットをオープンしました。 |
 
 `createInfoEmbed` 使用
+
+**再オープン通知ボタン:**
+
+| コンポーネント | emoji | ラベル | スタイル | 動作 |
+| --- | --- | --- | --- | --- |
+| `ticket:close:<ticketId>` | 🔒 | クローズ | Secondary | チケットをクローズ（作成者・スタッフ） |
+| `ticket:delete:<ticketId>` | 🗑️ | 削除 | Danger | チケットを即時削除（スタッフのみ） |
 
 ---
 
@@ -293,10 +302,10 @@
 
 **確認ダイアログボタン:**
 
-| コンポーネント | ラベル | スタイル | 動作 |
-| --- | --- | --- | --- |
-| `ticket:delete-confirm:<ticketId>` | 削除する | Danger | チケットチャンネルを削除 |
-| `ticket:delete-cancel:<ticketId>` | キャンセル | Secondary | ダイアログを閉じる |
+| コンポーネント | emoji | ラベル | スタイル | 動作 |
+| --- | --- | --- | --- | --- |
+| `ticket:delete-confirm:<ticketId>` | 🗑️ | 削除する | Danger | チケットチャンネルを削除 |
+| `ticket:delete-cancel:<ticketId>` | ❌ | キャンセル | Secondary | ダイアログを閉じる |
 
 ---
 
@@ -324,6 +333,34 @@
 
 ---
 
+## パネル削除検知
+
+パネルメッセージまたはパネル設置チャンネルが削除された場合、設定を自動クリーンアップする。
+
+### トリガー
+
+**イベント**: `messageDelete` / `channelDelete`
+
+**発火条件:**
+
+- `messageDelete`: 削除されたメッセージの ID がいずれかの `panelMessageId` と一致する
+- `channelDelete`: 削除されたチャンネルの ID がいずれかの `panelChannelId` と一致する
+
+### 動作フロー
+
+1. 削除されたメッセージ ID / チャンネル ID から対応する `GuildTicketConfig` を特定
+2. 該当設定を DB から削除
+
+**ビジネスルール:**
+
+- **既存チケットチャンネルは削除しない** — オープン中のチケットで進行中のやりとりが失われるのを防ぐため
+- **チケットの DB レコードは残す** — クローズ・再オープン・削除ボタンは引き続き動作する
+- **自動削除タイマーはクローズ済みチケットについてそのまま維持** — 設定削除前の `autoDeleteDays` に基づくタイマーが満了すれば通常通り削除される
+- 新規チケットの作成のみ不可能になる（パネルボタンが存在しないため）
+- 管理者が再設置したい場合は `/ticket-config setup` で再度パネルを設置できる
+
+---
+
 ## /ticket-config setup
 
 （「パネル設置（setup）」セクション参照）
@@ -343,10 +380,12 @@
 ### 動作フロー
 
 1. ManageGuild 権限チェック
-2. 設定済みカテゴリ一覧をセレクトメニューで表示
-3. カテゴリ選択後、オープン中チケットの有無を確認
-4. オープン中チケットがある場合は警告 Embed を表示
-5. 確認後:
+2. 設定済みカテゴリ一覧を確認
+3. **1件の場合**: セレクトメニューをスキップし、直接確認ダイアログを表示
+4. **複数件の場合**: セレクトメニュー（複数選択可）+ 全選択ボタンを表示
+5. カテゴリ選択後、選択されたカテゴリのオープン中チケットの有無を確認
+6. オープン中チケットがある場合は警告 Embed を表示
+7. 確認後:
    - 自動削除タイマーをすべてキャンセル
    - 全チケットチャンネルを削除
    - パネルメッセージを削除
@@ -354,96 +393,30 @@
 
 **ビジネスルール:**
 
+- 設定が1件の場合はセレクトメニューをスキップ（UX向上）
+- セレクトメニューは複数選択可能（全カテゴリを一度に撤去可能）
 - オープン中チケットがない場合は通常の確認フロー
 - オープン中チケットがある場合は警告付き確認（チケットも全削除）
 
 ### UI
 
-**カテゴリ選択セレクトメニュー:**
+**カテゴリ選択セレクトメニュー（複数件の場合のみ）:**
 
 | コンポーネント | スタイル | 動作 |
 | --- | --- | --- |
-| `ticket:teardown-select:<sessionId>` | StringSelect | 撤去するカテゴリを選択 |
-
-**確認 Embed（オープンチケットなし）:**
-
-| 項目 | 内容 |
-| --- | --- |
-| タイトル | チケット撤去確認 |
-| 説明 | 選択したカテゴリのパネル・設定を削除します。この操作は取り消せません。 |
-
-`createWarningEmbed` 使用
-
-**確認ボタン（オープンチケットなし）:**
-
-| コンポーネント | ラベル | スタイル | 動作 |
-| --- | --- | --- | --- |
-| `ticket:teardown-confirm:<sessionId>` | 撤去する | Danger | パネル・設定を削除 |
-| `ticket:teardown-cancel:<sessionId>` | キャンセル | Secondary | 何もしない |
-
-**警告 Embed（オープンチケットあり）:**
-
-| 項目 | 内容 |
-| --- | --- |
-| タイトル | チケット撤去確認 |
-| 説明 | オープン中のチケットが{{count}}件あります。続行するとチケットチャンネルも全て削除されます。この操作は取り消せません。 |
-| フィールド: オープン中のチケット（N件） | `#ticket-1`, `#ticket-2`, `#ticket-3`（上限超過時は「他 X件」と省略） |
-
-`createWarningEmbed` 使用
-
-**確認ボタン:**
-
-| コンポーネント | ラベル | スタイル | 動作 |
-| --- | --- | --- | --- |
-| `ticket:teardown-confirm:<sessionId>` | 撤去する | Danger | パネル・チケット・設定を全削除 |
-| `ticket:teardown-cancel:<sessionId>` | キャンセル | Secondary | 何もしない |
-
----
-
-## /ticket-config reset
-
-### コマンド定義
-
-**コマンド**: `/ticket-config reset`
-
-**実行権限**: ManageGuild
-
-**コマンドオプション:** なし
-
-### 動作フロー
-
-1. ManageGuild 権限チェック
-2. 全カテゴリのオープン中チケット合計を確認
-3. 警告付き2段階確認 Embed を表示
-4. 確認後:
-   - 全カテゴリの自動削除タイマーをキャンセル
-   - 全チケットチャンネルを削除
-   - 全パネルメッセージを削除
-   - DB から全チケットレコードと全設定を削除
-
-**ビジネスルール:**
-
-- 設定が存在しない場合はエラー
-- オープン中チケットがある場合は警告表示（チケット一覧をカンマ区切りで表示）
-
-### UI
+| `ticket:teardown-select:<sessionId>` | StringSelect（複数選択可） | 撤去するカテゴリを選択 |
 
 **確認 Embed:**
 
 | 項目 | 内容 |
 | --- | --- |
-| タイトル | チケット設定リセット確認 |
-| 説明 | 全てのチケット設定をリセットします。全カテゴリのパネル・チケットチャンネル・設定が削除されます。この操作は取り消せません。 |
-| フィールド: オープン中のチケット（N件）| `#ticket-1`, `#ticket-2`, `#ticket-3`（上限超過時は「他 X件」と省略） |
+| タイトル | チケット撤去確認 |
+| 説明 | オープンチケットなし: 選択したカテゴリのパネル・設定を削除します。この操作は取り消せません。 |
+| 説明（オープンチケットあり） | オープン中のチケットが{{count}}件あります。続行するとチケットチャンネルも全て削除されます。この操作は取り消せません。 |
+| フィールド: 削除対象カテゴリ | `#カテゴリ1`, `#カテゴリ2`（カンマ区切り） |
+| フィールド: オープン中のチケット（N件） | `#ticket-1`, `#ticket-2`...（上限超過時は「他 X件」と省略、オープンチケットがある場合のみ表示） |
 
 `createWarningEmbed` 使用
-
-**確認ボタン:**
-
-| コンポーネント | ラベル | スタイル | 動作 |
-| --- | --- | --- | --- |
-| `ticket:reset-confirm:<sessionId>` | リセットする | Danger | 全設定削除 |
-| `ticket:reset-cancel:<sessionId>` | キャンセル | Secondary | 何もしない |
 
 ---
 
@@ -529,6 +502,7 @@
 | --- | --- | --- | --- | --- |
 | `ticket:edit-panel-title` | パネルタイトル | Short | ✅ | 現在の設定値 |
 | `ticket:edit-panel-description` | パネル説明文 | Paragraph | ✅ | 現在の設定値 |
+| `ticket:edit-panel-color` | カラー（例: #00A8F3） | Short | ❌ | 現在の設定値 |
 
 **成功メッセージ（`createSuccessEmbed` 使用 / ephemeral）:**
 
@@ -751,6 +725,7 @@
 | `panelMessageId` | String | パネルメッセージID |
 | `panelTitle` | String | パネルタイトル（デフォルト: サポート） |
 | `panelDescription` | String | パネル説明文（デフォルト: サポートが必要な場合は下のボタンからチケットを作成してください。） |
+| `panelColor` | String | パネル・チケットEmbedカラー（デフォルト: #00A8F3） |
 | `autoDeleteDays` | Int | 自動削除日数（デフォルト: 7） |
 | `maxTicketsPerUser` | Int | ユーザーあたり同時チケット上限（デフォルト: 1） |
 | `ticketCounter` | Int | チケット連番カウンター（デフォルト: 0） |
@@ -781,6 +756,7 @@
 - チケット即時削除はスタッフロールのみ
 - 自動削除タイマーはBot再起動時にDBから復元
 - パネル Embed のフィールド値上限（1024文字）を超えるチケット一覧は先頭N件 + 「他 X件」で省略
+- パネルメッセージまたはパネル設置チャンネルが削除された場合、設定のみ自動削除（既存チケットは維持）
 
 ---
 
@@ -802,7 +778,6 @@
 | `ticket-config.setup.description` | サブコマンド説明 | チケットパネルを設置 | Set up ticket panel |
 | `ticket-config.setup.category.description` | オプション説明 | チケット作成先カテゴリ | Category for ticket channels |
 | `ticket-config.teardown.description` | サブコマンド説明 | チケットパネルを撤去 | Remove ticket panel |
-| `ticket-config.reset.description` | サブコマンド説明 | 全設定をリセット | Reset all settings |
 | `ticket-config.view.description` | サブコマンド説明 | 現在の設定を表示 | Show current settings |
 | `ticket-config.edit-panel.description` | サブコマンド説明 | パネルのタイトル・説明文を編集 | Edit panel title and description |
 | `ticket-config.edit-panel.category.description` | オプション説明 | 編集対象のカテゴリ | Target category |
@@ -826,8 +801,6 @@
 | `user-response.setup_success` | パネル設置成功 | チケットパネルを設置しました。 | Ticket panel has been set up. |
 | `user-response.teardown_success` | パネル撤去成功 | チケットパネルを撤去しました。 | Ticket panel has been removed. |
 | `user-response.teardown_cancelled` | 撤去キャンセル | キャンセルしました。 | Cancelled. |
-| `user-response.reset_success` | リセット成功 | 全てのチケット設定をリセットしました。 | All ticket settings have been reset. |
-| `user-response.reset_cancelled` | リセットキャンセル | キャンセルしました。 | Cancelled. |
 | `user-response.ticket_created` | チケット作成成功 | チケットを作成しました: {{channel}} | Ticket created: {{channel}} |
 | `user-response.ticket_closed` | クローズ成功 | チケットをクローズしました。 | Ticket has been closed. |
 | `user-response.ticket_opened` | 再オープン成功 | チケットを再オープンしました。 | Ticket has been reopened. |
@@ -857,7 +830,6 @@
 | `embed.title.panel_default` | パネルデフォルトタイトル | サポート | Support |
 | `embed.description.panel_default` | パネルデフォルト説明文 | サポートが必要な場合は下のボタンからチケットを作成してください。 | If you need support, please create a ticket using the button below. |
 | `embed.title.ticket` | チケット初期メッセージタイトル | チケット: {{subject}} | Ticket: {{subject}} |
-| `embed.field.name.detail` | 詳細フィールド名 | 詳細 | Details |
 | `embed.field.name.created_by` | 作成者フィールド名 | 作成者 | Created by |
 | `embed.field.name.created_at` | 作成日時フィールド名 | 作成日時 | Created at |
 | `embed.title.closed` | クローズ通知タイトル | チケットクローズ | Ticket Closed |
@@ -871,8 +843,6 @@
 | `embed.description.teardown_confirm` | 撤去確認説明（チケットなし） | 選択したカテゴリのパネル・設定を削除します。この操作は取り消せません。 | The panel and settings for the selected category will be deleted. This action cannot be undone. |
 | `embed.description.teardown_warning` | 撤去警告文（チケットあり） | オープン中のチケットが{{count}}件あります。続行するとチケットチャンネルも全て削除されます。この操作は取り消せません。 | There are {{count}} open tickets. Continuing will also delete all ticket channels. This action cannot be undone. |
 | `embed.field.name.open_tickets` | オープンチケットフィールド名 | オープン中のチケット（{{count}}件） | Open tickets ({{count}}) |
-| `embed.title.reset_confirm` | リセット確認タイトル | チケット設定リセット確認 | Ticket Settings Reset |
-| `embed.description.reset_warning` | リセット警告文 | 全てのチケット設定をリセットします。全カテゴリのパネル・チケットチャンネル・設定が削除されます。この操作は取り消せません。 | All ticket settings will be reset. All panels, ticket channels, and settings for all categories will be deleted. This action cannot be undone. |
 | `embed.title.config_view` | 設定表示タイトル | チケット設定 | Ticket Settings |
 | `embed.field.name.category` | カテゴリフィールド名 | カテゴリ | Category |
 | `embed.field.name.staff_roles` | スタッフロールフィールド名 | スタッフロール | Staff Roles |
@@ -894,8 +864,6 @@
 | `ui.button.cancel` | キャンセルボタン | キャンセル | Cancel |
 | `ui.button.teardown_confirm` | 撤去確認ボタン | 撤去する | Remove |
 | `ui.button.teardown_cancel` | 撤去キャンセルボタン | キャンセル | Cancel |
-| `ui.button.reset_confirm` | リセット確認ボタン | リセットする | Reset |
-| `ui.button.reset_cancel` | リセットキャンセルボタン | キャンセル | Cancel |
 | `ui.select.roles_placeholder` | ロール選択プレースホルダー | スタッフロールを選択してください | Select staff roles |
 | `ui.select.teardown_placeholder` | 撤去カテゴリ選択プレースホルダー | 撤去するカテゴリを選択してください | Select a category to remove |
 | `ui.select.view_placeholder` | 設定表示カテゴリ選択プレースホルダー | カテゴリを選択してください | Select a category |
@@ -913,7 +881,6 @@
 | --- | --- | --- | --- |
 | `log.setup` | パネル設置ログ | チケットパネルを設置 GuildId: {{guildId}} CategoryId: {{categoryId}} ChannelId: {{channelId}} | ticket panel set up GuildId: {{guildId}} CategoryId: {{categoryId}} ChannelId: {{channelId}} |
 | `log.teardown` | パネル撤去ログ | チケットパネルを撤去 GuildId: {{guildId}} CategoryId: {{categoryId}} | ticket panel removed GuildId: {{guildId}} CategoryId: {{categoryId}} |
-| `log.reset` | リセットログ | 全チケット設定をリセット GuildId: {{guildId}} | all ticket settings reset GuildId: {{guildId}} |
 | `log.ticket_created` | チケット作成ログ | チケット作成 GuildId: {{guildId}} ChannelId: {{channelId}} UserId: {{userId}} TicketNumber: {{ticketNumber}} | ticket created GuildId: {{guildId}} ChannelId: {{channelId}} UserId: {{userId}} TicketNumber: {{ticketNumber}} |
 | `log.ticket_closed` | クローズログ | チケットクローズ GuildId: {{guildId}} ChannelId: {{channelId}} ClosedBy: {{closedBy}} | ticket closed GuildId: {{guildId}} ChannelId: {{channelId}} ClosedBy: {{closedBy}} |
 | `log.ticket_opened` | 再オープンログ | チケット再オープン GuildId: {{guildId}} ChannelId: {{channelId}} OpenedBy: {{openedBy}} | ticket reopened GuildId: {{guildId}} ChannelId: {{channelId}} OpenedBy: {{openedBy}} |
@@ -923,6 +890,8 @@
 | `log.database_config_save_failed` | DB操作エラーログ | チケット設定保存に失敗 GuildId: {{guildId}} CategoryId: {{categoryId}} | failed to save ticket config GuildId: {{guildId}} CategoryId: {{categoryId}} |
 | `log.database_ticket_saved` | DB操作ログ | チケットを保存 GuildId: {{guildId}} TicketId: {{ticketId}} | ticket saved GuildId: {{guildId}} TicketId: {{ticketId}} |
 | `log.database_ticket_save_failed` | DB操作エラーログ | チケット保存に失敗 GuildId: {{guildId}} TicketId: {{ticketId}} | failed to save ticket GuildId: {{guildId}} TicketId: {{ticketId}} |
+| `log.panel_deleted` | パネル削除検知ログ | パネル削除を検知 GuildId: {{guildId}} CategoryId: {{categoryId}} | panel deletion detected GuildId: {{guildId}} CategoryId: {{categoryId}} |
+| `log.panel_channel_deleted` | パネルチャンネル削除検知ログ | パネル設置チャンネル削除を検知 GuildId: {{guildId}} CategoryId: {{categoryId}} | panel channel deletion detected GuildId: {{guildId}} CategoryId: {{categoryId}} |
 
 ---
 
@@ -934,3 +903,5 @@
 | Ticket（DB） | チケット情報の CRUD |
 | JobScheduler | 自動削除タイマーのスケジュール |
 | ページネーション共通コンポーネント | view のページ切り替え |
+| messageDelete イベント | パネルメッセージ個別削除の検知 |
+| channelDelete イベント | パネル設置チャンネル削除の検知 |

@@ -109,3 +109,45 @@ model StickyMessage {
   @@index([guildId])
   @@map("sticky_messages")
 }
+
+// チケットチャンネル設定
+model GuildTicketConfig {
+  guildId          String  @map("guild_id")
+  categoryId       String  @map("category_id")
+  enabled          Boolean @default(false)
+  staffRoleIds     String  @default("[]") @map("staff_role_ids") // JSON: string[]
+  panelChannelId   String  @map("panel_channel_id")
+  panelMessageId   String  @map("panel_message_id")
+  panelTitle       String  @default("サポート") @map("panel_title")
+  panelDescription String  @default("サポートが必要な場合は下のボタンからチケットを作成してください。") @map("panel_description")
+  panelColor       String  @default("#00A8F3") @map("panel_color")
+  autoDeleteDays   Int     @default(7) @map("auto_delete_days")
+  maxTicketsPerUser Int    @default(1) @map("max_tickets_per_user")
+  ticketCounter    Int     @default(0) @map("ticket_counter")
+
+  @@id([guildId, categoryId])
+  @@index([guildId])
+  @@map("guild_ticket_configs")
+}
+
+// チケット
+model Ticket {
+  id              String    @id @default(cuid())
+  guildId         String    @map("guild_id")
+  categoryId      String    @map("category_id")
+  channelId       String    @map("channel_id")
+  userId          String    @map("user_id")
+  ticketNumber    Int       @map("ticket_number")
+  subject         String
+  status          String    @default("open") // open, closed
+  elapsedDeleteMs Int       @default(0) @map("elapsed_delete_ms")
+  closedAt        DateTime? @map("closed_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@index([guildId])
+  @@index([categoryId])
+  @@index([channelId])
+  @@index([guildId, categoryId, userId, status])
+  @@map("tickets")
+}

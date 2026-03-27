@@ -3,6 +3,7 @@
 
 import { Events } from "discord.js";
 import { handleStickyMessageChannelDelete } from "../features/sticky-message/handlers/stickyMessageChannelDeleteHandler";
+import { handleTicketChannelDelete } from "../features/ticket/handlers/ticketChannelDeleteHandler";
 import { handleVacChannelDelete } from "../features/vac/handlers/vacChannelDelete";
 import { handleVcRecruitChannelDelete } from "../features/vc-recruit/handlers/vcRecruitChannelDeleteHandler";
 import type { BotEvent } from "../types/discord";
@@ -24,5 +25,7 @@ export const channelDeleteEvent: BotEvent<typeof Events.ChannelDelete> = {
     await handleStickyMessageChannelDelete(channel);
     // VC募集セットアップのペアチャンネルとDBレコードを破棄
     await handleVcRecruitChannelDelete(channel);
+    // チケットパネル設置チャンネルの削除検知・設定クリーンアップ
+    await handleTicketChannelDelete(channel);
   },
 };
