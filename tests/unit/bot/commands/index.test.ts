@@ -46,6 +46,21 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
     stickyMessageService: {},
     vacService: {},
   })),
+  getBotTicketConfigService: vi.fn(() => ({})),
+  getBotTicketRepository: vi.fn(() => ({})),
+}));
+vi.mock("@/bot/features/ticket/services/ticketAutoDeleteService", () => ({
+  scheduleTicketAutoDelete: vi.fn(),
+  cancelTicketAutoDelete: vi.fn(),
+  restoreAutoDeleteTimers: vi.fn(),
+}));
+vi.mock("@/bot/features/ticket/services/ticketService", () => ({
+  createTicketChannel: vi.fn(),
+  closeTicket: vi.fn(),
+  reopenTicket: vi.fn(),
+  deleteTicket: vi.fn(),
+  hasTicketPermission: vi.fn(),
+  hasStaffRole: vi.fn(),
 }));
 
 // 現在 commands/ に登録済みのコマンド名（新規追加時はここへの手動追加不要）
@@ -56,6 +71,8 @@ const KNOWN_COMMAND_NAMES = [
   "member-log-config",
   "message-delete",
   "sticky-message",
+  "ticket",
+  "ticket-config",
   "vc",
   "vac-config",
   "vc-recruit-config",
@@ -68,7 +85,7 @@ describe("commandLoader", () => {
   let cachedCommands: Awaited<ReturnType<typeof loadCommands>>;
   beforeAll(async () => {
     cachedCommands = await loadCommands();
-  });
+  }, 30_000);
 
   it("commands/ ディレクトリから Command オブジェクトを自動ロードする", () => {
     expect(cachedCommands.length).toBeGreaterThan(0);

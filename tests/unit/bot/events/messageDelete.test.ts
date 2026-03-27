@@ -4,6 +4,7 @@ import { Events } from "discord.js";
 import { messageDeleteEvent } from "@/bot/events/messageDelete";
 
 const handleVcRecruitMessageDeleteMock = vi.fn();
+const handleTicketMessageDeleteMock = vi.fn();
 
 vi.mock(
   "@/bot/features/vc-recruit/handlers/vcRecruitMessageDeleteHandler",
@@ -12,6 +13,10 @@ vi.mock(
       handleVcRecruitMessageDeleteMock(...args),
   }),
 );
+vi.mock("@/bot/features/ticket/handlers/ticketMessageDeleteHandler", () => ({
+  handleTicketMessageDelete: (...args: unknown[]) =>
+    handleTicketMessageDeleteMock(...args),
+}));
 
 function createMessage(overrides?: Record<string, unknown>) {
   return {

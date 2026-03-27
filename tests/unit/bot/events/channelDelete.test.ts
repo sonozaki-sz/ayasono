@@ -6,6 +6,7 @@ import { channelDeleteEvent } from "@/bot/events/channelDelete";
 const handleVacChannelDeleteMock = vi.fn();
 const handleStickyMessageChannelDeleteMock = vi.fn();
 const handleVcRecruitChannelDeleteMock = vi.fn();
+const handleTicketChannelDeleteMock = vi.fn();
 
 vi.mock("@/bot/features/vac/handlers/vacChannelDelete", () => ({
   handleVacChannelDelete: (...args: unknown[]) =>
@@ -27,6 +28,11 @@ vi.mock(
       handleVcRecruitChannelDeleteMock(...args),
   }),
 );
+
+vi.mock("@/bot/features/ticket/handlers/ticketChannelDeleteHandler", () => ({
+  handleTicketChannelDelete: (...args: unknown[]) =>
+    handleTicketChannelDeleteMock(...args),
+}));
 
 type ChannelLike = {
   guildId: string;

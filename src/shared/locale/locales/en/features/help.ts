@@ -14,9 +14,9 @@ export const help = {
   "embed.field.value.basic":
     "`/ping` — Check bot response speed\n`/help` — Show this help",
   "embed.field.value.config":
-    "`/guild-config` — Guild settings\n`/afk-config` — AFK settings\n`/vac-config` — Auto VC creation settings\n`/vc-recruit-config` — VC recruitment settings\n`/sticky-message` — Sticky message settings\n`/member-log-config` — Member log settings\n`/message-delete-config` — Message delete settings\n`/bump-reminder-config` — Bump reminder settings",
+    "`/guild-config` — Guild settings\n`/afk-config` — AFK settings\n`/vac-config` — Auto VC creation settings\n`/vc-recruit-config` — VC recruitment settings\n`/sticky-message` — Sticky message settings\n`/member-log-config` — Member log settings\n`/message-delete-config` — Message delete settings\n`/bump-reminder-config` — Bump reminder settings\n`/ticket-config` — Ticket system settings",
   "embed.field.value.action":
-    "`/afk` — Move to AFK channel\n`/vc` — Change VC name or user limit\n`/message-delete` — Bulk delete messages",
+    "`/afk` — Move to AFK channel\n`/vc` — Change VC name or user limit\n`/message-delete` — Bulk delete messages\n`/ticket` — Ticket operations (close, open, delete)",
 } as const;
 
 export type HelpTranslations = typeof help;

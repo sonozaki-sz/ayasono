@@ -24,8 +24,17 @@ export const system = {
   "log_prefix.message_delete": "messageDelete",
   "log_prefix.voice_state_update": "voiceStateUpdate",
   "log_prefix.channel_delete": "channelDelete",
+  "log_prefix.guild_delete": "guildDelete",
   "log_prefix.ready": "ready",
+  "log_prefix.ticket": "Ticket",
   "log_prefix.guild_config": "GuildConfig",
+
+  // guildDelete (cleanup on bot removal)
+  "guild_delete.start":
+    "guild removal detected, deleting config data GuildId: {{guildId}} GuildName: {{guildName}}",
+  "guild_delete.complete": "guild config data deleted GuildId: {{guildId}}",
+  "guild_delete.failed":
+    "failed to delete guild config data GuildId: {{guildId}}",
 
   // Bot startup & shutdown
   "bot.starting": "Starting Discord Bot...",

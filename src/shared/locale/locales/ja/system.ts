@@ -24,8 +24,18 @@ export const system = {
   "log_prefix.message_delete": "messageDelete",
   "log_prefix.voice_state_update": "voiceStateUpdate",
   "log_prefix.channel_delete": "channelDelete",
+  "log_prefix.guild_delete": "guildDelete",
   "log_prefix.ready": "ready",
+  "log_prefix.ticket": "チケット",
   "log_prefix.guild_config": "ギルド設定",
+
+  // guildDelete（Bot退出時クリーンアップ）
+  "guild_delete.start":
+    "ギルド退出を検知 設定データを削除します GuildId: {{guildId}} GuildName: {{guildName}}",
+  "guild_delete.complete":
+    "ギルド設定データの削除が完了しました GuildId: {{guildId}}",
+  "guild_delete.failed":
+    "ギルド設定データの削除に失敗しました GuildId: {{guildId}}",
 
   // Bot起動・シャットダウン
   "bot.starting": "Discord Botを起動しています...",

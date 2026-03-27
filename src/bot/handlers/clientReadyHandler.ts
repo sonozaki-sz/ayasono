@@ -7,7 +7,9 @@ import { logger } from "../../shared/utils/logger";
 import type { BotClient } from "../client";
 import { restoreBumpRemindersOnStartup } from "../features/bump-reminder/handlers/bumpReminderStartup";
 import { initGuildInviteCache } from "../features/member-log/handlers/inviteTracker";
+import { restoreAutoDeleteTimers } from "../features/ticket/services/ticketAutoDeleteService";
 import { cleanupVacOnStartup } from "../features/vac/handlers/vacStartupCleanup";
+import { getBotTicketRepository } from "../services/botCompositionRoot";
 
 /**
  * clientReady 発火時の初期化後処理をまとめて実行する関数
@@ -59,4 +61,6 @@ export async function handleClientReady(client: BotClient): Promise<void> {
   await restoreBumpRemindersOnStartup(client);
   // Bump 復元後に VAC 掃除を行い、起動後の状態を最終整合
   await cleanupVacOnStartup(client);
+  // クローズ済みチケットの自動削除タイマーを復元
+  await restoreAutoDeleteTimers(client, getBotTicketRepository());
 }

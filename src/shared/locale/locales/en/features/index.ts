@@ -9,6 +9,7 @@ export { memberLog } from "./memberLog";
 export { messageDelete } from "./messageDelete";
 export { ping } from "./ping";
 export { stickyMessage } from "./stickyMessage";
+export { ticket } from "./ticket";
 export { vac } from "./vac";
 export { vc } from "./vc";
 export { vcRecruit } from "./vcRecruit";

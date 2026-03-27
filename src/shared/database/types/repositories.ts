@@ -16,6 +16,7 @@ import type {
   VacConfig,
 } from "./entities";
 import type { StickyMessage } from "./stickyMessageTypes";
+import type { GuildTicketConfig, Ticket } from "./ticketTypes";
 import type { VcRecruitConfig } from "./vcRecruitTypes";
 
 export interface IBaseGuildRepository {
@@ -121,6 +122,41 @@ export interface IStickyMessageRepository {
   ): Promise<StickyMessage>;
   delete(id: string): Promise<void>;
   deleteByChannel(channelId: string): Promise<number>;
+}
+
+export interface IGuildTicketConfigRepository {
+  findByGuildAndCategory(
+    guildId: string,
+    categoryId: string,
+  ): Promise<GuildTicketConfig | null>;
+  findAllByGuild(guildId: string): Promise<GuildTicketConfig[]>;
+  create(config: GuildTicketConfig): Promise<GuildTicketConfig>;
+  update(
+    guildId: string,
+    categoryId: string,
+    data: Partial<GuildTicketConfig>,
+  ): Promise<GuildTicketConfig>;
+  delete(guildId: string, categoryId: string): Promise<void>;
+  deleteAllByGuild(guildId: string): Promise<number>;
+  incrementCounter(guildId: string, categoryId: string): Promise<number>;
+}
+
+export interface ITicketRepository {
+  findById(id: string): Promise<Ticket | null>;
+  findByChannelId(channelId: string): Promise<Ticket | null>;
+  findOpenByUserAndCategory(
+    guildId: string,
+    categoryId: string,
+    userId: string,
+  ): Promise<Ticket[]>;
+  findAllByCategory(guildId: string, categoryId: string): Promise<Ticket[]>;
+  findOpenByCategory(guildId: string, categoryId: string): Promise<Ticket[]>;
+  findAllClosedByGuild(guildId: string): Promise<Ticket[]>;
+  create(data: Omit<Ticket, "id" | "createdAt" | "updatedAt">): Promise<Ticket>;
+  update(id: string, data: Partial<Ticket>): Promise<Ticket>;
+  delete(id: string): Promise<void>;
+  deleteByCategory(guildId: string, categoryId: string): Promise<number>;
+  deleteAllByGuild(guildId: string): Promise<number>;
 }
 
 /**

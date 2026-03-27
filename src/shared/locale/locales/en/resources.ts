@@ -11,6 +11,7 @@ import {
   messageDelete,
   ping,
   stickyMessage,
+  ticket,
   vac,
   vc,
   vcRecruit,
@@ -29,6 +30,7 @@ export const en: {
   messageDelete: typeof messageDelete;
   memberLog: typeof memberLog;
   stickyMessage: typeof stickyMessage;
+  ticket: typeof ticket;
   vcRecruit: typeof vcRecruit;
   guildConfig: typeof guildConfig;
 } = {
@@ -43,6 +45,7 @@ export const en: {
   messageDelete,
   memberLog,
   stickyMessage,
+  ticket,
   vcRecruit,
   guildConfig,
 };

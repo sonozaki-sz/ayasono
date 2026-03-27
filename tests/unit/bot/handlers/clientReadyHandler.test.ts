@@ -13,6 +13,8 @@ const loggerInfoMock = vi.fn();
 const restoreBumpRemindersOnStartupMock = vi.fn();
 const cleanupVacOnStartupMock = vi.fn();
 const initGuildInviteCacheMock = vi.fn();
+const restoreAutoDeleteTimersMock = vi.fn();
+const getBotTicketRepositoryMock = vi.fn();
 
 vi.mock("@/shared/locale/localeManager", () => ({
   logPrefixed: (
@@ -58,6 +60,16 @@ vi.mock("@/bot/features/member-log/handlers/inviteTracker", () => ({
     initGuildInviteCacheMock(...args),
 }));
 
+vi.mock("@/bot/features/ticket/services/ticketAutoDeleteService", () => ({
+  restoreAutoDeleteTimers: (...args: unknown[]) =>
+    restoreAutoDeleteTimersMock(...args),
+}));
+
+vi.mock("@/bot/services/botCompositionRoot", () => ({
+  getBotTicketRepository: (...args: unknown[]) =>
+    getBotTicketRepositoryMock(...args),
+}));
+
 // clientReady ハンドラーが
 // 起動ログ出力・プレゼンス設定・各スタートアップタスク（バンプリマインダー復元 / VAC クリーンアップ）の
 // 実行順序とエラー伝播を正しく行うかを検証する
@@ -67,6 +79,8 @@ describe("bot/handlers/clientReadyHandler", () => {
     restoreBumpRemindersOnStartupMock.mockResolvedValue(undefined);
     cleanupVacOnStartupMock.mockResolvedValue(undefined);
     initGuildInviteCacheMock.mockResolvedValue(undefined);
+    restoreAutoDeleteTimersMock.mockResolvedValue(undefined);
+    getBotTicketRepositoryMock.mockReturnValue({});
   });
 
   it("起動ログ・プレゼンス設定・各スタートアップタスクが正しく実行されることを確認", async () => {
