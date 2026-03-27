@@ -238,6 +238,21 @@
 
 ---
 
+## テストケース
+
+### ユニットテスト
+
+- [x] `/afk`: ギルド外実行エラー、正常移動+成功Embed、config未設定/無効エラー、メンバー未検出/VC未参加/AFKチャンネル不在エラー、Bot権限不足エラー伝播、userオプション指定
+- [x] `/afk-config set-channel`: ManageGuild権限チェック、正常設定、非VCチャンネルエラー
+- [x] `/afk-config view`: 設定済み/未設定の表示
+- [x] `/afk-config clear-channel`: 設定解除
+
+### インテグレーションテスト
+
+- [x] set-channel → view → /afk 移動の一連フロー
+
+---
+
 ## 依存関係
 
 | 依存先 | 内容 |
