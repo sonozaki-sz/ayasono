@@ -3,7 +3,9 @@
 
 import {
   ChatInputCommandInteraction,
+  DiscordAPIError,
   MessageFlags,
+  RESTJSONErrorCodes,
   type RepliableInteraction,
 } from "discord.js";
 import {
@@ -72,6 +74,15 @@ const getErrorTitle = (
 };
 
 /**
+ * Discord API の MissingPermissions エラーかどうか判定する
+ * @param error 判定対象のエラー
+ * @returns MissingPermissions エラーであれば true
+ */
+const isMissingPermissionsError = (error: unknown): boolean =>
+  error instanceof DiscordAPIError &&
+  error.code === RESTJSONErrorCodes.MissingPermissions;
+
+/**
  * エラー内容をEmbedで返信する内部関数
  * 返信済または defer済みの場合は editReply、未返信の場合は reply を使用する
  * @param interaction 返信先インタラクション
@@ -82,6 +93,37 @@ const replyWithError = async (
   interaction: RepliableInteraction,
   error: unknown,
 ): Promise<void> => {
+  // Discord API の MissingPermissions は専用メッセージで応答する
+  if (isMissingPermissionsError(error)) {
+    logError(toError(error));
+    const title = tInteraction(
+      interaction.locale,
+      "common:title_bot_permission_denied",
+    );
+    const message = tInteraction(
+      interaction.locale,
+      "common:bot_permission.missing",
+    );
+    const embed = createErrorEmbed(message, { title });
+
+    try {
+      if (interaction.deferred || interaction.replied) {
+        await interaction.editReply({ embeds: [embed] });
+        return;
+      }
+      await interaction.reply({
+        embeds: [embed],
+        flags: MessageFlags.Ephemeral,
+      });
+    } catch (replyError) {
+      logger.error(
+        logPrefixed("system:log_prefix.bot", "system:error.reply_failed"),
+        replyError,
+      );
+    }
+    return;
+  }
+
   const err = toError(error);
   logError(err);
 

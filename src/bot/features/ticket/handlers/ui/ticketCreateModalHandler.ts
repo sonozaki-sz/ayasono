@@ -1,12 +1,7 @@
 // src/bot/features/ticket/handlers/ui/ticketCreateModalHandler.ts
 // チケット作成モーダル送信ハンドラ
 
-import {
-  DiscordAPIError,
-  MessageFlags,
-  type ModalSubmitInteraction,
-  RESTJSONErrorCodes,
-} from "discord.js";
+import { MessageFlags, type ModalSubmitInteraction } from "discord.js";
 import {
   logPrefixed,
   tInteraction,
@@ -17,10 +12,7 @@ import {
   getBotTicketConfigService,
   getBotTicketRepository,
 } from "../../../../services/botCompositionRoot";
-import {
-  createErrorEmbed,
-  createSuccessEmbed,
-} from "../../../../utils/messageResponse";
+import { createSuccessEmbed } from "../../../../utils/messageResponse";
 import { TICKET_CUSTOM_ID } from "../../commands/ticketCommand.constants";
 import { createTicketChannel } from "../../services/ticketService";
 
@@ -49,38 +41,16 @@ export const ticketCreateModalHandler: ModalHandler = {
     const configService = getBotTicketConfigService();
     const ticketRepository = getBotTicketRepository();
 
-    let channel: { id: string };
-    try {
-      const result = await createTicketChannel(
-        guild,
-        categoryId,
-        interaction.user.id,
-        subject,
-        detail,
-        configService,
-        ticketRepository,
-      );
-      channel = result.channel;
-    } catch (error) {
-      if (
-        error instanceof DiscordAPIError &&
-        error.code === RESTJSONErrorCodes.MissingPermissions
-      ) {
-        const embed = createErrorEmbed(
-          tInteraction(
-            interaction.locale,
-            "common:title_bot_permission_denied",
-          ),
-          { locale: interaction.locale },
-        );
-        await interaction.reply({
-          embeds: [embed],
-          flags: MessageFlags.Ephemeral,
-        });
-        return;
-      }
-      throw error;
-    }
+    // MissingPermissions は上位の interactionErrorHandler で統一処理される
+    const { channel } = await createTicketChannel(
+      guild,
+      categoryId,
+      interaction.user.id,
+      subject,
+      detail,
+      configService,
+      ticketRepository,
+    );
 
     logger.info(
       logPrefixed("system:log_prefix.ticket", "ticket:log.ticket_created", {

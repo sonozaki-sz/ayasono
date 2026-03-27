@@ -41,6 +41,8 @@
 | 実行者（設定パネルボタン） | VC参加中のユーザーのみ | VC名変更・人数制限変更・AFK移動・パネル再送信 |
 | Bot | `SendMessages`, `ManageMessages`, `EmbedLinks`, `CreatePublicThreads`, `ManageThreads`, `ManageChannels` | チャンネル作成・メッセージ送信・スレッド作成・スレッド管理・チャンネル削除 |
 
+> Bot に上記の権限が不足している場合、インタラクション経由の操作では Bot権限不足エラー（共通フォーマット）を返します。詳細は [MESSAGE_RESPONSE_SPEC.md](MESSAGE_RESPONSE_SPEC.md) を参照。
+
 ---
 
 ## VC自動作成（募集ボタン経由）

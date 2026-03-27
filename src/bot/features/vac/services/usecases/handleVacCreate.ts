@@ -3,8 +3,10 @@
 
 import {
   ChannelType,
+  DiscordAPIError,
   type GuildMember,
   PermissionFlagsBits,
+  RESTJSONErrorCodes,
   type VoiceState,
 } from "discord.js";
 import type { VacConfigService } from "../../../../../shared/features/vac/vacConfigService";
@@ -52,7 +54,20 @@ export async function handleVacCreateUseCase(
       .fetch(existingOwnedChannel.voiceChannelId)
       .catch(() => null);
     if (ownedChannel?.type === ChannelType.GuildVoice) {
-      await member.voice.setChannel(ownedChannel);
+      try {
+        await member.voice.setChannel(ownedChannel);
+      } catch (error) {
+        if (
+          error instanceof DiscordAPIError &&
+          error.code === RESTJSONErrorCodes.MissingPermissions
+        ) {
+          await notifyErrorChannel(member.guild, error, {
+            feature: "VAC",
+            action: "Bot権限不足によるメンバー移動失敗",
+          });
+        }
+        // ユーザーが切断済みの場合も含め、移動失敗は無視して続行しない
+      }
       return;
     }
     await vacRepository.removeCreatedVacChannel(
@@ -91,18 +106,39 @@ export async function handleVacCreateUseCase(
     member,
     member.guild.channels.cache,
   );
-  const voiceChannel = await member.guild.channels.create({
-    name: channelName,
-    type: ChannelType.GuildVoice,
-    parent: parentCategory?.id ?? null,
-    userLimit: VAC_EVENT.DEFAULT_LIMIT,
-    permissionOverwrites: [
-      {
-        id: member.id,
-        allow: [PermissionFlagsBits.ManageChannels],
-      },
-    ],
-  });
+
+  let voiceChannel;
+  try {
+    voiceChannel = await member.guild.channels.create({
+      name: channelName,
+      type: ChannelType.GuildVoice,
+      parent: parentCategory?.id ?? null,
+      userLimit: VAC_EVENT.DEFAULT_LIMIT,
+      permissionOverwrites: [
+        {
+          id: member.id,
+          allow: [PermissionFlagsBits.ManageChannels],
+        },
+      ],
+    });
+  } catch (error) {
+    if (
+      error instanceof DiscordAPIError &&
+      error.code === RESTJSONErrorCodes.MissingPermissions
+    ) {
+      logger.warn(
+        logPrefixed("system:log_prefix.vac", "vac:log.channel_create_failed", {
+          guildId: member.guild.id,
+        }),
+      );
+      await notifyErrorChannel(member.guild, error, {
+        feature: "VAC",
+        action: "Bot権限不足によるVCチャンネル作成失敗",
+      });
+      return;
+    }
+    throw error;
+  }
 
   if (voiceChannel.type !== ChannelType.GuildVoice) {
     return;

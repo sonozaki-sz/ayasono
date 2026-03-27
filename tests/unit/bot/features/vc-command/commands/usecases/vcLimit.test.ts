@@ -1,6 +1,6 @@
 // tests/unit/bot/features/vc-command/commands/usecases/vcLimit.test.ts
 
-import { MessageFlags } from "discord.js";
+import { DiscordAPIError, MessageFlags, RESTJSONErrorCodes } from "discord.js";
 import type { Mock } from "vitest";
 import { resolveVoiceChannelForEdit } from "@/bot/features/vc-command/commands/helpers/vcVoiceChannelResolver";
 import { executeVcLimit } from "@/bot/features/vc-command/commands/usecases/vcLimit";
@@ -86,6 +86,32 @@ describe("bot/features/vc-command/commands/usecases/vcLimit", () => {
       embeds: [{ description: "limit:unlimited" }],
       flags: MessageFlags.Ephemeral,
     });
+  });
+
+  it("channel.edit で MissingPermissions エラーが発生した場合は上位ハンドラへ伝播する", async () => {
+    const apiError = new DiscordAPIError(
+      {
+        code: RESTJSONErrorCodes.MissingPermissions,
+        message: "Missing Permissions",
+      },
+      RESTJSONErrorCodes.MissingPermissions,
+      403,
+      "PATCH",
+      "/channels/voice-1",
+      {},
+    );
+    const edit = vi.fn().mockRejectedValue(apiError);
+    (resolveVoiceChannelForEdit as Mock).mockResolvedValue({ edit });
+
+    const interaction = {
+      locale: "ja",
+      options: { getInteger: vi.fn(() => 5) },
+      reply: vi.fn(),
+    };
+
+    await expect(executeVcLimit(interaction as never, "voice-1")).rejects.toBe(
+      apiError,
+    );
   });
 
   it("チャンネル上限を数値で設定して数値ラベルで成功応答する", async () => {

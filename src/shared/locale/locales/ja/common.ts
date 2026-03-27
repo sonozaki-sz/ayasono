@@ -80,6 +80,10 @@ export const common = {
   "ui.modal.page_jump_label": "ページ番号",
   "ui.modal.page_jump_placeholder": "1〜{{total}}の整数",
 
+  // Bot権限不足エラー
+  "bot_permission.missing":
+    "Botに必要な権限が不足しているため、操作を実行できませんでした。\nサーバー管理者にBotの権限設定の確認をお願いします。",
+
   // 共通キャンセル
   cancelled: "キャンセルしました。",
 } as const;

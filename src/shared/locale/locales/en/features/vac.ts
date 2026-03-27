@@ -91,6 +91,8 @@ export const vac = {
   "log.trigger_removed_by_delete":
     "removed deleted trigger channel from config GuildId: {{guildId}} ChannelId: {{channelId}}",
   "log.channel_delete_sync_failed": "Failed to sync config on channelDelete",
+  "log.channel_create_failed":
+    "Failed to create VC channel due to missing bot permissions GuildId: {{guildId}}",
   "log.panel_send_failed": "Failed to send control panel",
   "log.startup_cleanup_failed": "Startup cleanup failed",
   "log.database_trigger_added":

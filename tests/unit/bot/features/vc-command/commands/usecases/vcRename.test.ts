@@ -1,6 +1,6 @@
 // tests/unit/bot/features/vc-command/commands/usecases/vcRename.test.ts
 
-import { MessageFlags } from "discord.js";
+import { DiscordAPIError, MessageFlags, RESTJSONErrorCodes } from "discord.js";
 import type { Mock } from "vitest";
 import { resolveVoiceChannelForEdit } from "@/bot/features/vc-command/commands/helpers/vcVoiceChannelResolver";
 import { executeVcRename } from "@/bot/features/vc-command/commands/usecases/vcRename";
@@ -70,6 +70,32 @@ describe("bot/features/vc-command/commands/usecases/vcRename", () => {
       embeds: [{ description: "renamed:My VC" }],
       flags: MessageFlags.Ephemeral,
     });
+  });
+
+  it("channel.edit で MissingPermissions エラーが発生した場合は上位ハンドラへ伝播する", async () => {
+    const apiError = new DiscordAPIError(
+      {
+        code: RESTJSONErrorCodes.MissingPermissions,
+        message: "Missing Permissions",
+      },
+      RESTJSONErrorCodes.MissingPermissions,
+      403,
+      "PATCH",
+      "/channels/voice-1",
+      {},
+    );
+    const edit = vi.fn().mockRejectedValue(apiError);
+    (resolveVoiceChannelForEdit as Mock).mockResolvedValue({ edit });
+
+    const interaction = {
+      locale: "ja",
+      options: { getString: vi.fn(() => "My VC") },
+      reply: vi.fn(),
+    };
+
+    await expect(executeVcRename(interaction as never, "voice-1")).rejects.toBe(
+      apiError,
+    );
   });
 
   it("resolverの失敗を呼び出し元に伝播する", async () => {

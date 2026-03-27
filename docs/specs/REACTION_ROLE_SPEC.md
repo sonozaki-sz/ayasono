@@ -32,6 +32,8 @@
 | Bot | ManageRoles | ロールの付与・解除 |
 | Bot | SendMessages | パネル送信・応答メッセージ |
 
+> Bot に上記の権限が不足している場合は Bot権限不足エラー（共通フォーマット）を返します。詳細は [MESSAGE_RESPONSE_SPEC.md](MESSAGE_RESPONSE_SPEC.md) を参照。
+
 ---
 
 ## パネル設置（setup）

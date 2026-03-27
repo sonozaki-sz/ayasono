@@ -53,6 +53,7 @@
 - AFK機能が無効（`enabled=false`）または未設定（`channelId=null`）の場合はエラー
 - 対象ユーザーがVCに参加していない場合はエラー
 - AFKチャンネルが削除済み・存在しない場合はエラー
+- Bot に `MoveMembers` 権限が不足している場合は Bot権限不足エラー（共通フォーマット、[MESSAGE_RESPONSE_SPEC.md](MESSAGE_RESPONSE_SPEC.md) 参照）
 
 ### UI
 
