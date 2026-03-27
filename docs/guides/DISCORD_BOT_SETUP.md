@@ -80,7 +80,8 @@
 | リンクを埋め込み | Embed Links | Embed 形式での送信（全機能） |
 | メッセージ履歴を読む | Read Message History | メッセージ履歴の読み取り（メッセージ削除・メッセージ固定） |
 | メッセージを管理 | Manage Messages | メッセージの削除・管理（メッセージ削除・メッセージ固定・VC募集） |
-| チャンネルの管理 | Manage Channels | チャンネルの作成・削除（VC自動作成・VC募集） |
+| チャンネルの管理 | Manage Channels | チャンネルの作成・削除（VC自動作成・VC募集・チケット） |
+| ロールの管理 | Manage Roles | チャンネル権限の設定（チケット） |
 | メンバーを移動 | Move Members | メンバーの VC 移動（AFK・VC自動作成・VC募集） |
 
 ### 4-2. 招待 URL の生成とサーバー追加
