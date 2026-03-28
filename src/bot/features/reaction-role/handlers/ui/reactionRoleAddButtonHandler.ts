@@ -359,6 +359,7 @@ export const reactionRoleAddButtonButtonHandler: ButtonHandler = {
         // パネルメッセージが削除済み → DB クリーンアップ
         await configService.delete(session.panelId);
         await interaction.deleteReply().catch(() => null);
+        await session.commandInteraction?.deleteReply().catch(() => null);
         const embed = createErrorEmbed(
           tInteraction(
             interaction.locale,
@@ -376,6 +377,8 @@ export const reactionRoleAddButtonButtonHandler: ButtonHandler = {
 
       // フローメッセージを削除
       await interaction.deleteReply().catch(() => null);
+      // セレクトメニューメッセージを削除
+      await session.commandInteraction?.deleteReply().catch(() => null);
 
       const count = session.buttons.length;
       const embed = createSuccessEmbed(

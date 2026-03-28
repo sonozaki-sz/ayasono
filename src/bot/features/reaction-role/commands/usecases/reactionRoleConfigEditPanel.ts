@@ -68,6 +68,7 @@ export async function handleReactionRoleConfigEditPanel(
   // 複数パネルの場合はセレクトメニュー表示
   reactionRoleEditPanelSessions.set(sessionId, {
     panelId: "",
+    commandInteraction: interaction,
   });
 
   const guild = interaction.guild;

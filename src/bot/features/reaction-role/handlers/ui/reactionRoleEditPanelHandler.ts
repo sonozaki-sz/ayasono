@@ -130,6 +130,9 @@ export const reactionRoleEditPanelModalHandler: ModalHandler = {
 
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
+    // セレクトメニューメッセージを削除
+    await session.commandInteraction?.deleteReply().catch(() => null);
+
     const configService = getBotReactionRolePanelConfigService();
     const panel = await configService.findById(session.panelId);
     if (!panel) return;

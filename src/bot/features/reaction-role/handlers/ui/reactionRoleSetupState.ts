@@ -1,7 +1,10 @@
 // src/bot/features/reaction-role/handlers/ui/reactionRoleSetupState.ts
 // setup フローのセッション状態管理
 
-import type { ModalSubmitInteraction } from "discord.js";
+import type {
+  ChatInputCommandInteraction,
+  ModalSubmitInteraction,
+} from "discord.js";
 import type { ReactionRoleButton } from "../../../../../shared/database/types/reactionRoleTypes";
 import { TtlMap } from "../../../../../shared/utils/ttlMap";
 import { REACTION_ROLE_SESSION_TTL_MS } from "../../commands/reactionRoleCommand.constants";
@@ -43,6 +46,8 @@ export interface ReactionRoleAddButtonSession {
   pendingButton?: PendingButtonInfo;
   /** 前回のモーダル送信インタラクション（エフェメラルメッセージ削除用） */
   previousReplyInteraction?: ModalSubmitInteraction;
+  /** コマンドインタラクション（セレクトメニューメッセージ削除用） */
+  commandInteraction?: ChatInputCommandInteraction;
 }
 
 export const reactionRoleAddButtonSessions: TtlMap<ReactionRoleAddButtonSession> =
@@ -53,6 +58,8 @@ export interface ReactionRoleEditButtonSession {
   panelId: string;
   buttonId: number;
   pendingButton?: PendingButtonInfo;
+  /** コマンドインタラクション（セレクトメニューメッセージ削除用） */
+  commandInteraction?: ChatInputCommandInteraction;
 }
 
 export const reactionRoleEditButtonSessions: TtlMap<ReactionRoleEditButtonSession> =
@@ -78,6 +85,8 @@ export const reactionRoleRemoveButtonSessions: TtlMap<ReactionRoleRemoveButtonSe
 /** edit-panel フローのセッション */
 export interface ReactionRoleEditPanelSession {
   panelId: string;
+  /** コマンドインタラクション（セレクトメニューメッセージ削除用） */
+  commandInteraction?: ChatInputCommandInteraction;
 }
 
 export const reactionRoleEditPanelSessions: TtlMap<ReactionRoleEditPanelSession> =

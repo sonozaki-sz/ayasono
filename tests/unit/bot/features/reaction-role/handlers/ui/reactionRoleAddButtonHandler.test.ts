@@ -597,6 +597,9 @@ describe("bot/features/reaction-role/handlers/ui/reactionRoleAddButtonHandler", 
       });
 
       it("正常系: updatePanelMessageがtrueを返す場合はdeleteReply+followUpで成功応答する", async () => {
+        const mockCommandInteraction = {
+          deleteReply: vi.fn().mockResolvedValue(undefined),
+        };
         const session = {
           panelId: "panel-1",
           buttons: [
@@ -610,6 +613,7 @@ describe("bot/features/reaction-role/handlers/ui/reactionRoleAddButtonHandler", 
           ],
           buttonCounter: 2,
           pendingButton: undefined,
+          commandInteraction: mockCommandInteraction as never,
         };
         reactionRoleAddButtonSessions.set("session-1", session);
         mockConfigService.findById.mockResolvedValue({
@@ -656,6 +660,7 @@ describe("bot/features/reaction-role/handlers/ui/reactionRoleAddButtonHandler", 
 
         expect(mockUpdatePanelMessage).toHaveBeenCalled();
         expect(interaction.deleteReply).toHaveBeenCalled();
+        expect(mockCommandInteraction.deleteReply).toHaveBeenCalled();
         expect(interaction.followUp).toHaveBeenCalledWith(
           expect.objectContaining({
             embeds: expect.any(Array),
@@ -665,6 +670,9 @@ describe("bot/features/reaction-role/handlers/ui/reactionRoleAddButtonHandler", 
       });
 
       it("updatePanelMessageがfalseを返す場合はpanel_message_not_foundエラーを返しDBをクリーンアップする", async () => {
+        const mockCommandInteraction = {
+          deleteReply: vi.fn().mockResolvedValue(undefined),
+        };
         const session = {
           panelId: "panel-1",
           buttons: [
@@ -678,6 +686,7 @@ describe("bot/features/reaction-role/handlers/ui/reactionRoleAddButtonHandler", 
           ],
           buttonCounter: 2,
           pendingButton: undefined,
+          commandInteraction: mockCommandInteraction as never,
         };
         reactionRoleAddButtonSessions.set("session-1", session);
         mockConfigService.findById.mockResolvedValue({
@@ -710,6 +719,7 @@ describe("bot/features/reaction-role/handlers/ui/reactionRoleAddButtonHandler", 
 
         expect(mockConfigService.delete).toHaveBeenCalledWith("panel-1");
         expect(interaction.deleteReply).toHaveBeenCalled();
+        expect(mockCommandInteraction.deleteReply).toHaveBeenCalled();
         expect(interaction.followUp).toHaveBeenCalledWith(
           expect.objectContaining({
             embeds: expect.any(Array),
