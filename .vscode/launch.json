@@ -71,15 +71,13 @@
             "name": "🧪 Test: Debug Current File",
             "type": "node",
             "request": "launch",
-            "program": "${workspaceFolder}/node_modules/.bin/jest",
-            "args": [
-                "${relativeFile}",
-                "--config",
-                "jest.config.js",
-                "--runInBand",
-                "--no-coverage"
+            "runtimeExecutable": "pnpm",
+            "runtimeArgs": [
+                "run",
+                "test",
+                "--",
+                "${relativeFile}"
             ],
-            "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",
             "skipFiles": [
@@ -90,12 +88,11 @@
             "name": "🧪 Test: Debug All",
             "type": "node",
             "request": "launch",
-            "program": "${workspaceFolder}/node_modules/.bin/jest",
-            "args": [
-                "--runInBand",
-                "--no-coverage"
+            "runtimeExecutable": "pnpm",
+            "runtimeArgs": [
+                "run",
+                "test"
             ],
-            "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",
             "skipFiles": [
@@ -106,12 +103,11 @@
             "name": "🧪 Test: Coverage",
             "type": "node",
             "request": "launch",
-            "program": "${workspaceFolder}/node_modules/.bin/jest",
-            "args": [
-                "--coverage",
-                "--runInBand"
+            "runtimeExecutable": "pnpm",
+            "runtimeArgs": [
+                "run",
+                "test:coverage"
             ],
-            "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",
             "skipFiles": [

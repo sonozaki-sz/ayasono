@@ -79,8 +79,8 @@
         },
         "background": {
           "activeOnStart": true,
-          "beginsPattern": "^.*Watch Usage.*$",
-          "endsPattern": "^.*Ran all test suites.*$"
+          "beginsPattern": "^\\s*Restarting on file changes\\.\\.\\.$",
+          "endsPattern": "^\\s*Tests\\s+\\d+"
         }
       }
     },
@@ -108,7 +108,7 @@
         "focus": false,
         "panel": "shared"
       },
-      "problemMatcher": ["$eslint-stylish"]
+      "problemMatcher": []
     },
     {
       "label": "Lint: Fix",

@@ -56,10 +56,7 @@
 
     // === オプション ===
     // コラボレーション
-    "ms-vsliveshare.vsliveshare",
-
-    // GitHub Copilot
-    "github.copilot-chat"
+    "ms-vsliveshare.vsliveshare"
   ],
   "unwantedRecommendations": []
 }
