@@ -63,6 +63,10 @@ export const ticket = {
     "チケットの同時作成上限（{{max}}件）に達しています。",
   "user-response.cannot_remove_last_role":
     "スタッフロールを0件にすることはできません。",
+  "user-response.panel_not_found":
+    "パネルメッセージが見つかりませんでした。パネルが削除された可能性があります。",
+  "user-response.panels_cleaned_up":
+    "{{count}}件のパネルが削除済みのためクリーンアップしました。",
   "user-response.session_expired":
     "セッションが期限切れです。もう一度お試しください。",
   "user-response.and_more": "他 {{count}}件",

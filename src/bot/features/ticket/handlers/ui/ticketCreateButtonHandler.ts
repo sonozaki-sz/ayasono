@@ -48,7 +48,20 @@ export const ticketCreateButtonHandler: ButtonHandler = {
       guildId,
       categoryId,
     );
-    if (!config) return;
+    if (!config) {
+      const embed = createErrorEmbed(
+        tInteraction(
+          interaction.locale,
+          "ticket:user-response.panel_not_found",
+        ),
+        { locale: interaction.locale },
+      );
+      await interaction.reply({
+        embeds: [embed],
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
 
     // ユーザーのオープンチケット数を確認
     const openTickets = await ticketRepository.findOpenByUserAndCategory(

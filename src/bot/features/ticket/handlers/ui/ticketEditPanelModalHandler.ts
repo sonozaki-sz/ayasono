@@ -87,6 +87,36 @@ export const ticketEditPanelModalHandler: ModalHandler = {
 
     const resolvedColor = panelColor ?? config.panelColor;
 
+    // パネルメッセージの存在確認（Bot オフライン中の削除を検知）
+    const guild = interaction.guild;
+    const panelChannel = guild
+      ? ((await guild.channels
+          .fetch(config.panelChannelId)
+          .catch(() => null)) as TextChannel | null)
+      : null;
+    const panelMessage = panelChannel
+      ? await panelChannel.messages
+          .fetch(config.panelMessageId)
+          .catch(() => null)
+      : null;
+
+    if (!panelMessage) {
+      // パネルメッセージが削除済み → DB クリーンアップ
+      await configService.delete(guildId, categoryId);
+      const embed = createErrorEmbed(
+        tInteraction(
+          interaction.locale,
+          "ticket:user-response.panel_not_found",
+        ),
+        { locale: interaction.locale },
+      );
+      await interaction.reply({
+        embeds: [embed],
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+
     // DB の設定を更新
     await configService.update(guildId, categoryId, {
       panelTitle: title,
@@ -95,30 +125,13 @@ export const ticketEditPanelModalHandler: ModalHandler = {
     });
 
     // パネルメッセージの Embed を更新
-    const guild = interaction.guild;
-    try {
-      const panelChannel = guild
-        ? ((await guild.channels
-            .fetch(config.panelChannelId)
-            .catch(() => null)) as TextChannel | null)
-        : null;
-      if (panelChannel) {
-        const panelMessage = await panelChannel.messages
-          .fetch(config.panelMessageId)
-          .catch(() => null);
-        if (panelMessage) {
-          const updatedEmbed = new EmbedBuilder()
-            .setTitle(title)
-            .setDescription(description)
-            .setColor(Number.parseInt(resolvedColor.slice(1), 16));
-          await panelMessage.edit({
-            embeds: [updatedEmbed],
-          });
-        }
-      }
-    } catch {
-      // パネルメッセージの更新に失敗しても設定は保存済み
-    }
+    const updatedEmbed = new EmbedBuilder()
+      .setTitle(title)
+      .setDescription(description)
+      .setColor(Number.parseInt(resolvedColor.slice(1), 16));
+    await panelMessage.edit({
+      embeds: [updatedEmbed],
+    });
 
     const embed = createSuccessEmbed(
       tInteraction(

@@ -62,6 +62,10 @@ export const ticket = {
   "user-response.max_tickets_reached":
     "You have reached the maximum number of simultaneous tickets ({{max}}).",
   "user-response.cannot_remove_last_role": "Cannot remove all staff roles.",
+  "user-response.panel_not_found":
+    "Panel message not found. The panel may have been deleted.",
+  "user-response.panels_cleaned_up":
+    "{{count}} panel(s) cleaned up because the message was deleted.",
   "user-response.session_expired": "Session expired. Please try again.",
   "user-response.and_more": "and {{count}} more",
 

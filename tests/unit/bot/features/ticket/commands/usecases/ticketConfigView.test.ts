@@ -4,10 +4,12 @@ import { MessageFlags } from "discord.js";
 
 const findAllByGuildMock = vi.fn();
 const findOpenByCategoryMock = vi.fn();
+const deleteMock = vi.fn().mockResolvedValue(undefined);
 
 vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotTicketConfigService: vi.fn(() => ({
     findAllByGuild: findAllByGuildMock,
+    delete: deleteMock,
   })),
   getBotTicketRepository: vi.fn(() => ({
     findOpenByCategory: findOpenByCategoryMock,
@@ -50,9 +52,14 @@ const createInfoEmbedMock = vi.fn((_desc: string, _opts?: unknown) => ({
   type: "info",
   addFields: vi.fn().mockReturnThis(),
 }));
+const createErrorEmbedMock = vi.fn((msg: string) => ({
+  type: "error",
+  description: msg,
+}));
 
 vi.mock("@/bot/utils/messageResponse", () => ({
   createInfoEmbed: createInfoEmbedMock,
+  createErrorEmbed: createErrorEmbedMock,
 }));
 
 vi.mock("@/bot/shared/pagination", () => ({
@@ -62,10 +69,26 @@ vi.mock("@/bot/shared/pagination", () => ({
   })),
 }));
 
+/**
+ * パネルメッセージが存在するチャンネルのモックを返す client を作成
+ */
+function createClientMock() {
+  return {
+    channels: {
+      fetch: vi.fn().mockResolvedValue({
+        messages: {
+          fetch: vi.fn().mockResolvedValue({ id: "panel-msg-1" }),
+        },
+      }),
+    },
+  };
+}
+
 function createInteractionMock(overrides = {}) {
   return {
     channelId: "channel-1",
     locale: "ja",
+    client: createClientMock(),
     guild: {
       id: "guild-1",
       channels: {
@@ -75,6 +98,7 @@ function createInteractionMock(overrides = {}) {
       },
     },
     reply: vi.fn().mockResolvedValue(undefined),
+    followUp: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   };
 }
@@ -87,6 +111,7 @@ function createConfig(categoryId: string, overrides = {}) {
     autoDeleteDays: 7,
     maxTicketsPerUser: 3,
     panelChannelId: "panel-ch-1",
+    panelMessageId: "panel-msg-1",
     panelTitle: "テスト",
     panelDescription: "テスト説明",
     ...overrides,
@@ -236,6 +261,67 @@ describe("bot/features/ticket/commands/usecases/ticketConfigView", () => {
     await handleTicketConfigView(interaction as never, "guild-1");
 
     expect(findOpenByCategoryMock).toHaveBeenCalledWith("guild-1", "cat-1");
+  });
+
+  it("パネルメッセージが全て削除済みの場合はエラー応答を返す", async () => {
+    const { handleTicketConfigView } = await import(
+      "@/bot/features/ticket/commands/usecases/ticketConfigView"
+    );
+
+    findAllByGuildMock.mockResolvedValue([createConfig("cat-1")]);
+    const interaction = createInteractionMock({
+      client: {
+        channels: {
+          fetch: vi.fn().mockResolvedValue(null),
+        },
+      },
+    });
+
+    await handleTicketConfigView(interaction as never, "guild-1");
+
+    expect(deleteMock).toHaveBeenCalledWith("guild-1", "cat-1");
+    expect(interaction.reply).toHaveBeenCalledWith(
+      expect.objectContaining({
+        embeds: [expect.objectContaining({ type: "error" })],
+        flags: MessageFlags.Ephemeral,
+      }),
+    );
+  });
+
+  it("一部パネルがクリーンアップされた場合はfollowUpで通知する", async () => {
+    const { handleTicketConfigView } = await import(
+      "@/bot/features/ticket/commands/usecases/ticketConfigView"
+    );
+
+    findAllByGuildMock.mockResolvedValue([
+      createConfig("cat-1"),
+      createConfig("cat-2"),
+    ]);
+    findOpenByCategoryMock.mockResolvedValue([]);
+
+    // cat-1はパネル存在、cat-2はパネル不在
+    const clientMock = {
+      channels: {
+        fetch: vi
+          .fn()
+          .mockResolvedValueOnce({
+            messages: {
+              fetch: vi.fn().mockResolvedValue({ id: "panel-msg-1" }),
+            },
+          })
+          .mockResolvedValueOnce(null),
+      },
+    };
+    const interaction = createInteractionMock({ client: clientMock });
+
+    await handleTicketConfigView(interaction as never, "guild-1");
+
+    expect(deleteMock).toHaveBeenCalledWith("guild-1", "cat-2");
+    expect(interaction.followUp).toHaveBeenCalledWith(
+      expect.objectContaining({
+        flags: MessageFlags.Ephemeral,
+      }),
+    );
   });
 });
 

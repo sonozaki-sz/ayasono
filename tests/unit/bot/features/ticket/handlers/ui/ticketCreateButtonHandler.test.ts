@@ -1,5 +1,6 @@
 // tests/unit/bot/features/ticket/handlers/ui/ticketCreateButtonHandler.test.ts
 
+import { MessageFlags } from "discord.js";
 import { ticketCreateButtonHandler } from "@/bot/features/ticket/handlers/ui/ticketCreateButtonHandler";
 
 vi.mock("@/shared/locale/localeManager", () => ({
@@ -74,7 +75,7 @@ describe("bot/features/ticket/handlers/ui/ticketCreateButtonHandler", () => {
   });
 
   describe("execute", () => {
-    it("設定が見つからない場合は何もしない", async () => {
+    it("設定が見つからない場合はエラー応答を返す", async () => {
       const mockConfigService = {
         findByGuildAndCategory: vi.fn().mockResolvedValue(null),
       };
@@ -92,7 +93,12 @@ describe("bot/features/ticket/handlers/ui/ticketCreateButtonHandler", () => {
 
       await ticketCreateButtonHandler.execute(interaction as never);
 
-      expect(interaction.reply).not.toHaveBeenCalled();
+      expect(interaction.reply).toHaveBeenCalledWith(
+        expect.objectContaining({
+          embeds: expect.any(Array),
+          flags: MessageFlags.Ephemeral,
+        }),
+      );
       expect(interaction.showModal).not.toHaveBeenCalled();
     });
 

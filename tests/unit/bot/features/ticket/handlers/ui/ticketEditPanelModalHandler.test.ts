@@ -174,13 +174,14 @@ describe("bot/features/ticket/handlers/ui/ticketEditPanelModalHandler", () => {
       );
     });
 
-    it("guildがnullの場合、パネル更新をスキップしてDB更新と応答のみ行う", async () => {
+    it("guildがnullの場合、パネル不在としてDB設定を削除しエラー応答する", async () => {
       mockConfigService.findByGuildAndCategory.mockResolvedValue({
         panelChannelId: "panel-ch-1",
         panelMessageId: "panel-msg-1",
         panelColor: "#00A8F3",
       });
       mockConfigService.update.mockResolvedValue(undefined);
+      mockConfigService.delete.mockResolvedValue(undefined);
 
       const interaction = createMockModalInteraction(
         "ticket:edit-panel-modal:cat-1",
@@ -190,11 +191,15 @@ describe("bot/features/ticket/handlers/ui/ticketEditPanelModalHandler", () => {
 
       await ticketEditPanelModalHandler.execute(interaction as never);
 
-      expect(mockConfigService.update).toHaveBeenCalled();
-      expect(interaction.reply).toHaveBeenCalled();
+      expect(mockConfigService.delete).toHaveBeenCalledWith("guild-1", "cat-1");
+      expect(interaction.reply).toHaveBeenCalledWith(
+        expect.objectContaining({
+          embeds: [expect.objectContaining({ type: "error" })],
+        }),
+      );
     });
 
-    it("パネルチャンネルが見つからない場合でもDB更新と応答は行う", async () => {
+    it("パネルチャンネルが見つからない場合はDB設定を削除しエラー応答する", async () => {
       const mockGuild = {
         id: "guild-1",
         channels: { fetch: vi.fn().mockResolvedValue(null) },
@@ -205,7 +210,7 @@ describe("bot/features/ticket/handlers/ui/ticketEditPanelModalHandler", () => {
         panelMessageId: "panel-msg-1",
         panelColor: "#00A8F3",
       });
-      mockConfigService.update.mockResolvedValue(undefined);
+      mockConfigService.delete.mockResolvedValue(undefined);
 
       const interaction = createMockModalInteraction(
         "ticket:edit-panel-modal:cat-1",
@@ -215,11 +220,16 @@ describe("bot/features/ticket/handlers/ui/ticketEditPanelModalHandler", () => {
 
       await ticketEditPanelModalHandler.execute(interaction as never);
 
-      expect(mockConfigService.update).toHaveBeenCalled();
-      expect(interaction.reply).toHaveBeenCalled();
+      expect(mockConfigService.delete).toHaveBeenCalledWith("guild-1", "cat-1");
+      expect(mockConfigService.update).not.toHaveBeenCalled();
+      expect(interaction.reply).toHaveBeenCalledWith(
+        expect.objectContaining({
+          embeds: [expect.objectContaining({ type: "error" })],
+        }),
+      );
     });
 
-    it("パネルメッセージが見つからない場合でもDB更新と応答は行う", async () => {
+    it("パネルメッセージが見つからない場合はDB設定を削除しエラー応答する", async () => {
       const mockPanelChannel = {
         messages: { fetch: vi.fn().mockResolvedValue(null) },
       };
@@ -233,7 +243,7 @@ describe("bot/features/ticket/handlers/ui/ticketEditPanelModalHandler", () => {
         panelMessageId: "panel-msg-1",
         panelColor: "#00A8F3",
       });
-      mockConfigService.update.mockResolvedValue(undefined);
+      mockConfigService.delete.mockResolvedValue(undefined);
 
       const interaction = createMockModalInteraction(
         "ticket:edit-panel-modal:cat-1",
@@ -243,35 +253,13 @@ describe("bot/features/ticket/handlers/ui/ticketEditPanelModalHandler", () => {
 
       await ticketEditPanelModalHandler.execute(interaction as never);
 
-      expect(mockConfigService.update).toHaveBeenCalled();
-      expect(interaction.reply).toHaveBeenCalled();
-    });
-
-    it("パネルメッセージ更新で例外が発生しても応答は行う", async () => {
-      const mockGuild = {
-        id: "guild-1",
-        channels: {
-          fetch: vi.fn().mockRejectedValue(new Error("fetch error")),
-        },
-      };
-
-      mockConfigService.findByGuildAndCategory.mockResolvedValue({
-        panelChannelId: "panel-ch-1",
-        panelMessageId: "panel-msg-1",
-        panelColor: "#00A8F3",
-      });
-      mockConfigService.update.mockResolvedValue(undefined);
-
-      const interaction = createMockModalInteraction(
-        "ticket:edit-panel-modal:cat-1",
-        {},
-        { guild: mockGuild },
+      expect(mockConfigService.delete).toHaveBeenCalledWith("guild-1", "cat-1");
+      expect(mockConfigService.update).not.toHaveBeenCalled();
+      expect(interaction.reply).toHaveBeenCalledWith(
+        expect.objectContaining({
+          embeds: [expect.objectContaining({ type: "error" })],
+        }),
       );
-
-      await ticketEditPanelModalHandler.execute(interaction as never);
-
-      expect(mockConfigService.update).toHaveBeenCalled();
-      expect(interaction.reply).toHaveBeenCalled();
     });
   });
 });
