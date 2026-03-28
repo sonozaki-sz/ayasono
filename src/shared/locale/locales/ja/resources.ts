@@ -10,6 +10,7 @@ import {
   memberLog,
   messageDelete,
   ping,
+  reactionRole,
   stickyMessage,
   ticket,
   vac,
@@ -29,6 +30,7 @@ export const ja: {
   vc: typeof vc;
   messageDelete: typeof messageDelete;
   memberLog: typeof memberLog;
+  reactionRole: typeof reactionRole;
   stickyMessage: typeof stickyMessage;
   ticket: typeof ticket;
   vcRecruit: typeof vcRecruit;
@@ -44,6 +46,7 @@ export const ja: {
   vc,
   messageDelete,
   memberLog,
+  reactionRole,
   stickyMessage,
   ticket,
   vcRecruit,

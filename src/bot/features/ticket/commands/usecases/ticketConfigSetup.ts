@@ -7,6 +7,7 @@ import {
   type ChatInputCommandInteraction,
   MessageFlags,
   RoleSelectMenuBuilder,
+  type TextChannel,
 } from "discord.js";
 import {
   logPrefixed,
@@ -43,18 +44,36 @@ export async function handleTicketConfigSetup(
     category.id,
   );
   if (existingConfig) {
-    const embed = createErrorEmbed(
-      tInteraction(
-        interaction.locale,
-        "ticket:user-response.category_already_setup",
-      ),
-      { locale: interaction.locale },
-    );
-    await interaction.reply({
-      embeds: [embed],
-      flags: MessageFlags.Ephemeral,
-    });
-    return;
+    // パネルメッセージがまだ存在するか確認（Bot オフライン中の削除を検知）
+    const panelChannel = interaction.guild
+      ? ((await interaction.guild.channels
+          .fetch(existingConfig.panelChannelId)
+          .catch(() => null)) as TextChannel | null)
+      : null;
+    const panelMessage = panelChannel
+      ? await panelChannel.messages
+          .fetch(existingConfig.panelMessageId)
+          .catch(() => null)
+      : null;
+
+    if (panelMessage) {
+      // パネルメッセージが存在する → 本当に重複設定
+      const embed = createErrorEmbed(
+        tInteraction(
+          interaction.locale,
+          "ticket:user-response.category_already_setup",
+        ),
+        { locale: interaction.locale },
+      );
+      await interaction.reply({
+        embeds: [embed],
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+
+    // パネルメッセージが削除済み → 古い設定をクリーンアップして再セットアップを許可
+    await configService.delete(guildId, category.id);
   }
 
   // セッションを生成して保存

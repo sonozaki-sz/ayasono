@@ -101,6 +101,8 @@ export const TICKET_DEFAULT_MAX_TICKETS_PER_USER = 1;
 /**
  * staffRoleIds の JSON 文字列を安全にパースする
  * パース失敗時は空配列を返す
+ * @param json スタッフロールIDのJSON文字列
+ * @returns ロールIDの配列（パース失敗時は空配列）
  */
 export function parseStaffRoleIds(json: string): string[] {
   try {

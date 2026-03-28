@@ -24,10 +24,19 @@ import { ticketTeardownSessions } from "./ticketTeardownState";
  * teardown フローのカテゴリ選択メニューを処理するハンドラ
  */
 export const ticketTeardownSelectHandler: StringSelectHandler = {
+  /**
+   * カスタムIDが teardown 選択プレフィックスに一致するか判定する
+   * @param customId カスタムID
+   * @returns 一致する場合 true
+   */
   matches(customId: string) {
     return customId.startsWith(TICKET_CUSTOM_ID.TEARDOWN_SELECT_PREFIX);
   },
 
+  /**
+   * teardown フローのカテゴリ選択を処理する
+   * @param interaction セレクトメニューインタラクション
+   */
   async execute(interaction: StringSelectMenuInteraction) {
     const sessionId = interaction.customId.slice(
       TICKET_CUSTOM_ID.TEARDOWN_SELECT_PREFIX.length,
@@ -51,6 +60,10 @@ export const ticketTeardownSelectHandler: StringSelectHandler = {
 /**
  * teardown 確認ダイアログを表示する共通関数
  * usecase（1件スキップ時）とセレクトハンドラの両方から呼ばれる
+ * @param interaction コマンドまたはコンポーネントインタラクション
+ * @param sessionId teardown セッションID
+ * @param categoryIds 削除対象のカテゴリID配列
+ * @param guildId ギルドID
  */
 export async function showTeardownConfirmation(
   interaction: ChatInputCommandInteraction | MessageComponentInteraction,

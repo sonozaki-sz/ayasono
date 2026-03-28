@@ -3,11 +3,13 @@
 import { MessageFlags } from "discord.js";
 
 const findByGuildAndCategoryMock = vi.fn();
+const deleteMock = vi.fn().mockResolvedValue(undefined);
 const sessionSetMock = vi.fn();
 
 vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotTicketConfigService: vi.fn(() => ({
     findByGuildAndCategory: findByGuildAndCategoryMock,
+    delete: deleteMock,
   })),
 }));
 
@@ -76,16 +78,28 @@ describe("bot/features/ticket/commands/usecases/ticketConfigSetup", () => {
     vi.clearAllMocks();
   });
 
-  it("既にカテゴリに設定がある場合はエラー応答", async () => {
+  it("既にカテゴリに設定がありパネルメッセージが存在する場合はエラー応答", async () => {
     const { handleTicketConfigSetup } = await import(
       "@/bot/features/ticket/commands/usecases/ticketConfigSetup"
     );
 
+    const mockPanelMessage = { id: "panel-msg-1" };
+    const mockPanelChannel = {
+      messages: { fetch: vi.fn().mockResolvedValue(mockPanelMessage) },
+    };
+
     findByGuildAndCategoryMock.mockResolvedValue({
       guildId: "guild-1",
       categoryId: "category-1",
+      panelChannelId: "panel-ch-1",
+      panelMessageId: "panel-msg-1",
     });
-    const interaction = createInteractionMock();
+    const interaction = createInteractionMock({
+      guild: {
+        id: "guild-1",
+        channels: { fetch: vi.fn().mockResolvedValue(mockPanelChannel) },
+      },
+    });
 
     await handleTicketConfigSetup(interaction as never, "guild-1");
 
@@ -93,6 +107,35 @@ describe("bot/features/ticket/commands/usecases/ticketConfigSetup", () => {
       expect.objectContaining({ flags: MessageFlags.Ephemeral }),
     );
     expect(sessionSetMock).not.toHaveBeenCalled();
+    expect(deleteMock).not.toHaveBeenCalled();
+  });
+
+  it("既存設定のパネルメッセージが削除済みの場合は古い設定を削除して再セットアップを許可する", async () => {
+    const { handleTicketConfigSetup } = await import(
+      "@/bot/features/ticket/commands/usecases/ticketConfigSetup"
+    );
+
+    const mockPanelChannel = {
+      messages: { fetch: vi.fn().mockResolvedValue(null) },
+    };
+
+    findByGuildAndCategoryMock.mockResolvedValue({
+      guildId: "guild-1",
+      categoryId: "category-1",
+      panelChannelId: "panel-ch-1",
+      panelMessageId: "panel-msg-1",
+    });
+    const interaction = createInteractionMock({
+      guild: {
+        id: "guild-1",
+        channels: { fetch: vi.fn().mockResolvedValue(mockPanelChannel) },
+      },
+    });
+
+    await handleTicketConfigSetup(interaction as never, "guild-1");
+
+    expect(deleteMock).toHaveBeenCalledWith("guild-1", "category-1");
+    expect(sessionSetMock).toHaveBeenCalled();
   });
 
   it("設定がない場合は RoleSelectMenu が表示される", async () => {

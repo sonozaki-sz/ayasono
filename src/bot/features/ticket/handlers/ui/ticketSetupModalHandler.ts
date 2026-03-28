@@ -33,10 +33,19 @@ import { ticketSetupSessions } from "./ticketSetupState";
  * setup フローのモーダル送信を処理するハンドラ
  */
 export const ticketSetupModalHandler: ModalHandler = {
+  /**
+   * カスタムIDがセットアップモーダルプレフィックスに一致するか判定する
+   * @param customId カスタムID
+   * @returns 一致する場合 true
+   */
   matches(customId: string) {
     return customId.startsWith(TICKET_CUSTOM_ID.SETUP_MODAL_PREFIX);
   },
 
+  /**
+   * セットアップモーダルの送信を処理する
+   * @param interaction モーダル送信インタラクション
+   */
   async execute(interaction: ModalSubmitInteraction) {
     const sessionId = interaction.customId.slice(
       TICKET_CUSTOM_ID.SETUP_MODAL_PREFIX.length,

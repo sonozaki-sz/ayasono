@@ -7,12 +7,16 @@ import {
   type ChatInputCommandInteraction,
   MessageFlags,
   StringSelectMenuBuilder,
+  type TextChannel,
 } from "discord.js";
 import type { GuildTicketConfig } from "../../../../../shared/database/types";
 import { tInteraction } from "../../../../../shared/locale/localeManager";
 import { getBotTicketConfigService } from "../../../../services/botCompositionRoot";
 import { disableComponentsAfterTimeout } from "../../../../shared/disableComponentsAfterTimeout";
-import { createErrorEmbed } from "../../../../utils/messageResponse";
+import {
+  createErrorEmbed,
+  createInfoEmbed,
+} from "../../../../utils/messageResponse";
 import { showTeardownConfirmation } from "../../handlers/ui/ticketTeardownSelectHandler";
 import { ticketTeardownSessions } from "../../handlers/ui/ticketTeardownState";
 import {
@@ -30,7 +34,14 @@ export async function handleTicketConfigTeardown(
   guildId: string,
 ): Promise<void> {
   const configService = getBotTicketConfigService();
-  const configs = await configService.findAllByGuild(guildId);
+  const allConfigs = await configService.findAllByGuild(guildId);
+
+  // メッセージ存在確認 → 不在パネルを DB 削除して除外
+  const { existing: configs, cleanedUp } = await filterExistingConfigs(
+    interaction,
+    allConfigs,
+    configService,
+  );
 
   if (configs.length === 0) {
     const embed = createErrorEmbed(
@@ -57,6 +68,7 @@ export async function handleTicketConfigTeardown(
       [configs[0].categoryId],
       guildId,
     );
+    await notifyCleanedUp(interaction, cleanedUp);
     return;
   }
 
@@ -103,4 +115,66 @@ export async function handleTicketConfigTeardown(
     [selectRow],
     TICKET_SESSION_TTL_MS,
   );
+
+  await notifyCleanedUp(interaction, cleanedUp);
+}
+
+/**
+ * 設定一覧からパネルメッセージが存在するもののみを返す
+ * 不在パネルは DB レコードを削除する
+ */
+async function filterExistingConfigs(
+  interaction: ChatInputCommandInteraction,
+  configs: GuildTicketConfig[],
+  configService: {
+    delete: (guildId: string, categoryId: string) => Promise<void>;
+  },
+): Promise<{ existing: GuildTicketConfig[]; cleanedUp: number }> {
+  const existing: GuildTicketConfig[] = [];
+  let cleanedUp = 0;
+
+  for (const config of configs) {
+    const channel = (await interaction.client.channels
+      .fetch(config.panelChannelId)
+      .catch(() => null)) as TextChannel | null;
+    if (!channel) {
+      await configService.delete(config.guildId, config.categoryId);
+      cleanedUp++;
+      continue;
+    }
+
+    const message = await channel.messages
+      .fetch(config.panelMessageId)
+      .catch(() => null);
+    if (!message) {
+      await configService.delete(config.guildId, config.categoryId);
+      cleanedUp++;
+      continue;
+    }
+
+    existing.push(config);
+  }
+
+  return { existing, cleanedUp };
+}
+
+/**
+ * クリーンアップが発生した場合に通知する
+ */
+async function notifyCleanedUp(
+  interaction: ChatInputCommandInteraction,
+  cleanedUp: number,
+): Promise<void> {
+  if (cleanedUp === 0) return;
+
+  const embed = createInfoEmbed(
+    tInteraction(interaction.locale, "ticket:user-response.panels_cleaned_up", {
+      count: cleanedUp,
+    }),
+    { locale: interaction.locale },
+  );
+  await interaction.followUp({
+    embeds: [embed],
+    flags: MessageFlags.Ephemeral,
+  });
 }

@@ -20,10 +20,19 @@ import { createTicketChannel } from "../../services/ticketService";
  * チケット作成モーダルの送信を処理するハンドラ
  */
 export const ticketCreateModalHandler: ModalHandler = {
+  /**
+   * カスタムIDがチケット作成モーダルプレフィックスに一致するか判定する
+   * @param customId カスタムID
+   * @returns 一致する場合 true
+   */
   matches(customId: string) {
     return customId.startsWith(TICKET_CUSTOM_ID.CREATE_MODAL_PREFIX);
   },
 
+  /**
+   * チケット作成モーダルの送信を処理する
+   * @param interaction モーダル送信インタラクション
+   */
   async execute(interaction: ModalSubmitInteraction) {
     const categoryId = interaction.customId.slice(
       TICKET_CUSTOM_ID.CREATE_MODAL_PREFIX.length,

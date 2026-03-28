@@ -2,6 +2,24 @@
 // セレクトメニューハンドラのレジストリ
 
 import { guildConfigViewSelectHandler } from "../../../features/guild-config/handlers/ui/guildConfigViewSelectHandler";
+import {
+  reactionRoleAddButtonRoleSelectHandler,
+  reactionRoleAddButtonSelectHandler,
+} from "../../../features/reaction-role/handlers/ui/reactionRoleAddButtonHandler";
+import {
+  reactionRoleEditButtonPanelSelectHandler,
+  reactionRoleEditButtonRoleSelectHandler,
+  reactionRoleEditButtonSelectHandler,
+} from "../../../features/reaction-role/handlers/ui/reactionRoleEditButtonHandler";
+import { reactionRoleEditPanelSelectHandler } from "../../../features/reaction-role/handlers/ui/reactionRoleEditPanelHandler";
+import {
+  reactionRoleRemoveButtonPanelSelectHandler,
+  reactionRoleRemoveButtonSelectHandler,
+} from "../../../features/reaction-role/handlers/ui/reactionRoleRemoveButtonHandler";
+import { reactionRoleSetupModeSelectHandler } from "../../../features/reaction-role/handlers/ui/reactionRoleSetupModeSelectHandler";
+import { reactionRoleSetupRoleSelectHandler } from "../../../features/reaction-role/handlers/ui/reactionRoleSetupRoleSelectHandler";
+import { reactionRoleTeardownSelectHandler } from "../../../features/reaction-role/handlers/ui/reactionRoleTeardownHandler";
+import { reactionRoleViewSelectHandler } from "../../../features/reaction-role/handlers/ui/reactionRoleViewHandler";
 import { stickyMessageRemoveSelectHandler } from "../../../features/sticky-message/handlers/ui/stickyMessageRemoveSelectHandler";
 import { stickyMessageViewSelectHandler } from "../../../features/sticky-message/handlers/ui/stickyMessageViewSelectHandler";
 import { ticketRoleSelectHandler } from "../../../features/ticket/handlers/ui/ticketRoleSelectHandler";
@@ -21,6 +39,12 @@ import type {
 export const userSelectHandlers: UserSelectHandler[] = [];
 
 export const roleSelectHandlers: RoleSelectHandler[] = [
+  // リアクションロール setup のロール選択を処理
+  reactionRoleSetupRoleSelectHandler,
+  // リアクションロール add-button のロール選択を処理
+  reactionRoleAddButtonRoleSelectHandler,
+  // リアクションロール edit-button のロール選択を処理
+  reactionRoleEditButtonRoleSelectHandler,
   // チケット setup のスタッフロール選択を処理
   ticketSetupRoleSelectHandler,
   // チケット set-roles / add-roles / remove-roles のロール選択を処理
@@ -32,6 +56,24 @@ export const roleSelectHandlers: RoleSelectHandler[] = [
 export const stringSelectHandlers: StringSelectHandler[] = [
   // guild-config view ページセレクトメニューを処理
   guildConfigViewSelectHandler,
+  // リアクションロール setup のモード選択を処理
+  reactionRoleSetupModeSelectHandler,
+  // リアクションロール teardown のパネル選択を処理
+  reactionRoleTeardownSelectHandler,
+  // リアクションロール view のパネル選択を処理
+  reactionRoleViewSelectHandler,
+  // リアクションロール edit-panel のパネル選択を処理
+  reactionRoleEditPanelSelectHandler,
+  // リアクションロール add-button のパネル選択を処理
+  reactionRoleAddButtonSelectHandler,
+  // リアクションロール remove-button のパネル選択を処理
+  reactionRoleRemoveButtonPanelSelectHandler,
+  // リアクションロール remove-button のボタン選択を処理
+  reactionRoleRemoveButtonSelectHandler,
+  // リアクションロール edit-button のパネル選択を処理
+  reactionRoleEditButtonPanelSelectHandler,
+  // リアクションロール edit-button のボタン選択を処理
+  reactionRoleEditButtonSelectHandler,
   // sticky-message remove コマンドのチャンネル選択を処理
   stickyMessageRemoveSelectHandler,
   // sticky-message view コマンドのチャンネル選択を処理

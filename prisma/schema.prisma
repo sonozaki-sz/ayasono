@@ -151,3 +151,22 @@ model Ticket {
   @@index([guildId, categoryId, userId, status])
   @@map("tickets")
 }
+
+// リアクションロールパネル
+model GuildReactionRolePanel {
+  id            String   @id @default(cuid())
+  guildId       String   @map("guild_id")
+  channelId     String   @map("channel_id")
+  messageId     String   @map("message_id")
+  mode          String   @default("toggle") // toggle, one-action, exclusive
+  title         String   @default("ロール選択")
+  description   String   @default("ボタンを押してロールを取得・解除できます。")
+  color         String   @default("#00A8F3")
+  buttons       String   @default("[]") // JSON: ReactionRoleButton[]
+  buttonCounter Int      @default(0) @map("button_counter")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@index([guildId])
+  @@map("guild_reaction_role_panels")
+}

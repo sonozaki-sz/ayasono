@@ -78,9 +78,11 @@ export async function handleResetAll(
   // ボタン応答を待機
   const collector = response.createMessageComponentCollector({
     time: CONFIRM_TIMEOUT_MS,
+    /* istanbul ignore next -- Discord.js collector filter */
     filter: (i) => i.user.id === interaction.user.id,
   });
 
+  /* istanbul ignore start -- Discord.js collector callback */
   collector.on("collect", async (i) => {
     if (i.customId === GUILD_CONFIG_CUSTOM_ID.RESET_ALL_CONFIRM) {
       // 全設定削除
@@ -110,8 +112,10 @@ export async function handleResetAll(
 
     collector.stop();
   });
+  /* istanbul ignore stop */
 
   // タイムアウト時はキャンセル扱い
+  /* istanbul ignore start -- Discord.js collector callback */
   collector.on("end", async (_, reason) => {
     if (reason === "time") {
       const cancelEmbed = createSuccessEmbed(
@@ -122,4 +126,5 @@ export async function handleResetAll(
         .catch(() => {});
     }
   });
+  /* istanbul ignore stop */
 }

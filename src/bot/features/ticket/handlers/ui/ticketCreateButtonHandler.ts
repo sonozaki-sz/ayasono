@@ -22,10 +22,19 @@ import { TICKET_CUSTOM_ID } from "../../commands/ticketCommand.constants";
  * チケット作成ボタンを処理するハンドラ
  */
 export const ticketCreateButtonHandler: ButtonHandler = {
+  /**
+   * カスタムIDがチケット作成プレフィックスに一致するか判定する
+   * @param customId カスタムID
+   * @returns 一致する場合 true
+   */
   matches(customId: string) {
     return customId.startsWith(TICKET_CUSTOM_ID.CREATE_PREFIX);
   },
 
+  /**
+   * チケット作成ボタンの操作を処理する
+   * @param interaction ボタンインタラクション
+   */
   async execute(interaction: ButtonInteraction) {
     const categoryId = interaction.customId.slice(
       TICKET_CUSTOM_ID.CREATE_PREFIX.length,
@@ -39,7 +48,20 @@ export const ticketCreateButtonHandler: ButtonHandler = {
       guildId,
       categoryId,
     );
-    if (!config) return;
+    if (!config) {
+      const embed = createErrorEmbed(
+        tInteraction(
+          interaction.locale,
+          "ticket:user-response.panel_not_found",
+        ),
+        { locale: interaction.locale },
+      );
+      await interaction.reply({
+        embeds: [embed],
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
 
     // ユーザーのオープンチケット数を確認
     const openTickets = await ticketRepository.findOpenByUserAndCategory(

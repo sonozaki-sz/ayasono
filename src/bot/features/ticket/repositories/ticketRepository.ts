@@ -12,10 +12,20 @@ import { TICKET_STATUS } from "../commands/ticketCommand.constants";
 
 export class TicketRepository implements ITicketRepository {
   private prisma: PrismaClient;
+
+  /**
+   * TicketRepository を初期化する
+   * @param prisma Prisma クライアントインスタンス
+   */
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
   }
 
+  /**
+   * チケットをIDで検索する
+   * @param id チケットID
+   * @returns チケット（存在しない場合は null）
+   */
   async findById(id: string): Promise<Ticket | null> {
     return executeWithDatabaseError(
       () => this.prisma.ticket.findUnique({ where: { id } }),
@@ -23,6 +33,11 @@ export class TicketRepository implements ITicketRepository {
     );
   }
 
+  /**
+   * チャンネルIDでチケットを検索する
+   * @param channelId チャンネルID
+   * @returns チケット（存在しない場合は null）
+   */
   async findByChannelId(channelId: string): Promise<Ticket | null> {
     return executeWithDatabaseError(
       () =>
@@ -35,6 +50,13 @@ export class TicketRepository implements ITicketRepository {
     );
   }
 
+  /**
+   * 指定カテゴリ内のユーザーのオープンチケットを検索する
+   * @param guildId ギルドID
+   * @param categoryId カテゴリID
+   * @param userId ユーザーID
+   * @returns オープン状態のチケット一覧
+   */
   async findOpenByUserAndCategory(
     guildId: string,
     categoryId: string,
@@ -53,6 +75,12 @@ export class TicketRepository implements ITicketRepository {
     );
   }
 
+  /**
+   * 指定カテゴリの全チケットを番号順で取得する
+   * @param guildId ギルドID
+   * @param categoryId カテゴリID
+   * @returns チケット一覧（番号昇順）
+   */
   async findAllByCategory(
     guildId: string,
     categoryId: string,
@@ -70,6 +98,12 @@ export class TicketRepository implements ITicketRepository {
     );
   }
 
+  /**
+   * 指定カテゴリのオープンチケットを番号順で取得する
+   * @param guildId ギルドID
+   * @param categoryId カテゴリID
+   * @returns オープン状態のチケット一覧（番号昇順）
+   */
   async findOpenByCategory(
     guildId: string,
     categoryId: string,
@@ -87,6 +121,11 @@ export class TicketRepository implements ITicketRepository {
     );
   }
 
+  /**
+   * ギルド内のクローズ済みチケットを全取得する
+   * @param guildId ギルドID
+   * @returns クローズ状態のチケット一覧
+   */
   async findAllClosedByGuild(guildId: string): Promise<Ticket[]> {
     return executeWithDatabaseError(
       () =>
@@ -97,6 +136,11 @@ export class TicketRepository implements ITicketRepository {
     );
   }
 
+  /**
+   * チケットを新規作成する
+   * @param data チケットの作成データ（id, createdAt, updatedAt は自動生成）
+   * @returns 作成されたチケット
+   */
   async create(
     data: Omit<Ticket, "id" | "createdAt" | "updatedAt">,
   ): Promise<Ticket> {
@@ -109,6 +153,12 @@ export class TicketRepository implements ITicketRepository {
     );
   }
 
+  /**
+   * チケットを更新する
+   * @param id チケットID
+   * @param data 更新データ
+   * @returns 更新後のチケット
+   */
   async update(id: string, data: Partial<Ticket>): Promise<Ticket> {
     return executeWithDatabaseError(
       () => this.prisma.ticket.update({ where: { id }, data }),
@@ -116,6 +166,10 @@ export class TicketRepository implements ITicketRepository {
     );
   }
 
+  /**
+   * チケットを削除する
+   * @param id チケットID
+   */
   async delete(id: string): Promise<void> {
     await executeWithDatabaseError(
       () => this.prisma.ticket.delete({ where: { id } }),
@@ -123,6 +177,12 @@ export class TicketRepository implements ITicketRepository {
     );
   }
 
+  /**
+   * 指定カテゴリの全チケットを削除する
+   * @param guildId ギルドID
+   * @param categoryId カテゴリID
+   * @returns 削除されたチケット数
+   */
   async deleteByCategory(guildId: string, categoryId: string): Promise<number> {
     const result = await executeWithDatabaseError(
       () =>
@@ -137,6 +197,11 @@ export class TicketRepository implements ITicketRepository {
     return result.count;
   }
 
+  /**
+   * ギルドの全チケットを削除する
+   * @param guildId ギルドID
+   * @returns 削除されたチケット数
+   */
   async deleteAllByGuild(guildId: string): Promise<number> {
     const result = await executeWithDatabaseError(
       () =>
@@ -153,6 +218,8 @@ let repository: ITicketRepository | undefined;
 
 /**
  * チケットリポジトリのシングルトンを取得する
+ * @param prisma 初回呼び出し時に必要な Prisma クライアント
+ * @returns チケットリポジトリのインスタンス
  */
 export function getTicketRepository(prisma?: PrismaClient): ITicketRepository {
   if (!repository) {

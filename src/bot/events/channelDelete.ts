@@ -2,6 +2,7 @@
 // チャンネル削除同期イベント（VAC・スティッキーメッセージ・VC募集）
 
 import { Events } from "discord.js";
+import { handleReactionRoleChannelDelete } from "../features/reaction-role/handlers/reactionRoleChannelDeleteHandler";
 import { handleStickyMessageChannelDelete } from "../features/sticky-message/handlers/stickyMessageChannelDeleteHandler";
 import { handleTicketChannelDelete } from "../features/ticket/handlers/ticketChannelDeleteHandler";
 import { handleVacChannelDelete } from "../features/vac/handlers/vacChannelDelete";
@@ -14,7 +15,7 @@ export const channelDeleteEvent: BotEvent<typeof Events.ChannelDelete> = {
   once: false,
 
   /**
-   * channelDelete イベント発火時に VAC・スティッキーメッセージ・VC募集の同期処理を実行する
+   * channelDelete イベント発火時に VAC・スティッキーメッセージ・VC募集・リアクションロールの同期処理を実行する
    * @param channel 削除されたチャンネル
    * @returns 実行完了を示す Promise
    */
@@ -27,5 +28,7 @@ export const channelDeleteEvent: BotEvent<typeof Events.ChannelDelete> = {
     await handleVcRecruitChannelDelete(channel);
     // チケットパネル設置チャンネルの削除検知・設定クリーンアップ
     await handleTicketChannelDelete(channel);
+    // リアクションロールパネル設置チャンネルの削除検知・設定クリーンアップ
+    await handleReactionRoleChannelDelete(channel);
   },
 };

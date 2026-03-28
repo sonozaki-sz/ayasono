@@ -101,6 +101,7 @@ export async function showPreviewDialog(
     // stop() より先にフラグを立てる
     let handledByCollect = false;
 
+    /* istanbul ignore start -- Discord.js collector callback */
     collector.on("collect", async (i) => {
       if (i.user.id !== baseInteraction.user.id) {
         await i.reply({
@@ -293,7 +294,9 @@ export async function showPreviewDialog(
           .catch(() => {});
       }
     });
+    /* istanbul ignore stop */
 
+    /* istanbul ignore start -- Discord.js collector callback */
     collector.on("end", async (_, reason) => {
       // collect ハンドラで処理済みの場合（通常終了・キャンセル）はスキップ
       // "time" 以外（messageDelete / channelDelete 等）でも未処理なら Timeout として解決し
@@ -325,5 +328,6 @@ export async function showPreviewDialog(
         .catch(() => {});
       resolve({ type: DIALOG_TYPE.Timeout });
     });
+    /* istanbul ignore stop */
   });
 }

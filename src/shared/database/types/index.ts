@@ -3,6 +3,7 @@
 
 export * from "./bumpReminderTypes";
 export * from "./entities";
+export * from "./reactionRoleTypes";
 export * from "./repositories";
 export * from "./stickyMessageTypes";
 export * from "./ticketTypes";

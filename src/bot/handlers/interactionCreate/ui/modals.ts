@@ -3,6 +3,11 @@
 
 import { memberLogSetJoinMessageModalHandler } from "../../../features/member-log/handlers/ui/memberLogSetJoinMessageModalHandler";
 import { memberLogSetLeaveMessageModalHandler } from "../../../features/member-log/handlers/ui/memberLogSetLeaveMessageModalHandler";
+import { reactionRoleAddButtonModalHandler } from "../../../features/reaction-role/handlers/ui/reactionRoleAddButtonHandler";
+import { reactionRoleEditButtonModalHandler } from "../../../features/reaction-role/handlers/ui/reactionRoleEditButtonHandler";
+import { reactionRoleEditPanelModalHandler } from "../../../features/reaction-role/handlers/ui/reactionRoleEditPanelHandler";
+import { reactionRoleSetupButtonModalHandler } from "../../../features/reaction-role/handlers/ui/reactionRoleSetupButtonModalHandler";
+import { reactionRoleSetupModalHandler } from "../../../features/reaction-role/handlers/ui/reactionRoleSetupModalHandler";
 import { stickyMessageSetEmbedModalHandler } from "../../../features/sticky-message/handlers/ui/stickyMessageSetEmbedModalHandler";
 import { stickyMessageSetModalHandler } from "../../../features/sticky-message/handlers/ui/stickyMessageSetModalHandler";
 import { stickyMessageUpdateEmbedModalHandler } from "../../../features/sticky-message/handlers/ui/stickyMessageUpdateEmbedModalHandler";
@@ -34,6 +39,16 @@ export const modalHandlers: ModalHandler[] = [
   memberLogSetJoinMessageModalHandler,
   // member-log-config set-leave-message モーダルを処理
   memberLogSetLeaveMessageModalHandler,
+  // リアクションロール setup パネル設定モーダルを処理
+  reactionRoleSetupModalHandler,
+  // リアクションロール setup ボタン設定モーダルを処理
+  reactionRoleSetupButtonModalHandler,
+  // リアクションロール edit-panel モーダルを処理
+  reactionRoleEditPanelModalHandler,
+  // リアクションロール add-button ボタン設定モーダルを処理
+  reactionRoleAddButtonModalHandler,
+  // リアクションロール edit-button モーダルを処理
+  reactionRoleEditButtonModalHandler,
   // ticket setup モーダル（パネルタイトル・説明文入力）を処理
   ticketSetupModalHandler,
   // ticket create モーダル（件名・詳細入力）を処理

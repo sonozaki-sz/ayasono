@@ -18,6 +18,11 @@ import {
  * スタッフロール設定のロール選択メニューを処理するハンドラ
  */
 export const ticketRoleSelectHandler: RoleSelectHandler = {
+  /**
+   * カスタムIDがロール設定プレフィックス（set/add/remove）に一致するか判定する
+   * @param customId カスタムID
+   * @returns 一致する場合 true
+   */
   matches(customId: string) {
     return (
       customId.startsWith(TICKET_CUSTOM_ID.SET_ROLES_PREFIX) ||
@@ -26,6 +31,10 @@ export const ticketRoleSelectHandler: RoleSelectHandler = {
     );
   },
 
+  /**
+   * ロール設定メニューの操作を処理する
+   * @param interaction ロール選択メニューインタラクション
+   */
   async execute(interaction: RoleSelectMenuInteraction) {
     if (interaction.customId.startsWith(TICKET_CUSTOM_ID.SET_ROLES_PREFIX)) {
       await handleSetRoles(interaction);
@@ -41,6 +50,7 @@ export const ticketRoleSelectHandler: RoleSelectHandler = {
 
 /**
  * ロール設定（上書き）処理
+ * @param interaction ロール選択メニューインタラクション
  */
 async function handleSetRoles(
   interaction: RoleSelectMenuInteraction,
@@ -68,6 +78,7 @@ async function handleSetRoles(
     return;
   }
 
+  // 選択されたロールで上書き更新
   const roleIds = Array.from(interaction.roles.keys());
   await configService.update(guildId, categoryId, {
     staffRoleIds: JSON.stringify(roleIds),
@@ -85,6 +96,7 @@ async function handleSetRoles(
 
 /**
  * ロール追加処理
+ * @param interaction ロール選択メニューインタラクション
  */
 async function handleAddRoles(
   interaction: RoleSelectMenuInteraction,
@@ -112,6 +124,7 @@ async function handleAddRoles(
     return;
   }
 
+  // 既存ロールと新規ロールをマージして重複を除去
   const existingRoleIds: string[] = parseStaffRoleIds(config.staffRoleIds);
   const newRoleIds = Array.from(interaction.roles.keys());
   const mergedRoleIds = [...new Set([...existingRoleIds, ...newRoleIds])];
@@ -132,6 +145,7 @@ async function handleAddRoles(
 
 /**
  * ロール削除処理
+ * @param interaction ロール選択メニューインタラクション
  */
 async function handleRemoveRoles(
   interaction: RoleSelectMenuInteraction,
@@ -159,12 +173,14 @@ async function handleRemoveRoles(
     return;
   }
 
+  // 既存ロールから選択されたロールを除外
   const existingRoleIds: string[] = parseStaffRoleIds(config.staffRoleIds);
   const removeRoleIds = Array.from(interaction.roles.keys());
   const remainingRoleIds = existingRoleIds.filter(
     (id) => !removeRoleIds.includes(id),
   );
 
+  // 全ロールが削除される場合はエラー（最低1つ必要）
   if (remainingRoleIds.length === 0) {
     const embed = createErrorEmbed(
       tInteraction(

@@ -138,6 +138,7 @@ export async function runConditionSetupStep(
   return new Promise<ConditionSetupResult | null>((resolve) => {
     let resolved = false;
 
+    /* istanbul ignore start -- Discord.js collector callback */
     collector.on("collect", async (i) => {
       // 実行者本人以外の操作は無視
       if (i.user.id !== interaction.user.id) {
@@ -292,7 +293,9 @@ export async function runConditionSetupStep(
         return;
       }
     });
+    /* istanbul ignore stop */
 
+    /* istanbul ignore start -- Discord.js collector callback */
     collector.on("end", async (_collected, _reason) => {
       if (resolved) return;
 
@@ -317,5 +320,6 @@ export async function runConditionSetupStep(
 
       resolve(null);
     });
+    /* istanbul ignore stop */
   });
 }

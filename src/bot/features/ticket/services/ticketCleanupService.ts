@@ -19,6 +19,10 @@ import { deleteTicket } from "./ticketService";
  * 1. チケットの自動削除タイマーをキャンセル + チャンネル削除
  * 2. DB からチケットレコードと設定を削除
  * 3. パネルメッセージを削除
+ * @param guild 対象ギルド
+ * @param configs クリーンアップ対象のチケット設定一覧
+ * @param configService チケット設定サービス
+ * @param ticketRepository チケットリポジトリ
  */
 export async function cleanupTicketConfigs(
   guild: Guild,

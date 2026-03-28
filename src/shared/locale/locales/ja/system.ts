@@ -27,6 +27,7 @@ export const system = {
   "log_prefix.guild_delete": "guildDelete",
   "log_prefix.ready": "ready",
   "log_prefix.ticket": "チケット",
+  "log_prefix.reaction_role": "リアクションロール",
   "log_prefix.guild_config": "ギルド設定",
 
   // guildDelete（Bot退出時クリーンアップ）

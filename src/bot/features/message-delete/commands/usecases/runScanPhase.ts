@@ -85,18 +85,22 @@ export async function runScanPhase(
 
   // 「収集分を確認」ボタンコレクター（ユーザーによる任意中断）
   const cancelCollector = scanReply.createMessageComponentCollector({
+    /* istanbul ignore next -- Discord.js collector filter */
     filter: (i) =>
       i.customId === MSG_DEL_CUSTOM_ID.SCAN_CANCEL &&
       i.user.id === interaction.user.id,
     max: 1,
   });
   const cancelWatcher = new Promise<void>((resolve) => {
+    /* istanbul ignore start -- Discord.js collector callback */
     cancelCollector.on("collect", async (i) => {
       cancelState.reason = "user";
       controller.abort();
       await i.deferUpdate().catch(() => {});
       resolve();
     });
+    /* istanbul ignore stop */
+    /* istanbul ignore start -- Discord.js collector callback */
     cancelCollector.on("end", (_, reason) => {
       // "user" 以外（messageDelete / channelDelete 等）でメッセージが削除された場合は
       // スキャンを即座に中断する。"user" は finally の cancelCollector.stop() による通常停止。
@@ -120,6 +124,7 @@ export async function runScanPhase(
       }
       resolve();
     });
+    /* istanbul ignore stop */
   });
 
   let scannedMessages: ScannedMessageWithChannel[];

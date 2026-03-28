@@ -30,6 +30,7 @@ export const I18N_NAMESPACES = [
   "vc",
   "messageDelete",
   "memberLog",
+  "reactionRole",
   "stickyMessage",
   "ticket",
   "vcRecruit",

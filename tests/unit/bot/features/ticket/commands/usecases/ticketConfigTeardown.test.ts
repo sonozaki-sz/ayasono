@@ -3,10 +3,12 @@
 import { MessageFlags } from "discord.js";
 
 const findAllByGuildMock = vi.fn();
+const deleteMock = vi.fn().mockResolvedValue(undefined);
 
 vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotTicketConfigService: vi.fn(() => ({
     findAllByGuild: findAllByGuildMock,
+    delete: deleteMock,
   })),
 }));
 
@@ -47,6 +49,9 @@ vi.mock("@/bot/utils/messageResponse", () => ({
     type: "error",
     description: msg,
   })),
+  createInfoEmbed: vi.fn((_desc: string, _opts?: unknown) => ({
+    type: "info",
+  })),
 }));
 
 vi.mock("@/bot/features/ticket/services/ticketAutoDeleteService", () => ({
@@ -71,10 +76,26 @@ vi.mock("@/bot/features/ticket/handlers/ui/ticketTeardownState", () => ({
   ticketTeardownSessions: ticketTeardownSessionsMock,
 }));
 
+/**
+ * パネルメッセージが存在するチャンネルのモックを返す client を作成
+ */
+function createClientMock() {
+  return {
+    channels: {
+      fetch: vi.fn().mockResolvedValue({
+        messages: {
+          fetch: vi.fn().mockResolvedValue({ id: "panel-msg-1" }),
+        },
+      }),
+    },
+  };
+}
+
 function createInteractionMock(overrides = {}) {
   return {
     channelId: "channel-1",
     locale: "ja",
+    client: createClientMock(),
     guild: {
       id: "guild-1",
       channels: {
@@ -87,6 +108,17 @@ function createInteractionMock(overrides = {}) {
       getChannel: vi.fn(() => ({ id: "category-1" })),
     },
     reply: vi.fn().mockResolvedValue(undefined),
+    followUp: vi.fn().mockResolvedValue(undefined),
+    ...overrides,
+  };
+}
+
+function createConfig(categoryId: string, overrides = {}) {
+  return {
+    guildId: "guild-1",
+    categoryId,
+    panelChannelId: "panel-ch-1",
+    panelMessageId: "panel-msg-1",
     ...overrides,
   };
 }
@@ -119,9 +151,7 @@ describe("bot/features/ticket/commands/usecases/ticketConfigTeardown", () => {
       "@/bot/features/ticket/commands/usecases/ticketConfigTeardown"
     );
 
-    findAllByGuildMock.mockResolvedValue([
-      { guildId: "guild-1", categoryId: "cat-1" },
-    ]);
+    findAllByGuildMock.mockResolvedValue([createConfig("cat-1")]);
     const interaction = createInteractionMock();
 
     await handleTicketConfigTeardown(interaction as never, "guild-1");
@@ -145,8 +175,8 @@ describe("bot/features/ticket/commands/usecases/ticketConfigTeardown", () => {
     );
 
     findAllByGuildMock.mockResolvedValue([
-      { guildId: "guild-1", categoryId: "cat-1" },
-      { guildId: "guild-1", categoryId: "cat-2" },
+      createConfig("cat-1"),
+      createConfig("cat-2"),
     ]);
     const interaction = createInteractionMock();
 
@@ -170,8 +200,8 @@ describe("bot/features/ticket/commands/usecases/ticketConfigTeardown", () => {
     );
 
     findAllByGuildMock.mockResolvedValue([
-      { guildId: "guild-1", categoryId: "cat-1" },
-      { guildId: "guild-1", categoryId: "cat-2" },
+      createConfig("cat-1"),
+      createConfig("cat-2"),
     ]);
     const interaction = createInteractionMock();
 
@@ -188,8 +218,8 @@ describe("bot/features/ticket/commands/usecases/ticketConfigTeardown", () => {
     );
 
     findAllByGuildMock.mockResolvedValue([
-      { guildId: "guild-1", categoryId: "cat-1" },
-      { guildId: "guild-1", categoryId: "cat-2" },
+      createConfig("cat-1"),
+      createConfig("cat-2"),
     ]);
     const interaction = createInteractionMock();
 
@@ -208,8 +238,8 @@ describe("bot/features/ticket/commands/usecases/ticketConfigTeardown", () => {
     );
 
     findAllByGuildMock.mockResolvedValue([
-      { guildId: "guild-1", categoryId: "cat-unknown" },
-      { guildId: "guild-1", categoryId: "cat-unknown2" },
+      createConfig("cat-unknown"),
+      createConfig("cat-unknown2"),
     ]);
     const interaction = createInteractionMock({
       guild: {
@@ -233,8 +263,8 @@ describe("bot/features/ticket/commands/usecases/ticketConfigTeardown", () => {
     );
 
     findAllByGuildMock.mockResolvedValue([
-      { guildId: "guild-1", categoryId: "cat-null" },
-      { guildId: "guild-1", categoryId: "cat-null2" },
+      createConfig("cat-null"),
+      createConfig("cat-null2"),
     ]);
     const interaction = createInteractionMock({
       guild: {
@@ -250,5 +280,65 @@ describe("bot/features/ticket/commands/usecases/ticketConfigTeardown", () => {
     const replyCall = interaction.reply.mock.calls[0][0];
     const selectMenuComponent = replyCall.components[0].components[0];
     expect(selectMenuComponent.options[0].data.label).toBe("cat-null");
+  });
+
+  it("パネルメッセージが全て削除済みの場合はDB設定を削除しエラー応答を返す", async () => {
+    const { handleTicketConfigTeardown } = await import(
+      "@/bot/features/ticket/commands/usecases/ticketConfigTeardown"
+    );
+
+    findAllByGuildMock.mockResolvedValue([createConfig("cat-1")]);
+    const interaction = createInteractionMock({
+      client: {
+        channels: {
+          fetch: vi.fn().mockResolvedValue(null),
+        },
+      },
+    });
+
+    await handleTicketConfigTeardown(interaction as never, "guild-1");
+
+    expect(deleteMock).toHaveBeenCalledWith("guild-1", "cat-1");
+    expect(interaction.reply).toHaveBeenCalledWith(
+      expect.objectContaining({
+        embeds: [expect.objectContaining({ type: "error" })],
+        flags: MessageFlags.Ephemeral,
+      }),
+    );
+  });
+
+  it("一部パネルがクリーンアップされた場合はfollowUpで通知する", async () => {
+    const { handleTicketConfigTeardown } = await import(
+      "@/bot/features/ticket/commands/usecases/ticketConfigTeardown"
+    );
+
+    findAllByGuildMock.mockResolvedValue([
+      createConfig("cat-1"),
+      createConfig("cat-2"),
+    ]);
+
+    // cat-1はパネル存在、cat-2はパネル不在
+    const clientMock = {
+      channels: {
+        fetch: vi
+          .fn()
+          .mockResolvedValueOnce({
+            messages: {
+              fetch: vi.fn().mockResolvedValue({ id: "panel-msg-1" }),
+            },
+          })
+          .mockResolvedValueOnce(null),
+      },
+    };
+    const interaction = createInteractionMock({ client: clientMock });
+
+    await handleTicketConfigTeardown(interaction as never, "guild-1");
+
+    expect(deleteMock).toHaveBeenCalledWith("guild-1", "cat-2");
+    expect(interaction.followUp).toHaveBeenCalledWith(
+      expect.objectContaining({
+        flags: MessageFlags.Ephemeral,
+      }),
+    );
   });
 });

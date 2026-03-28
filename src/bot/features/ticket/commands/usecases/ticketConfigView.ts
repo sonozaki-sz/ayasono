@@ -8,6 +8,7 @@ import {
   type MessageActionRowComponentBuilder,
   MessageFlags,
   StringSelectMenuBuilder,
+  type TextChannel,
 } from "discord.js";
 import type { GuildTicketConfig } from "../../../../../shared/database/types";
 import { tInteraction } from "../../../../../shared/locale/localeManager";
@@ -16,7 +17,10 @@ import {
   getBotTicketRepository,
 } from "../../../../services/botCompositionRoot";
 import { buildPaginationRow } from "../../../../shared/pagination";
-import { createInfoEmbed } from "../../../../utils/messageResponse";
+import {
+  createErrorEmbed,
+  createInfoEmbed,
+} from "../../../../utils/messageResponse";
 import {
   parseStaffRoleIds,
   TICKET_CUSTOM_ID,
@@ -100,14 +104,27 @@ export async function handleTicketConfigView(
 ): Promise<void> {
   const configService = getBotTicketConfigService();
   const ticketRepository = getBotTicketRepository();
-  const configs = await configService.findAllByGuild(guildId);
+  const allConfigs = await configService.findAllByGuild(guildId);
   const locale = interaction.locale;
 
+  // メッセージ存在確認 → 不在パネルを DB 削除して除外
+  const { existing: configs, cleanedUp } = await filterExistingConfigs(
+    interaction,
+    allConfigs,
+    configService,
+  );
+
   if (configs.length === 0) {
-    const embed = createInfoEmbed(
-      tInteraction(locale, "ticket:user-response.no_configs"),
-      { locale },
-    );
+    const embed =
+      allConfigs.length > 0
+        ? createErrorEmbed(
+            tInteraction(locale, "ticket:user-response.panel_not_found"),
+            { locale },
+          )
+        : createInfoEmbed(
+            tInteraction(locale, "ticket:user-response.no_configs"),
+            { locale },
+          );
     await interaction.reply({
       embeds: [embed],
       flags: MessageFlags.Ephemeral,
@@ -171,4 +188,57 @@ export async function handleTicketConfigView(
     components,
     flags: MessageFlags.Ephemeral,
   });
+
+  // クリーンアップが発生した場合は通知
+  if (cleanedUp > 0) {
+    const cleanupEmbed = createInfoEmbed(
+      tInteraction(locale, "ticket:user-response.panels_cleaned_up", {
+        count: cleanedUp,
+      }),
+      { locale },
+    );
+    await interaction.followUp({
+      embeds: [cleanupEmbed],
+      flags: MessageFlags.Ephemeral,
+    });
+  }
+}
+
+/**
+ * 設定一覧からパネルメッセージが存在するもののみを返す
+ * 不在パネルは DB レコードを削除する
+ */
+async function filterExistingConfigs(
+  interaction: ChatInputCommandInteraction,
+  configs: GuildTicketConfig[],
+  configService: {
+    delete: (guildId: string, categoryId: string) => Promise<void>;
+  },
+): Promise<{ existing: GuildTicketConfig[]; cleanedUp: number }> {
+  const existing: GuildTicketConfig[] = [];
+  let cleanedUp = 0;
+
+  for (const config of configs) {
+    const channel = (await interaction.client.channels
+      .fetch(config.panelChannelId)
+      .catch(() => null)) as TextChannel | null;
+    if (!channel) {
+      await configService.delete(config.guildId, config.categoryId);
+      cleanedUp++;
+      continue;
+    }
+
+    const message = await channel.messages
+      .fetch(config.panelMessageId)
+      .catch(() => null);
+    if (!message) {
+      await configService.delete(config.guildId, config.categoryId);
+      cleanedUp++;
+      continue;
+    }
+
+    existing.push(config);
+  }
+
+  return { existing, cleanedUp };
 }

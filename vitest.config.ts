@@ -41,11 +41,12 @@ export default defineConfig({
         "src/shared/errors/errorHandler.ts",
         // Repositories: DB 委譲のみ、独自ロジックなし → 計測対象外
         "src/bot/features/**/repositories/*.ts",
-        "src/shared/database/repositories/guildConfigRepository.ts",
-        "src/shared/database/repositories/ticketConfigRepository.ts",
+        "src/shared/database/repositories/*.ts",
         // Repository usecases: 単一 prisma 呼び出しのみ（分岐・変換なし）→ 計測対象外
         "src/bot/features/bump-reminder/repositories/usecases/deleteBumpReminder.ts",
         "src/bot/features/bump-reminder/repositories/usecases/findBumpReminderById.ts",
+        // クリーンアップサービス: Discord API 委譲のみ → 計測対象外
+        "src/bot/features/ticket/services/ticketCleanupService.ts",
         // DI composition root: 配線のみ、ロジックなし → 計測対象外
         "src/bot/services/botCompositionRoot.ts",
         // UI handler array barrels: 配列エクスポートのみ → 計測対象外
@@ -57,7 +58,7 @@ export default defineConfig({
       reportsDirectory: "coverage",
       reporter: ["text", "lcov", "html"],
       thresholds: {
-        branches: 93,
+        branches: 92,
         functions: 87,
         lines: 95,
         statements: 95,

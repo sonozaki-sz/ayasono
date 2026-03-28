@@ -14,6 +14,11 @@ import { TICKET_AUTO_DELETE_JOB_PREFIX } from "../commands/ticketCommand.constan
 
 /**
  * 自動削除タイマーを開始する
+ * @param ticketId チケットID
+ * @param channelId チケットチャンネルID
+ * @param guildId ギルドID
+ * @param delayMs 削除までの遅延ミリ秒
+ * @param client Discord クライアント
  */
 export function scheduleTicketAutoDelete(
   ticketId: string,
@@ -43,6 +48,8 @@ export function scheduleTicketAutoDelete(
 
 /**
  * 自動削除タイマーをキャンセルする
+ * @param ticketId チケットID
+ * @param guildId ギルドID
  */
 export function cancelTicketAutoDelete(
   ticketId: string,
@@ -63,6 +70,10 @@ export function cancelTicketAutoDelete(
 
 /**
  * 自動削除を実行する
+ * @param ticketId チケットID
+ * @param channelId チケットチャンネルID
+ * @param guildId ギルドID
+ * @param client Discord クライアント
  */
 async function executeAutoDelete(
   ticketId: string,
@@ -106,6 +117,8 @@ async function executeAutoDelete(
 
 /**
  * Bot起動時にクローズ済みチケットの自動削除タイマーを復元する
+ * @param client Discord クライアント
+ * @param ticketRepository チケットリポジトリ
  */
 export async function restoreAutoDeleteTimers(
   client: Client,
