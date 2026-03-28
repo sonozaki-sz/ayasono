@@ -36,6 +36,8 @@ export const reactionRole = {
   "user-response.cannot_remove_all_buttons": "Cannot remove all buttons.",
   "user-response.invalid_color":
     "Invalid color format. Please use #RRGGBB format.",
+  "user-response.invalid_emoji":
+    "Invalid emoji format. Please use a Unicode emoji or Discord custom emoji (<:name:id>).",
   "user-response.invalid_style":
     "Invalid style. Please use primary, secondary, success, or danger.",
   "user-response.session_expired":

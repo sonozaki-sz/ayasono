@@ -286,6 +286,34 @@ describe("bot/features/reaction-role/handlers/ui/reactionRoleAddButtonHandler", 
         );
       });
 
+      it("無効な絵文字の場合はエラー応答する", async () => {
+        const session = {
+          panelId: "panel-1",
+          buttons: [],
+          buttonCounter: 0,
+          pendingButton: undefined,
+        };
+        reactionRoleAddButtonSessions.set("session-1", session);
+
+        const interaction = createMockModalInteraction(
+          "reaction-role:add-button-modal:session-1",
+          {
+            "reaction-role:button-label": "テスト",
+            "reaction-role:button-emoji": "not-emoji",
+            "reaction-role:button-style": "primary",
+          },
+        );
+
+        await reactionRoleAddButtonModalHandler.execute(interaction as never);
+
+        expect(interaction.reply).toHaveBeenCalledWith(
+          expect.objectContaining({
+            embeds: expect.any(Array),
+          }),
+        );
+        expect(session.pendingButton).toBeUndefined();
+      });
+
       it("無効なスタイルの場合はエラー応答する", async () => {
         const session = {
           panelId: "panel-1",

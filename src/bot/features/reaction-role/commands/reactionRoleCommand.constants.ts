@@ -119,6 +119,40 @@ export function parseButtons(json: string): ReactionRoleButton[] {
   }
 }
 
+/** カスタム絵文字パターン: <:name:id> または <a:name:id> */
+const CUSTOM_EMOJI_REGEX = /^<a?:\w{2,32}:\d{17,19}>$/;
+
+/** Unicode 絵文字パターン（Emoji_Presentation, Emoji+VS16, ZWJシーケンス, 国旗, スキントーン） */
+const UNICODE_EMOJI_REGEX =
+  /^(?:[\u{1F1E6}-\u{1F1FF}]{2}|(?:\p{Emoji_Presentation}|\p{Emoji}\uFE0F)(?:\u200D(?:\p{Emoji_Presentation}|\p{Emoji}\uFE0F))*[\u{1F3FB}-\u{1F3FF}]?)$/u;
+
+/** Emoji_Presentation 文字に続く冗余な VS16 (U+FE0F) を除去する */
+const REDUNDANT_VS16_REGEX = /(\p{Emoji_Presentation})\uFE0F/gu;
+
+/**
+ * 絵文字文字列を正規化する
+ * Discord API が拒否する冗余な VS16（異体字セレクタ）を除去する
+ * @param emoji 正規化する絵文字文字列
+ * @returns 正規化された絵文字文字列
+ */
+export function normalizeEmoji(emoji: string): string {
+  return emoji.replace(REDUNDANT_VS16_REGEX, "$1");
+}
+
+/**
+ * 絵文字文字列をバリデーションする
+ * 正規化後の値で判定する。空文字列は絵文字なしとして有効扱い
+ * @param emoji 検証する絵文字文字列
+ * @returns 有効な絵文字（または空文字列）であれば true
+ */
+export function isValidEmoji(emoji: string): boolean {
+  if (emoji === "") return true;
+  const normalized = normalizeEmoji(emoji);
+  return (
+    CUSTOM_EMOJI_REGEX.test(normalized) || UNICODE_EMOJI_REGEX.test(normalized)
+  );
+}
+
 /**
  * ボタンスタイル文字列をバリデーションする
  * @param style 検証するスタイル文字列
