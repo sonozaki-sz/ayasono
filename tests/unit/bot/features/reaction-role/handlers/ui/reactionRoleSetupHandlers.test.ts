@@ -310,6 +310,32 @@ describe("bot/features/reaction-role/handlers/ui/reactionRoleSetupHandlers", () 
       );
     });
 
+    it("無効な絵文字の場合、エラーを返す", async () => {
+      const session = createBaseSession();
+      reactionRoleSetupSessions.set("s1", session);
+      const interaction = createMockModalInteraction(
+        "reaction-role:setup-button-modal:s1",
+        {
+          fields: {
+            getTextInputValue: vi.fn((fieldId: string) => {
+              if (fieldId === "reaction-role:button-label") return "Label";
+              if (fieldId === "reaction-role:button-emoji") return "not-emoji";
+              if (fieldId === "reaction-role:button-style") return "primary";
+              return "";
+            }),
+          },
+        },
+      );
+
+      await reactionRoleSetupButtonModalHandler.execute(interaction as never);
+
+      expect(interaction.reply).toHaveBeenCalledWith(
+        expect.objectContaining({
+          embeds: [{ type: "error" }],
+        }),
+      );
+    });
+
     it("有効な送信で pendingButton を保存し、RoleSelectMenu を返す", async () => {
       const session = createBaseSession();
       reactionRoleSetupSessions.set("s1", session);

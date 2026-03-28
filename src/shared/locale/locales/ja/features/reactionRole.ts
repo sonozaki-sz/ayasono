@@ -37,6 +37,8 @@ export const reactionRole = {
     "ボタンを0個にすることはできません。",
   "user-response.invalid_color":
     "カラーの形式が正しくありません。#RRGGBB形式で入力してください。",
+  "user-response.invalid_emoji":
+    "絵文字の形式が正しくありません。Unicode絵文字またはDiscordカスタム絵文字（<:name:id>）を入力してください。",
   "user-response.invalid_style":
     "スタイルの形式が正しくありません。primary / secondary / success / danger のいずれかを入力してください。",
   "user-response.session_expired":

@@ -15,6 +15,8 @@ import {
 import type { ReactionRoleButton } from "../../../../shared/database/types/reactionRoleTypes";
 import { tInteraction } from "../../../../shared/locale/localeManager";
 import {
+  isValidEmoji,
+  normalizeEmoji,
   REACTION_ROLE_BUTTONS_PER_ROW,
   REACTION_ROLE_CUSTOM_ID,
   REACTION_ROLE_DEFAULT_BUTTON_STYLE,
@@ -70,7 +72,10 @@ export function buildPanelButtonRows(
         .setStyle(STYLE_MAP[btn.style.toLowerCase()] ?? ButtonStyle.Primary);
 
       if (btn.emoji) {
-        builder.setEmoji(btn.emoji);
+        const normalized = normalizeEmoji(btn.emoji);
+        if (isValidEmoji(normalized)) {
+          builder.setEmoji(normalized);
+        }
       }
 
       row.addComponents(builder);

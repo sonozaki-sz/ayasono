@@ -30,6 +30,8 @@ import {
 } from "../../../../utils/messageResponse";
 import {
   isValidButtonStyle,
+  isValidEmoji,
+  normalizeEmoji,
   parseButtons,
   REACTION_ROLE_CUSTOM_ID,
   REACTION_ROLE_DEFAULT_BUTTON_STYLE,
@@ -237,14 +239,31 @@ export const reactionRoleEditButtonModalHandler: ModalHandler = {
     const label = interaction.fields.getTextInputValue(
       REACTION_ROLE_CUSTOM_ID.BUTTON_LABEL,
     );
-    const emoji = interaction.fields
-      .getTextInputValue(REACTION_ROLE_CUSTOM_ID.BUTTON_EMOJI)
-      .trim();
+    const emoji = normalizeEmoji(
+      interaction.fields
+        .getTextInputValue(REACTION_ROLE_CUSTOM_ID.BUTTON_EMOJI)
+        .trim(),
+    );
     const styleInput = interaction.fields
       .getTextInputValue(REACTION_ROLE_CUSTOM_ID.BUTTON_STYLE)
       .trim()
       .toLowerCase();
     const style = styleInput || REACTION_ROLE_DEFAULT_BUTTON_STYLE;
+
+    if (!isValidEmoji(emoji)) {
+      const embed = createErrorEmbed(
+        tInteraction(
+          interaction.locale,
+          "reactionRole:user-response.invalid_emoji",
+        ),
+        { locale: interaction.locale },
+      );
+      await interaction.reply({
+        embeds: [embed],
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
 
     if (!isValidButtonStyle(style)) {
       const embed = createErrorEmbed(
