@@ -30,8 +30,9 @@ WORKDIR /app
 
 # OS パッケージを最新化してセキュリティ脆弱性を修正 + OpenSSL（Prisma が必要）
 # gosu: entrypoint で root → node への安全な権限降格に使用
+# tini: PID 1 の init プロセスとしてゾンビプロセスを自動回収
 RUN apt-get update && apt-get upgrade -y --no-install-recommends \
-    && apt-get install -y --no-install-recommends openssl gosu \
+    && apt-get install -y --no-install-recommends openssl gosu tini \
     && rm -rf /var/lib/apt/lists/*
 
 # corepack キャッシュを /app 以下に設定（app ユーザーが書き込み可能にするため）
@@ -44,14 +45,15 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # 本番依存のみインストール（--ignore-scripts で prepare/husky 等を無効化）
 COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile --prod --ignore-scripts
-
-# ビルド成果物・Prisma クライアントをコピー
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules/.pnpm ./node_modules/.pnpm
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY prisma ./prisma
 COPY prisma.config.ts ./
+RUN pnpm install --frozen-lockfile --prod --ignore-scripts
+
+# Prisma クライアントを生成（本番 node_modules 内に生成）
+RUN pnpm prisma generate
+
+# ビルド成果物をコピー
+COPY --from=builder /app/dist ./dist
 
 # 起動時権限修正スクリプトをコピー
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
@@ -69,4 +71,4 @@ RUN chown -R node:node /app
 
 EXPOSE 3000
 
-ENTRYPOINT ["docker-entrypoint.sh"]
+ENTRYPOINT ["tini", "--", "docker-entrypoint.sh"]
