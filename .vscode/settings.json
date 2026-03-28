@@ -70,8 +70,6 @@
     "prisma/migrations/**/migration.sql": true,
     "prisma/migrations/migration_lock.toml": true
   },
-  // テスト設定
-  "jest.runMode": "on-demand",
   // Git設定
   "git.autofetch": true,
   "git.confirmSync": false,
