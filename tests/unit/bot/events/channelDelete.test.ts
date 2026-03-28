@@ -34,6 +34,15 @@ vi.mock("@/bot/features/ticket/handlers/ticketChannelDeleteHandler", () => ({
     handleTicketChannelDeleteMock(...args),
 }));
 
+const handleReactionRoleChannelDeleteMock = vi.fn();
+vi.mock(
+  "@/bot/features/reaction-role/handlers/reactionRoleChannelDeleteHandler",
+  () => ({
+    handleReactionRoleChannelDelete: (...args: unknown[]) =>
+      handleReactionRoleChannelDeleteMock(...args),
+  }),
+);
+
 type ChannelLike = {
   guildId: string;
   id: string;

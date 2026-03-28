@@ -3,6 +3,12 @@
 
 import { bumpPanelButtonHandler } from "../../../features/bump-reminder/handlers/ui/bumpPanelButtonHandler";
 import { guildConfigViewButtonHandler } from "../../../features/guild-config/handlers/ui/guildConfigViewButtonHandler";
+import { reactionRoleAddButtonButtonHandler } from "../../../features/reaction-role/handlers/ui/reactionRoleAddButtonHandler";
+import { reactionRoleClickHandler } from "../../../features/reaction-role/handlers/ui/reactionRoleClickHandler";
+import { reactionRoleRemoveButtonButtonHandler } from "../../../features/reaction-role/handlers/ui/reactionRoleRemoveButtonHandler";
+import { reactionRoleSetupButtonHandler } from "../../../features/reaction-role/handlers/ui/reactionRoleSetupButtonHandler";
+import { reactionRoleTeardownButtonHandler } from "../../../features/reaction-role/handlers/ui/reactionRoleTeardownHandler";
+import { reactionRoleViewButtonHandler } from "../../../features/reaction-role/handlers/ui/reactionRoleViewHandler";
 import { stickyMessageRemoveButtonHandler } from "../../../features/sticky-message/handlers/ui/stickyMessageRemoveButtonHandler";
 import { ticketButtonHandler } from "../../../features/ticket/handlers/ui/ticketButtonHandler";
 import { ticketCreateButtonHandler } from "../../../features/ticket/handlers/ui/ticketCreateButtonHandler";
@@ -29,6 +35,18 @@ export const buttonHandlers: ButtonHandler[] = [
   ticketTeardownButtonHandler,
   // チケット設定表示のページネーションボタンを処理
   ticketViewButtonHandler,
+  // リアクションロールパネルボタンクリックを処理
+  reactionRoleClickHandler,
+  // リアクションロール setup の「もう1つ追加」「完了」ボタンを処理
+  reactionRoleSetupButtonHandler,
+  // リアクションロール teardown の確認・キャンセルボタンを処理
+  reactionRoleTeardownButtonHandler,
+  // リアクションロール view のページネーションボタンを処理
+  reactionRoleViewButtonHandler,
+  // リアクションロール add-button の「もう1つ追加」「完了」ボタンを処理
+  reactionRoleAddButtonButtonHandler,
+  // リアクションロール remove-button の確認・キャンセルボタンを処理
+  reactionRoleRemoveButtonButtonHandler,
   // VC操作パネルのボタン入力を処理（VAC・VC募集など共用）
   vcPanelButtonHandler,
   // VC募集パネルのボタン入力を処理

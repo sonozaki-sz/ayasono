@@ -15,6 +15,7 @@ import type {
   MemberLogConfig,
   VacConfig,
 } from "./entities";
+import type { GuildReactionRolePanel } from "./reactionRoleTypes";
 import type { StickyMessage } from "./stickyMessageTypes";
 import type { GuildTicketConfig, Ticket } from "./ticketTypes";
 import type { VcRecruitConfig } from "./vcRecruitTypes";
@@ -122,6 +123,20 @@ export interface IStickyMessageRepository {
   ): Promise<StickyMessage>;
   delete(id: string): Promise<void>;
   deleteByChannel(channelId: string): Promise<number>;
+}
+
+export interface IReactionRolePanelRepository {
+  findById(id: string): Promise<GuildReactionRolePanel | null>;
+  findAllByGuild(guildId: string): Promise<GuildReactionRolePanel[]>;
+  create(
+    data: Omit<GuildReactionRolePanel, "id" | "createdAt" | "updatedAt">,
+  ): Promise<GuildReactionRolePanel>;
+  update(
+    id: string,
+    data: Partial<GuildReactionRolePanel>,
+  ): Promise<GuildReactionRolePanel>;
+  delete(id: string): Promise<void>;
+  deleteAllByGuild(guildId: string): Promise<number>;
 }
 
 export interface IGuildTicketConfigRepository {

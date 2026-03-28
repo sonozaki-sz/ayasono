@@ -3,6 +3,7 @@
 
 import type { PrismaClient } from "@prisma/client";
 import { getGuildConfigRepository } from "../../shared/database/guildConfigRepositoryProvider";
+import { getReactionRolePanelRepository } from "../../shared/database/repositories/reactionRolePanelRepository";
 import { getTicketConfigRepository } from "../../shared/database/repositories/ticketConfigRepository";
 import type {
   IGuildConfigRepository,
@@ -13,6 +14,8 @@ import type { GuildConfigService } from "../../shared/features/guild-config/guil
 import { createGuildConfigService } from "../../shared/features/guild-config/guildConfigService";
 import type { MemberLogConfigService } from "../../shared/features/member-log/memberLogConfigService";
 import { createMemberLogConfigService } from "../../shared/features/member-log/memberLogConfigService";
+import type { ReactionRolePanelConfigService } from "../../shared/features/reaction-role/reactionRolePanelConfigService";
+import { createReactionRolePanelConfigService } from "../../shared/features/reaction-role/reactionRolePanelConfigService";
 import type { StickyMessageConfigService } from "../../shared/features/sticky-message/stickyMessageConfigService";
 import { createStickyMessageConfigService } from "../../shared/features/sticky-message/stickyMessageConfigService";
 import type { TicketConfigService } from "../../shared/features/ticket/ticketConfigService";
@@ -54,6 +57,7 @@ export interface BotServices {
   memberLogConfigService: MemberLogConfigService;
   ticketConfigService: TicketConfigService;
   ticketRepository: ITicketRepository;
+  reactionRolePanelConfigService: ReactionRolePanelConfigService;
   vcRecruitRepository: IVcRecruitRepository;
 }
 
@@ -143,6 +147,16 @@ export const setBotMemberLogConfigService: (
   value: MemberLogConfigService,
 ) => void = _memberLogConfigServiceAccessor[1];
 
+const _reactionRolePanelConfigServiceAccessor =
+  createBotServiceAccessor<ReactionRolePanelConfigService>(
+    "ReactionRolePanelConfigService",
+  );
+export const getBotReactionRolePanelConfigService: () => ReactionRolePanelConfigService =
+  _reactionRolePanelConfigServiceAccessor[0];
+export const setBotReactionRolePanelConfigService: (
+  value: ReactionRolePanelConfigService,
+) => void = _reactionRolePanelConfigServiceAccessor[1];
+
 const _ticketConfigServiceAccessor =
   createBotServiceAccessor<TicketConfigService>("TicketConfigService");
 export const getBotTicketConfigService: () => TicketConfigService =
@@ -226,6 +240,13 @@ export function initializeBotCompositionRoot(
   setBotTicketConfigService(ticketConfigService);
   setBotTicketRepository(ticketRepository);
 
+  // ReactionRole
+  const reactionRolePanelRepository = getReactionRolePanelRepository(prisma);
+  const reactionRolePanelConfigService = createReactionRolePanelConfigService(
+    reactionRolePanelRepository,
+  );
+  setBotReactionRolePanelConfigService(reactionRolePanelConfigService);
+
   // VcRecruit
   const vcRecruitConfigService = createVcRecruitConfigService(
     guildConfigRepository,
@@ -256,6 +277,7 @@ export function initializeBotCompositionRoot(
     memberLogConfigService,
     ticketConfigService,
     ticketRepository,
+    reactionRolePanelConfigService,
     vcRecruitRepository,
   };
 }

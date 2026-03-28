@@ -2,7 +2,7 @@
 
 > Architecture Guide - コード設計・モジュール構成・設計パターンの解説
 
-最終更新: 2026年3月16日
+最終更新: 2026年3月28日
 
 ---
 
@@ -54,102 +54,43 @@ pnpm start     # 両方
 
 ```
 src/
-├── bot/                   # Bot プロセス専用
-│   ├── main.ts            # エントリーポイント
-│   ├── client.ts          # BotClient クラス（discord.js Client 拡張）
-│   ├── types/
-│   │   └── discord.ts     # Bot専用のdiscord.js型拡張
-│   ├── commands/          # スラッシュコマンド定義（commandLoader が自動スキャン）
-│   ├── events/            # Discord イベントハンドラ（eventLoader が自動スキャン）
-│   ├── features/          # Bot専用機能（機能ごとにサブディレクトリ）
-│   │   ├── <feature>/
-│   │   │   ├── commands/   # コマンド実行ロジック（*.execute.ts, *.guard.ts 等）
-│   │   │   ├── handlers/   # イベント境界・起動処理
-│   │   │   │   └── ui/    # Button/Select/Modal などUI境界
-│   │   │   ├── services/   # 機能固有のビジネスロジック
-│   │   │   ├── repositories/ # 機能固有のランタイムデータのリポジトリ（設定以外）
-│   │   │   └── constants/  # 共通定数・CustomID 定義
-│   ├── handlers/interactionCreate/
-│   │   ├── flow/          # command/components/modal のフロー制御
-│   │   │   └── components.ts # customIdベースの汎用ハンドラディスパッチ
-│   │   ├── handleInteractionCreate.ts
-│   │   └── ui/            # UIインタラクションハンドラレジストリ
-│   │       └── types.ts   # InteractionHandler<T> 汎用ハンドラ型定義
-│   ├── shared/            # Bot 層内の複数機能で共用するユーティリティ
-│   │   ├── i18nKeys.ts    # 共通 i18n キー定数
-│   │   ├── permissionGuards.ts # 共通権限チェック関数
-│   │   └── disableComponentsAfterTimeout.ts # コンポーネント一括無効化
-│   ├── errors/
-│   │   └── interactionErrorHandler.ts
-│   ├── utils/
-│   │   ├── interaction.ts
-│   │   └── messageResponse.ts
+├── bot/                       # Bot プロセス専用
+│   ├── main.ts                # エントリーポイント
+│   ├── client.ts              # BotClient クラス（discord.js Client 拡張）
+│   ├── commands/              # スラッシュコマンド定義（自動スキャン）
+│   ├── events/                # Discord イベントハンドラ（自動スキャン）
+│   ├── features/<feature>/    # Bot専用機能（機能ごとにサブディレクトリ）
+│   │   ├── commands/          #   コマンド実行ロジック
+│   │   ├── handlers/          #   イベント境界・起動処理
+│   │   │   └── ui/            #   Button/Select/Modal などUI境界
+│   │   ├── services/          #   機能固有のビジネスロジック
+│   │   ├── repositories/      #   機能固有のランタイムデータリポジトリ
+│   │   └── constants/         #   共通定数・CustomID 定義
+│   ├── handlers/interactionCreate/  # インタラクション振り分け
+│   ├── shared/                # Bot 層内の複数機能で共用するユーティリティ
+│   ├── errors/                # インタラクションエラーハンドリング
+│   ├── utils/                 # Bot用ユーティリティ
 │   └── services/
 │       └── botCompositionRoot.ts  # Composition Root（全サービスの初期化・DI）
 │
-├── shared/                # Bot・Web 両プロセスで使用する共有コード
-│   ├── config/
-│   │   └── env.ts         # 環境変数定義（Zod バリデーション）
+├── shared/                    # Bot・Web 両プロセスで使用する共有コード
+│   ├── config/                # 環境変数定義（Zod バリデーション）
 │   ├── database/
-│   │   ├── types/         # ドメイン型・リポジトリインターフェース定義
-│   │   │   ├── index.ts   # 型バレル（import type 専用）
-│   │   │   ├── entities.ts        # エンティティインターフェース
-│   │   │   ├── repositories.ts    # リポジトリインターフェース（IGuildConfigRepository 等）
-│   │   │   ├── bumpReminderTypes.ts
-│   │   │   ├── vcRecruitTypes.ts
-│   │   │   └── stickyMessageTypes.ts
-│   │   ├── repositories/  # リポジトリ実装
-│   │   │   ├── guildConfigRepository.ts          # 複合リポジトリ（PrismaGuildConfigRepository）
-│   │   │   ├── afkConfigRepository.ts
-│   │   │   ├── bumpReminderConfigRepository.ts
-│   │   │   ├── memberLogConfigRepository.ts
-│   │   │   ├── vacConfigRepository.ts
-│   │   │   ├── vcRecruitConfigRepository.ts
-│   │   │   ├── persistence/       # 読み書き永続化ヘルパー
-│   │   │   └── serializers/       # データ変換（Prisma ↔ ドメイン型）
-│   │   └── guildConfigRepositoryProvider.ts # リポジトリ singleton キャッシュ
-│   ├── errors/
-│   │   ├── customErrors.ts
-│   │   ├── errorUtils.ts
-│   │   └── processErrorHandler.ts
-│   ├── features/          # ギルド設定サービス（全機能）
-│   │   ├── afk/
-│   │   │   ├── afkConfigService.ts
-│   │   │   └── afkConfigDefaults.ts
-│   │   ├── bump-reminder/
-│   │   │   ├── bumpReminderConfigService.ts
-│   │   │   └── bumpReminderConfigDefaults.ts
-│   │   ├── member-log/
-│   │   │   ├── memberLogConfigService.ts
-│   │   │   └── memberLogConfigDefaults.ts
-│   │   ├── vac/
-│   │   │   ├── vacConfigService.ts
-│   │   │   └── vacConfigDefaults.ts
-│   │   ├── vc-recruit/
-│   │   │   ├── vcRecruitConfigService.ts
-│   │   │   └── vcRecruitConfigDefaults.ts
-│   │   └── sticky-message/
-│   │       └── stickyMessageConfigService.ts
-│   ├── locale/            # i18n（i18next）
-│   ├── scheduler/
-│   │   └── jobScheduler.ts
-│   └── utils/
-│       ├── logger.ts
-│       ├── prisma.ts
-│       ├── serviceFactory.ts  # createBotServiceAccessor / createServiceGetter
-│       ├── jsonUtils.ts       # parseJsonArray 等
-│       └── ttlMap.ts          # TTL付きインメモリMap（UIセッション状態管理）
+│   │   ├── types/             # ドメイン型・リポジトリインターフェース定義
+│   │   ├── repositories/      # リポジトリ実装・シリアライザ
+│   │   └── guildConfigRepositoryProvider.ts  # リポジトリ singleton キャッシュ
+│   ├── errors/                # カスタムエラークラス・グローバルハンドラ
+│   ├── features/<feature>/    # ギルド設定サービス（ConfigService + Defaults）
+│   ├── locale/                # i18n（i18next）
+│   ├── scheduler/             # JobScheduler（cron + setTimeout）
+│   └── utils/                 # logger, prisma, serviceFactory 等
 │
-└── web/                   # Web プロセス専用
-    ├── server.ts          # Fastify サーバー起動
-    ├── webAppBuilder.ts   # Webアプリ組み立て
-    ├── middleware/
-    │   └── auth.ts        # Bearer トークン認証
-    ├── routes/
-    │   ├── health.ts      # GET /health, GET /ready
-    │   └── api/           # GET /api/*
-    ├── schemas/           # リクエスト/レスポンス型
-    └── public/            # 静的ファイル配信
+└── web/                       # Web プロセス専用
+    ├── server.ts              # Fastify サーバー起動
+    ├── middleware/             # 認証ミドルウェア
+    ├── routes/                # API ルート定義
+    ├── schemas/               # リクエスト/レスポンス型
+    └── public/                # 静的ファイル配信
 ```
 
 ### 設計原則
@@ -185,16 +126,22 @@ intents: [
 
 ### Bot パーミッション
 
-| パーミッション   | 用途                                       |
-| ---------------- | ------------------------------------------ |
-| ManageChannels   | チケットチャンネルの作成・削除             |
-| ManageRoles      | チケットチャンネルの権限オーバーライド     |
+Bot の招待時は **Administrator** 権限を推奨します。多くの機能がチャンネル作成・権限オーバーライド・メッセージ管理など幅広いパーミッションを必要とするため、個別設定では機能ごとに不足が発生しやすくなります。
 
 ### イベントハンドラ
 
-| イベント      | 用途                                   |
-| ------------- | -------------------------------------- |
-| guildDelete   | Bot退出時の全設定クリーンアップ        |
+| イベント          | 用途                                                         |
+| ----------------- | ------------------------------------------------------------ |
+| clientReady       | Bot 起動時の初期化処理                                       |
+| interactionCreate | スラッシュコマンド・ボタン・モーダル等のインタラクション処理 |
+| messageCreate     | Bump 検知・Sticky Message 再送信                             |
+| messageDelete     | VC 募集パネル・チケットパネルの自己修復                      |
+| voiceStateUpdate  | VAC（VC 自動作成）の同期処理                                 |
+| guildMemberAdd    | メンバー参加ログ通知                                         |
+| guildMemberRemove | メンバー退出ログ・退出ユーザーの記録削除                     |
+| channelDelete     | 削除チャンネル関連設定のクリーンアップ                       |
+| roleDelete        | 削除ロールの Bump リマインダー設定除去                       |
+| guildDelete       | Bot 退出時の全設定クリーンアップ                             |
 
 ### BotClient クラス
 
@@ -203,7 +150,6 @@ intents: [
 ```typescript
 class BotClient extends Client {
   commands: Collection<string, Command>; // 登録済みコマンド
-  modals: Collection<string, Modal>; // 登録済みモーダル
   cooldownManager: CooldownManager; // クールダウン管理
 }
 ```
@@ -241,7 +187,7 @@ export const helloCommand: Command = {
 };
 ```
 
-### コマンド・モーダルの型インターフェース
+### コマンドの型インターフェース
 
 ```typescript
 interface Command {
@@ -249,12 +195,6 @@ interface Command {
   execute: (interaction: ChatInputCommandInteraction) => Promise<void>;
   autocomplete?: (interaction: AutocompleteInteraction) => Promise<void>;
   cooldown?: number; // 秒単位（省略時はクールダウンなし）
-}
-
-interface Modal {
-  modal: ModalBuilder;
-  data?: unknown;
-  execute: (interaction: ModalSubmitInteraction) => Promise<void>;
 }
 ```
 
@@ -294,6 +234,7 @@ const prisma = getPrismaClient(); // null の場合あり
 | `StickyMessage`           | 固定メッセージ記録                         |
 | `GuildTicketConfig`       | チケット機能設定（カテゴリ・スタッフロール・パネル情報） |
 | `Ticket`                  | チケットレコード（ステータス・作成者・自動削除タイマー） |
+| `GuildReactionRolePanel`  | リアクションロールパネル設定（ボタン・モード・表示設定） |
 
 JSON 配列フィールド（`mentionUserIds`, `triggerChannelIds` 等）は SQLite の制約上 `String` 型で保存し、`parseJsonArray()` で読み出し時に変換します。
 
@@ -302,25 +243,31 @@ JSON 配列フィールド（`mentionUserIds`, `triggerChannelIds` 等）は SQL
 データベースへのアクセスはすべて Repository クラスを経由します。
 テスト時は Repository インターフェースをモック注入することで DB 依存を排除できます。
 
-**ギルド設定リポジトリ（`src/shared/database/repositories/`）**:
+**設定リポジトリ（`src/shared/database/repositories/`）**:
+
+機能ごとの設定テーブルに対応するリポジトリです。初期5機能は `PrismaGuildConfigRepository` に合成されており、`getGuildConfigRepository(prisma)` で取得します。
 
 ```
-PrismaGuildConfigRepository   ← 複合リポジトリ（全機能設定インターフェースを実装）
+PrismaGuildConfigRepository   ← 複合リポジトリ（IGuildConfigRepository を実装）
   ├─ AfkConfigRepository
   ├─ BumpReminderConfigRepository
   ├─ MemberLogConfigRepository
   ├─ VacConfigRepository
   └─ VcRecruitConfigRepository
+
+TicketConfigRepository         ← チケット機能設定
+ReactionRolePanelRepository    ← リアクションロールパネル
 ```
 
-すべての機能設定リポジトリは `IGuildConfigRepository` インターフェース（`src/shared/database/types/repositories.ts`）に集約されており、`getGuildConfigRepository(prisma)` で取得します。
+**ランタイムデータリポジトリ（`src/bot/features/<feature>/repositories/`）**:
 
-**機能固有のランタイムデータリポジトリ（`src/bot/features/<feature>/repositories/`）**:
+設定以外のランタイムデータ（レコード・状態管理）を扱うリポジトリです。
 
 ```
 BumpReminderRepository   ← BumpReminder テーブルの CRUD
 StickyMessageRepository  ← StickyMessage テーブルの CRUD
-VcRecruitRepository      ← VcRecruit の作成済みチャンネル管理（設定サービスをラップ）
+TicketRepository         ← Ticket テーブルの CRUD
+VcRecruitRepository      ← VcRecruit の作成済みチャンネル管理
 ```
 
 ### Composition Root と DI

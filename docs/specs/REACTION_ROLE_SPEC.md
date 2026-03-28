@@ -2,7 +2,7 @@
 
 > 管理者が設置したパネルのボタンをユーザーが押すことでロールを付与・解除できるリアクションロールシステム
 
-最終更新: 2026年3月26日
+最終更新: 2026年3月28日
 
 ---
 
@@ -15,8 +15,7 @@
 | パネル設置 | 管理者がリアクションロール用パネル（Embed + ボタン）をチャンネルに設置 |
 | ロール操作 | ユーザーがボタンを押してロールを付与・解除 |
 | `/reaction-role-config setup` | パネル作成（Embed設定 → モード選択 → ボタン追加 → 設置） |
-| `/reaction-role-config teardown` | パネル撤去 |
-| `/reaction-role-config reset` | 全設定リセット |
+| `/reaction-role-config teardown` | パネル撤去（複数選択可） |
 | `/reaction-role-config view` | 設定一覧表示 |
 | `/reaction-role-config edit-panel` | パネルのタイトル・説明文・カラー編集 |
 | `/reaction-role-config add-button` | 既存パネルにボタン追加 |
@@ -107,10 +106,10 @@
 
 **追加/完了ボタン:**
 
-| コンポーネント | ラベル | スタイル | 動作 |
-| --- | --- | --- | --- |
-| `reaction-role:setup-add:<sessionId>` | もう1つ追加 | Primary | ボタン追加ループに戻る |
-| `reaction-role:setup-done:<sessionId>` | 完了 | Success | パネルを設置 |
+| コンポーネント | emoji | ラベル | スタイル | 動作 |
+| --- | --- | --- | --- | --- |
+| `reaction-role:setup-add:<sessionId>` | ➕ | もう1つ追加 | Primary | ボタン追加ループに戻る |
+| `reaction-role:setup-done:<sessionId>` | ✅ | 完了 | Success | パネルを設置 |
 
 **パネル Embed（設置後）:**
 
@@ -122,9 +121,9 @@
 
 **パネルボタン（設置後）:**
 
-| コンポーネント | ラベル | スタイル | 動作 |
-| --- | --- | --- | --- |
-| `reaction-role:click:<panelId>:<buttonId>` | {カスタムラベル} | {カスタムスタイル} | ロール操作を実行 |
+| コンポーネント | emoji | ラベル | スタイル | 動作 |
+| --- | --- | --- | --- | --- |
+| `reaction-role:click:<panelId>:<buttonId>` | {カスタム絵文字} | {カスタムラベル} | {カスタムスタイル} | ロール操作を実行 |
 
 **成功メッセージ（`createSuccessEmbed` 使用 / ephemeral）:**
 
@@ -165,6 +164,7 @@
 - one-action: ボタンの全ロールを保持済みの場合のみ「既に付与済み」。一部未付与の場合は未付与分を付与
 - exclusive: 同一パネル内の他ボタンに割り当てられたロールをすべて解除してから、クリックしたボタンのロールを付与。既に同じボタンのロールをすべて保持済みの場合は「既に選択済み」
 - Bot のロールより上位のロールは操作不可 → エラーメッセージ
+- `{{roles}}` はロールメンションをカンマ区切りで表示（例: `@Role1, @Role2, @Role3`）
 
 ### UI
 
@@ -174,7 +174,7 @@
 | --- | --- |
 | 説明 | {{roles}} を付与しました。 |
 
-**ロール解除メッセージ（`createInfoEmbed` 使用 / ephemeral）:**
+**ロール解除メッセージ（`createSuccessEmbed` 使用 / ephemeral）:**
 
 | 項目 | 内容 |
 | --- | --- |
@@ -219,11 +219,16 @@
 ### 動作フロー
 
 1. ManageGuild 権限チェック
-2. ギルド内のパネル一覧を StringSelectMenu で表示（1件のみならスキップ）
-3. パネル選択後、確認 Embed を表示
-4. 確認後:
-   - パネルメッセージを削除
-   - DB からパネルレコードを削除
+2. ギルド内のパネル一覧を取得
+3. 各パネルのメッセージ存在を確認し、不在パネルは DB レコードを削除して除外（フォールバッククリーンアップ）
+4. クリーンアップ後 0件 → エラー
+5. 1件 → セレクトメニューをスキップし、直接確認ダイアログを表示
+6. 複数件 → StringSelectMenu を表示（複数選択可: minValues=1, maxValues=パネル数）
+7. パネル選択後、確認 Embed を表示（選択したパネル一覧を表示）
+8. 確認後:
+   - 選択したパネルメッセージを削除
+   - DB から選択したパネルレコードを削除
+9. クリーンアップが発生した場合は followUp で通知
 
 **ビジネスルール:**
 
@@ -236,66 +241,31 @@
 
 | コンポーネント | スタイル | 動作 |
 | --- | --- | --- |
-| `reaction-role:teardown-select:<sessionId>` | StringSelect | 撤去するパネルを選択 |
+| `reaction-role:teardown-select:<sessionId>` | StringSelect（複数選択可） | 撤去するパネルを選択 |
+
+**セレクトメニューオプション:**
+
+| 項目 | 内容 |
+| --- | --- |
+| ラベル | `{パネルタイトル}（#{チャンネル名}）` |
+| 値 | パネルID |
 
 **確認 Embed:**
 
 | 項目 | 内容 |
 | --- | --- |
 | タイトル | パネル撤去確認 |
-| 説明 | 「{{title}}」パネルを撤去します。この操作は取り消せません。 |
+| 説明 | 選択した{{count}}件のパネルを撤去します。この操作は取り消せません。 |
+| フィールド: 撤去対象（{{count}}件） | 「{title1}」（#channel1）、「{title2}」（#channel2）... |
 
 `createWarningEmbed` 使用
 
 **確認ボタン:**
 
-| コンポーネント | ラベル | スタイル | 動作 |
-| --- | --- | --- | --- |
-| `reaction-role:teardown-confirm:<sessionId>` | 撤去する | Danger | パネルを削除 |
-| `reaction-role:teardown-cancel:<sessionId>` | キャンセル | Secondary | 何もしない |
-
----
-
-## /reaction-role-config reset
-
-### コマンド定義
-
-**コマンド**: `/reaction-role-config reset`
-
-**実行権限**: ManageGuild
-
-**コマンドオプション:** なし
-
-### 動作フロー
-
-1. ManageGuild 権限チェック
-2. 2段階確認 Embed を表示
-3. 確認後:
-   - 全パネルメッセージを削除
-   - DB から全パネルレコードを削除
-
-**ビジネスルール:**
-
-- 設定が存在しない場合はエラー
-
-### UI
-
-**確認 Embed:**
-
-| 項目 | 内容 |
-| --- | --- |
-| タイトル | リアクションロール設定リセット確認 |
-| 説明 | 全てのリアクションロール設定をリセットします。全パネルが削除されます。この操作は取り消せません。 |
-| フィールド: パネル一覧（N件） | 「{title1}」（#channel1）、「{title2}」（#channel2）... |
-
-`createWarningEmbed` 使用
-
-**確認ボタン:**
-
-| コンポーネント | ラベル | スタイル | 動作 |
-| --- | --- | --- | --- |
-| `reaction-role:reset-confirm:<sessionId>` | リセットする | Danger | 全設定削除 |
-| `reaction-role:reset-cancel:<sessionId>` | キャンセル | Secondary | 何もしない |
+| コンポーネント | emoji | ラベル | スタイル | 動作 |
+| --- | --- | --- | --- | --- |
+| `reaction-role:teardown-confirm:<sessionId>` | 🗑️ | 撤去する | Danger | 選択したパネルを削除 |
+| `reaction-role:teardown-cancel:<sessionId>` | ❌ | キャンセル | Secondary | 何もしない |
 
 ---
 
@@ -313,9 +283,17 @@
 
 1. ManageGuild 権限チェック
 2. 全パネルの設定を取得
-3. 設定がない場合は「設定がありません」と表示
-4. 1件の場合はそのまま Embed 表示
-5. 複数件の場合はページネーション + パネル選択で表示
+3. 各パネルのメッセージ存在を確認し、不在パネルは DB レコードを削除して除外（フォールバッククリーンアップ）
+4. クリーンアップ後に設定が0件の場合は「設定がありません」と表示
+5. 1件の場合はそのまま Embed 表示
+6. 複数件の場合はページネーション + パネル選択で表示
+7. クリーンアップが発生した場合は followUp で通知
+
+**クリーンアップ通知メッセージ（`createInfoEmbed` 使用 / ephemeral）:**
+
+| 項目 | 内容 |
+| --- | --- |
+| 説明 | {{count}}件のパネルが削除済みのためクリーンアップしました。 |
 
 ### UI
 
@@ -445,10 +423,10 @@
 
 **追加/完了ボタン:**
 
-| コンポーネント | ラベル | スタイル | 動作 |
-| --- | --- | --- | --- |
-| `reaction-role:add-button-more:<sessionId>` | もう1つ追加 | Primary | ボタン追加ループに戻る（上限時 disabled） |
-| `reaction-role:add-button-done:<sessionId>` | 完了 | Success | パネルを更新 |
+| コンポーネント | emoji | ラベル | スタイル | 動作 |
+| --- | --- | --- | --- | --- |
+| `reaction-role:add-button-more:<sessionId>` | ➕ | もう1つ追加 | Primary | ボタン追加ループに戻る（上限時 disabled） |
+| `reaction-role:add-button-done:<sessionId>` | ✅ | 完了 | Success | パネルを更新 |
 
 **成功メッセージ（`createSuccessEmbed` 使用 / ephemeral）:**
 
@@ -508,10 +486,10 @@
 
 **確認ボタン:**
 
-| コンポーネント | ラベル | スタイル | 動作 |
-| --- | --- | --- | --- |
-| `reaction-role:remove-button-confirm:<sessionId>` | 削除する | Danger | ボタンを削除 |
-| `reaction-role:remove-button-cancel:<sessionId>` | キャンセル | Secondary | 何もしない |
+| コンポーネント | emoji | ラベル | スタイル | 動作 |
+| --- | --- | --- | --- | --- |
+| `reaction-role:remove-button-confirm:<sessionId>` | 🗑️ | 削除する | Danger | ボタンを削除 |
+| `reaction-role:remove-button-cancel:<sessionId>` | ❌ | キャンセル | Secondary | 何もしない |
 
 **成功メッセージ（`createSuccessEmbed` 使用 / ephemeral）:**
 
@@ -616,6 +594,50 @@
 
 ---
 
+## パネル自動クリーンアップ
+
+### 概要
+
+パネルメッセージやパネル設置チャンネルが手動で削除された場合に、DBレコードを自動クリーンアップする。
+
+### イベント監視
+
+**messageDelete:**
+
+- 削除されたメッセージの ID がいずれかのパネルの `messageId` と一致する場合、該当パネルの DB レコードを削除する
+
+**channelDelete:**
+
+- 削除されたチャンネルの ID がいずれかのパネルの `channelId` と一致する場合、該当パネルの DB レコードをすべて削除する
+
+### 操作時フォールバック
+
+Bot がオフラインの間に削除が行われた場合、イベントを受信できない。そのため、以下のサブコマンドではパネルメッセージの存在確認を行い、不在の場合は DB レコードを削除してエラーを返す:
+
+- `view`（パネル一覧取得時にメッセージ存在を確認し、不在パネルを除外 + DB 削除）
+- `edit-panel`（モーダル送信後のメッセージ更新時）
+- `add-button`（完了時のメッセージ更新時）
+- `remove-button`（確認後のメッセージ更新時）
+- `edit-button`（ロール選択後のメッセージ更新時）
+
+**パネルメッセージ不在エラー（`createErrorEmbed` 使用 / ephemeral）:**
+
+| 項目 | 内容 |
+| --- | --- |
+| 説明 | パネルメッセージが見つかりませんでした。パネルが削除された可能性があります。 |
+
+（既存キー `user-response.panel_message_not_found` を使用）
+
+### ローカライズ（追加分）
+
+| キー | 用途 | ja | en |
+| --- | --- | --- | --- |
+| `log.panel_message_deleted` | パネルメッセージ削除検知ログ | パネルメッセージ削除検知 GuildId: {{guildId}} PanelId: {{panelId}} | panel message deleted GuildId: {{guildId}} PanelId: {{panelId}} |
+| `log.panel_channel_deleted` | パネルチャンネル削除検知ログ | パネルチャンネル削除検知 GuildId: {{guildId}} ChannelId: {{channelId}} | panel channel deleted GuildId: {{guildId}} ChannelId: {{channelId}} |
+| `log.panel_cleanup_failed` | クリーンアップ失敗ログ | パネルクリーンアップに失敗 GuildId: {{guildId}} | panel cleanup failed GuildId: {{guildId}} |
+
+---
+
 ## 制約・制限事項
 
 - 1パネルあたりのボタン上限: 25個（Discord上限: 5個/行 × 5行）
@@ -640,7 +662,6 @@
 | `reaction-role-config.description` | コマンド説明 | リアクションロール機能の設定（サーバー管理権限が必要） | Configure reaction role feature (requires Manage Server) |
 | `reaction-role-config.setup.description` | サブコマンド説明 | リアクションロールパネルを設置 | Set up reaction role panel |
 | `reaction-role-config.teardown.description` | サブコマンド説明 | リアクションロールパネルを撤去 | Remove reaction role panel |
-| `reaction-role-config.reset.description` | サブコマンド説明 | 全設定をリセット | Reset all settings |
 | `reaction-role-config.view.description` | サブコマンド説明 | 現在の設定を表示 | Show current settings |
 | `reaction-role-config.edit-panel.description` | サブコマンド説明 | パネルのタイトル・説明文・カラーを編集 | Edit panel title, description, and color |
 | `reaction-role-config.add-button.description` | サブコマンド説明 | パネルにボタンを追加 | Add a button to panel |
@@ -652,10 +673,8 @@
 | キー | 用途 | ja | en |
 | --- | --- | --- | --- |
 | `user-response.setup_success` | パネル設置成功 | リアクションロールパネルを設置しました。 | Reaction role panel has been set up. |
-| `user-response.teardown_success` | パネル撤去成功 | リアクションロールパネルを撤去しました。 | Reaction role panel has been removed. |
+| `user-response.teardown_success` | パネル撤去成功 | {{count}}件のリアクションロールパネルを撤去しました。 | {{count}} reaction role panel(s) removed. |
 | `user-response.teardown_cancelled` | 撤去キャンセル | キャンセルしました。 | Cancelled. |
-| `user-response.reset_success` | リセット成功 | 全てのリアクションロール設定をリセットしました。 | All reaction role settings have been reset. |
-| `user-response.reset_cancelled` | リセットキャンセル | キャンセルしました。 | Cancelled. |
 | `user-response.edit_panel_success` | パネル編集成功 | パネルを更新しました。 | Panel has been updated. |
 | `user-response.add_button_success` | ボタン追加成功 | ボタンを{{count}}個追加しました。 | {{count}} button(s) added. |
 | `user-response.remove_button_success` | ボタン削除成功 | ボタンを{{count}}個削除しました。 | {{count}} button(s) removed. |
@@ -673,6 +692,9 @@
 | `user-response.invalid_color` | カラー形式エラー | カラーの形式が正しくありません。#RRGGBB形式で入力してください。 | Invalid color format. Please use #RRGGBB format. |
 | `user-response.invalid_style` | スタイル形式エラー | スタイルの形式が正しくありません。primary / secondary / success / danger のいずれかを入力してください。 | Invalid style. Please use primary, secondary, success, or danger. |
 | `user-response.and_more` | 一覧省略 | 他 {{count}}件 | and {{count}} more |
+| `user-response.panels_cleaned_up` | パネルクリーンアップ通知 | {{count}}件のパネルが削除済みのためクリーンアップしました。 | {{count}} panel(s) cleaned up because the message was deleted. |
+| `user-response.session_expired` | セッション期限切れ | セッションの有効期限が切れました。もう一度コマンドを実行してください。 | Session has expired. Please run the command again. |
+| `user-response.panel_message_not_found` | パネルメッセージ不在 | パネルメッセージが見つかりませんでした。パネルが削除された可能性があります。 | Panel message not found. The panel may have been deleted. |
 
 ### Embed
 
@@ -681,10 +703,8 @@
 | `embed.title.panel_default` | パネルデフォルトタイトル | ロール選択 | Role Selection |
 | `embed.description.panel_default` | パネルデフォルト説明文 | ボタンを押してロールを取得・解除できます。 | Press a button to get or remove a role. |
 | `embed.title.teardown_confirm` | 撤去確認タイトル | パネル撤去確認 | Panel Removal |
-| `embed.description.teardown_confirm` | 撤去確認説明 | 「{{title}}」パネルを撤去します。この操作は取り消せません。 | The "{{title}}" panel will be removed. This action cannot be undone. |
-| `embed.title.reset_confirm` | リセット確認タイトル | リアクションロール設定リセット確認 | Reaction Role Settings Reset |
-| `embed.description.reset_warning` | リセット警告文 | 全てのリアクションロール設定をリセットします。全パネルが削除されます。この操作は取り消せません。 | All reaction role settings will be reset. All panels will be deleted. This action cannot be undone. |
-| `embed.field.name.panel_list` | パネル一覧フィールド名 | パネル一覧（{{count}}件） | Panels ({{count}}) |
+| `embed.description.teardown_confirm` | 撤去確認説明 | 選択した{{count}}件のパネルを撤去します。この操作は取り消せません。 | {{count}} panel(s) will be removed. This action cannot be undone. |
+| `embed.field.name.teardown_targets` | 撤去対象フィールド名 | 撤去対象（{{count}}件） | Targets ({{count}}) |
 | `embed.title.remove_button_confirm` | ボタン削除確認タイトル | ボタン削除確認 | Button Removal |
 | `embed.description.remove_button_confirm` | ボタン削除確認説明 | 選択した{{count}}個のボタンを削除します。この操作は取り消せません。 | {{count}} button(s) will be removed. This action cannot be undone. |
 | `embed.field.name.remove_targets` | 削除対象フィールド名 | 削除対象 | Targets |
@@ -707,8 +727,7 @@
 | `ui.button.setup_done` | 設置完了ボタン | 完了 | Done |
 | `ui.button.teardown_confirm` | 撤去確認ボタン | 撤去する | Remove |
 | `ui.button.teardown_cancel` | 撤去キャンセルボタン | キャンセル | Cancel |
-| `ui.button.reset_confirm` | リセット確認ボタン | リセットする | Reset |
-| `ui.button.reset_cancel` | リセットキャンセルボタン | キャンセル | Cancel |
+| `ui.select.teardown_placeholder` | 撤去パネル選択プレースホルダー | 撤去するパネルを選択してください | Select panels to remove |
 | `ui.button.remove_button_confirm` | ボタン削除確認ボタン | 削除する | Delete |
 | `ui.button.remove_button_cancel` | ボタン削除キャンセルボタン | キャンセル | Cancel |
 | `ui.select.panel_placeholder` | パネル選択プレースホルダー | パネルを選択してください | Select a panel |
@@ -736,8 +755,7 @@
 | キー | 用途 | ja | en |
 | --- | --- | --- | --- |
 | `log.setup` | パネル設置ログ | リアクションロールパネルを設置 GuildId: {{guildId}} ChannelId: {{channelId}} | reaction role panel set up GuildId: {{guildId}} ChannelId: {{channelId}} |
-| `log.teardown` | パネル撤去ログ | リアクションロールパネルを撤去 GuildId: {{guildId}} PanelId: {{panelId}} | reaction role panel removed GuildId: {{guildId}} PanelId: {{panelId}} |
-| `log.reset` | リセットログ | 全リアクションロール設定をリセット GuildId: {{guildId}} | all reaction role settings reset GuildId: {{guildId}} |
+| `log.teardown` | パネル撤去ログ | リアクションロールパネルを撤去 GuildId: {{guildId}} PanelIds: {{panelIds}} | reaction role panel(s) removed GuildId: {{guildId}} PanelIds: {{panelIds}} |
 | `log.role_granted` | ロール付与ログ | ロール付与 GuildId: {{guildId}} UserId: {{userId}} RoleIds: {{roleIds}} | role granted GuildId: {{guildId}} UserId: {{userId}} RoleIds: {{roleIds}} |
 | `log.role_removed` | ロール解除ログ | ロール解除 GuildId: {{guildId}} UserId: {{userId}} RoleIds: {{roleIds}} | role removed GuildId: {{guildId}} UserId: {{userId}} RoleIds: {{roleIds}} |
 | `log.button_added` | ボタン追加ログ | ボタン追加 GuildId: {{guildId}} PanelId: {{panelId}} ButtonId: {{buttonId}} | button added GuildId: {{guildId}} PanelId: {{panelId}} ButtonId: {{buttonId}} |
@@ -745,6 +763,12 @@
 | `log.button_edited` | ボタン編集ログ | ボタン編集 GuildId: {{guildId}} PanelId: {{panelId}} ButtonId: {{buttonId}} | button edited GuildId: {{guildId}} PanelId: {{panelId}} ButtonId: {{buttonId}} |
 | `log.database_panel_saved` | DB操作ログ | パネル設定を保存 GuildId: {{guildId}} PanelId: {{panelId}} | panel config saved GuildId: {{guildId}} PanelId: {{panelId}} |
 | `log.database_panel_save_failed` | DB操作エラーログ | パネル設定保存に失敗 GuildId: {{guildId}} PanelId: {{panelId}} | failed to save panel config GuildId: {{guildId}} PanelId: {{panelId}} |
+| `log.setup_started` | セットアップ開始ログ | リアクションロールセットアップ開始 GuildId: {{guildId}} | reaction role setup started GuildId: {{guildId}} |
+| `log.database_panel_find_failed` | DB取得エラーログ | パネル設定取得に失敗 GuildId: {{guildId}} PanelId: {{panelId}} | failed to find panel config GuildId: {{guildId}} PanelId: {{panelId}} |
+| `log.database_panel_delete_failed` | DB削除エラーログ | パネル設定削除に失敗 GuildId: {{guildId}} PanelId: {{panelId}} | failed to delete panel config GuildId: {{guildId}} PanelId: {{panelId}} |
+| `log.panel_message_deleted` | パネルメッセージ削除検知ログ | パネルメッセージ削除検知 GuildId: {{guildId}} PanelId: {{panelId}} | panel message deleted GuildId: {{guildId}} PanelId: {{panelId}} |
+| `log.panel_channel_deleted` | パネルチャンネル削除検知ログ | パネルチャンネル削除検知 GuildId: {{guildId}} ChannelId: {{channelId}} | panel channel deleted GuildId: {{guildId}} ChannelId: {{channelId}} |
+| `log.panel_cleanup_failed` | クリーンアップ失敗ログ | パネルクリーンアップに失敗 GuildId: {{guildId}} | panel cleanup failed GuildId: {{guildId}} |
 
 ---
 
@@ -753,8 +777,7 @@
 ### ユニットテスト
 
 - [ ] setup: モーダル入力、モード選択、ボタン追加ループ、パネル送信+DB保存、Bot権限不足エラー伝播
-- [ ] teardown: パネル選択、確認ダイアログ、正常削除
-- [ ] reset: 2段階確認、全パネル削除
+- [ ] teardown: パネル選択（複数選択可）、確認ダイアログ、正常削除（単数・複数）
 - [ ] view: ページネーション、パネル選択
 - [ ] edit-panel: モーダルでタイトル・説明文・カラー編集
 - [ ] add-button / remove-button / edit-button: ボタン操作

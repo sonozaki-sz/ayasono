@@ -27,6 +27,7 @@ export const system = {
   "log_prefix.guild_delete": "guildDelete",
   "log_prefix.ready": "ready",
   "log_prefix.ticket": "Ticket",
+  "log_prefix.reaction_role": "ReactionRole",
   "log_prefix.guild_config": "GuildConfig",
 
   // guildDelete (cleanup on bot removal)

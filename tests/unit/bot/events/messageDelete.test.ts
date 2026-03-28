@@ -18,6 +18,15 @@ vi.mock("@/bot/features/ticket/handlers/ticketMessageDeleteHandler", () => ({
     handleTicketMessageDeleteMock(...args),
 }));
 
+const handleReactionRoleMessageDeleteMock = vi.fn();
+vi.mock(
+  "@/bot/features/reaction-role/handlers/reactionRoleMessageDeleteHandler",
+  () => ({
+    handleReactionRoleMessageDelete: (...args: unknown[]) =>
+      handleReactionRoleMessageDeleteMock(...args),
+  }),
+);
+
 function createMessage(overrides?: Record<string, unknown>) {
   return {
     id: "msg-1",
