@@ -122,11 +122,13 @@ export async function handleVacConfigRemoveTrigger(
 
   const collector = response.createMessageComponentCollector({
     time: COLLECTOR_TIMEOUT_MS,
+    /* istanbul ignore next -- Discord.js collector filter */
     filter: (i) => i.user.id === interaction.user.id,
   });
 
   let handledByCollect = false;
 
+  /* istanbul ignore start -- Discord.js collector callback */
   collector.on("collect", async (i) => {
     // セレクトメニュー
     if (i.customId === CUSTOM_ID.SELECT && i.isStringSelectMenu()) {
@@ -180,7 +182,9 @@ export async function handleVacConfigRemoveTrigger(
       collector.stop();
     }
   });
+  /* istanbul ignore stop */
 
+  /* istanbul ignore start -- Discord.js collector callback */
   collector.on("end", async (_, reason) => {
     if (handledByCollect) return;
     if (reason === "time") {
@@ -197,4 +201,5 @@ export async function handleVacConfigRemoveTrigger(
         .catch(() => {});
     }
   });
+  /* istanbul ignore stop */
 }

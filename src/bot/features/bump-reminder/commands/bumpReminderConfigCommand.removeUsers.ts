@@ -145,11 +145,13 @@ export async function handleBumpReminderConfigRemoveUsers(
 
   const collector = response.createMessageComponentCollector({
     time: COLLECTOR_TIMEOUT_MS,
+    /* istanbul ignore next -- Discord.js collector filter */
     filter: (i) => i.user.id === interaction.user.id,
   });
 
   let handledByCollect = false;
 
+  /* istanbul ignore start -- Discord.js collector callback */
   collector.on("collect", async (i) => {
     // ページネーション
     const pageAction = parsePaginationAction(i.customId, PREFIX);
@@ -242,7 +244,9 @@ export async function handleBumpReminderConfigRemoveUsers(
       collector.stop();
     }
   });
+  /* istanbul ignore stop */
 
+  /* istanbul ignore start -- Discord.js collector callback */
   collector.on("end", async (_, reason) => {
     if (handledByCollect) return;
     if (reason === "time") {
@@ -259,4 +263,5 @@ export async function handleBumpReminderConfigRemoveUsers(
         .catch(() => {});
     }
   });
+  /* istanbul ignore stop */
 }

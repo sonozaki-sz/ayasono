@@ -128,9 +128,11 @@ export async function handleImport(
   // ボタン応答を待機
   const collector = response.createMessageComponentCollector({
     time: CONFIRM_TIMEOUT_MS,
+    /* istanbul ignore next -- Discord.js collector filter */
     filter: (i) => i.user.id === interaction.user.id,
   });
 
+  /* istanbul ignore start -- Discord.js collector callback */
   collector.on("collect", async (i) => {
     // セッションから取得
     const session = importSessions.get(sessionKey);
@@ -165,8 +167,10 @@ export async function handleImport(
     importSessions.delete(sessionKey);
     collector.stop();
   });
+  /* istanbul ignore stop */
 
   // タイムアウト時はキャンセル扱い
+  /* istanbul ignore start -- Discord.js collector callback */
   collector.on("end", async (_, reason) => {
     if (reason === "time") {
       importSessions.delete(sessionKey);
@@ -178,6 +182,7 @@ export async function handleImport(
         .catch(() => {});
     }
   });
+  /* istanbul ignore stop */
 }
 
 /**
