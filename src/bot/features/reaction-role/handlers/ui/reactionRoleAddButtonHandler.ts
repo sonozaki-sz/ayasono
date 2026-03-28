@@ -180,6 +180,11 @@ export const reactionRoleAddButtonModalHandler: ModalHandler = {
       return;
     }
 
+    // 前回のエフェメラルメッセージを削除（「もう1つ追加」ループ時）
+    if (session.previousReplyInteraction) {
+      await session.previousReplyInteraction.deleteReply().catch(() => null);
+    }
+
     session.pendingButton = { label, emoji, style };
 
     // RoleSelectMenu を表示
@@ -204,6 +209,9 @@ export const reactionRoleAddButtonModalHandler: ModalHandler = {
       components: [row],
       flags: MessageFlags.Ephemeral,
     });
+
+    // 次のループで削除できるようインタラクションを保存
+    session.previousReplyInteraction = interaction;
   },
 };
 
