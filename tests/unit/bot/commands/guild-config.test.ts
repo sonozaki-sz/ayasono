@@ -10,6 +10,13 @@ vi.mock("@/shared/locale/commandLocalizations", () => ({
     ja: "desc",
     localizations: { "en-US": "desc" },
   }),
+  getChoiceLocalizations: vi
+    .fn()
+    .mockImplementation((_ns: string, _key: string, value: string) => ({
+      name: "test",
+      name_localizations: { "en-US": "test", "en-GB": "test" },
+      value,
+    })),
 }));
 
 vi.mock("@/shared/locale/localeManager", () => ({
@@ -102,8 +109,8 @@ vi.mock("@/bot/shared/pagination", () => ({
   showPaginationJumpModal: vi.fn(),
 }));
 
-vi.mock("@/shared/database/guildConfigRepositoryProvider", () => ({
-  getGuildConfigRepository: () => ({}),
+vi.mock("@/shared/database/repositories/guildCoreRepository", () => ({
+  getGuildCoreRepository: () => ({}),
 }));
 
 import { guildConfigCommand } from "@/bot/commands/guild-config";

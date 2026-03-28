@@ -355,7 +355,7 @@ async function handleDelete(interaction: ButtonInteraction): Promise<void> {
     new ButtonBuilder()
       .setCustomId(`${TICKET_CUSTOM_ID.DELETE_CANCEL_PREFIX}${ticketId}`)
       .setEmoji("❌")
-      .setLabel(tInteraction(interaction.locale, "ticket:ui.button.cancel"))
+      .setLabel(tInteraction(interaction.locale, "common:ui.button.cancel"))
       .setStyle(ButtonStyle.Secondary),
   );
 

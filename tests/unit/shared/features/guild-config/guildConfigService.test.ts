@@ -12,9 +12,6 @@ vi.mock("@/shared/locale/localeManager", () => ({
   logPrefixed: vi.fn((...args: unknown[]) => String(args[1])),
   tDefault: vi.fn((key: string) => key),
 }));
-vi.mock("@/shared/database/guildConfigRepositoryProvider", () => ({
-  getGuildConfigRepository: () => ({}),
-}));
 
 import { EXPORT_SCHEMA_VERSION } from "@/shared/features/guild-config/guildConfigDefaults";
 import { GuildConfigService } from "@/shared/features/guild-config/guildConfigService";
@@ -22,11 +19,13 @@ import { GuildConfigService } from "@/shared/features/guild-config/guildConfigSe
 // GuildConfigService のビジネスロジックを検証
 describe("shared/features/guild-config/guildConfigService", () => {
   let service: GuildConfigService;
-  let repoMock: {
+  let coreRepoMock: {
     getConfig: Mock;
     updateLocale: Mock;
     updateErrorChannel: Mock;
     resetGuildSettings: Mock;
+  };
+  let aggregateRepoMock: {
     deleteAllConfigs: Mock;
     getFullConfig: Mock;
     importFullConfig: Mock;
@@ -35,16 +34,21 @@ describe("shared/features/guild-config/guildConfigService", () => {
   // 各ケースで新しいモックとサービスインスタンスを生成する
   beforeEach(() => {
     vi.clearAllMocks();
-    repoMock = {
+    coreRepoMock = {
       getConfig: vi.fn(),
       updateLocale: vi.fn(),
       updateErrorChannel: vi.fn(),
       resetGuildSettings: vi.fn(),
+    };
+    aggregateRepoMock = {
       deleteAllConfigs: vi.fn(),
       getFullConfig: vi.fn(),
       importFullConfig: vi.fn(),
     };
-    service = new GuildConfigService(repoMock as any);
+    service = new GuildConfigService(
+      coreRepoMock as any,
+      aggregateRepoMock as any,
+    );
   });
 
   // getConfig のテスト
@@ -56,14 +60,14 @@ describe("shared/features/guild-config/guildConfigService", () => {
         createdAt: new Date(),
         updatedAt: new Date(),
       };
-      repoMock.getConfig.mockResolvedValue(config);
+      coreRepoMock.getConfig.mockResolvedValue(config);
       const result = await service.getConfig("g1");
       expect(result).toBe(config);
-      expect(repoMock.getConfig).toHaveBeenCalledWith("g1");
+      expect(coreRepoMock.getConfig).toHaveBeenCalledWith("g1");
     });
 
     it("設定が存在しない場合は null を返すこと", async () => {
-      repoMock.getConfig.mockResolvedValue(null);
+      coreRepoMock.getConfig.mockResolvedValue(null);
       const result = await service.getConfig("g1");
       expect(result).toBeNull();
     });
@@ -73,11 +77,11 @@ describe("shared/features/guild-config/guildConfigService", () => {
   describe("updateLocale", () => {
     it("リポジトリの updateLocale を呼び出すこと", async () => {
       await service.updateLocale("g1", "en");
-      expect(repoMock.updateLocale).toHaveBeenCalledWith("g1", "en");
+      expect(coreRepoMock.updateLocale).toHaveBeenCalledWith("g1", "en");
     });
 
     it("リポジトリがエラーを投げた場合は DatabaseError になること", async () => {
-      repoMock.updateLocale.mockRejectedValue(new Error("db error"));
+      coreRepoMock.updateLocale.mockRejectedValue(new Error("db error"));
       await expect(service.updateLocale("g1", "en")).rejects.toThrow();
     });
   });
@@ -86,7 +90,10 @@ describe("shared/features/guild-config/guildConfigService", () => {
   describe("updateErrorChannel", () => {
     it("リポジトリの updateErrorChannel を呼び出すこと", async () => {
       await service.updateErrorChannel("g1", "ch-1");
-      expect(repoMock.updateErrorChannel).toHaveBeenCalledWith("g1", "ch-1");
+      expect(coreRepoMock.updateErrorChannel).toHaveBeenCalledWith(
+        "g1",
+        "ch-1",
+      );
     });
   });
 
@@ -94,7 +101,7 @@ describe("shared/features/guild-config/guildConfigService", () => {
   describe("resetGuildSettings", () => {
     it("リポジトリの resetGuildSettings を呼び出すこと", async () => {
       await service.resetGuildSettings("g1");
-      expect(repoMock.resetGuildSettings).toHaveBeenCalledWith("g1");
+      expect(coreRepoMock.resetGuildSettings).toHaveBeenCalledWith("g1");
     });
   });
 
@@ -102,14 +109,14 @@ describe("shared/features/guild-config/guildConfigService", () => {
   describe("deleteAllConfig", () => {
     it("リポジトリの deleteAllConfigs を呼び出すこと", async () => {
       await service.deleteAllConfig("g1");
-      expect(repoMock.deleteAllConfigs).toHaveBeenCalledWith("g1");
+      expect(aggregateRepoMock.deleteAllConfigs).toHaveBeenCalledWith("g1");
     });
   });
 
   // exportConfig のテスト
   describe("exportConfig", () => {
     it("設定が存在する場合はエクスポートデータを返すこと", async () => {
-      repoMock.getFullConfig.mockResolvedValue({ locale: "ja" });
+      aggregateRepoMock.getFullConfig.mockResolvedValue({ locale: "ja" });
       const result = await service.exportConfig("g1");
       expect(result).toEqual({
         version: EXPORT_SCHEMA_VERSION,
@@ -120,7 +127,7 @@ describe("shared/features/guild-config/guildConfigService", () => {
     });
 
     it("設定が存在しない場合は null を返すこと", async () => {
-      repoMock.getFullConfig.mockResolvedValue(null);
+      aggregateRepoMock.getFullConfig.mockResolvedValue(null);
       const result = await service.exportConfig("g1");
       expect(result).toBeNull();
     });
@@ -171,7 +178,7 @@ describe("shared/features/guild-config/guildConfigService", () => {
         config: { locale: "ja" },
       };
       await service.importConfig("g1", data);
-      expect(repoMock.importFullConfig).toHaveBeenCalledWith("g1", {
+      expect(aggregateRepoMock.importFullConfig).toHaveBeenCalledWith("g1", {
         locale: "ja",
       });
     });

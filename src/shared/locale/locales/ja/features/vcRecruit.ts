@@ -36,7 +36,6 @@ export const vcRecruit = {
   "ui.button.delete_post": "🗑️ 募集を削除",
   "ui.button.vc_ended": "🔇 募集終了済み",
   "ui.button.end_confirm": "終了する",
-  "ui.button.cancel": "キャンセル",
   "ui.button.delete_confirm": "削除する",
   "ui.modal.rename_title": "VC名を変更",
   "ui.modal.rename_vc_name_label": "VC名",
@@ -56,7 +55,6 @@ export const vcRecruit = {
   "ui.button.remove_role_cancel": "キャンセル",
 
   // ── Embed ─────────────────────────────────────
-  "embed.title.success": "設定完了",
   "embed.title.config_view": "VC募集設定",
   "embed.field.name.setups": "セットアップ済みカテゴリー",
   "embed.field.name.roles": "メンション候補ロール",

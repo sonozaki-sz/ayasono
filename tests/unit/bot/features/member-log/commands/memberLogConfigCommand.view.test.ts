@@ -122,7 +122,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.view", () => {
       expect.objectContaining({
         fields: expect.arrayContaining([
           expect.objectContaining({
-            name: "memberLog:embed.field.name.status",
+            name: "common:embed.field.name.status",
           }),
           expect.objectContaining({
             name: "memberLog:embed.field.name.channel",
@@ -154,7 +154,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.view", () => {
     const callArg = createInfoEmbedMock.mock.calls[0][1];
     const statusField = (
       callArg!.fields as Array<{ name: string; value: string }>
-    ).find((f) => f.name === "memberLog:embed.field.name.status");
+    ).find((f) => f.name === "common:embed.field.name.status");
     expect(statusField?.value).toBe("common:enabled");
   });
 
@@ -174,7 +174,7 @@ describe("bot/features/member-log/commands/memberLogConfigCommand.view", () => {
     const callArg = createInfoEmbedMock.mock.calls[0][1];
     const statusField = (
       callArg!.fields as Array<{ name: string; value: string }>
-    ).find((f) => f.name === "memberLog:embed.field.name.status");
+    ).find((f) => f.name === "common:embed.field.name.status");
     expect(statusField?.value).toBe("common:disabled");
   });
 

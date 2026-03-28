@@ -2,7 +2,7 @@
 // エラーチャンネル通知ユーティリティ
 
 import { ChannelType, type Guild } from "discord.js";
-import { tGuild } from "../../shared/locale/localeManager";
+import { logPrefixed, tGuild } from "../../shared/locale/localeManager";
 import { logger } from "../../shared/utils/logger";
 import { getBotGuildConfigService } from "../services/botCompositionRoot";
 import { createErrorEmbed, createWarningEmbed } from "../utils/messageResponse";
@@ -83,7 +83,11 @@ export async function notifyErrorChannel(
   } catch {
     // 通知失敗は再帰しない（ログのみ）
     logger.debug(
-      `[ErrorChannelNotifier] Failed to send error notification for guild ${guild.id}`,
+      logPrefixed(
+        "system:log_prefix.error_channel",
+        "system:error_channel.send_error_failed",
+        { guildId: guild.id },
+      ),
     );
   }
 }
@@ -142,7 +146,11 @@ export async function notifyWarnChannel(
     await channel.send({ embeds: [embed] });
   } catch {
     logger.debug(
-      `[ErrorChannelNotifier] Failed to send warn notification for guild ${guild.id}`,
+      logPrefixed(
+        "system:log_prefix.error_channel",
+        "system:error_channel.send_warn_failed",
+        { guildId: guild.id },
+      ),
     );
   }
 }

@@ -7,6 +7,7 @@ import {
   MessageFlags,
   type ModalSubmitInteraction,
 } from "discord.js";
+import { VC_USER_LIMIT } from "../../../../../shared/constants/discord";
 import { tInteraction } from "../../../../../shared/locale/localeManager";
 import type { ModalHandler } from "../../../../handlers/interactionCreate/ui/types";
 import { safeReply } from "../../../../utils/interaction";
@@ -19,10 +20,6 @@ import {
   VAC_PANEL_CUSTOM_ID,
 } from "../../vcControlPanel";
 import { isVcPanelManagedChannel } from "../../vcPanelOwnershipRegistry";
-
-// Discord VC userLimit の許容範囲（0 は無制限）
-const LIMIT_MIN = 0;
-const LIMIT_MAX = 99;
 
 export const vcPanelModalHandler: ModalHandler = {
   /**
@@ -165,7 +162,11 @@ export const vcPanelModalHandler: ModalHandler = {
       .trim();
     const limit = Number.parseInt(rawLimit, 10);
 
-    if (!Number.isInteger(limit) || limit < LIMIT_MIN || limit > LIMIT_MAX) {
+    if (
+      !Number.isInteger(limit) ||
+      limit < VC_USER_LIMIT.MIN ||
+      limit > VC_USER_LIMIT.MAX
+    ) {
       await safeReply(interaction, {
         embeds: [
           createWarningEmbed(

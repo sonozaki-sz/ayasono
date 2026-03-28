@@ -3,6 +3,7 @@
 
 import type { PrismaClient } from "@prisma/client";
 import { parseJsonArray } from "../../utils/jsonUtils";
+import { createRepositoryGetter } from "../../utils/serviceFactory";
 import type { IVacConfigRepository, VacChannelPair, VacConfig } from "../types";
 
 /**
@@ -43,3 +44,13 @@ export class VacConfigRepository implements IVacConfigRepository {
     });
   }
 }
+
+/**
+ * VAC設定リポジトリのシングルトンを取得する
+ */
+export const getVacConfigRepository: (
+  prisma?: PrismaClient,
+) => IVacConfigRepository = createRepositoryGetter<IVacConfigRepository>(
+  "VacConfigRepository",
+  (prisma) => new VacConfigRepository(prisma),
+);

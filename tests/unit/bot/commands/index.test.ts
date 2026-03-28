@@ -10,6 +10,13 @@ vi.mock("@/shared/locale/commandLocalizations", () => ({
     ja: "test-description",
     localizations: {},
   })),
+  getChoiceLocalizations: vi
+    .fn()
+    .mockImplementation((_ns: string, _key: string, value: string) => ({
+      name: "test",
+      name_localizations: { "en-US": "test", "en-GB": "test" },
+      value,
+    })),
 }));
 vi.mock("@/shared/locale/localeManager", () => ({
   logPrefixed: (

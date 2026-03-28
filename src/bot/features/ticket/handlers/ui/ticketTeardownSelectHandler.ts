@@ -153,7 +153,7 @@ export async function showTeardownConfirmation(
     new ButtonBuilder()
       .setCustomId(`${TICKET_CUSTOM_ID.TEARDOWN_CANCEL_PREFIX}${sessionId}`)
       .setEmoji("❌")
-      .setLabel(tInteraction(interaction.locale, "ticket:ui.button.cancel"))
+      .setLabel(tInteraction(interaction.locale, "common:ui.button.cancel"))
       .setStyle(ButtonStyle.Secondary),
   );
 

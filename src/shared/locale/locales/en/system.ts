@@ -29,6 +29,13 @@ export const system = {
   "log_prefix.ticket": "Ticket",
   "log_prefix.reaction_role": "ReactionRole",
   "log_prefix.guild_config": "GuildConfig",
+  "log_prefix.error_channel": "ErrorChannelNotifier",
+
+  // Error channel notification internal logs
+  "error_channel.send_error_failed":
+    "Failed to send error notification GuildId: {{guildId}}",
+  "error_channel.send_warn_failed":
+    "Failed to send warn notification GuildId: {{guildId}}",
 
   // guildDelete (cleanup on bot removal)
   "guild_delete.start":
@@ -117,6 +124,7 @@ export const system = {
   "ready.users": "👥 Users: {{count}}",
   "ready.commands": "💬 Commands: {{count}}",
   "ready.event_registered": "  ✓ {{name}}",
+  "ready.startup_init_failed": "Error during startup initialization",
 
   // Interaction event logs
   "interaction.unknown_command": "Unknown command CommandName: {{commandName}}",

@@ -26,14 +26,9 @@ export const afk = {
   "user-response.invalid_channel_type": "ボイスチャンネルを指定してください。",
   "user-response.clear_channel_success": "AFKチャンネル設定を解除しました。",
 
-  // ── embed: success ──────────────────────────
-  "embed.title.success": "設定完了",
-
   // ── embed: config_view ──────────────────────
   "embed.title.config_view": "AFK機能",
-  "embed.field.name.status": "状態",
   "embed.field.name.channel": "AFKチャンネル",
-  "embed.field.value.not_configured": "未設定",
 
   // ── ログ ─────────────────────────────────────
   "log.moved":

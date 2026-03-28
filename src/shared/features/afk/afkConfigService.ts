@@ -1,11 +1,10 @@
 // src/shared/features/afk/afkConfigService.ts
 // AFK設定サービス実装（Repositoryパターン準拠）
 
-import { getGuildConfigRepository } from "../../database/guildConfigRepositoryProvider";
+import { getAfkConfigRepository } from "../../database/repositories/afkConfigRepository";
 import {
   type AfkConfig,
   type IAfkConfigRepository,
-  type IGuildConfigRepository,
 } from "../../database/types";
 import { logPrefixed, tDefault } from "../../locale/localeManager";
 import { executeWithDatabaseError } from "../../utils/errorHandling";
@@ -116,10 +115,10 @@ export function createAfkConfigService(
  * AFK設定サービスのシングルトンを取得する
  */
 export const getAfkConfigService: (
-  repository?: IGuildConfigRepository,
+  repository?: IAfkConfigRepository,
 ) => AfkConfigService = createServiceGetter(
   createAfkConfigService,
-  getGuildConfigRepository,
+  getAfkConfigRepository,
 );
 
 /**

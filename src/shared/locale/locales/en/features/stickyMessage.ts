@@ -20,6 +20,10 @@ export const stickyMessage = {
   "sticky-message.update.style.description":
     "Display style (text: plain text / embed: embed; defaults to text)",
 
+  // ── Choice names ──────────────────────────────
+  "choice.style.text": "Text",
+  "choice.style.embed": "Embed",
+
   // ── User responses ─────────────────────────────
   "user-response.set_success": "Sticky message has been set.",
   "user-response.already_exists":

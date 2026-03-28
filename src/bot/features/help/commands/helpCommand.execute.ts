@@ -4,10 +4,8 @@
 import type { ChatInputCommandInteraction } from "discord.js";
 import { EmbedBuilder, MessageFlags } from "discord.js";
 import { env } from "../../../../shared/config/env";
+import { EMBED_COLORS } from "../../../../shared/constants/embedColors";
 import { tInteraction } from "../../../../shared/locale/localeManager";
-
-/** ヘルプ Embed のカラーコード */
-const HELP_EMBED_COLOR = 0x77b255;
 
 const HELP_I18N_KEYS = {
   EMBED_TITLE: "help:embed.title.help",
@@ -31,7 +29,7 @@ export async function executeHelpCommand(
   const locale = interaction.locale;
 
   const embed = new EmbedBuilder()
-    .setColor(HELP_EMBED_COLOR)
+    .setColor(EMBED_COLORS.HELP)
     .setTitle(tInteraction(locale, HELP_I18N_KEYS.EMBED_TITLE))
     .addFields(
       {

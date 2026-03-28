@@ -35,6 +35,37 @@ export function getCommandLocalizations<NS extends keyof typeof resources.ja>(
 }
 
 /**
+ * コマンドチョイスのローカライゼーションを取得
+ * @param namespace 翻訳名前空間（例: "guildConfig"）
+ * @param key 翻訳キー（例: "choice.locale.ja"）
+ * @returns Discord APIのChoice形式（name + name_localizations）
+ */
+export function getChoiceLocalizations<NS extends keyof typeof resources.ja>(
+  namespace: NS,
+  key: keyof (typeof resources.ja)[NS],
+  value: string,
+): {
+  name: string;
+  name_localizations: CommandLocalizationMap;
+  value: string;
+} {
+  const jaValue = (resources.ja[namespace] as Record<string, string>)[
+    key as string
+  ];
+  const enValue = (resources.en[namespace] as Record<string, string>)[
+    key as string
+  ];
+  return {
+    name: jaValue,
+    name_localizations: {
+      "en-US": enValue,
+      "en-GB": enValue,
+    },
+    value,
+  };
+}
+
+/**
  * コマンド説明文とローカライゼーションを一度に設定するヘルパー
  * @param namespace 翻訳名前空間
  * @param key 翻訳キー

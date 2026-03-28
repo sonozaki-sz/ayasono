@@ -172,7 +172,7 @@ export async function handleVcRecruitConfigSetup(
   const embed = createSuccessEmbed(
     tInteraction(interaction.locale, "vcRecruit:user-response.setup_success"),
     {
-      title: tInteraction(interaction.locale, "vcRecruit:embed.title.success"),
+      title: tInteraction(interaction.locale, "common:embed.title.success"),
       fields: [
         {
           name: categoryName,

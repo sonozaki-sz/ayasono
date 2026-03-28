@@ -2,6 +2,7 @@
 // メンバーログ設定リポジトリ（guild_member_log_configs テーブル）
 
 import type { PrismaClient } from "@prisma/client";
+import { createRepositoryGetter } from "../../utils/serviceFactory";
 import type { IMemberLogConfigRepository, MemberLogConfig } from "../types";
 
 /**
@@ -48,3 +49,14 @@ export class MemberLogConfigRepository implements IMemberLogConfigRepository {
     });
   }
 }
+
+/**
+ * メンバーログ設定リポジトリのシングルトンを取得する
+ */
+export const getMemberLogConfigRepository: (
+  prisma?: PrismaClient,
+) => IMemberLogConfigRepository =
+  createRepositoryGetter<IMemberLogConfigRepository>(
+    "MemberLogConfigRepository",
+    (prisma) => new MemberLogConfigRepository(prisma),
+  );

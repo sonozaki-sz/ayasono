@@ -3,7 +3,7 @@ import { handleBumpReminderConfigRemoveUsers } from "@/bot/features/bump-reminde
 import { ValidationError } from "@/shared/errors/customErrors";
 
 const getBumpReminderConfigOrDefaultMock = vi.fn();
-const removeBumpReminderMentionUserMock = vi.fn();
+const saveBumpReminderConfigMock = vi.fn();
 
 vi.mock("@/shared/locale/localeManager", () => ({
   logPrefixed: (
@@ -25,8 +25,8 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
   getBotBumpReminderConfigService: () => ({
     getBumpReminderConfigOrDefault: (...args: unknown[]) =>
       getBumpReminderConfigOrDefaultMock(...args),
-    removeBumpReminderMentionUser: (...args: unknown[]) =>
-      removeBumpReminderMentionUserMock(...args),
+    saveBumpReminderConfig: (...args: unknown[]) =>
+      saveBumpReminderConfigMock(...args),
   }),
 }));
 
@@ -103,7 +103,7 @@ describe("bumpReminderConfigCommand.removeUsers", () => {
       enabled: true,
       mentionUserIds: ["user-a", "user-b", "user-c"],
     });
-    removeBumpReminderMentionUserMock.mockResolvedValue(undefined);
+    saveBumpReminderConfigMock.mockResolvedValue(undefined);
 
     const collectHandlers: ((i: unknown) => Promise<void>)[] = [];
     const endHandlers: ((
@@ -159,17 +159,12 @@ describe("bumpReminderConfigCommand.removeUsers", () => {
     };
     await collectHandlers[0](deleteInteraction);
 
-    expect(removeBumpReminderMentionUserMock).toHaveBeenCalledWith(
+    // 一括操作: user-a, user-c を除外した ["user-b"] で保存される
+    expect(saveBumpReminderConfigMock).toHaveBeenCalledWith(
       "guild-1",
-      "user-a",
-    );
-    expect(removeBumpReminderMentionUserMock).toHaveBeenCalledWith(
-      "guild-1",
-      "user-c",
-    );
-    expect(removeBumpReminderMentionUserMock).not.toHaveBeenCalledWith(
-      "guild-1",
-      "user-b",
+      expect.objectContaining({
+        mentionUserIds: ["user-b"],
+      }),
     );
     expect(deleteInteraction.update).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -185,7 +180,7 @@ describe("bumpReminderConfigCommand.removeUsers", () => {
       enabled: true,
       mentionUserIds: ["user-a", "user-b"],
     });
-    removeBumpReminderMentionUserMock.mockResolvedValue(undefined);
+    saveBumpReminderConfigMock.mockResolvedValue(undefined);
 
     const collectHandlers: ((i: unknown) => Promise<void>)[] = [];
 
@@ -232,15 +227,14 @@ describe("bumpReminderConfigCommand.removeUsers", () => {
     };
     await collectHandlers[0](deleteInteraction);
 
-    expect(removeBumpReminderMentionUserMock).toHaveBeenCalledWith(
+    // 一括操作: 全員除外して空配列で保存される
+    expect(saveBumpReminderConfigMock).toHaveBeenCalledWith(
       "guild-1",
-      "user-a",
+      expect.objectContaining({
+        mentionUserIds: [],
+      }),
     );
-    expect(removeBumpReminderMentionUserMock).toHaveBeenCalledWith(
-      "guild-1",
-      "user-b",
-    );
-    expect(removeBumpReminderMentionUserMock).toHaveBeenCalledTimes(2);
+    expect(saveBumpReminderConfigMock).toHaveBeenCalledTimes(1);
     expect(collectorMock.stop).toHaveBeenCalled();
   });
 

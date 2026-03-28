@@ -39,7 +39,6 @@ export const memberLog = {
     "⚠️ メンバーログの通知チャンネルが削除されました。\n設定をリセットしたので、`/member-log-config set-channel` で再設定してください。",
 
   // ── Embed ─────────────────────────────────────
-  "embed.title.success": "設定完了",
   "embed.title.config_view": "メンバーログ機能",
   "embed.title.reset_confirm": "メンバーログ設定リセット確認",
   "embed.description.reset_confirm":
@@ -48,7 +47,6 @@ export const memberLog = {
   "embed.field.value.reset_target":
     "有効/無効設定 / 通知チャンネル / カスタム参加メッセージ / カスタム退出メッセージ",
   "embed.description.not_configured": "メンバーログが設定されていません。",
-  "embed.field.name.status": "状態",
   "embed.field.name.channel": "通知チャンネル",
   "embed.field.name.join_message": "参加メッセージ",
   "embed.field.name.leave_message": "退出メッセージ",
@@ -80,8 +78,6 @@ export const memberLog = {
   "embed.field.value.age_separator": "",
 
   // ── UIラベル ──────────────────────────────────
-  "ui.button.reset_confirm": "リセットする",
-  "ui.button.reset_cancel": "キャンセル",
   "ui.modal.set_join_message_title": "参加メッセージを設定",
   "ui.modal.set_join_message_label": "参加メッセージ",
   "ui.modal.set_join_message_placeholder":

@@ -23,7 +23,6 @@ export const messageDelete = {
   // ── UI labels ──────────────────────────────────
   "ui.button.scan_cancel": "Preview Collected",
   "ui.button.delete": "Delete ({{count}})",
-  "ui.button.cancel": "Cancel",
   "ui.select.exclude_placeholder": "Select messages to exclude from this page",
   "ui.select.exclude_no_messages": "(no messages)",
   "ui.button.deletion_confirm": "Delete ({{count}})",

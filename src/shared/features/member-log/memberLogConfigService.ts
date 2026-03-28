@@ -1,9 +1,8 @@
 // src/shared/features/member-log/memberLogConfigService.ts
 // メンバーログ設定サービス実装（Repositoryパターン準拠）
 
-import { getGuildConfigRepository } from "../../database/guildConfigRepositoryProvider";
+import { getMemberLogConfigRepository } from "../../database/repositories/memberLogConfigRepository";
 import type {
-  IGuildConfigRepository,
   IMemberLogConfigRepository,
   MemberLogConfig,
 } from "../../database/types";
@@ -144,8 +143,8 @@ export function createMemberLogConfigService(
  * @returns MemberLogConfigService シングルトン
  */
 export const getMemberLogConfigService: (
-  repository?: IGuildConfigRepository,
+  repository?: IMemberLogConfigRepository,
 ) => MemberLogConfigService = createServiceGetter(
   createMemberLogConfigService,
-  getGuildConfigRepository,
+  getMemberLogConfigRepository,
 );

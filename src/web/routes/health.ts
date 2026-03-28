@@ -2,6 +2,7 @@
 // ヘルスチェックエンドポイント
 
 import { type FastifyPluginAsync } from "fastify";
+import { logger } from "../../shared/utils/logger";
 import { getPrismaClient } from "../../shared/utils/prisma";
 
 export const healthRoute: FastifyPluginAsync = async (fastify) => {
@@ -29,7 +30,8 @@ export const healthRoute: FastifyPluginAsync = async (fastify) => {
       await prisma.$queryRaw`SELECT 1`;
       // クエリ成功時のみ ready=true を返す
       return { ready: true };
-    } catch {
+    } catch (error) {
+      logger.error("Database readiness check failed", error);
       // DB不達時は 503 で非準備状態を返す
       return reply.status(503).send({
         ready: false,

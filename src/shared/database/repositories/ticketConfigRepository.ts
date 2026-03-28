@@ -4,6 +4,7 @@
 import type { PrismaClient } from "@prisma/client";
 import { tDefault } from "../../locale/localeManager";
 import { executeWithDatabaseError } from "../../utils/errorHandling";
+import { createRepositoryGetter } from "../../utils/serviceFactory";
 import type { GuildTicketConfig, IGuildTicketConfigRepository } from "../types";
 
 export class TicketConfigRepository implements IGuildTicketConfigRepository {
@@ -109,21 +110,13 @@ export class TicketConfigRepository implements IGuildTicketConfigRepository {
   }
 }
 
-let repository: IGuildTicketConfigRepository | undefined;
-
 /**
  * チケット設定リポジトリのシングルトンを取得する
  */
-export function getTicketConfigRepository(
+export const getTicketConfigRepository: (
   prisma?: PrismaClient,
-): IGuildTicketConfigRepository {
-  if (!repository) {
-    if (!prisma) {
-      throw new Error(
-        "TicketConfigRepository is not initialized. Provide PrismaClient on first call.",
-      );
-    }
-    repository = new TicketConfigRepository(prisma);
-  }
-  return repository;
-}
+) => IGuildTicketConfigRepository =
+  createRepositoryGetter<IGuildTicketConfigRepository>(
+    "TicketConfigRepository",
+    (prisma) => new TicketConfigRepository(prisma),
+  );

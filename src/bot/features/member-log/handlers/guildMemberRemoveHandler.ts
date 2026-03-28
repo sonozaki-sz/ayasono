@@ -7,6 +7,7 @@ import {
   type GuildMember,
   type PartialGuildMember,
 } from "discord.js";
+import { EMBED_COLORS } from "../../../../shared/constants/embedColors";
 import { getGuildTranslator } from "../../../../shared/locale/helpers";
 import { logPrefixed } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
@@ -17,9 +18,6 @@ import {
 } from "../../../shared/errorChannelNotifier";
 import { calcDuration } from "./accountAge";
 import { formatAccountAge, formatCustomMessage } from "./memberLogUtils";
-
-// 退出通知 Embed の色（茜色）
-const LEAVE_EMBED_COLOR = 0xb7282d;
 
 /**
  * guildMemberRemove 時にメンバーログ通知を送信する
@@ -98,7 +96,7 @@ export async function handleGuildMemberRemove(
 
     // 退出通知 Embed を生成
     const embed = new EmbedBuilder()
-      .setColor(LEAVE_EMBED_COLOR)
+      .setColor(EMBED_COLORS.MEMBER_LOG_LEAVE)
       .setTitle(t("memberLog:embed.title.leave"))
       .addFields(
         {

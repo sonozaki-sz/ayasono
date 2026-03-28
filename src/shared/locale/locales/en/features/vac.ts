@@ -41,9 +41,6 @@ export const vac = {
   "user-response.afk_move_failed":
     "Failed to move to AFK channel. The target user(s) may have left the VC.",
 
-  // ── embed: success ─────────────────────────────
-  "embed.title.success": "Settings Updated",
-
   // ── embed: remove_error ────────────────────────
   "embed.title.remove_error": "Removal Error",
 
@@ -52,7 +49,6 @@ export const vac = {
   "embed.field.name.trigger_channels": "Trigger channels",
   "embed.field.name.created_vcs": "Created VC count",
   "embed.field.name.created_vc_details": "Created VCs",
-  "embed.field.value.not_configured": "Not configured",
   "embed.field.value.no_created_vcs": "None",
   "embed.field.value.top": "TOP",
 
@@ -88,6 +84,8 @@ export const vac = {
     "channel deleted GuildId: {{guildId}} ChannelId: {{channelId}}",
   "log.category_full":
     "category reached channel limit GuildId: {{guildId}} CategoryId: {{categoryId}}",
+  "log.category_full_action":
+    "VC creation blocked due to category channel limit",
   "log.trigger_removed_by_delete":
     "removed deleted trigger channel from config GuildId: {{guildId}} ChannelId: {{channelId}}",
   "log.channel_delete_sync_failed": "Failed to sync config on channelDelete",

@@ -37,7 +37,7 @@ export async function presentVacConfigView(
             }),
           )
         ).join("\n")
-      : tInteraction(locale, "vac:embed.field.value.not_configured");
+      : tInteraction(locale, "common:embed.field.value.not_configured");
 
   const createdVcDetails =
     config.createdChannels.length > 0

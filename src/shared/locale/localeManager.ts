@@ -3,7 +3,7 @@
 
 import i18next, { type TFunction, type TOptionsBase } from "i18next";
 import { env, NODE_ENV } from "../config/env";
-import type { IBaseGuildRepository } from "../database/types";
+import type { IGuildCoreRepository } from "../database/types";
 import { logger } from "../utils/logger";
 import {
   type AllParseKeys,
@@ -30,7 +30,7 @@ type FlexibleT = (
  */
 export class LocaleManager {
   private defaultLocale: SupportedLocale;
-  private repository?: IBaseGuildRepository;
+  private repository?: IGuildCoreRepository;
   private initialized = false;
   /** 初期化中の Promise（並行呼び出しによる二重初期化防止） */
   private _initPromise: Promise<void> | null = null;
@@ -106,7 +106,7 @@ export class LocaleManager {
   /**
    * Repositoryを設定（DIパターン）
    */
-  setRepository(repository: IBaseGuildRepository): void {
+  setRepository(repository: IGuildCoreRepository): void {
     // Guild locale 取得元（DB repository）を差し替える
     this.repository = repository;
   }

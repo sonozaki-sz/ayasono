@@ -216,17 +216,20 @@ export async function handleBumpReminderConfigRemoveUsers(
       return;
     }
 
-    // 削除実行
+    // 削除実行（選択ユーザーを一括除外して 1 回の書き込みで完了）
     if (i.customId === CUSTOM_ID.DELETE) {
       const configService = getBotBumpReminderConfigService();
-      for (const userId of selectedIds) {
-        await configService.removeBumpReminderMentionUser(guildId, userId);
-      }
+      const currentConfig =
+        await configService.getBumpReminderConfigOrDefault(guildId);
+      currentConfig.mentionUserIds = currentConfig.mentionUserIds.filter(
+        (id) => !selectedIds.has(id),
+      );
+      await configService.saveBumpReminderConfig(guildId, currentConfig);
 
       const successEmbed = createSuccessEmbed(
         tInteraction(locale, "bumpReminder:user-response.remove_users_success"),
         {
-          title: tInteraction(locale, "bumpReminder:embed.title.success"),
+          title: tInteraction(locale, "common:embed.title.success"),
         },
       );
 

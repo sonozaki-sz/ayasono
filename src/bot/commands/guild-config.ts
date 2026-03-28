@@ -7,7 +7,10 @@ import {
   PermissionFlagsBits,
   SlashCommandBuilder,
 } from "discord.js";
-import { getCommandLocalizations } from "../../shared/locale/commandLocalizations";
+import {
+  getChoiceLocalizations,
+  getCommandLocalizations,
+} from "../../shared/locale/commandLocalizations";
 import { handleCommandError } from "../errors/interactionErrorHandler";
 import { executeGuildConfigCommand } from "../features/guild-config/commands/guildConfigCommand.execute";
 import type { Command } from "../types/discord";
@@ -82,6 +85,18 @@ export const guildConfigCommand: Command = {
       "guild-config.import.file.description",
     );
 
+    // チョイス名のローカライゼーション
+    const localeChoiceJa = getChoiceLocalizations(
+      "guildConfig",
+      "choice.locale.ja",
+      "ja",
+    );
+    const localeChoiceEn = getChoiceLocalizations(
+      "guildConfig",
+      "choice.locale.en",
+      "en",
+    );
+
     return (
       new SlashCommandBuilder()
         .setName(GUILD_CONFIG_COMMAND.NAME)
@@ -101,10 +116,7 @@ export const guildConfigCommand: Command = {
                 .setDescription(localeOptDesc.ja)
                 .setDescriptionLocalizations(localeOptDesc.localizations)
                 .setRequired(true)
-                .addChoices(
-                  { name: "日本語", value: "ja" },
-                  { name: "English", value: "en" },
-                ),
+                .addChoices(localeChoiceJa, localeChoiceEn),
             ),
         )
         .addSubcommand((sub) =>

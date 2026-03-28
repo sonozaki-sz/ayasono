@@ -29,6 +29,13 @@ export const system = {
   "log_prefix.ticket": "チケット",
   "log_prefix.reaction_role": "リアクションロール",
   "log_prefix.guild_config": "ギルド設定",
+  "log_prefix.error_channel": "エラーチャンネル通知",
+
+  // エラーチャンネル通知の内部ログ
+  "error_channel.send_error_failed":
+    "エラー通知の送信に失敗しました GuildId: {{guildId}}",
+  "error_channel.send_warn_failed":
+    "警告通知の送信に失敗しました GuildId: {{guildId}}",
 
   // guildDelete（Bot退出時クリーンアップ）
   "guild_delete.start":
@@ -116,6 +123,7 @@ export const system = {
   "ready.users": "👥 ユーザー数: {{count}}",
   "ready.commands": "💬 コマンド数: {{count}}",
   "ready.event_registered": "  ✓ {{name}}",
+  "ready.startup_init_failed": "起動時の初期化処理でエラーが発生しました",
 
   // インタラクションイベントログ
   "interaction.unknown_command": "不明なコマンド CommandName: {{commandName}}",

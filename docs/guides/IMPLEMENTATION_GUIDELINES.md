@@ -67,8 +67,8 @@ src/bot/features/<feature>/handlers/**
 **機能追加時の必須手順:**
 
 1. `prisma/schema.prisma` に `GuildXxxConfig` モデルを追加し、マイグレーションを作成する
-2. `src/shared/database/types/entities.ts` に `XxxConfig` インターフェースを、`repositories.ts` に `IXxxConfigRepository` を追記して `IGuildConfigRepository` に組み込む
-3. `src/shared/database/repositories/xxxConfigRepository.ts` で実装し、`PrismaGuildConfigRepository` に追加する
+2. `src/shared/database/types/entities.ts` に `XxxConfig` インターフェースを、`repositories.ts` に `IXxxConfigRepository` を追記する
+3. `src/shared/database/repositories/xxxConfigRepository.ts` でスタンドアロンリポジトリを実装し、シングルトンゲッター `getXxxConfigRepository(prisma?)` を追加する
 4. `src/shared/features/xxx/xxxConfigDefaults.ts` にデフォルト設定と正規化関数を定義する
 5. `src/shared/features/xxx/xxxConfigService.ts` に `XxxConfigService` クラスをエクスポートする
 6. `src/bot/services/botCompositionRoot.ts` にアクセサを追加し、初期化・登録する
@@ -133,7 +133,7 @@ src/shared/features/<feature-name>/
 | 対象             | 規則       | 例                                              |
 | ---------------- | ---------- | ----------------------------------------------- |
 | クラス           | PascalCase | `BotClient`, `BumpReminderManager`              |
-| インターフェース | PascalCase（リポジトリは `I` プレフィックス） | `IGuildConfigRepository`, `IVcRecruitConfigRepository` |
+| インターフェース | PascalCase（リポジトリは `I` プレフィックス） | `IGuildCoreRepository`, `IVcRecruitConfigRepository` |
 | 型エイリアス     | PascalCase | `MessageStatus`, `BotEvent`                     |
 
 #### コマンド名・イベント名（Discord API 準拠）

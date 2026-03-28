@@ -96,6 +96,16 @@ export const common = {
 
   // Common cancel
   cancelled: "Cancelled.",
+
+  // Cross-feature embed titles and fields
+  "embed.title.success": "Settings Updated",
+  "embed.field.name.status": "Status",
+  "embed.field.value.not_configured": "Not configured",
+
+  // Cross-feature UI button labels
+  "ui.button.cancel": "Cancel",
+  "ui.button.reset_confirm": "Reset",
+  "ui.button.reset_cancel": "Cancel",
 } as const;
 
 export type CommonTranslations = typeof common;

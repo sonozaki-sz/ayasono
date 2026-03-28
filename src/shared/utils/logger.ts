@@ -6,6 +6,14 @@ import DailyRotateFile from "winston-daily-rotate-file";
 import { env, NODE_ENV } from "../config/env";
 import { DiscordWebhookTransport } from "./discordWebhookTransport";
 
+// ── ログローテーション設定 ──
+/** 1ファイルあたりの最大サイズ */
+const LOG_MAX_SIZE = "10m";
+/** 全ログの保持期間 */
+const LOG_RETENTION = "14d";
+/** エラーログの保持期間（障害調査向けに長め） */
+const ERROR_LOG_RETENTION = "30d";
+
 // 実行環境を判定し、コンソール出力の粒度を切り替える
 const isDevelopment = env.NODE_ENV === NODE_ENV.DEVELOPMENT;
 
@@ -51,8 +59,8 @@ transports.push(
     // アプリ全体の監査用ログ（info以上）
     filename: "logs/app-%DATE%.log",
     datePattern: "YYYY-MM-DD",
-    maxSize: "10m",
-    maxFiles: "14d",
+    maxSize: LOG_MAX_SIZE,
+    maxFiles: LOG_RETENTION,
     format: logFormat,
     level: "info",
   }),
@@ -64,8 +72,8 @@ transports.push(
     // 障害調査向けに保持期間を長めに確保
     filename: "logs/error-%DATE%.log",
     datePattern: "YYYY-MM-DD",
-    maxSize: "10m",
-    maxFiles: "30d",
+    maxSize: LOG_MAX_SIZE,
+    maxFiles: ERROR_LOG_RETENTION,
     format: logFormat,
     level: "error",
   }),

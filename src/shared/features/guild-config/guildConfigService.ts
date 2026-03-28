@@ -1,17 +1,15 @@
 // src/shared/features/guild-config/guildConfigService.ts
 // ギルド設定のビジネスロジックを担当するサービス
 
-import { getGuildConfigRepository } from "../../database/guildConfigRepositoryProvider";
 import type {
   FullGuildConfig,
   GuildConfig,
-  IBaseGuildRepository,
-  IGuildConfigRepository,
+  IGuildConfigAggregateRepository,
+  IGuildCoreRepository,
 } from "../../database/types";
 import { logPrefixed, tDefault } from "../../locale/localeManager";
 import { executeWithDatabaseError } from "../../utils/errorHandling";
 import { logger } from "../../utils/logger";
-import { createServiceGetter } from "../../utils/serviceFactory";
 import {
   EXPORT_SCHEMA_VERSION,
   type GuildConfigExportData,
@@ -19,12 +17,17 @@ import {
 
 /**
  * ギルド設定の取得・更新・エクスポート・インポートを担当するサービス
- * DBアクセスは IBaseGuildRepository 経由で行う
+ * コアCRUD は IGuildCoreRepository、一括操作は IGuildConfigAggregateRepository 経由で行う
  */
 export class GuildConfigService {
-  private readonly repository: IBaseGuildRepository;
-  constructor(repository: IBaseGuildRepository) {
-    this.repository = repository;
+  private readonly coreRepo: IGuildCoreRepository;
+  private readonly aggregateRepo: IGuildConfigAggregateRepository;
+  constructor(
+    coreRepo: IGuildCoreRepository,
+    aggregateRepo: IGuildConfigAggregateRepository,
+  ) {
+    this.coreRepo = coreRepo;
+    this.aggregateRepo = aggregateRepo;
   }
 
   /**
@@ -33,7 +36,7 @@ export class GuildConfigService {
    * @returns ギルド設定（未設定時は null）
    */
   async getConfig(guildId: string): Promise<GuildConfig | null> {
-    return this.repository.getConfig(guildId);
+    return this.coreRepo.getConfig(guildId);
   }
 
   /**
@@ -44,7 +47,7 @@ export class GuildConfigService {
   async updateLocale(guildId: string, locale: string): Promise<void> {
     return executeWithDatabaseError(
       async () => {
-        await this.repository.updateLocale(guildId, locale);
+        await this.coreRepo.updateLocale(guildId, locale);
         logger.debug(
           logPrefixed(
             "system:log_prefix.guild_config",
@@ -65,7 +68,7 @@ export class GuildConfigService {
   async updateErrorChannel(guildId: string, channelId: string): Promise<void> {
     return executeWithDatabaseError(
       async () => {
-        await this.repository.updateErrorChannel(guildId, channelId);
+        await this.coreRepo.updateErrorChannel(guildId, channelId);
         logger.debug(
           logPrefixed(
             "system:log_prefix.guild_config",
@@ -85,7 +88,7 @@ export class GuildConfigService {
   async resetGuildSettings(guildId: string): Promise<void> {
     return executeWithDatabaseError(
       async () => {
-        await this.repository.resetGuildSettings(guildId);
+        await this.coreRepo.resetGuildSettings(guildId);
         logger.debug(
           logPrefixed(
             "system:log_prefix.guild_config",
@@ -105,7 +108,7 @@ export class GuildConfigService {
   async deleteAllConfig(guildId: string): Promise<void> {
     return executeWithDatabaseError(
       async () => {
-        await this.repository.deleteAllConfigs(guildId);
+        await this.aggregateRepo.deleteAllConfigs(guildId);
         logger.debug(
           logPrefixed(
             "system:log_prefix.guild_config",
@@ -124,13 +127,14 @@ export class GuildConfigService {
    * @returns エクスポートJSON（設定が存在しない場合は null）
    */
   async exportConfig(guildId: string): Promise<GuildConfigExportData | null> {
-    const fullConfig = await this.repository.getFullConfig(guildId);
+    const fullConfig = await this.aggregateRepo.getFullConfig(guildId);
     if (!fullConfig) return null;
 
     return {
       version: EXPORT_SCHEMA_VERSION,
       exportedAt: new Date().toISOString(),
       guildId,
+      // FullGuildConfig → JSON 互換型へのシリアライズ境界キャスト
       config: fullConfig as unknown as Record<string, unknown>,
     };
   }
@@ -178,8 +182,9 @@ export class GuildConfigService {
   ): Promise<void> {
     return executeWithDatabaseError(
       async () => {
-        await this.repository.importFullConfig(
+        await this.aggregateRepo.importFullConfig(
           guildId,
+          // JSON 互換型 → FullGuildConfig へのデシリアライズ境界キャスト
           data.config as unknown as FullGuildConfig,
         );
         logger.debug(
@@ -197,21 +202,13 @@ export class GuildConfigService {
 
 /**
  * GuildConfigService のインスタンスを生成する
- * @param repository リポジトリ
+ * @param coreRepo コアCRUDリポジトリ
+ * @param aggregateRepo 一括操作リポジトリ
  * @returns GuildConfigService インスタンス
  */
 export function createGuildConfigService(
-  repository: IBaseGuildRepository,
+  coreRepo: IGuildCoreRepository,
+  aggregateRepo: IGuildConfigAggregateRepository,
 ): GuildConfigService {
-  return new GuildConfigService(repository);
+  return new GuildConfigService(coreRepo, aggregateRepo);
 }
-
-/**
- * GuildConfigService のシングルトンを取得する
- */
-export const getGuildConfigService: (
-  repository?: IGuildConfigRepository,
-) => GuildConfigService = createServiceGetter(
-  createGuildConfigService,
-  getGuildConfigRepository,
-);

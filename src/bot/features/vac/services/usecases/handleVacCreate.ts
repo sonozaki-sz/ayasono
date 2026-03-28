@@ -10,17 +10,23 @@ import {
   type VoiceState,
 } from "discord.js";
 import type { VacConfigService } from "../../../../../shared/features/vac/vacConfigService";
-import { logPrefixed } from "../../../../../shared/locale/localeManager";
+import {
+  logPrefixed,
+  tDefault,
+} from "../../../../../shared/locale/localeManager";
 import { logger } from "../../../../../shared/utils/logger";
 import {
   notifyErrorChannel,
   notifyWarnChannel,
 } from "../../../../shared/errorChannelNotifier";
 import { sendVcControlPanel } from "../../../vc-panel/vcControlPanel";
+import { VAC_CONFIG_COMMAND } from "../../commands/vacConfigCommand.constants";
 
 const VAC_EVENT = {
+  /** VC作成時のデフォルトユーザー制限（0 は無制限だが 99 で実質無制限を表現） */
   DEFAULT_LIMIT: 99,
-  CATEGORY_CHANNEL_LIMIT: 50,
+  /** カテゴリ内チャンネル上限 */
+  CATEGORY_CHANNEL_LIMIT: VAC_CONFIG_COMMAND.CATEGORY_CHANNEL_LIMIT,
 } as const;
 
 type GuildChannelsCache = GuildMember["guild"]["channels"]["cache"];
@@ -93,10 +99,13 @@ export async function handleVacCreateUseCase(
     );
     await notifyWarnChannel(
       member.guild,
-      `Category ${parentCategory.id} channel limit reached`,
+      tDefault("vac:log.category_full", {
+        guildId: member.guild.id,
+        categoryId: parentCategory.id,
+      }),
       {
         feature: "VAC",
-        action: "カテゴリのチャンネル上限到達でVC作成不可",
+        action: tDefault("vac:log.category_full_action"),
       },
     );
     return;

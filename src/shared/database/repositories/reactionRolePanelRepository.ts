@@ -4,6 +4,7 @@
 import type { PrismaClient } from "@prisma/client";
 import { tDefault } from "../../locale/localeManager";
 import { executeWithDatabaseError } from "../../utils/errorHandling";
+import { createRepositoryGetter } from "../../utils/serviceFactory";
 import type {
   GuildReactionRolePanel,
   IReactionRolePanelRepository,
@@ -106,23 +107,15 @@ export class ReactionRolePanelRepository
   }
 }
 
-let repository: IReactionRolePanelRepository | undefined;
-
 /**
  * リアクションロールパネルリポジトリのシングルトンを取得する
  * @param prisma 初回呼び出し時に必要なPrismaClientインスタンス
  * @returns リポジトリのシングルトンインスタンス
  */
-export function getReactionRolePanelRepository(
+export const getReactionRolePanelRepository: (
   prisma?: PrismaClient,
-): IReactionRolePanelRepository {
-  if (!repository) {
-    if (!prisma) {
-      throw new Error(
-        "ReactionRolePanelRepository is not initialized. Provide PrismaClient on first call.",
-      );
-    }
-    repository = new ReactionRolePanelRepository(prisma);
-  }
-  return repository;
-}
+) => IReactionRolePanelRepository =
+  createRepositoryGetter<IReactionRolePanelRepository>(
+    "ReactionRolePanelRepository",
+    (prisma) => new ReactionRolePanelRepository(prisma),
+  );

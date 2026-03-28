@@ -48,12 +48,12 @@ export async function handleReset(
     new ButtonBuilder()
       .setCustomId(GUILD_CONFIG_CUSTOM_ID.RESET_CONFIRM)
       .setEmoji("🗑️")
-      .setLabel(tInteraction(locale, "guildConfig:ui.button.reset_confirm"))
+      .setLabel(tInteraction(locale, "common:ui.button.reset_confirm"))
       .setStyle(ButtonStyle.Danger),
     new ButtonBuilder()
       .setCustomId(GUILD_CONFIG_CUSTOM_ID.RESET_CANCEL)
       .setEmoji("❌")
-      .setLabel(tInteraction(locale, "guildConfig:ui.button.reset_cancel"))
+      .setLabel(tInteraction(locale, "common:ui.button.reset_cancel"))
       .setStyle(ButtonStyle.Secondary),
   );
 

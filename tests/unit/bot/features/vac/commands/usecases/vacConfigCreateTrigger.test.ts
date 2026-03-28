@@ -158,7 +158,7 @@ describe("bot/features/vac/commands/usecases/vacConfigCreateTrigger", () => {
     expect(addTriggerChannel).toHaveBeenCalledWith("guild-1", "trigger-new");
     expect(createSuccessEmbed).toHaveBeenCalledWith(
       "vac:user-response.trigger_created",
-      { title: "vac:embed.title.success" },
+      { title: "common:embed.title.success" },
     );
     expect(reply).toHaveBeenCalledWith({
       embeds: [{ description: "vac:user-response.trigger_created" }],

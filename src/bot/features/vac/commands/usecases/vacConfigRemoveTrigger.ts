@@ -163,7 +163,7 @@ export async function handleVacConfigRemoveTrigger(
             });
 
       const embed = createSuccessEmbed(description, {
-        title: tInteraction(locale, "vac:embed.title.success"),
+        title: tInteraction(locale, "common:embed.title.success"),
       });
 
       await i.update({ embeds: [embed], components: [] });

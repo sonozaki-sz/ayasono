@@ -2,13 +2,16 @@
 // Bot層の依存解決を集約する Composition Root
 
 import type { PrismaClient } from "@prisma/client";
-import { getGuildConfigRepository } from "../../shared/database/guildConfigRepositoryProvider";
+import { getAfkConfigRepository } from "../../shared/database/repositories/afkConfigRepository";
+import { getBumpReminderConfigRepository } from "../../shared/database/repositories/bumpReminderConfigRepository";
+import { GuildConfigAggregateRepository } from "../../shared/database/repositories/guildConfigAggregateRepository";
+import { getGuildCoreRepository } from "../../shared/database/repositories/guildCoreRepository";
+import { getMemberLogConfigRepository } from "../../shared/database/repositories/memberLogConfigRepository";
 import { getReactionRolePanelRepository } from "../../shared/database/repositories/reactionRolePanelRepository";
 import { getTicketConfigRepository } from "../../shared/database/repositories/ticketConfigRepository";
-import type {
-  IGuildConfigRepository,
-  ITicketRepository,
-} from "../../shared/database/types";
+import { getVacConfigRepository } from "../../shared/database/repositories/vacConfigRepository";
+import { getVcRecruitConfigRepository } from "../../shared/database/repositories/vcRecruitConfigRepository";
+import type { ITicketRepository } from "../../shared/database/types";
 import type { BumpReminderConfigService } from "../../shared/features/bump-reminder/bumpReminderConfigService";
 import type { GuildConfigService } from "../../shared/features/guild-config/guildConfigService";
 import { createGuildConfigService } from "../../shared/features/guild-config/guildConfigService";
@@ -21,13 +24,13 @@ import { createStickyMessageConfigService } from "../../shared/features/sticky-m
 import type { TicketConfigService } from "../../shared/features/ticket/ticketConfigService";
 import { createTicketConfigService } from "../../shared/features/ticket/ticketConfigService";
 import type { VacConfigService } from "../../shared/features/vac/vacConfigService";
-import { getVacConfigService } from "../../shared/features/vac/vacConfigService";
+import { createVacConfigService } from "../../shared/features/vac/vacConfigService";
 import { createVcRecruitConfigService } from "../../shared/features/vc-recruit/vcRecruitConfigService";
 import { localeManager } from "../../shared/locale/localeManager";
 import { createBotServiceAccessor } from "../../shared/utils/serviceFactory";
 import { getBumpReminderRepository } from "../features/bump-reminder/repositories/bumpReminderRepository";
 import type { IBumpReminderRepository as BumpReminderRepositoryType } from "../features/bump-reminder/repositories/types";
-import { getBumpReminderFeatureConfigService } from "../features/bump-reminder/services/bumpReminderConfigServiceResolver";
+import { createBumpReminderFeatureConfigService } from "../features/bump-reminder/services/bumpReminderConfigServiceResolver";
 import type { BumpReminderManager } from "../features/bump-reminder/services/bumpReminderService";
 import { getBumpReminderManager } from "../features/bump-reminder/services/bumpReminderService";
 import { getStickyMessageRepository } from "../features/sticky-message/repositories/stickyMessageRepository";
@@ -45,7 +48,6 @@ import { createVcRecruitRepository } from "../features/vc-recruit/repositories/v
 // ---------------------------------------------------------------------------
 
 export interface BotServices {
-  guildConfigRepository: IGuildConfigRepository;
   guildConfigService: GuildConfigService;
   bumpReminderConfigService: BumpReminderConfigService;
   bumpReminderRepository: BumpReminderRepositoryType;
@@ -64,14 +66,6 @@ export interface BotServices {
 // ---------------------------------------------------------------------------
 // Module-level singletons
 // ---------------------------------------------------------------------------
-
-const _guildConfigRepositoryAccessor =
-  createBotServiceAccessor<IGuildConfigRepository>("GuildConfigRepository");
-export const getBotGuildConfigRepository: () => IGuildConfigRepository =
-  _guildConfigRepositoryAccessor[0];
-export const setBotGuildConfigRepository: (
-  value: IGuildConfigRepository,
-) => void = _guildConfigRepositoryAccessor[1];
 
 const _guildConfigServiceAccessor =
   createBotServiceAccessor<GuildConfigService>("GuildConfigService");
@@ -192,17 +186,38 @@ export const getBotVcRecruitConfigService: () => IVcRecruitRepository =
 export function initializeBotCompositionRoot(
   prisma: PrismaClient,
 ): BotServices {
-  const guildConfigRepository = getGuildConfigRepository(prisma);
-  setBotGuildConfigRepository(guildConfigRepository);
-  localeManager.setRepository(guildConfigRepository);
+  // スタンドアロンリポジトリ群
+  const guildCoreRepo = getGuildCoreRepository(prisma);
+  const afkRepo = getAfkConfigRepository(prisma);
+  const bumpReminderConfigRepo = getBumpReminderConfigRepository(prisma);
+  const vacRepo = getVacConfigRepository(prisma);
+  const memberLogRepo = getMemberLogConfigRepository(prisma);
+  const vcRecruitConfigRepo = getVcRecruitConfigRepository(prisma);
+
+  // 一括操作リポジトリ（各スタンドアロンリポジトリを集約）
+  const aggregateRepo = new GuildConfigAggregateRepository(
+    guildCoreRepo,
+    afkRepo,
+    bumpReminderConfigRepo,
+    vacRepo,
+    memberLogRepo,
+    vcRecruitConfigRepo,
+    prisma,
+  );
+
+  // LocaleManager にコアリポジトリを設定
+  localeManager.setRepository(guildCoreRepo);
 
   // GuildConfig
-  const guildConfigService = createGuildConfigService(guildConfigRepository);
+  const guildConfigService = createGuildConfigService(
+    guildCoreRepo,
+    aggregateRepo,
+  );
   setBotGuildConfigService(guildConfigService);
 
   // BumpReminder
-  const bumpReminderConfigService = getBumpReminderFeatureConfigService(
-    guildConfigRepository,
+  const bumpReminderConfigService = createBumpReminderFeatureConfigService(
+    bumpReminderConfigRepo,
   );
   const bumpReminderRepository = getBumpReminderRepository(prisma);
   const bumpReminderManager = getBumpReminderManager(bumpReminderRepository);
@@ -211,7 +226,7 @@ export function initializeBotCompositionRoot(
   setBotBumpReminderManager(bumpReminderManager);
 
   // VAC
-  const vacConfigService = getVacConfigService(guildConfigRepository);
+  const vacConfigService = createVacConfigService(vacRepo);
   const vacService = getVacService(vacConfigService);
   setBotVacConfigService(vacConfigService);
   setBotVacService(vacService);
@@ -228,9 +243,7 @@ export function initializeBotCompositionRoot(
   setBotStickyMessageResendService(stickyMessageResendService);
 
   // MemberLog
-  const memberLogConfigService = createMemberLogConfigService(
-    guildConfigRepository,
-  );
+  const memberLogConfigService = createMemberLogConfigService(memberLogRepo);
   setBotMemberLogConfigService(memberLogConfigService);
 
   // Ticket
@@ -248,9 +261,8 @@ export function initializeBotCompositionRoot(
   setBotReactionRolePanelConfigService(reactionRolePanelConfigService);
 
   // VcRecruit
-  const vcRecruitConfigService = createVcRecruitConfigService(
-    guildConfigRepository,
-  );
+  const vcRecruitConfigService =
+    createVcRecruitConfigService(vcRecruitConfigRepo);
   const vcRecruitRepository = createVcRecruitRepository(vcRecruitConfigService);
   setBotVcRecruitRepository(vcRecruitRepository);
 
@@ -265,7 +277,6 @@ export function initializeBotCompositionRoot(
   });
 
   return {
-    guildConfigRepository,
     guildConfigService,
     bumpReminderConfigService,
     bumpReminderRepository,

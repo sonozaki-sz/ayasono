@@ -38,7 +38,6 @@ export const memberLog = {
     "⚠️ The member log notification channel has been deleted.\nSettings have been reset. Please reconfigure with `/member-log-config set-channel`.",
 
   // ── Embed ─────────────────────────────────────
-  "embed.title.success": "Settings Updated",
   "embed.title.config_view": "Member Log",
   "embed.title.reset_confirm": "Member Log Settings Reset",
   "embed.description.reset_confirm":
@@ -47,7 +46,6 @@ export const memberLog = {
   "embed.field.value.reset_target":
     "Enabled/Disabled / Notification Channel / Custom Join Message / Custom Leave Message",
   "embed.description.not_configured": "Member log is not configured.",
-  "embed.field.name.status": "Status",
   "embed.field.name.channel": "Notification Channel",
   "embed.field.name.join_message": "Join Message",
   "embed.field.name.leave_message": "Leave Message",
@@ -79,8 +77,6 @@ export const memberLog = {
   "embed.field.value.age_separator": " ",
 
   // ── UI labels ──────────────────────────────────
-  "ui.button.reset_confirm": "Reset",
-  "ui.button.reset_cancel": "Cancel",
   "ui.modal.set_join_message_title": "Set Join Message",
   "ui.modal.set_join_message_label": "Join message",
   "ui.modal.set_join_message_placeholder":

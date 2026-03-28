@@ -16,6 +16,10 @@ export const guildConfig = {
   "guild-config.import.description": "JSONファイルからギルド設定をインポート",
   "guild-config.import.file.description": "エクスポートしたJSONファイル",
 
+  // ── チョイス名 ──────────────────────────────
+  "choice.locale.ja": "日本語",
+  "choice.locale.en": "English",
+
   // ── ユーザーレスポンス ────────────────────────
   "user-response.set_locale_success":
     "サーバーの言語を「{{locale}}」に設定しました。",
@@ -44,7 +48,6 @@ export const guildConfig = {
   "embed.title.view": "ギルド設定",
   "embed.field.name.locale": "言語",
   "embed.field.name.error_channel": "エラー通知チャンネル",
-  "embed.field.value.not_configured": "未設定",
 
   // ── embed: reset_confirm ──────────────────────
   "embed.title.reset_confirm": "ギルド設定リセット確認",
@@ -73,8 +76,6 @@ export const guildConfig = {
   "ui.select.sticky": "メッセージ固定",
   "ui.select.member_log": "メンバーログ",
   "ui.select.bump": "Bumpリマインダー",
-  "ui.button.reset_confirm": "リセットする",
-  "ui.button.reset_cancel": "キャンセル",
   "ui.button.reset_all_confirm": "リセットする",
   "ui.button.reset_all_cancel": "キャンセル",
   "ui.button.import_confirm": "インポートする",

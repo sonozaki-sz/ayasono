@@ -49,7 +49,7 @@ export async function handleMemberLogConfigView(
   );
   const fieldStatus = tInteraction(
     interaction.locale,
-    "memberLog:embed.field.name.status",
+    "common:embed.field.name.status",
   );
   const fieldChannel = tInteraction(
     interaction.locale,

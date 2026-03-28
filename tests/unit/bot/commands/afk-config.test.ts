@@ -28,8 +28,8 @@ const createWarningEmbedMock = vi.fn(
 
 // afkConfigService が使う DB レイヤーのみモック
 const saveAfkConfigMock = vi.fn();
-vi.mock("@/shared/database/guildConfigRepositoryProvider", () => ({
-  getGuildConfigRepository: () => ({
+vi.mock("@/shared/database/repositories/afkConfigRepository", () => ({
+  getAfkConfigRepository: () => ({
     setAfkChannel: (...args: unknown[]) => setAfkChannelMock(...args),
     getAfkConfig: (...args: unknown[]) => getAfkConfigMock(...args),
     updateAfkConfig: (...args: unknown[]) => saveAfkConfigMock(...args),
@@ -236,7 +236,7 @@ describe("bot/commands/afk-config", () => {
       title: "afk:embed.title.config_view",
       fields: [
         {
-          name: "afk:embed.field.name.status",
+          name: "common:embed.field.name.status",
           value: "common:enabled",
           inline: true,
         },

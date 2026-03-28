@@ -97,7 +97,7 @@ export async function handleTicketDelete(
     new ButtonBuilder()
       .setCustomId(`${TICKET_CUSTOM_ID.DELETE_CANCEL_PREFIX}${ticket.id}`)
       .setEmoji("❌")
-      .setLabel(tInteraction(interaction.locale, "ticket:ui.button.cancel"))
+      .setLabel(tInteraction(interaction.locale, "common:ui.button.cancel"))
       .setStyle(ButtonStyle.Secondary),
   );
 

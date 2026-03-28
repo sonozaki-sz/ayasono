@@ -38,9 +38,6 @@ export const bumpReminder = {
   "user-response.remove_users_empty": "通知登録されているユーザーがいません。",
   "user-response.panel_update_failed": "Bump通知リストの更新に失敗しました。",
 
-  // ── embed: success ─────────────────────────────
-  "embed.title.success": "設定完了",
-
   // ── embed: not_configured ──────────────────────
   "embed.description.not_configured": "Bumpリマインダーが設定されていません。",
 
@@ -64,15 +61,12 @@ export const bumpReminder = {
   "embed.title.panel": "Bumpリマインダー機能",
 
   // ── embed fields ───────────────────────────────
-  "embed.field.name.status": "状態",
   "embed.field.name.mention_role": "メンションロール",
   "embed.field.name.mention_users": "メンションユーザー",
 
   // ── UIラベル ──────────────────────────────────
   "ui.button.mention_on": "ユーザー通知をONにする",
   "ui.button.mention_off": "ユーザー通知をOFFにする",
-  "ui.button.reset_confirm": "リセットする",
-  "ui.button.reset_cancel": "キャンセル",
   "ui.button.select_all": "全員を選択",
   "ui.button.submit_delete": "削除する",
 

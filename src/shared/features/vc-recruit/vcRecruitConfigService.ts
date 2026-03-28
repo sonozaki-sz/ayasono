@@ -16,6 +16,7 @@ import {
   createDefaultVcRecruitConfig,
   DEFAULT_THREAD_ARCHIVE_DURATION,
   DEFAULT_VC_RECRUIT_CONFIG,
+  MAX_MENTION_ROLES,
   normalizeVcRecruitConfig,
 } from "./vcRecruitConfigDefaults";
 
@@ -242,7 +243,7 @@ export class VcRecruitConfigService {
       const config = await this.getVcRecruitConfigOrDefault(guildId);
       if (config.mentionRoleIds.includes(roleId))
         return VC_RECRUIT_MENTION_ROLE_ADD_RESULT.ALREADY_EXISTS;
-      if (config.mentionRoleIds.length >= 25)
+      if (config.mentionRoleIds.length >= MAX_MENTION_ROLES)
         return VC_RECRUIT_MENTION_ROLE_ADD_RESULT.LIMIT_EXCEEDED;
       const updated: VcRecruitConfig = {
         ...config,

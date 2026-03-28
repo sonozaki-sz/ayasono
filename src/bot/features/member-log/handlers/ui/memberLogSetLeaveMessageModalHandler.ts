@@ -35,7 +35,7 @@ export const memberLogSetLeaveMessageModalHandler: ModalHandler = {
     );
     const successTitle = tInteraction(
       interaction.locale,
-      "memberLog:embed.title.success",
+      "common:embed.title.success",
     );
     await interaction.reply({
       embeds: [createSuccessEmbed(description, { title: successTitle })],

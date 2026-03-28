@@ -1,6 +1,8 @@
 // src/shared/utils/serviceFactory.ts
 // module-level singleton のキャッシュパターンを抽象化するユーティリティ
 
+import type { PrismaClient } from "@prisma/client";
+
 /**
  * Bot 層の初期化済みサービスを保持する getter/setter ペアを生成する
  * @param name エラーメッセージに使用するサービス名
@@ -23,6 +25,30 @@ export function createBotServiceAccessor<T>(
       cached = value;
     },
   ];
+}
+
+/**
+ * リポジトリの module-level singleton キャッシュパターンを抽象化する
+ * @param name エラーメッセージに使用するリポジトリ名
+ * @param createFn PrismaClient からリポジトリインスタンスを生成する関数
+ * @returns 初回呼び出し時に PrismaClient を受け取り、以降はキャッシュを返す getter
+ */
+export function createRepositoryGetter<T>(
+  name: string,
+  createFn: (prisma: PrismaClient) => T,
+): (prisma?: PrismaClient) => T {
+  let cached: T | undefined;
+  return (prisma?: PrismaClient): T => {
+    if (!cached) {
+      if (!prisma) {
+        throw new Error(
+          `${name} is not initialized. Provide PrismaClient on first call.`,
+        );
+      }
+      cached = createFn(prisma);
+    }
+    return cached;
+  };
 }
 
 /**

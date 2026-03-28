@@ -51,7 +51,7 @@ export async function handleBumpReminderConfigSetMention(
     { role: `<@&${role.id}>` },
   );
   const embed = createSuccessEmbed(roleMessage, {
-    title: tInteraction(interaction.locale, "bumpReminder:embed.title.success"),
+    title: tInteraction(interaction.locale, "common:embed.title.success"),
   });
   await interaction.reply({
     embeds: [embed],

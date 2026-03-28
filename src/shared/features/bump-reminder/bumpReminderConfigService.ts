@@ -1,7 +1,7 @@
 // src/shared/features/bump-reminder/bumpReminderConfigService.ts
 // Bumpリマインダー設定サービス実装（Repositoryパターン準拠）
 
-import { getGuildConfigRepository } from "../../database/guildConfigRepositoryProvider";
+import { getBumpReminderConfigRepository } from "../../database/repositories/bumpReminderConfigRepository";
 import {
   BUMP_REMINDER_MENTION_CLEAR_RESULT,
   BUMP_REMINDER_MENTION_ROLE_RESULT,
@@ -15,7 +15,6 @@ import {
   type BumpReminderMentionUserRemoveResult,
   type BumpReminderMentionUsersClearResult,
   type IBumpReminderConfigRepository,
-  type IGuildConfigRepository,
 } from "../../database/types";
 import { createServiceGetter } from "../../utils/serviceFactory";
 import {
@@ -182,8 +181,8 @@ export function createBumpReminderConfigService(
  * Bumpリマインダー設定サービスのシングルトンを取得する
  */
 export const getBumpReminderConfigService: (
-  repository?: IGuildConfigRepository,
+  repository?: IBumpReminderConfigRepository,
 ) => BumpReminderConfigService = createServiceGetter(
   createBumpReminderConfigService,
-  getGuildConfigRepository,
+  getBumpReminderConfigRepository,
 );

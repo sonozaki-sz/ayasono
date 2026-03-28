@@ -28,8 +28,8 @@ vi.mock("@/shared/scheduler/jobScheduler", () => ({
   },
 }));
 vi.mock("@/bot/services/botCompositionRoot", () => ({
-  getBotGuildConfigRepository: () => ({
-    deleteAllConfigs: mockDeleteAllConfigs,
+  getBotGuildConfigService: () => ({
+    deleteAllConfig: mockDeleteAllConfigs,
   }),
   getBotTicketRepository: () => ({
     findAllClosedByGuild: mockFindAllClosedByGuild,

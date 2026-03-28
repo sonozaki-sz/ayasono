@@ -2,6 +2,7 @@
 // スティッキーメッセージ送信ペイロードビルダー
 
 import { EmbedBuilder, type MessageCreateOptions } from "discord.js";
+import { EMBED_COLORS } from "../../../../shared/constants/embedColors";
 import type { StickyMessage } from "../repositories/types";
 
 /** Embed データの型 */
@@ -39,7 +40,9 @@ function parseEmbedData(
 ): EmbedBuilder {
   try {
     const data = JSON.parse(embedDataJson) as StickyEmbedData;
-    const embed = new EmbedBuilder().setColor(data.color ?? 0x008969);
+    const embed = new EmbedBuilder().setColor(
+      data.color ?? EMBED_COLORS.STICKY_MESSAGE_DEFAULT,
+    );
 
     if (data.title) embed.setTitle(data.title);
     embed.setDescription(data.description ?? fallbackContent);
@@ -48,7 +51,7 @@ function parseEmbedData(
   } catch {
     // JSON パース失敗時はプレーンテキストで代用
     return new EmbedBuilder()
-      .setColor(0x008969)
+      .setColor(EMBED_COLORS.STICKY_MESSAGE_DEFAULT)
       .setDescription(fallbackContent);
   }
 }
@@ -59,12 +62,12 @@ function parseEmbedData(
  * @returns 数値カラーコード
  */
 export function parseColorStr(colorStr: string | null | undefined): number {
-  if (!colorStr) return 0x008969;
+  if (!colorStr) return EMBED_COLORS.STICKY_MESSAGE_DEFAULT;
   const normalized = colorStr.startsWith("#")
     ? colorStr.slice(1)
     : colorStr.startsWith("0x") || colorStr.startsWith("0X")
       ? colorStr.slice(2)
       : colorStr;
   const parsed = parseInt(normalized, 16);
-  return isNaN(parsed) ? 0x008969 : parsed;
+  return isNaN(parsed) ? EMBED_COLORS.STICKY_MESSAGE_DEFAULT : parsed;
 }

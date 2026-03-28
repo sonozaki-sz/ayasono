@@ -45,7 +45,7 @@ export async function handleBumpReminderConfigView(
   );
   const fieldStatus = tInteraction(
     interaction.locale,
-    "bumpReminder:embed.field.name.status",
+    "common:embed.field.name.status",
   );
   const fieldMentionRole = tInteraction(
     interaction.locale,

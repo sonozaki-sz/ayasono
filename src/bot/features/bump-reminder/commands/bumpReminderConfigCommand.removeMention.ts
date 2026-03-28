@@ -24,7 +24,7 @@ export async function handleBumpReminderConfigRemoveMention(
   const bumpReminderConfigService = getBotBumpReminderConfigService();
   const successTitle = tInteraction(
     interaction.locale,
-    "bumpReminder:embed.title.success",
+    "common:embed.title.success",
   );
 
   // メンションロール設定を削除

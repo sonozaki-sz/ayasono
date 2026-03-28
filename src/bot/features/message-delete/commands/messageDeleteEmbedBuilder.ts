@@ -356,7 +356,7 @@ export function buildPreviewComponents(
     new ButtonBuilder()
       .setCustomId(MSG_DEL_CUSTOM_ID.CONFIRM_NO)
       .setEmoji("❌")
-      .setLabel(tInteraction(locale, "messageDelete:ui.button.cancel"))
+      .setLabel(tInteraction(locale, "common:ui.button.cancel"))
       .setStyle(ButtonStyle.Secondary),
   );
 
