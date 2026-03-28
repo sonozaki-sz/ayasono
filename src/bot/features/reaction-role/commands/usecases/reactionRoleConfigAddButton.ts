@@ -88,6 +88,7 @@ export async function handleReactionRoleConfigAddButton(
     panelId: "",
     buttons: [],
     buttonCounter: 0,
+    commandInteraction: interaction,
   });
 
   const guild = interaction.guild;

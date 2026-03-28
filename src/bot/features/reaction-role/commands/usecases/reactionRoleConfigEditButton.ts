@@ -53,6 +53,7 @@ export async function handleReactionRoleConfigEditButton(
     reactionRoleEditButtonSessions.set(sessionId, {
       panelId: panel.id,
       buttonId: -1,
+      commandInteraction: interaction,
     });
 
     const selectMenu = new StringSelectMenuBuilder()
@@ -94,6 +95,7 @@ export async function handleReactionRoleConfigEditButton(
   reactionRoleEditButtonSessions.set(sessionId, {
     panelId: "",
     buttonId: -1,
+    commandInteraction: interaction,
   });
 
   const guild = interaction.guild;

@@ -231,7 +231,13 @@ describe("bot/features/reaction-role/handlers/ui/reactionRoleEditPanelHandler", 
       });
 
       it("updatePanelMessageがtrueを返す場合は成功応答する", async () => {
-        reactionRoleEditPanelSessions.set("session-1", { panelId: "panel-1" });
+        const mockCommandInteraction = {
+          deleteReply: vi.fn().mockResolvedValue(undefined),
+        };
+        reactionRoleEditPanelSessions.set("session-1", {
+          panelId: "panel-1",
+          commandInteraction: mockCommandInteraction as never,
+        });
         mockConfigService.findById.mockResolvedValue({
           id: "panel-1",
           channelId: "ch-1",
@@ -256,6 +262,7 @@ describe("bot/features/reaction-role/handlers/ui/reactionRoleEditPanelHandler", 
         await reactionRoleEditPanelModalHandler.execute(interaction as never);
 
         expect(interaction.deferReply).toHaveBeenCalled();
+        expect(mockCommandInteraction.deleteReply).toHaveBeenCalled();
         expect(mockConfigService.update).toHaveBeenCalledWith("panel-1", {
           title: "新タイトル",
           description: "新説明",
@@ -271,7 +278,13 @@ describe("bot/features/reaction-role/handlers/ui/reactionRoleEditPanelHandler", 
       });
 
       it("updatePanelMessageがfalseを返す場合はpanel_message_not_foundエラーを返しDBを削除する", async () => {
-        reactionRoleEditPanelSessions.set("session-1", { panelId: "panel-1" });
+        const mockCommandInteraction = {
+          deleteReply: vi.fn().mockResolvedValue(undefined),
+        };
+        reactionRoleEditPanelSessions.set("session-1", {
+          panelId: "panel-1",
+          commandInteraction: mockCommandInteraction as never,
+        });
         mockConfigService.findById.mockResolvedValue({
           id: "panel-1",
           channelId: "ch-1",
@@ -297,6 +310,7 @@ describe("bot/features/reaction-role/handlers/ui/reactionRoleEditPanelHandler", 
         await reactionRoleEditPanelModalHandler.execute(interaction as never);
 
         expect(mockConfigService.delete).toHaveBeenCalledWith("panel-1");
+        expect(mockCommandInteraction.deleteReply).toHaveBeenCalled();
         expect(interaction.editReply).toHaveBeenCalledWith(
           expect.objectContaining({
             embeds: expect.any(Array),

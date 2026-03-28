@@ -380,6 +380,7 @@ export const reactionRoleEditButtonRoleSelectHandler: RoleSelectHandler = {
       // パネルメッセージが削除済み → DB クリーンアップ
       await configService.delete(session.panelId);
       await interaction.deleteReply().catch(() => null);
+      await session.commandInteraction?.deleteReply().catch(() => null);
       const embed = createErrorEmbed(
         tInteraction(
           interaction.locale,
@@ -409,6 +410,8 @@ export const reactionRoleEditButtonRoleSelectHandler: RoleSelectHandler = {
 
     // フローメッセージを削除
     await interaction.deleteReply().catch(() => null);
+    // セレクトメニューメッセージを削除
+    await session.commandInteraction?.deleteReply().catch(() => null);
 
     const embed = createSuccessEmbed(
       tInteraction(
