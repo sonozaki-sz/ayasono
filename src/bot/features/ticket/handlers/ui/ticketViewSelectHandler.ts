@@ -22,10 +22,19 @@ import { buildConfigEmbed } from "../../commands/usecases/ticketConfigView";
  * ticket-config view のカテゴリ選択メニューを処理するハンドラ
  */
 export const ticketViewSelectHandler: StringSelectHandler = {
+  /**
+   * カスタムIDがビュー選択プレフィックスに一致するか判定する
+   * @param customId カスタムID
+   * @returns 一致する場合 true
+   */
   matches(customId: string) {
     return customId.startsWith(TICKET_CUSTOM_ID.VIEW_SELECT_PREFIX);
   },
 
+  /**
+   * カテゴリ選択メニューの操作を処理する
+   * @param interaction セレクトメニューインタラクション
+   */
   async execute(interaction: StringSelectMenuInteraction) {
     const guildId = interaction.guildId;
     const guild = interaction.guild;
@@ -55,6 +64,7 @@ export const ticketViewSelectHandler: StringSelectHandler = {
 
     const components: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [];
 
+    // 複数カテゴリがある場合はページネーションとセレクトメニューを表示
     if (configs.length > 1) {
       components.push(
         buildPaginationRow(

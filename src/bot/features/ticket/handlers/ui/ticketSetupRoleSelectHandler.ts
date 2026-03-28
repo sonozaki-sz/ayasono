@@ -20,10 +20,19 @@ import { ticketSetupSessions } from "./ticketSetupState";
  * setup フローのロール選択メニューを処理するハンドラ
  */
 export const ticketSetupRoleSelectHandler: RoleSelectHandler = {
+  /**
+   * カスタムIDがセットアップロール選択プレフィックスに一致するか判定する
+   * @param customId カスタムID
+   * @returns 一致する場合 true
+   */
   matches(customId: string) {
     return customId.startsWith(TICKET_CUSTOM_ID.SETUP_ROLES_PREFIX);
   },
 
+  /**
+   * セットアップフローのロール選択を処理する
+   * @param interaction ロール選択メニューインタラクション
+   */
   async execute(interaction: RoleSelectMenuInteraction) {
     const sessionId = interaction.customId.slice(
       TICKET_CUSTOM_ID.SETUP_ROLES_PREFIX.length,

@@ -28,12 +28,21 @@ import { buildConfigEmbed } from "../../commands/usecases/ticketConfigView";
  * ticket-config view のページネーションボタンを処理するハンドラ
  */
 export const ticketViewButtonHandler: ButtonHandler = {
+  /**
+   * カスタムIDがビューページネーションプレフィックスに一致するか判定する
+   * @param customId カスタムID
+   * @returns 一致する場合 true
+   */
   matches(customId: string) {
     return (
       parsePaginationAction(customId, TICKET_CUSTOM_ID.VIEW_PREFIX) !== null
     );
   },
 
+  /**
+   * ページネーションボタンの操作を処理する
+   * @param interaction ボタンインタラクション
+   */
   async execute(interaction: ButtonInteraction) {
     const guildId = interaction.guildId;
     const guild = interaction.guild;
@@ -56,6 +65,7 @@ export const ticketViewButtonHandler: ButtonHandler = {
 
     let newPage: number;
 
+    // ジャンプの場合はモーダルでページ番号を入力、それ以外はアクションからページを算出
     if (action === "jump") {
       const input = await showPaginationJumpModal(
         interaction,
@@ -90,6 +100,7 @@ export const ticketViewButtonHandler: ButtonHandler = {
 
     const components: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [];
 
+    // 複数ページある場合はページネーションとセレクトメニューを表示
     if (totalPages > 1) {
       components.push(
         buildPaginationRow(
@@ -131,6 +142,7 @@ export const ticketViewButtonHandler: ButtonHandler = {
       );
     }
 
+    // jump はモーダル応答後なので editReply、それ以外はボタン応答なので update
     if (action === "jump") {
       await interaction.editReply({ embeds: [embed], components });
     } else {
@@ -141,6 +153,9 @@ export const ticketViewButtonHandler: ButtonHandler = {
 
 /**
  * 現在のページを設定一覧から復元する
+ * @param interaction ボタンインタラクション
+ * @param configs チケット設定一覧
+ * @returns 現在のページインデックス（デフォルト 0）
  */
 function getCurrentPageFromConfigs(
   interaction: ButtonInteraction,

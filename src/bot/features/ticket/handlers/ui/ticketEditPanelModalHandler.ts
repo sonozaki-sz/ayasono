@@ -20,10 +20,19 @@ import { TICKET_CUSTOM_ID } from "../../commands/ticketCommand.constants";
  * パネル編集モーダルの送信を処理するハンドラ
  */
 export const ticketEditPanelModalHandler: ModalHandler = {
+  /**
+   * カスタムIDがパネル編集モーダルプレフィックスに一致するか判定する
+   * @param customId カスタムID
+   * @returns 一致する場合 true
+   */
   matches(customId: string) {
     return customId.startsWith(TICKET_CUSTOM_ID.EDIT_PANEL_MODAL_PREFIX);
   },
 
+  /**
+   * パネル編集モーダルの送信を処理する
+   * @param interaction モーダル送信インタラクション
+   */
   async execute(interaction: ModalSubmitInteraction) {
     const categoryId = interaction.customId.slice(
       TICKET_CUSTOM_ID.EDIT_PANEL_MODAL_PREFIX.length,

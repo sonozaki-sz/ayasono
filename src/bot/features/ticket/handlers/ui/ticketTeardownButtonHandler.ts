@@ -24,6 +24,11 @@ import { ticketTeardownSessions } from "./ticketTeardownState";
  * teardown フローの確認・キャンセル・全選択ボタンを処理するハンドラ
  */
 export const ticketTeardownButtonHandler: ButtonHandler = {
+  /**
+   * カスタムIDが teardown 確認またはキャンセルプレフィックスに一致するか判定する
+   * @param customId カスタムID
+   * @returns 一致する場合 true
+   */
   matches(customId: string) {
     return (
       customId.startsWith(TICKET_CUSTOM_ID.TEARDOWN_CONFIRM_PREFIX) ||
@@ -31,6 +36,10 @@ export const ticketTeardownButtonHandler: ButtonHandler = {
     );
   },
 
+  /**
+   * teardown の確認・キャンセルボタンの操作を処理する
+   * @param interaction ボタンインタラクション
+   */
   async execute(interaction: ButtonInteraction) {
     if (
       interaction.customId.startsWith(TICKET_CUSTOM_ID.TEARDOWN_CONFIRM_PREFIX)
@@ -44,6 +53,7 @@ export const ticketTeardownButtonHandler: ButtonHandler = {
 
 /**
  * teardown 確認処理
+ * @param interaction ボタンインタラクション
  */
 async function handleConfirm(interaction: ButtonInteraction): Promise<void> {
   const sessionId = interaction.customId.slice(
@@ -120,6 +130,7 @@ async function handleConfirm(interaction: ButtonInteraction): Promise<void> {
 
 /**
  * teardown キャンセル処理
+ * @param interaction ボタンインタラクション
  */
 async function handleCancel(interaction: ButtonInteraction): Promise<void> {
   const sessionId = interaction.customId.slice(

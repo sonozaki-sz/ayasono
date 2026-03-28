@@ -37,6 +37,8 @@ import {
 
 /**
  * メンバーのロールID一覧を取得する
+ * @param interaction ボタンインタラクション
+ * @returns ロールIDの配列
  */
 function getMemberRoleIds(interaction: ButtonInteraction): string[] {
   return Array.from(
@@ -50,6 +52,11 @@ function getMemberRoleIds(interaction: ButtonInteraction): string[] {
  * チケット操作ボタン（close/open/delete/confirm/cancel）を処理するハンドラ
  */
 export const ticketButtonHandler: ButtonHandler = {
+  /**
+   * カスタムIDがチケット操作ボタンのプレフィックスに一致するか判定する
+   * @param customId カスタムID
+   * @returns 一致する場合 true
+   */
   matches(customId: string) {
     return (
       customId.startsWith(TICKET_CUSTOM_ID.CLOSE_PREFIX) ||
@@ -60,7 +67,12 @@ export const ticketButtonHandler: ButtonHandler = {
     );
   },
 
+  /**
+   * チケット操作ボタンのインタラクションを処理する
+   * @param interaction ボタンインタラクション
+   */
   async execute(interaction: ButtonInteraction) {
+    // カスタムIDのプレフィックスに応じて処理を振り分け
     if (interaction.customId.startsWith(TICKET_CUSTOM_ID.CLOSE_PREFIX)) {
       await handleClose(interaction);
     } else if (interaction.customId.startsWith(TICKET_CUSTOM_ID.OPEN_PREFIX)) {
@@ -83,6 +95,7 @@ export const ticketButtonHandler: ButtonHandler = {
 
 /**
  * チケットクローズ処理
+ * @param interaction ボタンインタラクション
  */
 async function handleClose(interaction: ButtonInteraction): Promise<void> {
   const ticketId = interaction.customId.slice(
@@ -107,6 +120,7 @@ async function handleClose(interaction: ButtonInteraction): Promise<void> {
     return;
   }
 
+  // 既にクローズ済みの場合はエラー通知
   if (ticket.status !== TICKET_STATUS.OPEN) {
     const embed = createErrorEmbed(
       tInteraction(
@@ -122,6 +136,7 @@ async function handleClose(interaction: ButtonInteraction): Promise<void> {
     return;
   }
 
+  // スタッフロールと操作権限を確認
   const config = await configService.findByGuildAndCategory(
     ticket.guildId,
     ticket.categoryId,
@@ -175,6 +190,7 @@ async function handleClose(interaction: ButtonInteraction): Promise<void> {
 
 /**
  * チケット再オープン処理
+ * @param interaction ボタンインタラクション
  */
 async function handleOpen(interaction: ButtonInteraction): Promise<void> {
   const ticketId = interaction.customId.slice(
@@ -199,6 +215,7 @@ async function handleOpen(interaction: ButtonInteraction): Promise<void> {
     return;
   }
 
+  // 既にオープン済みの場合はエラー通知
   if (ticket.status !== TICKET_STATUS.CLOSED) {
     const embed = createErrorEmbed(
       tInteraction(
@@ -214,6 +231,7 @@ async function handleOpen(interaction: ButtonInteraction): Promise<void> {
     return;
   }
 
+  // スタッフロールと操作権限を確認
   const config = await configService.findByGuildAndCategory(
     ticket.guildId,
     ticket.categoryId,
@@ -267,6 +285,7 @@ async function handleOpen(interaction: ButtonInteraction): Promise<void> {
 
 /**
  * チケット削除確認ダイアログ表示処理
+ * @param interaction ボタンインタラクション
  */
 async function handleDelete(interaction: ButtonInteraction): Promise<void> {
   const ticketId = interaction.customId.slice(
@@ -291,6 +310,7 @@ async function handleDelete(interaction: ButtonInteraction): Promise<void> {
     return;
   }
 
+  // スタッフロール権限を確認（削除はスタッフのみ可能）
   const config = await configService.findByGuildAndCategory(
     ticket.guildId,
     ticket.categoryId,
@@ -348,6 +368,7 @@ async function handleDelete(interaction: ButtonInteraction): Promise<void> {
 
 /**
  * チケット削除確認処理
+ * @param interaction ボタンインタラクション
  */
 async function handleDeleteConfirm(
   interaction: ButtonInteraction,
@@ -374,6 +395,7 @@ async function handleDeleteConfirm(
     return;
   }
 
+  // スタッフロール権限を確認（削除はスタッフのみ可能）
   const config = await configService.findByGuildAndCategory(
     ticket.guildId,
     ticket.categoryId,
@@ -422,6 +444,7 @@ async function handleDeleteConfirm(
 
 /**
  * チケット削除キャンセル処理
+ * @param interaction ボタンインタラクション
  */
 async function handleDeleteCancel(
   interaction: ButtonInteraction,

@@ -33,6 +33,14 @@ import {
 
 /**
  * チケットチャンネルを作成する
+ * @param guild 対象ギルド
+ * @param categoryId カテゴリID
+ * @param userId チケット作成者のユーザーID
+ * @param subject チケットの件名
+ * @param detail チケットの詳細
+ * @param configService チケット設定サービス
+ * @param ticketRepository チケットリポジトリ
+ * @returns 作成されたチケットとチャンネル
  */
 export async function createTicketChannel(
   guild: Guild,
@@ -168,6 +176,10 @@ export async function createTicketChannel(
 
 /**
  * チケットをクローズする
+ * @param ticket 対象チケット
+ * @param guild 対象ギルド
+ * @param configService チケット設定サービス
+ * @param ticketRepository チケットリポジトリ
  */
 export async function closeTicket(
   ticket: Ticket,
@@ -250,6 +262,10 @@ export async function closeTicket(
 
 /**
  * チケットを再オープンする
+ * @param ticket 対象チケット
+ * @param guild 対象ギルド
+ * @param configService チケット設定サービス
+ * @param ticketRepository チケットリポジトリ
  */
 export async function reopenTicket(
   ticket: Ticket,
@@ -327,6 +343,9 @@ export async function reopenTicket(
 
 /**
  * チケットを削除する
+ * @param ticket 対象チケット
+ * @param guild 対象ギルド
+ * @param ticketRepository チケットリポジトリ
  */
 export async function deleteTicket(
   ticket: Ticket,
@@ -351,6 +370,11 @@ export async function deleteTicket(
 /**
  * ユーザーがチケットの操作権限を持っているか確認する
  * （チケット作成者 or スタッフロール）
+ * @param ticket 対象チケット
+ * @param userId 操作ユーザーのID
+ * @param memberRoleIds ユーザーが持つロールIDの配列
+ * @param staffRoleIds スタッフロールIDの配列
+ * @returns 操作権限を持っている場合 true
  */
 export function hasTicketPermission(
   ticket: Ticket,
@@ -364,6 +388,9 @@ export function hasTicketPermission(
 
 /**
  * ユーザーがスタッフロールを持っているか確認する
+ * @param memberRoleIds ユーザーが持つロールIDの配列
+ * @param staffRoleIds スタッフロールIDの配列
+ * @returns スタッフロールを持っている場合 true
  */
 export function hasStaffRole(
   memberRoleIds: string[],
@@ -375,6 +402,8 @@ export function hasStaffRole(
 /**
  * 前回の再オープン通知（ボタンなし embed）を検索して削除する
  * クローズ時に呼ばれる。初期メッセージ（ボタン付き）には触れない
+ * @param channel 対象テキストチャンネル
+ * @param guild 対象ギルド
  */
 async function deleteReopenNotification(
   channel: TextChannel,
@@ -404,6 +433,8 @@ async function deleteReopenNotification(
 /**
  * 前回のクローズ通知（再オープンボタン付き）を検索して削除する
  * 再オープン時に呼ばれる。初期メッセージ（クローズボタン付き）には触れない
+ * @param channel 対象テキストチャンネル
+ * @param guild 対象ギルド
  */
 async function deleteCloseNotification(
   channel: TextChannel,
