@@ -97,6 +97,11 @@ export const reactionRoleSetupButtonModalHandler: ModalHandler = {
       return;
     }
 
+    // 前回のエフェメラルメッセージを削除（「もう1つ追加」ループ時）
+    if (session.previousReplyInteraction) {
+      await session.previousReplyInteraction.deleteReply().catch(() => null);
+    }
+
     // 一時的にボタン情報を保存（ロール選択後に確定）
     session.pendingButton = { label, emoji, style };
 
@@ -120,5 +125,8 @@ export const reactionRoleSetupButtonModalHandler: ModalHandler = {
       components: [row],
       flags: MessageFlags.Ephemeral,
     });
+
+    // 次のループで削除できるようインタラクションを保存
+    session.previousReplyInteraction = interaction;
   },
 };

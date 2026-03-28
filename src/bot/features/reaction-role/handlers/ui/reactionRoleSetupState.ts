@@ -1,6 +1,7 @@
 // src/bot/features/reaction-role/handlers/ui/reactionRoleSetupState.ts
 // setup フローのセッション状態管理
 
+import type { ModalSubmitInteraction } from "discord.js";
 import type { ReactionRoleButton } from "../../../../../shared/database/types/reactionRoleTypes";
 import { TtlMap } from "../../../../../shared/utils/ttlMap";
 import { REACTION_ROLE_SESSION_TTL_MS } from "../../commands/reactionRoleCommand.constants";
@@ -27,6 +28,8 @@ export interface ReactionRoleSetupSession {
   buttonCounter: number;
   /** 現在追加中のボタン情報（モーダル→ロール選択の間） */
   pendingButton?: PendingButtonInfo;
+  /** 前回のモーダル送信インタラクション（エフェメラルメッセージ削除用） */
+  previousReplyInteraction?: ModalSubmitInteraction;
 }
 
 export const reactionRoleSetupSessions: TtlMap<ReactionRoleSetupSession> =
@@ -38,6 +41,8 @@ export interface ReactionRoleAddButtonSession {
   buttons: ReactionRoleButton[];
   buttonCounter: number;
   pendingButton?: PendingButtonInfo;
+  /** 前回のモーダル送信インタラクション（エフェメラルメッセージ削除用） */
+  previousReplyInteraction?: ModalSubmitInteraction;
 }
 
 export const reactionRoleAddButtonSessions: TtlMap<ReactionRoleAddButtonSession> =
