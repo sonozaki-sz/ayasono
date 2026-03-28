@@ -2,6 +2,7 @@
 // AFK設定リポジトリ（guild_afk_configs テーブル）
 
 import type { PrismaClient } from "@prisma/client";
+import { createRepositoryGetter } from "../../utils/serviceFactory";
 import type { AfkConfig, IAfkConfigRepository } from "../types";
 
 /**
@@ -43,3 +44,13 @@ export class AfkConfigRepository implements IAfkConfigRepository {
     });
   }
 }
+
+/**
+ * AFK設定リポジトリのシングルトンを取得する
+ */
+export const getAfkConfigRepository: (
+  prisma?: PrismaClient,
+) => IAfkConfigRepository = createRepositoryGetter<IAfkConfigRepository>(
+  "AfkConfigRepository",
+  (prisma) => new AfkConfigRepository(prisma),
+);

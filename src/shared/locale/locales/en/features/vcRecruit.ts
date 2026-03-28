@@ -39,7 +39,6 @@ export const vcRecruit = {
   "ui.button.delete_post": "🗑️ Delete post",
   "ui.button.vc_ended": "🔇 Recruitment Ended",
   "ui.button.end_confirm": "End",
-  "ui.button.cancel": "Cancel",
   "ui.button.delete_confirm": "Delete",
   "ui.modal.rename_title": "Rename VC",
   "ui.modal.rename_vc_name_label": "VC Name",
@@ -59,7 +58,6 @@ export const vcRecruit = {
   "ui.button.remove_role_cancel": "Cancel",
 
   // ── Embed ─────────────────────────────────────
-  "embed.title.success": "Settings Updated",
   "embed.title.config_view": "VC Recruit Settings",
   "embed.field.name.setups": "Configured categories",
   "embed.field.name.roles": "Mention candidate roles",

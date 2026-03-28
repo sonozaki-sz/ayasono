@@ -3,6 +3,7 @@
 
 import type { PrismaClient } from "@prisma/client";
 import { parseJsonArray } from "../../utils/jsonUtils";
+import { createRepositoryGetter } from "../../utils/serviceFactory";
 import type {
   IVcRecruitConfigRepository,
   VcRecruitConfig,
@@ -50,3 +51,14 @@ export class VcRecruitConfigRepository implements IVcRecruitConfigRepository {
     });
   }
 }
+
+/**
+ * VC募集設定リポジトリのシングルトンを取得する
+ */
+export const getVcRecruitConfigRepository: (
+  prisma?: PrismaClient,
+) => IVcRecruitConfigRepository =
+  createRepositoryGetter<IVcRecruitConfigRepository>(
+    "VcRecruitConfigRepository",
+    (prisma) => new VcRecruitConfigRepository(prisma),
+  );

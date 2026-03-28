@@ -1,13 +1,10 @@
 // src/bot/features/guild-config/commands/guildConfigCommand.execute.ts
 // guild-config コマンドのサブコマンドルーティング
 
-import {
-  type ChatInputCommandInteraction,
-  PermissionFlagsBits,
-} from "discord.js";
+import { type ChatInputCommandInteraction } from "discord.js";
 import { ValidationError } from "../../../../shared/errors/customErrors";
-import { tInteraction } from "../../../../shared/locale/localeManager";
 import { COMMON_I18N_KEYS } from "../../../shared/i18nKeys";
+import { ensureManageGuildPermission } from "../../../shared/permissionGuards";
 import { handleExport } from "./guildConfigCommand.export";
 import { handleImport } from "./guildConfigCommand.import";
 import { handleReset } from "./guildConfigCommand.reset";
@@ -39,11 +36,7 @@ export async function executeGuildConfigCommand(
   }
 
   // 実行時にも管理権限を確認
-  if (!interaction.memberPermissions?.has(PermissionFlagsBits.ManageGuild)) {
-    throw new ValidationError(
-      tInteraction(interaction.locale, COMMON_I18N_KEYS.MANAGE_GUILD_REQUIRED),
-    );
-  }
+  ensureManageGuildPermission(interaction);
 
   const subcommand = interaction.options.getSubcommand();
 

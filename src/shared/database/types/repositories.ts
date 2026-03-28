@@ -20,7 +20,8 @@ import type { StickyMessage } from "./stickyMessageTypes";
 import type { GuildTicketConfig, Ticket } from "./ticketTypes";
 import type { VcRecruitConfig } from "./vcRecruitTypes";
 
-export interface IBaseGuildRepository {
+/** ギルド設定のコアCRUD・locale操作 */
+export interface IGuildCoreRepository {
   getConfig(guildId: string): Promise<GuildConfig | null>;
   saveConfig(config: GuildConfig): Promise<void>;
   updateConfig(guildId: string, updates: Partial<GuildConfig>): Promise<void>;
@@ -30,10 +31,19 @@ export interface IBaseGuildRepository {
   updateLocale(guildId: string, locale: string): Promise<void>;
   updateErrorChannel(guildId: string, channelId: string): Promise<void>;
   resetGuildSettings(guildId: string): Promise<void>;
+}
+
+/** 全機能設定の一括取得・インポート・削除（エクスポート/reset-all 用） */
+export interface IGuildConfigAggregateRepository {
   getFullConfig(guildId: string): Promise<FullGuildConfig | null>;
   importFullConfig(guildId: string, data: FullGuildConfig): Promise<void>;
   deleteAllConfigs(guildId: string): Promise<void>;
 }
+
+/** コア + 一括操作の統合インターフェース */
+export interface IBaseGuildRepository
+  extends IGuildCoreRepository,
+    IGuildConfigAggregateRepository {}
 
 /** エクスポート/インポート用の全設定統合型 */
 export interface FullGuildConfig {
@@ -173,22 +183,3 @@ export interface ITicketRepository {
   deleteByCategory(guildId: string, categoryId: string): Promise<number>;
   deleteAllByGuild(guildId: string): Promise<number>;
 }
-
-/**
- * 全機能を束ねた統合インターフェース
- */
-export interface IGuildConfigRepository
-  extends IBaseGuildRepository,
-    IAfkConfigRepository,
-    IBumpReminderConfigRepository,
-    IVacConfigRepository,
-    IMemberLogConfigRepository,
-    IVcRecruitConfigRepository {}
-
-// 後方互換のためのエイリアス（既存コードを壊さないため）
-/** @deprecated IAfkConfigRepository を使用してください */
-export type IAfkRepository = IAfkConfigRepository;
-/** @deprecated IVacConfigRepository を使用してください */
-export type IVacRepository = IVacConfigRepository;
-/** @deprecated IMemberLogConfigRepository を使用してください */
-export type IMemberLogRepository = IMemberLogConfigRepository;

@@ -83,7 +83,7 @@ export async function handleVacConfigCreateTrigger(
       channel: `<#${triggerChannel.id}>`,
     }),
     {
-      title: tInteraction(interaction.locale, "vac:embed.title.success"),
+      title: tInteraction(interaction.locale, "common:embed.title.success"),
     },
   );
   // 管理系操作の結果は Ephemeral で返してチャンネルノイズを抑える

@@ -7,6 +7,7 @@ import {
   type ModalSubmitInteraction,
   StringSelectMenuBuilder,
 } from "discord.js";
+import { REACTION_ROLE_MODE } from "../../../../../shared/database/types/reactionRoleTypes";
 import { tInteraction } from "../../../../../shared/locale/localeManager";
 import type { ModalHandler } from "../../../../handlers/interactionCreate/ui/types";
 import { createErrorEmbed } from "../../../../utils/messageResponse";
@@ -96,7 +97,7 @@ export const reactionRoleSetupModalHandler: ModalHandler = {
             interaction.locale,
             "reactionRole:ui.select.mode_toggle_description",
           ),
-          value: "toggle",
+          value: REACTION_ROLE_MODE.TOGGLE,
         },
         {
           label: tInteraction(
@@ -107,7 +108,7 @@ export const reactionRoleSetupModalHandler: ModalHandler = {
             interaction.locale,
             "reactionRole:ui.select.mode_one_action_description",
           ),
-          value: "one-action",
+          value: REACTION_ROLE_MODE.ONE_ACTION,
         },
         {
           label: tInteraction(
@@ -118,7 +119,7 @@ export const reactionRoleSetupModalHandler: ModalHandler = {
             interaction.locale,
             "reactionRole:ui.select.mode_exclusive_description",
           ),
-          value: "exclusive",
+          value: REACTION_ROLE_MODE.EXCLUSIVE,
         },
       );
 

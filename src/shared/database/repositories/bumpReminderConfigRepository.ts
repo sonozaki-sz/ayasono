@@ -3,6 +3,7 @@
 
 import type { PrismaClient } from "@prisma/client";
 import { parseJsonArray } from "../../utils/jsonUtils";
+import { createRepositoryGetter } from "../../utils/serviceFactory";
 import {
   BUMP_REMINDER_MENTION_CLEAR_RESULT,
   BUMP_REMINDER_MENTION_ROLE_RESULT,
@@ -90,8 +91,10 @@ export class BumpReminderConfigRepository
     guildId: string,
     roleId: string | undefined,
   ): Promise<BumpReminderMentionRoleResult> {
+    // 存在確認のみなので最小フィールドで問い合わせ
     const record = await this.prisma.guildBumpReminderConfig.findUnique({
       where: { guildId },
+      select: { guildId: true },
     });
     if (!record) return BUMP_REMINDER_MENTION_ROLE_RESULT.NOT_CONFIGURED;
 
@@ -108,6 +111,7 @@ export class BumpReminderConfigRepository
   ): Promise<BumpReminderMentionUserAddResult> {
     const record = await this.prisma.guildBumpReminderConfig.findUnique({
       where: { guildId },
+      select: { mentionUserIds: true },
     });
     if (!record) return BUMP_REMINDER_MENTION_USER_ADD_RESULT.NOT_CONFIGURED;
 
@@ -131,6 +135,7 @@ export class BumpReminderConfigRepository
   ): Promise<BumpReminderMentionUserRemoveResult> {
     const record = await this.prisma.guildBumpReminderConfig.findUnique({
       where: { guildId },
+      select: { mentionUserIds: true },
     });
     if (!record) {
       return BUMP_REMINDER_MENTION_USER_REMOVE_RESULT.NOT_CONFIGURED;
@@ -157,6 +162,7 @@ export class BumpReminderConfigRepository
   ): Promise<BumpReminderMentionUsersClearResult> {
     const record = await this.prisma.guildBumpReminderConfig.findUnique({
       where: { guildId },
+      select: { mentionUserIds: true },
     });
     if (!record) {
       return BUMP_REMINDER_MENTION_USERS_CLEAR_RESULT.NOT_CONFIGURED;
@@ -179,6 +185,7 @@ export class BumpReminderConfigRepository
   ): Promise<BumpReminderMentionClearResult> {
     const record = await this.prisma.guildBumpReminderConfig.findUnique({
       where: { guildId },
+      select: { mentionRoleId: true, mentionUserIds: true },
     });
     if (!record) {
       return BUMP_REMINDER_MENTION_CLEAR_RESULT.NOT_CONFIGURED;
@@ -196,3 +203,14 @@ export class BumpReminderConfigRepository
     return BUMP_REMINDER_MENTION_CLEAR_RESULT.CLEARED;
   }
 }
+
+/**
+ * Bumpリマインダー設定リポジトリのシングルトンを取得する
+ */
+export const getBumpReminderConfigRepository: (
+  prisma?: PrismaClient,
+) => IBumpReminderConfigRepository =
+  createRepositoryGetter<IBumpReminderConfigRepository>(
+    "BumpReminderConfigRepository",
+    (prisma) => new BumpReminderConfigRepository(prisma),
+  );

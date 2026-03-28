@@ -86,7 +86,7 @@ export const bumpPanelButtonHandler: ButtonHandler = {
       // 成功系レスポンスで使う共通タイトル
       const successTitle = tInteraction(
         interaction.locale,
-        "bumpReminder:embed.title.success",
+        "common:embed.title.success",
       );
 
       if (isOnButton) {

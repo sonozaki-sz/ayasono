@@ -53,8 +53,8 @@ vi.mock("@/bot/utils/messageResponse", () => ({
   }),
 }));
 
-vi.mock("@/shared/database/guildConfigRepositoryProvider", () => ({
-  getGuildConfigRepository: () => ({}),
+vi.mock("@/shared/database/repositories/guildCoreRepository", () => ({
+  getGuildCoreRepository: () => ({}),
 }));
 
 import { buildPage } from "@/bot/features/guild-config/commands/guildConfigCommand.viewPages";
@@ -102,7 +102,7 @@ describe("bot/features/guild-config/commands/guildConfigCommand.viewPages", () =
       expect(embed.fields).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
-            value: "guildConfig:embed.field.value.not_configured",
+            value: "common:embed.field.value.not_configured",
           }),
         ]),
       );

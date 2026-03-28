@@ -17,6 +17,10 @@ export const guildConfig = {
   "guild-config.import.description": "Import guild settings from JSON file",
   "guild-config.import.file.description": "Exported JSON file",
 
+  // ── Choice names ──────────────────────────────
+  "choice.locale.ja": "Japanese",
+  "choice.locale.en": "English",
+
   // ── User responses ───────────────────────────
   "user-response.set_locale_success":
     'Server language has been set to "{{locale}}".',
@@ -44,7 +48,6 @@ export const guildConfig = {
   "embed.title.view": "Guild Settings",
   "embed.field.name.locale": "Language",
   "embed.field.name.error_channel": "Error Notification Channel",
-  "embed.field.value.not_configured": "Not configured",
 
   // ── embed: reset_confirm ──────────────────────
   "embed.title.reset_confirm": "Guild Settings Reset",
@@ -73,8 +76,6 @@ export const guildConfig = {
   "ui.select.sticky": "Sticky Message",
   "ui.select.member_log": "Member Log",
   "ui.select.bump": "Bump Reminder",
-  "ui.button.reset_confirm": "Reset",
-  "ui.button.reset_cancel": "Cancel",
   "ui.button.reset_all_confirm": "Reset",
   "ui.button.reset_all_cancel": "Cancel",
   "ui.button.import_confirm": "Import",

@@ -6,7 +6,10 @@ import {
   PermissionFlagsBits,
   SlashCommandBuilder,
 } from "discord.js";
-import { getCommandLocalizations } from "../../shared/locale/commandLocalizations";
+import {
+  getChoiceLocalizations,
+  getCommandLocalizations,
+} from "../../shared/locale/commandLocalizations";
 import { handleCommandError } from "../errors/interactionErrorHandler";
 import { STICKY_MESSAGE_COMMAND } from "../features/sticky-message/commands/stickyMessageCommand.constants";
 import { executeStickyMessageCommand } from "../features/sticky-message/commands/stickyMessageCommand.execute";
@@ -58,6 +61,18 @@ export const stickyMessageCommand: Command = {
       "sticky-message.view.description",
     );
 
+    // チョイス名のローカライゼーション
+    const styleChoiceText = getChoiceLocalizations(
+      "stickyMessage",
+      "choice.style.text",
+      STICKY_MESSAGE_COMMAND.OPTION_VALUE.TEXT,
+    );
+    const styleChoiceEmbed = getChoiceLocalizations(
+      "stickyMessage",
+      "choice.style.embed",
+      STICKY_MESSAGE_COMMAND.OPTION_VALUE.EMBED,
+    );
+
     return (
       new SlashCommandBuilder()
         .setName(STICKY_MESSAGE_COMMAND.NAME)
@@ -82,16 +97,7 @@ export const stickyMessageCommand: Command = {
                 .setName(STICKY_MESSAGE_COMMAND.OPTION.STYLE)
                 .setDescription(setStyleDesc.ja)
                 .setDescriptionLocalizations(setStyleDesc.localizations)
-                .addChoices(
-                  {
-                    name: "text",
-                    value: STICKY_MESSAGE_COMMAND.OPTION_VALUE.TEXT,
-                  },
-                  {
-                    name: "embed",
-                    value: STICKY_MESSAGE_COMMAND.OPTION_VALUE.EMBED,
-                  },
-                )
+                .addChoices(styleChoiceText, styleChoiceEmbed)
                 .setRequired(false),
             ),
         )
@@ -127,16 +133,7 @@ export const stickyMessageCommand: Command = {
                 .setName(STICKY_MESSAGE_COMMAND.OPTION.STYLE)
                 .setDescription(updateStyleDesc.ja)
                 .setDescriptionLocalizations(updateStyleDesc.localizations)
-                .addChoices(
-                  {
-                    name: "text",
-                    value: STICKY_MESSAGE_COMMAND.OPTION_VALUE.TEXT,
-                  },
-                  {
-                    name: "embed",
-                    value: STICKY_MESSAGE_COMMAND.OPTION_VALUE.EMBED,
-                  },
-                )
+                .addChoices(styleChoiceText, styleChoiceEmbed)
                 .setRequired(false),
             ),
         )

@@ -40,9 +40,6 @@ export const bumpReminder = {
   "user-response.panel_update_failed":
     "Failed to update the notification list.",
 
-  // ── embed: success ─────────────────────────────
-  "embed.title.success": "Settings Updated",
-
   // ── embed: not_configured ──────────────────────
   "embed.description.not_configured": "Bump reminder is not configured.",
 
@@ -66,15 +63,12 @@ export const bumpReminder = {
   "embed.title.panel": "Bump Reminder",
 
   // ── embed fields ───────────────────────────────
-  "embed.field.name.status": "Status",
   "embed.field.name.mention_role": "Mention Role",
   "embed.field.name.mention_users": "Mention Users",
 
   // ── UI labels ──────────────────────────────────
   "ui.button.mention_on": "Turn Notification ON",
   "ui.button.mention_off": "Turn Notification OFF",
-  "ui.button.reset_confirm": "Reset",
-  "ui.button.reset_cancel": "Cancel",
   "ui.button.select_all": "Select All",
   "ui.button.submit_delete": "Delete",
 

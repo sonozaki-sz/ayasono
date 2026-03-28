@@ -11,7 +11,10 @@ import {
   StringSelectMenuBuilder,
   type TextChannel,
 } from "discord.js";
-import type { GuildReactionRolePanel } from "../../../../../shared/database/types/reactionRoleTypes";
+import {
+  type GuildReactionRolePanel,
+  REACTION_ROLE_MODE,
+} from "../../../../../shared/database/types/reactionRoleTypes";
 import { tInteraction } from "../../../../../shared/locale/localeManager";
 import { getBotReactionRolePanelConfigService } from "../../../../services/botCompositionRoot";
 import { disableComponentsAfterTimeout } from "../../../../shared/disableComponentsAfterTimeout";
@@ -152,9 +155,9 @@ export function buildViewEmbed(
   const buttons = parseButtons(panel.buttons);
 
   const modeDisplayKey =
-    panel.mode === "one-action"
+    panel.mode === REACTION_ROLE_MODE.ONE_ACTION
       ? "reactionRole:embed.field.value.mode_one_action"
-      : panel.mode === "exclusive"
+      : panel.mode === REACTION_ROLE_MODE.EXCLUSIVE
         ? "reactionRole:embed.field.value.mode_exclusive"
         : "reactionRole:embed.field.value.mode_toggle";
 

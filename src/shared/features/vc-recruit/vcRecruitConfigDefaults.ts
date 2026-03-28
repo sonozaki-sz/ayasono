@@ -13,6 +13,9 @@ export const DEFAULT_VC_RECRUIT_CONFIG: VcRecruitConfig = {
 /** セットアップのデフォルトスレッドアーカイブ時間（24h） */
 export const DEFAULT_THREAD_ARCHIVE_DURATION = 1440 as const;
 
+/** メンションロール登録の上限数（Discord セレクトメニューの上限に準拠） */
+export const MAX_MENTION_ROLES = 25;
+
 /**
  * VC募集設定の初期値を生成する
  */

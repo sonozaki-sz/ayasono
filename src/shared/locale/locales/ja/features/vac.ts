@@ -42,9 +42,6 @@ export const vac = {
   "user-response.afk_move_failed":
     "AFK チャンネルへの移動に失敗しました。対象ユーザーがVCから退出した可能性があります。",
 
-  // ── embed: success ─────────────────────────────
-  "embed.title.success": "設定完了",
-
   // ── embed: remove_error ────────────────────────
   "embed.title.remove_error": "削除エラー",
 
@@ -53,7 +50,6 @@ export const vac = {
   "embed.field.name.trigger_channels": "トリガーチャンネル",
   "embed.field.name.created_vcs": "作成されたVC数",
   "embed.field.name.created_vc_details": "作成されたVC",
-  "embed.field.value.not_configured": "未設定",
   "embed.field.value.no_created_vcs": "なし",
   "embed.field.value.top": "TOP",
 
@@ -88,6 +84,7 @@ export const vac = {
     "VCチャンネル削除 GuildId: {{guildId}} ChannelId: {{channelId}}",
   "log.category_full":
     "カテゴリがチャンネル上限に達しました。 GuildId: {{guildId}} CategoryId: {{categoryId}}",
+  "log.category_full_action": "カテゴリのチャンネル上限到達でVC作成不可",
   "log.trigger_removed_by_delete":
     "削除されたトリガーチャンネルを設定から除外 GuildId: {{guildId}} ChannelId: {{channelId}}",
   "log.channel_delete_sync_failed": "channelDelete同期処理失敗",

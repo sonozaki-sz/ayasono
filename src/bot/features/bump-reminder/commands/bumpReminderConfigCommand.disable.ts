@@ -40,7 +40,7 @@ export async function handleBumpReminderConfigDisable(
   );
   const successTitle = tInteraction(
     interaction.locale,
-    "bumpReminder:embed.title.success",
+    "common:embed.title.success",
   );
   const embed = createSuccessEmbed(description, { title: successTitle });
   await interaction.reply({

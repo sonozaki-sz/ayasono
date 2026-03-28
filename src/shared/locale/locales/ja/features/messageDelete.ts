@@ -23,7 +23,6 @@ export const messageDelete = {
   // ── UIラベル ──────────────────────────────────
   "ui.button.scan_cancel": "収集分を確認",
   "ui.button.delete": "削除する（{{count}}件）",
-  "ui.button.cancel": "キャンセル",
   "ui.select.exclude_placeholder": "このページから除外するメッセージを選択",
   "ui.select.exclude_no_messages": "(メッセージなし)",
   "ui.button.deletion_confirm": "削除する（{{count}}件）",

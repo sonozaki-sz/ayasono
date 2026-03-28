@@ -11,7 +11,7 @@ import {
   PermissionsBitField,
 } from "discord.js";
 import type { Mock } from "vitest";
-import { ValidationError } from "@/shared/errors/customErrors";
+import { PermissionError, ValidationError } from "@/shared/errors/customErrors";
 
 // Logger のモック
 vi.mock("@/shared/utils/logger", () => ({
@@ -208,7 +208,7 @@ describe("AFK Commands Integration", () => {
       expect(mockSetAfkChannel).not.toHaveBeenCalled();
     });
 
-    it("ManageGuild 権限がない場合は ValidationError になること", async () => {
+    it("ManageGuild 権限がない場合は PermissionError になること", async () => {
       const handler = await loadConfigHandler();
 
       const { interaction } = createInteraction({
@@ -219,7 +219,7 @@ describe("AFK Commands Integration", () => {
       );
 
       await expect(handler(interaction as never)).rejects.toThrow(
-        ValidationError,
+        PermissionError,
       );
     });
   });

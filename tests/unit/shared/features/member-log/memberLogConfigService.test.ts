@@ -12,16 +12,19 @@ describe("shared/features/member-log/memberLogConfigService", () => {
     vi.resetModules();
     vi.clearAllMocks();
 
-    const getGuildConfigRepositoryMock = vi.fn();
-    vi.doMock("@/shared/database/guildConfigRepositoryProvider", () => ({
-      getGuildConfigRepository: getGuildConfigRepositoryMock,
-    }));
+    const getMemberLogConfigRepositoryMock = vi.fn();
+    vi.doMock(
+      "@/shared/database/repositories/memberLogConfigRepository",
+      () => ({
+        getMemberLogConfigRepository: getMemberLogConfigRepositoryMock,
+      }),
+    );
 
     const module = await import(
       "@/shared/features/member-log/memberLogConfigService"
     );
 
-    return { module, getGuildConfigRepositoryMock };
+    return { module, getMemberLogConfigRepositoryMock };
   };
 
   // getMemberLogConfig がリポジトリの値をそのまま返すことを確認
@@ -218,9 +221,9 @@ describe("shared/features/member-log/memberLogConfigService", () => {
   // getMemberLogConfigService のシングルトン動作を検証
   describe("getMemberLogConfigService", () => {
     it("同じ repository で呼び出すと同一のシングルトンを返すこと", async () => {
-      const { module, getGuildConfigRepositoryMock } = await loadModule();
+      const { module, getMemberLogConfigRepositoryMock } = await loadModule();
       const repository = createRepositoryMock();
-      getGuildConfigRepositoryMock.mockReturnValue(repository);
+      getMemberLogConfigRepositoryMock.mockReturnValue(repository);
 
       const first = module.getMemberLogConfigService();
       const second = module.getMemberLogConfigService();
@@ -240,16 +243,16 @@ describe("shared/features/member-log/memberLogConfigService", () => {
     });
 
     it("repository が指定されない場合は getGuildConfigRepository をデフォルトとして使用すること", async () => {
-      const { module, getGuildConfigRepositoryMock } = await loadModule();
+      const { module, getMemberLogConfigRepositoryMock } = await loadModule();
       const repository = createRepositoryMock();
-      getGuildConfigRepositoryMock.mockReturnValue(repository);
+      getMemberLogConfigRepositoryMock.mockReturnValue(repository);
 
       const service = module.getMemberLogConfigService();
       repository.getMemberLogConfig.mockResolvedValueOnce(null);
       await service.getMemberLogConfig("guild-1");
 
       expect(repository.getMemberLogConfig).toHaveBeenCalledWith("guild-1");
-      expect(getGuildConfigRepositoryMock).toHaveBeenCalled();
+      expect(getMemberLogConfigRepositoryMock).toHaveBeenCalled();
     });
   });
 });

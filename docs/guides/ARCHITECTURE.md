@@ -78,7 +78,7 @@ src/
 │   ├── database/
 │   │   ├── types/             # ドメイン型・リポジトリインターフェース定義
 │   │   ├── repositories/      # リポジトリ実装・シリアライザ
-│   │   └── guildConfigRepositoryProvider.ts  # リポジトリ singleton キャッシュ
+│   │   └── (各リポジトリにシングルトンゲッターを内包)
 │   ├── errors/                # カスタムエラークラス・グローバルハンドラ
 │   ├── features/<feature>/    # ギルド設定サービス（ConfigService + Defaults）
 │   ├── locale/                # i18n（i18next）
@@ -245,18 +245,18 @@ JSON 配列フィールド（`mentionUserIds`, `triggerChannelIds` 等）は SQL
 
 **設定リポジトリ（`src/shared/database/repositories/`）**:
 
-機能ごとの設定テーブルに対応するリポジトリです。初期5機能は `PrismaGuildConfigRepository` に合成されており、`getGuildConfigRepository(prisma)` で取得します。
+機能ごとの設定テーブルに対応するスタンドアロンリポジトリです。各リポジトリは個別のインターフェースを実装し、シングルトンゲッター（例: `getAfkConfigRepository(prisma)`）で取得します。
 
 ```
-PrismaGuildConfigRepository   ← 複合リポジトリ（IGuildConfigRepository を実装）
-  ├─ AfkConfigRepository
-  ├─ BumpReminderConfigRepository
-  ├─ MemberLogConfigRepository
-  ├─ VacConfigRepository
-  └─ VcRecruitConfigRepository
-
-TicketConfigRepository         ← チケット機能設定
-ReactionRolePanelRepository    ← リアクションロールパネル
+GuildCoreRepository              ← ギルド設定コアCRUD（IGuildCoreRepository）
+GuildConfigAggregateRepository   ← 全設定一括操作（IGuildConfigAggregateRepository）
+AfkConfigRepository              ← AFK設定（IAfkConfigRepository）
+BumpReminderConfigRepository     ← Bumpリマインダー設定（IBumpReminderConfigRepository）
+MemberLogConfigRepository        ← メンバーログ設定（IMemberLogConfigRepository）
+VacConfigRepository              ← VAC設定（IVacConfigRepository）
+VcRecruitConfigRepository        ← VC募集設定（IVcRecruitConfigRepository）
+TicketConfigRepository           ← チケット機能設定（IGuildTicketConfigRepository）
+ReactionRolePanelRepository      ← リアクションロールパネル（IReactionRolePanelRepository）
 ```
 
 **ランタイムデータリポジトリ（`src/bot/features/<feature>/repositories/`）**:

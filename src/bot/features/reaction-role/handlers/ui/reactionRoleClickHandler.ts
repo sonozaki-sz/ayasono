@@ -6,6 +6,7 @@ import {
   type GuildMember,
   MessageFlags,
 } from "discord.js";
+import { REACTION_ROLE_MODE } from "../../../../../shared/database/types/reactionRoleTypes";
 import {
   logPrefixed,
   tInteraction,
@@ -97,13 +98,13 @@ export const reactionRoleClickHandler: ButtonHandler = {
     const roleMentions = roleIds.map((id) => `<@&${id}>`).join(", ");
 
     switch (panel.mode) {
-      case "toggle":
+      case REACTION_ROLE_MODE.TOGGLE:
         await handleToggle(interaction, member, roleIds, roleMentions);
         break;
-      case "one-action":
+      case REACTION_ROLE_MODE.ONE_ACTION:
         await handleOneAction(interaction, member, roleIds, roleMentions);
         break;
-      case "exclusive":
+      case REACTION_ROLE_MODE.EXCLUSIVE:
         await handleExclusive(
           interaction,
           member,

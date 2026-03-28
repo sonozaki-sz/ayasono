@@ -54,5 +54,6 @@ export async function handleInteractionCreate(
 
   if (interaction.isStringSelectMenu()) {
     await handleStringSelectMenu(interaction);
+    return;
   }
 }

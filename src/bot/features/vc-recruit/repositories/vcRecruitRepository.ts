@@ -40,10 +40,6 @@ export interface IVcRecruitRepository {
   ): Promise<VcRecruitConfig>;
   findSetupByCreatedVcId(
     guildId: string,
-    postChannelId: string,
-  ): Promise<VcRecruitSetup | null>;
-  findSetupByCreatedVcId(
-    guildId: string,
     voiceChannelId: string,
   ): Promise<VcRecruitSetup | null>;
   addCreatedVoiceChannelId(

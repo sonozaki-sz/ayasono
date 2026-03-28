@@ -1,9 +1,8 @@
 // src/shared/features/vac/vacConfigService.ts
 // VAC設定のサービス実装（Repositoryパターン準拠）
 
-import { getGuildConfigRepository } from "../../database/guildConfigRepositoryProvider";
+import { getVacConfigRepository } from "../../database/repositories/vacConfigRepository";
 import {
-  type IGuildConfigRepository,
   type IVacConfigRepository,
   type VacChannelPair,
   type VacConfig,
@@ -268,8 +267,8 @@ export function createVacConfigService(
  * VAC設定サービスのシングルトンを取得する
  */
 export const getVacConfigService: (
-  repository?: IGuildConfigRepository,
+  repository?: IVacConfigRepository,
 ) => VacConfigService = createServiceGetter(
   createVacConfigService,
-  getGuildConfigRepository,
+  getVacConfigRepository,
 );

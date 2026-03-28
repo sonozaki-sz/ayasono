@@ -1,8 +1,10 @@
 // src/bot/features/vc-recruit/commands/vcRecruitConfigCommand.constants.ts
 // VC募集設定コマンド定数
 
+import { EMBED_COLORS } from "../../../../shared/constants/embedColors";
+
 /** VC募集パネル・投稿 Embed のブランドカラー（#24B9B8） */
-export const VC_RECRUIT_PANEL_COLOR = 0x24b9b8;
+export const VC_RECRUIT_PANEL_COLOR: number = EMBED_COLORS.VC_RECRUIT_PANEL;
 
 /**
  * VC招募設定コマンドで使用するコマンド名・サブコマンド名・オプション名を一元管理する

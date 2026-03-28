@@ -25,14 +25,9 @@ export const afk = {
   "user-response.clear_channel_success":
     "AFK channel setting has been cleared.",
 
-  // ── embed: success ──────────────────────────
-  "embed.title.success": "Settings Updated",
-
   // ── embed: config_view ──────────────────────
   "embed.title.config_view": "AFK",
-  "embed.field.name.status": "Status",
   "embed.field.name.channel": "AFK Channel",
-  "embed.field.value.not_configured": "Not configured",
 
   // ── Logs ─────────────────────────────────────
   "log.moved":

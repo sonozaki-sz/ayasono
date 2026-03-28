@@ -64,7 +64,7 @@ async function buildGuildConfigPage(
   const config = await getBotGuildConfigService().getConfig(guildId);
   const notConfigured = tInteraction(
     locale,
-    "guildConfig:embed.field.value.not_configured",
+    "common:embed.field.value.not_configured",
   );
 
   const localeLabel = config?.locale === "en" ? "English (en)" : "日本語 (ja)";
@@ -108,13 +108,13 @@ async function buildAfkPage(
   );
   const channelValue = afkConfig?.channelId
     ? `<#${afkConfig.channelId}>`
-    : tInteraction(locale, "afk:embed.field.value.not_configured");
+    : tInteraction(locale, "common:embed.field.value.not_configured");
 
   return createInfoEmbed("", {
     title: tInteraction(locale, "afk:embed.title.config_view"),
     fields: [
       {
-        name: tInteraction(locale, "afk:embed.field.name.status"),
+        name: tInteraction(locale, "common:embed.field.name.status"),
         value: statusValue,
         inline: true,
       },
@@ -232,7 +232,7 @@ async function buildMemberLogPage(
     title: tInteraction(locale, "memberLog:embed.title.config_view"),
     fields: [
       {
-        name: tInteraction(locale, "memberLog:embed.field.name.status"),
+        name: tInteraction(locale, "common:embed.field.name.status"),
         value: tInteraction(
           locale,
           config.enabled ? "common:enabled" : "common:disabled",
@@ -282,7 +282,7 @@ async function buildBumpPage(
     title: tInteraction(locale, "bumpReminder:embed.title.config_view"),
     fields: [
       {
-        name: tInteraction(locale, "bumpReminder:embed.field.name.status"),
+        name: tInteraction(locale, "common:embed.field.name.status"),
         value: tInteraction(
           locale,
           config.enabled ? "common:enabled" : "common:disabled",

@@ -21,6 +21,10 @@ export const stickyMessage = {
   "sticky-message.update.style.description":
     "表示スタイル（text: テキスト / embed: Embed、省略時: text）",
 
+  // ── チョイス名 ──────────────────────────────
+  "choice.style.text": "テキスト",
+  "choice.style.embed": "Embed",
+
   // ── ユーザーレスポンス ────────────────────────
   "user-response.set_success": "スティッキーメッセージを設定しました。",
   "user-response.already_exists":

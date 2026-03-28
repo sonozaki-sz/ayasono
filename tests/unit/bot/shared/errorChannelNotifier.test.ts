@@ -26,6 +26,7 @@ vi.mock("@/bot/services/botCompositionRoot", () => ({
 
 vi.mock("@/shared/locale/localeManager", () => ({
   tGuild: (guildId: string, key: string) => tGuildMock(guildId, key),
+  logPrefixed: (...args: unknown[]) => args.join(":"),
 }));
 
 vi.mock("@/shared/utils/logger", () => ({
@@ -199,7 +200,7 @@ describe("bot/shared/errorChannelNotifier", () => {
       });
 
       expect(loggerDebugMock).toHaveBeenCalledWith(
-        expect.stringContaining("Failed to send error notification"),
+        expect.stringContaining("send_error_failed"),
       );
     });
 
@@ -314,7 +315,7 @@ describe("bot/shared/errorChannelNotifier", () => {
       });
 
       expect(loggerDebugMock).toHaveBeenCalledWith(
-        expect.stringContaining("Failed to send warn notification"),
+        expect.stringContaining("send_warn_failed"),
       );
     });
   });

@@ -96,6 +96,16 @@ export const common = {
 
   // 共通キャンセル
   cancelled: "キャンセルしました。",
+
+  // 機能横断 Embed タイトル・フィールド
+  "embed.title.success": "設定完了",
+  "embed.field.name.status": "状態",
+  "embed.field.value.not_configured": "未設定",
+
+  // 機能横断 UI ボタンラベル
+  "ui.button.cancel": "キャンセル",
+  "ui.button.reset_confirm": "リセットする",
+  "ui.button.reset_cancel": "キャンセル",
 } as const;
 
 export type CommonTranslations = typeof common;

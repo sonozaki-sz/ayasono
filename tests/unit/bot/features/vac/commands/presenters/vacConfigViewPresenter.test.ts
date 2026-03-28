@@ -26,7 +26,7 @@ vi.mock("@/shared/locale/localeManager", () => ({
   tInteraction: vi.fn((_locale: string, key: string) => {
     const labels: Record<string, string> = {
       "vac:embed.field.value.top": "TOP",
-      "vac:embed.field.value.not_configured": "未設定",
+      "common:embed.field.value.not_configured": "未設定",
       "vac:embed.field.value.no_created_vcs": "作成済みVCなし",
       "vac:embed.title.config_view": "VAC設定",
       "vac:embed.field.name.trigger_channels": "トリガー",

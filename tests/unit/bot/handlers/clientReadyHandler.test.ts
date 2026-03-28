@@ -40,9 +40,11 @@ vi.mock("@/shared/locale/localeManager", () => ({
   tInteraction: (...args: unknown[]) => args[1],
 }));
 
+const loggerErrorMock = vi.fn();
 vi.mock("@/shared/utils/logger", () => ({
   logger: {
     info: (...args: unknown[]) => loggerInfoMock(...args),
+    error: (...args: unknown[]) => loggerErrorMock(...args),
   },
 }));
 
@@ -115,7 +117,7 @@ describe("bot/handlers/clientReadyHandler", () => {
     expect(cleanupVacOnStartupMock).toHaveBeenCalledWith(client);
   });
 
-  it("先行スタートアップタスクが失敗した場合に後続タスクは実行されず例外が伝播することを確認", async () => {
+  it("先行スタートア���プタスクが失敗した場合にエラーがログされ例外は伝播しないことを確認", async () => {
     restoreBumpRemindersOnStartupMock.mockRejectedValueOnce(
       new Error("restore failed"),
     );
@@ -131,9 +133,9 @@ describe("bot/handlers/clientReadyHandler", () => {
       commands: { size: 1 },
     };
 
-    await expect(handleClientReady(client as never)).rejects.toThrow(
-      "restore failed",
-    );
+    // try-catch で捕捉されるため例外は伝播しない
+    await handleClientReady(client as never);
+    expect(loggerErrorMock).toHaveBeenCalledTimes(1);
     expect(cleanupVacOnStartupMock).not.toHaveBeenCalled();
   });
 });

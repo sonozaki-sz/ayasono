@@ -162,7 +162,7 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
       expect(addMentionUserMock).toHaveBeenCalledWith("guild-1", "user-1");
       expect(createSuccessEmbed).toHaveBeenCalledWith(
         "bumpReminder:user-response.panel_mention_toggled_on",
-        { title: "bumpReminder:embed.title.success" },
+        { title: "common:embed.title.success" },
       );
       expect(safeReplyMock).toHaveBeenCalledWith(interaction, {
         embeds: [
@@ -183,7 +183,7 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
       expect(removeMentionUserMock).not.toHaveBeenCalled();
       expect(createSuccessEmbed).toHaveBeenCalledWith(
         "bumpReminder:user-response.panel_mention_toggled_on",
-        { title: "bumpReminder:embed.title.success" },
+        { title: "common:embed.title.success" },
       );
     });
 
@@ -212,7 +212,7 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
       expect(removeMentionUserMock).toHaveBeenCalledWith("guild-1", "user-1");
       expect(createSuccessEmbed).toHaveBeenCalledWith(
         "bumpReminder:user-response.panel_mention_toggled_off",
-        { title: "bumpReminder:embed.title.success" },
+        { title: "common:embed.title.success" },
       );
       expect(safeReplyMock).toHaveBeenCalledWith(interaction, {
         embeds: [
@@ -235,7 +235,7 @@ describe("bot/features/bump-reminder/ui/bumpPanelButtonHandler", () => {
       expect(addMentionUserMock).not.toHaveBeenCalled();
       expect(createSuccessEmbed).toHaveBeenCalledWith(
         "bumpReminder:user-response.panel_mention_toggled_off",
-        { title: "bumpReminder:embed.title.success" },
+        { title: "common:embed.title.success" },
       );
     });
 

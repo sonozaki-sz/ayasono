@@ -11,9 +11,6 @@ import { buildStickyMessagePayload } from "./stickyMessagePayloadBuilder";
 /** チャンネルごとの再送信タイマー管理 */
 const resendTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
-/** 最後に再送信した時刻（チャンネルID → epoch ms）*/
-const lastResendAt = new Map<string, number>();
-
 /** レート制限: 5秒 */
 const RESEND_DELAY_MS = 5_000;
 
@@ -86,7 +83,6 @@ export class StickyMessageResendService {
     try {
       const sent = await channel.send(payload);
       await this.repository.updateLastMessageId(sticky.id, sent.id);
-      lastResendAt.set(channel.id, Date.now());
     } catch (err) {
       logger.error(
         logPrefixed(
@@ -144,7 +140,6 @@ export class StickyMessageResendService {
       clearTimeout(timer);
       resendTimers.delete(channelId);
     }
-    lastResendAt.delete(channelId);
   }
 }
 

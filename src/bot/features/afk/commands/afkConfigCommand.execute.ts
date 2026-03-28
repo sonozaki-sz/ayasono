@@ -5,7 +5,6 @@ import {
   ChannelType,
   type ChatInputCommandInteraction,
   MessageFlags,
-  PermissionFlagsBits,
 } from "discord.js";
 import { ValidationError } from "../../../../shared/errors/customErrors";
 import { createDefaultAfkConfig } from "../../../../shared/features/afk/afkConfigDefaults";
@@ -20,6 +19,7 @@ import {
 } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
 import { COMMON_I18N_KEYS } from "../../../shared/i18nKeys";
+import { ensureManageGuildPermission } from "../../../shared/permissionGuards";
 import {
   createInfoEmbed,
   createSuccessEmbed,
@@ -42,11 +42,8 @@ export async function executeAfkConfigCommand(
     throw ValidationError.fromKey(COMMON_I18N_KEYS.GUILD_ONLY);
   }
 
-  if (!interaction.memberPermissions?.has(PermissionFlagsBits.ManageGuild)) {
-    throw new ValidationError(
-      tInteraction(interaction.locale, COMMON_I18N_KEYS.MANAGE_GUILD_REQUIRED),
-    );
-  }
+  // ManageGuild 権限を検証する
+  ensureManageGuildPermission(interaction);
 
   const subcommand = interaction.options.getSubcommand();
 
@@ -99,7 +96,7 @@ async function handleSetChannel(
 
   const successTitle = tInteraction(
     interaction.locale,
-    "afk:embed.title.success",
+    "common:embed.title.success",
   );
   const embed = createSuccessEmbed(description, { title: successTitle });
 
@@ -134,7 +131,7 @@ async function handleClearChannel(
   );
   const successTitle = tInteraction(
     interaction.locale,
-    "afk:embed.title.success",
+    "common:embed.title.success",
   );
   const embed = createSuccessEmbed(description, { title: successTitle });
 
@@ -172,13 +169,13 @@ async function handleViewSetting(
   );
   const channelValue = config?.channelId
     ? `<#${config.channelId}>`
-    : tInteraction(locale, "afk:embed.field.value.not_configured");
+    : tInteraction(locale, "common:embed.field.value.not_configured");
 
   const embed = createInfoEmbed("", {
     title,
     fields: [
       {
-        name: tInteraction(locale, "afk:embed.field.name.status"),
+        name: tInteraction(locale, "common:embed.field.name.status"),
         value: statusValue,
         inline: true,
       },

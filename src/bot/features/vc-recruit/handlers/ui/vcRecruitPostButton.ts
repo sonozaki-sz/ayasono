@@ -368,7 +368,7 @@ async function handleEndVc(interaction: ButtonInteraction): Promise<void> {
   );
   const cancelLabel = tInteraction(
     interaction.locale,
-    "vcRecruit:ui.button.cancel",
+    "common:ui.button.cancel",
   );
 
   // 元メッセージIDを確認ボタンに埋め込む
@@ -454,7 +454,7 @@ async function handleDeletePost(interaction: ButtonInteraction): Promise<void> {
   );
   const cancelLabel = tInteraction(
     interaction.locale,
-    "vcRecruit:ui.button.cancel",
+    "common:ui.button.cancel",
   );
 
   // 元メッセージIDを確認ボタンに埋め込む

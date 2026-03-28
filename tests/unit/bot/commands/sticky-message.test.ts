@@ -8,6 +8,13 @@ vi.mock("@/shared/locale/commandLocalizations", () => ({
     ja: "desc",
     localizations: { "en-US": "desc" },
   }),
+  getChoiceLocalizations: vi
+    .fn()
+    .mockImplementation((_ns: string, _key: string, value: string) => ({
+      name: "test",
+      name_localizations: { "en-US": "test", "en-GB": "test" },
+      value,
+    })),
 }));
 
 vi.mock(

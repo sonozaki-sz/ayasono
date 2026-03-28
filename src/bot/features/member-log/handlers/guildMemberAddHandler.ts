@@ -2,6 +2,7 @@
 // guildMemberAdd イベントのメンバーログ処理
 
 import { ChannelType, EmbedBuilder, type GuildMember } from "discord.js";
+import { EMBED_COLORS } from "../../../../shared/constants/embedColors";
 import { getGuildTranslator } from "../../../../shared/locale/helpers";
 import { logPrefixed } from "../../../../shared/locale/localeManager";
 import { logger } from "../../../../shared/utils/logger";
@@ -13,9 +14,6 @@ import {
 import { calcDuration } from "./accountAge";
 import { findUsedInvite } from "./inviteTracker";
 import { formatAccountAge, formatCustomMessage } from "./memberLogUtils";
-
-// 参加通知 Embed の色（ビリジアン）
-const JOIN_EMBED_COLOR = 0x008969;
 
 /**
  * guildMemberAdd 時にメンバーログ通知を送信する
@@ -99,7 +97,7 @@ export async function handleGuildMemberAdd(member: GuildMember): Promise<void> {
 
     // 参加通知 Embed を生成
     const embed = new EmbedBuilder()
-      .setColor(JOIN_EMBED_COLOR)
+      .setColor(EMBED_COLORS.MEMBER_LOG_JOIN)
       .setTitle(t("memberLog:embed.title.join"))
       .setThumbnail(avatarUrl)
       .addFields(

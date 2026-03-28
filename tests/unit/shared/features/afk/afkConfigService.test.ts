@@ -12,16 +12,16 @@ describe("shared/features/afk/afkConfigService", () => {
     vi.resetModules();
     vi.clearAllMocks();
 
-    const getGuildConfigRepositoryMock = vi.fn();
-    vi.doMock("@/shared/database/guildConfigRepositoryProvider", () => ({
-      getGuildConfigRepository: getGuildConfigRepositoryMock,
+    const getAfkConfigRepositoryMock = vi.fn();
+    vi.doMock("@/shared/database/repositories/afkConfigRepository", () => ({
+      getAfkConfigRepository: getAfkConfigRepositoryMock,
     }));
 
     const module = await import("@/shared/features/afk/afkConfigService");
 
     return {
       module,
-      getGuildConfigRepositoryMock,
+      getAfkConfigRepositoryMock,
     };
   };
 
@@ -109,9 +109,9 @@ describe("shared/features/afk/afkConfigService", () => {
   });
 
   it("トップレベル関数 API がリポジトリファクトリ経由のシングルトンサービスに委譲すること", async () => {
-    const { module, getGuildConfigRepositoryMock } = await loadModule();
+    const { module, getAfkConfigRepositoryMock } = await loadModule();
     const repository = createRepositoryMock();
-    getGuildConfigRepositoryMock.mockReturnValue(repository);
+    getAfkConfigRepositoryMock.mockReturnValue(repository);
 
     repository.getAfkConfig.mockResolvedValue({
       enabled: true,

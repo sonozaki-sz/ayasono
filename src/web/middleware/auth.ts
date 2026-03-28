@@ -1,6 +1,7 @@
 // src/web/middleware/auth.ts
 // Web API ベアラートークン認証プラグイン
 
+import crypto from "node:crypto";
 import type { FastifyPluginAsync, FastifyReply, FastifyRequest } from "fastify";
 import { env } from "../../shared/config/env";
 import { logPrefixed, tDefault } from "../../shared/locale/localeManager";
@@ -47,9 +48,14 @@ export const apiAuthPlugin: FastifyPluginAsync = async (fastify) => {
       // Bearer プレフィックスを除去した実トークン値
       const token = authHeader.slice(7).trim();
 
-      // APIキーと一致するか確認（単純なAPIキー認証）
+      // APIキーと一致するか確認（タイミングセーフな比較でタイミング攻撃を防止）
       // 本格的なJWT検証が必要な場合はここを差し替える
-      if (token !== env.JWT_SECRET) {
+      const tokenBuf = Buffer.from(token);
+      const secretBuf = Buffer.from(env.JWT_SECRET);
+      const isInvalid =
+        tokenBuf.length !== secretBuf.length ||
+        !crypto.timingSafeEqual(tokenBuf, secretBuf);
+      if (isInvalid) {
         logger.warn(
           logPrefixed(
             "system:log_prefix.web",

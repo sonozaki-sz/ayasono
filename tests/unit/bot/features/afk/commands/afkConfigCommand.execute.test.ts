@@ -1,8 +1,8 @@
 // tests/unit/bot/features/afk/commands/afkConfigCommand.execute.test.ts
 
-import { ChannelType, PermissionFlagsBits } from "discord.js";
+import { ChannelType } from "discord.js";
 import { executeAfkConfigCommand } from "@/bot/features/afk/commands/afkConfigCommand.execute";
-import { ValidationError } from "@/shared/errors/customErrors";
+import { PermissionError } from "@/shared/errors/customErrors";
 
 const setAfkChannelMock = vi.fn();
 const getAfkConfigMock = vi.fn();
@@ -111,10 +111,7 @@ describe("bot/features/afk/commands/afkConfigCommand.execute", () => {
 
     await expect(
       executeAfkConfigCommand(interaction as never),
-    ).rejects.toBeInstanceOf(ValidationError);
-    expect(interaction.memberPermissions.has).toHaveBeenCalledWith(
-      PermissionFlagsBits.ManageGuild,
-    );
+    ).rejects.toBeInstanceOf(PermissionError);
   });
 
   it("set-channel サブコマンドで AFK チャンネルを設定し成功返信する", async () => {

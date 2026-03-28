@@ -2,7 +2,7 @@
 
 > タスク管理・進捗状況・残件リスト
 
-最終更新: 2026年3月28日
+最終更新: 2026年3月29日
 
 ---
 
@@ -10,9 +10,9 @@
 
 | 対象 | ファイル数 | 行数 |
 | --- | ---: | ---: |
-| src | 360 | 41,605 |
-| tests | 285 | 64,120 |
-| **合計** | **645** | **105,725** |
+| src | 362 | 41,624 |
+| tests | 284 | 63,953 |
+| **合計** | **646** | **105,577** |
 
 ---
 
@@ -56,6 +56,7 @@
 - ✅ 11. Bot権限不足エラーハンドリング統一（全機能の MissingPermissions を共通フォーマットで応答 + 仕様書更新 + テスト）
 - ✅ 12. チケット機能（パネルUI・チケット作成/クローズ/再オープン/削除・自動削除 + テスト）
 - ✅ 13. リアクションロール機能（パネルUI・ロール付与/解除・パネル自動クリーンアップ + テスト）
+- ✅ 14. コードベース改善（choice name ローカライズ・翻訳キー冗長性修正・リポジトリファクトリ統一・権限チェック統一・DBクエリ最適化）
 
 ---
 
@@ -63,22 +64,39 @@
 
 | セクション | タスク | 残件 |
 | --- | --- | ---: |
-| 1. コードベースリファクタ | リファクタ・最適化 | 5 |
+| 1. コードベース改善 | リファクタ・最適化 | 0 |
 | 2. Web UI | 設計・実装 | 7 |
-| **合計** | | **12** |
+| **合計** | | **7** |
 
-> ※ リファクタ完了後に Web UI に着手予定
+> ※ コードベース改善完了 → 次は Web UI に着手予定
 
 ---
 
-### 1. コードベースリファクタ（残: 6件）
+### 1. コードベース改善（完了）
 
-- [ ] 複合リポジトリ（PrismaGuildConfigRepository）をスタンドアロンに統一
-- [ ] 翻訳名前空間を「メッセージの性質」基準にリファクタ
-- [ ] 未使用コード・デッドコードの削除
-- [ ] コード全体の最適化・重複排除
-- [ ] DBクエリ最適化・メモリ使用量プロファイリング
-
+- [x] Embed カラーコードを共通定数に集約（`src/shared/constants/embedColors.ts` 新設）
+- [x] ロガー設定のハードコード値を定数化（`LOG_MAX_SIZE`, `LOG_RETENTION`, `ERROR_LOG_RETENTION`）
+- [x] vc-recruit メンションロール上限 25 を名前付き定数に（`MAX_MENTION_ROLES`）
+- [x] VAC `CATEGORY_CHANNEL_LIMIT` 重複定義を統一（constants 参照に一本化）
+- [x] vc-panel モーダル入力制限を共通定数に統一（`VC_USER_LIMIT` in `src/shared/constants/discord.ts`）
+- [x] `lastResendAt` Map 削除（デッドコード）
+- [x] `vcRecruitRepository.ts` インターフェース重複宣言を除去
+- [x] `clientReadyHandler.ts` に try-catch を追加
+- [x] `errorChannelNotifier.ts` のハードコード英語ログを i18n 化
+- [x] `handleVacCreate.ts` のエラー通知で英語・日本語混在を修正
+- [x] web `auth.ts` のトークン比較をタイミングセーフに変更（`crypto.timingSafeEqual`）
+- [x] web `health.ts` の空 catch にログ出力追加
+- [x] `handleInteractionCreate.ts` の最終分岐に return を追加
+- [x] reaction-role モード文字列を `REACTION_ROLE_MODE` 定数に統一
+- [x] `discordWebhookTransport.ts` の unsafe キャスト修正（`String()` ラップ）
+- [x] `guildConfigService.ts` のシリアライズ境界キャストにコメント追加
+- [x] guild-config / sticky-message の choice name ローカライズ（`name_localizations` 対応）
+- [x] 翻訳キー冗長性修正（6キーを `common.ts` に集約、`i18nKeys.ts` に共通定数追加）
+- [x] リポジトリシングルトンパターンを `createRepositoryGetter` ファクトリに統一（8ファイル）
+- [x] インライン権限チェックを共有ガード `ensureManageGuildPermission` に統一（afk/guild-config）
+- [x] `deleteAllConfigs` を `$transaction` + `deleteMany` に変更（原子性確保）
+- [x] `removeUsers` の N+1 クエリ解消（N回の個別削除 → 1回の一括保存）
+- [x] `bumpReminderConfigRepository` の read-before-write クエリに `select` 句追加
 
 ---
 

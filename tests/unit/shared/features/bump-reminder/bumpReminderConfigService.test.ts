@@ -23,7 +23,7 @@ describe("shared/features/bump-reminder/bumpReminderConfigService", () => {
     vi.resetModules();
     vi.clearAllMocks();
 
-    const getGuildConfigRepositoryMock = vi.fn();
+    const getBumpReminderConfigRepositoryMock = vi.fn();
     vi.doMock("@/shared/database/types", () => ({
       BUMP_REMINDER_MENTION_CLEAR_RESULT: CLEAR,
       BUMP_REMINDER_MENTION_ROLE_RESULT: ROLE,
@@ -31,9 +31,12 @@ describe("shared/features/bump-reminder/bumpReminderConfigService", () => {
       BUMP_REMINDER_MENTION_USER_REMOVE_RESULT: REMOVE,
       BUMP_REMINDER_MENTION_USERS_CLEAR_RESULT: USERS_CLEAR,
     }));
-    vi.doMock("@/shared/database/guildConfigRepositoryProvider", () => ({
-      getGuildConfigRepository: getGuildConfigRepositoryMock,
-    }));
+    vi.doMock(
+      "@/shared/database/repositories/bumpReminderConfigRepository",
+      () => ({
+        getBumpReminderConfigRepository: getBumpReminderConfigRepositoryMock,
+      }),
+    );
 
     const module = await import(
       "@/shared/features/bump-reminder/bumpReminderConfigService"
@@ -41,7 +44,7 @@ describe("shared/features/bump-reminder/bumpReminderConfigService", () => {
 
     return {
       module,
-      getGuildConfigRepositoryMock,
+      getBumpReminderConfigRepositoryMock,
     };
   };
 

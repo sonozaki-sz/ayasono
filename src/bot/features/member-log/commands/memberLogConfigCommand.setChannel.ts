@@ -56,7 +56,7 @@ export async function handleMemberLogConfigSetChannel(
   );
   const successTitle = tInteraction(
     interaction.locale,
-    "memberLog:embed.title.success",
+    "common:embed.title.success",
   );
   const embed = createSuccessEmbed(description, { title: successTitle });
   await interaction.reply({

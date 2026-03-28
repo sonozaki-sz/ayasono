@@ -61,12 +61,12 @@ export async function handleMemberLogConfigReset(
     new ButtonBuilder()
       .setCustomId(CUSTOM_ID.CONFIRM)
       .setEmoji("🗑️")
-      .setLabel(tInteraction(locale, "memberLog:ui.button.reset_confirm"))
+      .setLabel(tInteraction(locale, "common:ui.button.reset_confirm"))
       .setStyle(ButtonStyle.Danger),
     new ButtonBuilder()
       .setCustomId(CUSTOM_ID.CANCEL)
       .setEmoji("❌")
-      .setLabel(tInteraction(locale, "memberLog:ui.button.reset_cancel"))
+      .setLabel(tInteraction(locale, "common:ui.button.reset_cancel"))
       .setStyle(ButtonStyle.Secondary),
   );
 
@@ -97,7 +97,7 @@ export async function handleMemberLogConfigReset(
       const successEmbed = createSuccessEmbed(
         tInteraction(locale, "memberLog:user-response.reset_success"),
         {
-          title: tInteraction(locale, "memberLog:embed.title.success"),
+          title: tInteraction(locale, "common:embed.title.success"),
         },
       );
 
@@ -114,7 +114,7 @@ export async function handleMemberLogConfigReset(
       const cancelEmbed = createSuccessEmbed(
         tInteraction(locale, "memberLog:user-response.reset_cancelled"),
         {
-          title: tInteraction(locale, "memberLog:embed.title.success"),
+          title: tInteraction(locale, "common:embed.title.success"),
         },
       );
 
@@ -131,7 +131,7 @@ export async function handleMemberLogConfigReset(
       const cancelEmbed = createSuccessEmbed(
         tInteraction(locale, "memberLog:user-response.reset_cancelled"),
         {
-          title: tInteraction(locale, "memberLog:embed.title.success"),
+          title: tInteraction(locale, "common:embed.title.success"),
         },
       );
 

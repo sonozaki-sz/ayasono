@@ -38,14 +38,11 @@ export class DiscordWebhookTransport extends TransportStream {
     const payload = {
       embeds: [
         {
-          title: (
-            i18next.t as unknown as (
-              key: string,
-              opts: Record<string, unknown>,
-            ) => string
-          )("system:discord.error_notification_title", {
-            appName: PROJECT_NAME,
-          }),
+          title: String(
+            i18next.t("system:discord.error_notification_title", {
+              appName: PROJECT_NAME,
+            }),
+          ),
           description,
           color: DISCORD_EMBED_COLOR.ERROR,
           timestamp: new Date().toISOString(),
