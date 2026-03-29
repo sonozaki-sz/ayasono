@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ayasono - サーバー選択</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: {
+              main: '#1a1a2e',
+              card: '#25253e',
+              input: '#2a2a45',
+              sidebar: '#16162a',
+            },
+            text: {
+              primary: '#e0e0e0',
+              secondary: '#a0a0b0',
+            },
+            accent: '#5865F2',
+            success: '#57F287',
+            warning: '#FEE75C',
+            danger: '#ED4245',
+            border: '#35354e',
+          },
+          fontFamily: {
+            sans: ['"Noto Sans JP"', '"Noto Sans"', 'sans-serif'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    body {
+      background-color: #1a1a2e;
+      color: #e0e0e0;
+    }
+    .server-card {
+      transition: transform 0.2s, border-color 0.3s;
+    }
+    .server-card:hover {
+      transform: translateY(-4px);
+      border-color: #5865F2;
+    }
+    .server-icon-placeholder {
+      background: linear-gradient(135deg, var(--icon-from), var(--icon-to));
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #5865F2 0%, #EB459E 40%, #57F287 70%, #FEE75C 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .cta-gradient {
+      background: linear-gradient(135deg, #5865F2 0%, #EB459E 100%);
+    }
+    .cta-gradient:hover {
+      background: linear-gradient(135deg, #4752C4 0%, #d63d8a 100%);
+    }
+    /* トグルスイッチ */
+    .toggle-track {
+      transition: background-color 0.2s;
+    }
+    .toggle-track.active {
+      background-color: #5865F2;
+    }
+    .toggle-knob {
+      transition: transform 0.2s;
+    }
+    .toggle-track.active .toggle-knob {
+      transform: translateX(20px);
+    }
+  </style>
+</head>
+<body class="font-sans min-h-screen">
+
+  <!-- ヘッダー -->
+  <header class="fixed top-0 w-full z-50 bg-bg-main/80 backdrop-blur-md border-b border-border">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-accent to-pink-500 flex items-center justify-center font-bold text-white text-lg">A</div>
+        <span class="text-xl font-bold text-text-primary">Ayasono</span>
+      </div>
+      <!-- ユーザーメニュー -->
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full bg-accent/30 flex items-center justify-center text-sm font-medium text-accent">S</div>
+        <span class="text-sm text-text-primary hidden sm:block">User1</span>
+        <button class="text-text-secondary hover:text-text-primary text-sm ml-2 transition-colors">ログアウト</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- メインコンテンツ -->
+  <main class="pt-24 pb-16 px-6">
+    <div class="max-w-5xl mx-auto">
+
+      <!-- タイトル -->
+      <div class="mb-8">
+        <h1 class="text-2xl font-bold text-text-primary mb-2">サーバーを選択</h1>
+        <p class="text-text-secondary text-sm">管理権限を持つサーバーが表示されます</p>
+      </div>
+
+      <!-- フィルター -->
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+          <button class="toggle-track active w-11 h-6 rounded-full relative cursor-pointer" onclick="this.classList.toggle('active')">
+            <div class="toggle-knob w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 shadow"></div>
+          </button>
+          <span class="text-sm text-text-secondary">Bot 参加済みのみ表示</span>
+        </div>
+        <span class="text-sm text-text-secondary">6 サーバー</span>
+      </div>
+
+      <!-- サーバーグリッド -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+
+        <!-- サーバーカード: Bot参加済み -->
+        <div class="server-card bg-bg-card border border-border rounded-xl p-5 flex flex-col">
+          <div class="flex items-center gap-4 mb-4">
+            <div class="w-14 h-14 rounded-2xl server-icon-placeholder flex items-center justify-center text-white text-xl font-bold flex-shrink-0"
+                 style="--icon-from: #5865F2; --icon-to: #7B8AF2;">
+              G
+            </div>
+            <div class="min-w-0">
+              <h3 class="text-base font-semibold text-text-primary truncate">Gaming Community</h3>
+              <p class="text-xs text-text-secondary">152 メンバー</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-2 h-2 rounded-full bg-success"></div>
+            <span class="text-xs text-success">Bot 参加済み</span>
+          </div>
+          <a href="#" class="mt-auto block text-center bg-accent/10 hover:bg-accent/20 text-accent font-medium py-2.5 rounded-lg transition-colors text-sm">
+            管理する
+          </a>
+        </div>
+
+        <!-- サーバーカード: Bot参加済み -->
+        <div class="server-card bg-bg-card border border-border rounded-xl p-5 flex flex-col">
+          <div class="flex items-center gap-4 mb-4">
+            <div class="w-14 h-14 rounded-2xl server-icon-placeholder flex items-center justify-center text-white text-xl font-bold flex-shrink-0"
+                 style="--icon-from: #EB459E; --icon-to: #F47CB5;">
+              C
+            </div>
+            <div class="min-w-0">
+              <h3 class="text-base font-semibold text-text-primary truncate">Creative Studio</h3>
+              <p class="text-xs text-text-secondary">73 メンバー</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-2 h-2 rounded-full bg-success"></div>
+            <span class="text-xs text-success">Bot 参加済み</span>
+          </div>
+          <a href="#" class="mt-auto block text-center bg-accent/10 hover:bg-accent/20 text-accent font-medium py-2.5 rounded-lg transition-colors text-sm">
+            管理する
+          </a>
+        </div>
+
+        <!-- サーバーカード: Bot参加済み -->
+        <div class="server-card bg-bg-card border border-border rounded-xl p-5 flex flex-col">
+          <div class="flex items-center gap-4 mb-4">
+            <div class="w-14 h-14 rounded-2xl server-icon-placeholder flex items-center justify-center text-white text-xl font-bold flex-shrink-0"
+                 style="--icon-from: #57F287; --icon-to: #7BF5A3;">
+              D
+            </div>
+            <div class="min-w-0">
+              <h3 class="text-base font-semibold text-text-primary truncate">開発チーム</h3>
+              <p class="text-xs text-text-secondary">28 メンバー</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-2 h-2 rounded-full bg-success"></div>
+            <span class="text-xs text-success">Bot 参加済み</span>
+          </div>
+          <a href="#" class="mt-auto block text-center bg-accent/10 hover:bg-accent/20 text-accent font-medium py-2.5 rounded-lg transition-colors text-sm">
+            管理する
+          </a>
+        </div>
+
+        <!-- サーバーカード: Bot参加済み -->
+        <div class="server-card bg-bg-card border border-border rounded-xl p-5 flex flex-col">
+          <div class="flex items-center gap-4 mb-4">
+            <div class="w-14 h-14 rounded-2xl server-icon-placeholder flex items-center justify-center text-white text-xl font-bold flex-shrink-0"
+                 style="--icon-from: #FEE75C; --icon-to: #FEEE8A;">
+              M
+            </div>
+            <div class="min-w-0">
+              <h3 class="text-base font-semibold text-text-primary truncate">音楽好き集まれ</h3>
+              <p class="text-xs text-text-secondary">210 メンバー</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-2 h-2 rounded-full bg-success"></div>
+            <span class="text-xs text-success">Bot 参加済み</span>
+          </div>
+          <a href="#" class="mt-auto block text-center bg-accent/10 hover:bg-accent/20 text-accent font-medium py-2.5 rounded-lg transition-colors text-sm">
+            管理する
+          </a>
+        </div>
+
+        <!-- サーバーカード: Bot未参加 -->
+        <div class="server-card bg-bg-card border border-border rounded-xl p-5 flex flex-col opacity-70">
+          <div class="flex items-center gap-4 mb-4">
+            <div class="w-14 h-14 rounded-2xl bg-bg-input flex items-center justify-center text-text-secondary text-xl font-bold flex-shrink-0">
+              T
+            </div>
+            <div class="min-w-0">
+              <h3 class="text-base font-semibold text-text-primary truncate">テスト鯖</h3>
+              <p class="text-xs text-text-secondary">5 メンバー</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-2 h-2 rounded-full bg-text-secondary"></div>
+            <span class="text-xs text-text-secondary">Bot 未参加</span>
+          </div>
+          <a href="#" class="mt-auto block text-center bg-bg-input hover:bg-border text-text-secondary hover:text-text-primary font-medium py-2.5 rounded-lg transition-colors text-sm border border-border">
+            Bot を追加
+          </a>
+        </div>
+
+        <!-- サーバーカード: Bot未参加 -->
+        <div class="server-card bg-bg-card border border-border rounded-xl p-5 flex flex-col opacity-70">
+          <div class="flex items-center gap-4 mb-4">
+            <div class="w-14 h-14 rounded-2xl bg-bg-input flex items-center justify-center text-text-secondary text-xl font-bold flex-shrink-0">
+              S
+            </div>
+            <div class="min-w-0">
+              <h3 class="text-base font-semibold text-text-primary truncate">User1's Server</h3>
+              <p class="text-xs text-text-secondary">12 メンバー</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-2 h-2 rounded-full bg-text-secondary"></div>
+            <span class="text-xs text-text-secondary">Bot 未参加</span>
+          </div>
+          <a href="#" class="mt-auto block text-center bg-bg-input hover:bg-border text-text-secondary hover:text-text-primary font-medium py-2.5 rounded-lg transition-colors text-sm border border-border">
+            Bot を追加
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+</body>
+</html>
