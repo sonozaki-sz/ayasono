@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ayasono - AFK 設定</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: {
+              main: '#1a1a2e',
+              card: '#25253e',
+              input: '#2a2a45',
+              sidebar: '#16162a',
+            },
+            text: {
+              primary: '#e0e0e0',
+              secondary: '#a0a0b0',
+            },
+            accent: '#5865F2',
+            success: '#57F287',
+            warning: '#FEE75C',
+            danger: '#ED4245',
+            border: '#35354e',
+          },
+          fontFamily: {
+            sans: ['"Noto Sans JP"', '"Noto Sans"', 'sans-serif'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    body {
+      background-color: #1a1a2e;
+      color: #e0e0e0;
+    }
+    .sidebar-link {
+      transition: background-color 0.15s, color 0.15s;
+    }
+    .sidebar-link:hover {
+      background-color: #2a2a45;
+    }
+    .sidebar-link.active {
+      background-color: rgba(88, 101, 242, 0.15);
+      color: #5865F2;
+      border-left: 3px solid #5865F2;
+    }
+    /* トグルスイッチ */
+    .toggle-track {
+      width: 44px;
+      height: 24px;
+      border-radius: 12px;
+      background-color: #57F287;
+      position: relative;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .toggle-track.off {
+      background-color: #4a4a5e;
+    }
+    .toggle-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background-color: #fff;
+      position: absolute;
+      top: 2px;
+      left: 22px;
+      transition: left 0.2s;
+    }
+    .toggle-track.off .toggle-thumb {
+      left: 2px;
+    }
+    /* モバイルメニュー */
+    .mobile-overlay {
+      background: rgba(0, 0, 0, 0.5);
+    }
+  </style>
+</head>
+<body class="font-sans min-h-screen">
+
+  <!-- ヘッダー -->
+  <header class="fixed top-0 w-full z-50 bg-bg-main/80 backdrop-blur-md border-b border-border">
+    <div class="px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <!-- ハンバーガーメニュー（モバイル） -->
+        <button class="lg:hidden text-text-secondary hover:text-text-primary" aria-label="メニュー">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+        <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-accent to-pink-500 flex items-center justify-center font-bold text-white text-lg">A</div>
+        <span class="text-xl font-bold text-text-primary hidden sm:block">Ayasono</span>
+        <!-- サーバー名 -->
+        <span class="text-text-secondary mx-2 hidden sm:block">/</span>
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-accent to-blue-400 flex items-center justify-center text-white text-xs font-bold">G</div>
+          <span class="text-sm font-medium text-text-primary">Gaming Community</span>
+        </div>
+      </div>
+      <!-- ユーザーメニュー -->
+      <div class="flex items-center gap-3">
+        <a href="#" class="text-text-secondary hover:text-text-primary text-sm transition-colors hidden sm:block">サーバー選択に戻る</a>
+        <div class="w-8 h-8 rounded-full bg-accent/30 flex items-center justify-center text-sm font-medium text-accent">S</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="flex pt-16">
+
+    <!-- サイドバー -->
+    <aside class="hidden lg:block w-60 fixed top-16 bottom-0 bg-bg-sidebar border-r border-border overflow-y-auto">
+      <nav class="py-4">
+        <a href="#" class="sidebar-link flex items-center gap-3 px-5 py-2.5 text-sm text-text-secondary">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4"/></svg>
+          概要
+        </a>
+        <a href="#" class="sidebar-link flex items-center gap-3 px-5 py-2.5 text-sm text-text-secondary">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          サーバー設定
+        </a>
+        <a href="#" class="sidebar-link active flex items-center gap-3 px-5 py-2.5 text-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 11-12.728 0M12 9v4"/></svg>
+          AFK
+        </a>
+        <a href="#" class="sidebar-link flex items-center gap-3 px-5 py-2.5 text-sm text-text-secondary">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+          VAC
+        </a>
+        <a href="#" class="sidebar-link flex items-center gap-3 px-5 py-2.5 text-sm text-text-secondary">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
+          VC募集
+        </a>
+        <a href="#" class="sidebar-link flex items-center gap-3 px-5 py-2.5 text-sm text-text-secondary">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+          メッセージ固定
+        </a>
+        <a href="#" class="sidebar-link flex items-center gap-3 px-5 py-2.5 text-sm text-text-secondary">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          メンバーログ
+        </a>
+        <a href="#" class="sidebar-link flex items-center gap-3 px-5 py-2.5 text-sm text-text-secondary">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Bumpリマインダー
+        </a>
+        <a href="#" class="sidebar-link flex items-center gap-3 px-5 py-2.5 text-sm text-text-secondary">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg>
+          チケット
+        </a>
+        <a href="#" class="sidebar-link flex items-center gap-3 px-5 py-2.5 text-sm text-text-secondary">
+          <span class="relative w-4 h-4 flex-shrink-0">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 1l8 4.5v5.5c0 5.5-3.5 10-8 12-4.5-2-8-6.5-8-12V5.5L12 1z"/><circle cx="12" cy="9" r="3" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16.5c0-2.2 1.8-3.5 4-3.5s4 1.3 4 3.5"/></svg>
+            <svg class="w-2.5 h-2.5 absolute -bottom-0.5 -right-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 12l5 5 9-9" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          リアクションロール
+        </a>
+      </nav>
+    </aside>
+
+    <!-- メインコンテンツ -->
+    <main class="flex-1 lg:ml-60 p-6 lg:p-8">
+      <div class="max-w-3xl mx-auto">
+
+        <!-- ページヘッダー -->
+        <div class="mb-8">
+          <h1 class="text-2xl font-bold text-text-primary">AFK 設定</h1>
+          <p class="text-sm text-text-secondary mt-1">VCの非アクティブメンバーをAFKチャンネルに移動します</p>
+        </div>
+
+        <!-- 警告メッセージ -->
+        <div class="flex items-start gap-3 bg-warning/10 border border-warning/20 rounded-xl px-5 py-4 mb-6">
+          <svg class="w-5 h-5 text-warning flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <p class="text-sm text-warning">有効化時にAFKチャンネルが未設定の場合、機能は動作しません</p>
+        </div>
+
+        <!-- 設定カード -->
+        <div class="bg-bg-card border border-border rounded-xl p-6">
+
+          <!-- 有効/無効 -->
+          <div class="flex items-center justify-between py-4">
+            <div>
+              <h3 class="text-sm font-semibold text-text-primary">有効/無効</h3>
+              <p class="text-xs text-text-secondary mt-1">AFK機能の有効・無効を切り替えます</p>
+            </div>
+            <div class="toggle-track" onclick="this.classList.toggle('off')">
+              <div class="toggle-thumb"></div>
+            </div>
+          </div>
+
+          <hr class="border-border">
+
+          <!-- AFK チャンネル -->
+          <div class="flex items-center justify-between py-4">
+            <div>
+              <h3 class="text-sm font-semibold text-text-primary">AFK チャンネル</h3>
+              <p class="text-xs text-text-secondary mt-1">非アクティブメンバーの移動先チャンネル</p>
+            </div>
+            <select class="bg-bg-input border border-border rounded-lg px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-accent cursor-pointer min-w-[200px]">
+              <option selected>&#x1F50A; AFK部屋</option>
+              <option>&#x1F50A; 一般VC</option>
+              <option>&#x1F50A; 雑談VC</option>
+              <option>&#x1F50A; ゲームVC 1</option>
+              <option>&#x1F50A; ゲームVC 2</option>
+            </select>
+          </div>
+
+        </div>
+
+        <!-- リセット -->
+        <div class="mt-6 mb-16">
+          <button class="text-sm text-danger hover:text-danger/80 transition-colors font-medium">この機能の設定をリセット</button>
+        </div>
+
+      </div>
+
+      <!-- 未保存バー -->
+      <div class="fixed bottom-0 left-0 lg:left-60 right-0 bg-bg-card border-t border-border px-6 py-3 flex items-center justify-between z-40">
+        <span class="text-sm text-warning flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+          未保存の変更があります
+        </span>
+        <div class="flex gap-3">
+          <button class="text-text-secondary hover:text-text-primary text-sm font-medium px-4 py-2 rounded-lg transition-colors">破棄</button>
+          <button class="bg-accent hover:bg-accent/80 text-white text-sm font-medium px-6 py-2 rounded-lg transition-colors">保存</button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+</body>
+</html>

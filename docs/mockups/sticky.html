@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ayasono - メッセージ固定設定</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: {
+              main: '#1a1a2e',
+              card: '#25253e',
+              input: '#2a2a45',
+              sidebar: '#16162a',
+            },
+            text: {
+              primary: '#e0e0e0',
+              secondary: '#a0a0b0',
+            },
+            accent: '#5865F2',
+            success: '#57F287',
+            warning: '#FEE75C',
+            danger: '#ED4245',
+            border: '#35354e',
+          },
+          fontFamily: {
+            sans: ['"Noto Sans JP"', '"Noto Sans"', 'sans-serif'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    body { background-color: #1a1a2e; color: #e0e0e0; }
+    .sidebar-link { transition: background-color 0.15s, color 0.15s; }
+    .sidebar-link:hover { background-color: #2a2a45; }
+    .sidebar-link.active { background-color: rgba(88, 101, 242, 0.15); color: #5865F2; border-left: 3px solid #5865F2; }
+
+    /* Discord Embed プレビュー */
+    .embed-preview { border-radius: 4px; max-width: 520px; }
+    .embed-accent { width: 4px; border-radius: 4px 0 0 4px; }
+    .embed-body { background: #2b2d31; border-radius: 0 4px 4px 0; }
+
+    /* カラーピッカー */
+    .color-preset { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; transition: transform 0.1s; }
+    .color-preset:hover { transform: scale(1.2); }
+    .color-preset.active { outline: 2px solid white; outline-offset: 2px; }
+  </style>
+</head>
+<body class="font-sans min-h-screen">
+
+  <!-- ヘッダー -->
+  <header class="fixed top-0 w-full z-50 bg-bg-main/80 backdrop-blur-md border-b border-border">
+    <div class="px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <button class="lg:hidden text-text-secondary hover:text-text-primary" aria-label="メニュー">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-accent to-pink-500 flex items-center justify-center font-bold text-white text-lg">A</div>
+        <span class="text-xl font-bold text-text-primary hidden sm:block">Ayasono</span>
+        <span class="text-text-secondary mx-2 hidden sm:block">/</span>
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-accent to-blue-400 flex items-center justify-center text-white text-xs font-bold">G</div>
+          <span class="text-sm font-medium text-text-primary">Gaming Community</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="#" class="text-text-secondary hover:text-text-primary text-sm transition-colors hidden sm:block">サーバー選択に戻る</a>
+        <div class="w-8 h-8 rounded-full bg-accent/30 flex items-center justify-center text-sm font-medium text-accent">S</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="flex pt-16">
+
+    <!-- サイドバー -->
+    <aside class="hidden lg:block w-60 fixed top-16 bottom-0 bg-bg-sidebar border-r border-border overflow-y-auto">
+      <nav class="py-4">
+        <a href="#" class="sidebar-link flex items-center gap-3 px-5 py-2.5 text-sm text-text-secondary">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4"/></svg>
+          概要
+        </a>
+        <a href="#" class="sidebar-link flex items-center gap-3 px-5 py-2.5 text-sm text-text-secondary">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          サーバー設定
+        </a>
+        <a href="#" class="sidebar-link flex items-center gap-3 px-5 py-2.5 text-sm text-text-secondary">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 11-12.728 0M12 9v4"/></svg>
+          AFK
+        </a>
+        <a href="#" class="sidebar-link flex items-center gap-3 px-5 py-2.5 text-sm text-text-secondary">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+          VAC
+        </a>
+        <a href="#" class="sidebar-link flex items-center gap-3 px-5 py-2.5 text-sm text-text-secondary">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
+          VC募集
+        </a>
+        <a href="#" class="sidebar-link active flex items-center gap-3 px-5 py-2.5 text-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+          メッセージ固定
+        </a>
+        <a href="#" class="sidebar-link flex items-center gap-3 px-5 py-2.5 text-sm text-text-secondary">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          メンバーログ
+        </a>
+        <a href="#" class="sidebar-link flex items-center gap-3 px-5 py-2.5 text-sm text-text-secondary">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Bumpリマインダー
+        </a>
+        <a href="#" class="sidebar-link flex items-center gap-3 px-5 py-2.5 text-sm text-text-secondary">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg>
+          チケット
+        </a>
+        <a href="#" class="sidebar-link flex items-center gap-3 px-5 py-2.5 text-sm text-text-secondary">
+          <span class="relative w-4 h-4 flex-shrink-0">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 1l8 4.5v5.5c0 5.5-3.5 10-8 12-4.5-2-8-6.5-8-12V5.5L12 1z"/><circle cx="12" cy="9" r="3" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16.5c0-2.2 1.8-3.5 4-3.5s4 1.3 4 3.5"/></svg>
+            <svg class="w-2.5 h-2.5 absolute -bottom-0.5 -right-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 12l5 5 9-9" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          リアクションロール
+        </a>
+      </nav>
+    </aside>
+
+    <!-- メインコンテンツ -->
+    <main class="flex-1 lg:ml-60 p-6 lg:p-8">
+      <div class="max-w-6xl mx-auto">
+
+        <!-- ページヘッダー -->
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h1 class="text-2xl font-bold text-text-primary">メッセージ固定</h1>
+            <p class="text-sm text-text-secondary mt-1">チャンネルに固定メッセージを送信・管理します</p>
+          </div>
+          <button class="bg-accent hover:bg-accent/80 text-white font-medium px-4 py-2.5 rounded-lg transition-colors text-sm flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            メッセージを追加
+          </button>
+        </div>
+
+        <!-- ===== メッセージ一覧セクション ===== -->
+        <section class="mb-12">
+          <h2 class="text-lg font-semibold text-text-primary mb-4">メッセージ一覧</h2>
+
+          <div class="bg-bg-card border border-border rounded-xl overflow-hidden">
+            <!-- テーブルヘッダー -->
+            <div class="hidden sm:grid sm:grid-cols-12 gap-4 px-6 py-3 border-b border-border text-xs font-medium text-text-secondary uppercase tracking-wider">
+              <div class="col-span-2">チャンネル</div>
+              <div class="col-span-5">内容プレビュー</div>
+              <div class="col-span-2">最終更新者</div>
+              <div class="col-span-3 text-right">操作</div>
+            </div>
+
+            <!-- Row 1: #ルール (編集中を示す) -->
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 sm:gap-4 px-6 py-4 border-b border-border items-center bg-accent/5 border-l-2 border-l-accent">
+              <div class="col-span-2">
+                <span class="text-sm font-medium text-accent"># ルール</span>
+              </div>
+              <div class="col-span-5">
+                <p class="text-sm text-text-secondary truncate">このサーバーのルールです。必ずお読みください。...</p>
+              </div>
+              <div class="col-span-2">
+                <span class="text-sm text-text-secondary">Admin_User</span>
+              </div>
+              <div class="col-span-3 flex justify-end gap-2">
+                <button class="bg-accent/10 hover:bg-accent/20 text-accent font-medium py-1.5 px-3 rounded-lg transition-colors text-xs">編集</button>
+                <button class="bg-danger/10 hover:bg-danger/20 text-danger font-medium py-1.5 px-3 rounded-lg transition-colors text-xs">削除</button>
+              </div>
+            </div>
+
+            <!-- Row 2: #お知らせ -->
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 sm:gap-4 px-6 py-4 border-b border-border items-center">
+              <div class="col-span-2">
+                <span class="text-sm font-medium text-text-primary"># お知らせ</span>
+              </div>
+              <div class="col-span-5">
+                <p class="text-sm text-text-secondary truncate">最新のアップデート情報やイベント告知をお届けします。...</p>
+              </div>
+              <div class="col-span-2">
+                <span class="text-sm text-text-secondary">Moderator</span>
+              </div>
+              <div class="col-span-3 flex justify-end gap-2">
+                <button class="bg-accent/10 hover:bg-accent/20 text-accent font-medium py-1.5 px-3 rounded-lg transition-colors text-xs">編集</button>
+                <button class="bg-danger/10 hover:bg-danger/20 text-danger font-medium py-1.5 px-3 rounded-lg transition-colors text-xs">削除</button>
+              </div>
+            </div>
+
+            <!-- Row 3: #自己紹介 -->
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 sm:gap-4 px-6 py-4 items-center">
+              <div class="col-span-2">
+                <span class="text-sm font-medium text-text-primary"># 自己紹介</span>
+              </div>
+              <div class="col-span-5">
+                <p class="text-sm text-text-secondary truncate">自己紹介のテンプレートです。以下の形式で投稿してくだ...</p>
+              </div>
+              <div class="col-span-2">
+                <span class="text-sm text-text-secondary">Admin_User</span>
+              </div>
+              <div class="col-span-3 flex justify-end gap-2">
+                <button class="bg-accent/10 hover:bg-accent/20 text-accent font-medium py-1.5 px-3 rounded-lg transition-colors text-xs">編集</button>
+                <button class="bg-danger/10 hover:bg-danger/20 text-danger font-medium py-1.5 px-3 rounded-lg transition-colors text-xs">削除</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== メッセージ編集セクション ===== -->
+        <section>
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-lg font-semibold text-text-primary">メッセージ編集: #ルール</h2>
+          </div>
+
+          <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+
+            <!-- 左カラム: エディタ -->
+            <div class="space-y-6">
+
+              <!-- 対象チャンネル -->
+              <div class="bg-bg-card border border-border rounded-xl p-6">
+                <h3 class="text-base font-semibold text-text-primary mb-5">基本設定</h3>
+
+                <div class="mb-5">
+                  <label class="block text-sm font-medium text-text-primary mb-1.5">対象チャンネル</label>
+                  <select class="w-full bg-bg-input border border-border rounded-lg px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:border-accent">
+                    <option selected># ルール</option>
+                    <option># お知らせ</option>
+                    <option># 自己紹介</option>
+                    <option># 雑談</option>
+                    <option># ゲーム</option>
+                  </select>
+                </div>
+
+                <!-- テキスト内容 -->
+                <div>
+                  <label class="block text-sm font-medium text-text-primary mb-1.5">テキスト内容</label>
+                  <textarea rows="4" class="w-full bg-bg-input border border-border rounded-lg px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:border-accent resize-none">このサーバーのルールです。必ずお読みください。
+ルールに違反した場合、警告やBANの対象となります。</textarea>
+                </div>
+              </div>
+
+              <!-- Embed エディタ -->
+              <div class="bg-bg-card border border-border rounded-xl p-6">
+                <h3 class="text-base font-semibold text-text-primary mb-5">Embed エディタ</h3>
+
+                <!-- タイトル -->
+                <div class="mb-5">
+                  <label class="block text-sm font-medium text-text-primary mb-1.5">タイトル</label>
+                  <input type="text" value="&#x1F4DC; サーバールール" class="w-full bg-bg-input border border-border rounded-lg px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:border-accent">
+                </div>
+
+                <!-- 説明文 -->
+                <div class="mb-5">
+                  <label class="block text-sm font-medium text-text-primary mb-1.5">説明文</label>
+                  <textarea rows="5" class="w-full bg-bg-input border border-border rounded-lg px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:border-accent resize-none">1. 他のメンバーへの敬意を忘れずに
+2. スパム・荒らし行為は禁止
+3. NSFWコンテンツは専用チャンネルのみ
+4. 個人情報の公開は自己責任で
+5. 管理者の指示に従ってください</textarea>
+                </div>
+
+                <!-- カラー -->
+                <div>
+                  <label class="block text-sm font-medium text-text-primary mb-1.5">カラー</label>
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg border border-border" style="background: #5865F2;"></div>
+                    <input type="text" value="#5865F2" class="w-32 bg-bg-input border border-border rounded-lg px-3 py-2.5 text-sm text-text-primary font-mono focus:outline-none focus:border-accent">
+                    <div class="flex gap-2 ml-2">
+                      <div class="color-preset" style="background: #00A8F3;"></div>
+                      <div class="color-preset active" style="background: #5865F2;"></div>
+                      <div class="color-preset" style="background: #57F287;"></div>
+                      <div class="color-preset" style="background: #FEE75C;"></div>
+                      <div class="color-preset" style="background: #EB459E;"></div>
+                      <div class="color-preset" style="background: #ED4245;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 右カラム: プレビュー -->
+            <div>
+              <div class="bg-bg-card border border-border rounded-xl p-6 xl:sticky xl:top-24">
+                <h3 class="text-base font-semibold text-text-primary mb-5">プレビュー</h3>
+
+                <!-- Discord メッセージ風プレビュー -->
+                <div class="bg-[#313338] rounded-lg p-4">
+
+                  <!-- Bot アバター + メッセージ -->
+                  <div class="flex gap-3">
+                    <!-- Bot アバター -->
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-accent to-pink-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">A</div>
+
+                    <div class="flex-1 min-w-0">
+                      <!-- Bot 名 + タイムスタンプ -->
+                      <div class="flex items-center gap-2 mb-1">
+                        <span class="text-sm font-medium text-white">Ayasono</span>
+                        <span class="text-xs bg-accent/30 text-accent px-1 py-0.5 rounded text-[10px] font-medium">BOT</span>
+                        <span class="text-[11px] text-[#949ba4]">今日 12:00</span>
+                      </div>
+
+                      <!-- テキスト内容 -->
+                      <div class="text-[14px] text-[#dbdee1] leading-relaxed mb-1">このサーバーのルールです。必ずお読みください。<br>ルールに違反した場合、警告やBANの対象となります。</div>
+
+                      <!-- Embed -->
+                      <div class="embed-preview flex mt-1">
+                        <div class="embed-accent" style="background: #5865F2;"></div>
+                        <div class="embed-body p-3 flex-1">
+                          <div class="text-sm font-semibold text-white mb-1">&#x1F4DC; サーバールール</div>
+                          <div class="text-[13px] text-[#dbdee1] leading-relaxed whitespace-pre-line">1. 他のメンバーへの敬意を忘れずに
+2. スパム・荒らし行為は禁止
+3. NSFWコンテンツは専用チャンネルのみ
+4. 個人情報の公開は自己責任で
+5. 管理者の指示に従ってください</div>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+
+          <!-- リセットボタン -->
+          <div class="pt-5 border-t border-border mt-5">
+            <button class="text-sm text-danger hover:text-danger/80 transition-colors font-medium">この機能の設定をリセット</button>
+          </div>
+        </section>
+
+        <!-- 未保存バー -->
+        <div class="fixed bottom-0 left-0 lg:left-60 right-0 bg-bg-card border-t border-border px-6 py-3 flex items-center justify-between z-40">
+          <span class="text-sm text-warning flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+            未保存の変更があります
+          </span>
+          <div class="flex gap-3">
+            <button class="text-text-secondary hover:text-text-primary text-sm font-medium px-4 py-2 rounded-lg transition-colors">破棄</button>
+            <button class="bg-accent hover:bg-accent/80 text-white text-sm font-medium px-6 py-2 rounded-lg transition-colors">保存</button>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+</body>
+</html>

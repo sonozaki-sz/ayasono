@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ayasono - ランディングページ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: {
+              main: '#1a1a2e',
+              card: '#25253e',
+              input: '#2a2a45',
+              sidebar: '#16162a',
+            },
+            text: {
+              primary: '#e0e0e0',
+              secondary: '#a0a0b0',
+            },
+            accent: '#5865F2',
+            success: '#57F287',
+            warning: '#FEE75C',
+            danger: '#ED4245',
+            border: '#35354e',
+          },
+          fontFamily: {
+            sans: ['"Noto Sans JP"', '"Noto Sans"', 'sans-serif'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    body {
+      background-color: #1a1a2e;
+      color: #e0e0e0;
+    }
+
+    /* ヒーロー背景: 多色グラデーション */
+    .hero-bg {
+      background:
+        radial-gradient(ellipse at 20% 20%, rgba(88, 101, 242, 0.2) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 30%, rgba(235, 69, 158, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 80%, rgba(87, 242, 135, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse at 10% 70%, rgba(254, 231, 92, 0.08) 0%, transparent 40%);
+    }
+
+    /* タイトルグラデーション */
+    .gradient-text {
+      background: linear-gradient(135deg, #5865F2 0%, #EB459E 40%, #57F287 70%, #FEE75C 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* CTAボタンのグラデーション */
+    .cta-gradient {
+      background: linear-gradient(135deg, #5865F2 0%, #EB459E 100%);
+    }
+    .cta-gradient:hover {
+      background: linear-gradient(135deg, #4752C4 0%, #d63d8a 100%);
+    }
+
+    /* ロゴのグロー */
+    .logo-glow {
+      box-shadow:
+        0 0 30px rgba(88, 101, 242, 0.4),
+        0 0 60px rgba(235, 69, 158, 0.2),
+        0 0 90px rgba(87, 242, 135, 0.1);
+    }
+
+    /* 機能カードのカラフルなホバー */
+    .feature-card {
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s, border-color 0.3s;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--card-accent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .feature-card:hover {
+      transform: translateY(-4px);
+    }
+    .feature-card:hover::before {
+      opacity: 1;
+    }
+
+    /* ダッシュボードプレビューの枠グラデーション */
+    .preview-border {
+      background: linear-gradient(135deg, #5865F2, #EB459E, #57F287, #FEE75C);
+      padding: 2px;
+      border-radius: 1rem;
+    }
+    .preview-inner {
+      background: #25253e;
+      border-radius: calc(1rem - 2px);
+    }
+
+    /* セクション区切りのグラデーションライン */
+    .gradient-line {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #5865F2, #EB459E, #57F287, transparent);
+    }
+
+    /* フッターリンクのホバー */
+    .footer-link:hover {
+      background: linear-gradient(135deg, #5865F2, #EB459E);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* アニメーション */
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .float-animation {
+      animation: float 4s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+    .shimmer {
+      background: linear-gradient(
+        90deg,
+        #5865F2 0%, #EB459E 25%, #57F287 50%, #FEE75C 75%, #5865F2 100%
+      );
+      background-size: 200% auto;
+      animation: shimmer 6s linear infinite;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  </style>
+</head>
+<body class="font-sans min-h-screen">
+
+  <!-- ヘッダー -->
+  <header class="fixed top-0 w-full z-50 bg-bg-main/80 backdrop-blur-md border-b border-border">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-accent to-pink-500 flex items-center justify-center font-bold text-white text-lg">A</div>
+        <span class="text-xl font-bold text-text-primary">Ayasono</span>
+      </div>
+      <a href="#" class="cta-gradient text-white font-medium px-5 py-2.5 rounded-lg transition-all text-sm">
+        Discord でログイン
+      </a>
+    </div>
+  </header>
+
+  <!-- ヒーローセクション -->
+  <main class="hero-bg">
+    <section class="pt-32 pb-20 px-6">
+      <div class="max-w-4xl mx-auto text-center">
+        <!-- ロゴ -->
+        <div class="mb-8 float-animation">
+          <div class="w-24 h-24 mx-auto rounded-2xl bg-gradient-to-br from-accent via-pink-500 to-success logo-glow flex items-center justify-center text-white text-5xl font-bold">
+            A
+          </div>
+        </div>
+
+        <!-- タイトル -->
+        <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+          <span class="gradient-text">Ayasono</span>
+        </h1>
+
+        <!-- キャッチコピー -->
+        <p class="text-xl md:text-2xl text-text-secondary mb-12 leading-relaxed">
+          サーバーに彩りを加え、豊かで快適なコミュニティを
+        </p>
+
+        <!-- CTA ボタン -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="#" class="cta-gradient text-white font-semibold px-8 py-4 rounded-xl transition-all text-lg shadow-lg shadow-accent/25 hover:shadow-accent/40 hover:scale-105">
+            Discord でログイン
+          </a>
+          <a href="#" class="bg-bg-card hover:bg-bg-input border border-border hover:border-accent/50 text-text-primary font-semibold px-8 py-4 rounded-xl transition-all text-lg hover:scale-105">
+            Bot をサーバーに追加
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- グラデーション区切り線 -->
+    <div class="gradient-line max-w-4xl mx-auto"></div>
+
+    <!-- 機能紹介セクション -->
+    <section class="py-24 px-6">
+      <div class="max-w-6xl mx-auto">
+        <h2 class="text-2xl font-bold text-center mb-4">
+          <span class="gradient-text">主な機能</span>
+        </h2>
+        <p class="text-text-secondary text-center mb-12">サーバー運営に必要なすべてを、ひとつのBotで</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- チケット -->
+          <div class="feature-card bg-bg-card border border-border rounded-xl p-6" style="--card-accent: linear-gradient(90deg, #5865F2, #7B8AF2);">
+            <div class="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center text-2xl mb-4">🎫</div>
+            <h3 class="text-lg font-semibold text-text-primary mb-2">チケットシステム</h3>
+            <p class="text-text-secondary text-sm leading-relaxed">パネルからワンクリックでサポートチケットを作成。スタッフロール管理や自動削除にも対応。</p>
+          </div>
+
+          <!-- リアクションロール -->
+          <div class="feature-card bg-bg-card border border-border rounded-xl p-6" style="--card-accent: linear-gradient(90deg, #EB459E, #F47CB5);">
+            <div class="w-12 h-12 rounded-xl bg-pink-500/10 flex items-center justify-center text-2xl mb-4">🏷️</div>
+            <h3 class="text-lg font-semibold text-text-primary mb-2">リアクションロール</h3>
+            <p class="text-text-secondary text-sm leading-relaxed">ボタンを押すだけでロールを取得・解除。トグル・排他・ワンアクションの3モードに対応。</p>
+          </div>
+
+          <!-- VC自動作成 -->
+          <div class="feature-card bg-bg-card border border-border rounded-xl p-6" style="--card-accent: linear-gradient(90deg, #57F287, #7BF5A3);">
+            <div class="w-12 h-12 rounded-xl bg-success/10 flex items-center justify-center text-2xl mb-4">🔊</div>
+            <h3 class="text-lg font-semibold text-text-primary mb-2">VC 自動作成</h3>
+            <p class="text-text-secondary text-sm leading-relaxed">トリガーチャンネルに参加するだけでプライベート VC を自動作成。退出後は自動削除。</p>
+          </div>
+
+          <!-- VC募集 -->
+          <div class="feature-card bg-bg-card border border-border rounded-xl p-6" style="--card-accent: linear-gradient(90deg, #FEE75C, #FEEE8A);">
+            <div class="w-12 h-12 rounded-xl bg-warning/10 flex items-center justify-center text-2xl mb-4">📢</div>
+            <h3 class="text-lg font-semibold text-text-primary mb-2">VC 募集</h3>
+            <p class="text-text-secondary text-sm leading-relaxed">パネルから募集を投稿し、スレッドで参加者を集める。メンションロールで通知も可能。</p>
+          </div>
+
+          <!-- メンバーログ -->
+          <div class="feature-card bg-bg-card border border-border rounded-xl p-6" style="--card-accent: linear-gradient(90deg, #3BA4F5, #6BB8F7);">
+            <div class="w-12 h-12 rounded-xl bg-blue-400/10 flex items-center justify-center text-2xl mb-4">📋</div>
+            <h3 class="text-lg font-semibold text-text-primary mb-2">メンバーログ</h3>
+            <p class="text-text-secondary text-sm leading-relaxed">メンバーの入退室を自動通知。招待リンクの追跡やカスタムメッセージにも対応。</p>
+          </div>
+
+          <!-- Bumpリマインダー -->
+          <div class="feature-card bg-bg-card border border-border rounded-xl p-6" style="--card-accent: linear-gradient(90deg, #F59E3B, #F7B86B);">
+            <div class="w-12 h-12 rounded-xl bg-success/10 flex items-center justify-center text-2xl mb-4">⏰</div>
+            <h3 class="text-lg font-semibold text-text-primary mb-2">Bump リマインダー</h3>
+            <p class="text-text-secondary text-sm leading-relaxed">Disboard / Dissoku の Bump を自動検知し、2時間後にリマインダーを送信。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- グラデーション区切り線 -->
+    <div class="gradient-line max-w-4xl mx-auto"></div>
+
+    <!-- ダッシュボード訴求セクション -->
+    <section class="py-24 px-6">
+      <div class="max-w-4xl mx-auto text-center">
+        <h2 class="text-2xl font-bold mb-4">
+          <span class="gradient-text">Web ダッシュボードで簡単管理</span>
+        </h2>
+        <p class="text-text-secondary mb-12 text-lg">コマンドを覚えなくても、ブラウザからすべての設定を直感的に操作できます。</p>
+
+        <!-- ダッシュボードプレビュー（グラデーション枠） -->
+        <div class="preview-border">
+          <div class="preview-inner p-6 md:p-10">
+            <div class="bg-bg-main rounded-xl border border-border overflow-hidden">
+              <!-- ミニヘッダー -->
+              <div class="bg-bg-sidebar px-4 py-3 border-b border-border flex items-center gap-3">
+                <div class="w-3 h-3 rounded-full bg-danger"></div>
+                <div class="w-3 h-3 rounded-full bg-warning"></div>
+                <div class="w-3 h-3 rounded-full bg-success"></div>
+                <span class="text-text-secondary text-xs ml-2">dashboard.ayasono.example</span>
+              </div>
+              <!-- ミニレイアウト -->
+              <div class="flex h-48 md:h-64">
+                <!-- ミニサイドバー -->
+                <div class="w-1/4 bg-bg-sidebar border-r border-border p-3 hidden sm:block">
+                  <div class="space-y-2">
+                    <div class="h-2.5 bg-gradient-to-r from-accent/40 to-pink-500/40 rounded w-3/4"></div>
+                    <div class="h-2.5 bg-border rounded w-full"></div>
+                    <div class="h-2.5 bg-border rounded w-5/6"></div>
+                    <div class="h-2.5 bg-border rounded w-2/3"></div>
+                    <div class="h-2.5 bg-border rounded w-4/5"></div>
+                    <div class="h-2.5 bg-border rounded w-3/4"></div>
+                  </div>
+                </div>
+                <!-- ミニコンテンツ -->
+                <div class="flex-1 p-4">
+                  <div class="grid grid-cols-2 md:grid-cols-3 gap-3 h-full">
+                    <div class="bg-bg-card rounded-lg border border-border p-3">
+                      <div class="h-2 bg-gradient-to-r from-success/40 to-success/20 rounded w-1/2 mb-2"></div>
+                      <div class="h-2 bg-border rounded w-3/4"></div>
+                    </div>
+                    <div class="bg-bg-card rounded-lg border border-border p-3">
+                      <div class="h-2 bg-gradient-to-r from-accent/40 to-accent/20 rounded w-1/2 mb-2"></div>
+                      <div class="h-2 bg-border rounded w-3/4"></div>
+                    </div>
+                    <div class="bg-bg-card rounded-lg border border-border p-3 hidden md:block">
+                      <div class="h-2 bg-gradient-to-r from-pink-500/40 to-pink-500/20 rounded w-1/2 mb-2"></div>
+                      <div class="h-2 bg-border rounded w-3/4"></div>
+                    </div>
+                    <div class="bg-bg-card rounded-lg border border-border p-3">
+                      <div class="h-2 bg-gradient-to-r from-warning/40 to-warning/20 rounded w-1/2 mb-2"></div>
+                      <div class="h-2 bg-border rounded w-3/4"></div>
+                    </div>
+                    <div class="bg-bg-card rounded-lg border border-border p-3">
+                      <div class="h-2 bg-gradient-to-r from-success/40 to-success/20 rounded w-1/2 mb-2"></div>
+                      <div class="h-2 bg-border rounded w-3/4"></div>
+                    </div>
+                    <div class="bg-bg-card rounded-lg border border-border p-3 hidden md:block">
+                      <div class="h-2 bg-gradient-to-r from-accent/40 to-pink-500/20 rounded w-1/2 mb-2"></div>
+                      <div class="h-2 bg-border rounded w-3/4"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- フッター -->
+    <footer class="border-t border-border py-8 px-6">
+      <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 rounded bg-gradient-to-br from-accent to-pink-500 flex items-center justify-center font-bold text-white text-xs">A</div>
+          <span class="text-text-secondary text-sm">Ayasono</span>
+        </div>
+        <div class="flex gap-6 text-text-secondary text-sm">
+          <a href="#" class="footer-link transition-colors">利用規約</a>
+          <a href="#" class="footer-link transition-colors">プライバシーポリシー</a>
+          <a href="#" class="footer-link transition-colors">サポート</a>
+        </div>
+        <p class="text-text-secondary text-xs">&copy; 2026 Ayasono. All rights reserved.</p>
+      </div>
+    </footer>
+  </main>
+
+</body>
+</html>
